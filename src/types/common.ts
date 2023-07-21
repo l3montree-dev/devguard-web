@@ -13,22 +13,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { UiNode, UiNodeInputAttributes } from "@ory/client";
-import { FormEvent, MouseEvent } from "react";
+export type State =
+  | "verifiedFix"
+  | "pendingFix"
+  | "unhandled"
+  | "acceptedFix"
+  | "avoided"
+  | "transfered";
 
-export type ValueSetter = (
-  value: string | number | boolean | undefined,
-) => Promise<void>;
+export interface User {
+  name: string;
+  imageUrl: string;
+}
 
-export type FormDispatcher = (
-  e: FormEvent<HTMLFormElement> | MouseEvent,
-) => Promise<void>;
+export interface ActivityItem {
+  id: number;
+  user: User;
+  projectName: string;
+  cve: string;
+  newState: State;
+  date: string;
+  dateTime: string;
+}
 
-export interface NodeInputProps {
-  node: UiNode;
-  attributes: UiNodeInputAttributes;
-  value: any;
-  disabled: boolean;
-  dispatchSubmit: FormDispatcher;
-  setValue: ValueSetter;
+export interface ActivityItems {
+  items: ActivityItem[];
 }

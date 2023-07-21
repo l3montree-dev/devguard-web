@@ -1,16 +1,17 @@
-// Copyright 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Fragment, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
@@ -31,13 +32,18 @@ import {
 } from "@heroicons/react/20/solid";
 import { classNames } from "@/utils/common";
 import StickySearchHeader from "../Navigation/StickySearchHeader";
+import Image from "next/image";
+import MobileSidebar from "../Navigation/MobileSidebar";
+import Sidebar from "../Navigation/Sidebar";
+import { ActivityItem, ActivityItems } from "@/types/common";
+import { activityString, calculateActivityString } from "@/utils/activityFeed";
 
 const navigation = [
-  { name: "Projekte", href: "#", icon: ServerIcon, current: true },
-  { name: "Neuste Aktivitäten", href: "#", icon: SignalIcon, current: false },
+  { name: "Projects", href: "#", icon: ServerIcon, current: true },
+  { name: "Latest Activity", href: "#", icon: SignalIcon, current: false },
   { name: "Domains", href: "#", icon: GlobeAltIcon, current: false },
-  { name: "Berichte", href: "#", icon: ChartBarSquareIcon, current: false },
-  { name: "Einstellungen", href: "#", icon: Cog6ToothIcon, current: false },
+  { name: "Reports", href: "#", icon: ChartBarSquareIcon, current: false },
+  { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
 ];
 const statuses = {
   offline: "text-gray-500 bg-gray-100/10",
@@ -60,21 +66,58 @@ const projects = [
     environment: "Behandeln",
   },
 ];
-const activityItems = [
-  {
-    user: {
-      name: "Michael Foster",
-      imageUrl:
-        "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+const activityItems: ActivityItems = {
+  items: [
+    {
+      id: 1,
+      user: {
+        name: "Tim Bastin",
+        imageUrl: "/examples/tim.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "verifiedFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
     },
-    projectName: "ios-app",
-    commit: "2d89f0c8",
-    branch: "main",
-    date: "1h",
-    dateTime: "2023-01-23T11:00",
-  },
-  // More items...
-];
+    {
+      id: 2,
+      user: {
+        name: "Sebastian Kawelke",
+        imageUrl: "/examples/sebastian.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "pendingFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+    {
+      id: 3,
+      user: {
+        name: "Frédéric Noppe",
+        imageUrl: "/examples/frederic.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "pendingFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+    {
+      id: 4,
+      user: {
+        name: "Tim Bastin",
+        imageUrl: "/examples/tim.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "verifiedFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+  ],
+};
 
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -134,57 +177,7 @@ export default function Example() {
                       </button>
                     </div>
                   </Transition.Child>
-                  {/* Sidebar component, swap this element with another sidebar if you like */}
-                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 ring-1 ring-white/10">
-                    <div className="flex h-16 shrink-0 items-center">
-                      <img
-                        className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                        alt="Your Company"
-                      />
-                    </div>
-                    <nav className="flex flex-1 flex-col">
-                      <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                        <li>
-                          <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                              <li key={item.name}>
-                                <a
-                                  href={item.href}
-                                  className={classNames(
-                                    item.current
-                                      ? "bg-gray-800 text-white"
-                                      : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                                    "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
-                                  )}
-                                >
-                                  <item.icon
-                                    className="h-6 w-6 shrink-0"
-                                    aria-hidden="true"
-                                  />
-                                  {item.name}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                        <li className="-mx-6 mt-auto">
-                          <a
-                            href="#"
-                            className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
-                          >
-                            <img
-                              className="h-8 w-8 rounded-full bg-gray-800"
-                              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                              alt=""
-                            />
-                            <span className="sr-only">Your profile</span>
-                            <span aria-hidden="true">Tom Cook</span>
-                          </a>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
+                  <MobileSidebar navigation={navigation} />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -193,57 +186,7 @@ export default function Example() {
 
         {/* Static sidebar for desktop */}
         <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
-          {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 ring-1 ring-white/5">
-            <div className="flex h-16 shrink-0 items-center">
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                alt="Your Company"
-              />
-            </div>
-            <nav className="flex flex-1 flex-col">
-              <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                <li>
-                  <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((item) => (
-                      <li key={item.name}>
-                        <a
-                          href={item.href}
-                          className={classNames(
-                            item.current
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                            "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
-                          )}
-                        >
-                          <item.icon
-                            className="h-6 w-6 shrink-0"
-                            aria-hidden="true"
-                          />
-                          {item.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-                <li className="-mx-6 mt-auto">
-                  <a
-                    href="#"
-                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
-                  >
-                    <img
-                      className="h-8 w-8 rounded-full bg-gray-800"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                    <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">Tom Cook</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+          <Sidebar navigation={navigation} />
         </div>
 
         <div className="xl:pl-72">
@@ -252,7 +195,7 @@ export default function Example() {
           <main className="lg:pr-96">
             <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
               <h1 className="text-base font-semibold leading-7 text-white">
-                Projekte
+                Projects
               </h1>
 
               {/* Sort dropdown */}
@@ -382,21 +325,23 @@ export default function Example() {
               </h2>
               <a
                 href="#"
-                className="text-sm font-semibold leading-6 text-indigo-400"
+                className="text-sm font-semibold leading-6 text-blue-500 hover:text-blue-400"
               >
                 View all
               </a>
             </header>
             <ul role="list" className="divide-y divide-white/5">
-              {activityItems.map((item) => (
-                <li key={item.commit} className="px-4 py-4 sm:px-6 lg:px-8">
+              {activityItems.items.map((item: ActivityItem) => (
+                <li key={item.id} className="px-4 py-4 sm:px-6 lg:px-8">
                   <div className="flex items-center gap-x-3">
-                    <img
+                    <Image
                       src={item.user.imageUrl}
                       alt=""
+                      width={32}
+                      height={32}
                       className="h-6 w-6 flex-none rounded-full bg-gray-800"
                     />
-                    <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-white">
+                    <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-gray-400">
                       {item.user.name}
                     </h3>
                     <time
@@ -406,14 +351,7 @@ export default function Example() {
                       {item.date}
                     </time>
                   </div>
-                  <p className="mt-3 truncate text-sm text-gray-500">
-                    Pushed to{" "}
-                    <span className="text-gray-400">{item.projectName}</span> (
-                    <span className="font-mono text-gray-400">
-                      {item.commit}
-                    </span>{" "}
-                    on <span className="text-gray-400">{item.branch}</span>)
-                  </p>
+                  <div className="mt-3">{calculateActivityString(item)}</div>
                 </li>
               ))}
             </ul>
