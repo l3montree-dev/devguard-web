@@ -12,13 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Html, Head, Main, NextScript } from "next/document";
+import { Head, Html, Main, NextScript } from "next/document";
 
+import { lexend, inter, merriweather } from "@/pages/_app";
+const env = process.env.NODE_ENV;
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html
+      className={
+        "h-full scroll-smooth bg-white antialiased " +
+        lexend.className +
+        " " +
+        inter.className
+      }
+      lang="de"
+    >
       <Head />
-      <body>
+      <body
+        className={
+          "flex h-full flex-col bg-gray-900 " +
+          inter.variable +
+          " " +
+          lexend.variable +
+          " " +
+          merriweather.variable
+        }
+      >
         <Main />
         <NextScript />
       </body>

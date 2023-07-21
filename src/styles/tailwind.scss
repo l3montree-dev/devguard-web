@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body, html {
+    hyphens: auto;
+    word-break: break-word;
+}
+
+.globe-container {
+    transition: all 2s
+}
+
+:root {
+    color-scheme: dark; /* both supported */
+  }
+
+pre {
+    @apply bg-black/20 p-2 mb-5 text-sm;
+    code {
+        @apply text-gray-100;
+      
+    }
+
+    .hljs-keyword {
+        @apply text-pink-400
+    }
+    .hljs-string {
+        @apply text-yellow-400
+    }
+    .hljs-number, .hljs-literal {
+        @apply text-purple-400
+    }
+    .hljs-built_in {
+        @apply text-blue-400
+    }
+    .hljs-comment {
+        @apply opacity-50
+    }
+    .hljs-type {
+        @apply text-blue-400
+    }
+    .hljs-title {
+        @apply text-green-400
+    }
+}

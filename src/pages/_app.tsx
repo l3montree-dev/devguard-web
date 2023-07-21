@@ -12,9 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import "@/styles/globals.scss";
-import type { AppProps } from "next/app";
+import "focus-visible";
+import "@/styles/tailwind.scss";
+import { Lexend, Merriweather } from "next/font/google";
+import { Inter } from "next/font/google";
+import { useRouter } from "next/router";
 
-export default function App({ Component, pageProps }: AppProps) {
+export const lexend = Lexend({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-lexend",
+});
+
+export const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+export const merriweather = Merriweather({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-merriweather",
+  weight: "700",
+});
+
+export default function App({ Component, pageProps }) {
+  const router = useRouter();
   return <Component {...pageProps} />;
 }
