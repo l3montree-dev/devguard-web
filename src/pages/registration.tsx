@@ -1,8 +1,18 @@
-import {
-  ContinueWithVerificationUiFlow,
-  RegistrationFlow,
-  UpdateRegistrationFlowBody,
-} from "@ory/client";
+// Copyright 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client";
 
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
@@ -10,8 +20,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { handleFlowError, ory } from "../services/ory";
-import { Flow } from "../components/Flow";
+import { Flow } from "../components/kratos/Flow";
 import Link from "next/link";
+import Image from "next/image";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -104,14 +115,37 @@ const Registration: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Create account</title>
+        <title>Create your FlawFix account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      Create account
-      <Flow onSubmit={onSubmit} flow={flow} />
-      <Link data-testid="cta-link" href="/login">
-        Sign in
-      </Link>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <Image
+            className="mx-auto h-16 w-auto"
+            src="/logo_flaw_fix_white_l3.svg"
+            alt="FlawFix by l3montree Logo"
+            width={200}
+            height={200}
+          />
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+            Create your FlawFix account
+          </h2>
+        </div>
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </div>
+        <p className="mt-10 text-center text-sm text-gray-400">
+          Already have an Account?{" "}
+          <Link
+            data-testid="cta-link"
+            href="/login"
+            className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
     </>
   );
 };

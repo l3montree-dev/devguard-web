@@ -1,3 +1,17 @@
+// Copyright 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
 
 import { AxiosError } from "axios";
@@ -6,9 +20,10 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Flow } from "../components/Flow";
+import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks";
 import { ory, handleGetFlowError, handleFlowError } from "../services/ory";
+import Image from "next/image";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -99,36 +114,63 @@ const Login: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Sign in - Ory NextJS Integration Example</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
+        <title>FlawFix - Sign in</title>
+        <meta name="description" content="FlawFix Sign in" />
       </Head>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <Image
+            className="mx-auto h-16 w-auto"
+            src="/logo_flaw_fix_white_l3.svg"
+            alt="FlawFix by l3montree Logo"
+            width={200}
+            height={200}
+          />
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+            {(() => {
+              if (flow?.refresh) {
+                return "Confirm Action";
+              } else if (flow?.requested_aal === "aal2") {
+                return "Two-Factor Authentication";
+              }
+              return "Sign In";
+            })()}
+          </h2>
+        </div>
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <Flow onSubmit={onSubmit} flow={flow} />
+        </div>
 
-      {(() => {
-        if (flow?.refresh) {
-          return "Confirm Action";
-        } else if (flow?.requested_aal === "aal2") {
-          return "Two-Factor Authentication";
-        }
-        return "Sign In";
-      })()}
+        {aal || refresh ? (
+          <a data-testid="logout-link" onClick={onLogout}>
+            Log out
+          </a>
+        ) : (
+          <>
+            <p className="mt-10 text-center text-sm text-gray-400">
+              You do not have an Account?{" "}
+              <Link
+                href="/registration"
+                passHref
+                className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+              >
+                Create account
+              </Link>
+            </p>
 
-      <Flow onSubmit={onSubmit} flow={flow} />
-
-      {aal || refresh ? (
-        <a data-testid="logout-link" onClick={onLogout}>
-          Log out
-        </a>
-      ) : (
-        <>
-          <Link href="/registration" passHref>
-            Create account
-          </Link>
-
-          <Link href="/recovery" passHref>
-            Recover your account
-          </Link>
-        </>
-      )}
+            <p className="mt-4 text-center text-sm text-gray-400">
+              Forgot password?{" "}
+              <Link
+                href="/recovery"
+                passHref
+                className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+              >
+                Recover your account
+              </Link>
+            </p>
+          </>
+        )}
+      </div>
     </>
   );
 };
