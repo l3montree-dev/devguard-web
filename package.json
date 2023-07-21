@@ -11,10 +11,13 @@
     "dependencies": {
         "@headlessui/react": "^1.7.15",
         "@heroicons/react": "^2.0.18",
+        "@ory/client": "^1.1.41",
+        "@ory/integrations": "^1.1.4",
         "@types/node": "20.4.2",
         "@types/react": "18.2.15",
         "@types/react-dom": "18.2.7",
         "autoprefixer": "10.4.14",
+        "axios": "^1.4.0",
         "eslint": "8.45.0",
         "eslint-config-next": "13.4.10",
         "focus-visible": "^5.2.0",
