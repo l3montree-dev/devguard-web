@@ -39,6 +39,7 @@ import Sidebar from "../Navigation/Sidebar";
 import { ActivityItem, ActivityItems } from "@/types/common";
 import { activityString, calculateActivityString } from "@/utils/activityFeed";
 import SingleStatGroup from "../SingleStatGroup";
+import FlowDashboard from "../FlowDashboard";
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: RectangleGroupIcon, current: true },
@@ -203,6 +204,9 @@ export default function Example() {
             </header>
             <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
               <SingleStatGroup />
+            </div>
+            <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+              <FlowDashboard />
             </div>
           </main>
 

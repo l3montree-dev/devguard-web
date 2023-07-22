@@ -16,10 +16,19 @@
 export type State =
   | "verifiedFix"
   | "pendingFix"
+  | "pendingTransfered"
   | "unhandled"
-  | "acceptedFix"
+  | "accepted"
   | "avoided"
-  | "transfered";
+  | "verifiedTransfered";
+
+export type ClosedState =
+  | "verifiedFix"
+  | "avoided"
+  | "accepted"
+  | "verifiedTransfered";
+
+export type PendingState = "pendingFix" | "pendingTransfered";
 
 export interface User {
   name: string;
