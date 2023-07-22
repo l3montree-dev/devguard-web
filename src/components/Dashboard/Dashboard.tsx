@@ -30,6 +30,7 @@ import Sidebar from "../Navigation/Sidebar";
 import { ActivityItem, ActivityItems } from "@/types/common";
 import { calculateActivityString } from "@/utils/activityFeed";
 import SingleStatGroup from "../SingleStatGroup";
+import ProjectList from "../ProjectList";
 
 const navigation = [
   { name: "Projects", href: "#", icon: ServerIcon, current: true },
@@ -193,6 +194,9 @@ export default function Example() {
             </header>
             <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
               <SingleStatGroup />
+            </div>
+            <div className="px-8 py-2 sm:px-6 lg:px-14">
+              <ProjectList />
             </div>
           </main>
 
