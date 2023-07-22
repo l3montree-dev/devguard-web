@@ -14,36 +14,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Fragment, useState } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   ChartBarSquareIcon,
   Cog6ToothIcon,
-  FolderIcon,
   GlobeAltIcon,
   ServerIcon,
   SignalIcon,
   XMarkIcon,
-  RectangleGroupIcon,
 } from "@heroicons/react/24/outline";
-import {
-  Bars3Icon,
-  ChevronRightIcon,
-  ChevronUpDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/20/solid";
-import { classNames } from "@/utils/common";
 import StickySearchHeader from "../Navigation/StickySearchHeader";
 import Image from "next/image";
 import MobileSidebar from "../Navigation/MobileSidebar";
 import Sidebar from "../Navigation/Sidebar";
 import { ActivityItem, ActivityItems } from "@/types/common";
-import { activityString, calculateActivityString } from "@/utils/activityFeed";
+import { calculateActivityString } from "@/utils/activityFeed";
 import SingleStatGroup from "../SingleStatGroup";
-import FlowDashboard from "../FlowDashboard";
 
 const navigation = [
-  { name: "Dashboard", href: "#", icon: RectangleGroupIcon, current: true },
-  { name: "Projects", href: "#", icon: ServerIcon, current: false },
+  { name: "Projects", href: "#", icon: ServerIcon, current: true },
   { name: "Latest Activity", href: "#", icon: SignalIcon, current: false },
   { name: "Domains", href: "#", icon: GlobeAltIcon, current: false },
   { name: "Reports", href: "#", icon: ChartBarSquareIcon, current: false },
@@ -199,14 +188,11 @@ export default function Example() {
           <main className="lg:pr-96">
             <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
               <h1 className="text-lg font-semibold leading-7 text-white">
-                Dashboard
+                Projects
               </h1>
             </header>
             <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
               <SingleStatGroup />
-            </div>
-            <div className="px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-              <FlowDashboard />
             </div>
           </main>
 
