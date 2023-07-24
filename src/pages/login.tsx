@@ -22,7 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
-import { LogoutLink } from "../hooks";
+import { LogoutLink } from "../hooks/logoutLink";
 import { ory, handleGetFlowError, handleFlowError } from "../services/ory";
 import Image from "next/image";
 

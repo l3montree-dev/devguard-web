@@ -28,7 +28,6 @@ export function handleGetFlowError<S>(
   resetFlow: Dispatch<SetStateAction<S | undefined>>,
 ) {
   return async (err: any) => {
-    console.log(err, flowType);
     switch (err.response?.data.error?.id) {
       case "session_inactive":
         await router.push("/login?return_to=" + window.location.href);

@@ -24,7 +24,6 @@ export function LogoutLink(deps?: DependencyList) {
   const router = useRouter();
 
   useEffect(() => {
-    /*
     ory
       .createBrowserLogoutFlow()
       .then(({ data }) => {
@@ -40,7 +39,6 @@ export function LogoutLink(deps?: DependencyList) {
         // Something else happened!
         return Promise.reject(err);
       });
-      */
   }, deps);
 
   return () => {
