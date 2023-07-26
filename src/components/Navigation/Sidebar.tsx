@@ -23,9 +23,10 @@ interface Props {
     icon: any;
     current: boolean;
   }[];
+  isActive: boolean;
 }
 
-export default function Sidebar({ navigation }: Props) {
+export default function Sidebar({ navigation, isActive }: Props) {
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 ring-1 ring-white/5">
       <div className="flex h-24 shrink-0 items-center">
@@ -41,25 +42,41 @@ export default function Sidebar({ navigation }: Props) {
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" className="-mx-2 space-y-1">
-              {navigation.map((item) => (
-                <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className={classNames(
-                      item.current
-                        ? "bg-gray-800 text-white"
-                        : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
-                    )}
-                  >
-                    <item.icon
-                      className="h-6 w-6 shrink-0"
-                      aria-hidden="true"
-                    />
-                    {item.name}
-                  </a>
-                </li>
-              ))}
+              {isActive
+                ? navigation.map((item) => (
+                    <li key={item.name}>
+                      <a
+                        href={item.href}
+                        className={classNames(
+                          item.current
+                            ? "bg-gray-800 text-white"
+                            : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                          "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
+                        )}
+                      >
+                        <item.icon
+                          className="h-6 w-6 shrink-0"
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </a>
+                    </li>
+                  ))
+                : navigation.map((item) => (
+                    <li key={item.name}>
+                      <p
+                        className={
+                          "text-gray-400/40 cursor-not-allowed group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
+                        }
+                      >
+                        <item.icon
+                          className="h-6 w-6 shrink-0"
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </p>
+                    </li>
+                  ))}
             </ul>
           </li>
           <li className="-mx-6 mt-auto">
