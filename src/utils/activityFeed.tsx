@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ActivityItem } from "@/types/common";
+import { IActivityItem } from "@/types/common";
 
-export function calculateActivityString(item: ActivityItem): JSX.Element {
+export function calculateActivityString(item: IActivityItem): JSX.Element {
   switch (item.newState) {
     case "verifiedFix":
       return (

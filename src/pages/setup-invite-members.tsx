@@ -13,9 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import OrgRegisterForm from "@/components/OrgRegisterForm";
+import Alert from "@/components/Alert";
+import AlreadyInvitedMembersList from "@/components/AlreadyInvitedMembersList";
+import InviteMembersForm from "@/components/InviteMembersForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
+import { IMember } from "@/types/common";
 import {
   ChartBarSquareIcon,
   Cog6ToothIcon,
@@ -23,6 +26,7 @@ import {
   ServerIcon,
   SignalIcon,
 } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 const navigation = [
   { name: "Projects", href: "#", icon: ServerIcon, current: true },
@@ -32,16 +36,41 @@ const navigation = [
   { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
 ];
 
-export default function SetupOrg() {
+export default function SetupInviteMembers() {
+  const [invitedMembers, setinvitedMembers] = useState<IMember[]>([]);
+  const [showAlert, setShowAlert] = useState<boolean>(true);
+
+  const setNewMember = (member: IMember) => {
+    // Check if member is already invited
+    if (invitedMembers.find((m) => m.email === member.email)) {
+      setShowAlert(true);
+      return;
+    }
+    setinvitedMembers((prev) => [...prev, member]);
+  };
+
   return (
     <Page
-      title="Create your organization"
+      title="Invite Team Members"
       navigation={navigation}
       menuActive={false}
       searchActive={false}
     >
-      <div className="px-8 py-2 sm:px-6 lg:px-14">
-        <OrgRegisterForm />
+      {showAlert && (
+        <div className="px-4 py-4">
+          <Alert
+            alertType={"warning"}
+            title="The member is already invited."
+            show={showAlert}
+            setShow={setShowAlert}
+          />
+        </div>
+      )}
+      <div className="px-8 py-2 sm:px-6 lg:px-14 mt-8">
+        <InviteMembersForm inviteMembers={setNewMember} />
+      </div>
+      <div className="px-8 py-2 sm:px-6 lg:px-14 mt-8">
+        <AlreadyInvitedMembersList members={invitedMembers} />
       </div>
       <div className="xl:pl-72">
         <ProgressSidebar
@@ -52,15 +81,15 @@ export default function SetupOrg() {
             },
             {
               name: "Create your organization",
-              status: "current",
+              status: "complete",
             },
             {
-              name: "Create first project",
-              status: "upcoming",
+              name: "Create first projects",
+              status: "complete",
             },
             {
               name: "Invite team members",
-              status: "upcoming",
+              status: "current",
             },
           ]}
         />

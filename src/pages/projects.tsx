@@ -27,7 +27,7 @@ import StickySearchHeader from "../components/Navigation/StickySearchHeader";
 import Image from "next/image";
 import MobileSidebar from "../components/Navigation/MobileSidebar";
 import Sidebar from "../components/Navigation/Sidebar";
-import { ActivityItem, ActivityItems } from "@/types/common";
+import { IActivityItem, IActivityItems } from "@/types/common";
 import { calculateActivityString } from "@/utils/activityFeed";
 import SingleStatGroup from "../components/SingleStatGroup";
 import ProjectList from "../components/ProjectList";
@@ -39,7 +39,7 @@ const navigation = [
   { name: "Reports", href: "#", icon: ChartBarSquareIcon, current: false },
   { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
 ];
-const activityItems: ActivityItems = {
+const activityItems: IActivityItems = {
   items: [
     {
       id: 1,
@@ -193,7 +193,7 @@ export default function Projects() {
               </a>
             </header>
             <ul role="list" className="divide-y divide-white/5">
-              {activityItems.items.map((item: ActivityItem) => (
+              {activityItems.items.map((item: IActivityItem) => (
                 <li key={item.id} className="px-4 py-4 sm:px-6 lg:px-8">
                   <div className="flex items-center gap-x-3">
                     <Image
