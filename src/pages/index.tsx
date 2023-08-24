@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Dashboard from "@/components/Dashboard/Dashboard";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/flawFixApi";
 
 export default function Home() {
-  return <Dashboard />;
+  return <></>;
 }
 
 export const getServerSideProps = async (

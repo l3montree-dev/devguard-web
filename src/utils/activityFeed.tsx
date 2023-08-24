@@ -32,7 +32,7 @@ export function calculateActivityString(item: ActivityItem): JSX.Element {
           <span className="font-mono text-gray-400">{item.cve}</span> in{" "}
           <span className="font-mono text-gray-400">{item.projectName}</span>{" "}
           now mitigated through{" "}
-          <span className="font-mono text-yellow-400">pending-fix</span>.
+          <span className="font-montext-yellow-400">pending-fix</span>.
         </p>
       );
     default:

@@ -23,14 +23,14 @@ import {
   SignalIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import StickySearchHeader from "../Navigation/StickySearchHeader";
+import StickySearchHeader from "../components/Navigation/StickySearchHeader";
 import Image from "next/image";
-import MobileSidebar from "../Navigation/MobileSidebar";
-import Sidebar from "../Navigation/Sidebar";
+import MobileSidebar from "../components/Navigation/MobileSidebar";
+import Sidebar from "../components/Navigation/Sidebar";
 import { ActivityItem, ActivityItems } from "@/types/common";
 import { calculateActivityString } from "@/utils/activityFeed";
-import SingleStatGroup from "../SingleStatGroup";
-import ProjectList from "../ProjectList";
+import SingleStatGroup from "../components/SingleStatGroup";
+import ProjectList from "../components/ProjectList";
 
 const navigation = [
   { name: "Projects", href: "#", icon: ServerIcon, current: true },
@@ -38,27 +38,6 @@ const navigation = [
   { name: "Domains", href: "#", icon: GlobeAltIcon, current: false },
   { name: "Reports", href: "#", icon: ChartBarSquareIcon, current: false },
   { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
-];
-const statuses = {
-  offline: "text-gray-500 bg-gray-100/10",
-  online: "text-green-400 bg-green-400/10",
-  error: "text-rose-400 bg-rose-400/10",
-};
-const environments = {
-  Preview: "text-gray-400 bg-gray-400/10 ring-gray-400/20",
-  Behandeln: "text-rose-400 bg-rose-400/10 ring-rose-400/30",
-};
-const projects = [
-  {
-    id: 1,
-    href: "#",
-    projectName: "3 nicht verwaltete Schwachstellen",
-    teamName: "StampLab",
-    status: "error",
-    statusText: "Offen seit 1 Tag 4 Stunden",
-    description: "l3montree (Self Managed)",
-    environment: "Behandeln",
-  },
 ];
 const activityItems: ActivityItems = {
   items: [
@@ -113,7 +92,7 @@ const activityItems: ActivityItems = {
   ],
 };
 
-export default function Example() {
+export default function Projects() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -180,11 +159,11 @@ export default function Example() {
 
         {/* Static sidebar for desktop */}
         <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
-          <Sidebar navigation={navigation} />
+          <Sidebar isActive={true} navigation={navigation} />
         </div>
 
         <div className="xl:pl-72">
-          <StickySearchHeader setSidebarOpen={setSidebarOpen} />
+          <StickySearchHeader isActive={true} setSidebarOpen={setSidebarOpen} />
 
           <main className="lg:pr-96">
             <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
