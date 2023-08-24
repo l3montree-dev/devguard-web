@@ -12,19 +12,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import { GetServerSidePropsContext } from "next";
-
-export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
-  const { req } = ctx;
-  const orySessionCookie = req.cookies["ory_kratos_session"];
-  return (input: RequestInfo | URL, init?: RequestInit) =>
-    fetch(input, {
-      ...init,
-      headers: {
-        ...init?.headers,
-        Cookie: `ory_kratos_session=${orySessionCookie}`,
-      },
-      credentials: "include",
-    });
+export const config = {
+  flawFixApiUrl: process.env.FLAWFIX_API_URL,
 };

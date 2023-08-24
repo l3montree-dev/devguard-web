@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2023 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -12,21 +12,21 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import Dashboard from "@/components/Dashboard/Dashboard";
 import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/flawFixApi";
+import { config } from "../config";
 
-export default function Home() {
-  return <Dashboard />;
-}
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
-) => {
-  const apiClient = getApiClientFromContext(context);
-  console.log(await (await apiClient("/organizations")).json());
-  return {
-    props: {},
+export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
+  const { req } = ctx;
+  const orySessionCookie = req.cookies["ory_kratos_session"];
+  return (input: string, init?: RequestInit) => {
+    console.log(config.flawFixApiUrl + "/api/v1" + input);
+    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Cookie: `ory_kratos_session=${orySessionCookie}`,
+      },
+      credentials: "include",
+    });
   };
 };

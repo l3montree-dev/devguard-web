@@ -1,3 +1,4 @@
 {
-    "licenser.license": "AGPLv3"
+    "licenser.license": "AGPLv3",
+    "sarif-viewer.connectToGithubCodeScanning": "off"
 }
