@@ -21,13 +21,16 @@ type Props = React.DetailedHTMLProps<
   label: string;
   help?: string;
 };
-const Checkbox: FunctionComponent<Props> = (props) => {
+const Checkbox = React.forwardRef<any, Props>((props, ref) => {
   const { label, ...rest } = props;
   const id = useId();
   return (
     <div className="flex gap-x-3">
       <input
+        id={id}
+        ref={ref}
         className="h-4 relative top-1 w-4 rounded border-white/10 bg-white/5 text-amber-400 indeterminate:text-black focus:ring-amber-400 focus:ring-offset-gray-900"
+        type="checkbox"
         {...rest}
       ></input>
       <div>
@@ -43,6 +46,8 @@ const Checkbox: FunctionComponent<Props> = (props) => {
       </div>
     </div>
   );
-};
+});
+
+Checkbox.displayName = "Checkbox";
 
 export default Checkbox;

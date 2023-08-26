@@ -22,7 +22,7 @@ type Props = React.DetailedHTMLProps<
   label: string;
 };
 
-const Select: FunctionComponent<Props> = (props) => {
+const Select = React.forwardRef<any, Props>((props, ref) => {
   const { label, ...rest } = props;
   const id = useId();
   return (
@@ -34,12 +34,15 @@ const Select: FunctionComponent<Props> = (props) => {
         {label}
       </label>
       <select
+        ref={ref}
         id={id}
         className="block mt-2 w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6 [&_*]:text-black"
         {...rest}
       />
     </>
   );
-};
+});
+
+Select.displayName = "Select";
 
 export default Select;

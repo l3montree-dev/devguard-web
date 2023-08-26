@@ -13,16 +13,49 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useForm } from "react-hook-form";
 import { countries, industryOptions } from "../const/organizationConstants";
 import Button from "./common/Button";
 import Checkbox from "./common/Checkbox";
 import Input from "./common/Input";
 import Section from "./common/Section";
 import Select from "./common/Select";
+import { OrganizationDTO } from "../types/api";
+import { getApiClient } from "../services/flawFixApi";
+import { toast } from "./Toaster";
+import { useEffect } from "react";
 
 export default function OrgRegisterForm() {
+  const { register, handleSubmit } = useForm<
+    OrganizationDTO & { permission: string }
+  >();
+
+  const handleOrgCreation = async (data: OrganizationDTO) => {
+    const client = getApiClient(document);
+
+    const resp: OrganizationDTO = await (
+      await client("/organizations", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          numberOfEmployees: !!data.numberOfEmployees
+            ? Number(data.numberOfEmployees)
+            : undefined,
+        }),
+      })
+    ).json();
+  };
+
+  useEffect(() => {
+    toast({
+      title: "Welcome to FlawFix!",
+      msg: "We are happy to have you here. Please fill out the form below to create your organization.",
+      type: "info",
+    });
+  }, []);
+
   return (
-    <form>
+    <form onSubmit={handleSubmit(handleOrgCreation)}>
       <Section
         description="General and required information about your organization."
         title="Required Information"
@@ -30,26 +63,23 @@ export default function OrgRegisterForm() {
         <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div className="sm:col-span-4">
             <Input
-              required
               type="text"
               label="Organization name *"
-              name="organization"
-              id="organization"
               autoComplete="organization"
-              placeholder="My cool organization..."
+              placeholder="FlawFix Inc."
+              {...register("name", { required: true })}
             />
           </div>
         </div>
 
         <div className="mt-6">
           <Checkbox
-            name="permission"
             type="checkbox"
-            required
             label="Permission *"
             help="I am authorized to create an organization account on behalf of
                 my organization. For legal entities, I have a right of
                 representation."
+            {...register("permission", { required: true })}
           />
         </div>
       </Section>
@@ -73,8 +103,7 @@ export default function OrgRegisterForm() {
             <Input
               label="Number of employees"
               type="number"
-              name="number-of-employees"
-              id="number-of-employees"
+              {...register("numberOfEmployees")}
             />
           </div>
         </div>
@@ -82,9 +111,8 @@ export default function OrgRegisterForm() {
           <div className="sm:col-span-3">
             <Select
               label="Country"
-              id="country"
-              name="country"
               autoComplete="country-name"
+              {...register("country")}
             >
               {countries.map((country) => (
                 <option key={country} value={country}>
@@ -97,9 +125,8 @@ export default function OrgRegisterForm() {
           <div className="sm:col-span-3">
             <Select
               label="Industry"
-              id="industry"
-              name="industry"
               autoComplete="industry-name"
+              {...register("industry")}
             >
               {industryOptions.map((industry) => (
                 <option key={industry} value={industry}>
@@ -116,19 +143,16 @@ export default function OrgRegisterForm() {
           </span>
           <div className="mt-4 space-y-4">
             <Checkbox
-              name="comments"
-              type="checkbox"
               label="Critical infrastructures ( KRITIS )"
+              {...register("criticalInfrastructure")}
             />
-            <Checkbox name="candidates" type="checkbox" label="ISO 27001" />
+            <Checkbox {...register("iso27001")} label="ISO 27001" />
             <Checkbox
-              name="candidates"
-              type="checkbox"
               label="IT-Grundschutz (German Federal Office for Information Security)"
+              {...register("grundschutz")}
             />
             <Checkbox
-              name="candidates"
-              type="checkbox"
+              {...register("nist")}
               label="NIST Cybersecurity Framework"
             />
           </div>

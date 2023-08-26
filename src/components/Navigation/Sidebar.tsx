@@ -29,7 +29,7 @@ interface Props {
 export default function Sidebar({ navigation }: Props) {
   const router = useRouter();
   const currentPath = router.pathname;
-  console.log(currentPath);
+
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 ring-1 ring-white/5">
       <div className="flex h-24 shrink-0 items-center">

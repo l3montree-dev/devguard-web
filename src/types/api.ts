@@ -12,6 +12,20 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-export const config = {
-  flawFixApiUrl: process.env.NEXT_PUBLIC_FLAWFIX_API_URL,
-};
+interface AppModelDTO {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizationDTO extends AppModelDTO {
+  name: string;
+  contactPhoneNumber?: string;
+  numberOfEmployees?: number;
+  country?: string;
+  industry?: string;
+  criticalInfrastructure: boolean;
+  iso27001: boolean;
+  nist: boolean;
+  grundschutz: boolean;
+}

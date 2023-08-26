@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import React, { FunctionComponent, useId } from "react";
+import React, { useId } from "react";
 
 type Props = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -20,7 +20,7 @@ type Props = React.DetailedHTMLProps<
 > & {
   label: string;
 };
-const Input: FunctionComponent<Props> = (props) => {
+const Input = React.forwardRef<any, Props>((props, ref) => {
   const { label, ...rest } = props;
   const id = useId();
   return (
@@ -32,6 +32,7 @@ const Input: FunctionComponent<Props> = (props) => {
         {label}
       </label>
       <input
+        ref={ref}
         id={id}
         title={label}
         className="mt-2 block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6"
@@ -39,6 +40,8 @@ const Input: FunctionComponent<Props> = (props) => {
       />
     </>
   );
-};
+});
+
+Input.displayName = "Input";
 
 export default Input;

@@ -16,6 +16,7 @@
 import { Head, Html, Main, NextScript } from "next/document";
 
 import { lexend, inter, merriweather } from "@/pages/_app";
+import Toaster from "../components/Toaster";
 const env = process.env.NODE_ENV;
 export default function Document() {
   return (

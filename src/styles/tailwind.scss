@@ -67,3 +67,7 @@ pre {
 a {
     @apply text-amber-400 hover:underline;
 }
+
+.toaster {
+    z-index: 999
+}

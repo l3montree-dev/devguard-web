@@ -19,10 +19,28 @@ export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
   const { req } = ctx;
   const orySessionCookie = req.cookies["ory_kratos_session"];
   return (input: string, init?: RequestInit) => {
-    console.log(config.flawFixApiUrl + "/api/v1" + input);
     return fetch(config.flawFixApiUrl + "/api/v1" + input, {
       ...init,
       headers: {
+        ...init?.headers,
+        Cookie: `ory_kratos_session=${orySessionCookie}`,
+      },
+      credentials: "include",
+    });
+  };
+};
+
+export const getApiClient = (d: Document) => {
+  // get the cookie from the browser
+  const orySessionCookie = d.cookie
+    .split("; ")
+    .find((row) => row.startsWith("ory_kratos_session"));
+
+  return (input: string, init?: RequestInit) => {
+    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
         ...init?.headers,
         Cookie: `ory_kratos_session=${orySessionCookie}`,
       },

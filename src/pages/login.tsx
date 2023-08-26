@@ -52,9 +52,6 @@ const Login: NextPage = () => {
       return;
     }
 
-    // If ?flow=.. was in the URL, we fetch it
-    console.log("flowId", flowId);
-
     if (flowId) {
       ory
         .getLoginFlow({ id: String(flowId) })
