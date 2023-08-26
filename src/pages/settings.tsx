@@ -304,6 +304,7 @@ const Settings: NextPage = () => {
       </Section>
 
       <Section
+        id="webauthn"
         title="Manage Hardware Tokens and Biometrics"
         description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
       >

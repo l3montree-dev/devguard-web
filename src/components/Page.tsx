@@ -26,6 +26,7 @@ import { Fragment, PropsWithChildren, useState } from "react";
 import MobileSidebar from "./Navigation/MobileSidebar";
 import Sidebar from "./Navigation/Sidebar";
 import { classNames } from "../utils/common";
+import Link from "next/link";
 
 type PageProps = {
   title: string;
@@ -129,6 +130,31 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">
             {props.children}
           </div>
+          <footer className="px-8 text-slate-500 text-sm pb-8">
+            <div className="flex flex-row gap-5 mb-2">
+              <Link
+                className="text-slate-500"
+                target="_blank"
+                href="https://github.com/l3montree-dev/flawfix"
+              >
+                GitHub
+              </Link>
+              <Link
+                className="text-slate-500"
+                target="_blank"
+                href="https://flawfix.dev/impressum"
+              >
+                Imprint
+              </Link>
+              <Link
+                className="text-slate-500"
+                href="https://flawfix.dev/datenschutzerklaerung/"
+              >
+                Privacy
+              </Link>
+            </div>
+            Copyright © 2023 l3montree. All rights reserved.
+          </footer>
         </main>
         {!!props.Sidebar && (
           <aside className="flex-1 bg-slate-950/50 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">

@@ -16,6 +16,7 @@
 import Image from "next/image";
 import { classNames } from "../../utils/common";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 interface Props {
   navigation: {
@@ -46,13 +47,13 @@ export default function Sidebar({ navigation }: Props) {
             <ul role="list" className="-mx-2 space-y-1">
               {navigation.map((item) => (
                 <li key={item.name}>
-                  <a
+                  <Link
                     href={item.href}
                     className={classNames(
                       item.href === currentPath
                         ? "bg-slate-800 text-white"
                         : "text-gray-400 hover:bg-slate-800 hover:text-white",
-                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
+                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 hover:no-underline",
                     )}
                   >
                     <item.icon
@@ -60,7 +61,7 @@ export default function Sidebar({ navigation }: Props) {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
