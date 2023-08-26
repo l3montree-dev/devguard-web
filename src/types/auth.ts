@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2023 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -13,21 +13,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GetServerSidePropsContext } from "next";
-import Page from "../components/Page";
-import { getApiClientFromContext } from "../services/flawFixApi";
+import { Identity } from "@ory/client";
 
-export default function Home() {
-  return <Page title=""></Page>;
-}
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
-) => {
-  const apiClient = getApiClientFromContext(context);
-
-  console.log(await (await apiClient("/organizations")).json());
-  return {
-    props: {},
+export interface User extends Omit<Identity, "traits"> {
+  traits: {
+    name: {
+      last: string;
+      first: string;
+    };
+    email: string;
   };
-};
+}

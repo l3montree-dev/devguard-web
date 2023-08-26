@@ -23,10 +23,10 @@ import {
   SignalIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import StickySearchHeader from "../components/Navigation/StickySearchHeader";
+import StickySearchHeader from "../components/navigation/StickySearchHeader";
 import Image from "next/image";
-import MobileSidebar from "../components/Navigation/MobileSidebar";
-import Sidebar from "../components/Navigation/Sidebar";
+import MobileSidebar from "../components/navigation/MobileSidebar";
+import Sidebar from "../components/navigation/Sidebar";
 import { ActivityItem, ActivityItems } from "@/types/common";
 import { calculateActivityString } from "@/utils/activityFeed";
 import SingleStatGroup from "../components/SingleStatGroup";
