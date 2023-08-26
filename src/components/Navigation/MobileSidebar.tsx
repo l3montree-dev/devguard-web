@@ -15,17 +15,18 @@
 
 import Image from "next/image";
 import { classNames } from "../../utils/common";
+import { useRouter } from "next/router";
 
 interface Props {
   navigation: {
     name: string;
     href: string;
     icon: any;
-    current: boolean;
   }[];
 }
 
 export default function MobileSidebar({ navigation }: Props) {
+  const pathname = useRouter().pathname;
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 ring-1 ring-white/10">
       <div className="flex h-24 shrink-0 items-center">
@@ -46,7 +47,7 @@ export default function MobileSidebar({ navigation }: Props) {
                   <a
                     href={item.href}
                     className={classNames(
-                      item.current
+                      item.href === pathname
                         ? "bg-gray-800 text-white"
                         : "text-gray-400 hover:bg-gray-800 hover:text-white",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",

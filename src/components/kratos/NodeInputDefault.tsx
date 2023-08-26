@@ -29,6 +29,9 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
     }
   };
 
+  const labelText =
+    node.meta.label?.text === "ID" ? "E-Mail" : node.meta.label?.text;
+
   // Render a generic text input field.
   return (
     <>
@@ -37,7 +40,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           className="mt-6 block text-sm font-medium leading-6 text-white"
           htmlFor={attributes.name}
         >
-          {node.meta.label?.text}
+          {labelText}
         </label>
       )}
       <input
@@ -54,7 +57,11 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
       />
       <>
         {node.messages.map(({ text, id }, k) => (
-          <span key={`${id}-${k}`} data-testid={`ui/message/${id}`}>
+          <span
+            key={`${id}-${k}`}
+            className="text-sm mt-2 block"
+            data-testid={`ui/message/${id}`}
+          >
             {text}
           </span>
         ))}

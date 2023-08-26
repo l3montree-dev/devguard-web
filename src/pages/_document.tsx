@@ -31,7 +31,7 @@ export default function Document() {
       <Head />
       <body
         className={
-          "flex h-full flex-col bg-gray-900 " +
+          "flex min-h-full flex-col bg-slate-950 " +
           inter.variable +
           " " +
           lexend.variable +

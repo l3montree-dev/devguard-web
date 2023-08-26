@@ -16,34 +16,11 @@
 import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
-import {
-  ChartBarSquareIcon,
-  Cog6ToothIcon,
-  GlobeAltIcon,
-  ServerIcon,
-  SignalIcon,
-} from "@heroicons/react/24/outline";
-
-const navigation = [
-  { name: "Projects", href: "#", icon: ServerIcon, current: true },
-  { name: "Latest Activity", href: "#", icon: SignalIcon, current: false },
-  { name: "Domains", href: "#", icon: GlobeAltIcon, current: false },
-  { name: "Reports", href: "#", icon: ChartBarSquareIcon, current: false },
-  { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
-];
 
 export default function SetupOrg() {
   return (
     <Page
-      title="Create your organization"
-      navigation={navigation}
-      menuActive={false}
-      searchActive={false}
-    >
-      <div className="px-8 py-2 sm:px-6 lg:px-14">
-        <OrgRegisterForm />
-      </div>
-      <div className="xl:pl-72">
+      Sidebar={
         <ProgressSidebar
           steps={[
             {
@@ -64,7 +41,10 @@ export default function SetupOrg() {
             },
           ]}
         />
-      </div>
+      }
+      title="Create your organization"
+    >
+      <OrgRegisterForm />
     </Page>
   );
 }

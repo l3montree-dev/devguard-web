@@ -25,6 +25,7 @@ import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
 import { ory, handleFlowError } from "../services/ory";
 import Image from "next/image";
+import Page from "../components/Page";
 
 interface Props {
   flow?: SettingsFlow;
@@ -134,13 +135,9 @@ const Settings: NextPage = () => {
       );
 
   return (
-    <>
-      <Head>
-        <title>Profile Management and Security Settings</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
-      </Head>
-      <div className="divide-y divide-white/5 bg-gray-900">
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+    <Page title="Profile Management and Security Settings">
+      <div className="divide-y divide-white/5">
+        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10   md:grid-cols-3">
           <div>
             <h2 className="text-base font-semibold leading-7 text-white">
               Profile Management & Security Settings
@@ -343,7 +340,7 @@ const Settings: NextPage = () => {
           </div>
         </div>
       </div>
-    </>
+    </Page>
   );
 };
 
