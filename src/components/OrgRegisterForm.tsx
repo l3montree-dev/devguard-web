@@ -23,119 +23,117 @@ import Select from "./common/Select";
 export default function OrgRegisterForm() {
   return (
     <form>
-      <div className="space-y-12">
-        <Section
-          description="General and required information about your organization."
-          title="Required Information"
-        >
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-4">
-              <Input
-                required
-                type="text"
-                label="Organization name *"
-                name="organization"
-                id="organization"
-                autoComplete="organization"
-                placeholder="My cool organization..."
-              />
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <Checkbox
-              name="permission"
-              type="checkbox"
+      <Section
+        description="General and required information about your organization."
+        title="Required Information"
+      >
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <div className="sm:col-span-4">
+            <Input
               required
-              label="Permission *"
-              help="I am authorized to create an organization account on behalf of
-                my organization. For legal entities, I have a right of
-                representation."
+              type="text"
+              label="Organization name *"
+              name="organization"
+              id="organization"
+              autoComplete="organization"
+              placeholder="My cool organization..."
             />
           </div>
-        </Section>
+        </div>
 
-        <Section
-          description="Help us to improve FlawFix."
-          title="Optional Information"
-        >
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-3">
-              <Input
-                type="text"
-                name="tel"
-                label="Contact phone number"
-                id="tel"
-                autoComplete="tel"
-                placeholder="+49 123 456 789"
-              />
-            </div>
-            <div className="sm:col-span-3">
-              <Input
-                label="Number of employees"
-                type="number"
-                name="number-of-employees"
-                id="number-of-employees"
-              />
-            </div>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-3">
-              <Select
-                label="Country"
-                id="country"
-                name="country"
-                autoComplete="country-name"
-              >
-                {countries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </Select>
-            </div>
+        <div className="mt-6">
+          <Checkbox
+            name="permission"
+            type="checkbox"
+            required
+            label="Permission *"
+            help="I am authorized to create an organization account on behalf of
+                my organization. For legal entities, I have a right of
+                representation."
+          />
+        </div>
+      </Section>
 
-            <div className="sm:col-span-3">
-              <Select
-                label="Industry"
-                id="industry"
-                name="industry"
-                autoComplete="industry-name"
-              >
-                {industryOptions.map((industry) => (
-                  <option key={industry} value={industry}>
-                    {industry}
-                  </option>
-                ))}
-              </Select>
-            </div>
+      <Section
+        description="Help us to improve FlawFix."
+        title="Optional Information"
+      >
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <div className="sm:col-span-3">
+            <Input
+              type="text"
+              name="tel"
+              label="Contact phone number"
+              id="tel"
+              autoComplete="tel"
+              placeholder="+49 123 456 789"
+            />
           </div>
-          <div className="mt-10">
-            <span className="text-sm font-semibold leading-6 text-white">
-              Do you have to comply with any of the following regulations/
-              standards?
-            </span>
-            <div className="mt-4 space-y-4">
-              <Checkbox
-                name="comments"
-                type="checkbox"
-                label="Critical infrastructures ( KRITIS )"
-              />
-              <Checkbox name="candidates" type="checkbox" label="ISO 27001" />
-              <Checkbox
-                name="candidates"
-                type="checkbox"
-                label="IT-Grundschutz (German Federal Office for Information Security)"
-              />
-              <Checkbox
-                name="candidates"
-                type="checkbox"
-                label="NIST Cybersecurity Framework"
-              />
-            </div>
+          <div className="sm:col-span-3">
+            <Input
+              label="Number of employees"
+              type="number"
+              name="number-of-employees"
+              id="number-of-employees"
+            />
           </div>
-        </Section>
-      </div>
+        </div>
+        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <div className="sm:col-span-3">
+            <Select
+              label="Country"
+              id="country"
+              name="country"
+              autoComplete="country-name"
+            >
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="sm:col-span-3">
+            <Select
+              label="Industry"
+              id="industry"
+              name="industry"
+              autoComplete="industry-name"
+            >
+              {industryOptions.map((industry) => (
+                <option key={industry} value={industry}>
+                  {industry}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
+        <div className="mt-10">
+          <span className="text-sm font-semibold leading-6 text-white">
+            Do you have to comply with any of the following regulations/
+            standards?
+          </span>
+          <div className="mt-4 space-y-4">
+            <Checkbox
+              name="comments"
+              type="checkbox"
+              label="Critical infrastructures ( KRITIS )"
+            />
+            <Checkbox name="candidates" type="checkbox" label="ISO 27001" />
+            <Checkbox
+              name="candidates"
+              type="checkbox"
+              label="IT-Grundschutz (German Federal Office for Information Security)"
+            />
+            <Checkbox
+              name="candidates"
+              type="checkbox"
+              label="NIST Cybersecurity Framework"
+            />
+          </div>
+        </div>
+      </Section>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <Button type="submit">Save</Button>

@@ -50,8 +50,8 @@ export default function Sidebar({ navigation }: Props) {
                     href={item.href}
                     className={classNames(
                       item.href === currentPath
-                        ? "bg-white/20 text-white"
-                        : "text-gray-400 hover:bg-gray-800 hover:text-white",
+                        ? "bg-slate-800 text-white"
+                        : "text-gray-400 hover:bg-slate-800 hover:text-white",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
                     )}
                   >

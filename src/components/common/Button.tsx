@@ -23,7 +23,7 @@ const Button: FunctionComponent<
 > = (props) => {
   return (
     <button
-      className="rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-amber-200 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
+      className="rounded-md bg-amber-400 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-amber-200 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
       {...props}
     />
   );

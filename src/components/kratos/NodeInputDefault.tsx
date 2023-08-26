@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import Input from "../common/Input";
 import { NodeInputProps } from "./helpers";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
@@ -34,27 +35,19 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
 
   // Render a generic text input field.
   return (
-    <>
-      {node.meta.label?.text && (
-        <label
-          className="mt-6 block text-sm font-medium leading-6 text-white"
-          htmlFor={attributes.name}
-        >
-          {labelText}
-        </label>
-      )}
-      <input
-        title={node.meta.label?.text}
-        onClick={onClick}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
+    <div className="mt-4">
+      <Input
+        label={labelText ?? ""}
         type={attributes.type}
         name={attributes.name}
         value={value}
         disabled={attributes.disabled || disabled}
-        className="mt-2 block w-full rounded-md border-0 bg-white/5 py-1.5 px-2 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
+        onClick={onClick}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
       />
+
       <>
         {node.messages.map(({ text, id }, k) => (
           <span
@@ -66,6 +59,6 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           </span>
         ))}
       </>
-    </>
+    </div>
   );
 }

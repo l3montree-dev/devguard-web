@@ -16,6 +16,7 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
+import Button from "../common/Button";
 
 export function NodeInputButton<T>({
   node,
@@ -44,7 +45,7 @@ export function NodeInputButton<T>({
 
   return (
     <>
-      <button
+      <Button
         name={attributes.name}
         onClick={(e) => {
           onClick(e);
@@ -53,7 +54,7 @@ export function NodeInputButton<T>({
         disabled={attributes.disabled || disabled}
       >
         {getNodeLabel(node)}
-      </button>
+      </Button>
     </>
   );
 }

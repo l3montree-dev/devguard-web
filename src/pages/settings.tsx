@@ -26,6 +26,8 @@ import { Messages } from "../components/kratos/Messages";
 import { ory, handleFlowError } from "../services/ory";
 import Image from "next/image";
 import Page from "../components/Page";
+import Section from "../components/common/Section";
+import SubnavSidebar from "../components/SubnavSidebar";
 
 interface Props {
   flow?: SettingsFlow;
@@ -135,211 +137,186 @@ const Settings: NextPage = () => {
       );
 
   return (
-    <Page title="Profile Management and Security Settings">
-      <div className="divide-y divide-white/5">
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10   md:grid-cols-3">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Profile Management & Security Settings
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Use a permanent address where you can receive mail.
-            </p>
+    <Page
+      Sidebar={
+        <SubnavSidebar
+          links={[
+            {
+              href: "#profile",
+              title: "Profile Management & Security Settings",
+            },
+            {
+              href: "#password",
+              title: "Change Password",
+            },
+            {
+              href: "#oidc",
+              title: "Manage Social Sign In",
+            },
+            {
+              href: "#lookup_secret",
+              title: "Manage 2FA Backup Recovery Codes",
+            },
+            {
+              href: "#totp",
+              title: "Manage 2FA TOTP Authenticator App",
+            },
+            {
+              href: "#webauthn",
+              title: "Manage Hardware Tokens and Biometrics",
+            },
+          ]}
+        />
+      }
+      title="Profile Management and Security Settings"
+    >
+      <Section
+        id="profile"
+        description="Use a permanent address where you can receive mail."
+        title="Profile Management & Security Settings"
+      >
+        <div className="grid  grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <div className="col-span-full flex items-center gap-x-8">
+            <Image
+              src="/examples/tim.jpg"
+              alt=""
+              width={96}
+              height={96}
+              className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
+            />
+            <div>
+              <button
+                type="button"
+                className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white/20"
+              >
+                Change avatar
+              </button>
+              <p className="mt-2 text-xs leading-5 text-gray-400">
+                JPG, GIF or PNG. 1MB max.
+              </p>
+            </div>
           </div>
 
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full flex items-center gap-x-8">
-                <Image
-                  src="/examples/tim.jpg"
-                  alt=""
-                  width={96}
-                  height={96}
-                  className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
-                />
-                <div>
-                  <button
-                    type="button"
-                    className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white/20"
-                  >
-                    Change avatar
-                  </button>
-                  <p className="mt-2 text-xs leading-5 text-gray-400">
-                    JPG, GIF or PNG. 1MB max.
-                  </p>
-                </div>
-              </div>
+          <div className="col-span-full">
+            <SettingsCard only="profile" flow={flow}>
+              <Messages messages={flow?.ui.messages} />
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="profile"
+                flow={flow}
+              />
+            </SettingsCard>
+          </div>
+        </div>
+      </Section>
 
-              <div className="col-span-full">
-                <SettingsCard only="profile" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="profile"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Change password
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Update your password associated with your account.
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full">
-                <SettingsCard only="password" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="password"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Manage Social Sign In
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Update your password associated with your account.
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full">
-                <SettingsCard only="oidc" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="oidc"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Manage 2FA Backup Recovery Codes
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Recovery codes can be used in panic situations where you have lost
-              access to your 2FA device.
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full">
-                <SettingsCard only="lookup_secret" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="lookup_secret"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Manage 2FA TOTP Authenticator App
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Add a TOTP Authenticator App to your account to improve your
-              account security. Popular Authenticator Apps are{" "}
-              <a
-                href="https://www.lastpass.com"
-                rel="noreferrer"
-                target="_blank"
-                className="text-blue-500 hover:text-blue-400"
-              >
-                LastPass
-              </a>{" "}
-              and Google Authenticator (
-              <a
-                href="https://apps.apple.com/us/app/google-authenticator/id388497605"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 hover:text-blue-400"
-              >
-                iOS
-              </a>
-              ,{" "}
-              <a
-                href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 hover:text-blue-400"
-              >
-                Android
-              </a>
-              ).
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full">
-                <SettingsCard only="totp" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="totp"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-white">
-              Manage Hardware Tokens and Biometrics
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-400">
-              Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID,
-              TouchID) to enhance your account security.
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-              <div className="col-span-full">
-                <SettingsCard only="webauthn" flow={flow}>
-                  <Messages messages={flow?.ui.messages} />
-                  <Flow
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    only="webauthn"
-                    flow={flow}
-                  />
-                </SettingsCard>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Section
+        id="password"
+        title="Change Password"
+        description="Update your password associated with your account."
+      >
+        <SettingsCard only="password" flow={flow}>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="password"
+            flow={flow}
+          />
+        </SettingsCard>
+      </Section>
+      <Section
+        id="oidc"
+        title="Manage Social Sign In"
+        description="Update your password associated with your account."
+      >
+        <SettingsCard only="oidc" flow={flow}>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="oidc"
+            flow={flow}
+          />
+        </SettingsCard>
+      </Section>
+
+      <Section
+        id="lookup_secret"
+        title="Manage 2FA Backup Recovery Codes"
+        description="Recovery codes can be used in panic situations where you have lost
+        access to your 2FA device."
+      >
+        <SettingsCard only="lookup_secret" flow={flow}>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="lookup_secret"
+            flow={flow}
+          />
+        </SettingsCard>
+      </Section>
+      <Section
+        id="totp"
+        title="Manage 2FA TOTP Authenticator App"
+        description={
+          <>
+            Add a TOTP Authenticator App to your account to improve your account
+            security. Popular Authenticator Apps are{" "}
+            <Link
+              href="https://www.lastpass.com"
+              rel="noreferrer"
+              target="_blank"
+            >
+              LastPass
+            </Link>{" "}
+            and Google Authenticator (
+            <Link
+              href="https://apps.apple.com/us/app/google-authenticator/id388497605"
+              target="_blank"
+              rel="noreferrer"
+            >
+              iOS
+            </Link>
+            ,{" "}
+            <Link
+              href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Android
+            </Link>
+            ).
+          </>
+        }
+      >
+        <SettingsCard only="totp" flow={flow}>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="totp"
+            flow={flow}
+          />
+        </SettingsCard>
+      </Section>
+
+      <Section
+        title="Manage Hardware Tokens and Biometrics"
+        description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
+      >
+        <SettingsCard only="webauthn" flow={flow}>
+          <Messages messages={flow?.ui.messages} />
+          <Flow
+            hideGlobalMessages
+            onSubmit={onSubmit}
+            only="webauthn"
+            flow={flow}
+          />
+        </SettingsCard>
+      </Section>
     </Page>
   );
 };

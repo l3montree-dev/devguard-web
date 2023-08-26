@@ -13,16 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactNode } from "react";
 
 interface Props {
   title: string;
-  description?: string;
+  description?: ReactNode;
   children: React.ReactNode;
+  id?: string;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
-    <div className="border-b border-white/10 pb-12">
+    <div id={props.id} className="border-b border-white/10 mb-6 pb-6">
       <h2 className="text-base font-semibold leading-7 text-white">
         {props.title}
       </h2>

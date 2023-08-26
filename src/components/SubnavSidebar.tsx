@@ -13,25 +13,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { getNodeLabel } from "@ory/integrations/ui";
+import Link from "next/link";
 
-import { NodeInputProps } from "./helpers";
-import Button from "../common/Button";
+interface Props {
+  links: Array<{
+    title: string;
+    href: string;
+  }>;
+}
 
-export function NodeInputSubmit<T>({
-  node,
-  attributes,
-  disabled,
-}: NodeInputProps) {
+export default function SubnavSidebar({ links }: Props) {
   return (
-    <div className="flex flex-row justify-end mt-6">
-      <Button
-        name={attributes.name}
-        value={attributes.value || ""}
-        disabled={attributes.disabled || disabled}
-      >
-        {getNodeLabel(node)}
-      </Button>
-    </div>
+    <>
+      <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <h2 className="text-base font-semibold leading-7 text-white">
+          Navigation
+        </h2>
+      </header>
+      <ol role="list" className="space-y-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link className="text-sm text-slate-400" href={link.href}>
+              {link.title}
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </>
   );
 }
