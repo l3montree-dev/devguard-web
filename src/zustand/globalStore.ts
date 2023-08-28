@@ -1,42 +1,44 @@
-import { useState, useEffect } from "react";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { Session } from "@ory/client";
+import { useMemo } from "react";
+import { StoreApi, UseBoundStore, create } from "zustand";
 import { User } from "../types/auth";
 
-interface GlobalStore {
-  user?: User; // if user is defined, it means that the user is logged in
-  setUser: (user: User) => void;
+export interface GlobalStore {
+  session?: Omit<Session, "identity"> & { identity: User };
 }
 
-const globalStore = create(
-  persist<GlobalStore>(
-    (set, get) => ({
-      user: undefined, // gets set inside the Bootstrap component
-      setUser: (user: User) => set({ user }),
-    }),
-    {
-      name: "global-store",
-    },
-  ),
-);
+let store: UseBoundStore<StoreApi<GlobalStore>> | undefined;
 
-// make sure that it works using nextjs
-// https://docs.pmnd.rs/zustand/integrations/persisting-store-data#usage-in-next.js
-export function useGlobalStore(): GlobalStore | undefined;
-export function useGlobalStore<F>(
-  callback: (state: GlobalStore) => F,
-): F | undefined;
-export function useGlobalStore<F>(
-  callback: (state: GlobalStore) => F = (s: GlobalStore) => s as F,
-) {
-  const result = globalStore(callback) as F;
-  const [data, setData] = useState<F>();
+const initStore = (preloadedState: Partial<GlobalStore>) =>
+  create<GlobalStore>((set) => ({
+    ...preloadedState,
+  }));
 
-  useEffect(() => {
-    setData(result);
-  }, [result]);
+export const initializeStore = (preloadedState: GlobalStore) => {
+  let _store = store ?? initStore(preloadedState);
 
-  return data;
+  // After navigating to a page with an initial Zustand state, merge that state
+  // with the current state in the store, and create a new store
+  if (preloadedState && store) {
+    _store = initStore({
+      ...store.getState(),
+      ...preloadedState,
+    });
+    // Reset the current store
+    store = undefined;
+  }
+
+  // For SSG and SSR always create a new store
+  if (typeof window === "undefined") return _store;
+  // Create the store once in the client
+  if (!store) store = _store;
+
+  return _store;
+};
+
+export function useHydrate(initialState: Partial<GlobalStore>) {
+  const state =
+    typeof initialState === "string" ? JSON.parse(initialState) : initialState;
+  const store = useMemo(() => initializeStore(state), [state]);
+  return store;
 }
-
-export default useGlobalStore;

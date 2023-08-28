@@ -159,7 +159,7 @@ export default function Projects() {
 
         {/* Static sidebar for desktop */}
         <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col">
-          <Sidebar isActive={true} navigation={navigation} />
+          <Sidebar navigation={navigation} />
         </div>
 
         <div className="xl:pl-72">

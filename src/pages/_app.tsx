@@ -18,6 +18,8 @@ import "@/styles/tailwind.scss";
 import { Lexend, Merriweather } from "next/font/google";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
+import { useHydrate } from "../zustand/globalStore";
+import { StoreProvider } from "../zustand/globalStoreProvider";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -40,5 +42,11 @@ export const merriweather = Merriweather({
 
 // @ts-ignore
 export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  const store = useHydrate(pageProps.initialZustandState);
+
+  return (
+    <StoreProvider store={store}>
+      <Component {...pageProps} />
+    </StoreProvider>
+  );
 }

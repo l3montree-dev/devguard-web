@@ -16,18 +16,21 @@
 import { GetServerSidePropsContext } from "next";
 import Page from "../components/Page";
 import { getApiClientFromContext } from "../services/flawFixApi";
+import { withSession } from "../services/ory";
+import { useStore } from "../zustand/globalStoreProvider";
 
 export default function Home() {
+  const store = useStore((s) => s);
+
   return <Page title=""></Page>;
 }
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
-) => {
-  const apiClient = getApiClientFromContext(context);
-
-  console.log(await (await apiClient("/organizations")).json());
-  return {
-    props: {},
-  };
-};
+export const getServerSideProps = withSession(
+  async (session, context: GetServerSidePropsContext) => {
+    const apiClient = getApiClientFromContext(context);
+    console.log("orgs", await (await apiClient("/organizations")).json());
+    return {
+      props: {},
+    };
+  },
+);

@@ -28,7 +28,6 @@ import Sidebar from "./navigation/Sidebar";
 import { classNames } from "../utils/common";
 import Link from "next/link";
 import Toaster from "./Toaster";
-import Bootstrap from "./Bootstrap";
 
 type PageProps = {
   title: string;
@@ -47,7 +46,7 @@ const navigation = [
 const Page = (props: PropsWithChildren<PageProps>) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
-    <Bootstrap>
+    <>
       <Toaster />
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
@@ -165,7 +164,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </aside>
         )}
       </div>
-    </Bootstrap>
+    </>
   );
 };
 

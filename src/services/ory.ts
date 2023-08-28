@@ -13,16 +13,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Configuration, FrontendApi } from "@ory/client";
+import { Configuration, FrontendApi, Session } from "@ory/client";
 import { edgeConfig } from "@ory/integrations/next";
+import { isAxiosError } from "axios";
+import { GetServerSidePropsContext } from "next";
+import { NextRouter } from "next/router";
+import { Dispatch, SetStateAction } from "react";
+import { config } from "../config";
+import { User } from "../types/auth";
 
 export const ory = new FrontendApi(new Configuration(edgeConfig));
 
-import { NextRouter } from "next/router";
-import { Dispatch, SetStateAction } from "react";
-
 // A small function to help us deal with errors coming from fetching a flow.
-export function handleGetFlowError<S>(
+export function handleFlowError<S>(
   router: NextRouter,
   flowType: "login" | "registration" | "settings" | "recovery" | "verification",
   resetFlow: Dispatch<SetStateAction<S | undefined>>,
@@ -98,5 +101,75 @@ export function handleGetFlowError<S>(
   };
 }
 
-// A small function to help us deal with errors coming from initializing a flow.
-export const handleFlowError = handleGetFlowError;
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+export function withSession(
+  next: (
+    session: Omit<Session, "identity"> & { identity: User },
+    ctx: GetServerSidePropsContext,
+  ) => any,
+) {
+  return async (ctx: GetServerSidePropsContext) => {
+    const orySessionCookie = ctx.req.cookies["ory_kratos_session"];
+    // get the latest session
+    try {
+      const session = await ory.toSession(
+        {
+          cookie: "ory_kratos_session=" + orySessionCookie + ";",
+        },
+        {
+          baseURL: "http://localhost:3000",
+        },
+      );
+
+      if (!session.data) {
+        return {
+          redirect: {
+            destination: "/login?return_to=" + ctx.resolvedUrl,
+            permanent: false,
+          },
+        };
+      }
+      // call the initial endpoint with the latest information available
+      const resp = await next(session.data, ctx);
+
+      // check if the response contains the props
+      if ("props" in resp) {
+        // check if the page does already define an initial zustand state
+        if (resp.props.initialZustandState) {
+          // merge the initial zustand state with the session data
+          resp.props.initialZustandState = {
+            ...resp.props.initialZustandState,
+            session: session.data,
+          };
+        } else {
+          // at least provide the session data
+          resp.props.initialZustandState = {
+            session: session.data,
+          };
+        }
+      }
+
+      return resp;
+    } catch (e: unknown) {
+      if (isAxiosError(e))
+        if (e.response?.status === 401) {
+          // check if axios error and 401.
+          return {
+            redirect: {
+              destination: "/login?return_to=" + ctx.resolvedUrl,
+              permanent: false,
+            },
+          };
+        }
+
+      // internal server error
+      console.log(e);
+      return {
+        redirect: {
+          destination: "/login?return_to=" + ctx.resolvedUrl,
+          permanent: false,
+        },
+      };
+    }
+  };
+}

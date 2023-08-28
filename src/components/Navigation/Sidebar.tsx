@@ -17,6 +17,7 @@ import Image from "next/image";
 import { classNames } from "../../utils/common";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useStore } from "../../zustand/globalStoreProvider";
 
 interface Props {
   navigation: {
@@ -29,6 +30,8 @@ interface Props {
 export default function Sidebar({ navigation }: Props) {
   const router = useRouter();
   const currentPath = router.pathname;
+
+  const user = useStore((s) => s.session?.identity);
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 ring-1 ring-white/5">
@@ -66,22 +69,26 @@ export default function Sidebar({ navigation }: Props) {
               ))}
             </ul>
           </li>
-          <li className="-mx-6 mt-auto">
-            <a
-              href="#"
-              className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
-            >
-              <Image
-                className="h-10 w-10 rounded-full bg-gray-800"
-                src="/examples/tim.jpg"
-                alt=""
-                width={32}
-                height={32}
-              />
-              <span className="sr-only">Your profile</span>
-              <span aria-hidden="true">Tim Bastin</span>
-            </a>
-          </li>
+          {user && (
+            <li className="-mx-6 mt-auto">
+              <a
+                href="#"
+                className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
+              >
+                <Image
+                  className="h-10 w-10 rounded-full bg-gray-800"
+                  src="/examples/tim.jpg"
+                  alt=""
+                  width={32}
+                  height={32}
+                />
+                <span className="sr-only">Your profile</span>
+                <span aria-hidden="true">
+                  {user.traits.name.first} {user.traits.name.last}
+                </span>
+              </a>
+            </li>
+          )}
         </ul>
       </nav>
     </div>

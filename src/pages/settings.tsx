@@ -17,17 +17,16 @@ import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
-import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
+import Page from "../components/Page";
+import SubnavSidebar from "../components/SubnavSidebar";
+import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { ory, handleFlowError } from "../services/ory";
-import Image from "next/image";
-import Page from "../components/Page";
-import Section from "../components/common/Section";
-import SubnavSidebar from "../components/SubnavSidebar";
+import { handleFlowError, ory, withSession } from "../services/ory";
 
 interface Props {
   flow?: SettingsFlow;
@@ -321,5 +320,12 @@ const Settings: NextPage = () => {
     </Page>
   );
 };
+
+// just guard the page with the session decorator
+export const getServerSideProps = withSession(() => {
+  return {
+    props: {},
+  };
+});
 
 export default Settings;

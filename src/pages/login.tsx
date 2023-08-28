@@ -23,7 +23,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
-import { ory, handleGetFlowError, handleFlowError } from "../services/ory";
+import { ory, handleFlowError } from "../services/ory";
 import Image from "next/image";
 
 const Login: NextPage = () => {
@@ -58,7 +58,7 @@ const Login: NextPage = () => {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleGetFlowError(router, "login", setFlow));
+        .catch(handleFlowError(router, "login", setFlow));
       return;
     }
 

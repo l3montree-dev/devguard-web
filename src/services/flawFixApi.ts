@@ -14,10 +14,34 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { GetServerSidePropsContext } from "next";
 import { config } from "../config";
+import { NextApiRequestCookies } from "next/dist/server/api-utils";
 
 export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
   const { req } = ctx;
+  return getApiClientFromRequest(req);
+};
+
+export const getApiClientFromRequest = (req: {
+  cookies: Partial<{
+    [key: string]: string;
+  }>;
+}) => {
   const orySessionCookie = req.cookies["ory_kratos_session"];
+  return (input: string, init?: RequestInit) => {
+    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Cookie: `ory_kratos_session=${orySessionCookie}`,
+      },
+      credentials: "include",
+    });
+  };
+};
+
+export const getApiClientFromCookies = (
+  orySessionCookie: string | undefined,
+) => {
   return (input: string, init?: RequestInit) => {
     return fetch(config.flawFixApiUrl + "/api/v1" + input, {
       ...init,
