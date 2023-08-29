@@ -21,6 +21,8 @@ import { NextRouter } from "next/router";
 import { Dispatch, SetStateAction } from "react";
 import { config } from "../config";
 import { User } from "../types/auth";
+import { OrganizationDTO } from "../types/api";
+import { getApiClientFromContext } from "./flawFixApi";
 
 export const ory = new FrontendApi(new Configuration(edgeConfig));
 
@@ -98,78 +100,5 @@ export function handleFlowError<S>(
 
     // We are not able to handle the error? Return it.
     return Promise.reject(err);
-  };
-}
-
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-export function withSession(
-  next: (
-    session: Omit<Session, "identity"> & { identity: User },
-    ctx: GetServerSidePropsContext,
-  ) => any,
-) {
-  return async (ctx: GetServerSidePropsContext) => {
-    const orySessionCookie = ctx.req.cookies["ory_kratos_session"];
-    // get the latest session
-    try {
-      const session = await ory.toSession(
-        {
-          cookie: "ory_kratos_session=" + orySessionCookie + ";",
-        },
-        {
-          baseURL: "http://localhost:3000",
-        },
-      );
-
-      if (!session.data) {
-        return {
-          redirect: {
-            destination: "/login?return_to=" + ctx.resolvedUrl,
-            permanent: false,
-          },
-        };
-      }
-      // call the initial endpoint with the latest information available
-      const resp = await next(session.data, ctx);
-
-      // check if the response contains the props
-      if ("props" in resp) {
-        // check if the page does already define an initial zustand state
-        if (resp.props.initialZustandState) {
-          // merge the initial zustand state with the session data
-          resp.props.initialZustandState = {
-            ...resp.props.initialZustandState,
-            session: session.data,
-          };
-        } else {
-          // at least provide the session data
-          resp.props.initialZustandState = {
-            session: session.data,
-          };
-        }
-      }
-
-      return resp;
-    } catch (e: unknown) {
-      if (isAxiosError(e))
-        if (e.response?.status === 401) {
-          // check if axios error and 401.
-          return {
-            redirect: {
-              destination: "/login?return_to=" + ctx.resolvedUrl,
-              permanent: false,
-            },
-          };
-        }
-
-      // internal server error
-      console.log(e);
-      return {
-        redirect: {
-          destination: "/login?return_to=" + ctx.resolvedUrl,
-          permanent: false,
-        },
-      };
-    }
   };
 }

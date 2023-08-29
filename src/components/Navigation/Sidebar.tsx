@@ -71,9 +71,9 @@ export default function Sidebar({ navigation }: Props) {
           </li>
           {user && (
             <li className="-mx-6 mt-auto">
-              <a
-                href="#"
-                className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
+              <Link
+                href="/settings"
+                className="flex hover:no-underline items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
               >
                 <Image
                   className="h-10 w-10 rounded-full bg-gray-800"
@@ -86,7 +86,7 @@ export default function Sidebar({ navigation }: Props) {
                 <span aria-hidden="true">
                   {user.traits.name.first} {user.traits.name.last}
                 </span>
-              </a>
+              </Link>
             </li>
           )}
         </ul>

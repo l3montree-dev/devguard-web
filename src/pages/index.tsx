@@ -14,23 +14,53 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GetServerSidePropsContext } from "next";
+import { FunctionComponent } from "react";
 import Page from "../components/Page";
 import { getApiClientFromContext } from "../services/flawFixApi";
-import { withSession } from "../services/ory";
+import { OrganizationDTO } from "../types/api";
 import { useStore } from "../zustand/globalStoreProvider";
-
-export default function Home() {
-  const store = useStore((s) => s);
-
-  return <Page title=""></Page>;
+import { withSession } from "../decorators/withSession";
+import Section from "../components/common/Section";
+import Link from "next/link";
+interface Props {
+  organizations: Array<OrganizationDTO>;
 }
+
+const Home: FunctionComponent<Props> = ({ organizations }) => {
+  const store = useStore((s) => s);
+  return (
+    <Page hideNav title="Organizations">
+      <Section title="Select the organization" description="Test">
+        <div className="grid grid-cols-3 gap-4">
+          {organizations.map((org) => (
+            <Link key={org.id} href={`/${org.id}`}>
+              <div className="bg-slate-800 p-5 rounded-md">
+                <h1>{org.name}</h1>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Section>
+    </Page>
+  );
+};
+
+export default Home;
 
 export const getServerSideProps = withSession(
   async (session, context: GetServerSidePropsContext) => {
     const apiClient = getApiClientFromContext(context);
-    console.log("orgs", await (await apiClient("/organizations")).json());
+    const orgs: Array<OrganizationDTO> = await (
+      await apiClient("/organizations")
+    ).json();
     return {
-      props: {},
+      props: {
+        // hide the contactPhoneNumber
+        organizations: orgs.map((o) => ({
+          ...o,
+          contactPhoneNumber: null,
+        })),
+      },
     };
   },
 );

@@ -2,9 +2,11 @@ import { Session } from "@ory/client";
 import { useMemo } from "react";
 import { StoreApi, UseBoundStore, create } from "zustand";
 import { User } from "../types/auth";
+import { OrganizationDTO } from "../types/api";
 
 export interface GlobalStore {
   session?: Omit<Session, "identity"> & { identity: User };
+  organization?: OrganizationDTO; // the current selected organization
 }
 
 let store: UseBoundStore<StoreApi<GlobalStore>> | undefined;

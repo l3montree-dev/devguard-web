@@ -23,16 +23,17 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Fragment, PropsWithChildren, useState } from "react";
+import { classNames } from "../utils/common";
+import Main from "./Main";
+import Toaster from "./Toaster";
 import MobileSidebar from "./navigation/MobileSidebar";
 import Sidebar from "./navigation/Sidebar";
-import { classNames } from "../utils/common";
-import Link from "next/link";
-import Toaster from "./Toaster";
 
 type PageProps = {
   title: string;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
+  hideNav?: boolean;
 };
 
 const navigation = [
@@ -106,58 +107,19 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </div>
         </Dialog>
       </Transition.Root>
-
       {/* Static sidebar for desktop */}
       <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col bg-black/20">
-        <Sidebar navigation={navigation} />
+        <Sidebar navigation={props.hideNav ? [] : navigation} />
       </div>
-
       <div className="xl:pl-72">
         {/*<StickySearchHeader
           setSidebarOpen={setSidebarOpen}
           isActive={props.searchActive}
         /> */}
 
-        <main
-          className={classNames(
-            "bg-slate-950",
-            props.Sidebar ? "lg:mr-96" : "lg:mr-0",
-          )}
-        >
-          <header className="flex bg-black/20 items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-            <h1 className="text-lg font-semibold leading-7 text-white">
-              {props.title}
-            </h1>
-          </header>
-          <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">
-            {props.children}
-          </div>
-          <footer className="px-8 text-slate-500 text-sm pb-8">
-            <div className="flex flex-row gap-5 mb-2">
-              <Link
-                className="text-slate-500"
-                target="_blank"
-                href="https://github.com/l3montree-dev/flawfix"
-              >
-                GitHub
-              </Link>
-              <Link
-                className="text-slate-500"
-                target="_blank"
-                href="https://flawfix.dev/impressum"
-              >
-                Imprint
-              </Link>
-              <Link
-                className="text-slate-500"
-                href="https://flawfix.dev/datenschutzerklaerung/"
-              >
-                Privacy
-              </Link>
-            </div>
-            Copyright © 2023 l3montree. All rights reserved.
-          </footer>
-        </main>
+        <div className={classNames(props.Sidebar ? "lg:pr-96" : "lg:pr-72")}>
+          <Main title={props.title}>{props.children}</Main>
+        </div>
         {!!props.Sidebar && (
           <aside className="flex-1 bg-slate-950/50 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">
             {props.Sidebar}

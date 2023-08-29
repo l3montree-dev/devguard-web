@@ -14,7 +14,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { GetServerSidePropsContext } from "next";
 import { config } from "../config";
-import { NextApiRequestCookies } from "next/dist/server/api-utils";
 
 export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
   const { req } = ctx;
