@@ -31,11 +31,11 @@ export function withOrganization(
     session: Omit<Session, "identity"> & { identity: User },
     ctx: GetServerSidePropsContext,
   ) => {
-    // get the param from context
-    const organizationId = ctx.params?.organizationId;
-    if (!organizationId) {
+    // extract the organizationId from the cookie
+    const organizationSlug = ctx.params?.organization;
+    if (!organizationSlug) {
       return {
-        notFound: true,
+        redirect: "/",
       };
     }
 
@@ -43,9 +43,24 @@ export function withOrganization(
     const flawFixApiClient = getApiClientFromContext(ctx);
 
     // get the organization
-    const organization = await flawFixApiClient(
-      "/organizations/" + organizationId,
-    ).then((resp) => resp.json());
+    const r = await flawFixApiClient(
+      "/organizations/" + organizationSlug + "/",
+    );
+
+    console.log(r.url);
+    // check if the organization exists
+    if (!r.ok) {
+      console.log("organization not found");
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
+
+    // parse the organization
+    const organization = await r.json();
 
     // call the initial endpoint with the latest information available
     const resp = await next(session, organization, ctx);

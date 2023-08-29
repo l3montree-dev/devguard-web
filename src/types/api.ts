@@ -28,4 +28,5 @@ export interface OrganizationDTO extends AppModelDTO {
   iso27001: boolean;
   nist: boolean;
   grundschutz: boolean;
+  slug: string;
 }

@@ -22,18 +22,22 @@ import { useStore } from "../zustand/globalStoreProvider";
 import { withSession } from "../decorators/withSession";
 import Section from "../components/common/Section";
 import Link from "next/link";
+import { useRouter } from "next/router";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
 
 const Home: FunctionComponent<Props> = ({ organizations }) => {
-  const store = useStore((s) => s);
+  const router = useRouter();
+  const handleJoinOrganization = async (org: OrganizationDTO) => {
+    router.push(`/${org.id}`);
+  };
   return (
     <Page hideNav title="Organizations">
       <Section title="Select the organization" description="Test">
         <div className="grid grid-cols-3 gap-4">
           {organizations.map((org) => (
-            <Link key={org.id} href={`/${org.id}`}>
+            <Link key={org.id} href={`/${org.slug}`}>
               <div className="bg-slate-800 p-5 rounded-md">
                 <h1>{org.name}</h1>
               </div>

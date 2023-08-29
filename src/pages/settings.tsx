@@ -26,7 +26,8 @@ import SubnavSidebar from "../components/SubnavSidebar";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { handleFlowError, ory, withSession } from "../services/ory";
+import { handleFlowError, ory } from "../services/ory";
+import { withSession } from "../decorators/withSession";
 
 interface Props {
   flow?: SettingsFlow;

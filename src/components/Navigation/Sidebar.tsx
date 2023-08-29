@@ -54,8 +54,8 @@ export default function Sidebar({ navigation }: Props) {
                     href={item.href}
                     className={classNames(
                       item.href === currentPath
-                        ? "bg-slate-800 text-white"
-                        : "text-gray-400 hover:bg-slate-800 hover:text-white",
+                        ? "bg-blue-900 text-white"
+                        : "text-gray-400 hover:bg-blue-900 hover:text-white",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 hover:no-underline",
                     )}
                   >
@@ -73,7 +73,7 @@ export default function Sidebar({ navigation }: Props) {
             <li className="-mx-6 mt-auto">
               <Link
                 href="/settings"
-                className="flex hover:no-underline items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
+                className="flex hover:no-underline transition-all items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800"
               >
                 <Image
                   className="h-10 w-10 rounded-full bg-gray-800"

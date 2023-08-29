@@ -121,7 +121,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           <Main title={props.title}>{props.children}</Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="flex-1 bg-slate-950/50 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">
+          <aside className="flex-1 bg-black/20 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">
             {props.Sidebar}
           </aside>
         )}

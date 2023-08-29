@@ -22,8 +22,8 @@ interface Props {
 }
 const Main: FunctionComponent<Props> = ({ title, children }) => {
   return (
-    <main className={classNames("bg-slate-950")}>
-      <header className="flex bg-black/20 items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+    <main>
+      <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         <h1 className="text-lg font-semibold leading-7 text-white">{title}</h1>
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">{children}</div>

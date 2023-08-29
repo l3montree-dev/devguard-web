@@ -24,12 +24,14 @@ import { OrganizationDTO } from "../types/api";
 import { getApiClient } from "../services/flawFixApi";
 import { toast } from "./Toaster";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function OrgRegisterForm() {
   const { register, handleSubmit } = useForm<
     OrganizationDTO & { permission: string }
   >();
 
+  const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
     const client = getApiClient(document);
 
@@ -44,15 +46,10 @@ export default function OrgRegisterForm() {
         }),
       })
     ).json();
-  };
 
-  useEffect(() => {
-    toast({
-      title: "Welcome to FlawFix!",
-      msg: "We are happy to have you here. Please fill out the form below to create your organization.",
-      type: "info",
-    });
-  }, []);
+    // move the user to the newly created organization
+    router.push(`/${resp.slug}`);
+  };
 
   return (
     <form onSubmit={handleSubmit(handleOrgCreation)}>
