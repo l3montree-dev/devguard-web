@@ -24,6 +24,7 @@ import Section from "../components/common/Section";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Button from "../components/common/Button";
+import { userNavigation } from "../const/menus";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
@@ -34,7 +35,7 @@ const Home: FunctionComponent<Props> = ({ organizations }) => {
     router.push(`/${org.id}`);
   };
   return (
-    <Page hideNav title="Organizations">
+    <Page navigation={userNavigation} title="Organizations">
       <Section title="Select the organization" description="Test">
         <div className="grid grid-cols-3 gap-4">
           {organizations.map((org) => (

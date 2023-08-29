@@ -15,16 +15,27 @@
 import Link from "next/link";
 import React, { FunctionComponent } from "react";
 import { classNames } from "../utils/common";
+import { useStore } from "../zustand/globalStoreProvider";
+import { useRouter } from "next/router";
 
 interface Props {
   title: string;
   children: React.ReactNode;
 }
 const Main: FunctionComponent<Props> = ({ title, children }) => {
+  const org = useStore((s) => s.organization);
+  const inOrganization = useRouter().pathname.includes("[organization]");
   return (
     <main>
       <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <h1 className="text-lg font-semibold leading-7 text-white">{title}</h1>
+        <h1 className="text-lg font-semibold leading-7 text-white">
+          {inOrganization && Boolean(org) ? (
+            <span className="text-blue-200">{org!.name} / </span>
+          ) : (
+            ""
+          )}
+          {title}
+        </h1>
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">{children}</div>
       <footer className="px-8 text-white/50 text-sm pb-8">

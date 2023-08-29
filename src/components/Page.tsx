@@ -20,6 +20,7 @@ import {
   GlobeAltIcon,
   ServerIcon,
   SignalIcon,
+  UserGroupIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Fragment, PropsWithChildren, useState } from "react";
@@ -33,16 +34,14 @@ type PageProps = {
   title: string;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
-  hideNav?: boolean;
+
+  navigation: Array<{
+    name: string;
+    href: string;
+    icon: any;
+  }>;
 };
 
-const navigation = [
-  { name: "Projects", href: "/projects", icon: ServerIcon },
-  { name: "Latest Activity", href: "/activity", icon: SignalIcon },
-  { name: "Domains", href: "/domains", icon: GlobeAltIcon },
-  { name: "Reports", href: "/reports", icon: ChartBarSquareIcon },
-  { name: "Settings", href: "/settings", icon: Cog6ToothIcon },
-];
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -101,7 +100,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
                     </button>
                   </div>
                 </Transition.Child>
-                <MobileSidebar navigation={navigation} />
+                <MobileSidebar navigation={props.navigation} />
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -109,7 +108,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       </Transition.Root>
       {/* Static sidebar for desktop */}
       <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col bg-black/20">
-        <Sidebar navigation={props.hideNav ? [] : navigation} />
+        <Sidebar navigation={props.navigation} />
       </div>
       <div className="xl:pl-72">
         {/*<StickySearchHeader

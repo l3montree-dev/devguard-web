@@ -22,6 +22,7 @@ import SingleStatGroup from "../../components/SingleStatGroup";
 import { withOrganization } from "../../decorators/withOrganization";
 import { withSession } from "../../decorators/withSession";
 import { IActivityItem } from "../../types/common";
+import { organizationNavigation } from "../../const/menus";
 
 const activityItems: { items: Array<IActivityItem> } = {
   items: [
@@ -79,6 +80,7 @@ const activityItems: { items: Array<IActivityItem> } = {
 export default function Projects() {
   return (
     <Page
+      navigation={organizationNavigation}
       Sidebar={
         <div>
           <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">

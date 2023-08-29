@@ -16,10 +16,12 @@
 import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
+import { userNavigation } from "../const/menus";
 
 export default function SetupOrg() {
   return (
     <Page
+      navigation={userNavigation}
       Sidebar={
         <ProgressSidebar
           steps={[

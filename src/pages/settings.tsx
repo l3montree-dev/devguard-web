@@ -29,6 +29,7 @@ import { Messages } from "../components/kratos/Messages";
 import { handleFlowError, ory } from "../services/ory";
 import { withSession } from "../decorators/withSession";
 import Button from "../components/common/Button";
+import { userNavigation } from "../const/menus";
 
 interface Props {
   flow?: SettingsFlow;
@@ -139,6 +140,7 @@ const Settings: NextPage = () => {
 
   return (
     <Page
+      navigation={userNavigation}
       Sidebar={
         <SubnavSidebar
           links={[

@@ -32,7 +32,8 @@ export default function Sidebar({ navigation }: Props) {
   const currentPath = router.pathname;
 
   const user = useStore((s) => s.session?.identity);
-
+  const org = useStore((s) => s.organization);
+  console.log("currentPath", currentPath);
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 ring-1 ring-white/5">
       <div className="flex h-24 shrink-0 items-center">
@@ -51,7 +52,7 @@ export default function Sidebar({ navigation }: Props) {
               {navigation.map((item) => (
                 <li key={item.name}>
                   <Link
-                    href={item.href}
+                    href={item.href.replace("[organization]", org?.slug || "")}
                     className={classNames(
                       item.href === currentPath
                         ? "bg-blue-900 text-white"
