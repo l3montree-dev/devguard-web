@@ -51,7 +51,7 @@ export default function SingleStatGroup() {
             <dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
               <div className="flex items-baseline text-2xl font-semibold text-blue-500">
                 {item.stat}
-                <span className="ml-2 text-sm font-medium text-gray-500">
+                <span className="ml-2 text-sm font-medium text-blue-200">
                   from {item.previousStat}
                 </span>
               </div>

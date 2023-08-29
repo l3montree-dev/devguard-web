@@ -28,7 +28,7 @@ const Section: FunctionComponent<Props> = (props) => {
         {props.title}
       </h2>
       {props.description !== undefined && (
-        <p className="mt-1 text-sm leading-6 text-gray-400">
+        <p className="mt-1 text-sm leading-6 text-blue-200">
           {props.description}
         </p>
       )}

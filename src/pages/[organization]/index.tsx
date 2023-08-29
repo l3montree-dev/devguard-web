@@ -13,29 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Fragment, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import {
-  ChartBarSquareIcon,
-  Cog6ToothIcon,
-  GlobeAltIcon,
-  ServerIcon,
-  SignalIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import StickySearchHeader from "../../components/navigation/StickySearchHeader";
 import Image from "next/image";
-import MobileSidebar from "../../components/navigation/MobileSidebar";
-import Sidebar from "../../components/navigation/Sidebar";
-import { ActivityItem, ActivityItems } from "@/types/common";
-import { calculateActivityString } from "@/utils/activityFeed";
-import SingleStatGroup from "../../components/SingleStatGroup";
-import ProjectList from "../../components/ProjectList";
-import Page from "../../components/Page";
-import { withSession } from "../../decorators/withSession";
-import { withOrganization } from "../../decorators/withOrganization";
 
-const activityItems: ActivityItems = {
+import { calculateActivityString } from "@/utils/activityFeed";
+import Page from "../../components/Page";
+import ProjectList from "../../components/ProjectList";
+import SingleStatGroup from "../../components/SingleStatGroup";
+import { withOrganization } from "../../decorators/withOrganization";
+import { withSession } from "../../decorators/withSession";
+import { IActivityItem } from "../../types/common";
+
+const activityItems: { items: Array<IActivityItem> } = {
   items: [
     {
       id: 1,
@@ -105,7 +93,7 @@ export default function Projects() {
             </a>
           </header>
           <ul role="list" className="divide-y divide-white/5">
-            {activityItems.items.map((item: ActivityItem) => (
+            {activityItems.items.map((item) => (
               <li key={item.id} className="px-4 py-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-x-3">
                   <Image
@@ -115,7 +103,7 @@ export default function Projects() {
                     height={32}
                     className="h-6 w-6 flex-none rounded-full bg-gray-800"
                   />
-                  <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-gray-400">
+                  <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-blue-200">
                     {item.user.name}
                   </h3>
                   <time

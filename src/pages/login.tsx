@@ -145,7 +145,7 @@ const Login: NextPage = () => {
           </a>
         ) : (
           <>
-            <p className="mt-10 text-center text-sm text-gray-400">
+            <p className="mt-10 text-center text-sm text-blue-200">
               You do not have an Account?{" "}
               <Link
                 href="/registration"
@@ -156,7 +156,7 @@ const Login: NextPage = () => {
               </Link>
             </p>
 
-            <p className="mt-4 text-center text-sm text-gray-400">
+            <p className="mt-4 text-center text-sm text-blue-200">
               Forgot password?{" "}
               <Link
                 href="/recovery"

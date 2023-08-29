@@ -33,7 +33,7 @@ export default function SubnavSidebar({ links }: Props) {
       <ol role="list" className="space-y-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         {links.map((link) => (
           <li key={link.href}>
-            <Link className="text-sm text-slate-400" href={link.href}>
+            <Link className="text-sm text-blue-200" href={link.href}>
               {link.title}
             </Link>
           </li>

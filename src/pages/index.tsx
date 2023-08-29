@@ -23,6 +23,7 @@ import { withSession } from "../decorators/withSession";
 import Section from "../components/common/Section";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Button from "../components/common/Button";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
@@ -37,8 +38,12 @@ const Home: FunctionComponent<Props> = ({ organizations }) => {
       <Section title="Select the organization" description="Test">
         <div className="grid grid-cols-3 gap-4">
           {organizations.map((org) => (
-            <Link key={org.id} href={`/${org.slug}`}>
-              <div className="bg-slate-800 p-5 rounded-md">
+            <Link
+              className="text-white border border-white/10 hover:no-underline bg-white/10 hover:bg-white/20 rounded-sm block transition-all"
+              key={org.id}
+              href={`/${org.slug}`}
+            >
+              <div className="p-5">
                 <h1>{org.name}</h1>
               </div>
             </Link>

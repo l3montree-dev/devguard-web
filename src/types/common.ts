@@ -30,14 +30,33 @@ export type ClosedState =
 
 export type PendingState = "pendingFix" | "pendingTransfered";
 
-export interface User {
+export type GroupAndProjects = {
+  name: string;
+  projects: Project[];
+};
+
+export type Project = {
+  name: string;
+  environment: Environment;
+  status: "All handeled" | "Unhandeled Flaws";
+  lastReport: string | null;
+  lastReportDateTime: string | null;
+};
+
+export type Environment = "prod" | "stage" | "dev";
+
+export interface IMember {
+  email: string;
+}
+
+export interface IUser {
   name: string;
   imageUrl: string;
 }
 
-export interface ActivityItem {
+export interface IActivityItem {
   id: number;
-  user: User;
+  user: IUser;
   projectName: string;
   cve: string;
   newState: State;
@@ -45,6 +64,6 @@ export interface ActivityItem {
   dateTime: string;
 }
 
-export interface ActivityItems {
-  items: ActivityItem[];
+export interface IActivityItems {
+  items: IActivityItem[];
 }

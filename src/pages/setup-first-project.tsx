@@ -13,11 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import OrgRegisterForm from "@/components/OrgRegisterForm";
+import GroupAndProjectsForm from "@/components/GroupAndProjectsForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
+import { GetServerSidePropsContext } from "next";
+import { withSession } from "../decorators/withSession";
+import { withOrganization } from "../decorators/withOrganization";
 
-export default function SetupOrg() {
+export default function SetupFirstProject(props) {
+  console.log(props);
   return (
     <Page
       Sidebar={
@@ -29,11 +33,11 @@ export default function SetupOrg() {
             },
             {
               name: "Create your organization",
-              status: "current",
+              status: "complete",
             },
             {
-              name: "Create first project",
-              status: "upcoming",
+              name: "Create first projects",
+              status: "current",
             },
             {
               name: "Invite team members",
@@ -42,9 +46,19 @@ export default function SetupOrg() {
           ]}
         />
       }
-      title="Create your organization"
+      title="Create your First Projects"
     >
-      <OrgRegisterForm />
+      <GroupAndProjectsForm />
+      <div className="xl:pl-72"></div>
     </Page>
   );
 }
+
+export const getServerSideProps = withSession(
+  async (session, ctx: GetServerSidePropsContext) => {
+    console.log("Hallo");
+    return {
+      props: {},
+    };
+  },
+);

@@ -136,7 +136,7 @@ const Registration: NextPage = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <Flow onSubmit={onSubmit} flow={flow} />
         </div>
-        <p className="mt-10 text-center text-sm text-gray-400">
+        <p className="mt-10 text-center text-sm text-blue-200">
           Already have an Account?{" "}
           <Link
             data-testid="cta-link"

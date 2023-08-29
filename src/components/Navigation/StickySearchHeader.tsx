@@ -54,8 +54,8 @@ export default function StickySearchHeader({
             <MagnifyingGlassIcon
               className={classNames(
                 isActive
-                  ? "text-gray-500"
-                  : "cursor-not-allowed text-gray-400/40",
+                  ? "text-blue-200"
+                  : "cursor-not-allowed text-blue-200/40",
                 "pointer-events-none absolute inset-y-0 left-0 h-full w-5",
               )}
               aria-hidden="true"
@@ -64,7 +64,7 @@ export default function StickySearchHeader({
               id="search-field"
               disabled={!isActive}
               className={classNames(
-                isActive ? "text-white" : "cursor-not-allowed text-gray-400/40",
+                isActive ? "text-white" : "cursor-not-allowed text-blue-200/40",
                 "block h-full w-full border-0 bg-transparent py-0 pl-8 pr-0 focus:ring-0 sm:text-sm",
               )}
               placeholder={isActive ? "Search..." : ""}

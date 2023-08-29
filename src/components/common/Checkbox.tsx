@@ -41,7 +41,7 @@ const Checkbox = React.forwardRef<any, Props>((props, ref) => {
           {label}
         </label>
         {props.help && (
-          <small className="text-sm text-gray-400">{props.help}</small>
+          <small className="text-sm text-blue-200">{props.help}</small>
         )}
       </div>
     </div>

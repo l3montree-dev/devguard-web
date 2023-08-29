@@ -55,8 +55,8 @@ export default function Sidebar({ navigation }: Props) {
                     className={classNames(
                       item.href === currentPath
                         ? "bg-blue-900 text-white"
-                        : "text-gray-400 hover:bg-blue-900 hover:text-white",
-                      "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 hover:no-underline",
+                        : "text-blue-200 hover:bg-blue-900 hover:text-white",
+                      "group flex gap-x-3 rounded-sm p-2 text-sm font-semibold leading-6 hover:no-underline",
                     )}
                   >
                     <item.icon

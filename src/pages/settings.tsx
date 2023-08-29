@@ -28,6 +28,7 @@ import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
 import { handleFlowError, ory } from "../services/ory";
 import { withSession } from "../decorators/withSession";
+import Button from "../components/common/Button";
 
 interface Props {
   flow?: SettingsFlow;
@@ -185,13 +186,8 @@ const Settings: NextPage = () => {
               className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
             />
             <div>
-              <button
-                type="button"
-                className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-white/20"
-              >
-                Change avatar
-              </button>
-              <p className="mt-2 text-xs leading-5 text-gray-400">
+              <Button>Change avatar</Button>
+              <p className="mt-2 text-xs leading-5 text-blue-200">
                 JPG, GIF or PNG. 1MB max.
               </p>
             </div>

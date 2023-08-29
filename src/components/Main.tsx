@@ -27,24 +27,24 @@ const Main: FunctionComponent<Props> = ({ title, children }) => {
         <h1 className="text-lg font-semibold leading-7 text-white">{title}</h1>
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">{children}</div>
-      <footer className="px-8 text-slate-500 text-sm pb-8">
+      <footer className="px-8 text-white/50 text-sm pb-8">
         <div className="flex flex-row gap-5 mb-2">
           <Link
-            className="text-slate-500"
+            className="text-white/50"
             target="_blank"
             href="https://github.com/l3montree-dev/flawfix"
           >
             GitHub
           </Link>
           <Link
-            className="text-slate-500"
+            className="text-white/50"
             target="_blank"
             href="https://flawfix.dev/impressum"
           >
             Imprint
           </Link>
           <Link
-            className="text-slate-500"
+            className="text-white/50"
             href="https://flawfix.dev/datenschutzerklaerung/"
           >
             Privacy
