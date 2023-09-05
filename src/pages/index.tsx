@@ -14,17 +14,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent } from "react";
-import Page from "../components/Page";
-import { getApiClientFromContext } from "../services/flawFixApi";
-import { OrganizationDTO } from "../types/api";
-import { useStore } from "../zustand/globalStoreProvider";
-import { withSession } from "../decorators/withSession";
-import Section from "../components/common/Section";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { FunctionComponent } from "react";
+import Page from "../components/Page";
 import Button from "../components/common/Button";
 import { userNavigation } from "../const/menus";
+import { withSession } from "../decorators/withSession";
+import { getApiClientFromContext } from "../services/flawFixApi";
+import { OrganizationDTO } from "../types/api";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
@@ -35,22 +33,31 @@ const Home: FunctionComponent<Props> = ({ organizations }) => {
     router.push(`/${org.id}`);
   };
   return (
-    <Page navigation={userNavigation} title="Organizations">
-      <Section title="Select the organization" description="Test">
-        <div className="grid grid-cols-3 gap-4">
-          {organizations.map((org) => (
-            <Link
-              className="text-white border border-white/10 hover:no-underline bg-white/10 hover:bg-white/20 rounded-sm block transition-all"
-              key={org.id}
-              href={`/${org.slug}`}
-            >
-              <div className="p-5">
-                <h1>{org.name}</h1>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Section>
+    <Page
+      Button={<Button>New Organization</Button>}
+      navigation={userNavigation}
+      title="Organizations"
+    >
+      <div className="grid grid-cols-1 divide-y divide-white/10">
+        {organizations.map((org) => (
+          <Link
+            className="text-white py-2  border-white/10 hover:no-underline  rounded-sm flex flex-row justify-between items-center transition-all"
+            key={org.id}
+            href={`/${org.slug}`}
+          >
+            <div className="w-full">
+              <h1 className="font-medium items-center flex justify-between w-full flex-1">
+                {org.name}{" "}
+                <Link className="text-sm font-medium" href={`/${org.slug}/`}>
+                  View Organization
+                </Link>
+              </h1>
+              <p className="text-blue-200">{org.description}</p>
+            </div>
+            <div></div>
+          </Link>
+        ))}
+      </div>
     </Page>
   );
 };
@@ -63,6 +70,7 @@ export const getServerSideProps = withSession(
     const orgs: Array<OrganizationDTO> = await (
       await apiClient("/organizations")
     ).json();
+
     return {
       props: {
         // hide the contactPhoneNumber

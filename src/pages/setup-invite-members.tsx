@@ -45,7 +45,7 @@ export default function SetupInviteMembers() {
     toast({
       msg: "Member invited",
       title: "Member invited",
-      type: "success",
+      intent: "success",
     });
     // Check if member is already invited
     if (invitedMembers.find((m) => m.email === member.email)) {

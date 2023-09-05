@@ -26,7 +26,7 @@ import React, { Fragment, useEffect } from "react";
 export interface ToastMsg {
   msg: string;
   title: string;
-  type: "info" | "success" | "warning" | "error";
+  intent: "info" | "success" | "warning" | "error";
 }
 
 const toasterEventEmitter = new EventEmitter();
@@ -34,7 +34,7 @@ const toasterEventEmitter = new EventEmitter();
 export const toast = (msg: ToastMsg) => {
   toasterEventEmitter.emit("msg", msg);
 };
-const getIcon = (type: ToastMsg["type"]) => {
+const getIcon = (type: ToastMsg["intent"]) => {
   switch (type) {
     case "info":
       return <InformationCircleIcon className="w-6 h-6 text-blue-600" />;
@@ -59,7 +59,7 @@ const getIcon = (type: ToastMsg["type"]) => {
 
 const Msg = ({
   msg,
-  type,
+  intent: intent,
   title,
   onRemove,
 }: ToastMsg & { onRemove: () => void }) => {
@@ -77,7 +77,7 @@ const Msg = ({
     >
       <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5">
         <div className="flex flex-row p-4 items-start">
-          <div className="flex-shrink-0">{getIcon(type)}</div>
+          <div className="flex-shrink-0">{getIcon(intent)}</div>
           <div className="ml-3  flex-1 pt-0.5">
             <p className="font-medium text-gray-900">{title}</p>
             <p className="mt-1 text-sm text-slate-700">{msg}</p>
@@ -85,7 +85,7 @@ const Msg = ({
           <div className="ml-4 flex flex-shrink-0">
             <button
               type="button"
-              className="inline-flex rounded-md bg-white text-slate-700 hover:text-blue-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+              className="inline-flex rounded-md bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
               onClick={() => {
                 setShow(false);
                 setTimeout(onRemove, 1000);
@@ -113,7 +113,7 @@ const Toaster = () => {
     };
   }, []);
   return (
-    <div className="absolute flex flex-col gap-2 right-4 top-4 toaster">
+    <div className="fixed flex flex-col gap-2 right-4 top-4 toaster">
       {msgs.map((msg, i) => (
         <Msg
           key={msg.id}

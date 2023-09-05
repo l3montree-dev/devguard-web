@@ -29,4 +29,12 @@ export interface OrganizationDTO extends AppModelDTO {
   nist: boolean;
   grundschutz: boolean;
   slug: string;
+  description: string;
+}
+
+export interface PersonalAccessTokenDTO {
+  description: string;
+  userId: string;
+  createdAt: string;
+  id: string;
 }

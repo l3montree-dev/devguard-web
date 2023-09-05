@@ -19,14 +19,35 @@ const Button: FunctionComponent<
   React.DetailedHTMLProps<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
-  >
+  > & {
+    variant?: "solid" | "outline";
+    intent?: "primary" | "danger";
+  }
 > = (props) => {
-  return (
-    <button
-      className="rounded-sm bg-amber-400 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-amber-200 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
-      {...props}
-    />
-  );
+  const classNames = (options: {
+    intent?: "primary" | "danger";
+    variant?: "solid" | "outline";
+  }) => {
+    let cls =
+      "rounded-sm whitespace-nowrap px-3 py-2 text-sm font-semibold shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
+
+    if (options.variant === "outline") {
+      if (options.intent === "danger") {
+        cls += ` border border-red-500 text-red-500 hover:bg-red-500 hover:text-white`;
+      } else {
+        cls += ` border border-amber-400 text-amber-400 hover:bg-amber-200 hover:text-slate-900`;
+      }
+    } else {
+      if (options.intent === "danger") {
+        cls += ` bg-red-500 text-white hover:bg-red-600`;
+      } else {
+        cls += ` bg-amber-400 text-slate-900 hover:bg-amber-200`;
+      }
+    }
+    return cls;
+  };
+
+  return <button className={classNames(props)} {...props} />;
 };
 
 export default Button;

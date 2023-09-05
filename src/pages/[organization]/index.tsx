@@ -23,6 +23,7 @@ import { withOrganization } from "../../decorators/withOrganization";
 import { withSession } from "../../decorators/withSession";
 import { IActivityItem } from "../../types/common";
 import { organizationNavigation } from "../../const/menus";
+import Button from "../../components/common/Button";
 
 const activityItems: { items: Array<IActivityItem> } = {
   items: [
@@ -80,6 +81,7 @@ const activityItems: { items: Array<IActivityItem> } = {
 export default function Projects() {
   return (
     <Page
+      Button={<Button>New Project</Button>}
       navigation={organizationNavigation}
       Sidebar={
         <div>

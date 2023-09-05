@@ -34,7 +34,7 @@ type PageProps = {
   title: string;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
-
+  Button?: React.ReactNode;
   navigation: Array<{
     name: string;
     href: string;
@@ -117,7 +117,9 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         /> */}
 
         <div className={classNames(props.Sidebar ? "lg:pr-96" : "lg:pr-72")}>
-          <Main title={props.title}>{props.children}</Main>
+          <Main Button={props.Button} title={props.title}>
+            {props.children}
+          </Main>
         </div>
         {!!props.Sidebar && (
           <aside className="flex-1 bg-black/20 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">

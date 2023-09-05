@@ -13,29 +13,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useId } from "react";
+import { classNames } from "../../utils/common";
 
 type Props = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 > & {
-  label: string;
+  label?: string;
 };
 const Input = React.forwardRef<any, Props>((props, ref) => {
   const { label, ...rest } = props;
   const id = useId();
   return (
     <>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium leading-6 text-white"
-      >
-        {label}
-      </label>
+      {Boolean(label) && (
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium leading-6 text-white"
+        >
+          {label}
+        </label>
+      )}
       <input
         ref={ref}
         id={id}
         title={label}
-        className="mt-2 block w-full rounded-sm border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6"
+        className={classNames(
+          "block w-full rounded-sm border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6",
+          Boolean(label) ? "mt-2" : "",
+        )}
         {...rest}
       />
     </>

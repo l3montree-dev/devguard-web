@@ -16,20 +16,25 @@
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import { AxiosError } from "axios";
-import type { NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { FunctionComponent, ReactNode, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
+import Button from "../components/common/Button";
+import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { handleFlowError, ory } from "../services/ory";
-import { withSession } from "../decorators/withSession";
-import Button from "../components/common/Button";
 import { userNavigation } from "../const/menus";
+import { withSession } from "../decorators/withSession";
+import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
+import { handleFlowError, ory } from "../services/ory";
+import { PersonalAccessTokenDTO } from "../types/api";
+import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
+import { toast } from "../components/Toaster";
 
 interface Props {
   flow?: SettingsFlow;
@@ -56,12 +61,31 @@ function SettingsCard({
   return children;
 }
 
-const Settings: NextPage = () => {
+const Settings: FunctionComponent<{
+  personalAccessTokens: Array<PersonalAccessTokenDTO>;
+}> = ({ personalAccessTokens: pats }) => {
   const [flow, setFlow] = useState<SettingsFlow>();
 
   // Get ?flow=... from the URL
   const router = useRouter();
   const { flow: flowId, return_to: returnTo } = router.query;
+
+  const [personalAccessTokens, setPersonalAccessTokens] =
+    useState<Array<PersonalAccessTokenDTO & { token?: string }>>(pats);
+
+  const { register, handleSubmit } = useForm<{ description: string }>();
+
+  const handleCreatePat = async (data: { description: string }) => {
+    const apiClient = getApiClient(document);
+    const pat: PersonalAccessTokenDTO = await (
+      await apiClient("/pat", {
+        method: "POST",
+        body: JSON.stringify(data),
+      })
+    ).json();
+
+    setPersonalAccessTokens([...personalAccessTokens, pat]);
+  };
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
@@ -138,6 +162,28 @@ const Settings: NextPage = () => {
           }),
       );
 
+  const handleCopy = (token: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(token);
+      toast({
+        title: "Successfully copied to clipboard",
+        msg: "The token has been copied to your clipboard",
+        intent: "success",
+      });
+    }
+  };
+
+  const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
+    console.log(pat);
+    const apiClient = getApiClient(document);
+    await apiClient(`/pat/${pat.id}`, {
+      method: "DELETE",
+    });
+    setPersonalAccessTokens(
+      personalAccessTokens.filter((p) => p.id !== pat.id),
+    );
+  };
+
   return (
     <Page
       navigation={userNavigation}
@@ -151,6 +197,10 @@ const Settings: NextPage = () => {
             {
               href: "#password",
               title: "Change Password",
+            },
+            {
+              href: "#pat",
+              title: "Manage Personal Access Tokens",
             },
             {
               href: "#oidc",
@@ -224,6 +274,65 @@ const Settings: NextPage = () => {
           />
         </SettingsCard>
       </Section>
+      <Section
+        id="pat"
+        title="Manage Personal Access Tokens"
+        description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
+      >
+        <div className="mb-6 flex flex-col gap-2">
+          {personalAccessTokens.map((pat) => (
+            <div
+              className="border border-white/20 rounded-sm overflow-hidden px-2 py-2 text-sm"
+              key={pat.id}
+            >
+              <div className="flex items-center flex-row justify-between">
+                <div className="flex-1">
+                  <div className="mb-2 flex gap-2 flex-row">
+                    <Input
+                      readOnly
+                      value={pat.token ? pat.token : "***********"}
+                    />
+                    {pat.token && (
+                      <Button onClick={() => handleCopy(pat.token!)}>
+                        Copy
+                      </Button>
+                    )}
+                    <div>
+                      <Button
+                        intent="danger"
+                        variant="outline"
+                        onClick={() => handleDeletePat(pat)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                  {pat.token && (
+                    <span className="block text-red-500 mb-4">
+                      Make sure to copy the token. You won&apos;t be able to see
+                      it ever again
+                    </span>
+                  )}
+                  <p>{pat.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <form
+          className="border rounded-sm border-white/20 p-2"
+          onSubmit={handleSubmit(handleCreatePat)}
+        >
+          <span className="font-medium block pb-2">
+            Create new Personal Access Token
+          </span>
+          <Input {...register("description")} label="Description" />
+          <div className="mt-2 justify-end flex flex-row">
+            <Button type="submit">Create</Button>
+          </div>
+        </form>
+      </Section>
+
       <Section
         id="oidc"
         title="Manage Social Sign In"
@@ -321,9 +430,17 @@ const Settings: NextPage = () => {
 };
 
 // just guard the page with the session decorator
-export const getServerSideProps = withSession(() => {
+export const getServerSideProps = withSession(async (_, ctx) => {
+  // get the personal access tokens from the user
+  const apiClient = getApiClientFromContext(ctx);
+
+  const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
+    "/pat",
+  ).then((r) => r.json());
   return {
-    props: {},
+    props: {
+      personalAccessTokens,
+    },
   };
 });
 

@@ -17,17 +17,19 @@ import React, { FunctionComponent } from "react";
 import { classNames } from "../utils/common";
 import { useStore } from "../zustand/globalStoreProvider";
 import { useRouter } from "next/router";
+import Button from "./common/Button";
 
 interface Props {
   title: string;
   children: React.ReactNode;
+  Button?: React.ReactNode;
 }
-const Main: FunctionComponent<Props> = ({ title, children }) => {
+const Main: FunctionComponent<Props> = ({ title, children, Button }) => {
   const org = useStore((s) => s.organization);
   const inOrganization = useRouter().pathname.includes("[organization]");
   return (
     <main>
-      <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <header className="flex items-center justify-between border-b border-white/5 px-4 py-6 sm:px-6 lg:px-8">
         <h1 className="text-lg font-semibold leading-7 text-white">
           {inOrganization && Boolean(org) ? (
             <span className="text-blue-200">{org!.name} / </span>
@@ -36,6 +38,7 @@ const Main: FunctionComponent<Props> = ({ title, children }) => {
           )}
           {title}
         </h1>
+        {Boolean(Button) && Button}
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">{children}</div>
       <footer className="px-8 text-white/50 text-sm pb-8">
