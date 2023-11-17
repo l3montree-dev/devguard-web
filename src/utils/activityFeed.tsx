@@ -19,18 +19,18 @@ export function calculateActivityString(item: IActivityItem): JSX.Element {
   switch (item.newState) {
     case "verifiedFix":
       return (
-        <p className="text-sm text-blue-200">
-          <span className="font-mono text-blue-200">{item.cve}</span> in{" "}
-          <span className="font-mono text-blue-200">{item.projectName}</span>{" "}
+        <p className="text-sm text-blue-100">
+          <span className="font-mono text-blue-100">{item.cve}</span> in{" "}
+          <span className="font-mono text-blue-100">{item.projectName}</span>{" "}
           mitigated through{" "}
           <span className="font-mono text-green-400">verified-fix</span>.
         </p>
       );
     case "pendingFix":
       return (
-        <p className="text-sm text-blue-200">
-          <span className="font-mono text-blue-200">{item.cve}</span> in{" "}
-          <span className="font-mono text-blue-200">{item.projectName}</span>{" "}
+        <p className="text-sm text-blue-100">
+          <span className="font-mono text-blue-100">{item.cve}</span> in{" "}
+          <span className="font-mono text-blue-100">{item.projectName}</span>{" "}
           now mitigated through{" "}
           <span className="font-montext-yellow-400">pending-fix</span>.
         </p>

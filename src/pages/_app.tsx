@@ -20,6 +20,7 @@ import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import { useHydrate } from "../zustand/globalStore";
 import { StoreProvider } from "../zustand/globalStoreProvider";
+import { useEffect } from "react";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -44,6 +45,9 @@ export const merriweather = Merriweather({
 export default function App({ Component, pageProps }) {
   const store = useHydrate(pageProps.initialZustandState);
 
+  useEffect(() => {
+    store.getState().clientInit();
+  }, [store]);
   return (
     <StoreProvider store={store}>
       <Component {...pageProps} />

@@ -45,7 +45,7 @@ export default function ProgressSidebar({ steps }: Props) {
                       aria-hidden="true"
                     />
                   </span>
-                  <span className="ml-3 text-sm font-medium text-blue-200 ">
+                  <span className="ml-3 text-sm font-medium text-blue-100 ">
                     {step.name}
                   </span>
                 </span>
@@ -72,7 +72,7 @@ export default function ProgressSidebar({ steps }: Props) {
                   >
                     <div className="h-2 w-2 rounded-full bg-gray-500 " />
                   </div>
-                  <p className="ml-3 text-sm font-medium text-blue-200 ">
+                  <p className="ml-3 text-sm font-medium text-blue-100 ">
                     {step.name}
                   </p>
                 </div>

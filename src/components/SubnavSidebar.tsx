@@ -25,7 +25,7 @@ interface Props {
 export default function SubnavSidebar({ links }: Props) {
   return (
     <>
-      <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <header className="flex items-center justify-between bg-blue-950 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <h2 className="text-base font-semibold leading-7 text-white">
           Navigation
         </h2>
@@ -33,7 +33,7 @@ export default function SubnavSidebar({ links }: Props) {
       <ol role="list" className="space-y-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         {links.map((link) => (
           <li key={link.href}>
-            <Link className="text-sm text-blue-200" href={link.href}>
+            <Link className="text-sm text-blue-100" href={link.href}>
               {link.title}
             </Link>
           </li>

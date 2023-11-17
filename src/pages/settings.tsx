@@ -23,6 +23,7 @@ import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
+import { toast } from "../components/Toaster";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/common/Section";
@@ -33,8 +34,8 @@ import { withSession } from "../decorators/withSession";
 import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api";
-import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
-import { toast } from "../components/Toaster";
+import { LogoutLink } from "../hooks/logoutLink";
+import { withInitialState } from "../decorators/withInitialState";
 
 interface Props {
   flow?: SettingsFlow;
@@ -136,7 +137,6 @@ const Settings: FunctionComponent<{
               for (const item of data.continue_with) {
                 switch (item.action) {
                   case "show_verification_ui":
-                    //@ts-expect-error
                     router.push("/verification?flow=" + item.flow.id);
                     return;
                 }
@@ -183,6 +183,8 @@ const Settings: FunctionComponent<{
       personalAccessTokens.filter((p) => p.id !== pat.id),
     );
   };
+
+  const handleLogout = LogoutLink();
 
   return (
     <Page
@@ -239,7 +241,7 @@ const Settings: FunctionComponent<{
             />
             <div>
               <Button>Change avatar</Button>
-              <p className="mt-2 text-xs leading-5 text-blue-200">
+              <p className="mt-2 text-xs leading-5 text-black/80">
                 JPG, GIF or PNG. 1MB max.
               </p>
             </div>
@@ -282,7 +284,7 @@ const Settings: FunctionComponent<{
         <div className="mb-6 flex flex-col gap-2">
           {personalAccessTokens.map((pat) => (
             <div
-              className="border border-white/20 rounded-sm overflow-hidden px-2 py-2 text-sm"
+              className="rounded-sm overflow-hidden px-2 py-2 text-sm"
               key={pat.id}
             >
               <div className="flex items-center flex-row justify-between">
@@ -320,7 +322,7 @@ const Settings: FunctionComponent<{
           ))}
         </div>
         <form
-          className="border rounded-sm border-white/20 p-2"
+          className="border rounded-sm p-2"
           onSubmit={handleSubmit(handleCreatePat)}
         >
           <span className="font-medium block pb-2">
@@ -425,23 +427,28 @@ const Settings: FunctionComponent<{
           />
         </SettingsCard>
       </Section>
+      <div className="flex flex-row justify-end">
+        <Button onClick={handleLogout}>Logout</Button>
+      </div>
     </Page>
   );
 };
 
 // just guard the page with the session decorator
-export const getServerSideProps = withSession(async (_, ctx) => {
-  // get the personal access tokens from the user
-  const apiClient = getApiClientFromContext(ctx);
+export const getServerSideProps = withSession(
+  withInitialState(async (ctx) => {
+    // get the personal access tokens from the user
+    const apiClient = getApiClientFromContext(ctx);
 
-  const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
-    "/pat",
-  ).then((r) => r.json());
-  return {
-    props: {
-      personalAccessTokens,
-    },
-  };
-});
+    const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
+      "/pat",
+    ).then((r) => r.json());
+    return {
+      props: {
+        personalAccessTokens,
+      },
+    };
+  }),
+);
 
 export default Settings;

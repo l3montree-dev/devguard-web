@@ -22,7 +22,7 @@ interface MessageProps {
 export const Message = ({ message }: MessageProps) => {
   return (
     <p
-      className="text-sm text-blue-200"
+      className="text-sm text-black/80"
       data-testid={`ui/message/${message.id}`}
     >
       {message.text}

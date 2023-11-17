@@ -55,7 +55,7 @@ export default function GroupAndProjectsForm() {
             <h2 className="text-base font-semibold leading-7 text-white">
               Create your first Group
             </h2>
-            <p className="mt-1 text-sm leading-6 text-blue-200">
+            <p className="mt-1 text-sm leading-6 text-blue-100">
               Organize you projects in groups, just like folders. Groups can
               also serve as a namespace for several projects.
             </p>
@@ -94,7 +94,7 @@ export default function GroupAndProjectsForm() {
           ) : (
             <div className="text-center">
               <svg
-                className="mx-auto h-12 w-12 text-blue-200"
+                className="mx-auto h-12 w-12 text-blue-100"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -111,7 +111,7 @@ export default function GroupAndProjectsForm() {
               <h3 className="mt-2 text-sm font-semibold text-white">
                 No projects
               </h3>
-              <p className="mt-1 text-sm text-blue-200">
+              <p className="mt-1 text-sm text-blue-100">
                 Get started by creating a new project.
               </p>
               <div className="mt-6">

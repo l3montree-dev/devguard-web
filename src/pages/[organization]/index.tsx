@@ -19,11 +19,11 @@ import { calculateActivityString } from "@/utils/activityFeed";
 import Page from "../../components/Page";
 import ProjectList from "../../components/ProjectList";
 import SingleStatGroup from "../../components/SingleStatGroup";
-import { withOrganization } from "../../decorators/withOrganization";
+import Button from "../../components/common/Button";
+import { organizationNavigation } from "../../const/menus";
+import { withInitialState } from "../../decorators/withInitialState";
 import { withSession } from "../../decorators/withSession";
 import { IActivityItem } from "../../types/common";
-import { organizationNavigation } from "../../const/menus";
-import Button from "../../components/common/Button";
 
 const activityItems: { items: Array<IActivityItem> } = {
   items: [
@@ -107,7 +107,7 @@ export default function Projects() {
                     height={32}
                     className="h-6 w-6 flex-none rounded-full bg-gray-800"
                   />
-                  <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-blue-200">
+                  <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-blue-100">
                     {item.user.name}
                   </h3>
                   <time
@@ -136,7 +136,7 @@ export default function Projects() {
 }
 
 export const getServerSideProps = withSession(
-  withOrganization((session, organization, ctx) => {
+  withInitialState((ctx) => {
     return {
       props: {},
     };

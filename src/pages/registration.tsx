@@ -89,7 +89,6 @@ const Registration: NextPage = () => {
           for (const item of data.continue_with) {
             switch (item.action) {
               case "show_verification_ui":
-                // @ts-expect-error
                 await router.push("/verification?flow=" + item.flow.id);
                 return;
             }
@@ -119,7 +118,7 @@ const Registration: NextPage = () => {
         <title>Create your FlawFix account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+      <div className="flex min-h-screen bg-blue-900 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
             className="mx-auto h-16 w-auto"
@@ -136,12 +135,12 @@ const Registration: NextPage = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <Flow onSubmit={onSubmit} flow={flow} />
         </div>
-        <p className="mt-10 text-center text-sm text-blue-200">
+        <p className="mt-10 text-center text-sm text-blue-100">
           Already have an Account?{" "}
           <Link
             data-testid="cta-link"
             href="/login"
-            className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+            className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
           >
             Sign in
           </Link>

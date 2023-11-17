@@ -24,7 +24,9 @@ import Input from "./common/Input";
 import Section from "./common/Section";
 import Select from "./common/Select";
 
-export default function OrgRegisterForm() {
+interface Props {}
+
+export default function OrgRegisterForm(props: Props) {
   const { register, handleSubmit } = useForm<
     OrganizationDTO & { permission: string }
   >();
@@ -50,7 +52,7 @@ export default function OrgRegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(handleOrgCreation)}>
+    <form className="text-black" onSubmit={handleSubmit(handleOrgCreation)}>
       <Section
         description="General and required information about your organization."
         title="Required Information"
@@ -132,7 +134,7 @@ export default function OrgRegisterForm() {
           </div>
         </div>
         <div className="mt-10">
-          <span className="text-sm font-semibold leading-6 text-white">
+          <span className="text-sm font-semibold leading-6">
             Do you have to comply with any of the following regulations/
             standards?
           </span>

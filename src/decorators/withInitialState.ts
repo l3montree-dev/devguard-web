@@ -16,58 +16,43 @@
 import { Session } from "@ory/client";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/flawFixApi";
-import { OrganizationDTO } from "../types/api";
 import { User } from "../types/auth";
 import { addToInitialZustandState } from "../zustand/initialState";
 
-export function withOrganization(
+export function withInitialState(
   next: (
-    session: Omit<Session, "identity"> & { identity: User },
-    organization: OrganizationDTO,
     ctx: GetServerSidePropsContext,
+    session: Omit<Session, "identity"> & { identity: User },
   ) => any,
 ) {
   return async (
-    session: Omit<Session, "identity"> & { identity: User },
     ctx: GetServerSidePropsContext,
+    session: Omit<Session, "identity"> & { identity: User },
   ) => {
-    // extract the organizationId from the cookie
-    const organizationSlug = ctx.params?.organization;
-    if (!organizationSlug) {
-      return {
-        redirect: "/",
-      };
-    }
-
     // get the flawFixApiClient
     const flawFixApiClient = getApiClientFromContext(ctx);
 
     // get the organization
-    const r = await flawFixApiClient(
-      "/organizations/" + organizationSlug + "/",
-    );
+    const r = await flawFixApiClient("/organizations");
 
-    console.log(r.url);
-    // check if the organization exists
     if (!r.ok) {
-      console.log("organization not found");
+      // it must be an 500
       return {
         redirect: {
-          destination: "/",
+          destination: "/500",
           permanent: false,
         },
       };
     }
-
     // parse the organization
-    const organization = await r.json();
+    const organizations = await r.json();
 
     // call the initial endpoint with the latest information available
-    const resp = await next(session, organization, ctx);
+    const resp = await next(ctx, session);
 
     // add the organization to the initial zustand state
     return addToInitialZustandState(resp, {
-      organization,
+      organizations,
     });
   };
 }

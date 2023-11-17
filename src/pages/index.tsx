@@ -16,48 +16,33 @@
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import Page from "../components/Page";
 import Button from "../components/common/Button";
+import Modal from "../components/common/Modal";
 import { userNavigation } from "../const/menus";
 import { withSession } from "../decorators/withSession";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { OrganizationDTO } from "../types/api";
+import SetupOrg from "./setup-org";
+import OrgRegisterForm from "../components/OrgRegisterForm";
+import { withInitialState } from "../decorators/withInitialState";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
 
-const Home: FunctionComponent<Props> = ({ organizations }) => {
-  const router = useRouter();
-  const handleJoinOrganization = async (org: OrganizationDTO) => {
-    router.push(`/${org.id}`);
-  };
+const Home: FunctionComponent<Props> = () => {
+  const [open, setOpen] = useState(false);
   return (
     <Page
-      Button={<Button>New Organization</Button>}
+      Button={<Button onClick={() => setOpen(true)}>New Organization</Button>}
       navigation={userNavigation}
       title="Organizations"
     >
-      <div className="grid grid-cols-1 divide-y divide-white/10">
-        {organizations.map((org) => (
-          <Link
-            className="text-white py-2  border-white/10 hover:no-underline  rounded-sm flex flex-row justify-between items-center transition-all"
-            key={org.id}
-            href={`/${org.slug}`}
-          >
-            <div className="w-full">
-              <h1 className="font-medium items-center flex justify-between w-full flex-1">
-                {org.name}{" "}
-                <Link className="text-sm font-medium" href={`/${org.slug}/`}>
-                  View Organization
-                </Link>
-              </h1>
-              <p className="text-blue-200">{org.description}</p>
-            </div>
-            <div></div>
-          </Link>
-        ))}
-      </div>
+      <Modal title="Create new Organization" open={open} setOpen={setOpen}>
+        <OrgRegisterForm />
+      </Modal>
+      <div className="grid grid-cols-1 divide-y divide-white/10"></div>
     </Page>
   );
 };
@@ -65,20 +50,9 @@ const Home: FunctionComponent<Props> = ({ organizations }) => {
 export default Home;
 
 export const getServerSideProps = withSession(
-  async (session, context: GetServerSidePropsContext) => {
-    const apiClient = getApiClientFromContext(context);
-    const orgs: Array<OrganizationDTO> = await (
-      await apiClient("/organizations")
-    ).json();
-
+  withInitialState(async (context: GetServerSidePropsContext, session) => {
     return {
-      props: {
-        // hide the contactPhoneNumber
-        organizations: orgs.map((o) => ({
-          ...o,
-          contactPhoneNumber: null,
-        })),
-      },
+      props: {},
     };
-  },
+  }),
 );

@@ -115,7 +115,7 @@ const Login: NextPage = () => {
         <title>FlawFix - Sign in</title>
         <meta name="description" content="FlawFix Sign in" />
       </Head>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+      <div className="flex min-h-screen flex-1 bg-blue-900 flex-col items-center justify-center px-6 max-sm:py-16 py-32 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
             className="mx-auto h-16 w-auto"
@@ -135,7 +135,7 @@ const Login: NextPage = () => {
             })()}
           </h2>
         </div>
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="mt-10 sm:mx-auto text-white sm:w-full sm:max-w-sm">
           <Flow onSubmit={onSubmit} flow={flow} />
         </div>
 
@@ -145,23 +145,23 @@ const Login: NextPage = () => {
           </a>
         ) : (
           <>
-            <p className="mt-10 text-center text-sm text-blue-200">
+            <p className="mt-10 text-center text-sm text-white">
               You do not have an Account?{" "}
               <Link
                 href="/registration"
                 passHref
-                className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+                className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
               >
                 Create account
               </Link>
             </p>
 
-            <p className="mt-4 text-center text-sm text-blue-200">
+            <p className="mt-4 text-center text-sm text-white">
               Forgot password?{" "}
               <Link
                 href="/recovery"
                 passHref
-                className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+                className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
               >
                 Recover your account
               </Link>

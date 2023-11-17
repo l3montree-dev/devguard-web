@@ -58,7 +58,7 @@ export default function InviteMembersForm({ inviteMembers }: Props) {
           <h2 className="mt-2 text-base font-semibold leading-6 text-white">
             Invite team members
           </h2>
-          <p className="mt-1 text-sm text-blue-200">
+          <p className="mt-1 text-sm text-blue-100">
             You haven’t added any team members to your project yet. As the owner
             of this project, you can manage team member permissions.
           </p>

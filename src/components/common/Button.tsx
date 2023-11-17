@@ -14,6 +14,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { FunctionComponent } from "react";
+import { applyClsxConfig, classNames } from "../../utils/common";
+
+const cslxConfig = {
+  default: "rounded-md px-2 transition-all text-sm py-2 font-medium",
+  variant: {
+    "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
+    "outline+danger": "bg-transparent text-blue-500 hover:bg-blue-100",
+    "solid+primary": "bg-amber-400 text-black hover:bg-amber-300",
+    "outline+primary": "bg-transparent text-blue-500 hover:bg-blue-100",
+  },
+};
 
 const Button: FunctionComponent<
   React.DetailedHTMLProps<
@@ -23,31 +34,18 @@ const Button: FunctionComponent<
     variant?: "solid" | "outline";
     intent?: "primary" | "danger";
   }
-> = (props) => {
-  const classNames = (options: {
-    intent?: "primary" | "danger";
-    variant?: "solid" | "outline";
-  }) => {
-    let cls =
-      "rounded-sm whitespace-nowrap px-3 py-2 text-sm font-semibold shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
-
-    if (options.variant === "outline") {
-      if (options.intent === "danger") {
-        cls += ` border border-red-500 text-red-500 hover:bg-red-500 hover:text-white`;
-      } else {
-        cls += ` border border-amber-400 text-amber-400 hover:bg-amber-200 hover:text-slate-900`;
-      }
-    } else {
-      if (options.intent === "danger") {
-        cls += ` bg-red-500 text-white hover:bg-red-600`;
-      } else {
-        cls += ` bg-amber-400 text-slate-900 hover:bg-amber-200`;
-      }
-    }
-    return cls;
-  };
-
-  return <button className={classNames(props)} {...props} />;
+> = ({ variant = "solid", intent = "primary", ...rest }) => {
+  return (
+    <button
+      className={classNames(
+        cslxConfig.default,
+        applyClsxConfig(cslxConfig, {
+          variant: variant + "+" + intent,
+        }),
+      )}
+      {...rest}
+    />
+  );
 };
 
 export default Button;

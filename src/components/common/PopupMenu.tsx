@@ -12,27 +12,10 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import React from "react";
 
-import React, { FunctionComponent, ReactNode } from "react";
-
-interface Props {
-  title: string;
-  description?: ReactNode;
-  children: React.ReactNode;
-  id?: string;
-}
-const Section: FunctionComponent<Props> = (props) => {
-  return (
-    <div id={props.id} className="mb-6 text-black pb-6">
-      <h2 className="text-base font-semibold leading-7">{props.title}</h2>
-      {props.description !== undefined && (
-        <p className="mt-1 text-sm leading-6 text-black/80">
-          {props.description}
-        </p>
-      )}
-      <div className="mt-6">{props.children}</div>
-    </div>
-  );
+const PopupMenu = () => {
+  return <div></div>;
 };
 
-export default Section;
+export default PopupMenu;

@@ -23,7 +23,7 @@ interface Props {
 export default function AlreadyInvitedMembersList({ members }: Props) {
   return (
     <div className="">
-      <h3 className="text-sm font-medium text-blue-200">
+      <h3 className="text-sm font-medium text-blue-100">
         Team members already added
       </h3>
       <ul

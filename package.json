@@ -9,30 +9,30 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@headlessui/react": "^1.7.15",
+        "@headlessui/react": "^1.7.17",
         "@heroicons/react": "^2.0.18",
-        "@ory/client": "^1.1.41",
-        "@ory/integrations": "^1.1.4",
-        "@tailwindcss/forms": "^0.5.4",
-        "@types/node": "20.4.5",
-        "@types/react": "18.2.16",
-        "@types/react-dom": "18.2.7",
-        "autoprefixer": "10.4.14",
-        "axios": "^1.4.0",
-        "eslint": "8.45.0",
-        "eslint-config-next": "13.4.12",
+        "@ory/client": "^1.4.0",
+        "@ory/integrations": "^1.1.5",
+        "@tailwindcss/forms": "^0.5.7",
+        "@types/node": "20.9.1",
+        "@types/react": "18.2.37",
+        "@types/react-dom": "18.2.15",
+        "autoprefixer": "10.4.16",
+        "axios": "^1.6.2",
+        "eslint": "8.53.0",
+        "eslint-config-next": "14.0.3",
         "focus-visible": "^5.2.0",
-        "next": "13.4.12",
-        "postcss": "8.4.27",
+        "next": "14.0.3",
+        "postcss": "8.4.31",
         "react": "18.2.0",
         "react-dom": "18.2.0",
-        "react-hook-form": "^7.45.4",
-        "sass": "^1.64.1",
-        "tailwindcss": "3.3.3",
-        "typescript": "5.1.6",
-        "zustand": "^4.4.1"
+        "react-hook-form": "^7.48.2",
+        "sass": "^1.69.5",
+        "tailwindcss": "3.3.5",
+        "typescript": "5.2.2",
+        "zustand": "^4.4.6"
     },
     "devDependencies": {
-        "eslint-plugin-prettier": "^5.0.0"
+        "eslint-plugin-prettier": "^5.0.1"
     }
 }

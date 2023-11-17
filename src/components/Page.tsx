@@ -51,7 +51,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-50 xl:hidden"
+          className="relative z-10 xl:hidden"
           onClose={setSidebarOpen}
         >
           <Transition.Child
@@ -107,22 +107,17 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         </Dialog>
       </Transition.Root>
       {/* Static sidebar for desktop */}
-      <div className="hidden xl:fixed xl:inset-y-0 xl:z-50 xl:flex xl:w-72 xl:flex-col bg-black/20">
+      <div className="hidden md:fixed inset-y-0  md:flex w-80 flex-col bg-blue-950">
         <Sidebar navigation={props.navigation} />
       </div>
-      <div className="xl:pl-72">
-        {/*<StickySearchHeader
-          setSidebarOpen={setSidebarOpen}
-          isActive={props.searchActive}
-        /> */}
-
-        <div className={classNames(props.Sidebar ? "lg:pr-96" : "lg:pr-72")}>
+      <div className="md:pl-80">
+        <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
           <Main Button={props.Button} title={props.title}>
             {props.children}
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="flex-1 bg-black/20 lg:fixed lg:bottom-0 lg:right-0 top-0 lg:w-96 lg:overflow-y-auto lg:border-l lg:border-white/5">
+          <aside className="flex-1 hidden bg-blue-900 md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
             {props.Sidebar}
           </aside>
         )}

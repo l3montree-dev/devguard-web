@@ -29,36 +29,38 @@ const Main: FunctionComponent<Props> = ({ title, children, Button }) => {
   const inOrganization = useRouter().pathname.includes("[organization]");
   return (
     <main>
-      <header className="flex items-center justify-between border-b border-white/5 px-4 py-6 sm:px-6 lg:px-8">
+      <header className="flex relative items-center justify-between bg-blue-900 px-4 py-5 sm:px-6 lg:px-8">
         <h1 className="text-lg font-semibold leading-7 text-white">
           {inOrganization && Boolean(org) ? (
-            <span className="text-blue-200">{org!.name} / </span>
+            <span className="text-blue-100">{org!.name} / </span>
           ) : (
             ""
           )}
           {title}
         </h1>
-        {Boolean(Button) && Button}
+        {Boolean(Button) && <div className="absolute right-4">{Button}</div>}
       </header>
-      <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8">{children}</div>
-      <footer className="px-8 text-white/50 text-sm pb-8">
+      <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">
+        {children}
+      </div>
+      <footer className="px-8 text-black/50 text-sm pb-8">
         <div className="flex flex-row gap-5 mb-2">
           <Link
-            className="text-white/50"
+            className="text-black/50"
             target="_blank"
             href="https://github.com/l3montree-dev/flawfix"
           >
             GitHub
           </Link>
           <Link
-            className="text-white/50"
+            className="text-black/50"
             target="_blank"
             href="https://flawfix.dev/impressum"
           >
             Imprint
           </Link>
           <Link
-            className="text-white/50"
+            className="text-black/50"
             href="https://flawfix.dev/datenschutzerklaerung/"
           >
             Privacy

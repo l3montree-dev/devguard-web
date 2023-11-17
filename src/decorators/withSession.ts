@@ -22,8 +22,8 @@ import { addToInitialZustandState } from "../zustand/initialState";
 
 export function withSession(
   next: (
-    session: Omit<Session, "identity"> & { identity: User },
     ctx: GetServerSidePropsContext,
+    session: Omit<Session, "identity"> & { identity: User },
   ) => any,
 ) {
   return async (ctx: GetServerSidePropsContext) => {
@@ -48,10 +48,10 @@ export function withSession(
         };
       }
       // call the initial endpoint with the latest information available
-      const resp = await next(session.data, ctx);
+      const resp = await next(ctx, session.data as any);
 
       return addToInitialZustandState(resp, {
-        session: session.data,
+        session: session.data as any,
       });
     } catch (e: unknown) {
       if (isAxiosError(e))
@@ -65,8 +65,6 @@ export function withSession(
           };
         }
 
-      // internal server error
-      console.log(e);
       return {
         redirect: {
           destination: "/login?return_to=" + ctx.resolvedUrl,

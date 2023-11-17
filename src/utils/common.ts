@@ -39,3 +39,18 @@ export function getBGColorByState(state: State) {
       return "bg-gray-600";
   }
 }
+
+export const applyClsxConfig = (
+  config: Record<string, any>,
+  props: Record<string, any>,
+): string => {
+  // iterate over the blok keys and check if a corresponding config key exists.
+  let classNames: Array<string> = [];
+  Object.entries(props).forEach(([key, value]) => {
+    if (key in config) {
+      classNames.push(config[key][value]);
+    }
+  });
+
+  return classNames.join(" ");
+};

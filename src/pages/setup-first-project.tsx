@@ -18,7 +18,6 @@ import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
 import { GetServerSidePropsContext } from "next";
 import { withSession } from "../decorators/withSession";
-import { withOrganization } from "../decorators/withOrganization";
 
 export default function SetupFirstProject(props) {
   console.log(props);
@@ -56,7 +55,6 @@ export default function SetupFirstProject(props) {
 
 export const getServerSideProps = withSession(
   async (session, ctx: GetServerSidePropsContext) => {
-    console.log("Hallo");
     return {
       props: {},
     };

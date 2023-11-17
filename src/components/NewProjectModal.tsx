@@ -111,7 +111,7 @@ export default function NewProjectModal({
                       >
                         Environment *
                       </label>
-                      <p className="text-sm text-blue-200">
+                      <p className="text-sm text-blue-100">
                         Set the current environment for this project.
                       </p>
                       <fieldset className="mt-4">

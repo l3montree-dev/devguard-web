@@ -146,7 +146,7 @@ const Verification: NextPage = () => {
           <Link
             href="/"
             passHref
-            className="font-semibold leading-6 text-blue-500 hover:text-blue-400"
+            className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
           >
             Go back
           </Link>

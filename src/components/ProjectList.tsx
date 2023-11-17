@@ -95,7 +95,7 @@ export default function ProjectList() {
                   {project.status}
                 </p>
               </div>
-              <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-blue-200">
+              <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-blue-100">
                 <p className="whitespace-nowrap">
                   Latest Report:{" "}
                   <time dateTime={project.dueDateTime}>{project.dueDate}</time>
@@ -116,7 +116,7 @@ export default function ProjectList() {
                 View project<span className="sr-only">, {project.name}</span>
               </a>
               <Menu as="div" className="relative flex-none">
-                <Menu.Button className="-m-2.5 block p-2.5 text-blue-200 hover:text-gray-900">
+                <Menu.Button className="-m-2.5 block p-2.5 text-blue-100 hover:text-gray-900">
                   <span className="sr-only">Open options</span>
                   <EllipsisVerticalIcon
                     className="h-5 w-5"

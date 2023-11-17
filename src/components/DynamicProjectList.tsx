@@ -51,7 +51,7 @@ export default function DynamicProjectList({
             <div className="min-w-0 pt-4">
               <div className="flex items-start gap-x-3">
                 <p className="leading-6">
-                  <span className="text-blue-200">
+                  <span className="text-blue-100">
                     {groupAndProjects.name} /
                   </span>{" "}
                   <span className="font-semibold text-white">
@@ -67,7 +67,7 @@ export default function DynamicProjectList({
                   {project.status}
                 </p>
               </div>
-              <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-blue-200">
+              <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-blue-100">
                 <p className="whitespace-nowrap">
                   Latest Report:{" "}
                   <time dateTime={project.lastReportDateTime || undefined}>
@@ -84,7 +84,7 @@ export default function DynamicProjectList({
             </div>
             <div className="flex flex-none items-center gap-x-4">
               <Menu as="div" className="relative flex-none">
-                <Menu.Button className="-m-2.5 block p-2.5 text-blue-200 hover:text-blue-200">
+                <Menu.Button className="-m-2.5 block p-2.5 text-blue-100 hover:text-blue-100">
                   <span className="sr-only">Open options</span>
                   <EllipsisVerticalIcon
                     className="h-5 w-5"

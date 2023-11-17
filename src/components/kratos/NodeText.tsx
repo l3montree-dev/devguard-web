@@ -48,7 +48,7 @@ const Content = ({ node, attributes }: Props) => {
 
   return (
     <div
-      className="mt-2 font-medium text-white"
+      className="mt-2 font-medium"
       data-testid={`node/text/${attributes.id}/text`}
     >
       {attributes.text.text}
@@ -60,7 +60,7 @@ export const NodeText = ({ node, attributes }: Props) => {
   return (
     <>
       <p
-        className="mt-6 text-sm text-white"
+        className="mt-6 text-sm"
         data-testid={`node/text/${attributes.id}/label`}
       >
         {node.meta?.label?.text}
