@@ -25,7 +25,7 @@ interface Props {
   }[];
 }
 
-export default function MobileSidebar({ navigation }: Props) {
+export default function MobileNav({ navigation }: Props) {
   const pathname = useRouter().pathname;
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 ring-1 ring-white/10">

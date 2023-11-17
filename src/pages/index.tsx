@@ -14,35 +14,89 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GetServerSidePropsContext } from "next";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import Page from "../components/Page";
 import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
-import { userNavigation } from "../const/menus";
-import { withSession } from "../decorators/withSession";
-import { getApiClientFromContext } from "../services/flawFixApi";
-import { OrganizationDTO } from "../types/api";
-import SetupOrg from "./setup-org";
-import OrgRegisterForm from "../components/OrgRegisterForm";
 import { withInitialState } from "../decorators/withInitialState";
+import { withSession } from "../decorators/withSession";
+import { OrganizationDTO } from "../types/api";
+import { IActivityItem } from "../types/common";
+import { organizationNavigation } from "../const/menus";
+import Image from "next/image";
+import ProjectList from "../components/ProjectList";
+import SingleStatGroup from "../components/SingleStatGroup";
+import { calculateActivityString } from "../utils/activityFeed";
+import { useStore } from "../zustand/globalStoreProvider";
 interface Props {
   organizations: Array<OrganizationDTO>;
 }
+const activityItems: { items: Array<IActivityItem> } = {
+  items: [
+    {
+      id: 1,
+      user: {
+        name: "Tim Bastin",
+        imageUrl: "/examples/tim.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "verifiedFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+    {
+      id: 2,
+      user: {
+        name: "Sebastian Kawelke",
+        imageUrl: "/examples/sebastian.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "pendingFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+    {
+      id: 3,
+      user: {
+        name: "Frédéric Noppe",
+        imageUrl: "/examples/frederic.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "pendingFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+    {
+      id: 4,
+      user: {
+        name: "Tim Bastin",
+        imageUrl: "/examples/tim.jpg",
+      },
+      projectName: "StampLab",
+      cve: "CVE-2023-1234",
+      newState: "verifiedFix",
+      date: "1h",
+      dateTime: "2023-01-23T11:00",
+    },
+  ],
+};
 
 const Home: FunctionComponent<Props> = () => {
   const [open, setOpen] = useState(false);
+  const activeOrg = useStore((s) => s.activeOrganization);
   return (
     <Page
-      Button={<Button onClick={() => setOpen(true)}>New Organization</Button>}
-      navigation={userNavigation}
-      title="Organizations"
+      Button={<Button>New Project</Button>}
+      title={activeOrg?.name ?? "Loading..."}
     >
-      <Modal title="Create new Organization" open={open} setOpen={setOpen}>
-        <OrgRegisterForm />
-      </Modal>
-      <div className="grid grid-cols-1 divide-y divide-white/10"></div>
+      <div>
+        <SingleStatGroup />
+      </div>
+      <div>
+        <ProjectList />
+      </div>
     </Page>
   );
 };

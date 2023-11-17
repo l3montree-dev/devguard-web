@@ -14,27 +14,21 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Link from "next/link";
-import Sidebar from "./Sidebar";
 
 interface Props {
-  links: Array<{
-    title: string;
-    href: string;
-  }>;
+  title: string;
+  children: React.ReactNode;
 }
 
-export default function SubnavSidebar({ links }: Props) {
+export default function Sidebar({ title, children }: Props) {
   return (
-    <Sidebar title="Navigation">
-      <ol role="list" className="space-y-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link className="text-sm text-blue-100" href={link.href}>
-              {link.title}
-            </Link>
-          </li>
-        ))}
-      </ol>
-    </Sidebar>
+    <>
+      <header className="flex items-center justify-between bg-blue-950 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+        <h2 className="text-base font-semibold leading-7 text-white">
+          {title}
+        </h2>
+      </header>
+      {children}
+    </>
   );
 }

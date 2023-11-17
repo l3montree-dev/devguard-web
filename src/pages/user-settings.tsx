@@ -29,13 +29,12 @@ import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { userNavigation } from "../const/menus";
+import { withInitialState } from "../decorators/withInitialState";
 import { withSession } from "../decorators/withSession";
+import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api";
-import { LogoutLink } from "../hooks/logoutLink";
-import { withInitialState } from "../decorators/withInitialState";
 
 interface Props {
   flow?: SettingsFlow;
@@ -174,7 +173,6 @@ const Settings: FunctionComponent<{
   };
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
-    console.log(pat);
     const apiClient = getApiClient(document);
     await apiClient(`/pat/${pat.id}`, {
       method: "DELETE",
@@ -188,7 +186,6 @@ const Settings: FunctionComponent<{
 
   return (
     <Page
-      navigation={userNavigation}
       Sidebar={
         <SubnavSidebar
           links={[

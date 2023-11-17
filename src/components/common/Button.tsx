@@ -17,7 +17,7 @@ import React, { FunctionComponent } from "react";
 import { applyClsxConfig, classNames } from "../../utils/common";
 
 const cslxConfig = {
-  default: "rounded-md px-2 transition-all text-sm py-2 font-medium",
+  default: "rounded-sm px-2 transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger": "bg-transparent text-blue-500 hover:bg-blue-100",

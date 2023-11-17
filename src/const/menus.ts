@@ -24,7 +24,7 @@ import {
 
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const organizationNavigation = [
-  { name: "Organizations", href: "/", icon: RectangleGroupIcon },
+  { name: "[activeOrganization]", href: "/", icon: RectangleGroupIcon },
   { name: "Projects", href: "/[organization]", icon: ServerIcon },
   { name: "Members", href: "/[organization]/members", icon: UserGroupIcon },
   {

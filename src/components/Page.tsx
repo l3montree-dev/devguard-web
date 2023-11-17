@@ -27,24 +27,22 @@ import { Fragment, PropsWithChildren, useState } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import Toaster from "./Toaster";
-import MobileSidebar from "./navigation/MobileSidebar";
-import Sidebar from "./navigation/Sidebar";
+import MobileNav from "./navigation/MobileNav";
+import Sidenav from "./navigation/Sidenav";
+import { useMenu } from "../hooks/useMenu";
 
 type PageProps = {
   title: string;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
   Button?: React.ReactNode;
-  navigation: Array<{
-    name: string;
-    href: string;
-    icon: any;
-  }>;
 };
 
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const menu = useMenu();
   return (
     <>
       <Toaster />
@@ -100,7 +98,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
                     </button>
                   </div>
                 </Transition.Child>
-                <MobileSidebar navigation={props.navigation} />
+                <MobileNav navigation={menu} />
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -108,7 +106,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       </Transition.Root>
       {/* Static sidebar for desktop */}
       <div className="hidden md:fixed inset-y-0  md:flex w-80 flex-col bg-blue-950">
-        <Sidebar navigation={props.navigation} />
+        <Sidenav navigation={menu} />
       </div>
       <div className="md:pl-80">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>

@@ -27,7 +27,7 @@ interface Props {
   }[];
 }
 
-export default function Sidebar({ navigation }: Props) {
+export default function Sidenav({ navigation }: Props) {
   const router = useRouter();
   const currentPath = router.pathname;
 
@@ -48,7 +48,7 @@ export default function Sidebar({ navigation }: Props) {
         </div>
         <div className="flex flex-row justify-center">
           {user && (
-            <Link href="/settings">
+            <Link href="/user-settings">
               <Image
                 className="rounded-full bg-gray-800"
                 src="/examples/tim.jpg"
@@ -77,10 +77,7 @@ export default function Sidebar({ navigation }: Props) {
                 {navigation.map((item) => (
                   <li key={item.name}>
                     <Link
-                      href={item.href.replace(
-                        "[organization]",
-                        activeOrg?.slug || "",
-                      )}
+                      href={item.href}
                       className={classNames(
                         item.href === currentPath
                           ? "bg-blue-900 text-white"
