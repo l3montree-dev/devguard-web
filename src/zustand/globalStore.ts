@@ -5,13 +5,13 @@ import { OrganizationDTO } from "../types/api";
 import { User } from "../types/auth";
 import { localStore } from "../services/localStore";
 
-export interface GlobalStore {
+export interface InitialState {
   session: Omit<Session, "identity"> & { identity: User };
-  activeOrganization?: OrganizationDTO; // the current selected organization
   organizations: OrganizationDTO[];
-
-  setActiveOrganization: (organization: OrganizationDTO) => void;
-  clientInit: () => void;
+  activeOrganization?: OrganizationDTO; // the current selected organization
+}
+export interface GlobalStore extends InitialState {
+  setActiveOrganization: (id: string) => void;
 }
 
 let store: UseBoundStore<StoreApi<GlobalStore>> | undefined;
@@ -23,24 +23,13 @@ const initStore = (
   },
 ) =>
   create<GlobalStore>((set, get) => {
-    console.log(preloadedState);
     return {
       ...preloadedState,
-      setActiveOrganization: (organization: OrganizationDTO) =>
-        set((state) => ({ ...state, activeOrganization: organization })),
-      clientInit: () => {
-        // we can use any browser apis
-        const activeOrg = localStore.get(
-          "activeOrganization",
-          get().organizations[0]?.id,
-        );
-
-        const org = get().organizations.find((o) => o.id === activeOrg);
-        if (org) {
-          localStore.set("activeOrganization", org.id);
-          set((state) => ({ ...state, activeOrganization: org }));
-        }
-      },
+      setActiveOrganization: (id: string) =>
+        set((state) => ({
+          ...state,
+          activeOrganization: state.organizations.find((o) => o.id === id),
+        })),
     };
   });
 

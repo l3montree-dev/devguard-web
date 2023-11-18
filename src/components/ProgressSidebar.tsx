@@ -15,6 +15,7 @@
 
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import Sidebar from "./Sidebar";
 
 interface Props {
   steps: StepItem[];
@@ -27,12 +28,7 @@ interface StepItem {
 
 export default function ProgressSidebar({ steps }: Props) {
   return (
-    <>
-      <header className="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <h2 className="text-base font-semibold leading-7 text-white">
-          Setup Progress
-        </h2>
-      </header>
+    <Sidebar title="Setup Progress">
       <ol role="list" className="space-y-6 px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         {steps.map((step) => (
           <li key={step.name}>
@@ -81,6 +77,6 @@ export default function ProgressSidebar({ steps }: Props) {
           </li>
         ))}
       </ol>
-    </>
+    </Sidebar>
   );
 }

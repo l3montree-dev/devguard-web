@@ -17,12 +17,14 @@ import { Session } from "@ory/client";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { User } from "../types/auth";
+import { InitialState } from "../zustand/globalStore";
 import { addToInitialZustandState } from "../zustand/initialState";
 
 export function withInitialState(
   next: (
     ctx: GetServerSidePropsContext,
     session: Omit<Session, "identity"> & { identity: User },
+    initialState: InitialState,
   ) => any,
 ) {
   return async (
@@ -48,11 +50,28 @@ export function withInitialState(
     const organizations = await r.json();
 
     // call the initial endpoint with the latest information available
-    const resp = await next(ctx, session);
-
-    // add the organization to the initial zustand state
-    return addToInitialZustandState(resp, {
+    const resp = await next(ctx, session, {
+      session,
       organizations,
     });
+
+    const initialState: InitialState = {
+      session,
+      organizations,
+    };
+
+    // check if the ctx provides an organizationSlug
+    if (ctx.params?.organizationSlug) {
+      // check if the organizationSlug is valid
+      const organization = organizations.find(
+        (o: any) => o.slug === ctx.query.organizationSlug,
+      );
+      if (organization) {
+        initialState.activeOrganization = organization;
+      }
+    }
+
+    // add the organization to the initial zustand state
+    return addToInitialZustandState(resp, initialState);
   };
 }

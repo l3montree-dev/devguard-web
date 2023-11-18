@@ -21,7 +21,6 @@ import { userNavigation } from "../const/menus";
 export default function SetupOrg() {
   return (
     <Page
-      navigation={userNavigation}
       Sidebar={
         <ProgressSidebar
           steps={[

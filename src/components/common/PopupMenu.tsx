@@ -12,10 +12,80 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import React from "react";
+import { Popover, Transition } from "@headlessui/react";
+import {
+  Fragment,
+  FunctionComponent,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { classNames } from "../../utils/common";
 
-const PopupMenu = () => {
-  return <div></div>;
+interface Props {
+  Button: ReactNode;
+}
+
+const PopupMenu: FunctionComponent<PropsWithChildren<Props>> = ({
+  Button,
+  children,
+}) => {
+  // calculate to which side is more space.
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [position, setPosition] = useState("top-0 left-0 translate-y-full");
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      // calculate if there is more space to the left or to the right
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const spaceLeft = buttonRect.left;
+      const spaceRight = windowWidth - buttonRect.right;
+      const spaceTop = buttonRect.top;
+      const spaceBottom = windowHeight - buttonRect.bottom;
+
+      const cls = [];
+      if (spaceLeft > spaceRight) {
+        // more space to the left
+        cls.push("right-0");
+      } else {
+        // more space to the right
+        cls.push("left-0");
+      }
+
+      if (spaceTop > spaceBottom) {
+        // more space to the top
+        cls.push("bottom-0");
+      } else {
+        // more space to the bottom
+        cls.push("top-0");
+      }
+    }
+  }, []);
+  return (
+    <Popover className={"relative"}>
+      <Popover.Button ref={buttonRef}>{Button}</Popover.Button>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 translate-y-1"
+      >
+        <Popover.Panel className={"absolute mt-2"}>
+          <div className="max-w-md flex-auto overflow-hidden rounded-sm bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+            <div className="p-1">{children}</div>
+          </div>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
+  );
 };
 
 export default PopupMenu;

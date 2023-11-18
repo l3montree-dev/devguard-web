@@ -48,11 +48,7 @@ export function withSession(
         };
       }
       // call the initial endpoint with the latest information available
-      const resp = await next(ctx, session.data as any);
-
-      return addToInitialZustandState(resp, {
-        session: session.data as any,
-      });
+      return next(ctx, session.data as any);
     } catch (e: unknown) {
       if (isAxiosError(e))
         if (e.response?.status === 401) {

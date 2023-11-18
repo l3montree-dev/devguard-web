@@ -18,6 +18,10 @@ import { classNames } from "../../utils/common";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useStore } from "../../zustand/globalStoreProvider";
+import PopupMenu from "../common/PopupMenu";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import PopupMenuItem from "../common/PopupMenuItem";
+import { UserGroupIcon } from "@heroicons/react/20/solid";
 
 interface Props {
   navigation: {
@@ -34,14 +38,60 @@ export default function Sidenav({ navigation }: Props) {
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
 
-  const activeOrg = useStore((s) => s.activeOrganization);
+  const activeOrg = useStore((s) => s.activeOrganization ?? s.organizations[0]);
+
+  const handleActiveOrgChange = (id: string) => () => {
+    // redirect to the new slug
+    const org = orgs.find((o) => o.id === id);
+    if (org) {
+      router.push(`/${org.slug}`);
+    }
+  };
+
+  const handleNavigateToSetupOrg = () => {
+    router.push(`/setup-organization`);
+  };
 
   return (
     <div className="flex grow flex-row">
       <div className="bg-black/20 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
         <div>
-          <div className="bg-blue-100 relative z-30 rounded-sm font-semibold flex flex-col justify-center items-center text-black text-2xl aspect-square m-1">
-            {activeOrg?.name[0]}
+          <div className="flex flex-row justify-center">
+            <PopupMenu
+              Button={
+                <div className="bg-blue-100 h-9 w-9 relative z-30 rounded-sm font-semibold flex flex-col justify-center items-center text-black text-2xl aspect-square m-1">
+                  {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
+                </div>
+              }
+            >
+              <div className="w-52 text-black">
+                {orgs.length === 0 ? (
+                  <>
+                    {orgs.map((o) => (
+                      <PopupMenuItem
+                        text={o.name}
+                        Icon={o.name[0]}
+                        key={o.id}
+                        onClick={handleActiveOrgChange(o.id)}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <PopupMenuItem
+                      text="Join Organization"
+                      onClick={handleNavigateToSetupOrg}
+                      Icon={<UserGroupIcon className="h-6 w-6" />}
+                    />
+                    <PopupMenuItem
+                      text="Create Organization"
+                      onClick={handleNavigateToSetupOrg}
+                      Icon={<PlusIcon className="h-6 w-6" />}
+                    />
+                  </>
+                )}
+              </div>
+            </PopupMenu>
           </div>
           <div className="h-2 z-20 mx-1.5 rounded-full relative bottom-2 bg-blue-400"></div>
           <div className="h-2 mx-1.5 z-10 rounded-full relative bottom-3.5 bg-blue-900"></div>

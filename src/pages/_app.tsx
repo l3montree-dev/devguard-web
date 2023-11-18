@@ -45,9 +45,6 @@ export const merriweather = Merriweather({
 export default function App({ Component, pageProps }) {
   const store = useHydrate(pageProps.initialZustandState);
 
-  useEffect(() => {
-    store.getState().clientInit();
-  }, [store]);
   return (
     <StoreProvider store={store}>
       <Component {...pageProps} />
