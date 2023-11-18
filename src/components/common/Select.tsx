@@ -33,7 +33,7 @@ const Select = React.forwardRef<any, Props>((props, ref) => {
       <select
         ref={ref}
         id={id}
-        className="block mt-2 w-full rounded-sm border-0 bg-black/10 py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6 [&_*]:text-black"
+        className="block mt-2 w-full rounded-sm border-0 bg-white py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6 [&_*]:text-black"
         {...rest}
       />
     </>

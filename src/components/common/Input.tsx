@@ -14,16 +14,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useId } from "react";
 import { classNames } from "../../utils/common";
+import { FieldError } from "react-hook-form";
 
 type Props = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 > & {
   label?: string;
+  variant?: "light" | "dark";
+  error?: FieldError;
 };
 const Input = React.forwardRef<any, Props>((props, ref) => {
-  const { label, ...rest } = props;
+  const { label, variant = "light", error, ...rest } = props;
   const id = useId();
+
   return (
     <>
       {Boolean(label) && (
@@ -36,11 +40,14 @@ const Input = React.forwardRef<any, Props>((props, ref) => {
         id={id}
         title={label}
         className={classNames(
-          "block w-full rounded-sm border-0 bg-black/10 py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6",
+          "block w-full rounded-sm border-0 text-black py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-amber-400 sm:text-sm sm:leading-6",
           Boolean(label) ? "mt-2" : "",
+          variant === "dark" ? "bg-slate-200" : "bg-white",
+          error ? "ring-red-500" : "ring-white/10",
         )}
         {...rest}
       />
+      {error && <small className="text-sm text-red-500">{error.message}</small>}
     </>
   );
 });

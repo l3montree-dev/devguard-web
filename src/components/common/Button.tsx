@@ -15,6 +15,7 @@
 
 import React, { FunctionComponent } from "react";
 import { applyClsxConfig, classNames } from "../../utils/common";
+import Link from "next/link";
 
 const cslxConfig = {
   default: "rounded-sm px-2 transition-all text-sm py-2 font-medium",
@@ -22,7 +23,10 @@ const cslxConfig = {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger": "bg-transparent text-blue-500 hover:bg-blue-100",
     "solid+primary": "bg-amber-400 text-black hover:bg-amber-300",
-    "outline+primary": "bg-transparent text-blue-500 hover:bg-blue-100",
+    "outline+primary":
+      "bg-transparent text-amber-600 border border-amber-400 hover:bg-amber-200",
+    "outline+secondary":
+      "bg-transparent text-blue-600 hover:bg-blue-100 border border-blue-500",
   },
 };
 
@@ -32,9 +36,26 @@ const Button: FunctionComponent<
     HTMLButtonElement
   > & {
     variant?: "solid" | "outline";
-    intent?: "primary" | "danger";
+    intent?: "primary" | "danger" | "secondary";
+    href?: string;
   }
-> = ({ variant = "solid", intent = "primary", ...rest }) => {
+> = ({ variant = "solid", intent = "primary", href, ...rest }) => {
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={classNames(
+          cslxConfig.default,
+          applyClsxConfig(cslxConfig, {
+            variant: variant + "+" + intent,
+          }),
+          "hover:no-underline",
+        )}
+      >
+        {rest.children}
+      </Link>
+    );
+  }
   return (
     <button
       className={classNames(
@@ -42,6 +63,7 @@ const Button: FunctionComponent<
         applyClsxConfig(cslxConfig, {
           variant: variant + "+" + intent,
         }),
+        rest.disabled ? "opacity-75 cursor-not-allowed" : "",
       )}
       {...rest}
     />

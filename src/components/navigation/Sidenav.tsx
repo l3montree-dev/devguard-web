@@ -22,6 +22,7 @@ import PopupMenu from "../common/PopupMenu";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import PopupMenuItem from "../common/PopupMenuItem";
 import { UserGroupIcon } from "@heroicons/react/20/solid";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
 
 interface Props {
   navigation: {
@@ -33,12 +34,12 @@ interface Props {
 
 export default function Sidenav({ navigation }: Props) {
   const router = useRouter();
-  const currentPath = router.pathname;
+  const currentPath = router.asPath;
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
 
-  const activeOrg = useStore((s) => s.activeOrganization ?? s.organizations[0]);
+  const activeOrg = useActiveOrg() ?? orgs[0];
 
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
@@ -64,8 +65,8 @@ export default function Sidenav({ navigation }: Props) {
                 </div>
               }
             >
-              <div className="w-52 text-black">
-                {orgs.length === 0 ? (
+              <div className="text-black">
+                {orgs.length !== 0 && (
                   <>
                     {orgs.map((o) => (
                       <PopupMenuItem
@@ -76,20 +77,17 @@ export default function Sidenav({ navigation }: Props) {
                       />
                     ))}
                   </>
-                ) : (
-                  <>
-                    <PopupMenuItem
-                      text="Join Organization"
-                      onClick={handleNavigateToSetupOrg}
-                      Icon={<UserGroupIcon className="h-6 w-6" />}
-                    />
-                    <PopupMenuItem
-                      text="Create Organization"
-                      onClick={handleNavigateToSetupOrg}
-                      Icon={<PlusIcon className="h-6 w-6" />}
-                    />
-                  </>
                 )}
+                <PopupMenuItem
+                  text="Join Organization"
+                  onClick={handleNavigateToSetupOrg}
+                  Icon={<UserGroupIcon className="h-6 w-6" />}
+                />
+                <PopupMenuItem
+                  text="Create Organization"
+                  onClick={handleNavigateToSetupOrg}
+                  Icon={<PlusIcon className="h-6 w-6" />}
+                />
               </div>
             </PopupMenu>
           </div>

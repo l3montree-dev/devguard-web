@@ -22,7 +22,7 @@ export default function Document() {
   return (
     <Html
       className={
-        "h-full scroll-smooth bg-white antialiased " +
+        "h-full scroll-smooth bg-slate-200 antialiased " +
         lexend.className +
         " " +
         inter.className
@@ -32,7 +32,7 @@ export default function Document() {
       <Head />
       <body
         className={
-          "flex min-h-full flex-col bg-white " +
+          "flex min-h-full flex-col bg-slate-200 " +
           inter.variable +
           " " +
           lexend.variable +

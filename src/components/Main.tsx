@@ -14,10 +14,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Link from "next/link";
 import React, { FunctionComponent } from "react";
-import { classNames } from "../utils/common";
-import { useStore } from "../zustand/globalStoreProvider";
-import { useRouter } from "next/router";
-import Button from "./common/Button";
 
 interface Props {
   title: string;
@@ -25,19 +21,10 @@ interface Props {
   Button?: React.ReactNode;
 }
 const Main: FunctionComponent<Props> = ({ title, children, Button }) => {
-  const org = useStore((s) => s.organization);
-  const inOrganization = useRouter().pathname.includes("[organization]");
   return (
     <main>
       <header className="flex relative items-center justify-between bg-blue-900 px-4 py-5 sm:px-6 lg:px-8">
-        <h1 className="text-lg font-semibold leading-7 text-white">
-          {inOrganization && Boolean(org) ? (
-            <span className="text-blue-100">{org!.name} / </span>
-          ) : (
-            ""
-          )}
-          {title}
-        </h1>
+        <h1 className="text-lg font-semibold leading-7 text-white">{title}</h1>
         {Boolean(Button) && <div className="absolute right-4">{Button}</div>}
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">

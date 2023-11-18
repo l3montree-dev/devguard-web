@@ -9,10 +9,10 @@ const PopupMenuItem: FunctionComponent<Props> = ({ Icon, onClick, text }) => {
   return (
     <div
       onClick={onClick}
-      className="flex flex-row rounded-sm cursor-pointer hover:bg-blue-100 items-center gap-2"
+      className="flex p-1 flex-row min-w-[250px] rounded-sm cursor-pointer hover:bg-blue-100 gap-2 items-center"
     >
       {Boolean(Icon) && (
-        <div className="bg-blue-300 h-9 w-9 relative z-30 rounded-sm font-semibold flex flex-col justify-center items-center text-black text-2xl aspect-square m-1">
+        <div className="bg-blue-300 h-9 w-9 relative z-30 rounded-sm font-semibold flex flex-col justify-center items-center text-black text-2xl aspect-square">
           {Icon}
         </div>
       )}

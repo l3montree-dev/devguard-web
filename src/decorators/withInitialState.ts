@@ -49,6 +49,25 @@ export function withInitialState(
     // parse the organization
     const organizations = await r.json();
 
+    // check if there is a slug in the query
+    const organizationSlug = ctx.params?.organizationSlug;
+
+    if (organizationSlug) {
+      // check if the organizationSlug is valid
+      const organization = organizations.find(
+        (o: any) => o.slug === organizationSlug,
+      );
+      if (!organization) {
+        // it must be an 404
+        return {
+          redirect: {
+            destination: "/",
+            permanent: false,
+          },
+        };
+      }
+    }
+
     // call the initial endpoint with the latest information available
     const resp = await next(ctx, session, {
       session,
@@ -59,17 +78,6 @@ export function withInitialState(
       session,
       organizations,
     };
-
-    // check if the ctx provides an organizationSlug
-    if (ctx.params?.organizationSlug) {
-      // check if the organizationSlug is valid
-      const organization = organizations.find(
-        (o: any) => o.slug === ctx.query.organizationSlug,
-      );
-      if (organization) {
-        initialState.activeOrganization = organization;
-      }
-    }
 
     // add the organization to the initial zustand state
     return addToInitialZustandState(resp, initialState);

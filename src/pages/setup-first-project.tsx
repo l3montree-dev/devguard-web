@@ -54,7 +54,7 @@ export default function SetupFirstProject(props) {
 }
 
 export const getServerSideProps = withSession(
-  async (session, ctx: GetServerSidePropsContext) => {
+  async (ctx: GetServerSidePropsContext) => {
     return {
       props: {},
     };

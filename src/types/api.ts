@@ -38,3 +38,13 @@ export interface PersonalAccessTokenDTO {
   createdAt: string;
   id: string;
 }
+
+export interface CreateProjectReq {
+  name: string;
+}
+
+export interface ProjectDTO {
+  name: string;
+  slug: string;
+  id: string;
+}

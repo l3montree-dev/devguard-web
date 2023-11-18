@@ -17,6 +17,8 @@ import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
 import { userNavigation } from "../const/menus";
+import { withSession } from "../decorators/withSession";
+import { withInitialState } from "../decorators/withInitialState";
 
 export default function SetupOrg() {
   return (
@@ -49,3 +51,11 @@ export default function SetupOrg() {
     </Page>
   );
 }
+
+export const getServerSideProps = withSession(
+  withInitialState(async () => {
+    return {
+      props: {},
+    };
+  }),
+);

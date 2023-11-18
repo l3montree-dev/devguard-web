@@ -3,16 +3,12 @@ import { useMemo } from "react";
 import { StoreApi, UseBoundStore, create } from "zustand";
 import { OrganizationDTO } from "../types/api";
 import { User } from "../types/auth";
-import { localStore } from "../services/localStore";
 
 export interface InitialState {
   session: Omit<Session, "identity"> & { identity: User };
   organizations: OrganizationDTO[];
-  activeOrganization?: OrganizationDTO; // the current selected organization
 }
-export interface GlobalStore extends InitialState {
-  setActiveOrganization: (id: string) => void;
-}
+export interface GlobalStore extends InitialState {}
 
 let store: UseBoundStore<StoreApi<GlobalStore>> | undefined;
 
@@ -25,11 +21,6 @@ const initStore = (
   create<GlobalStore>((set, get) => {
     return {
       ...preloadedState,
-      setActiveOrganization: (id: string) =>
-        set((state) => ({
-          ...state,
-          activeOrganization: state.organizations.find((o) => o.id === id),
-        })),
     };
   });
 

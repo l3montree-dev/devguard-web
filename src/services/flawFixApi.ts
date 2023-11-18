@@ -53,9 +53,9 @@ export const getApiClientFromCookies = (
   };
 };
 
-export const getApiClient = (d: Document) => {
+export const getApiClient = (d?: Document) => {
   // get the cookie from the browser
-  const orySessionCookie = d.cookie
+  const orySessionCookie = (d ?? document).cookie
     .split("; ")
     .find((row) => row.startsWith("ory_kratos_session"));
 

@@ -43,15 +43,15 @@ const stats = [
 export default function SingleStatGroup() {
   return (
     <div>
-      <h3 className="text-sm leading-6 text-gray-300">Last 30 days</h3>
-      <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-900 overflow-hidden rounded-lg bg-gray-800 shadow md:grid-cols-3 md:divide-x md:divide-y-0">
+      <h3 className="text-sm leading-6">Last 30 days</h3>
+      <dl className="mt-2 grid grid-cols-1 overflow-hidden gap-5 md:grid-cols-3">
         {stats.map((item) => (
-          <div key={item.name} className="px-4 py-5 sm:p-6">
-            <dt className="text-base font-normal text-white">{item.name}</dt>
+          <div key={item.name} className="px-4 rounded-sm bg-white py-5 sm:p-6">
+            <dt className="text-base font-normal">{item.name}</dt>
             <dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div className="flex items-baseline text-2xl font-semibold text-blue-500">
+              <div className="flex items-baseline text-2xl font-semibold text-blue-900">
                 {item.stat}
-                <span className="ml-2 text-sm font-medium text-blue-100">
+                <span className="ml-2 text-sm font-medium">
                   from {item.previousStat}
                 </span>
               </div>
@@ -89,7 +89,7 @@ export default function SingleStatGroup() {
 
                 <span className="sr-only">
                   {" "}
-                  {item.changeType === "deccrease" &&
+                  {item.changeType === "decrease" &&
                   item.name !== "Avg. Time Till Handeled"
                     ? "Increased"
                     : "Decreased"}{" "}

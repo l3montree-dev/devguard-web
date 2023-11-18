@@ -33,8 +33,13 @@ const PopupMenu: FunctionComponent<PropsWithChildren<Props>> = ({
   children,
 }) => {
   // calculate to which side is more space.
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [position, setPosition] = useState("top-0 left-0 translate-y-full");
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<Record<string, any>>({
+    top: 0,
+    left: 0,
+  });
+
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (buttonRef.current) {
@@ -44,47 +49,61 @@ const PopupMenu: FunctionComponent<PropsWithChildren<Props>> = ({
       const windowHeight = window.innerHeight;
       const spaceLeft = buttonRect.left;
       const spaceRight = windowWidth - buttonRect.right;
-      const spaceTop = buttonRect.top;
-      const spaceBottom = windowHeight - buttonRect.bottom;
 
-      const cls = [];
+      const newStyle: Record<string, any> = {};
+
       if (spaceLeft > spaceRight) {
         // more space to the left
-        cls.push("right-0");
+        newStyle.right = 0;
       } else {
         // more space to the right
-        cls.push("left-0");
+        newStyle.left = 0;
       }
 
-      if (spaceTop > spaceBottom) {
-        // more space to the top
-        cls.push("bottom-0");
-      } else {
-        // more space to the bottom
-        cls.push("top-0");
-      }
+      setPosition(newStyle);
     }
   }, []);
   return (
-    <Popover className={"relative"}>
-      <Popover.Button ref={buttonRef}>{Button}</Popover.Button>
+    <>
+      <div className={"relative"}>
+        <div
+          role="button"
+          className="cursor-pointer"
+          onClick={() => setIsOpen((s) => !s)}
+          ref={buttonRef}
+        >
+          {Button}
+        </div>
 
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 translate-y-1"
-      >
-        <Popover.Panel className={"absolute mt-2"}>
-          <div className="max-w-md flex-auto overflow-hidden rounded-sm bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
-            <div className="p-1">{children}</div>
+        <Transition
+          show={isOpen}
+          as={Fragment}
+          enter="transition ease-out duration-200"
+          enterFrom="opacity-0 translate-y-1"
+          enterTo="opacity-100 translate-y-0"
+          leave="transition ease-in duration-150"
+          leaveFrom="opacity-100 translate-y-0"
+          leaveTo="opacity-0 translate-y-1"
+        >
+          <div
+            id="popover-panel"
+            style={position}
+            className={classNames("absolute mt-2 z-20")}
+          >
+            <div className="max-w-md flex-auto p-1 overflow-hidden rounded-sm bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+              {children}
+            </div>
           </div>
-        </Popover.Panel>
-      </Transition>
-    </Popover>
+        </Transition>
+      </div>
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 z-10"
+          aria-hidden="true"
+        />
+      )}
+    </>
   );
 };
 
