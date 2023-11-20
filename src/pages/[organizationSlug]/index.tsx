@@ -31,8 +31,9 @@ import {
   getApiClient,
   getApiClientFromContext,
 } from "../../services/flawFixApi";
-import { CreateProjectReq, ProjectDTO } from "../../types/api";
+import { ProjectDTO } from "../../types/api/api";
 import { hasErrors } from "../../utils/common";
+import { CreateProjectReq } from "../../types/api/req";
 interface Props {
   projects: Array<ProjectDTO>;
 }
@@ -42,13 +43,10 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CreateProjectReq>({
-    mode: "onBlur",
-  });
+  const { register, handleSubmit, getFieldState, formState } =
+    useForm<CreateProjectReq>({
+      mode: "onBlur",
+    });
 
   const handleCreateProject = async (req: CreateProjectReq) => {
     const client = getApiClient();
@@ -85,11 +83,18 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           <Input
             variant="dark"
             label="Name"
-            error={errors["name"]}
+            error={getFieldState("name", formState).error}
             {...register("name", { required: "Project name is required" })}
           />
+          <div className="mt-4">
+            <Input
+              variant="dark"
+              label="Description"
+              {...register("description")}
+            />
+          </div>
           <div className="flex flex-row justify-end mt-4">
-            <Button disabled={hasErrors(errors)} type="submit">
+            <Button disabled={hasErrors(formState.errors)} type="submit">
               Create
             </Button>
           </div>

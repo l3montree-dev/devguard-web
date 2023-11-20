@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { countries, industryOptions } from "../const/organizationConstants";
 import { getApiClient } from "../services/flawFixApi";
-import { OrganizationDTO } from "../types/api";
+import { OrganizationDTO } from "../types/api/api";
 import Button from "./common/Button";
 import Checkbox from "./common/Checkbox";
 import Input from "./common/Input";

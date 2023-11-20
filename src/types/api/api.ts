@@ -39,12 +39,24 @@ export interface PersonalAccessTokenDTO {
   id: string;
 }
 
-export interface CreateProjectReq {
-  name: string;
-}
-
 export interface ProjectDTO {
   name: string;
+  description: string;
+  slug: string;
+  id: string;
+}
+
+export interface EnvDTO {
+  name: string;
+  description: string;
+  slug: string;
+  id: string;
+  position: number;
+}
+
+export interface ApplicationDTO {
+  name: string;
+  description: string;
   slug: string;
   id: string;
 }

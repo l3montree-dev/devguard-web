@@ -1,7 +1,7 @@
 import { Session } from "@ory/client";
 import { useMemo } from "react";
 import { StoreApi, UseBoundStore, create } from "zustand";
-import { OrganizationDTO } from "../types/api";
+import { OrganizationDTO } from "../types/api/api";
 import { User } from "../types/auth";
 
 export interface InitialState {

@@ -21,7 +21,8 @@ const cslxConfig = {
   default: "rounded-sm px-2 transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
-    "outline+danger": "bg-transparent text-blue-500 hover:bg-blue-100",
+    "outline+danger":
+      "bg-transparent text-red-500 border border-red-500 hover:bg-red-100",
     "solid+primary": "bg-amber-400 text-black hover:bg-amber-300",
     "outline+primary":
       "bg-transparent text-amber-600 border border-amber-400 hover:bg-amber-200",
@@ -39,7 +40,7 @@ const Button: FunctionComponent<
     intent?: "primary" | "danger" | "secondary";
     href?: string;
   }
-> = ({ variant = "solid", intent = "primary", href, ...rest }) => {
+> = ({ variant = "solid", intent = "primary", href, className, ...rest }) => {
   if (href) {
     return (
       <Link
@@ -50,6 +51,7 @@ const Button: FunctionComponent<
             variant: variant + "+" + intent,
           }),
           "hover:no-underline",
+          className,
         )}
       >
         {rest.children}
@@ -64,6 +66,7 @@ const Button: FunctionComponent<
           variant: variant + "+" + intent,
         }),
         rest.disabled ? "opacity-75 cursor-not-allowed" : "",
+        className,
       )}
       {...rest}
     />

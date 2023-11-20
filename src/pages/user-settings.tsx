@@ -34,7 +34,7 @@ import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
-import { PersonalAccessTokenDTO } from "../types/api";
+import { PersonalAccessTokenDTO } from "../types/api/api";
 
 interface Props {
   flow?: SettingsFlow;
@@ -73,18 +73,19 @@ const Settings: FunctionComponent<{
   const [personalAccessTokens, setPersonalAccessTokens] =
     useState<Array<PersonalAccessTokenDTO & { token?: string }>>(pats);
 
-  const { register, handleSubmit } = useForm<{ description: string }>();
+  const { register, handleSubmit, reset } = useForm<{ description: string }>();
 
   const handleCreatePat = async (data: { description: string }) => {
     const apiClient = getApiClient(document);
     const pat: PersonalAccessTokenDTO = await (
-      await apiClient("/pat", {
+      await apiClient("/pat/", {
         method: "POST",
         body: JSON.stringify(data),
       })
     ).json();
 
     setPersonalAccessTokens([...personalAccessTokens, pat]);
+    reset();
   };
 
   useEffect(() => {
@@ -174,7 +175,7 @@ const Settings: FunctionComponent<{
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
     const apiClient = getApiClient(document);
-    await apiClient(`/pat/${pat.id}`, {
+    await apiClient(`/pat/${pat.id}/`, {
       method: "DELETE",
     });
     setPersonalAccessTokens(
@@ -281,24 +282,29 @@ const Settings: FunctionComponent<{
         <div className="mb-6 flex flex-col gap-2">
           {personalAccessTokens.map((pat) => (
             <div
-              className="rounded-sm overflow-hidden px-2 py-2 text-sm"
+              className="rounded-sm border bg-white overflow-hidden px-2 py-2 text-sm"
               key={pat.id}
             >
               <div className="flex items-center flex-row justify-between">
                 <div className="flex-1">
                   <div className="mb-2 flex gap-2 flex-row">
                     <Input
+                      variant="dark"
                       readOnly
                       value={pat.token ? pat.token : "***********"}
                     />
                     {pat.token && (
-                      <Button onClick={() => handleCopy(pat.token!)}>
+                      <Button
+                        className="whitespace-nowrap"
+                        onClick={() => handleCopy(pat.token!)}
+                      >
                         Copy
                       </Button>
                     )}
                     <div>
                       <Button
                         intent="danger"
+                        className="whitespace-nowrap"
                         variant="outline"
                         onClick={() => handleDeletePat(pat)}
                       >
@@ -319,13 +325,17 @@ const Settings: FunctionComponent<{
           ))}
         </div>
         <form
-          className="border rounded-sm p-2"
+          className="border bg-white rounded-sm p-2"
           onSubmit={handleSubmit(handleCreatePat)}
         >
           <span className="font-medium block pb-2">
             Create new Personal Access Token
           </span>
-          <Input {...register("description")} label="Description" />
+          <Input
+            variant="dark"
+            {...register("description")}
+            label="Description"
+          />
           <div className="mt-2 justify-end flex flex-row">
             <Button type="submit">Create</Button>
           </div>
@@ -438,7 +448,7 @@ export const getServerSideProps = withSession(
     const apiClient = getApiClientFromContext(ctx);
 
     const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
-      "/pat",
+      "/pat/",
     ).then((r) => r.json());
     return {
       props: {

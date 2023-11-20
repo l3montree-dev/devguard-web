@@ -15,7 +15,7 @@
 
 import { State } from "@/types/common";
 
-export function classNames(...classes: string[]) {
+export function classNames(...classes: Array<string | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 

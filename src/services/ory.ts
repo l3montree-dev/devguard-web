@@ -21,7 +21,7 @@ import { NextRouter } from "next/router";
 import { Dispatch, SetStateAction } from "react";
 import { config } from "../config";
 import { User } from "../types/auth";
-import { OrganizationDTO } from "../types/api";
+import { OrganizationDTO } from "../types/api/api";
 import { getApiClientFromContext } from "./flawFixApi";
 
 export const ory = new FrontendApi(new Configuration(edgeConfig));

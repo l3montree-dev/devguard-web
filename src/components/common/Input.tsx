@@ -25,7 +25,7 @@ type Props = React.DetailedHTMLProps<
   error?: FieldError;
 };
 const Input = React.forwardRef<any, Props>((props, ref) => {
-  const { label, variant = "light", error, ...rest } = props;
+  const { label, variant = "light", error, className, ...rest } = props;
   const id = useId();
 
   return (
@@ -44,6 +44,7 @@ const Input = React.forwardRef<any, Props>((props, ref) => {
           Boolean(label) ? "mt-2" : "",
           variant === "dark" ? "bg-slate-200" : "bg-white",
           error ? "ring-red-500" : "ring-white/10",
+          className,
         )}
         {...rest}
       />
