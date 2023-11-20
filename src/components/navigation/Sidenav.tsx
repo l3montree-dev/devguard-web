@@ -112,7 +112,7 @@ export default function Sidenav({ navigation }: Props) {
         <div className="flex h-24 shrink-0 items-center">
           <Image
             className="mt-6 h-10 w-auto"
-            src="logo_flaw_fix_white_l3.svg"
+            src="/logo_flaw_fix_white_l3.svg"
             alt="FlawFix by l3montree Logo"
             width={32}
             height={32}
