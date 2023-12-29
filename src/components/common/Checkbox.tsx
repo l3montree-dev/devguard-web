@@ -29,7 +29,7 @@ const Checkbox = React.forwardRef<any, Props>((props, ref) => {
       <input
         id={id}
         ref={ref}
-        className="h-4 relative top-1 w-4 border-none rounded-sm bg-white text-blue-400 indeterminate:text-black focus:ring-blue-400"
+        className="h-4 relative top-1 w-4 border-gray-300 shadow-sm rounded-sm bg-white border text-blue-500 indeterminate:text-black focus:ring-blue-400"
         type="checkbox"
         {...rest}
       ></input>

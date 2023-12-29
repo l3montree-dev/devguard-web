@@ -1,27 +1,25 @@
+import { EnvDTO, FlawWithLastEvent, Paged } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
-import React, { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
+import Page from "../../../../../../../../components/Page";
+import { toast } from "../../../../../../../../components/Toaster";
+import Button from "../../../../../../../../components/common/Button";
+import Input from "../../../../../../../../components/common/Input";
+import { config } from "../../../../../../../../config";
 import { withInitialState } from "../../../../../../../../decorators/withInitialState";
 import { withSession } from "../../../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../../../services/flawFixApi";
-import Page from "../../../../../../../../components/Page";
-import { EnvDTO, PersonalAccessTokenDTO } from "@/types/api/api";
-import Input from "../../../../../../../../components/common/Input";
-import { config } from "../../../../../../../../config";
-import Button from "../../../../../../../../components/common/Button";
-import { useForm } from "react-hook-form";
-import { createPat } from "../../../../../../../../services/patService";
-import { toast } from "../../../../../../../../components/Toaster";
 
 interface Props {
   env: EnvDTO;
+  flaws: Paged<FlawWithLastEvent>;
 }
 const Index: FunctionComponent<Props> = (props) => {
-  const { register, handleSubmit, reset } = useForm<{ description: string }>();
-
   const cmd =
     "cat report.sarif.json | curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <PERSONAL ACCESS TOKEN>' -d @- " +
     config.flawFixApiUrl +
-    "/api/v1/vulnreports/";
+    "/api/v1/vulnreports/" +
+    props.env.id;
 
   const handleCopy = () => {
     // use the clipboard api
@@ -33,6 +31,7 @@ const Index: FunctionComponent<Props> = (props) => {
     });
   };
 
+  console.log(props);
   return (
     <Page title={props.env.name}>
       <div className="text-sm">
@@ -66,27 +65,29 @@ export const getServerSideProps = withSession(
       context.params!;
 
     const apiClient = getApiClientFromContext(context);
-    const [resp] = await Promise.all([
-      apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/applications/" +
-          applicationSlug +
-          "/envs/" +
-          envSlug +
-          "/",
-      ),
+    const uri =
+      "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/applications/" +
+      applicationSlug +
+      "/envs/" +
+      envSlug +
+      "/";
+    const [resp, flawResp] = await Promise.all([
+      apiClient(uri),
+      apiClient(uri + "flaws/"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [env] = await Promise.all([resp.json()]);
+    const [env, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
     return {
       props: {
         env,
+        flaws,
       },
     };
   }),

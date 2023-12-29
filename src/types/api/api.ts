@@ -53,6 +53,35 @@ export interface EnvDTO {
   slug: string;
   id: string;
   position: number;
+  lastReportTime: string;
+}
+
+export interface FlawDTO {
+  message: string | null;
+  ruleId: string;
+  level: string | null;
+  events: FlawEventDTO[] | null;
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Paged<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface FlawEventDTO {
+  type: "fixed" | "detected";
+  userId: string;
+  createdAt: string;
+  id: string;
+  flawId: string;
+}
+export interface FlawWithLastEvent extends FlawDTO {
+  lastEvent: FlawEventDTO;
 }
 
 export interface ApplicationDTO {
