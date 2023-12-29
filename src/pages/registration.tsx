@@ -118,33 +118,45 @@ const Registration: NextPage = () => {
         <title>Create your FlawFix account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen bg-blue-900 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="flex min-h-screen flex-1 bg-white flex-row ">
+        <div className="w-3/5 relative bg-gray-200">
           <Image
-            className="mx-auto h-16 w-auto"
-            src="/logo_flaw_fix_white_l3.svg"
+            src="/bg.png"
             alt="FlawFix by l3montree Logo"
-            width={200}
-            height={200}
+            objectFit="contain"
+            fill
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
-            Create your FlawFix account
-          </h2>
         </div>
+        <div className="bg-white w-2/5 flex-col flex justify-center items-center">
+          <div className="w-full px-4">
+            <div>
+              <Image
+                className="mx-auto h-16 w-auto"
+                src="/logo_flaw_fix_white_l3.svg"
+                alt="FlawFix by l3montree Logo"
+                width={200}
+                height={200}
+              />
+              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight text-black">
+                Create your FlawFix account
+              </h2>
+            </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <Flow onSubmit={onSubmit} flow={flow} />
+            <div className="text-black">
+              <Flow onSubmit={onSubmit} flow={flow} />
+            </div>
+            <p className="mt-10 text-left text-sm text-black">
+              Already have an Account?{" "}
+              <Link
+                data-testid="cta-link"
+                href="/login"
+                className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
-        <p className="mt-10 text-center text-sm text-blue-100">
-          Already have an Account?{" "}
-          <Link
-            data-testid="cta-link"
-            href="/login"
-            className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
-          >
-            Sign in
-          </Link>
-        </p>
       </div>
     </>
   );

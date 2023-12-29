@@ -37,7 +37,7 @@ export default function ProgressSidebar({ steps }: Props) {
                 <span className="flex items-start">
                   <span className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
                     <CheckCircleIcon
-                      className="h-full w-full text-amber-500"
+                      className="h-full w-full text-blue-500"
                       aria-hidden="true"
                     />
                   </span>
@@ -52,10 +52,10 @@ export default function ProgressSidebar({ steps }: Props) {
                   className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center"
                   aria-hidden="true"
                 >
-                  <span className="absolute h-4 w-4 rounded-full bg-amber-300" />
-                  <span className="relative block h-2 w-2 rounded-full bg-amber-600" />
+                  <span className="absolute h-4 w-4 rounded-full bg-blue-300" />
+                  <span className="relative block h-2 w-2 rounded-full bg-blue-600" />
                 </span>
-                <span className="ml-3 text-sm font-medium text-amber-500">
+                <span className="ml-3 text-sm font-medium text-blue-500">
                   {step.name}
                 </span>
               </span>

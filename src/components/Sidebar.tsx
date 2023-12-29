@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Link from "next/link";
-
 interface Props {
   title: string;
   children: React.ReactNode;
@@ -23,8 +21,8 @@ interface Props {
 export default function Sidebar({ title, children }: Props) {
   return (
     <>
-      <header className="flex items-center justify-between bg-blue-950 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-        <h2 className="text-base font-semibold leading-7 text-white">
+      <header className="flex items-center justify-between bg-white border-r-gray-200 border-r px-6 py-5">
+        <h2 className="text-base font-semibold leading-7 text-black">
           {title}
         </h2>
       </header>

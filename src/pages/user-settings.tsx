@@ -78,7 +78,7 @@ const Settings: FunctionComponent<{
   const handleCreatePat = async (data: { description: string }) => {
     const apiClient = getApiClient(document);
     const pat: PersonalAccessTokenDTO = await (
-      await apiClient("/pat/", {
+      await apiClient("/pats/", {
         method: "POST",
         body: JSON.stringify(data),
       })
@@ -175,7 +175,7 @@ const Settings: FunctionComponent<{
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
     const apiClient = getApiClient(document);
-    await apiClient(`/pat/${pat.id}/`, {
+    await apiClient(`/pats/${pat.id}/`, {
       method: "DELETE",
     });
     setPersonalAccessTokens(
@@ -325,7 +325,7 @@ const Settings: FunctionComponent<{
           ))}
         </div>
         <form
-          className="border bg-white rounded-sm p-2"
+          className="border bg-white rounded-md p-4 shadow-sm"
           onSubmit={handleSubmit(handleCreatePat)}
         >
           <span className="font-medium block pb-2">
@@ -448,7 +448,7 @@ export const getServerSideProps = withSession(
     const apiClient = getApiClientFromContext(ctx);
 
     const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
-      "/pat/",
+      "/pats/",
     ).then((r) => r.json());
     return {
       props: {

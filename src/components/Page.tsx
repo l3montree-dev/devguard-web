@@ -14,22 +14,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Dialog, Transition } from "@headlessui/react";
-import {
-  ChartBarSquareIcon,
-  Cog6ToothIcon,
-  GlobeAltIcon,
-  ServerIcon,
-  SignalIcon,
-  UserGroupIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment, PropsWithChildren, useState } from "react";
+import { useMenu } from "../hooks/useMenu";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import Toaster from "./Toaster";
 import MobileNav from "./navigation/MobileNav";
 import Sidenav from "./navigation/Sidenav";
-import { useMenu } from "../hooks/useMenu";
 
 type PageProps = {
   title: string;
@@ -105,7 +97,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         </Dialog>
       </Transition.Root>
       {/* Static sidebar for desktop */}
-      <div className="hidden md:fixed inset-y-0  md:flex w-80 flex-col bg-blue-950">
+      <div className="hidden md:fixed inset-y-0  md:flex w-80 flex-col bg-white border-r border-r-gray-200">
         <Sidenav navigation={menu} />
       </div>
       <div className="md:pl-80">
@@ -115,7 +107,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="flex-1 hidden bg-blue-900 md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
+          <aside className="flex-1 hidden bg-white border-l md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
             {props.Sidebar}
           </aside>
         )}

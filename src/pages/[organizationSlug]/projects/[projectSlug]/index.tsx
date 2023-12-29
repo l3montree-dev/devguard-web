@@ -69,13 +69,9 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             description={app.description}
             Button={
               <Button
-                onClick={() => {
-                  router.push(
-                    `/${activeOrg.slug}/projects/${project.slug}/applications/${app.slug}`,
-                  );
-                }}
+                href={`/${activeOrg.slug}/projects/${project.slug}/applications/${app.slug}`}
                 variant="outline"
-                intent="secondary"
+                intent="primary"
               >
                 View Application
               </Button>

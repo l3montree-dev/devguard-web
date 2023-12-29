@@ -85,7 +85,7 @@ const Msg = ({
           <div className="ml-4 flex flex-shrink-0">
             <button
               type="button"
-              className="inline-flex rounded-md bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+              className="inline-flex rounded-md bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
               onClick={() => {
                 setShow(false);
                 setTimeout(onRemove, 1000);

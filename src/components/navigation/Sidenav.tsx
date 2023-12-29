@@ -55,12 +55,12 @@ export default function Sidenav({ navigation }: Props) {
 
   return (
     <div className="flex grow flex-row">
-      <div className="bg-black/20 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
+      <div className="border-r border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
         <div>
           <div className="flex flex-row justify-center">
             <PopupMenu
               Button={
-                <div className="bg-blue-100 h-9 w-9 relative z-30 rounded-sm font-semibold flex flex-col justify-center items-center text-black text-2xl aspect-square m-1">
+                <div className="bg-black h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
                 </div>
               }
@@ -91,18 +91,16 @@ export default function Sidenav({ navigation }: Props) {
               </div>
             </PopupMenu>
           </div>
-          <div className="h-2 z-20 mx-1.5 rounded-full relative bottom-2 bg-blue-400"></div>
-          <div className="h-2 mx-1.5 z-10 rounded-full relative bottom-3.5 bg-blue-900"></div>
         </div>
         <div className="flex flex-row justify-center">
           {user && (
             <Link href="/user-settings">
               <Image
-                className="rounded-full bg-gray-800"
+                className="rounded-lg bg-gray-800"
                 src="/examples/tim.jpg"
                 alt=""
-                width={45}
-                height={45}
+                width={40}
+                height={40}
               />
             </Link>
           )}
@@ -112,7 +110,7 @@ export default function Sidenav({ navigation }: Props) {
         <div className="flex h-24 shrink-0 items-center">
           <Image
             className="mt-6 h-10 w-auto"
-            src="/logo_flaw_fix_white_l3.svg"
+            src="/logo_flaw_fix_black_l3.svg"
             alt="FlawFix by l3montree Logo"
             width={32}
             height={32}
@@ -127,10 +125,10 @@ export default function Sidenav({ navigation }: Props) {
                     <Link
                       href={item.href}
                       className={classNames(
-                        item.href === currentPath
-                          ? "bg-blue-900 text-white"
-                          : "text-blue-100 hover:bg-blue-900 hover:text-white",
-                        "group flex gap-x-3 rounded-sm p-2 text-sm font-semibold leading-6 hover:no-underline",
+                        currentPath.startsWith(item.href)
+                          ? "bg-gray-200 text-black"
+                          : "text-black hover:bg-gray-200",
+                        "group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-all leading-6 hover:no-underline",
                       )}
                     >
                       <item.icon

@@ -6,6 +6,9 @@ import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { ApplicationDTO, EnvDTO } from "../../../../../../types/api/api";
 import Page from "../../../../../../components/Page";
 import ListItem from "../../../../../../components/common/ListItem";
+import Button from "../../../../../../components/common/Button";
+import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
+import { useRouter } from "next/router";
 
 interface Props {
   app: ApplicationDTO & {
@@ -13,17 +16,29 @@ interface Props {
   };
 }
 const Index: FunctionComponent<Props> = ({ app }) => {
+  const router = useRouter();
   return (
     <Page title={app.name}>
-      <p>{app.description}</p>
+      <div className="bg-gray-100 rounded-md text-sm mb-10 px-2 py-2">
+        <p>{app.description}</p>
+      </div>
       <div className="mt-2">
         <b>Environments</b>
-        <div className="flex flex-col gap-2">
+        <div className="flex mt-4 flex-col gap-2">
           {app.envs.map((env) => (
             <ListItem
               key={env.id}
               title={env.name}
               description={env.description}
+              Button={
+                <Button
+                  href={`${router.asPath}/envs/${env.slug}`}
+                  variant="outline"
+                  intent="primary"
+                >
+                  View Environment
+                </Button>
+              }
             />
           ))}
         </div>

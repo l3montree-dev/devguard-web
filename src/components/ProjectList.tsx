@@ -39,15 +39,15 @@ export default function ProjectList({ projects }: Props) {
                 {" "}
                 <Button
                   variant="outline"
-                  intent="secondary"
+                  intent="primary"
                   href={"/" + slug + "/projects/" + project.slug}
                 >
                   View project
                 </Button>
                 <PopupMenu
                   Button={
-                    <Button variant="outline" intent="secondary">
-                      <EllipsisVerticalIcon className="w-5 h-5 text-blue-600" />
+                    <Button variant="outline" intent="primary">
+                      <EllipsisVerticalIcon className="w-5 h-5 text-black" />
                     </Button>
                   }
                 >

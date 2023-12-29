@@ -36,7 +36,7 @@ export default function OrgRegisterForm(props: Props) {
     const client = getApiClient(document);
 
     const resp: OrganizationDTO = await (
-      await client("/organizations", {
+      await client("/organizations/", {
         method: "POST",
         body: JSON.stringify({
           ...data,

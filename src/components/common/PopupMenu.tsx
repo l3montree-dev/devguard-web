@@ -90,7 +90,7 @@ const PopupMenu: FunctionComponent<PropsWithChildren<Props>> = ({
             style={position}
             className={classNames("absolute mt-2 z-20")}
           >
-            <div className="max-w-md flex-auto p-1 overflow-hidden rounded-sm bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+            <div className="max-w-md flex-auto p-1 overflow-hidden rounded-md bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
               {children}
             </div>
           </div>

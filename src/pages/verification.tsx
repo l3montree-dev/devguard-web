@@ -126,7 +126,7 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+      <div className="flex min-h-screen bg-blue-900 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
             className="mx-auto h-16 w-auto"
@@ -146,7 +146,7 @@ const Verification: NextPage = () => {
           <Link
             href="/"
             passHref
-            className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
+            className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
           >
             Go back
           </Link>

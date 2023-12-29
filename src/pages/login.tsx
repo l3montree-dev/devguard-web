@@ -115,59 +115,71 @@ const Login: NextPage = () => {
         <title>FlawFix - Sign in</title>
         <meta name="description" content="FlawFix Sign in" />
       </Head>
-      <div className="flex min-h-screen flex-1 bg-blue-900 flex-col items-center justify-center px-6 max-sm:py-16 py-32 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="flex min-h-screen flex-1 bg-white flex-row ">
+        <div className="w-3/5 relative bg-gray-200">
           <Image
-            className="mx-auto h-16 w-auto"
-            src="/logo_flaw_fix_white_l3.svg"
+            src="/bg.png"
             alt="FlawFix by l3montree Logo"
-            width={200}
-            height={200}
+            objectFit="contain"
+            fill
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
-            {(() => {
-              if (flow?.refresh) {
-                return "Confirm Action";
-              } else if (flow?.requested_aal === "aal2") {
-                return "Two-Factor Authentication";
-              }
-              return "Sign In";
-            })()}
-          </h2>
         </div>
-        <div className="mt-10 sm:mx-auto text-white sm:w-full sm:max-w-sm">
-          <Flow onSubmit={onSubmit} flow={flow} />
+        <div className="bg-white w-2/5 flex-col flex justify-center items-center">
+          <div className="w-full px-8">
+            <div className="">
+              <Image
+                className="h-10 w-auto"
+                src="/logo_flaw_fix_black_l3.svg"
+                alt="FlawFix by l3montree Logo"
+                width={200}
+                height={200}
+              />
+              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight text-black">
+                {(() => {
+                  if (flow?.refresh) {
+                    return "Confirm Action";
+                  } else if (flow?.requested_aal === "aal2") {
+                    return "Two-Factor Authentication";
+                  }
+                  return "Sign In";
+                })()}
+              </h2>
+            </div>
+            <div className="mt-10 sm:mx-auto text-black">
+              <Flow onSubmit={onSubmit} flow={flow} />
+            </div>
+
+            {aal || refresh ? (
+              <a data-testid="logout-link" onClick={onLogout}>
+                Log out
+              </a>
+            ) : (
+              <>
+                <p className="mt-10 text-left text-sm text-black">
+                  You do not have an Account?{" "}
+                  <Link
+                    href="/registration"
+                    passHref
+                    className="font-semibold leading-6 text-blue-600 hover:text-blue-400"
+                  >
+                    Create account
+                  </Link>
+                </p>
+
+                <p className="mt-4 text-left text-sm text-black">
+                  Forgot password?{" "}
+                  <Link
+                    href="/recovery"
+                    passHref
+                    className="font-semibold leading-6 text-blue-600 hover:text-blue-400"
+                  >
+                    Recover your account
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
         </div>
-
-        {aal || refresh ? (
-          <a data-testid="logout-link" onClick={onLogout}>
-            Log out
-          </a>
-        ) : (
-          <>
-            <p className="mt-10 text-center text-sm text-white">
-              You do not have an Account?{" "}
-              <Link
-                href="/registration"
-                passHref
-                className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
-              >
-                Create account
-              </Link>
-            </p>
-
-            <p className="mt-4 text-center text-sm text-white">
-              Forgot password?{" "}
-              <Link
-                href="/recovery"
-                passHref
-                className="font-semibold leading-6 text-amber-500 hover:text-amber-400 hover:underline"
-              >
-                Recover your account
-              </Link>
-            </p>
-          </>
-        )}
       </div>
     </>
   );

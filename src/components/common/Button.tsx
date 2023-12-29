@@ -18,14 +18,14 @@ import { applyClsxConfig, classNames } from "../../utils/common";
 import Link from "next/link";
 
 const cslxConfig = {
-  default: "rounded-sm px-2 transition-all text-sm py-2 font-medium",
+  default: "rounded-md px-3 transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger":
       "bg-transparent text-red-500 border border-red-500 hover:bg-red-100",
-    "solid+primary": "bg-amber-400 text-black hover:bg-amber-300",
+    "solid+primary": "bg-black text-white hover:bg-gray-300 hover:text-black",
     "outline+primary":
-      "bg-transparent text-amber-600 border border-amber-400 hover:bg-amber-200",
+      "bg-white text-black shadow-sm border border-gray-300 hover:bg-gray-100",
     "outline+secondary":
       "bg-transparent text-blue-600 hover:bg-blue-100 border border-blue-500",
   },

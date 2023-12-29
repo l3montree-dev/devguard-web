@@ -44,12 +44,15 @@ export default function SingleStatGroup() {
   return (
     <div>
       <h3 className="text-sm leading-6">Last 30 days</h3>
-      <dl className="mt-2 grid grid-cols-1 overflow-hidden gap-5 md:grid-cols-3">
+      <dl className="mt-2 grid grid-cols-1 gap-5 md:grid-cols-3">
         {stats.map((item) => (
-          <div key={item.name} className="px-4 rounded-sm bg-white py-5 sm:p-6">
+          <div
+            key={item.name}
+            className="px-4 rounded-lg shadow-sm border bg-white py-5 sm:p-6"
+          >
             <dt className="text-base font-normal">{item.name}</dt>
             <dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
-              <div className="flex items-baseline text-2xl font-semibold text-blue-900">
+              <div className="flex items-baseline text-2xl font-semibold text-black">
                 {item.stat}
                 <span className="ml-2 text-sm font-medium">
                   from {item.previousStat}
@@ -60,11 +63,11 @@ export default function SingleStatGroup() {
                 className={classNames(
                   item.changeType === "decrease" &&
                     item.name !== "Avg. Time Till Handeled"
-                    ? "bg-green-300 text-green-900"
+                    ? "bg-green-200 text-green-900"
                     : item.changeType === "decrease" &&
                       item.name === "Avg. Time Till Handeled"
-                    ? "bg-green-300 text-green-900"
-                    : "bg-red-300 text-red-900",
+                    ? "bg-green-200 text-green-900"
+                    : "bg-red-200 text-red-900",
                   "inline-flex items-baseline rounded-full px-2.5 py-0.5 text-sm font-medium md:mt-2 lg:mt-0",
                 )}
               >

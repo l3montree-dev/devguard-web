@@ -52,7 +52,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
         {node.messages.map(({ text, id }, k) => (
           <span
             key={`${id}-${k}`}
-            className="text-sm mt-2 block"
+            className="text-sm mt-2 text-red-500 block"
             data-testid={`ui/message/${id}`}
           >
             {text}

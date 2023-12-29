@@ -16,9 +16,8 @@
 import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
 import ProgressSidebar from "@/components/ProgressSidebar";
-import { userNavigation } from "../const/menus";
-import { withSession } from "../decorators/withSession";
 import { withInitialState } from "../decorators/withInitialState";
+import { withSession } from "../decorators/withSession";
 
 export default function SetupOrg() {
   return (

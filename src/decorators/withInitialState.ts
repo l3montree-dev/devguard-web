@@ -35,7 +35,7 @@ export function withInitialState(
     const flawFixApiClient = getApiClientFromContext(ctx);
 
     // get the organization
-    const r = await flawFixApiClient("/organizations");
+    const r = await flawFixApiClient("/organizations/");
 
     if (!r.ok) {
       // it must be an 500

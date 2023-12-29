@@ -18,7 +18,6 @@ import { isAxiosError } from "axios";
 import { GetServerSidePropsContext } from "next";
 import { ory } from "../services/ory";
 import { User } from "../types/auth";
-import { addToInitialZustandState } from "../zustand/initialState";
 
 export function withSession(
   next: (
