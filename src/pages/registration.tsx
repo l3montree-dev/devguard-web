@@ -21,7 +21,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { handleFlowError, ory } from "../services/ory";
-import { Flow } from "../components/kratos/Flow";
+import { Flow } from "@/components/kratos/Flow";
 import Link from "next/link";
 import Image from "next/image";
 

@@ -35,6 +35,7 @@ import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
+import { createPat } from "../services/patService";
 
 interface Props {
   flow?: SettingsFlow;
@@ -76,13 +77,7 @@ const Settings: FunctionComponent<{
   const { register, handleSubmit, reset } = useForm<{ description: string }>();
 
   const handleCreatePat = async (data: { description: string }) => {
-    const apiClient = getApiClient(document);
-    const pat: PersonalAccessTokenDTO = await (
-      await apiClient("/pats/", {
-        method: "POST",
-        body: JSON.stringify(data),
-      })
-    ).json();
+    const pat = await createPat(data);
 
     setPersonalAccessTokens([...personalAccessTokens, pat]);
     reset();
@@ -282,7 +277,7 @@ const Settings: FunctionComponent<{
         <div className="mb-6 flex flex-col gap-2">
           {personalAccessTokens.map((pat) => (
             <div
-              className="rounded-sm border bg-white overflow-hidden px-2 py-2 text-sm"
+              className="rounded-md border bg-white overflow-hidden px-2 py-2 text-sm"
               key={pat.id}
             >
               <div className="flex items-center flex-row justify-between">

@@ -75,7 +75,7 @@ const Msg = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-sm bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
         <div className="flex flex-row p-4 items-start">
           <div className="flex-shrink-0">{getIcon(intent)}</div>
           <div className="ml-3  flex-1 pt-0.5">
@@ -105,7 +105,12 @@ const Toaster = () => {
 
   useEffect(() => {
     const listener = (msg: ToastMsg) => {
-      setMsgs((msgs) => [...msgs, { ...msg, id: Date.now().toString() }]);
+      const id = Date.now().toString();
+      setMsgs((msgs) => [...msgs, { ...msg, id }]);
+      // remove the message after 5 seconds
+      setTimeout(() => {
+        setMsgs((msgs) => msgs.filter((m) => m.id !== id));
+      }, 5_000);
     };
     toasterEventEmitter.addListener("msg", listener);
     return () => {

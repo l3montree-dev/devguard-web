@@ -37,6 +37,7 @@ export interface PersonalAccessTokenDTO {
   userId: string;
   createdAt: string;
   id: string;
+  token: string;
 }
 
 export interface ProjectDTO {
