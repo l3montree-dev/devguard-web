@@ -131,7 +131,7 @@ export const getServerSideProps = withSession(
     );
 
     const project = await resp.json();
-    console.log(project);
+
     return {
       props: {
         project,

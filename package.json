@@ -14,6 +14,7 @@
         "@ory/client": "^1.4.0",
         "@ory/integrations": "^1.1.5",
         "@tailwindcss/forms": "^0.5.7",
+        "@tanstack/react-table": "^8.11.2",
         "@types/node": "20.9.1",
         "@types/react": "18.2.37",
         "@types/react-dom": "18.2.15",

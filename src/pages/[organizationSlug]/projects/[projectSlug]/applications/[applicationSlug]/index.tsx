@@ -66,7 +66,7 @@ export const getServerSideProps = withSession(
     );
 
     const app = await resp.json();
-    console.log(app);
+
     return {
       props: {
         app,

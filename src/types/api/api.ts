@@ -64,6 +64,7 @@ export interface FlawDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
+  cveId: string | null;
 }
 
 export interface Paged<T> {
@@ -80,8 +81,30 @@ export interface FlawEventDTO {
   id: string;
   flawId: string;
 }
-export interface FlawWithLastEvent extends FlawDTO {
-  lastEvent: FlawEventDTO;
+
+export interface CVE {
+  attackComplexity: string;
+  attackVector: string;
+  availabilityImpact: string;
+  confidentialityImpact: string;
+  createdAt: string;
+  cve: string;
+  cvss: number;
+  cwe: null;
+  dateLastModified: string;
+  datePublished: string;
+  description: string;
+  exploitabilityScore: number;
+  fixAvailable: null;
+  impactScore: number;
+  integrityImpact: string;
+  privilegesRequired: string;
+  scope: string;
+  severity: string;
+  userInteractionRequired: string;
+}
+export interface FlawWithCVE extends FlawDTO {
+  cve: CVE | null;
 }
 
 export interface ApplicationDTO {
