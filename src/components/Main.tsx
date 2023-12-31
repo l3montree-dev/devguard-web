@@ -53,7 +53,7 @@ const Main: FunctionComponent<Props> = ({ title, children, Button }) => {
             Privacy
           </Link>
         </div>
-        Copyright © 2023 l3montree. All rights reserved.
+        Copyright © 2023 L3montree. All rights reserved.
       </footer>
     </main>
   );

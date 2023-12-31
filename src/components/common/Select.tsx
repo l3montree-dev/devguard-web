@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent, useId } from "react";
+import React, { useId } from "react";
 
 type Props = React.DetailedHTMLProps<
   React.SelectHTMLAttributes<HTMLSelectElement>,
@@ -33,7 +33,7 @@ const Select = React.forwardRef<any, Props>((props, ref) => {
       <select
         ref={ref}
         id={id}
-        className="block mt-2 w-full rounded-sm border-0 bg-white py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 sm:text-sm sm:leading-6 [&_*]:text-black"
+        className="block border mt-2 w-full border-gray-300 shadow-sm rounded-md bg-white py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 sm:text-sm sm:leading-6 [&_*]:text-black"
         {...rest}
       />
     </>

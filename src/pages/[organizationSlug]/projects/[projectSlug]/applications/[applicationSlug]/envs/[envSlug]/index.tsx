@@ -1,3 +1,12 @@
+import DateString from "@/components/common/DateString";
+import Filter from "@/components/common/Filter";
+import useFilter from "@/hooks/useFilter";
+import {
+  FilterableColumnDef,
+  dateOperators,
+  numberOperators,
+  stringOperators,
+} from "@/services/filter";
 import { EnvDTO, FlawWithCVE, Paged } from "@/types/api/api";
 import {
   createColumnHelper,
@@ -11,13 +20,13 @@ import Page from "../../../../../../../../components/Page";
 import { toast } from "../../../../../../../../components/Toaster";
 import Button from "../../../../../../../../components/common/Button";
 import Input from "../../../../../../../../components/common/Input";
+import Pagination from "../../../../../../../../components/common/Pagination";
 import { config } from "../../../../../../../../config";
 import { withInitialState } from "../../../../../../../../decorators/withInitialState";
 import { withSession } from "../../../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../../../utils/common";
-import Pagination from "../../../../../../../../components/common/Pagination";
-import DateString from "@/components/common/DateString";
+import SortingCaret from "@/components/common/SortingCaret";
 
 interface Props {
   env: EnvDTO;
@@ -29,13 +38,13 @@ const columnHelper = createColumnHelper<FlawWithCVE>();
 const Severity = ({ severity }: { severity: string }) => {
   const cls =
     severity === "CRITICAL"
-      ? "bg-red-500 text-white"
+      ? "bg-red-200 text-red-700 border border-red-300"
       : severity === "HIGH"
-      ? "bg-orange-500 text-white"
+      ? "bg-orange-200 text-orange-700 border border-red-300"
       : severity === "MEDIUM"
-      ? "bg-yellow-500 text-black"
+      ? "bg-yellow-300 border border-yellow-500 text-yellow-900"
       : severity === "LOW"
-      ? "text-white bg-green-500"
+      ? "text-green-700 border border-green-400 bg-green-200"
       : "text-white bg-gray-500";
 
   return (
@@ -52,49 +61,89 @@ const Severity = ({ severity }: { severity: string }) => {
 };
 
 const columnsDef = [
-  columnHelper.accessor("ruleId", {
-    header: "Rule ID",
-    cell: (row) => row.getValue(),
-  }),
-  columnHelper.accessor("message", {
-    header: "Message",
-    cell: (row) => (
-      <div className="line-clamp-3">
-        {row
-          .getValue()
-          ?.split("\n")
-          .map((s) => <p key={s}>{s}</p>)}
-      </div>
-    ),
-  }),
-
-  columnHelper.accessor("cve.cvss", {
-    header: "CVSS",
-    cell: (row) => row.getValue(),
-  }),
-  columnHelper.accessor("cve.severity", {
-    header: "Severity",
-    cell: (row) => <Severity severity={row.getValue()} />,
-  }),
-  columnHelper.accessor("cve.exploitabilityScore", {
-    header: "Exploitability Score",
-    cell: (row) => row.getValue(),
-  }),
-  columnHelper.accessor("cve.impactScore", {
-    header: "Impact Score",
-    cell: (row) => row.getValue(),
-  }),
-  columnHelper.accessor("cve.attackVector", {
-    header: "Attack Vector",
-    cell: (row) => row.getValue(),
-  }),
-  columnHelper.accessor("createdAt", {
-    header: "First reported",
-    cell: (row) => <DateString date={new Date(row.getValue())} />,
-  }),
+  {
+    ...columnHelper.accessor("ruleId", {
+      header: "Rule ID",
+      id: "ruleId",
+      cell: (row) => row.getValue(),
+    }),
+  },
+  {
+    ...columnHelper.accessor("message", {
+      header: "Message",
+      id: "message",
+      cell: (row) => (
+        <div className="line-clamp-3">
+          {row
+            .getValue()
+            ?.split("\n")
+            .slice(0, 4)
+            .map((s) => <p key={s}>{s}</p>)}
+        </div>
+      ),
+    }),
+  },
+  {
+    ...columnHelper.accessor("cve.cvss", {
+      header: "CVSS",
+      id: "cve.cvss",
+      cell: (row) => row.getValue(),
+    }),
+    operators: numberOperators,
+  },
+  {
+    ...columnHelper.accessor("cve.severity", {
+      header: "Severity",
+      id: "cve.severity",
+      cell: (row) => <Severity severity={row.getValue()} />,
+    }),
+    operators: stringOperators,
+    filterValues: ["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"],
+  },
+  {
+    ...columnHelper.accessor("cve.exploitabilityScore", {
+      header: "Exploitability Score",
+      id: "cve.exploitabilityScore",
+      cell: (row) => row.getValue(),
+    }),
+    operators: numberOperators,
+  },
+  {
+    ...columnHelper.accessor("cve.impactScore", {
+      header: "Impact Score",
+      id: "cve.impactScore",
+      cell: (row) => row.getValue(),
+    }),
+    operators: numberOperators,
+  },
+  {
+    ...columnHelper.accessor("cve.attackVector", {
+      header: "Attack Vector",
+      id: "cve.attackVector",
+      cell: (row) => row.getValue(),
+    }),
+    operators: stringOperators,
+    filterValues: [
+      "NETWORK",
+      "ADJACENT_NETWORK",
+      "LOCAL",
+      "PHYSICAL",
+      "UNKNOWN",
+    ],
+  },
+  {
+    ...columnHelper.accessor("createdAt", {
+      header: "First reported",
+      id: "createdAt",
+      cell: (row) => <DateString date={new Date(row.getValue())} />,
+    }),
+    operators: dateOperators,
+  },
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
+  const { sortingState, handleSort } = useFilter();
+
   const cmd =
     "cat report.sarif.json | curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <PERSONAL ACCESS TOKEN>' -d @- " +
     config.flawFixApiUrl +
@@ -115,6 +164,11 @@ const Index: FunctionComponent<Props> = (props) => {
     columns: columnsDef,
     data: props.flaws.data,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: handleSort,
+    manualSorting: true,
+    state: {
+      sorting: sortingState,
+    },
   });
 
   return (
@@ -137,31 +191,48 @@ const Index: FunctionComponent<Props> = (props) => {
           </Button>
         </div>
       </div>
-      <div className="border rounded-lg overflow-hidden">
+      <div className="mb-4">
+        <Filter
+          columnsDef={columnsDef.filter(
+            (c): c is FilterableColumnDef => "operators" in c,
+          )}
+        />
+      </div>
+      <div className="border shadow-sm rounded-lg overflow-hidden">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="border-b bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th className="text-left p-4 break-normal" key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                  <th
+                    className="text-left cursor-pointer p-4 break-normal"
+                    onClick={header.column.getToggleSortingHandler()}
+                    key={header.id}
+                  >
+                    <div className="flex flex-row items-center gap-2">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+
+                      <SortingCaret
+                        sortDirection={header.column.getIsSorted()}
+                      />
+                    </div>
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
           <tbody className="text-sm">
-            {table.getRowModel().rows.map((row, i) => (
+            {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 className={classNames(
-                  "align-top transition-all",
-                  i % 2 === 0 ? "bg-gray-100" : "bg-white",
-                  "hover:bg-gray-200",
+                  "align-top cursor-pointer transition-all",
+                  i === arr.length - 1 ? "" : "border-b",
+                  "hover:bg-gray-100",
                 )}
                 key={row.id}
               >
@@ -173,22 +244,6 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            {table.getFooterGroups().map((footerGroup) => (
-              <tr key={footerGroup.id}>
-                {footerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.footer,
-                          header.getContext(),
-                        )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </tfoot>
         </table>
       </div>
       <div className="mt-4">
@@ -218,13 +273,25 @@ export const getServerSideProps = withSession(
       envSlug +
       "/";
 
+    const filterQuery = Object.entries(context.query).filter(
+      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+    );
+
     // check for page and page size query params
     // if they are there, append them to the uri
     const page = (context.query.page as string) ?? "1";
-    const pageSize = (context.query.pageSize as string) ?? "5";
+    const pageSize = (context.query.pageSize as string) ?? "25";
     const [resp, flawResp] = await Promise.all([
       apiClient(uri),
-      apiClient(uri + "flaws/?" + new URLSearchParams({ page, pageSize })),
+      apiClient(
+        uri +
+          "flaws/?" +
+          new URLSearchParams({
+            page,
+            pageSize,
+            ...Object.fromEntries(filterQuery),
+          }),
+      ),
     ]);
 
     // fetch a personal access token from the user

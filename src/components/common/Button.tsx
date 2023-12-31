@@ -18,7 +18,8 @@ import { applyClsxConfig, classNames } from "../../utils/common";
 import Link from "next/link";
 
 const cslxConfig = {
-  default: "rounded-md px-3 transition-all text-sm py-2 font-medium",
+  default:
+    "rounded-md px-3 flex flex-row items-center transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger":
@@ -39,8 +40,16 @@ const Button: FunctionComponent<
     variant?: "solid" | "outline";
     intent?: "primary" | "danger" | "secondary";
     href?: string;
+    Icon?: JSX.Element;
   }
-> = ({ variant = "solid", intent = "primary", href, className, ...rest }) => {
+> = ({
+  variant = "solid",
+  intent = "primary",
+  href,
+  Icon,
+  className,
+  ...rest
+}) => {
   if (href) {
     return (
       <Link
@@ -54,6 +63,11 @@ const Button: FunctionComponent<
           className,
         )}
       >
+        {Boolean(Icon) && (
+          <span className="mr-2 w-6 h-6 flex justify-center items-center">
+            {Icon}
+          </span>
+        )}
         {rest.children}
       </Link>
     );
@@ -69,7 +83,14 @@ const Button: FunctionComponent<
         className,
       )}
       {...rest}
-    />
+    >
+      {Boolean(Icon) && (
+        <span className="mr-2 w-4 h-4 flex justify-center items-center">
+          {Icon}
+        </span>
+      )}
+      {rest.children}
+    </button>
   );
 };
 
