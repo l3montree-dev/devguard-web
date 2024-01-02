@@ -119,7 +119,7 @@ const Registration: NextPage = () => {
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-gray-200">
+        <div className="w-3/5 relative bg-slate-200">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"

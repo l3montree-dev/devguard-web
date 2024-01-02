@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+export type Modify<T, U> = Omit<T, keyof U> & U;
+
 export type State =
   | "verifiedFix"
   | "pendingFix"

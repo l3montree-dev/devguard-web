@@ -27,6 +27,10 @@ import { withSession } from "../../../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../../../utils/common";
 import SortingCaret from "@/components/common/SortingCaret";
+import { useRouter } from "next/router";
+import Severity from "@/components/common/Severity";
+import P from "@/components/common/P";
+import FlawState from "@/components/common/FlawState";
 
 interface Props {
   env: EnvDTO;
@@ -35,32 +39,14 @@ interface Props {
 
 const columnHelper = createColumnHelper<FlawWithCVE>();
 
-const Severity = ({ severity }: { severity: string }) => {
-  const cls =
-    severity === "CRITICAL"
-      ? "bg-red-200 text-red-700 border border-red-300"
-      : severity === "HIGH"
-      ? "bg-orange-200 text-orange-700 border border-red-300"
-      : severity === "MEDIUM"
-      ? "bg-yellow-300 border border-yellow-500 text-yellow-900"
-      : severity === "LOW"
-      ? "text-green-700 border border-green-400 bg-green-200"
-      : "text-white bg-gray-500";
-
-  return (
-    <div className="flex">
-      <div
-        className={classNames(
-          cls + " px-2 py-1 whitespace-nowrap font-semibold rounded-full",
-        )}
-      >
-        {severity}
-      </div>
-    </div>
-  );
-};
-
 const columnsDef = [
+  {
+    ...columnHelper.accessor("state", {
+      header: "State",
+      id: "state",
+      cell: (row) => <FlawState state={row.getValue()} />,
+    }),
+  },
   {
     ...columnHelper.accessor("ruleId", {
       header: "Rule ID",
@@ -74,11 +60,7 @@ const columnsDef = [
       id: "message",
       cell: (row) => (
         <div className="line-clamp-3">
-          {row
-            .getValue()
-            ?.split("\n")
-            .slice(0, 4)
-            .map((s) => <p key={s}>{s}</p>)}
+          <P value={row.getValue()} />
         </div>
       ),
     }),
@@ -171,6 +153,8 @@ const Index: FunctionComponent<Props> = (props) => {
     },
   });
 
+  const router = useRouter();
+
   return (
     <Page title={props.env.name}>
       <div className="text-sm mb-10">
@@ -229,6 +213,9 @@ const Index: FunctionComponent<Props> = (props) => {
           <tbody className="text-sm">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
+                onClick={() => {
+                  router.push(router.asPath + "/flaws/" + row.original.id);
+                }}
                 className={classNames(
                   "align-top cursor-pointer transition-all",
                   i === arr.length - 1 ? "" : "border-b",

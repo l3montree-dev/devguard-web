@@ -11,6 +11,9 @@
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
+
+import { Modify } from "../common";
+
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 interface AppModelDTO {
   id: string;
@@ -65,6 +68,15 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
+
+  state:
+    | "open"
+    | "fixed"
+    | "accepted"
+    | "falsePositive"
+    | "markedForMitigation";
+
+  priority: number | null; // will be null, if not prioritized yet.
 }
 
 export interface Paged<T> {
@@ -82,6 +94,10 @@ export interface FlawEventDTO {
   flawId: string;
 }
 
+export interface CWE {
+  cwe: string;
+  description: string;
+}
 export interface CVE {
   attackComplexity: string;
   attackVector: string;
@@ -90,7 +106,7 @@ export interface CVE {
   createdAt: string;
   cve: string;
   cvss: number;
-  cwe: null;
+  cwes: null;
   dateLastModified: string;
   datePublished: string;
   description: string;
@@ -104,7 +120,12 @@ export interface CVE {
   userInteractionRequired: string;
 }
 export interface FlawWithCVE extends FlawDTO {
-  cve: CVE | null;
+  cve: Modify<
+    CVE,
+    {
+      cwes: Array<CWE>;
+    }
+  > | null;
 }
 
 export interface ApplicationDTO {

@@ -22,6 +22,7 @@ import Main from "./Main";
 import Toaster from "./Toaster";
 import MobileNav from "./navigation/MobileNav";
 import Sidenav from "./navigation/Sidenav";
+import Head from "next/head";
 
 type PageProps = {
   title: string;
@@ -37,6 +38,9 @@ const Page = (props: PropsWithChildren<PageProps>) => {
   const menu = useMenu();
   return (
     <>
+      <Head>
+        <title>{props.title}</title>
+      </Head>
       <Toaster />
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog

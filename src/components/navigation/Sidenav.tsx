@@ -126,8 +126,8 @@ export default function Sidenav({ navigation }: Props) {
                       href={item.href}
                       className={classNames(
                         currentPath.startsWith(item.href)
-                          ? "bg-gray-200 text-black"
-                          : "text-black hover:bg-gray-200",
+                          ? "bg-slate-200 text-black"
+                          : "text-black hover:bg-slate-200",
                         "group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-all leading-6 hover:no-underline",
                       )}
                     >

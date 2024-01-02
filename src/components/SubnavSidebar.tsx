@@ -29,7 +29,7 @@ export default function SubnavSidebar({ links }: Props) {
       <ol role="list" className="flex flex-col gap-4 py-4 px-4">
         {links.map((link) => (
           <Link className="hover:no-underline" key={link.href} href={link.href}>
-            <li className="text-sm transition-all px-2 rounded-md py-1 hover:no-underline hover:bg-gray-200 text-black">
+            <li className="text-sm transition-all px-2 rounded-md py-1 hover:no-underline hover:bg-slate-200 text-black">
               {link.title}
             </li>
           </Link>
