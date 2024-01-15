@@ -24,19 +24,19 @@ export function getBGColorByState(state: State) {
     case "verifiedFix":
       return "bg-blue-500";
     case "pendingFix":
-      return "bg-gray-400";
+      return "bg-slate-400";
     case "pendingTransfered":
-      return "bg-gray-400";
+      return "bg-slate-400";
     case "unhandled":
       return "bg-red-500";
     case "accepted":
-      return "bg-gray-600";
+      return "bg-slate-600";
     case "avoided":
-      return "bg-gray-600";
+      return "bg-slate-600";
     case "verifiedTransfered":
       return "bg-blue-500";
     default:
-      return "bg-gray-600";
+      return "bg-slate-600";
   }
 }
 

@@ -3,10 +3,9 @@ import { classNames } from "@/utils/common";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { FunctionComponent, useState } from "react";
+import CVEChart from "./common/CVEChart";
 import DateString from "./common/DateString";
 import P from "./common/P";
-import CVEChart from "./common/CVEChart";
-import { Radar } from "@nivo/radar";
 
 interface Props {
   cve: FlawWithCVE["cve"];
@@ -34,14 +33,8 @@ const CVECard: FunctionComponent<Props> = ({ cve }) => {
     return null;
   }
   return (
-    <div
-      style={{ width: 500 }}
-      className="bg-slate-100 w-full text-sm p-4 relative rounded-lg"
-    >
-      <div className="absolute right-4 flex items-center flex-row gap-2">
-        Source:{" "}
-        <Image alt="NIST logo" width={50} height={10} src="/NIST_logo.svg" />
-      </div>
+    <div className="w-full text-black text-sm p-4 relative rounded-lg">
+      <div className="absolute -top-10 right-4 flex items-center flex-row gap-2"></div>
       {cve && (
         <div className="flex flex-row justify-center mb-4">
           <CVEChart severity={cve.severity} baseScore={cve.cvss} />

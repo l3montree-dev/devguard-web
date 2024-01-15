@@ -66,7 +66,7 @@ export default function ProgressSidebar({ steps }: Props) {
                     className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center"
                     aria-hidden="true"
                   >
-                    <div className="h-2 w-2 rounded-full bg-gray-500 " />
+                    <div className="h-2 w-2 rounded-full bg-slate-500 " />
                   </div>
                   <p className="ml-3 text-sm font-medium text-gray-400 ">
                     {step.name}

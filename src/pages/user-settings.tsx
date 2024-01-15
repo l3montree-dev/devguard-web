@@ -230,7 +230,7 @@ const Settings: FunctionComponent<{
               alt=""
               width={96}
               height={96}
-              className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
+              className="h-24 w-24 flex-none rounded-lg bg-slate-800 object-cover"
             />
             <div>
               <Button>Change avatar</Button>

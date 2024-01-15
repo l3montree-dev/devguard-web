@@ -184,7 +184,7 @@ const Index: FunctionComponent<Props> = (props) => {
       </div>
       <div className="border shadow-sm rounded-lg overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="border-b bg-gray-100">
+          <thead className="border-b bg-slate-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -210,7 +210,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody className="text-sm">
+          <tbody className="text-sm bg-white">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
@@ -219,7 +219,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 className={classNames(
                   "align-top cursor-pointer transition-all",
                   i === arr.length - 1 ? "" : "border-b",
-                  "hover:bg-gray-100",
+                  "hover:bg-yellow-50",
                 )}
                 key={row.id}
               >

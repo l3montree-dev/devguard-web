@@ -96,7 +96,7 @@ export default function Sidenav({ navigation }: Props) {
           {user && (
             <Link href="/user-settings">
               <Image
-                className="rounded-lg bg-gray-800"
+                className="rounded-lg bg-slate-800"
                 src="/examples/tim.jpg"
                 alt=""
                 width={40}

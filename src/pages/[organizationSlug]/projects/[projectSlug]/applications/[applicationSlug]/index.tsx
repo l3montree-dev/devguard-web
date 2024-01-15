@@ -19,7 +19,7 @@ const Index: FunctionComponent<Props> = ({ app }) => {
   const router = useRouter();
   return (
     <Page title={app.name}>
-      <div className="bg-gray-100 rounded-md text-sm mb-10 px-2 py-2">
+      <div className="bg-slate-100 rounded-md text-sm mb-10 px-2 py-2">
         <p>{app.description}</p>
       </div>
       <div className="mt-2">

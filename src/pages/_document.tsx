@@ -15,14 +15,13 @@
 
 import { Head, Html, Main, NextScript } from "next/document";
 
-import { lexend, inter, merriweather } from "@/pages/_app";
-import Toaster from "../components/Toaster";
+import { inter, lexend, merriweather } from "@/pages/_app";
 const env = process.env.NODE_ENV;
 export default function Document() {
   return (
     <Html
       className={
-        "h-full scroll-smooth bg-white antialiased " +
+        "h-full scroll-smooth bg-slate-100 antialiased " +
         lexend.className +
         " " +
         inter.className
@@ -32,7 +31,7 @@ export default function Document() {
       <Head />
       <body
         className={
-          "flex min-h-full flex-col bg-white " +
+          "flex min-h-full flex-col bg-slate-100 " +
           inter.variable +
           " " +
           lexend.variable +

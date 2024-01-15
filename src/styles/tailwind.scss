@@ -71,3 +71,78 @@ a {
 .toaster {
     z-index: 999
 }
+
+.risk-assessment {
+    display: grid;
+    grid-template-columns: 30px 25px auto auto auto auto;
+}
+
+.rotated-text {
+    writing-mode: tb;
+    transform: rotate(180deg);
+}
+
+.mdx-editor  {
+    background: theme('colors.white');
+}
+
+.mdx-editor {
+    @apply border rounded-lg;
+}
+
+.mdx-editor-content {
+    h1 {
+        @apply text-3xl font-bold mb-2;
+    }
+    h2 {
+        @apply text-2xl font-bold mb-2;
+    }
+
+    h3 {
+        @apply text-xl font-bold mb-2;
+    }
+
+    h4 {
+        @apply text-lg font-bold mb-2;
+    }
+
+    h5 {
+        @apply text-base font-bold mb-2;
+    }
+
+    h6 {
+        @apply text-sm font-bold mb-2;
+    }
+
+    p {
+        @apply mb-2;
+    }
+
+    ul {
+        @apply list-disc ml-4 mb-2;
+    }
+
+    ol {
+        @apply list-decimal ml-4 mb-2;
+    }
+
+    li {
+        @apply mb-2;
+    }
+
+    a {
+        @apply text-blue-600 hover:underline;
+    }
+
+    blockquote {
+        @apply border-l-4 border-gray-400 pl-2 mb-2;
+    }
+
+    strong {
+        @apply font-bold;
+    }
+
+    em {
+        @apply italic;
+    }
+}

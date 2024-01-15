@@ -100,7 +100,7 @@ export default function DynamicProjectList({
                   leaveFrom="transform opacity-100 scale-100"
                   leaveTo="transform opacity-0 scale-95"
                 >
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-gray-800 py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                  <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-slate-800 py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                     <Menu.Item>
                       {({ active }) => (
                         <button
@@ -108,7 +108,7 @@ export default function DynamicProjectList({
                           value={project.name}
                           onClick={handleRemoveProject}
                           className={classNames(
-                            active ? "bg-gray-700" : "",
+                            active ? "bg-slate-700" : "",
                             "block px-3 py-1 text-sm leading-6 text-red-500 w-full text-left",
                           )}
                         >
@@ -129,7 +129,7 @@ export default function DynamicProjectList({
           <button
             type="button"
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="inline-flex items-center rounded-md bg-slate-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             <PlusIcon className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
             Add another Project
