@@ -23,8 +23,10 @@ interface Props {
 const Main: FunctionComponent<Props> = ({ title, children, Button }) => {
   return (
     <main>
-      <header className="flex relative items-center justify-between bg-white border-b border-b-gray-200 px-4 py-5 sm:px-6 lg:px-8">
-        <h1 className="text-lg font-semibold leading-7 text-black">{title}</h1>
+      <header className="flex relative items-center justify-between bg-blue-950 border-b border-b-gray-200 px-4 py-5 sm:px-6 lg:px-8">
+        <h1 className="text-lg font-display font-semibold leading-7 text-white">
+          {title}
+        </h1>
         {Boolean(Button) && <div className="absolute right-4">{Button}</div>}
       </header>
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">

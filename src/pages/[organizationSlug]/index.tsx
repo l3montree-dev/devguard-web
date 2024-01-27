@@ -72,7 +72,11 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
   return (
     <Page
-      Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+      Button={
+        <Button intent="primary" onClick={() => setOpen(true)}>
+          New Project
+        </Button>
+      }
       title={activeOrg?.name ?? "Loading..."}
     >
       <Modal title="Create new Project" open={open} setOpen={setOpen}>
