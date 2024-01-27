@@ -128,7 +128,7 @@ export interface FlawWithCVE extends FlawDTO {
   > | null;
 }
 
-export interface ApplicationDTO {
+export interface AssetDTO {
   name: string;
   description: string;
   slug: string;

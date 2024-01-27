@@ -21,31 +21,7 @@ import { withSession } from "../decorators/withSession";
 
 export default function SetupOrg() {
   return (
-    <Page
-      Sidebar={
-        <ProgressSidebar
-          steps={[
-            {
-              name: "Create account",
-              status: "complete",
-            },
-            {
-              name: "Create your organization",
-              status: "current",
-            },
-            {
-              name: "Create first projects",
-              status: "upcoming",
-            },
-            {
-              name: "Invite team members",
-              status: "upcoming",
-            },
-          ]}
-        />
-      }
-      title="Create your organization"
-    >
+    <Page title="Create your organization">
       <OrgRegisterForm />
     </Page>
   );

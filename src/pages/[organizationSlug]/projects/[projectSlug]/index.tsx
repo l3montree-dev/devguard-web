@@ -7,7 +7,7 @@ import {
   getApiClient,
   getApiClientFromContext,
 } from "../../../../services/flawFixApi";
-import { ApplicationDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
+import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import Button from "../../../../components/common/Button";
 import Modal from "../../../../components/common/Modal";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import ListItem from "../../../../components/common/ListItem";
 
 interface Props {
   project: ProjectDTO & {
-    applications: Array<ApplicationDTO>;
+    assets: Array<AssetDTO>;
   };
 }
 const Index: FunctionComponent<Props> = ({ project }) => {
@@ -31,45 +31,43 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   const { register, getFieldState, formState, handleSubmit } =
     useForm<CreateApplicationReq>();
 
-  const handleCreateApplication = async (data: CreateApplicationReq) => {
+  const handleCreateAsset = async (data: CreateApplicationReq) => {
     const client = getApiClient();
     const resp = await client(
       "/organizations/" +
         activeOrg.slug +
         "/projects/" +
         project.slug +
-        "/applications",
+        "/assets",
       {
         method: "POST",
         body: JSON.stringify(data),
       },
     );
     if (resp.ok) {
-      const res: ApplicationDTO & {
+      const res: AssetDTO & {
         env: Array<EnvDTO>;
       } = await resp.json();
       // navigate to the new application
       router.push(
-        `/${activeOrg.slug}/projects/${project.slug}/applications/${res.slug}`,
+        `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
     }
   };
   return (
     <>
       <Page
-        Button={
-          <Button onClick={() => setShowModal(true)}>New Application</Button>
-        }
+        Button={<Button onClick={() => setShowModal(true)}>New Asset</Button>}
         title={project.name}
       >
-        {project.applications.map((app) => (
+        {project.assets.map((asset) => (
           <ListItem
-            key={app.id}
-            title={app.name}
-            description={app.description}
+            key={asset.id}
+            title={asset.name}
+            description={asset.description}
             Button={
               <Button
-                href={`/${activeOrg.slug}/projects/${project.slug}/applications/${app.slug}`}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
                 variant="outline"
                 intent="primary"
               >
@@ -79,15 +77,8 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           />
         ))}
       </Page>
-      <Modal
-        open={showModal}
-        setOpen={setShowModal}
-        title="Create new Application"
-      >
-        <form
-          className="text-black"
-          onSubmit={handleSubmit(handleCreateApplication)}
-        >
+      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
+        <form className="text-black" onSubmit={handleSubmit(handleCreateAsset)}>
           <Input
             variant="dark"
             label="Name"

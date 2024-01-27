@@ -125,9 +125,11 @@ export const getServerSideProps = withSession(
 
     const resp = await apiClient("/organizations/" + slug + "/projects");
 
+    const projects = await resp.json();
+
     return {
       props: {
-        projects: await resp.json(),
+        projects,
       },
     };
   }),

@@ -7,7 +7,7 @@ import {
   numberOperators,
   stringOperators,
 } from "@/services/filter";
-import { EnvDTO, FlawWithCVE, Paged } from "@/types/api/api";
+import { AssetDTO, EnvDTO, FlawWithCVE, Paged } from "@/types/api/api";
 import {
   createColumnHelper,
   flexRender,
@@ -16,16 +16,16 @@ import {
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
 import { FunctionComponent } from "react";
-import Page from "../../../../../../../../components/Page";
-import { toast } from "../../../../../../../../components/Toaster";
-import Button from "../../../../../../../../components/common/Button";
-import Input from "../../../../../../../../components/common/Input";
-import Pagination from "../../../../../../../../components/common/Pagination";
-import { config } from "../../../../../../../../config";
-import { withInitialState } from "../../../../../../../../decorators/withInitialState";
-import { withSession } from "../../../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../../../services/flawFixApi";
-import { classNames } from "../../../../../../../../utils/common";
+import Page from "../../../../../../components/Page";
+import { toast } from "../../../../../../components/Toaster";
+import Button from "../../../../../../components/common/Button";
+import Input from "../../../../../../components/common/Input";
+import Pagination from "../../../../../../components/common/Pagination";
+import { config } from "../../../../../../config";
+import { withInitialState } from "../../../../../../decorators/withInitialState";
+import { withSession } from "../../../../../../decorators/withSession";
+import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
+import { classNames } from "../../../../../../utils/common";
 import SortingCaret from "@/components/common/SortingCaret";
 import { useRouter } from "next/router";
 import Severity from "@/components/common/Severity";
@@ -33,7 +33,7 @@ import P from "@/components/common/P";
 import FlawState from "@/components/common/FlawState";
 
 interface Props {
-  env: EnvDTO;
+  asset: AssetDTO;
   flaws: Paged<FlawWithCVE>;
 }
 
@@ -130,7 +130,7 @@ const Index: FunctionComponent<Props> = (props) => {
     "cat report.sarif.json | curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer <PERSONAL ACCESS TOKEN>' -d @- " +
     config.flawFixApiUrl +
     "/api/v1/vulnreports/" +
-    props.env.id;
+    props.asset.id;
 
   const handleCopy = () => {
     // use the clipboard api
@@ -156,10 +156,10 @@ const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
 
   return (
-    <Page title={props.env.name}>
+    <Page title={props.asset.name}>
       <div className="text-sm mb-10">
-        Adding a vulnerability report to this environment is as easy as running
-        the following command:
+        Adding a vulnerability report to this asset is as easy as running the
+        following command:
         <div className="mt-2 gap-2 flex flex-row">
           <Input disabled value={cmd} />
           <Button onClick={handleCopy} className="whitespace-nowrap">
@@ -245,8 +245,7 @@ export default Index;
 export const getServerSideProps = withSession(
   withInitialState(async (context: GetServerSidePropsContext) => {
     // fetch the project
-    const { organizationSlug, projectSlug, applicationSlug, envSlug } =
-      context.params!;
+    const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
     const apiClient = getApiClientFromContext(context);
     const uri =
@@ -254,10 +253,8 @@ export const getServerSideProps = withSession(
       organizationSlug +
       "/projects/" +
       projectSlug +
-      "/applications/" +
-      applicationSlug +
-      "/envs/" +
-      envSlug +
+      "/assets/" +
+      assetSlug +
       "/";
 
     const filterQuery = Object.entries(context.query).filter(
@@ -283,11 +280,11 @@ export const getServerSideProps = withSession(
 
     // fetch a personal access token from the user
 
-    const [env, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+    const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
     return {
       props: {
-        env,
+        asset,
         flaws,
       },
     };
