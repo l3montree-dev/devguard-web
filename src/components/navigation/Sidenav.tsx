@@ -55,12 +55,12 @@ export default function Sidenav({ navigation }: Props) {
 
   return (
     <div className="flex grow flex-row">
-      <div className="border-r border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
+      <div className="border-r bg-white border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
         <div>
           <div className="flex flex-row justify-center">
             <PopupMenu
               Button={
-                <div className="bg-black h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
+                <div className="bg-black font-display h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
                 </div>
               }
@@ -105,44 +105,6 @@ export default function Sidenav({ navigation }: Props) {
             </Link>
           )}
         </div>
-      </div>
-      <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6">
-        <div className="flex h-24 shrink-0 items-center">
-          <Image
-            className="mt-6 h-10 w-auto"
-            src="/logo_flaw_fix_black_l3.svg"
-            alt="FlawFix by l3montree Logo"
-            width={32}
-            height={32}
-          />
-        </div>
-        <nav className="flex flex-1 flex-col">
-          <ul role="list" className="flex flex-1 flex-col gap-y-7">
-            <li>
-              <ul role="list" className="-mx-2 space-y-1">
-                {navigation.map((item) => (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={classNames(
-                        currentPath.startsWith(item.href)
-                          ? "bg-slate-200 text-black"
-                          : "text-black hover:bg-slate-200",
-                        "group flex gap-x-3 rounded-md p-2 text-sm font-semibold transition-all leading-6 hover:no-underline",
-                      )}
-                    >
-                      <item.icon
-                        className="h-6 w-6 shrink-0"
-                        aria-hidden="true"
-                      />
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          </ul>
-        </nav>
       </div>
     </div>
   );
