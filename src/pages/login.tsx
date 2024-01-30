@@ -116,7 +116,7 @@ const Login: NextPage = () => {
         <meta name="description" content="FlawFix Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-slate-200">
+        <div className="w-3/5 relative bg-blue-950">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"
@@ -128,13 +128,13 @@ const Login: NextPage = () => {
           <div className="w-full px-8">
             <div className="">
               <Image
-                className="h-10 w-auto"
-                src="/logo_flaw_fix_black_l3.svg"
+                className="h-20 w-auto"
+                src="/logo_horizontal.svg"
                 alt="FlawFix by l3montree Logo"
-                width={200}
-                height={200}
+                width={300}
+                height={300}
               />
-              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight text-black">
+              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight text-black">
                 {(() => {
                   if (flow?.refresh) {
                     return "Confirm Action";

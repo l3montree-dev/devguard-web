@@ -21,7 +21,7 @@ export default function Document() {
   return (
     <Html
       className={
-        "h-full scroll-smooth bg-slate-100 antialiased " +
+        "h-full scroll-smooth antialiased " +
         lexend.className +
         " " +
         inter.className

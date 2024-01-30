@@ -40,7 +40,7 @@ const Input = React.forwardRef<any, Props>((props, ref) => {
         id={id}
         title={label}
         className={classNames(
-          "block w-full rounded-md text-black py-1.5 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 focus:border-gray-200 border border-gray-200 shadow-sm sm:text-sm sm:leading-6",
+          "block w-full rounded-md text-black ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 focus:border-gray-200 border border-slate-300 py-2 sm:leading-6",
           Boolean(label) ? "mt-2" : "",
           "bg-white",
           error ? "ring-red-500" : "ring-white/10",

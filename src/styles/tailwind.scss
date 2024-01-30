@@ -17,6 +17,39 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/Lexend/Lexend-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight:600;
+    font-display: swap;
+    src: url('/fonts/Lexend/Lexend-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight:700;
+    font-display: swap;
+    src: url('/fonts/Lexend/Lexend-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight:800;
+    font-display: swap;
+    src: url('/fonts/Lexend/Lexend-Bold.ttf') format('truetype');
+}
+
+
 body, html {
     hyphens: auto;
     word-break: break-word;

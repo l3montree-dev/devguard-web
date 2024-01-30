@@ -101,10 +101,10 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         </Dialog>
       </Transition.Root>
       {/* Static sidebar for desktop */}
-      <div className="hidden md:fixed inset-y-0  md:flex w-80 flex-col bg-white border-r border-r-gray-200">
+      <div className="hidden md:fixed inset-y-0  md:flex flex-col bg-blue-950">
         <Sidenav navigation={menu} />
       </div>
-      <div className="md:pl-80">
+      <div className="md:pl-16">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
           <Main Button={props.Button} title={props.title}>
             {props.children}
