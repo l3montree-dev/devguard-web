@@ -1,22 +1,23 @@
+import Select from "@/components/common/Select";
 import { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
+import Button from "../../../../components/common/Button";
+import Input from "../../../../components/common/Input";
+import ListItem from "../../../../components/common/ListItem";
+import Modal from "../../../../components/common/Modal";
 import { withInitialState } from "../../../../decorators/withInitialState";
 import { withSession } from "../../../../decorators/withSession";
+import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
   getApiClient,
   getApiClientFromContext,
 } from "../../../../services/flawFixApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
-import Button from "../../../../components/common/Button";
-import Modal from "../../../../components/common/Modal";
-import { useForm } from "react-hook-form";
-import { CreateApplicationReq } from "../../../../types/api/req";
-import { useActiveOrg } from "../../../../hooks/useActiveOrg";
+import { CreateAssetReq } from "../../../../types/api/req";
 import { hasErrors } from "../../../../utils/common";
-import Input from "../../../../components/common/Input";
-import { useRouter } from "next/router";
-import ListItem from "../../../../components/common/ListItem";
 
 interface Props {
   project: ProjectDTO & {
@@ -29,9 +30,9 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg()!;
   const { register, getFieldState, formState, handleSubmit } =
-    useForm<CreateApplicationReq>();
+    useForm<CreateAssetReq>();
 
-  const handleCreateAsset = async (data: CreateApplicationReq) => {
+  const handleCreateAsset = async (data: CreateAssetReq) => {
     const client = getApiClient();
     const resp = await client(
       "/organizations/" +
@@ -77,7 +78,12 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           />
         ))}
       </Page>
-      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
+      <Modal
+        Help={<div>The Security Requirements are defined as...</div>}
+        open={showModal}
+        setOpen={setShowModal}
+        title="Create new Asset"
+      >
         <form className="text-black" onSubmit={handleSubmit(handleCreateAsset)}>
           <Input
             variant="dark"
@@ -96,6 +102,27 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               })}
               error={getFieldState("description")?.error}
             />
+          </div>
+          <div className="mt-4">
+            <Select label="Confidentiality Requirement">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Select label="Integrity Requirement">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Select label="Availability Requirement">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
           </div>
           <div className="mt-4 flex justify-end">
             <Button

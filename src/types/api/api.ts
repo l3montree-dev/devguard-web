@@ -14,6 +14,11 @@
 
 import { Modify } from "../common";
 
+export enum RequirementsLevel {
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 interface AppModelDTO {
   id: string;

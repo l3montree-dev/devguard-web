@@ -12,34 +12,30 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import { useId } from "react";
+import { FieldError } from "react-hook-form";
 
-import React, { useId } from "react";
+type Props = {
+  label?: string;
+  Element: (id: string) => JSX.Element;
+  error?: FieldError;
+  className?: string;
+};
+const FormField = (props: Props) => {
+  const { label, Element, error, className } = props;
+  const id = useId();
 
-type Props = React.DetailedHTMLProps<
-  React.SelectHTMLAttributes<HTMLSelectElement>,
-  HTMLSelectElement
-> & {
-  label: string;
+  return (
+    <div className={className}>
+      {Boolean(label) && (
+        <label htmlFor={id} className="block text-sm font-medium leading-6">
+          {label}
+        </label>
+      )}
+      {Element(id)}
+      {error && <small className="text-sm text-red-500">{error.message}</small>}
+    </div>
+  );
 };
 
-const Select = React.forwardRef<any, Props>((props, ref) => {
-  const { label, ...rest } = props;
-  const id = useId();
-  return (
-    <>
-      <label htmlFor={id} className="block text-sm font-medium leading-6">
-        {label}
-      </label>
-      <select
-        ref={ref}
-        id={id}
-        className="block border mt-2 w-full border-gray-300 shadow-sm rounded-md bg-white py-2 ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 sm:leading-6 [&_*]:text-black"
-        {...rest}
-      />
-    </>
-  );
-});
-
-Select.displayName = "Select";
-
-export default Select;
+export default FormField;

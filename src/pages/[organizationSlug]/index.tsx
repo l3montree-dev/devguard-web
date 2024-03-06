@@ -104,9 +104,6 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           </div>
         </form>
       </Modal>
-      <div>
-        <SingleStatGroup />
-      </div>
       <div className="mt-4">
         <ProjectList projects={projects} />
       </div>

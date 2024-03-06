@@ -21,8 +21,8 @@ interface Props {
 export default function Sidebar({ title, children }: Props) {
   return (
     <>
-      <header className="flex w-full items-center justify-between bg-white border-r-gray-200 border-r px-6 py-5">
-        <h2 className="text-base w-full font-semibold leading-7 text-black">
+      <header className="flex w-full items-center justify-between bg-blue-950 px-6 py-5">
+        <h2 className="text-base w-full font-semibold leading-7 text-white">
           {title}
         </h2>
       </header>
