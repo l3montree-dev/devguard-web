@@ -38,7 +38,7 @@ COPY . .
 RUN npm run build
 
 # Running the app
-FROM gcr.io/distroless/nodejs:20 AS runner
+FROM gcr.io/distroless/nodejs:20-debian12 AS runner
 WORKDIR /app
 
 # Mark as prod, disable telemetry, set port
