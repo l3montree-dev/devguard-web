@@ -27,7 +27,6 @@ EXPOSE 3000
 ENV NEXT_PUBLIC_ENVIRONMENT production
 ENV NODE_ENV production
 
-COPY ./prisma prisma
 COPY package*.json .
 
 RUN npm install
