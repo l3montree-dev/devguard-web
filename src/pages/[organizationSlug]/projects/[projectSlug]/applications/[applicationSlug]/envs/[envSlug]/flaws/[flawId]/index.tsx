@@ -85,11 +85,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
                 "p-4 bg-white",
                 showRiskAssessment ? "visible" : "hidden",
               )}
-            >
-              <RiskAssessment
-                onRiskAssessmentChange={handleRiskAssessmentChange}
-              />
-            </div>
+            ></div>
           </div>
         </div>
       </div>

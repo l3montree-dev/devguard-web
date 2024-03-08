@@ -17,7 +17,6 @@ import Alert from "@/components/Alert";
 import AlreadyInvitedMembersList from "@/components/AlreadyInvitedMembersList";
 import InviteMembersForm from "@/components/InviteMembersForm";
 import Page from "@/components/Page";
-import ProgressSidebar from "@/components/ProgressSidebar";
 import { IMember } from "@/types/common";
 import {
   ChartBarSquareIcon,
@@ -56,31 +55,7 @@ export default function SetupInviteMembers() {
   };
 
   return (
-    <Page
-      Sidebar={
-        <ProgressSidebar
-          steps={[
-            {
-              name: "Create account",
-              status: "complete",
-            },
-            {
-              name: "Create your organization",
-              status: "complete",
-            },
-            {
-              name: "Create first projects",
-              status: "complete",
-            },
-            {
-              name: "Invite team members",
-              status: "current",
-            },
-          ]}
-        />
-      }
-      title="Invite Team Members"
-    >
+    <Page title="Invite Team Members">
       {showAlert && (
         <Alert
           alertType={"warning"}
