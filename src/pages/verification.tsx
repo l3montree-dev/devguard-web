@@ -126,20 +126,20 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen bg-blue-900 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+      <div className="flex min-h-screen bg-slate-200 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
-            className="mx-auto h-16 w-auto"
-            src="/logo_flaw_fix_white_l3.svg"
+            className="h-20 mx-auto w-auto"
+            src="/logo_horizontal.svg"
             alt="FlawFix by l3montree Logo"
-            width={200}
-            height={200}
+            width={300}
+            height={300}
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-blue-950">
             Verify your E-Mail
           </h2>
         </div>
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="mt-10 text-black sm:mx-auto sm:w-full sm:max-w-sm">
           <Flow onSubmit={onSubmit} flow={flow} />
         </div>
         <p className="mt-10 text-center text-sm">

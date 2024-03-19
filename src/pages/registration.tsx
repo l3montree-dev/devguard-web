@@ -128,14 +128,14 @@ const Registration: NextPage = () => {
           />
         </div>
         <div className="bg-white w-2/5 flex-col flex justify-center items-center">
-          <div className="w-full px-4">
+          <div className="w-full px-8">
             <div>
               <Image
-                className="mx-auto h-16 w-auto"
-                src="/logo_flaw_fix_white_l3.svg"
+                className="h-20 w-auto"
+                src="/logo_horizontal.svg"
                 alt="FlawFix by l3montree Logo"
-                width={200}
-                height={200}
+                width={300}
+                height={300}
               />
               <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight text-black">
                 Create your FlawFix account
