@@ -18,6 +18,8 @@ import {
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
 import { hasErrors } from "../../../../utils/common";
+import { toast } from "@/components/Toaster";
+import Checkbox from "@/components/common/Checkbox";
 
 interface Props {
   project: ProjectDTO & {
@@ -53,6 +55,12 @@ const Index: FunctionComponent<Props> = ({ project }) => {
       router.push(
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
+    } else {
+      toast({
+        msg: "Could not create asset",
+        intent: "error",
+        title: "Error",
+      });
     }
   };
   return (
@@ -78,12 +86,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           />
         ))}
       </Page>
-      <Modal
-        Help={<div>The Security Requirements are defined as...</div>}
-        open={showModal}
-        setOpen={setShowModal}
-        title="Create new Asset"
-      >
+      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
         <form className="text-black" onSubmit={handleSubmit(handleCreateAsset)}>
           <Input
             variant="dark"
@@ -104,25 +107,40 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             />
           </div>
           <div className="mt-4">
-            <Select label="Confidentiality Requirement">
+            <Select
+              {...register("confidentialityRequirement")}
+              label="Confidentiality Requirement"
+            >
               <option>Low</option>
               <option>Medium</option>
               <option>High</option>
             </Select>
           </div>
           <div className="mt-4">
-            <Select label="Integrity Requirement">
+            <Select
+              {...register("integrityRequirement")}
+              label="Integrity Requirement"
+            >
               <option>Low</option>
               <option>Medium</option>
               <option>High</option>
             </Select>
           </div>
           <div className="mt-4">
-            <Select label="Availability Requirement">
+            <Select
+              {...register("availabilityRequirement")}
+              label="Availability Requirement"
+            >
               <option>Low</option>
               <option>Medium</option>
               <option>High</option>
             </Select>
+          </div>
+          <div className="mt-4">
+            <Checkbox
+              {...register("reachableFromTheInternet")}
+              label="Reachable from the internet"
+            />
           </div>
           <div className="mt-4 flex justify-end">
             <Button

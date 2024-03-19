@@ -4,13 +4,13 @@ export interface CreateAssetReq {
   name: string;
   description: string;
 
-  Importance: number;
+  importance: number;
 
-  ReachableFromInternet: boolean;
+  reachableFromTheInternet: boolean;
 
-  ConfidentialityRequirement: RequirementsLevel;
-  IntegrityRequirement: RequirementsLevel;
-  AvailabilityRequirement: RequirementsLevel;
+  confidentialityRequirement: RequirementsLevel;
+  integrityRequirement: RequirementsLevel;
+  availabilityRequirement: RequirementsLevel;
 }
 
 export interface CreateProjectReq {
