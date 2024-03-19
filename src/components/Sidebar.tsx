@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 interface Props {
-  title: JSX.Element;
+  title: JSX.Element | string;
   children: React.ReactNode;
 }
 
