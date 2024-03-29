@@ -80,7 +80,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
                 variant="outline"
                 intent="primary"
               >
-                View Application
+                View Asset
               </Button>
             }
           />
