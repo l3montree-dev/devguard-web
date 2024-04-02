@@ -123,6 +123,7 @@ export interface CVE {
   scope: string;
   severity: string;
   userInteractionRequired: string;
+  epss: number;
 }
 export interface FlawWithCVE extends FlawDTO {
   cve: Modify<
@@ -131,6 +132,9 @@ export interface FlawWithCVE extends FlawDTO {
       cwes: Array<CWE>;
     }
   > | null;
+  arbitraryJsonData: {
+    packageName?: string;
+  };
 }
 
 export interface AssetDTO {

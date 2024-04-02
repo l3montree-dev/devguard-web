@@ -104,7 +104,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           </div>
         </form>
       </Modal>
-      <div className="mt-4">
+      <div>
         <ProjectList projects={projects} />
       </div>
     </Page>
