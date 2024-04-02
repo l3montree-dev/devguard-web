@@ -1,26 +1,29 @@
+import Select from "@/components/common/Select";
 import { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
+import Button from "../../../../components/common/Button";
+import Input from "../../../../components/common/Input";
+import ListItem from "../../../../components/common/ListItem";
+import Modal from "../../../../components/common/Modal";
 import { withInitialState } from "../../../../decorators/withInitialState";
 import { withSession } from "../../../../decorators/withSession";
+import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
   getApiClient,
   getApiClientFromContext,
 } from "../../../../services/flawFixApi";
-import { ApplicationDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
-import Button from "../../../../components/common/Button";
-import Modal from "../../../../components/common/Modal";
-import { useForm } from "react-hook-form";
-import { CreateApplicationReq } from "../../../../types/api/req";
-import { useActiveOrg } from "../../../../hooks/useActiveOrg";
+import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
+import { CreateAssetReq } from "../../../../types/api/req";
 import { hasErrors } from "../../../../utils/common";
-import Input from "../../../../components/common/Input";
-import { useRouter } from "next/router";
-import ListItem from "../../../../components/common/ListItem";
+import { toast } from "@/components/Toaster";
+import Checkbox from "@/components/common/Checkbox";
 
 interface Props {
   project: ProjectDTO & {
-    applications: Array<ApplicationDTO>;
+    assets: Array<AssetDTO>;
   };
 }
 const Index: FunctionComponent<Props> = ({ project }) => {
@@ -29,65 +32,62 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg()!;
   const { register, getFieldState, formState, handleSubmit } =
-    useForm<CreateApplicationReq>();
+    useForm<CreateAssetReq>();
 
-  const handleCreateApplication = async (data: CreateApplicationReq) => {
+  const handleCreateAsset = async (data: CreateAssetReq) => {
     const client = getApiClient();
     const resp = await client(
       "/organizations/" +
         activeOrg.slug +
         "/projects/" +
         project.slug +
-        "/applications",
+        "/assets",
       {
         method: "POST",
         body: JSON.stringify(data),
       },
     );
     if (resp.ok) {
-      const res: ApplicationDTO & {
+      const res: AssetDTO & {
         env: Array<EnvDTO>;
       } = await resp.json();
       // navigate to the new application
       router.push(
-        `/${activeOrg.slug}/projects/${project.slug}/applications/${res.slug}`,
+        `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
+    } else {
+      toast({
+        msg: "Could not create asset",
+        intent: "error",
+        title: "Error",
+      });
     }
   };
   return (
     <>
       <Page
-        Button={
-          <Button onClick={() => setShowModal(true)}>New Application</Button>
-        }
+        Button={<Button onClick={() => setShowModal(true)}>New Asset</Button>}
         title={project.name}
       >
-        {project.applications.map((app) => (
+        {project.assets.map((asset) => (
           <ListItem
-            key={app.id}
-            title={app.name}
-            description={app.description}
+            key={asset.id}
+            title={asset.name}
+            description={asset.description}
             Button={
               <Button
-                href={`/${activeOrg.slug}/projects/${project.slug}/applications/${app.slug}`}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
                 variant="outline"
                 intent="primary"
               >
-                View Application
+                View Asset
               </Button>
             }
           />
         ))}
       </Page>
-      <Modal
-        open={showModal}
-        setOpen={setShowModal}
-        title="Create new Application"
-      >
-        <form
-          className="text-black"
-          onSubmit={handleSubmit(handleCreateApplication)}
-        >
+      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
+        <form className="text-black" onSubmit={handleSubmit(handleCreateAsset)}>
           <Input
             variant="dark"
             label="Name"
@@ -104,6 +104,42 @@ const Index: FunctionComponent<Props> = ({ project }) => {
                 required: "Please enter a description",
               })}
               error={getFieldState("description")?.error}
+            />
+          </div>
+          <div className="mt-4">
+            <Select
+              {...register("confidentialityRequirement")}
+              label="Confidentiality Requirement"
+            >
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Select
+              {...register("integrityRequirement")}
+              label="Integrity Requirement"
+            >
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Select
+              {...register("availabilityRequirement")}
+              label="Availability Requirement"
+            >
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </Select>
+          </div>
+          <div className="mt-4">
+            <Checkbox
+              {...register("reachableFromTheInternet")}
+              label="Reachable from the internet"
             />
           </div>
           <div className="mt-4 flex justify-end">

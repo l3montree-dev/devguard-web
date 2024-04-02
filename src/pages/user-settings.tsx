@@ -36,6 +36,7 @@ import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import { createPat } from "../services/patService";
+import DateString from "@/components/common/DateString";
 
 interface Props {
   flow?: SettingsFlow;
@@ -277,7 +278,7 @@ const Settings: FunctionComponent<{
         <div className="mb-6 flex flex-col gap-2">
           {personalAccessTokens.map((pat) => (
             <div
-              className="rounded-md border bg-white overflow-hidden px-2 py-2 text-sm"
+              className="rounded-md border bg-white overflow-hidden p-4 text-sm"
               key={pat.id}
             >
               <div className="flex items-center flex-row justify-between">
@@ -296,16 +297,15 @@ const Settings: FunctionComponent<{
                         Copy
                       </Button>
                     )}
-                    <div>
-                      <Button
-                        intent="danger"
-                        className="whitespace-nowrap"
-                        variant="outline"
-                        onClick={() => handleDeletePat(pat)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
+
+                    <Button
+                      intent="danger"
+                      className="whitespace-nowrap"
+                      variant="outline"
+                      onClick={() => handleDeletePat(pat)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                   {pat.token && (
                     <span className="block text-red-500 mb-4">
@@ -313,7 +313,10 @@ const Settings: FunctionComponent<{
                       it ever again
                     </span>
                   )}
-                  <p>{pat.description}</p>
+                  <p>Description: {pat.description}</p>
+                  <p>
+                    Created: <DateString date={new Date(pat.createdAt)} />
+                  </p>
                 </div>
               </div>
             </div>

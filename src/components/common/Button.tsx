@@ -19,13 +19,13 @@ import Link from "next/link";
 
 const cslxConfig = {
   default:
-    "rounded-md px-3 flex flex-row items-center transition-all text-sm py-2 font-medium",
+    "rounded-md px-3 shadow-sm flex flex-row items-center transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger":
       "bg-transparent text-red-500 border border-red-500 hover:bg-red-100",
     "solid+primary":
-      "bg-yellow-400 text-black hover:bg-slate-300 hover:text-black",
+      "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black",
     "outline+primary":
       "bg-white text-black shadow-sm border border-gray-300 hover:bg-slate-100",
     "outline+secondary":
