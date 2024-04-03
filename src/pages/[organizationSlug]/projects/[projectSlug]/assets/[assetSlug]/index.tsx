@@ -3,7 +3,11 @@ import Filter from "@/components/common/Filter";
 import FlawState from "@/components/common/FlawState";
 import P from "@/components/common/P";
 import SortingCaret from "@/components/common/SortingCaret";
+import { withProject } from "@/decorators/withProject";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
+import { useActiveProject } from "@/hooks/useProject";
 import {
   FilterableColumnDef,
   dateOperators,
@@ -17,6 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
@@ -25,11 +30,6 @@ import { withInitialState } from "../../../../../../decorators/withInitialState"
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../utils/common";
-import { withProject } from "@/decorators/withProject";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useProject";
-import Link from "next/link";
-import { assetMenu } from "@/const/assetMenu";
 
 interface Props {
   asset: AssetDTO;
@@ -122,6 +122,8 @@ const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+
+  const assetMenu = useAssetMenu();
 
   return (
     <Page
