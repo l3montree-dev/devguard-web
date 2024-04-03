@@ -24,15 +24,9 @@ import PopupMenuItem from "../common/PopupMenuItem";
 import { UserGroupIcon } from "@heroicons/react/20/solid";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 
-interface Props {
-  navigation: {
-    name: string;
-    href: string;
-    icon: any;
-  }[];
-}
+interface Props {}
 
-export default function Sidenav({ navigation }: Props) {
+export default function Sidenav() {
   const router = useRouter();
   const currentPath = router.asPath;
 

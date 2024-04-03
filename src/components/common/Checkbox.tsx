@@ -29,7 +29,7 @@ const Checkbox = React.forwardRef<any, Props>((props, ref) => {
       <input
         id={id}
         ref={ref}
-        className="h-4 relative top-1 w-4 border-gray-300 shadow-sm rounded-sm bg-white border text-amber-500  focus:ring-blue-400"
+        className="h-4 relative top-1 w-4 border-gray-300 shadow-sm rounded-sm dark:bg-slate-700 dark:border-slate-600 bg-white border text-amber-500  focus:ring-blue-400"
         type="checkbox"
         {...rest}
       ></input>
@@ -37,9 +37,7 @@ const Checkbox = React.forwardRef<any, Props>((props, ref) => {
         <label htmlFor={id} className="block text-sm font-medium leading-6">
           {label}
         </label>
-        {props.help && (
-          <small className="text-sm text-black/80">{props.help}</small>
-        )}
+        {props.help && <small className="text-sm">{props.help}</small>}
       </div>
     </div>
   );

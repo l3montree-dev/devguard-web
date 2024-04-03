@@ -15,14 +15,13 @@
 
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import Head from "next/head";
 import React, { Fragment, PropsWithChildren, useState } from "react";
-import { useMenu } from "../hooks/useMenu";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import Toaster from "./Toaster";
 import MobileNav from "./navigation/MobileNav";
 import Sidenav from "./navigation/Sidenav";
-import Head from "next/head";
 
 type PageProps = {
   title: string;
@@ -36,7 +35,6 @@ type PageProps = {
 const Page = (props: PropsWithChildren<PageProps>) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const menu = useMenu();
   return (
     <>
       <Head>
@@ -95,7 +93,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
                     </button>
                   </div>
                 </Transition.Child>
-                <MobileNav navigation={menu} />
+                {/*   <MobileNav navigation={menu} /> */}
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -103,7 +101,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       </Transition.Root>
       {/* Static sidebar for desktop */}
       <div className="hidden md:fixed inset-y-0 z-10 md:flex flex-col bg-blue-950">
-        <Sidenav navigation={menu} />
+        <Sidenav />
       </div>
       <div className="md:pl-16">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
