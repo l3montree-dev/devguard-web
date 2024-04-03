@@ -25,6 +25,7 @@ import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
 import { ory, handleFlowError } from "../services/ory";
 import Image from "next/image";
+import { isDarkModeEnabled } from "@/utils/common";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -116,25 +117,32 @@ const Login: NextPage = () => {
         <meta name="description" content="FlawFix Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-blue-950">
+        <div className="w-3/5 relative bg-slate-500">
           <Image
-            src="/bg.png"
+            src={"/bg.png"}
             alt="FlawFix by l3montree Logo"
-            objectFit="contain"
+            objectFit="cover"
             fill
           />
         </div>
-        <div className="bg-white w-2/5 flex-col flex justify-center items-center">
+        <div className="dark:bg-slate-950 dark:text-white text-slate-900 bg-white w-2/5 flex-col flex justify-center items-center">
           <div className="w-full px-8">
             <div className="">
               <Image
-                className="h-20 w-auto"
-                src="/logo_horizontal.svg"
+                className="h-20 w-auto hidden dark:block"
+                src={"/logo_inverse_horizontal.svg"}
                 alt="FlawFix by l3montree Logo"
                 width={300}
                 height={300}
               />
-              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight text-black">
+              <Image
+                className="h-20 w-auto dark:hidden"
+                src={"/logo_horizontal.svg"}
+                alt="FlawFix by l3montree Logo"
+                width={300}
+                height={300}
+              />
+              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
                 {(() => {
                   if (flow?.refresh) {
                     return "Confirm Action";
@@ -145,7 +153,7 @@ const Login: NextPage = () => {
                 })()}
               </h2>
             </div>
-            <div className="mt-10 sm:mx-auto text-black">
+            <div className="mt-10 sm:mx-auto">
               <Flow onSubmit={onSubmit} flow={flow} />
             </div>
 
@@ -155,7 +163,7 @@ const Login: NextPage = () => {
               </a>
             ) : (
               <>
-                <p className="mt-10 text-left text-sm text-black">
+                <p className="mt-10 text-left text-sm">
                   You do not have an Account?{" "}
                   <Link
                     href="/registration"
@@ -166,7 +174,7 @@ const Login: NextPage = () => {
                   </Link>
                 </p>
 
-                <p className="mt-4 text-left text-sm text-black">
+                <p className="mt-4 text-left text-sm">
                   Forgot password?{" "}
                   <Link
                     href="/recovery"
