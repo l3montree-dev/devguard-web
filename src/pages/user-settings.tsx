@@ -219,221 +219,223 @@ const Settings: FunctionComponent<{
       }
       title="Profile Management and Security Settings"
     >
-      <Section
-        id="profile"
-        description="Use a permanent address where you can receive mail."
-        title="Profile Management & Security Settings"
-      >
-        <div className="grid  grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
-          <div className="col-span-full flex items-center gap-x-8">
-            <Image
-              src="/examples/tim.jpg"
-              alt=""
-              width={96}
-              height={96}
-              className="h-24 w-24 flex-none rounded-lg bg-slate-800 object-cover"
-            />
-            <div>
-              <Button>Change avatar</Button>
-              <p className="mt-2 text-xs leading-5 text-black/80">
-                JPG, GIF or PNG. 1MB max.
-              </p>
-            </div>
-          </div>
-
-          <div className="col-span-full">
-            <SettingsCard only="profile" flow={flow}>
-              <Messages messages={flow?.ui.messages} />
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="profile"
-                flow={flow}
+      <div className="dark:text-white">
+        <Section
+          id="profile"
+          description="Use a permanent address where you can receive mail."
+          title="Profile Management & Security Settings"
+        >
+          <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="col-span-full flex items-center gap-x-8">
+              <Image
+                src="/examples/tim.jpg"
+                alt=""
+                width={96}
+                height={96}
+                className="h-24 w-24 flex-none rounded-lg bg-slate-800 object-cover"
               />
-            </SettingsCard>
-          </div>
-        </div>
-      </Section>
-
-      <Section
-        id="password"
-        title="Change Password"
-        description="Update your password associated with your account."
-      >
-        <SettingsCard only="password" flow={flow}>
-          <Messages messages={flow?.ui.messages} />
-          <Flow
-            hideGlobalMessages
-            onSubmit={onSubmit}
-            only="password"
-            flow={flow}
-          />
-        </SettingsCard>
-      </Section>
-      <Section
-        id="pat"
-        title="Manage Personal Access Tokens"
-        description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
-      >
-        <div className="mb-6 flex flex-col gap-2">
-          {personalAccessTokens.map((pat) => (
-            <div
-              className="rounded-md border bg-white overflow-hidden p-4 text-sm"
-              key={pat.id}
-            >
-              <div className="flex items-center flex-row justify-between">
-                <div className="flex-1">
-                  <div className="mb-2 flex gap-2 flex-row">
-                    <Input
-                      variant="dark"
-                      readOnly
-                      value={pat.token ? pat.token : "***********"}
-                    />
-                    {pat.token && (
-                      <Button
-                        className="whitespace-nowrap"
-                        onClick={() => handleCopy(pat.token!)}
-                      >
-                        Copy
-                      </Button>
-                    )}
-
-                    <Button
-                      intent="danger"
-                      className="whitespace-nowrap"
-                      variant="outline"
-                      onClick={() => handleDeletePat(pat)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                  {pat.token && (
-                    <span className="block text-red-500 mb-4">
-                      Make sure to copy the token. You won&apos;t be able to see
-                      it ever again
-                    </span>
-                  )}
-                  <p>Description: {pat.description}</p>
-                  <p>
-                    Created: <DateString date={new Date(pat.createdAt)} />
-                  </p>
-                </div>
+              <div>
+                <Button>Change avatar</Button>
+                <p className="mt-2 text-xs leading-5 text-black/80">
+                  JPG, GIF or PNG. 1MB max.
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-        <form
-          className="border bg-white rounded-md p-4 shadow-sm"
-          onSubmit={handleSubmit(handleCreatePat)}
-        >
-          <span className="font-medium block pb-2">
-            Create new Personal Access Token
-          </span>
-          <Input
-            variant="dark"
-            {...register("description")}
-            label="Description"
-          />
-          <div className="mt-2 justify-end flex flex-row">
-            <Button type="submit">Create</Button>
+
+            <div className="col-span-full">
+              <SettingsCard only="profile" flow={flow}>
+                <Messages messages={flow?.ui.messages} />
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="profile"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </div>
           </div>
-        </form>
-      </Section>
+        </Section>
 
-      <Section
-        id="oidc"
-        title="Manage Social Sign In"
-        description="Update your password associated with your account."
-      >
-        <SettingsCard only="oidc" flow={flow}>
-          <Messages messages={flow?.ui.messages} />
-          <Flow
-            hideGlobalMessages
-            onSubmit={onSubmit}
-            only="oidc"
-            flow={flow}
-          />
-        </SettingsCard>
-      </Section>
+        <Section
+          id="password"
+          title="Change Password"
+          description="Update your password associated with your account."
+        >
+          <SettingsCard only="password" flow={flow}>
+            <Messages messages={flow?.ui.messages} />
+            <Flow
+              hideGlobalMessages
+              onSubmit={onSubmit}
+              only="password"
+              flow={flow}
+            />
+          </SettingsCard>
+        </Section>
+        <Section
+          id="pat"
+          title="Manage Personal Access Tokens"
+          description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
+        >
+          <div className="mb-6 flex flex-col gap-2">
+            {personalAccessTokens.map((pat) => (
+              <div
+                className="rounded-md border dark:bg-slate-950 dark:border-slate-700 bg-white overflow-hidden p-4 text-sm"
+                key={pat.id}
+              >
+                <div className="flex items-center flex-row justify-between">
+                  <div className="flex-1">
+                    <div className="mb-2 flex gap-2 flex-row">
+                      <Input
+                        variant="dark"
+                        readOnly
+                        value={pat.token ? pat.token : "***********"}
+                      />
+                      {pat.token && (
+                        <Button
+                          className="whitespace-nowrap"
+                          onClick={() => handleCopy(pat.token!)}
+                        >
+                          Copy
+                        </Button>
+                      )}
 
-      <Section
-        id="lookup_secret"
-        title="Manage 2FA Backup Recovery Codes"
-        description="Recovery codes can be used in panic situations where you have lost
+                      <Button
+                        intent="danger"
+                        className="whitespace-nowrap"
+                        variant="outline"
+                        onClick={() => handleDeletePat(pat)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                    {pat.token && (
+                      <span className="block text-red-500 mb-4">
+                        Make sure to copy the token. You won&apos;t be able to
+                        see it ever again
+                      </span>
+                    )}
+                    <p>Description: {pat.description}</p>
+                    <p>
+                      Created: <DateString date={new Date(pat.createdAt)} />
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <form
+            className="border dark:border-slate-700 dark:bg-slate-950 bg-white rounded-md p-4 shadow-sm"
+            onSubmit={handleSubmit(handleCreatePat)}
+          >
+            <span className="font-medium block pb-2">
+              Create new Personal Access Token
+            </span>
+            <Input
+              variant="dark"
+              {...register("description")}
+              label="Description"
+            />
+            <div className="mt-2 justify-end flex flex-row">
+              <Button type="submit">Create</Button>
+            </div>
+          </form>
+        </Section>
+
+        <Section
+          id="oidc"
+          title="Manage Social Sign In"
+          description="Update your password associated with your account."
+        >
+          <SettingsCard only="oidc" flow={flow}>
+            <Messages messages={flow?.ui.messages} />
+            <Flow
+              hideGlobalMessages
+              onSubmit={onSubmit}
+              only="oidc"
+              flow={flow}
+            />
+          </SettingsCard>
+        </Section>
+
+        <Section
+          id="lookup_secret"
+          title="Manage 2FA Backup Recovery Codes"
+          description="Recovery codes can be used in panic situations where you have lost
         access to your 2FA device."
-      >
-        <SettingsCard only="lookup_secret" flow={flow}>
-          <Messages messages={flow?.ui.messages} />
-          <Flow
-            hideGlobalMessages
-            onSubmit={onSubmit}
-            only="lookup_secret"
-            flow={flow}
-          />
-        </SettingsCard>
-      </Section>
-      <Section
-        id="totp"
-        title="Manage 2FA TOTP Authenticator App"
-        description={
-          <>
-            Add a TOTP Authenticator App to your account to improve your account
-            security. Popular Authenticator Apps are{" "}
-            <Link
-              href="https://www.lastpass.com"
-              rel="noreferrer"
-              target="_blank"
-            >
-              LastPass
-            </Link>{" "}
-            and Google Authenticator (
-            <Link
-              href="https://apps.apple.com/us/app/google-authenticator/id388497605"
-              target="_blank"
-              rel="noreferrer"
-            >
-              iOS
-            </Link>
-            ,{" "}
-            <Link
-              href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Android
-            </Link>
-            ).
-          </>
-        }
-      >
-        <SettingsCard only="totp" flow={flow}>
-          <Messages messages={flow?.ui.messages} />
-          <Flow
-            hideGlobalMessages
-            onSubmit={onSubmit}
-            only="totp"
-            flow={flow}
-          />
-        </SettingsCard>
-      </Section>
+        >
+          <SettingsCard only="lookup_secret" flow={flow}>
+            <Messages messages={flow?.ui.messages} />
+            <Flow
+              hideGlobalMessages
+              onSubmit={onSubmit}
+              only="lookup_secret"
+              flow={flow}
+            />
+          </SettingsCard>
+        </Section>
+        <Section
+          id="totp"
+          title="Manage 2FA TOTP Authenticator App"
+          description={
+            <>
+              Add a TOTP Authenticator App to your account to improve your
+              account security. Popular Authenticator Apps are{" "}
+              <Link
+                href="https://www.lastpass.com"
+                rel="noreferrer"
+                target="_blank"
+              >
+                LastPass
+              </Link>{" "}
+              and Google Authenticator (
+              <Link
+                href="https://apps.apple.com/us/app/google-authenticator/id388497605"
+                target="_blank"
+                rel="noreferrer"
+              >
+                iOS
+              </Link>
+              ,{" "}
+              <Link
+                href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Android
+              </Link>
+              ).
+            </>
+          }
+        >
+          <SettingsCard only="totp" flow={flow}>
+            <Messages messages={flow?.ui.messages} />
+            <Flow
+              hideGlobalMessages
+              onSubmit={onSubmit}
+              only="totp"
+              flow={flow}
+            />
+          </SettingsCard>
+        </Section>
 
-      <Section
-        id="webauthn"
-        title="Manage Hardware Tokens and Biometrics"
-        description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
-      >
-        <SettingsCard only="webauthn" flow={flow}>
-          <Messages messages={flow?.ui.messages} />
-          <Flow
-            hideGlobalMessages
-            onSubmit={onSubmit}
-            only="webauthn"
-            flow={flow}
-          />
-        </SettingsCard>
-      </Section>
-      <div className="flex flex-row justify-end">
-        <Button onClick={handleLogout}>Logout</Button>
+        <Section
+          id="webauthn"
+          title="Manage Hardware Tokens and Biometrics"
+          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
+        >
+          <SettingsCard only="webauthn" flow={flow}>
+            <Messages messages={flow?.ui.messages} />
+            <Flow
+              hideGlobalMessages
+              onSubmit={onSubmit}
+              only="webauthn"
+              flow={flow}
+            />
+          </SettingsCard>
+        </Section>
+        <div className="flex flex-row justify-end">
+          <Button onClick={handleLogout}>Logout</Button>
+        </div>
       </div>
     </Page>
   );

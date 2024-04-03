@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -11,22 +11,12 @@
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-interface Props {
-  title: JSX.Element | string;
-  children: React.ReactNode;
-}
+import { useStore } from "@/zustand/globalStoreProvider";
 
-export default function Sidebar({ title, children }: Props) {
-  return (
-    <>
-      <header className="flex w-full items-center justify-between px-6 py-7">
-        <h2 className="text-base w-full font-semibold leading-7 text-white">
-          {title}
-        </h2>
-      </header>
-      {children}
-    </>
-  );
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+export function useActiveProject() {
+  return useStore((s) => {
+    return s.project;
+  });
 }

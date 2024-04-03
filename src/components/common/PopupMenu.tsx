@@ -86,11 +86,10 @@ const PopupMenu: FunctionComponent<PropsWithChildren<Props>> = ({
           leaveTo="opacity-0 translate-y-1"
         >
           <div
-            id="popover-panel"
             style={position}
-            className={classNames("absolute mt-2 z-20")}
+            className={classNames("popover-panel absolute mt-2")}
           >
-            <div className="flex-auto p-1 overflow-hidden rounded-md bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+            <div className="flex-auto p-1 border dark:border-slate-700 overflow-hidden rounded-md dark:text-white dark:bg-slate-900 bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
               {children}
             </div>
           </div>

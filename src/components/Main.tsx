@@ -42,24 +42,24 @@ const Main: FunctionComponent<Props> = ({ title, Title, children, Button }) => {
       <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">
         {children}
       </div>
-      <footer className="px-8 text-black/50 text-sm pb-8">
+      <footer className="px-8 text-black/50 dark:text-white text-sm pb-8">
         <div className="flex flex-row gap-5 mb-2">
           <Link
-            className="text-black/50"
+            className="text-black/50 dark:text-white"
             target="_blank"
             href="https://github.com/l3montree-dev/flawfix"
           >
             GitHub
           </Link>
           <Link
-            className="text-black/50"
+            className="text-black/50 dark:text-white"
             target="_blank"
             href="https://flawfix.dev/impressum"
           >
             Imprint
           </Link>
           <Link
-            className="text-black/50"
+            className="text-black/50 dark:text-white"
             href="https://flawfix.dev/datenschutzerklaerung/"
           >
             Privacy

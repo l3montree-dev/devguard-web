@@ -47,7 +47,7 @@ export default function ProjectList({ projects }: Props) {
                 <PopupMenu
                   Button={
                     <Button variant="outline" intent="primary">
-                      <EllipsisVerticalIcon className="w-5 h-5 text-black" />
+                      <EllipsisVerticalIcon className="w-5 h-5" />
                     </Button>
                   }
                 >
