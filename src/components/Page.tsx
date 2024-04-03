@@ -16,7 +16,12 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Head from "next/head";
-import React, { Fragment, PropsWithChildren, useState } from "react";
+import React, {
+  Fragment,
+  FunctionComponent,
+  PropsWithChildren,
+  useState,
+} from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import Toaster from "./Toaster";
@@ -29,6 +34,11 @@ type PageProps = {
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
   Button?: React.ReactNode;
+  Menu?: Array<{
+    title: string;
+    href: string;
+    Icon: any;
+  }>;
 };
 
 // Add that the navigation is a prop
@@ -105,7 +115,12 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       </div>
       <div className="md:pl-16">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
-          <Main Button={props.Button} Title={props.Title} title={props.title}>
+          <Main
+            Menu={props.Menu}
+            Button={props.Button}
+            Title={props.Title}
+            title={props.title}
+          >
             {props.children}
           </Main>
         </div>

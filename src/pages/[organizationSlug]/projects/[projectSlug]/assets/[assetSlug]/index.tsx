@@ -29,6 +29,7 @@ import { withProject } from "@/decorators/withProject";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useProject";
 import Link from "next/link";
+import { assetMenu } from "@/const/assetMenu";
 
 interface Props {
   asset: AssetDTO;
@@ -124,6 +125,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
   return (
     <Page
+      Menu={assetMenu}
       title={props.asset.name}
       Title={
         <span className="flex flex-row gap-2">
