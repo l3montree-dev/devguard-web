@@ -24,11 +24,11 @@ interface Props {
 const Section: FunctionComponent<Props> = (props) => {
   return (
     <div id={props.id} className="mb-6 pb-6">
-      <h2 className="text-base text-blue-950 font-semibold leading-7">
+      <h2 className="text-base dark:text-white text-blue-950 font-semibold leading-7">
         {props.title}
       </h2>
       {props.description !== undefined && (
-        <p className="mt-1 text-sm leading-6 text-black/80">
+        <p className="mt-1 text-sm leading-6 dark:text-white text-black/80">
           {props.description}
         </p>
       )}

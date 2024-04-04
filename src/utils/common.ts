@@ -58,3 +58,11 @@ export const applyClsxConfig = (
 export const hasErrors = (errors: Record<string, any>) => {
   return Object.keys(errors).length > 0;
 };
+
+export const isDarkModeEnabled = () => {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+};

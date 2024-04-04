@@ -52,7 +52,10 @@ export default function OrgRegisterForm(props: Props) {
   };
 
   return (
-    <form className="text-black" onSubmit={handleSubmit(handleOrgCreation)}>
+    <form
+      className="text-black dark:text-white"
+      onSubmit={handleSubmit(handleOrgCreation)}
+    >
       <Section
         description="General and required information about your organization."
         title="Required Information"

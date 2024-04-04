@@ -23,11 +23,11 @@ const cslxConfig = {
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger":
-      "bg-transparent text-red-500 border border-red-500 hover:bg-red-100",
+      "bg-transparent text-red-500 border border-red-500 hover:bg-red-500/20",
     "solid+primary":
       "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black",
     "outline+primary":
-      "bg-white text-black shadow-sm border border-gray-300 hover:bg-slate-100",
+      "bg-white text-black dark:text-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 shadow-sm border border-gray-300 hover:bg-slate-100",
     "outline+secondary":
       "bg-transparent text-blue-600 hover:bg-blue-100 border border-blue-500",
   },

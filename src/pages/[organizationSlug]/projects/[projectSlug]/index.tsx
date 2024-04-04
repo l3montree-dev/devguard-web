@@ -20,6 +20,7 @@ import { CreateAssetReq } from "../../../../types/api/req";
 import { hasErrors } from "../../../../utils/common";
 import { toast } from "@/components/Toaster";
 import Checkbox from "@/components/common/Checkbox";
+import Link from "next/link";
 
 interface Props {
   project: ProjectDTO & {
@@ -68,6 +69,23 @@ const Index: FunctionComponent<Props> = ({ project }) => {
       <Page
         Button={<Button onClick={() => setShowModal(true)}>New Asset</Button>}
         title={project.name}
+        Title={
+          <span className="flex flex-row gap-2">
+            <Link
+              href={`/${activeOrg.slug}`}
+              className="hover:no-underline text-white"
+            >
+              {activeOrg.name}
+            </Link>
+            <span className="opacity-75">/</span>
+            <Link
+              className="hover:no-underline text-white"
+              href={`/${activeOrg.slug}/projects/${project.slug}`}
+            >
+              {project.name}
+            </Link>
+          </span>
+        }
       >
         {project.assets.map((asset) => (
           <ListItem

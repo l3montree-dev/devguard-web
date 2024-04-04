@@ -7,7 +7,7 @@ interface Props {
 }
 const ListItem: FunctionComponent<Props> = ({ Button, title, description }) => {
   return (
-    <div className="flex transition-all bg-white border rounded-lg shadow-sm px-5 items-center justify-between gap-x-6 py-5">
+    <div className="flex transition-all dark:text-white dark:bg-slate-900 bg-white border dark:border-slate-700 rounded-lg shadow-sm px-5 items-center justify-between gap-x-6 py-5">
       <div className="min-w-0">
         <div className="">
           <span className="font-semibold leading-6">{title}</span>

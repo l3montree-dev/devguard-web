@@ -63,6 +63,9 @@ body, html {
     color-scheme: dark; /* both supported */
   }
 
+.popover-panel {
+    z-index: 9999
+}
 pre {
     @apply bg-black/20 p-2 mb-5 text-sm;
     code {

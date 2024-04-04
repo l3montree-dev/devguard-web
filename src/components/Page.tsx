@@ -15,27 +15,36 @@
 
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Fragment, PropsWithChildren, useState } from "react";
-import { useMenu } from "../hooks/useMenu";
+import Head from "next/head";
+import React, {
+  Fragment,
+  FunctionComponent,
+  PropsWithChildren,
+  useState,
+} from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import Toaster from "./Toaster";
 import MobileNav from "./navigation/MobileNav";
 import Sidenav from "./navigation/Sidenav";
-import Head from "next/head";
 
 type PageProps = {
   title: string;
+  Title?: React.ReactNode;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
   Button?: React.ReactNode;
+  Menu?: Array<{
+    title: string;
+    href: string;
+    Icon: any;
+  }>;
 };
 
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const menu = useMenu();
   return (
     <>
       <Head>
@@ -94,24 +103,29 @@ const Page = (props: PropsWithChildren<PageProps>) => {
                     </button>
                   </div>
                 </Transition.Child>
-                <MobileNav navigation={menu} />
+                {/*   <MobileNav navigation={menu} /> */}
               </Dialog.Panel>
             </Transition.Child>
           </div>
         </Dialog>
       </Transition.Root>
       {/* Static sidebar for desktop */}
-      <div className="hidden md:fixed inset-y-0  md:flex flex-col bg-blue-950">
-        <Sidenav navigation={menu} />
+      <div className="hidden md:fixed inset-y-0 z-10 md:flex flex-col bg-blue-950">
+        <Sidenav />
       </div>
       <div className="md:pl-16">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
-          <Main Button={props.Button} title={props.title}>
+          <Main
+            Menu={props.Menu}
+            Button={props.Button}
+            Title={props.Title}
+            title={props.title}
+          >
             {props.children}
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="flex-1 hidden bg-white border-l md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
+          <aside className="flex-1 hidden bg-white dark:bg-slate-950 dark:border-slate-700 dark:text-white border-l md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
             {props.Sidebar}
           </aside>
         )}
