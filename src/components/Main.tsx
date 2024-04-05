@@ -65,10 +65,8 @@ const Main: FunctionComponent<Props> = ({
                   href={item.href}
                 >
                   <div className="flex flex-row gap-1 items-center mt-4">
-                    <item.Icon className="h-5 dark:text-slate-400 w-5" />
-                    <span className="text-black dark:text-white ">
-                      {item.title}
-                    </span>
+                    <item.Icon className="h-5 text-slate-400 w-5" />
+                    <span className="text-white ">{item.title}</span>
                   </div>
                 </Link>
               ))}

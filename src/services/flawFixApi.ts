@@ -53,21 +53,13 @@ export const getApiClientFromCookies = (
   };
 };
 
-export const getApiClient = (d?: Document) => {
-  // get the cookie from the browser
-  const orySessionCookie = (d ?? document).cookie
-    .split("; ")
-    .find((row) => row.startsWith("ory_kratos_session"));
-
-  return (input: string, init?: RequestInit) => {
-    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...init?.headers,
-        Cookie: `ory_kratos_session=${orySessionCookie}`,
-      },
-      credentials: "include",
-    });
-  };
+export const browserApiClient = (input: string, init?: RequestInit) => {
+  return fetch("/api/flawfix-tunnel/api/v1" + input, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...init?.headers,
+    },
+    credentials: "include",
+  });
 };

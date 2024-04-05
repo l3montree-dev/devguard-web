@@ -12,7 +12,7 @@ import { withInitialState } from "../../../../decorators/withInitialState";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
-  getApiClient,
+  browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/flawFixApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
@@ -36,8 +36,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
     useForm<CreateAssetReq>();
 
   const handleCreateAsset = async (data: CreateAssetReq) => {
-    const client = getApiClient();
-    const resp = await client(
+    const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
         "/projects/" +
@@ -105,7 +104,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
         ))}
       </Page>
       <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
-        <form className="text-black" onSubmit={handleSubmit(handleCreateAsset)}>
+        <form onSubmit={handleSubmit(handleCreateAsset)}>
           <Input
             variant="dark"
             label="Name"

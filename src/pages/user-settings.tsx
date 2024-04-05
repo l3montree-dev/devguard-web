@@ -32,7 +32,10 @@ import { Messages } from "../components/kratos/Messages";
 import { withInitialState } from "../decorators/withInitialState";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
-import { getApiClient, getApiClientFromContext } from "../services/flawFixApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import { createPat } from "../services/patService";
@@ -170,8 +173,7 @@ const Settings: FunctionComponent<{
   };
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
-    const apiClient = getApiClient(document);
-    await apiClient(`/pats/${pat.id}/`, {
+    await browserApiClient(`/pats/${pat.id}/`, {
       method: "DELETE",
     });
     setPersonalAccessTokens(

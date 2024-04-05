@@ -19,7 +19,6 @@ import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../components/Page";
 import ProjectList from "../../components/ProjectList";
-import SingleStatGroup from "../../components/SingleStatGroup";
 import { toast } from "../../components/Toaster";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
@@ -28,12 +27,12 @@ import { withInitialState } from "../../decorators/withInitialState";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import {
-  getApiClient,
+  browserApiClient,
   getApiClientFromContext,
 } from "../../services/flawFixApi";
 import { ProjectDTO } from "../../types/api/api";
-import { hasErrors } from "../../utils/common";
 import { CreateProjectReq } from "../../types/api/req";
+import { hasErrors } from "../../utils/common";
 interface Props {
   projects: Array<ProjectDTO>;
 }
@@ -49,9 +48,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
     });
 
   const handleCreateProject = async (req: CreateProjectReq) => {
-    const client = getApiClient();
-
-    const resp = await client(
+    const resp = await browserApiClient(
       "/organizations/" + activeOrg?.slug + "/projects",
       {
         method: "POST",
@@ -80,10 +77,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
       title={activeOrg?.name ?? "Loading..."}
     >
       <Modal title="Create new Project" open={open} setOpen={setOpen}>
-        <form
-          className="text-black"
-          onSubmit={handleSubmit(handleCreateProject)}
-        >
+        <form onSubmit={handleSubmit(handleCreateProject)}>
           <Input
             variant="dark"
             label="Name"
