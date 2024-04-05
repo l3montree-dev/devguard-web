@@ -75,17 +75,17 @@ const Msg = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-md bg-white dark:bg-slate-800 dark:text-white shadow-lg ring-1 ring-black ring-opacity-5">
         <div className="flex flex-row p-4 items-start">
           <div className="flex-shrink-0">{getIcon(intent)}</div>
           <div className="ml-3  flex-1 pt-0.5">
-            <p className="font-medium text-gray-900">{title}</p>
-            <p className="mt-1 text-sm text-slate-700">{msg}</p>
+            <p className="font-medium ">{title}</p>
+            <p className="mt-1 text-sm ">{msg}</p>
           </div>
           <div className="ml-4 flex flex-shrink-0">
             <button
               type="button"
-              className="inline-flex rounded-md bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              className="inline-flex rounded-md dark:bg-slate-700 bg-white text-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
               onClick={() => {
                 setShow(false);
                 setTimeout(onRemove, 1000);

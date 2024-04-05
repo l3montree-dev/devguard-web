@@ -16,13 +16,13 @@
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { countries, industryOptions } from "../const/organizationConstants";
-import { getApiClient } from "../services/flawFixApi";
 import { OrganizationDTO } from "../types/api/api";
 import Button from "./common/Button";
 import Checkbox from "./common/Checkbox";
 import Input from "./common/Input";
 import Section from "./common/Section";
 import Select from "./common/Select";
+import { browserApiClient } from "@/services/flawFixApi";
 
 interface Props {}
 
@@ -33,10 +33,8 @@ export default function OrgRegisterForm(props: Props) {
 
   const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
-    const client = getApiClient(document);
-
     const resp: OrganizationDTO = await (
-      await client("/organizations/", {
+      await browserApiClient("/organizations/", {
         method: "POST",
         body: JSON.stringify({
           ...data,

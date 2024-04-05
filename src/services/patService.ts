@@ -1,10 +1,9 @@
 import { PersonalAccessTokenDTO } from "@/types/api/api";
-import { getApiClient } from "./flawFixApi";
+import { browserApiClient } from "./flawFixApi";
 
 const createPat = async (data: { description: string }) => {
-  const apiClient = getApiClient(document);
   const pat: PersonalAccessTokenDTO = await (
-    await apiClient("/pats/", {
+    await browserApiClient("/pats/", {
       method: "POST",
       body: JSON.stringify(data),
     })
