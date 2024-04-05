@@ -15,7 +15,7 @@
 
 import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
-import { withInitialState } from "../decorators/withInitialState";
+import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 
 export default function SetupOrg() {
@@ -27,7 +27,7 @@ export default function SetupOrg() {
 }
 
 export const getServerSideProps = withSession(
-  withInitialState(async () => {
+  withOrg(async () => {
     return {
       props: {},
     };

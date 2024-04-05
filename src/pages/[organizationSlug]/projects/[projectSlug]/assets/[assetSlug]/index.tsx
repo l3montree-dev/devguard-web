@@ -7,7 +7,7 @@ import { withProject } from "@/decorators/withProject";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
-import { useActiveProject } from "@/hooks/useProject";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import {
   FilterableColumnDef,
   dateOperators,
@@ -23,13 +23,15 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 import Page from "../../../../../../components/Page";
 import Pagination from "../../../../../../components/common/Pagination";
-import { withInitialState } from "../../../../../../decorators/withInitialState";
+import { withOrg } from "../../../../../../decorators/withOrg";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../utils/common";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { middleware } from "@/decorators/middleware";
 
 interface Props {
   asset: AssetDTO;
@@ -124,7 +126,9 @@ const Index: FunctionComponent<Props> = (props) => {
   const project = useActiveProject();
 
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
 
+  useEffect(() => {});
   return (
     <Page
       Menu={assetMenu}
@@ -219,8 +223,8 @@ const Index: FunctionComponent<Props> = (props) => {
 export default Index;
 
 export const getServerSideProps = withSession(
-  withInitialState(
-    withProject(async (context: GetServerSidePropsContext) => {
+  middleware(
+    async (context: GetServerSidePropsContext) => {
       // fetch the project
       const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
@@ -265,6 +269,8 @@ export const getServerSideProps = withSession(
           flaws,
         },
       };
-    }),
+    },
+    withOrg,
+    withProject,
   ),
 );

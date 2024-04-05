@@ -29,7 +29,7 @@ import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { withInitialState } from "../decorators/withInitialState";
+import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import {
@@ -445,7 +445,7 @@ const Settings: FunctionComponent<{
 
 // just guard the page with the session decorator
 export const getServerSideProps = withSession(
-  withInitialState(async (ctx) => {
+  withOrg(async (ctx) => {
     // get the personal access tokens from the user
     const apiClient = getApiClientFromContext(ctx);
 

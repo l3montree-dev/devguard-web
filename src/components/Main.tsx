@@ -60,7 +60,7 @@ const Main: FunctionComponent<Props> = ({
             <div className="flex mt-2 flex-row gap-6 text-sm">
               {Menu.map((item) => (
                 <Link
-                  className="hover:no-underline"
+                  className="hover:no-underline cursor:pointer"
                   key={item.title}
                   href={item.href}
                 >

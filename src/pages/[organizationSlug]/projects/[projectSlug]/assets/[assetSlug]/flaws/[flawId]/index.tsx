@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 
 import FlawState from "@/components/common/FlawState";
 import Severity from "@/components/common/Severity";
-import { withInitialState } from "@/decorators/withInitialState";
+import { withOrg } from "@/decorators/withOrg";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/flawFixApi";
 import { FlawWithCVE } from "@/types/api/api";
@@ -94,7 +94,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
 };
 
 export const getServerSideProps = withSession(
-  withInitialState(async (context: GetServerSidePropsContext) => {
+  withOrg(async (context: GetServerSidePropsContext) => {
     // fetch the project
     const { organizationSlug, projectSlug, applicationSlug, envSlug, flawId } =
       context.params!;
