@@ -3,7 +3,11 @@ import Filter from "@/components/common/Filter";
 import FlawState from "@/components/common/FlawState";
 import P from "@/components/common/P";
 import SortingCaret from "@/components/common/SortingCaret";
+import { withProject } from "@/decorators/withProject";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
+import { useActiveProject } from "@/hooks/useProject";
 import {
   FilterableColumnDef,
   dateOperators,
@@ -17,6 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
@@ -103,7 +108,6 @@ const columnsDef = [
 const Index: FunctionComponent<Props> = (props) => {
   const { sortingState, handleSort } = useFilter();
 
-  console.log(props.flaws.data);
   const table = useReactTable({
     columns: columnsDef,
     data: props.flaws.data,
@@ -116,9 +120,35 @@ const Index: FunctionComponent<Props> = (props) => {
   });
 
   const router = useRouter();
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+
+  const assetMenu = useAssetMenu();
 
   return (
-    <Page title={props.asset.name}>
+    <Page
+      Menu={assetMenu}
+      title={props.asset.name}
+      Title={
+        <span className="flex flex-row gap-2">
+          <Link
+            href={`/${activeOrg?.slug}`}
+            className="hover:no-underline text-white"
+          >
+            {activeOrg?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="hover:no-underline text-white"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+          >
+            {project?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          {props.asset.name}
+        </span>
+      }
+    >
       <div className="mb-4">
         <Filter
           columnsDef={columnsDef.filter(
@@ -126,9 +156,9 @@ const Index: FunctionComponent<Props> = (props) => {
           )}
         />
       </div>
-      <div className="border shadow-sm rounded-lg overflow-hidden">
+      <div className="border dark:border-slate-700 shadow-sm rounded-lg overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="border-b bg-slate-50">
+          <thead className="border-b dark:border-slate-700 dark:bg-slate-950 dark:text-white bg-slate-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -154,7 +184,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody className="text-sm bg-white">
+          <tbody className="text-sm dark:bg-slate-900 dark:text-white bg-white">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
@@ -162,8 +192,10 @@ const Index: FunctionComponent<Props> = (props) => {
                 }}
                 className={classNames(
                   "align-top cursor-pointer transition-all",
-                  i === arr.length - 1 ? "" : "border-b",
-                  "hover:bg-yellow-50",
+                  i === arr.length - 1
+                    ? ""
+                    : "border-b dark:border-b-slate-700",
+                  "hover:bg-slate-50 dark:hover:bg-slate-800",
                 )}
                 key={row.id}
               >
@@ -187,50 +219,52 @@ const Index: FunctionComponent<Props> = (props) => {
 export default Index;
 
 export const getServerSideProps = withSession(
-  withInitialState(async (context: GetServerSidePropsContext) => {
-    // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+  withInitialState(
+    withProject(async (context: GetServerSidePropsContext) => {
+      // fetch the project
+      const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/";
+      const apiClient = getApiClientFromContext(context);
+      const uri =
+        "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/";
 
-    const filterQuery = Object.entries(context.query).filter(
-      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
-    );
+      const filterQuery = Object.entries(context.query).filter(
+        ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+      );
 
-    // check for page and page size query params
-    // if they are there, append them to the uri
-    const page = (context.query.page as string) ?? "1";
-    const pageSize = (context.query.pageSize as string) ?? "25";
-    const [resp, flawResp] = await Promise.all([
-      apiClient(uri),
-      apiClient(
-        uri +
-          "flaws/?" +
-          new URLSearchParams({
-            page,
-            pageSize,
-            ...Object.fromEntries(filterQuery),
-          }),
-      ),
-    ]);
+      // check for page and page size query params
+      // if they are there, append them to the uri
+      const page = (context.query.page as string) ?? "1";
+      const pageSize = (context.query.pageSize as string) ?? "25";
+      const [resp, flawResp] = await Promise.all([
+        apiClient(uri),
+        apiClient(
+          uri +
+            "flaws/?" +
+            new URLSearchParams({
+              page,
+              pageSize,
+              ...Object.fromEntries(filterQuery),
+            }),
+        ),
+      ]);
 
-    // fetch a personal access token from the user
+      // fetch a personal access token from the user
 
-    const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+      const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
-    return {
-      props: {
-        asset,
-        flaws,
-      },
-    };
-  }),
+      return {
+        props: {
+          asset,
+          flaws,
+        },
+      };
+    }),
+  ),
 );

@@ -126,31 +126,40 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen bg-slate-200 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Image
-            className="h-20 mx-auto w-auto"
-            src="/logo_horizontal.svg"
-            alt="FlawFix by l3montree Logo"
-            width={300}
-            height={300}
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-blue-950">
-            Verify your E-Mail
-          </h2>
+      <div className="flex min-h-screen dark:bg-slate-950 bg-slate-200 flex-1 flex-col justify-center px-6 max-sm:py-16 py-32 lg:px-8">
+        <div className="bg-white dark:bg-slate-900 dark:text-white text-black sm:mx-auto sm:w-full sm:max-w-lg p-5 rounded-lg">
+          <div className="">
+            <Image
+              className="h-20 mx-auto dark:hidden w-auto"
+              src="/logo_horizontal.svg"
+              alt="FlawFix by l3montree Logo"
+              width={300}
+              height={300}
+            />
+            <Image
+              className="h-20 hidden dark:block mx-auto w-auto"
+              src="/logo_inverse_horizontal.svg"
+              alt="FlawFix by l3montree Logo"
+              width={300}
+              height={300}
+            />
+            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
+              Verify your E-Mail
+            </h2>
+          </div>
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg">
+            <Flow onSubmit={onSubmit} flow={flow} />
+          </div>
+          <p className="mt-2 text-right text-sm">
+            <Link
+              href="/"
+              passHref
+              className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
+            >
+              Go back
+            </Link>
+          </p>
         </div>
-        <div className="mt-10 text-black sm:mx-auto sm:w-full sm:max-w-sm">
-          <Flow onSubmit={onSubmit} flow={flow} />
-        </div>
-        <p className="mt-10 text-center text-sm">
-          <Link
-            href="/"
-            passHref
-            className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
-          >
-            Go back
-          </Link>
-        </p>
       </div>
     </>
   );

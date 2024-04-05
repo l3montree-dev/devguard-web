@@ -1,14 +1,16 @@
 import { Session } from "@ory/client";
 import { useMemo } from "react";
 import { StoreApi, UseBoundStore, create } from "zustand";
-import { OrganizationDTO } from "../types/api/api";
+import { OrganizationDTO, ProjectDTO } from "../types/api/api";
 import { User } from "../types/auth";
 
 export interface InitialState {
   session: Omit<Session, "identity"> & { identity: User };
   organizations: OrganizationDTO[];
 }
-export interface GlobalStore extends InitialState {}
+export interface GlobalStore extends InitialState {
+  project?: ProjectDTO;
+}
 
 let store: UseBoundStore<StoreApi<GlobalStore>> | undefined;
 

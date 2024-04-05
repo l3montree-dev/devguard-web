@@ -118,34 +118,41 @@ const Registration: NextPage = () => {
         <title>Create your FlawFix account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-slate-200">
+      <div className="flex min-h-screen flex-1  bg-white flex-row ">
+        <div className="w-3/5 relative bg-slate-500">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"
-            objectFit="contain"
+            objectFit="cover"
             fill
           />
         </div>
-        <div className="bg-white w-2/5 flex-col flex justify-center items-center">
+        <div className="bg-white dark:text-white text-black dark:bg-slate-950 w-2/5 flex-col flex justify-center items-center">
           <div className="w-full px-8">
             <div>
               <Image
-                className="h-20 w-auto"
+                className="h-20 hidden dark:block w-auto"
+                src="/logo_inverse_horizontal.svg"
+                alt="FlawFix by l3montree Logo"
+                width={300}
+                height={300}
+              />
+              <Image
+                className="h-20 dark:hidden w-auto"
                 src="/logo_horizontal.svg"
                 alt="FlawFix by l3montree Logo"
                 width={300}
                 height={300}
               />
-              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight text-black">
+              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight ">
                 Create your FlawFix account
               </h2>
             </div>
 
-            <div className="text-black">
+            <div className="">
               <Flow onSubmit={onSubmit} flow={flow} />
             </div>
-            <p className="mt-10 text-left text-sm text-black">
+            <p className="mt-10 text-left text-sm">
               Already have an Account?{" "}
               <Link
                 data-testid="cta-link"
