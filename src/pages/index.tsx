@@ -2,13 +2,14 @@ import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import React from "react";
 import { withSession } from "../decorators/withSession";
 import { withOrg } from "../decorators/withOrg";
+import { middleware } from "@/decorators/middleware";
 
 const Index = () => {
   return <div></div>;
 };
 
-export const getServerSideProps: GetServerSideProps = withSession(
-  withOrg(async (ctx: GetServerSidePropsContext, _, { organizations }) => {
+export const getServerSideProps: GetServerSideProps = middleware(
+  async (ctx: GetServerSidePropsContext, { organizations }) => {
     // check if we can redirect to the first organization
     if (organizations.length > 0) {
       return {
@@ -26,7 +27,11 @@ export const getServerSideProps: GetServerSideProps = withSession(
         },
       };
     }
-  }),
+  },
+  {
+    organizations: withOrg,
+    session: withSession,
+  },
 );
 
 export default Index;

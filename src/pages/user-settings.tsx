@@ -40,6 +40,7 @@ import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import { createPat } from "../services/patService";
 import DateString from "@/components/common/DateString";
+import { middleware } from "@/decorators/middleware";
 
 interface Props {
   flow?: SettingsFlow;
@@ -444,8 +445,8 @@ const Settings: FunctionComponent<{
 };
 
 // just guard the page with the session decorator
-export const getServerSideProps = withSession(
-  withOrg(async (ctx) => {
+export const getServerSideProps = middleware(
+  async (ctx) => {
     // get the personal access tokens from the user
     const apiClient = getApiClientFromContext(ctx);
 
@@ -457,7 +458,11 @@ export const getServerSideProps = withSession(
         personalAccessTokens,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );
 
 export default Settings;

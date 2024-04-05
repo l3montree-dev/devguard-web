@@ -32,6 +32,7 @@ import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../utils/common";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
 
 interface Props {
   asset: AssetDTO;
@@ -222,55 +223,57 @@ const Index: FunctionComponent<Props> = (props) => {
 
 export default Index;
 
-export const getServerSideProps = withSession(
-  middleware(
-    async (context: GetServerSidePropsContext) => {
-      // fetch the project
-      const { organizationSlug, projectSlug, assetSlug } = context.params!;
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
+    // fetch the project
+    const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
-      const apiClient = getApiClientFromContext(context);
-      const uri =
-        "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/";
+    const apiClient = getApiClientFromContext(context);
+    const uri =
+      "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/";
 
-      const filterQuery = Object.entries(context.query).filter(
-        ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
-      );
+    const filterQuery = Object.entries(context.query).filter(
+      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+    );
 
-      // check for page and page size query params
-      // if they are there, append them to the uri
-      const page = (context.query.page as string) ?? "1";
-      const pageSize = (context.query.pageSize as string) ?? "25";
-      const [resp, flawResp] = await Promise.all([
-        apiClient(uri),
-        apiClient(
-          uri +
-            "flaws/?" +
-            new URLSearchParams({
-              page,
-              pageSize,
-              ...Object.fromEntries(filterQuery),
-            }),
-        ),
-      ]);
+    // check for page and page size query params
+    // if they are there, append them to the uri
+    const page = (context.query.page as string) ?? "1";
+    const pageSize = (context.query.pageSize as string) ?? "25";
+    const [resp, flawResp] = await Promise.all([
+      apiClient(uri),
+      apiClient(
+        uri +
+          "flaws/?" +
+          new URLSearchParams({
+            page,
+            pageSize,
+            ...Object.fromEntries(filterQuery),
+          }),
+      ),
+    ]);
 
-      // fetch a personal access token from the user
+    // fetch a personal access token from the user
 
-      const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+    const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
-      return {
-        props: {
-          asset,
-          flaws,
-        },
-      };
-    },
-    withOrg,
-    withProject,
-  ),
+    return {
+      props: {
+        asset,
+        flaws,
+      },
+    };
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+    project: withProject,
+    asset: withAsset,
+  },
 );

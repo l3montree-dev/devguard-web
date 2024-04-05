@@ -17,7 +17,7 @@ import { AssetDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { HttpError } from "./middleware";
 
-export async function withProject(ctx: GetServerSidePropsContext) {
+export async function withAsset(ctx: GetServerSidePropsContext) {
   // get the flawFixApiClient
   const flawFixApiClient = getApiClientFromContext(ctx);
 
@@ -45,5 +45,5 @@ export async function withProject(ctx: GetServerSidePropsContext) {
   }
   // parse the organization
   const asset: AssetDTO = await r.json();
-  return { asset };
+  return asset;
 }

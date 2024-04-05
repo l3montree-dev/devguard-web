@@ -108,8 +108,8 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
 export default Home;
 
-export const getServerSideProps = withSession(
-  middleware(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // list the projects from the active organization
     const apiClient = getApiClientFromContext(context);
 
@@ -124,5 +124,9 @@ export const getServerSideProps = withSession(
         projects,
       },
     };
-  }, withOrg),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );

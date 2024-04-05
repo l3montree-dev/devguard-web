@@ -39,5 +39,5 @@ export async function withProject(ctx: GetServerSidePropsContext) {
   }
   // parse the organization
   const project: ProjectDTO = await r.json();
-  return { project };
+  return project;
 }

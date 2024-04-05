@@ -175,8 +175,8 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   );
 };
 
-export const getServerSideProps = withSession(
-  middleware(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // fetch the project
     const { organizationSlug, projectSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
@@ -191,6 +191,11 @@ export const getServerSideProps = withSession(
         project,
       },
     };
-  }, withOrg),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );
+
 export default Index;

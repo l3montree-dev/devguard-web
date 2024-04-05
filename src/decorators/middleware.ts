@@ -35,26 +35,26 @@ export type DecoratedGetServerSideProps<AdditionalData, Props = {}> = (
   additionalData: AdditionalData,
 ) => GetServerSidePropsResult<Props> | Promise<GetServerSidePropsResult<Props>>;
 
-export const middleware = <
-  Decorators extends ReadonlyArray<
-    (ctx: GetServerSidePropsContext) => Promise<any>
-  >,
->(
-  handler: DecoratedGetServerSideProps<Extract<Decorators>, any>,
-  ...decorators: Decorators
+export const middleware = <Additional extends Record<string, any>>(
+  handler: DecoratedGetServerSideProps<Additional, any>,
+  decorators: {
+    [K in keyof Additional]: (
+      ctx: GetServerSidePropsContext,
+    ) => Promise<Additional[K]>;
+  },
 ): GetServerSideProps => {
   return async (ctx: GetServerSidePropsContext) => {
     try {
       // @ts-ignore
-      const params = (await Promise.all(
-        decorators.map((fn) => fn(ctx)),
-      )) as Extract<Decorators>;
-
-      const resp = await handler(ctx, params);
-      addToInitialZustandState(
-        resp,
-        params.reduce((acc, p) => ({ ...acc, ...p }), {}),
+      const returns = await Promise.all(
+        Object.values(decorators).map((fn) => fn(ctx)),
       );
+      const params = Object.fromEntries(
+        Object.keys(decorators).map((key, i) => [key, returns[i]]),
+      );
+
+      const resp = await handler(ctx, params as any);
+      addToInitialZustandState(resp, params as any);
       return resp;
     } catch (e) {
       // if a middleware function throws an error,

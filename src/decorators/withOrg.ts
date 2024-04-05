@@ -16,6 +16,7 @@
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { HttpError } from "./middleware";
+import { OrganizationDTO } from "@/types/api/api";
 
 export async function withOrg(ctx: GetServerSidePropsContext) {
   // get the flawFixApiClient
@@ -26,15 +27,15 @@ export async function withOrg(ctx: GetServerSidePropsContext) {
 
   if (!r.ok) {
     // it must be an 500
-    return {
+    throw new HttpError({
       redirect: {
         destination: "/500",
         permanent: false,
       },
-    };
+    });
   }
   // parse the organization
-  const organizations = await r.json();
+  const organizations: OrganizationDTO[] = await r.json();
 
   // check if there is a slug in the query
   const organizationSlug = ctx.params?.organizationSlug;
@@ -55,5 +56,5 @@ export async function withOrg(ctx: GetServerSidePropsContext) {
       });
     }
   }
-  return { organizations };
+  return organizations;
 }
