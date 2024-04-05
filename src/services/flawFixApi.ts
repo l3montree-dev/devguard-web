@@ -53,8 +53,12 @@ export const getApiClientFromCookies = (
   };
 };
 
-export const browserApiClient = (input: string, init?: RequestInit) => {
-  return fetch("/api/flawfix-tunnel/api/v1" + input, {
+export const browserApiClient = (
+  input: string,
+  init?: RequestInit,
+  prefix = "/api/v1",
+) => {
+  return fetch("/api/flawfix-tunnel" + prefix + input, {
     ...init,
     headers: {
       "Content-Type": "application/json",
