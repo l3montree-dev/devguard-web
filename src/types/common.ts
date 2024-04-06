@@ -69,3 +69,8 @@ export interface IActivityItem {
 export interface IActivityItems {
   items: IActivityItem[];
 }
+
+export interface DependencyTreeNode {
+  name: string;
+  children: DependencyTreeNode[];
+}

@@ -29,7 +29,7 @@ export async function withOrg(ctx: GetServerSidePropsContext) {
     // it must be an 500
     throw new HttpError({
       redirect: {
-        destination: "/500",
+        destination: "/login",
         permanent: false,
       },
     });

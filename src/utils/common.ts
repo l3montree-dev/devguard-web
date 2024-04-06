@@ -66,3 +66,13 @@ export const isDarkModeEnabled = () => {
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
 };
+
+export const windowInnerWidth = () => {
+  if (typeof window === "undefined") return 0;
+  return window.innerWidth;
+};
+
+export const windowInnerHeight = () => {
+  if (typeof window === "undefined") return 0;
+  return window.innerHeight;
+};
