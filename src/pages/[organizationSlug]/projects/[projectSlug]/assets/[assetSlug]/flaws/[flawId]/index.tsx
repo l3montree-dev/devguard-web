@@ -16,6 +16,9 @@ import Image from "next/image";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
+import { withProject } from "@/decorators/withProject";
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
 });
@@ -93,8 +96,8 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
   );
 };
 
-export const getServerSideProps = withSession(
-  withOrg(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // fetch the project
     const { organizationSlug, projectSlug, applicationSlug, envSlug, flawId } =
       context.params!;
@@ -119,7 +122,13 @@ export const getServerSideProps = withSession(
         flaw: resp,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+    asset: withAsset,
+    project: withProject,
+  },
 );
 
 export default Index;

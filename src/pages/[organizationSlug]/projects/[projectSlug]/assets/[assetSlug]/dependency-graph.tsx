@@ -21,18 +21,57 @@ import { withAsset } from "@/decorators/withAsset";
 import { withOrg } from "@/decorators/withOrg";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/flawFixApi";
-import { DependencyTreeNode } from "@/types/common";
+import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
+import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+import Link from "next/link";
 import { FunctionComponent } from "react";
 
 const DependencyGraphPage: FunctionComponent<{
-  graph: { root: DependencyTreeNode };
-}> = ({ graph }) => {
+  graph: { root: ViewDependencyTreeNode };
+  affectedPackages: Array<AffectedPackage>;
+}> = ({ graph, affectedPackages }) => {
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
   const dimensions = useDimensions();
   return (
-    <Page fullscreen title="Dependency Graph">
+    <Page
+      fullscreen
+      Title={
+        <span className="flex flex-row gap-2">
+          <Link
+            href={`/${activeOrg?.slug}`}
+            className="hover:no-underline text-white"
+          >
+            {activeOrg?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="hover:no-underline text-white"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+          >
+            {project?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="hover:no-underline text-white"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
+          >
+            {asset?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <span>Dependency Graph</span>
+        </span>
+      }
+      title="Dependency Graph"
+    >
       <DependencyGraph
+        affectedPackages={affectedPackages}
         width={dimensions.width - SIDEBAR_WIDTH}
         height={dimensions.height - HEADER_HEIGHT}
         graph={graph}
@@ -42,6 +81,71 @@ const DependencyGraphPage: FunctionComponent<{
 };
 
 export default DependencyGraphPage;
+
+const severityToRisk = (severity: string): number => {
+  switch (severity) {
+    case "CRITICAL":
+      return 1;
+    case "HIGH":
+      return 0.7;
+    case "MEDIUM":
+      return 0.5;
+    case "LOW":
+      return 0.3;
+    default:
+      return 0;
+  }
+};
+
+const RISK_INHERITANCE_FACTOR = 0.33;
+const recursiveAddRisk = (
+  node: ViewDependencyTreeNode,
+  affected: Array<AffectedPackage>,
+) => {
+  if (node.children.length === 0) {
+    const affectedPackage = affected.find(
+      (p) => p.PurlWithVersion === node.name,
+    );
+    // if there are no children, the risk is the risk of the affected package
+    if (affectedPackage) {
+      node.risk = severityToRisk(affectedPackage.CVE.severity);
+      // update the parent node with the risk of this node
+      let parent = node.parent;
+      let i = 0;
+      while (parent != null) {
+        i++;
+        parent.risk = parent.risk
+          ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
+          : node.risk * (RISK_INHERITANCE_FACTOR / i);
+        parent = parent.parent;
+      }
+    }
+  } else {
+    node.children.forEach((child) => recursiveAddRisk(child, affected));
+  }
+  return node;
+};
+
+const recursiveRemoveParent = (node: ViewDependencyTreeNode) => {
+  node.parent = null;
+  node.children.forEach((child) => recursiveRemoveParent(child));
+};
+
+const convertGraph = (
+  graph: DependencyTreeNode,
+  parent: ViewDependencyTreeNode | null = null,
+): ViewDependencyTreeNode => {
+  const convertedNode = {
+    name: graph.name,
+    children: [] as ViewDependencyTreeNode[],
+    risk: 0,
+    parent,
+  };
+  convertedNode.children = graph.children.map((child) =>
+    convertGraph(child, convertedNode),
+  );
+  return convertedNode;
+};
 
 export const getServerSideProps = middleware(
   async (context) => {
@@ -58,15 +162,27 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const [resp] = await Promise.all([apiClient(uri + "dependency-graph/")]);
+    const [resp, affectedResp] = await Promise.all([
+      apiClient(uri + "dependency-graph/"),
+      apiClient(uri + "affected-packages/"),
+    ]);
 
     // fetch a personal access token from the user
 
-    const [graph] = await Promise.all([resp.json()]);
+    const [graph, affected] = await Promise.all([
+      resp.json() as Promise<{ root: DependencyTreeNode }>,
+      affectedResp.json() as Promise<Array<AffectedPackage>>,
+    ]);
+
+    const converted = convertGraph(graph.root);
+    recursiveAddRisk(converted, affected);
+    // we cannot return a circular data structure - remove the parent again
+    recursiveRemoveParent(converted);
 
     return {
       props: {
-        graph,
+        graph: { root: converted },
+        affectedPackages: affected,
       },
     };
   },

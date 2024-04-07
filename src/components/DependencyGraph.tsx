@@ -13,23 +13,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { DependencyTreeNode } from "@/types/common";
+import { AffectedPackage, CVE, DependencyTreeNode } from "@/types/api/api";
+import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import { FunctionComponent, useCallback, useMemo } from "react";
 import ReactFlow, {
   Background,
-  Controls,
-  MiniMap,
   addEdge,
   useEdgesState,
   useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import tinycolor from "tinycolor2";
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 300;
 const nodeHeight = 100;
+
+const riskToBgColor = (risk: number) => {
+  const red = new tinycolor("red");
+  const color = red.lighten((1 - risk) * 50).toString("hex");
+
+  return color;
+};
+
+const riskToTextColor = (risk: number) => {
+  const red = new tinycolor("red");
+  return red.lighten((1 - risk) * 50).isLight() ? "black" : "white";
+};
 
 const addRecursive = (dagreGraph: graphlib.Graph, node: DependencyTreeNode) => {
   if (node.name !== "") {
@@ -61,18 +73,20 @@ const recursiveEdges = (
 };
 
 const recursiveFlatten = (
-  node: DependencyTreeNode,
-): Array<{ name: string }> => {
+  node: ViewDependencyTreeNode,
+): Array<{ name: string; risk: number }> => {
   return [
     {
       name: node.name,
+      risk: node.risk ?? 0,
     },
     ...node.children.map((child) => recursiveFlatten(child)).flat(),
   ];
 };
 
 const getLayoutedElements = (
-  tree: DependencyTreeNode,
+  tree: ViewDependencyTreeNode,
+  affectedPackages: Array<AffectedPackage> = [],
   direction = "LR",
 ): [
   Array<{
@@ -86,6 +100,23 @@ const getLayoutedElements = (
     target: string;
   }>,
 ] => {
+  // build a map of all affected packages
+  const affectedMap = affectedPackages.reduce(
+    (acc, cur) => {
+      acc[cur.PurlWithVersion] = cur;
+      return acc;
+    },
+    {} as { [key: string]: AffectedPackage },
+  );
+
+  const riskMap = recursiveFlatten(tree).reduce(
+    (acc, cur) => {
+      acc[cur.name] = cur.risk;
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+
   dagreGraph.setGraph({ rankdir: direction });
 
   addRecursive(dagreGraph, tree);
@@ -94,21 +125,23 @@ const getLayoutedElements = (
 
   const nodes = dagreGraph.nodes().map((el) => {
     const nodeWithPosition = dagreGraph.node(el);
-
     // unfortunately we need this little hack to pass a slightly different position
     // to notify react flow about the change. Moreover we are shifting the dagre node position
     // (anchor=center center) to the top left so it matches the react flow node anchor point (top left).
+    const bgColor = riskToBgColor(riskMap[el]);
     return {
       id: el,
       targetPosition: "right",
       sourcePosition: "left",
-
       style: {
-        border: "1px solid #777",
+        border: bgColor,
+        boxShadow: `0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)`,
+        backgroundColor: riskToBgColor(riskMap[el]),
+        color: riskToTextColor(riskMap[el]),
       },
       position: {
-        x: nodeWithPosition.x - nodeWidth / 2 + Math.random() / 1000,
-        y: nodeWithPosition.y - nodeHeight / 2,
+        x: nodeWithPosition.x - nodeWidth / 2,
+        y: 10 + (nodeWithPosition.y - nodeHeight / 2),
       },
       data: {
         label: el,
@@ -125,6 +158,10 @@ const getLayoutedElements = (
       source: target,
       // type: "smoothstep",
       animated: true,
+      style: {
+        stroke:
+          riskMap[target] > 0 ? riskToBgColor(riskMap[target]) : "#a1a1aa",
+      },
     };
   });
   return [nodes, edges];
@@ -133,16 +170,21 @@ const getLayoutedElements = (
 const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
-  graph: { root: DependencyTreeNode };
-}> = ({ graph, width, height }) => {
+  affectedPackages: Array<AffectedPackage>;
+  graph: { root: ViewDependencyTreeNode };
+}> = ({ graph, width, height, affectedPackages }) => {
   const asset = useActiveAsset();
-  const [initialNodes, initialEdges] = useMemo(() => {
-    graph.root.name = asset?.name ?? "";
-    const [nodes, edges] = getLayoutedElements(graph.root);
-    return [nodes, edges];
-  }, [graph, asset?.name]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [initialNodes, initialEdges, rootNode] = useMemo(() => {
+    graph.root.name = asset?.name ?? "";
+
+    const [nodes, edges] = getLayoutedElements(graph.root, affectedPackages);
+    // get the root node - we use it for the initial position of the viewport
+    const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
+    return [nodes, edges, rootNode];
+  }, [graph, asset?.name, affectedPackages]);
+
+  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
@@ -161,11 +203,15 @@ const DependencyGraph: FunctionComponent<{
         nodes={nodes}
         nodesConnectable={false}
         edges={edges}
-        onSelect={console.log}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={console.log}
+        defaultViewport={{
+          zoom: 1,
+          x: rootNode.position.x - width / 2,
+          y: -(rootNode.position.y - height * -4),
+        }}
       >
         <Background />
       </ReactFlow>

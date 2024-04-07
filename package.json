@@ -39,11 +39,13 @@
         "sass": "^1.69.5",
         "sharp": "^0.33.2",
         "tailwindcss": "3.3.5",
+        "tinycolor2": "^1.6.0",
         "typescript": "5.2.2",
         "zustand": "^4.4.6"
     },
     "devDependencies": {
         "@types/lodash": "^4.17.0",
+        "@types/tinycolor2": "^1.4.6",
         "eslint-plugin-prettier": "^5.0.1"
     }
 }

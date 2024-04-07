@@ -143,3 +143,17 @@ export interface AssetDTO {
   slug: string;
   id: string;
 }
+
+export interface DependencyTreeNode {
+  name: string;
+  children: DependencyTreeNode[];
+}
+
+export interface AffectedPackage {
+  CVE: CVE;
+  CVEID: string;
+  FixedVersion: string;
+  IntroducedVersion: string;
+  PackageName: string;
+  PurlWithVersion: string;
+}

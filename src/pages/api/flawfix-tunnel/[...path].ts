@@ -11,7 +11,7 @@ export default async function handler(
   // check the url
   const url = new URL(req.url!, "http://localhost");
   url.pathname = url.pathname.replace("/api/flawfix-tunnel", "");
-  console.log(req.body);
+
   // get the path from the url
   const resp = await fetch(appConfig.flawFixApiUrl + url.pathname, {
     method: req.method,
