@@ -27,6 +27,7 @@ interface Props {
     href: string;
     Icon: FunctionComponent<{ className: string }>;
   }>;
+  fullscreen?: boolean;
 }
 const Main: FunctionComponent<Props> = ({
   title,
@@ -34,6 +35,7 @@ const Main: FunctionComponent<Props> = ({
   children,
   Button,
   Menu,
+  fullscreen,
 }) => {
   return (
     <main>
@@ -60,7 +62,7 @@ const Main: FunctionComponent<Props> = ({
             <div className="flex mt-2 flex-row gap-6 text-sm">
               {Menu.map((item) => (
                 <Link
-                  className="hover:no-underline"
+                  className="hover:no-underline cursor:pointer"
                   key={item.title}
                   href={item.href}
                 >
@@ -74,7 +76,12 @@ const Main: FunctionComponent<Props> = ({
           )}
         </div>
       </header>
-      <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">
+      <div
+        className={classNames(
+          fullscreen ? "" : "px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8",
+          "text-black",
+        )}
+      >
         {children}
       </div>
       <footer className="px-8 text-black/50 dark:text-white text-sm pb-8">

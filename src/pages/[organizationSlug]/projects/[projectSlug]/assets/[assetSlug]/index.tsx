@@ -7,7 +7,7 @@ import { withProject } from "@/decorators/withProject";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
-import { useActiveProject } from "@/hooks/useProject";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import {
   FilterableColumnDef,
   dateOperators,
@@ -23,13 +23,16 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 import Page from "../../../../../../components/Page";
 import Pagination from "../../../../../../components/common/Pagination";
-import { withInitialState } from "../../../../../../decorators/withInitialState";
+import { withOrg } from "../../../../../../decorators/withOrg";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../utils/common";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
 
 interface Props {
   asset: AssetDTO;
@@ -124,7 +127,9 @@ const Index: FunctionComponent<Props> = (props) => {
   const project = useActiveProject();
 
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
 
+  useEffect(() => {});
   return (
     <Page
       Menu={assetMenu}
@@ -218,53 +223,57 @@ const Index: FunctionComponent<Props> = (props) => {
 
 export default Index;
 
-export const getServerSideProps = withSession(
-  withInitialState(
-    withProject(async (context: GetServerSidePropsContext) => {
-      // fetch the project
-      const { organizationSlug, projectSlug, assetSlug } = context.params!;
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
+    // fetch the project
+    const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
-      const apiClient = getApiClientFromContext(context);
-      const uri =
-        "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/";
+    const apiClient = getApiClientFromContext(context);
+    const uri =
+      "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/";
 
-      const filterQuery = Object.entries(context.query).filter(
-        ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
-      );
+    const filterQuery = Object.entries(context.query).filter(
+      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+    );
 
-      // check for page and page size query params
-      // if they are there, append them to the uri
-      const page = (context.query.page as string) ?? "1";
-      const pageSize = (context.query.pageSize as string) ?? "25";
-      const [resp, flawResp] = await Promise.all([
-        apiClient(uri),
-        apiClient(
-          uri +
-            "flaws/?" +
-            new URLSearchParams({
-              page,
-              pageSize,
-              ...Object.fromEntries(filterQuery),
-            }),
-        ),
-      ]);
+    // check for page and page size query params
+    // if they are there, append them to the uri
+    const page = (context.query.page as string) ?? "1";
+    const pageSize = (context.query.pageSize as string) ?? "25";
+    const [resp, flawResp] = await Promise.all([
+      apiClient(uri),
+      apiClient(
+        uri +
+          "flaws/?" +
+          new URLSearchParams({
+            page,
+            pageSize,
+            ...Object.fromEntries(filterQuery),
+          }),
+      ),
+    ]);
 
-      // fetch a personal access token from the user
+    // fetch a personal access token from the user
 
-      const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+    const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
-      return {
-        props: {
-          asset,
-          flaws,
-        },
-      };
-    }),
-  ),
+    return {
+      props: {
+        asset,
+        flaws,
+      },
+    };
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+    project: withProject,
+    asset: withAsset,
+  },
 );

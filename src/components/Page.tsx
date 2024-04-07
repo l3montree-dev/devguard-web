@@ -39,6 +39,7 @@ type PageProps = {
     href: string;
     Icon: any;
   }>;
+  fullscreen?: boolean;
 };
 
 // Add that the navigation is a prop
@@ -116,6 +117,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       <div className="md:pl-16">
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
           <Main
+            fullscreen={props.fullscreen}
             Menu={props.Menu}
             Button={props.Button}
             Title={props.Title}

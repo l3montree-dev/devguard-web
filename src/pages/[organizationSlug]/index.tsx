@@ -23,7 +23,7 @@ import { toast } from "../../components/Toaster";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 import Modal from "../../components/common/Modal";
-import { withInitialState } from "../../decorators/withInitialState";
+import { withOrg } from "../../decorators/withOrg";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import {
@@ -33,6 +33,7 @@ import {
 import { ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 import { hasErrors } from "../../utils/common";
+import { middleware } from "@/decorators/middleware";
 interface Props {
   projects: Array<ProjectDTO>;
 }
@@ -107,8 +108,8 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
 export default Home;
 
-export const getServerSideProps = withSession(
-  withInitialState(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // list the projects from the active organization
     const apiClient = getApiClientFromContext(context);
 
@@ -123,5 +124,9 @@ export const getServerSideProps = withSession(
         projects,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );

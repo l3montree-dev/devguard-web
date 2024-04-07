@@ -17,6 +17,7 @@ import { config } from "../config";
 
 export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
   const { req } = ctx;
+
   return getApiClientFromRequest(req);
 };
 

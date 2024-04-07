@@ -18,14 +18,13 @@ import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
-import { ory, handleFlowError } from "../services/ory";
-import Image from "next/image";
-import { isDarkModeEnabled } from "@/utils/common";
+import { handleFlowError, ory } from "../services/ory";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
