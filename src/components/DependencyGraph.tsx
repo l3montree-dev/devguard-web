@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { AffectedPackage, CVE, DependencyTreeNode } from "@/types/api/api";
+import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
-import { FunctionComponent, useCallback, useMemo } from "react";
+import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
 import ReactFlow, {
   Background,
   addEdge,
@@ -26,8 +26,6 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import tinycolor from "tinycolor2";
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 300;
 const nodeHeight = 100;
 
@@ -100,6 +98,8 @@ const getLayoutedElements = (
     target: string;
   }>,
 ] => {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
   // build a map of all affected packages
   const affectedMap = affectedPackages.reduce(
     (acc, cur) => {
@@ -184,8 +184,13 @@ const DependencyGraph: FunctionComponent<{
     return [nodes, edges, rootNode];
   }, [graph, asset?.name, affectedPackages]);
 
-  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setEdges, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -210,7 +215,7 @@ const DependencyGraph: FunctionComponent<{
         defaultViewport={{
           zoom: 1,
           x: rootNode.position.x - width / 2,
-          y: -(rootNode.position.y - height * -4),
+          y: -(rootNode.position.y - height * -3), // i have no idea why it fits with a -3 factor
         }}
       >
         <Background />

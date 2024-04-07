@@ -15,6 +15,8 @@
 
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
+import FormField from "@/components/common/FormField";
+import { Toggle } from "@/components/common/Toggle";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -24,11 +26,13 @@ import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/flawFixApi";
 import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
 
 const DependencyGraphPage: FunctionComponent<{
@@ -39,8 +43,13 @@ const DependencyGraphPage: FunctionComponent<{
   const project = useActiveProject();
   const asset = useActiveAsset();
   const dimensions = useDimensions();
+
+  const router = useRouter();
+  const onlyRisk = router.query.onlyRisk === "1";
+  const menu = useAssetMenu();
   return (
     <Page
+      Menu={menu}
       fullscreen
       Title={
         <span className="flex flex-row gap-2">
@@ -70,10 +79,29 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
+      <div className="px-5 py-3 dark:bg-slate-900 bg-white flex-row flex justify-end border-b dark:border-b-slate-800 dark:text-white">
+        <FormField
+          className="flex flex-row gap-2"
+          label="Only show affected packages"
+          Element={() => (
+            <Toggle
+              checked={onlyRisk}
+              onChange={(onlyRisk) => {
+                router.push({
+                  query: {
+                    ...router.query,
+                    onlyRisk: onlyRisk ? "1" : undefined,
+                  },
+                });
+              }}
+            />
+          )}
+        ></FormField>
+      </div>
       <DependencyGraph
         affectedPackages={affectedPackages}
         width={dimensions.width - SIDEBAR_WIDTH}
-        height={dimensions.height - HEADER_HEIGHT}
+        height={dimensions.height - HEADER_HEIGHT - 50}
         graph={graph}
       />
     </Page>
@@ -147,6 +175,16 @@ const convertGraph = (
   return convertedNode;
 };
 
+export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
+  if (node.risk === 0) {
+    return null;
+  }
+  node.children = node.children
+    .map(recursiveRemoveWithoutRisk)
+    .filter((n): n is ViewDependencyTreeNode => n !== null);
+  return node;
+};
+
 export const getServerSideProps = middleware(
   async (context) => {
     // fetch the project
@@ -178,6 +216,10 @@ export const getServerSideProps = middleware(
     recursiveAddRisk(converted, affected);
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
+
+    if (context.query.onlyRisk === "1") {
+      recursiveRemoveWithoutRisk(converted);
+    }
 
     return {
       props: {
