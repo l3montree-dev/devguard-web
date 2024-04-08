@@ -28,7 +28,6 @@ interface Props {}
 
 export default function Sidenav() {
   const router = useRouter();
-  const currentPath = router.asPath;
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);

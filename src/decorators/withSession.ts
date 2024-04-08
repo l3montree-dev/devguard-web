@@ -39,8 +39,9 @@ export async function withSession(ctx: GetServerSidePropsContext) {
         },
       });
     }
+
     // call the initial endpoint with the latest information available
-    return { session: session.data as User };
+    return session.data as User;
   } catch (e: unknown) {
     throw new HttpError({
       redirect: {
