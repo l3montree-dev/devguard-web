@@ -1,116 +1,29 @@
-import ProductDetails from "@/components/Billing/ProductDetails";
-import ProductDescription from "@/components/Billing/ProductDescription";
-import Label from "@/components/Billing/Label";
-import { withInitialState } from "@/decorators/withInitialState";
-import { withSession } from "@/decorators/withSession";
+import Button from "@/components/common/Button";
+import { ProductsData } from "@/types/api/billing";
+import Title from "./Title";
+import Product from "./Product";
 
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { inter } from "../../pages/_app";
-
-interface productsData {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-}
-
-function ProductsList({
-  recommended,
-  recommendedColor,
-  productsData,
-  orgProductID,
+function Products({
+  productsDataWithFreeSorted,
   onButtonClick,
 }: {
-  recommended: string;
-  recommendedColor?: string;
-  productsData: productsData[];
-  orgProductID: number;
+  productsDataWithFreeSorted: ProductsData[];
   onButtonClick: (selectedPlan: string) => void;
 }) {
   return (
-    <div className="m-12 flex h-full flex-row  justify-center gap-4 ">
-      <Product
-        label={orgProductID === null ? "Your current plan " : undefined}
-        labelColor="bg-gray-200"
-        title="Free"
-        description="Use GitLab for personal projects"
-        price={0}
-        productID={999}
-      />
-      {productsData?.map((product) => (
-        <Product
-          title={product.name}
-          description={product.description}
-          price={product.price}
-          key={product.id}
-          productID={product.id}
-          orgProductID={orgProductID}
-          recommended={recommended}
-          recommendedColor={recommendedColor}
-          onButtonClick={() => onButtonClick(product.name)}
-        />
-      ))}
+    <div className="mx-auto max-w-7xl bg-white  px-6 py-24 dark:bg-slate-950 sm:py-32 lg:px-8">
+      <Title />
+      <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 dark:bg-black dark:text-white md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4 ">
+        {productsDataWithFreeSorted.map((product) => (
+          <Product
+            key={product.id}
+            product={product}
+            onButtonClick={onButtonClick}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-function Product({
-  label,
-  labelColor,
-  title,
-  description,
-  price,
-  subLink,
-  buttonText,
-  children,
-  orgProductID,
-  productID,
-  recommended,
-  recommendedColor,
-  onButtonClick,
-}: {
-  label?: string;
-  labelColor?: string;
-  title: string;
-  description: string;
-  price: number;
-  subLink?: string;
-  buttonText?: string;
-  children?: React.ReactNode;
-  orgProductID?: number;
-  productID?: number;
-  recommended?: string;
-  recommendedColor?: string;
-  onButtonClick?: () => void;
-}) {
-  const active = orgProductID === productID;
-  return (
-    <div>
-      <Label
-        title={title}
-        orgProductID={orgProductID}
-        productID={productID}
-        label={label}
-        labelColor={labelColor}
-        recommended={recommended}
-        recommendedColor={recommendedColor}
-      />
-
-      <ProductDetails
-        active={active}
-        title={title}
-        description={description}
-        price={price}
-        subLink={subLink}
-        onButtonClick={onButtonClick}
-        buttonText={buttonText}
-      />
-
-      <ProductDescription />
-
-      <div>{children}</div>
-    </div>
-  );
-}
-
-export default ProductsList;
+export default Products;
