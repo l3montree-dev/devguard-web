@@ -32,6 +32,7 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     );
 
     if (!session.data) {
+      console.error("no session data", session);
       throw new HttpError({
         redirect: {
           destination: "/login?return_to=" + ctx.resolvedUrl,
@@ -43,6 +44,7 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     // call the initial endpoint with the latest information available
     return session.data as User;
   } catch (e: unknown) {
+    console.error("http error", e);
     throw new HttpError({
       redirect: {
         destination: "/login?return_to=" + ctx.resolvedUrl,
