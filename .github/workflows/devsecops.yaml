@@ -74,8 +74,20 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set IMAGE_TAG if tagged
       # Setting the image tag if the push is a tag push
-      run: echo "IMAGE_TAG=ghcr.io/${{ github.repository }}:${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      run: |
+        echo "IMAGE_TAG=ghcr.io/${{ github.repository }}:${GITHUB_REF#refs/tags/}" > image-tag.txt
+        export IMAGE_TAG=$(cat image-tag.txt)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
+    - name: Set IMAGE_TAG if not tagged
+      run: |
+        branch=${GITHUB_REF##*/}
+        sha=${GITHUB_SHA::8}
+        ts=$(date +%s)
+        echo "ghcr.io/${{ github.repository }}:${branch}-${sha}-${ts}" > image-tag.txt
+        export IMAGE_TAG=$(cat image-tag.txt)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+      if: github.ref == 'refs/heads/main'
     - name: Build Docker image with Kaniko
       # Building the Docker image using Kaniko
       id: build_image
@@ -98,6 +110,12 @@ jobs:
       with:
         name: digest
         path: digest.txt
+    - name: Upload image tag
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-tag
+        path: image-tag.txt
+
 
   # Image scanning job to detect vulnerabilities in the built Docker image
   image-scanning:
@@ -134,6 +152,14 @@ jobs:
       with:
         name: docker-image
         path: .
+    - uses: actions/download-artifact@v4
+      with:
+        name: image-tag
+        path: .
+    - name: set IMAGE_TAG env
+      run: |
+        export IMAGE_TAG=$(cat image-tag.txt)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
     - uses: imjasonh/setup-crane@v0.1
     - name: Set IMAGE_TAG if tagged
       # Setting the image tag if the push is a tag push
@@ -157,10 +183,17 @@ jobs:
       with:
         name: digest
         path: .
-    - name: Read digest from file
+    - name: Download image tag
+      uses: actions/download-artifact@v4
+      with:
+        name: image-tag
+        path: .
+    - name: Read digest and image tag from file
       run: |
         export IMAGE_DIGEST=$(cat digest.txt)
         echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
+        export IMAGE_TAG=$(cat image-tag.txt)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2.1.0
       with:
