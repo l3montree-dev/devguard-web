@@ -13,16 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { useOrg } from "@/hooks/useOrg";
+import { UserGroupIcon } from "@heroicons/react/20/solid";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { classNames } from "../../utils/common";
-import { useRouter } from "next/router";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useStore } from "../../zustand/globalStoreProvider";
 import PopupMenu from "../common/PopupMenu";
-import { PlusIcon } from "@heroicons/react/24/outline";
 import PopupMenuItem from "../common/PopupMenuItem";
-import { UserGroupIcon } from "@heroicons/react/20/solid";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
 
 interface Props {}
 
@@ -33,7 +32,7 @@ export default function Sidenav() {
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
 
-  const activeOrg = useActiveOrg() ?? orgs[0];
+  const activeOrg = useOrg() ?? orgs[0];
 
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
@@ -49,12 +48,12 @@ export default function Sidenav() {
 
   return (
     <div className="flex grow flex-row">
-      <div className="border-r dark:bg-slate-950 dark:border-r-slate-700 bg-white border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
+      <div className="flex w-16 flex-col justify-between border-r border-r-gray-200 bg-white p-2 pb-2 pt-4 dark:border-r-slate-700 dark:bg-slate-950">
         <div>
           <div className="flex flex-row justify-center">
             <PopupMenu
               Button={
-                <div className="bg-black dark:bg-slate-700 font-display h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
+                <div className="relative z-30 m-1 flex aspect-square h-9 w-9 flex-col items-center justify-center rounded-lg bg-black font-display text-2xl font-semibold text-white dark:bg-slate-700">
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
                 </div>
               }

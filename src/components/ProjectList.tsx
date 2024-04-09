@@ -25,7 +25,7 @@ interface Props {
   projects: Array<ProjectDTO>;
 }
 export default function ProjectList({ projects }: Props) {
-  const { slug } = useActiveOrg()!;
+  const { slug } = useActiveOrg();
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -47,7 +47,7 @@ export default function ProjectList({ projects }: Props) {
                 <PopupMenu
                   Button={
                     <Button variant="outline" intent="primary">
-                      <EllipsisVerticalIcon className="w-5 h-5" />
+                      <EllipsisVerticalIcon className="h-5 w-5" />
                     </Button>
                   }
                 >

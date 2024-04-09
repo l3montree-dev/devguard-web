@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { RadioGroup } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
@@ -12,20 +12,9 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import ProductManagement from "@/components/Billing/ProductManagement";
 import { ProductsData } from "@/types/api/billing";
 import Products from "@/components/Billing/Productslist";
+import { config as appConfig } from "@/config";
 
-const freeProduct = {
-  id: "999",
-  name: "Free",
-  description: "Use GitLab for personal projects",
-  price: 0,
-  features: [
-    "Unlimited projects",
-    "Unlimited storage",
-    "Advanced analytics",
-    "Custom permissions",
-    "Advanced integrations",
-  ],
-};
+const freeProduct = {};
 
 export default function Billing({
   productsData,
@@ -35,17 +24,18 @@ export default function Billing({
   orgProductID: string;
 }) {
   const activeOrg = useActiveOrg();
-  const orgName = activeOrg?.name;
-  const orgID = activeOrg?.id;
+  const orgName = activeOrg.name;
+  const orgID = activeOrg.id;
 
   const orgProduct = productsData.find(
     (product) => product.id === orgProductID,
   );
+
   const orgProductName = orgProduct?.name;
 
-  const productsDataWithFree = [freeProduct, ...productsData];
-  const productsDataWithFreeSorted = productsDataWithFree.sort(
-    (a, b) => a.price - b.price,
+  const productsDataSorted = useMemo(
+    () => productsData.sort((a, b) => a.price - b.price),
+    [productsData],
   );
 
   const handleClick = async (selectedPlan: string) => {
@@ -69,7 +59,7 @@ export default function Billing({
     <Page title="Billing">
       {orgProductID === null ? (
         <Products
-          productsDataWithFreeSorted={productsDataWithFreeSorted}
+          productsDataWithFreeSorted={productsDataSorted}
           onButtonClick={handleClick}
         />
       ) : (
@@ -86,7 +76,9 @@ export default function Billing({
 export const getServerSideProps: GetServerSideProps = withSession(
   withInitialState(
     async (ctx: GetServerSidePropsContext, _, { organizations }) => {
-      const products = await fetch("http://localhost:4040/billing/products");
+      const products = await fetch(
+        appConfig.flawFixApiUrl + "/billing/products",
+      );
       if (!products.ok)
         throw new Error("Something went wrong with fetching the products");
 
@@ -94,8 +86,7 @@ export const getServerSideProps: GetServerSideProps = withSession(
 
       const orgID = organizations[0].id;
       const orgProduct = await fetch(
-        //"http://localhost:4040/billing/subscriptions/" + orgID,
-        "http://localhost:4040/billing/subscriptions/13",
+        appConfig.flawFixApiUrl + "/billing/subscriptions/" + orgID + "1",
         {
           method: "GET",
           headers: {

@@ -1,7 +1,12 @@
 import { ProductsData } from "@/types/api/billing";
 import Button from "@/components/common/Button";
 import { CheckIcon } from "@heroicons/react/20/solid";
+import { classNames } from "@/utils/common";
 
+const fn = () => {
+  console.log("fn called");
+  return true;
+};
 function Product({
   product,
   onButtonClick,
@@ -12,24 +17,23 @@ function Product({
   return (
     <div
       key={product.id}
-      className={`
-                    ${
-                      product.name === "Gold"
-                        ? "ring-2 ring-yellow-400"
-                        : "ring-1 ring-gray-200"
-                    }
-                    rounded-3xl p-8
-                    dark:text-white 
-                `}
+      className={classNames(
+        " dark:text-white rounded-3xl p-8",
+        product.name === "Gold"
+          ? "ring-2 ring-yellow-400"
+          : "ring-1 ring-gray-200",
+      )}
     >
       <h3
         className={`
-                  product.name === "Gold"
-                    ? "text-yellow-600"
-                    : "text-gray-900",
-                  "text-lg leading-8", "dark:text-white
-                  ", )
-                font-semibold`}
+                  ${
+                    product.name === "Gold"
+                      ? "text-yellow-600"
+                      : "text-gray-900"
+                  }
+                  text-lg 
+                  font-semibold leading-8
+                dark:text-white`}
       >
         {product.name}
       </h3>
@@ -38,7 +42,10 @@ function Product({
       </p>
       <p className="mt-6 flex items-baseline gap-x-1   ">
         <span className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
-          €{product.price / 100}
+          {new Intl.NumberFormat("de-DE", {
+            style: "currency",
+            currency: "EUR",
+          }).format(product.price)}
         </span>
         <span className="text-sm font-semibold leading-6 text-gray-600 dark:text-white">
           /monthly
@@ -50,9 +57,8 @@ function Product({
           onClick={() => onButtonClick(product.name)}
           variant={product.name === "Gold" ? "solid" : "outline"}
           intent={product.name === "Gold" ? "primary" : "primary"}
-          className={product.name !== "" ? "" : ""}
         >
-          {`upgrade to ${product.name}`}
+          {`Upgrade to ${product.name}`}
         </Button>
       </div>
       {product.features && product.features.length > 0 && (
