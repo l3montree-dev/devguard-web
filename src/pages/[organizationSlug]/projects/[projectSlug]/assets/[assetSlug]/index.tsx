@@ -16,6 +16,7 @@ import {
 } from "@/services/filter";
 import { AssetDTO, FlawWithCVE, Paged } from "@/types/api/api";
 import {
+  Cell,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -24,7 +25,7 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import Page from "../../../../../../components/Page";
 import Pagination from "../../../../../../components/common/Pagination";
 import { withOrg } from "../../../../../../decorators/withOrg";
@@ -34,6 +35,12 @@ import { classNames } from "../../../../../../utils/common";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { useColumnVisibility } from "@/hooks/useColumnVisibility";
+import Button from "@/components/common/Button";
+import { ViewColumnsIcon } from "@heroicons/react/24/outline";
+import PopupMenu from "@/components/common/PopupMenu";
+import PopupMenuItem from "@/components/common/PopupMenuItem";
+import Checkbox from "@/components/common/Checkbox";
 
 interface Props {
   asset: AssetDTO;
@@ -72,8 +79,24 @@ const columnsDef = [
       enableSorting: true,
       id: "cve.cve",
       cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue()}</span>
+        <div>
+          <span className="whitespace-nowrap">{row.getValue()}</span>
+        </div>
       ),
+    }),
+  },
+  {
+    ...columnHelper.accessor("cve.cisaActionDue", {
+      header: "CISA Action Due",
+      id: "cve.cisaActionDue",
+      enableSorting: true,
+      cell: (row) => {
+        const value = row.getValue();
+        if (!value) {
+          return null;
+        }
+        return <DateString date={new Date(value)} />;
+      },
     }),
   },
   {
@@ -153,15 +176,22 @@ const columnsDef = [
 
 const Index: FunctionComponent<Props> = (props) => {
   const { sortingState, handleSort } = useFilter();
-
+  const { visibleColumns, setVisibleColumns } = useColumnVisibility(
+    "scaTable",
+    {
+      "cve.cisaActionDue": false,
+    },
+  );
   const table = useReactTable({
     columns: columnsDef,
     data: props.flaws.data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSort,
+    onColumnVisibilityChange: setVisibleColumns,
     manualSorting: true,
     state: {
       sorting: sortingState,
+      columnVisibility: visibleColumns,
     },
   });
 
@@ -197,7 +227,30 @@ const Index: FunctionComponent<Props> = (props) => {
         </span>
       }
     >
-      <div className="mb-4">
+      <div className="mb-4 flex flex-row gap-2">
+        <PopupMenu
+          Button={
+            <Button
+              Icon={<ViewColumnsIcon />}
+              intent="primary"
+              variant="outline"
+            >
+              Columns
+            </Button>
+          }
+        >
+          {table.getAllLeafColumns().map((column) => {
+            return (
+              <div className="p-2 whitespace-nowrap" key={column.id}>
+                <Checkbox
+                  checked={column.getIsVisible()}
+                  onChange={column.getToggleVisibilityHandler()}
+                  label={(column.columnDef.header as string) ?? ""}
+                />
+              </div>
+            );
+          })}
+        </PopupMenu>
         <Filter
           columnsDef={columnsDef.filter(
             (c): c is FilterableColumnDef => "operators" in c,
@@ -243,13 +296,13 @@ const Index: FunctionComponent<Props> = (props) => {
                   router.push(router.asPath + "/flaws/" + row.original.id);
                 }}
                 className={classNames(
-                  "align-top cursor-pointer transition-all",
+                  "align-top relative cursor-pointer transition-all",
                   i === arr.length - 1 ? "" : "border-b dark:border-b-gray-700",
                   "hover:bg-gray-50 dark:hover:bg-gray-800",
                 )}
                 key={row.id}
               >
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map((cell, i) => (
                   <td className="p-4" key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

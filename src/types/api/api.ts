@@ -124,6 +124,11 @@ export interface CVE {
   severity: string;
   userInteractionRequired: string;
   epss: number;
+
+  cisaExploitAdd?: string;
+  cisaActionDue?: string;
+  cisaRequiredAction?: string;
+  cisaVulnerabilityName?: string;
 }
 export interface FlawWithCVE extends FlawDTO {
   cve: Modify<

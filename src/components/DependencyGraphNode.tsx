@@ -49,7 +49,10 @@ export const DependencyGraphNode: FunctionComponent<
     <div
       style={{
         maxWidth: 200,
-        color: riskToTextColor(props.data.risk),
+        color:
+          props.data.affectedPackage === undefined
+            ? "black"
+            : riskToTextColor(props.data.risk),
         backgroundColor:
           props.data.affectedPackage !== undefined ? color : "white",
         border: `1.5px solid ${color}`,
