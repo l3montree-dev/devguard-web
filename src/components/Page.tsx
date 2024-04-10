@@ -67,7 +67,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-slate-900/80" />
+            <div className="fixed inset-0 bg-gray-900/80" />
           </Transition.Child>
 
           <div className="fixed inset-0 flex">
@@ -127,7 +127,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="flex-1 hidden bg-white dark:bg-slate-950 dark:border-slate-700 dark:text-white border-l md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
+          <aside className="flex-1 hidden bg-white dark:bg-gray-950 dark:border-gray-700 dark:text-white border-l md:fixed lg:block bottom-0 right-0 top-0 w-72 overflow-y-auto">
             {props.Sidebar}
           </aside>
         )}

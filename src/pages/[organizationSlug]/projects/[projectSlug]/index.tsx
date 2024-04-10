@@ -87,22 +87,24 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           </span>
         }
       >
-        {project.assets.map((asset) => (
-          <ListItem
-            key={asset.id}
-            title={asset.name}
-            description={asset.description}
-            Button={
-              <Button
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                variant="outline"
-                intent="primary"
-              >
-                View Asset
-              </Button>
-            }
-          />
-        ))}
+        <div className="flex flex-col gap-4">
+          {project.assets.map((asset) => (
+            <ListItem
+              key={asset.id}
+              title={asset.name}
+              description={asset.description}
+              Button={
+                <Button
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
+                  variant="outline"
+                  intent="primary"
+                >
+                  View Asset
+                </Button>
+              }
+            />
+          ))}
+        </div>
       </Page>
       <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
         <form onSubmit={handleSubmit(handleCreateAsset)}>

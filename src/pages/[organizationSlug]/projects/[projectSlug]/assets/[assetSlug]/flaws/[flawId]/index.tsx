@@ -70,7 +70,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
           </div>
 
           <div className="border mt-4 overflow-hidden rounded-lg ">
-            <div className="font-semibold flex flex-row justify-between p-4 bg-slate-50 border-b">
+            <div className="font-semibold flex flex-row justify-between p-4 bg-gray-50 border-b">
               Risk Assessment
               <button
                 onClick={() => setShowRiskAssessment((prev) => !prev)}

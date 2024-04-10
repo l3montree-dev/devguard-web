@@ -41,7 +41,7 @@ const Main: FunctionComponent<Props> = ({
     <main>
       <header
         className={classNames(
-          "flex relative items-center justify-between dark:bg-black bg-blue-950 border-b dark:border-b-slate-700 border-b-gray-200 px-4 pt-5 sm:px-6 lg:px-8",
+          "flex relative items-center justify-between dark:bg-black bg-blue-950 border-b dark:border-b-gray-700 border-b-gray-200 px-4 pt-5 sm:px-6 lg:px-8",
           Boolean(Menu) ? "pb-3" : "pb-5",
         )}
       >
@@ -67,7 +67,7 @@ const Main: FunctionComponent<Props> = ({
                   href={item.href}
                 >
                   <div className="flex flex-row gap-1 items-center mt-4">
-                    <item.Icon className="h-5 text-slate-400 w-5" />
+                    <item.Icon className="h-5 text-gray-400 w-5" />
                     <span className="text-white ">{item.title}</span>
                   </div>
                 </Link>

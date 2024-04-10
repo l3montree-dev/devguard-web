@@ -204,9 +204,9 @@ const Index: FunctionComponent<Props> = (props) => {
           )}
         />
       </div>
-      <div className="border dark:border-slate-700 shadow-sm rounded-lg overflow-hidden">
+      <div className="border dark:border-gray-700 shadow-sm rounded-lg overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="border-b dark:border-slate-700 dark:bg-slate-950 dark:text-white bg-slate-50">
+          <thead className="border-b dark:border-gray-700 dark:bg-gray-950 dark:text-white bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -236,7 +236,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody className="text-sm dark:bg-slate-900 dark:text-white bg-white">
+          <tbody className="text-sm dark:bg-gray-900 dark:text-white bg-white">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
@@ -244,10 +244,8 @@ const Index: FunctionComponent<Props> = (props) => {
                 }}
                 className={classNames(
                   "align-top cursor-pointer transition-all",
-                  i === arr.length - 1
-                    ? ""
-                    : "border-b dark:border-b-slate-700",
-                  "hover:bg-slate-50 dark:hover:bg-slate-800",
+                  i === arr.length - 1 ? "" : "border-b dark:border-b-gray-700",
+                  "hover:bg-gray-50 dark:hover:bg-gray-800",
                 )}
                 key={row.id}
               >

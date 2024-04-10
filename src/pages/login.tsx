@@ -116,7 +116,7 @@ const Login: NextPage = () => {
         <meta name="description" content="FlawFix Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-slate-500">
+        <div className="w-3/5 relative bg-gray-500">
           <Image
             src={"/bg.png"}
             alt="FlawFix by l3montree Logo"
@@ -124,7 +124,7 @@ const Login: NextPage = () => {
             fill
           />
         </div>
-        <div className="dark:bg-slate-950 dark:text-white text-slate-900 bg-white w-2/5 flex-col flex justify-center items-center">
+        <div className="dark:bg-gray-950 dark:text-white text-gray-900 bg-white w-2/5 flex-col flex justify-center items-center">
           <div className="w-full px-8">
             <div className="">
               <Image

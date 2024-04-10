@@ -79,7 +79,7 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="px-5 py-3 dark:bg-slate-900 bg-white flex-row flex justify-end border-b dark:border-b-slate-800 dark:text-white">
+      <div className="px-5 py-3 dark:bg-gray-900 bg-white flex-row flex justify-end border-b dark:border-b-gray-800 dark:text-white">
         <FormField
           className="flex flex-row gap-2"
           label="Only show affected packages"

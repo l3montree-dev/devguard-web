@@ -48,12 +48,12 @@ export default function Sidenav() {
 
   return (
     <div className="flex grow flex-row">
-      <div className="border-r dark:bg-slate-950 dark:border-r-slate-700 bg-white border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
+      <div className="border-r dark:bg-gray-950 dark:border-r-gray-700 bg-white border-r-gray-200 flex pt-4 pb-2 flex-col justify-between w-16 p-2">
         <div>
           <div className="flex flex-row justify-center">
             <PopupMenu
               Button={
-                <div className="bg-black dark:bg-slate-700 font-display h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
+                <div className="bg-black dark:bg-gray-700 font-display h-9 w-9 relative z-30 rounded-lg font-semibold flex flex-col justify-center items-center text-white text-2xl aspect-square m-1">
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
                 </div>
               }
@@ -89,7 +89,7 @@ export default function Sidenav() {
           {user && (
             <Link href="/user-settings">
               <Image
-                className="rounded-lg bg-slate-800"
+                className="rounded-lg bg-gray-800"
                 src="/examples/tim.jpg"
                 alt=""
                 width={40}

@@ -33,7 +33,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-slate-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
+            "bg-gray-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
           )}
         >
           <SpeakerXMarkIcon className="w-4 h-4 inline-block" />
@@ -46,7 +46,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-slate-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
+            "bg-gray-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
           )}
         >
           <StopIcon className="w-4 h-4 inline-block" />

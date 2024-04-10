@@ -119,7 +119,7 @@ const Registration: NextPage = () => {
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1  bg-white flex-row ">
-        <div className="w-3/5 relative bg-slate-500">
+        <div className="w-3/5 relative bg-gray-500">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"
@@ -127,7 +127,7 @@ const Registration: NextPage = () => {
             fill
           />
         </div>
-        <div className="bg-white dark:text-white text-black dark:bg-slate-950 w-2/5 flex-col flex justify-center items-center">
+        <div className="bg-white dark:text-white text-black dark:bg-gray-950 w-2/5 flex-col flex justify-center items-center">
           <div className="w-full px-8">
             <div>
               <Image

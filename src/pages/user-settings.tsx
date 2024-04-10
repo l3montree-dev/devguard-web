@@ -235,7 +235,7 @@ const Settings: FunctionComponent<{
                 alt=""
                 width={96}
                 height={96}
-                className="h-24 w-24 flex-none rounded-lg bg-slate-800 object-cover"
+                className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
               />
               <div>
                 <Button>Change avatar</Button>
@@ -282,7 +282,7 @@ const Settings: FunctionComponent<{
           <div className="mb-6 flex flex-col gap-2">
             {personalAccessTokens.map((pat) => (
               <div
-                className="rounded-md border dark:bg-slate-950 dark:border-slate-700 bg-white overflow-hidden p-4 text-sm"
+                className="rounded-md border dark:bg-gray-950 dark:border-gray-700 bg-white overflow-hidden p-4 text-sm"
                 key={pat.id}
               >
                 <div className="flex items-center flex-row justify-between">
@@ -327,7 +327,7 @@ const Settings: FunctionComponent<{
             ))}
           </div>
           <form
-            className="border dark:border-slate-700 dark:bg-slate-950 bg-white rounded-md p-4 shadow-sm"
+            className="border dark:border-gray-700 dark:bg-gray-950 bg-white rounded-md p-4 shadow-sm"
             onSubmit={handleSubmit(handleCreatePat)}
           >
             <span className="font-medium block pb-2">

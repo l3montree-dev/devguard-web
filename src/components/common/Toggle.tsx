@@ -25,7 +25,7 @@ export const Toggle: FunctionComponent<Props> = ({ checked, onChange }) => {
       checked={checked}
       onChange={onChange}
       className={`${
-        checked ? "bg-amber-400" : "bg-slate-400"
+        checked ? "bg-amber-400" : "bg-gray-400"
       } relative inline-flex h-6 w-11 items-center rounded-full`}
     >
       <span className="sr-only">Enable notifications</span>

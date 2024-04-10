@@ -11,7 +11,7 @@ const getClassNames = (severity: string) => {
     case "LOW":
       return "text-green-700 border border-green-400 bg-green-200";
     default:
-      return "text-white bg-slate-500";
+      return "text-white bg-gray-500";
   }
 };
 const Severity = ({ severity }: { severity: string }) => {
