@@ -101,7 +101,7 @@ const DependencyGraphPage: FunctionComponent<{
       <DependencyGraph
         affectedPackages={affectedPackages}
         width={dimensions.width - SIDEBAR_WIDTH}
-        height={dimensions.height - HEADER_HEIGHT - 50}
+        height={dimensions.height - HEADER_HEIGHT - 85}
         graph={graph}
       />
     </Page>

@@ -24,22 +24,10 @@ import ReactFlow, {
   useNodesState,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import tinycolor from "tinycolor2";
+import { DependencyGraphNode, riskToBgColor } from "./DependencyGraphNode";
 
 const nodeWidth = 300;
 const nodeHeight = 100;
-
-const riskToBgColor = (risk: number) => {
-  const red = new tinycolor("red");
-  const color = red.lighten((1 - risk) * 50).toString("hex");
-
-  return color;
-};
-
-const riskToTextColor = (risk: number) => {
-  const red = new tinycolor("red");
-  return red.lighten((1 - risk) * 50).isLight() ? "black" : "white";
-};
 
 const addRecursive = (dagreGraph: graphlib.Graph, node: DependencyTreeNode) => {
   if (node.name !== "") {
@@ -128,16 +116,13 @@ const getLayoutedElements = (
     // unfortunately we need this little hack to pass a slightly different position
     // to notify react flow about the change. Moreover we are shifting the dagre node position
     // (anchor=center center) to the top left so it matches the react flow node anchor point (top left).
-    const bgColor = riskToBgColor(riskMap[el]);
     return {
       id: el,
       targetPosition: "right",
       sourcePosition: "left",
+      type: "customNode",
       style: {
-        border: bgColor,
-        boxShadow: `0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)`,
-        backgroundColor: riskToBgColor(riskMap[el]),
-        color: riskToTextColor(riskMap[el]),
+        // backgroundColor: riskToBgColor(riskMap[el]),
       },
       position: {
         x: nodeWithPosition.x - nodeWidth / 2,
@@ -145,6 +130,8 @@ const getLayoutedElements = (
       },
       data: {
         label: el,
+        risk: riskMap[el],
+        affectedPackage: affectedMap[el],
       },
     };
   });
@@ -165,6 +152,10 @@ const getLayoutedElements = (
     };
   });
   return [nodes, edges];
+};
+
+const nodeTypes = {
+  customNode: DependencyGraphNode,
 };
 
 const DependencyGraph: FunctionComponent<{
@@ -206,6 +197,7 @@ const DependencyGraph: FunctionComponent<{
     >
       <ReactFlow
         nodes={nodes}
+        nodeTypes={nodeTypes}
         nodesConnectable={false}
         edges={edges}
         onNodesChange={onNodesChange}
