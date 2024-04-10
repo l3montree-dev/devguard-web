@@ -12,6 +12,7 @@ import {
   FilterableColumnDef,
   dateOperators,
   numberOperators,
+  stringOperators,
 } from "@/services/filter";
 import { AssetDTO, FlawWithCVE, Paged } from "@/types/api/api";
 import {
@@ -54,6 +55,7 @@ const columnsDef = [
   {
     ...columnHelper.accessor("state", {
       header: "State",
+      enableSorting: true,
       id: "state",
       cell: (row) => (
         <div className="flex flex-row">
@@ -61,10 +63,13 @@ const columnsDef = [
         </div>
       ),
     }),
+    operators: stringOperators,
+    filterValues: ["open", "fixed", "ignored"],
   },
   {
     ...columnHelper.accessor("cve.cve", {
       header: "CVE",
+      enableSorting: true,
       id: "cve.cve",
       cell: (row) => (
         <span className="whitespace-nowrap">{row.getValue()}</span>
@@ -104,6 +109,7 @@ const columnsDef = [
     ...columnHelper.accessor("cve.description", {
       header: "Message",
       id: "message",
+      enableSorting: true,
       cell: (row) => (
         <div className="line-clamp-3 max-w-5xl">
           <P value={row.getValue()} />
@@ -114,6 +120,7 @@ const columnsDef = [
   {
     ...columnHelper.accessor("cve.cvss", {
       header: "Base CVSS",
+      enableSorting: true,
       id: "cve.cvss",
       cell: (row) => row.getValue(),
     }),
@@ -123,6 +130,7 @@ const columnsDef = [
     ...columnHelper.accessor("cve.epss", {
       header: "Exploit Prediction Scoring System",
       id: "cve.epss",
+      enableSorting: true,
       cell: (row) => row.getValue(),
     }),
     operators: numberOperators,
@@ -132,6 +140,7 @@ const columnsDef = [
     ...columnHelper.accessor("createdAt", {
       header: "First reported",
       id: "createdAt",
+      enableSorting: true,
       cell: (row) => (
         <span className="whitespace-nowrap">
           <DateString date={new Date(row.getValue())} />
@@ -203,7 +212,11 @@ const Index: FunctionComponent<Props> = (props) => {
                 {headerGroup.headers.map((header) => (
                   <th
                     className="text-left cursor-pointer p-4 break-normal"
-                    onClick={header.column.getToggleSortingHandler()}
+                    onClick={
+                      header.column.columnDef.enableSorting
+                        ? header.column.getToggleSortingHandler()
+                        : undefined
+                    }
                     key={header.id}
                   >
                     <div className="flex flex-row items-center gap-2">
