@@ -18,6 +18,7 @@ LABEL maintainer="Sebastian Kawelke <sebatian.kawelke@l3montree.com"
 
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
+ARG VERSION
 
 WORKDIR /usr/app/
 
@@ -25,6 +26,7 @@ ENV PORT 3000
 EXPOSE 3000
 
 ENV NEXT_PUBLIC_ENVIRONMENT production
+ENV NEXT_PUBLIC_VERSION $VERSION
 
 COPY package-lock.json .
 COPY package.json .
