@@ -135,6 +135,9 @@ export interface FlawWithCVE extends FlawDTO {
   arbitraryJsonData: {
     packageName?: string;
   };
+  component: {
+    purlOrCpe: string;
+  };
 }
 
 export interface AssetDTO {

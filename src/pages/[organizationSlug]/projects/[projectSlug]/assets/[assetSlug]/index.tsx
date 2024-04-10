@@ -41,6 +41,15 @@ interface Props {
 
 const columnHelper = createColumnHelper<FlawWithCVE>();
 
+const extractVersion = (purl: string) => {
+  const parts = purl.split("@");
+  const version = parts[parts.length - 1];
+  if (version.startsWith("v")) {
+    return version.substring(1);
+  }
+  return version;
+};
+
 const columnsDef = [
   {
     ...columnHelper.accessor("state", {
@@ -72,6 +81,26 @@ const columnsDef = [
     }),
   },
   {
+    ...columnHelper.accessor("component.purlOrCpe", {
+      header: "Installed Version",
+      id: "installedVersion",
+      cell: (row) => (
+        <span className="whitespace-nowrap">
+          {extractVersion(row.getValue())}
+        </span>
+      ),
+    }),
+  },
+  {
+    ...columnHelper.accessor("arbitraryJsonData.fixedVersion", {
+      header: "Fixed in Version",
+      id: "fixedVersion",
+      cell: (row) => (
+        <span className="whitespace-nowrap">{row.getValue() as string}</span>
+      ),
+    }),
+  },
+  {
     ...columnHelper.accessor("cve.description", {
       header: "Message",
       id: "message",
@@ -98,11 +127,16 @@ const columnsDef = [
     }),
     operators: numberOperators,
   },
+
   {
     ...columnHelper.accessor("createdAt", {
       header: "First reported",
       id: "createdAt",
-      cell: (row) => <DateString date={new Date(row.getValue())} />,
+      cell: (row) => (
+        <span className="whitespace-nowrap">
+          <DateString date={new Date(row.getValue())} />
+        </span>
+      ),
     }),
     operators: dateOperators,
   },
