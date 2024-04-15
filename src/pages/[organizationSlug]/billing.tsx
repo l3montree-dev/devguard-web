@@ -14,8 +14,6 @@ import { ProductsData } from "@/types/api/billing";
 import Products from "@/components/Billing/Productslist";
 import { config as appConfig } from "@/config";
 
-const freeProduct = {};
-
 export default function Billing({
   productsData,
   orgProductID,
