@@ -11,7 +11,7 @@ import Button from "@/components/common/Button";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import ProductManagement from "@/components/Billing/ProductManagement";
 import { ProductsData } from "@/types/api/billing";
-import Products from "@/components/Billing/Productslist";
+import Products from "@/components/Billing/ProductsList";
 import { config as appConfig } from "@/config";
 
 export default function Billing({
@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = withSession(
 
       const orgID = organizations[0].id;
       const orgProduct = await fetch(
-        appConfig.flawFixApiUrl + "/billing/subscriptions/" + orgID + "1",
+        appConfig.flawFixApiUrl + "/billing/subscriptions/" + orgID,
         {
           method: "GET",
           headers: {
