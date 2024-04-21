@@ -86,6 +86,20 @@ const columnsDef = [
     }),
   },
   {
+    ...columnHelper.accessor("cve.cisaExploitAdd", {
+      header: "CISA Exploit Add",
+      id: "cve.cisaExploitAdd",
+      enableSorting: true,
+      cell: (row) => {
+        const value = row.getValue();
+        if (!value) {
+          return null;
+        }
+        return <DateString date={new Date(value)} />;
+      },
+    }),
+  },
+  {
     ...columnHelper.accessor("cve.cisaActionDue", {
       header: "CISA Action Due",
       id: "cve.cisaActionDue",
@@ -97,6 +111,14 @@ const columnsDef = [
         }
         return <DateString date={new Date(value)} />;
       },
+    }),
+  },
+  {
+    ...columnHelper.accessor("cve.cisaRequiredAction", {
+      header: "CISA Required Action",
+      id: "cve.cisaRequiredAction",
+      enableSorting: true,
+      cell: (row) => row.getValue(),
     }),
   },
   {
@@ -150,6 +172,16 @@ const columnsDef = [
     operators: numberOperators,
   },
   {
+    ...columnHelper.accessor("cve.severity", {
+      header: "Severity",
+      enableSorting: true,
+      id: "cve.severity",
+      cell: (row) => (
+        <span className="whitespace-nowrap">{row.getValue()}</span>
+      ),
+    }),
+  },
+  {
     ...columnHelper.accessor("cve.epss", {
       header: "Exploit Prediction Scoring System",
       id: "cve.epss",
@@ -180,6 +212,9 @@ const Index: FunctionComponent<Props> = (props) => {
     "scaTable",
     {
       "cve.cisaActionDue": false,
+      "cve.cisaExploitAdd": false,
+      "cve.cisaRequiredAction": false,
+      "cve.severity": false,
     },
   );
   const table = useReactTable({
