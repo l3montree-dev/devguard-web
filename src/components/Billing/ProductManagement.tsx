@@ -6,8 +6,8 @@ function ProductManagement({
   orgProductName,
   orgID,
 }: {
-  orgName?: string;
-  orgProductName?: string;
+  orgName: string;
+  orgProductName: string;
   orgID: string;
 }) {
   return (

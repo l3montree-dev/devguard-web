@@ -3,10 +3,7 @@ import Button from "@/components/common/Button";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { classNames } from "@/utils/common";
 
-const fn = () => {
-  console.log("fn called");
-  return true;
-};
+
 function Product({
   product,
   onButtonClick,
@@ -42,6 +39,7 @@ function Product({
       </p>
       <p className="mt-6 flex items-baseline gap-x-1   ">
         <span className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+          //TODO: Add currency depending on the locale
           {new Intl.NumberFormat("de-DE", {
             style: "currency",
             currency: "EUR",
