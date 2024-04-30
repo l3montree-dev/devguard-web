@@ -8,7 +8,7 @@ import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
 import ListItem from "../../../../components/common/ListItem";
 import Modal from "../../../../components/common/Modal";
-import { withInitialState } from "../../../../decorators/withInitialState";
+import { withOrg } from "../../../../decorators/withOrg";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
@@ -21,6 +21,7 @@ import { hasErrors } from "../../../../utils/common";
 import { toast } from "@/components/Toaster";
 import Checkbox from "@/components/common/Checkbox";
 import Link from "next/link";
+import { middleware } from "@/decorators/middleware";
 
 interface Props {
   project: ProjectDTO & {
@@ -86,22 +87,24 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           </span>
         }
       >
-        {project.assets.map((asset) => (
-          <ListItem
-            key={asset.id}
-            title={asset.name}
-            description={asset.description}
-            Button={
-              <Button
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                variant="outline"
-                intent="primary"
-              >
-                View Asset
-              </Button>
-            }
-          />
-        ))}
+        <div className="flex flex-col gap-4">
+          {project.assets.map((asset) => (
+            <ListItem
+              key={asset.id}
+              title={asset.name}
+              description={asset.description}
+              Button={
+                <Button
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
+                  variant="outline"
+                  intent="primary"
+                >
+                  View Asset
+                </Button>
+              }
+            />
+          ))}
+        </div>
       </Page>
       <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
         <form onSubmit={handleSubmit(handleCreateAsset)}>
@@ -174,8 +177,8 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   );
 };
 
-export const getServerSideProps = withSession(
-  withInitialState(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // fetch the project
     const { organizationSlug, projectSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
@@ -190,6 +193,11 @@ export const getServerSideProps = withSession(
         project,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );
+
 export default Index;

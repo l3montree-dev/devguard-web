@@ -18,6 +18,7 @@ import {
   CursorArrowRippleIcon,
   WrenchScrewdriverIcon,
   CogIcon,
+  ShareIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
@@ -68,6 +69,18 @@ export const useAssetMenu = () => {
         assetSlug +
         "/risk-handling",
       Icon: WrenchScrewdriverIcon,
+    },
+    {
+      title: "Dependency graph",
+      href:
+        "/" +
+        orgSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/dependency-graph",
+      Icon: ShareIcon,
     },
     {
       title: "Settings",

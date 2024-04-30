@@ -27,6 +27,7 @@ interface Props {
     href: string;
     Icon: FunctionComponent<{ className: string }>;
   }>;
+  fullscreen?: boolean;
 }
 const Main: FunctionComponent<Props> = ({
   title,
@@ -34,12 +35,13 @@ const Main: FunctionComponent<Props> = ({
   children,
   Button,
   Menu,
+  fullscreen,
 }) => {
   return (
     <main>
       <header
         className={classNames(
-          "flex relative items-center justify-between dark:bg-black bg-blue-950 border-b dark:border-b-slate-700 border-b-gray-200 px-4 pt-5 sm:px-6 lg:px-8",
+          "flex relative items-center justify-between dark:bg-black bg-blue-950 border-b dark:border-b-gray-700 border-b-gray-200 px-4 pt-5 sm:px-6 lg:px-8",
           Boolean(Menu) ? "pb-3" : "pb-5",
         )}
       >
@@ -60,12 +62,12 @@ const Main: FunctionComponent<Props> = ({
             <div className="flex mt-2 flex-row gap-6 text-sm">
               {Menu.map((item) => (
                 <Link
-                  className="hover:no-underline"
+                  className="hover:no-underline cursor:pointer"
                   key={item.title}
                   href={item.href}
                 >
                   <div className="flex flex-row gap-1 items-center mt-4">
-                    <item.Icon className="h-5 text-slate-400 w-5" />
+                    <item.Icon className="h-5 text-gray-400 w-5" />
                     <span className="text-white ">{item.title}</span>
                   </div>
                 </Link>
@@ -74,7 +76,12 @@ const Main: FunctionComponent<Props> = ({
           )}
         </div>
       </header>
-      <div className="px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8 text-black">
+      <div
+        className={classNames(
+          fullscreen ? "" : "px-8 py-2 sm:px-6 mt-6 lg:px-8 pb-8",
+          "text-black",
+        )}
+      >
         {children}
       </div>
       <footer className="px-8 text-black/50 dark:text-white text-sm pb-8">
@@ -100,7 +107,8 @@ const Main: FunctionComponent<Props> = ({
             Privacy
           </Link>
         </div>
-        Copyright © 2023 L3montree. All rights reserved.
+        Copyright © 2023 L3montree. All rights reserved. Version{" "}
+        {process.env.NEXT_PUBLIC_VERSION}
       </footer>
     </main>
   );

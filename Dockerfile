@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 FROM node:20.11.1 as build-env
-LABEL maintainer="Sebastian Kawelke <sebatian.kawelke@neuland-homeland.de"
+LABEL maintainer="Sebastian Kawelke <sebatian.kawelke@l3montree.com"
 
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
+ARG VERSION
 
 WORKDIR /usr/app/
 
@@ -25,13 +26,16 @@ ENV PORT 3000
 EXPOSE 3000
 
 ENV NEXT_PUBLIC_ENVIRONMENT production
-ENV NODE_ENV production
+ENV NEXT_PUBLIC_VERSION $VERSION
 
+COPY package-lock.json .
 COPY package.json .
 
-RUN npm install
+RUN npm ci
 
 COPY . .
+
+RUN npx tsc --showConfig
 
 # Build
 RUN npm run build

@@ -29,7 +29,7 @@ import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { Messages } from "../components/kratos/Messages";
-import { withInitialState } from "../decorators/withInitialState";
+import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import {
@@ -40,6 +40,7 @@ import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import { createPat } from "../services/patService";
 import DateString from "@/components/common/DateString";
+import { middleware } from "@/decorators/middleware";
 
 interface Props {
   flow?: SettingsFlow;
@@ -234,7 +235,7 @@ const Settings: FunctionComponent<{
                 alt=""
                 width={96}
                 height={96}
-                className="h-24 w-24 flex-none rounded-lg bg-slate-800 object-cover"
+                className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
               />
               <div>
                 <Button>Change avatar</Button>
@@ -281,7 +282,7 @@ const Settings: FunctionComponent<{
           <div className="mb-6 flex flex-col gap-2">
             {personalAccessTokens.map((pat) => (
               <div
-                className="rounded-md border dark:bg-slate-950 dark:border-slate-700 bg-white overflow-hidden p-4 text-sm"
+                className="rounded-md border dark:bg-gray-950 dark:border-gray-700 bg-white overflow-hidden p-4 text-sm"
                 key={pat.id}
               >
                 <div className="flex items-center flex-row justify-between">
@@ -326,7 +327,7 @@ const Settings: FunctionComponent<{
             ))}
           </div>
           <form
-            className="border dark:border-slate-700 dark:bg-slate-950 bg-white rounded-md p-4 shadow-sm"
+            className="border dark:border-gray-700 dark:bg-gray-950 bg-white rounded-md p-4 shadow-sm"
             onSubmit={handleSubmit(handleCreatePat)}
           >
             <span className="font-medium block pb-2">
@@ -444,8 +445,8 @@ const Settings: FunctionComponent<{
 };
 
 // just guard the page with the session decorator
-export const getServerSideProps = withSession(
-  withInitialState(async (ctx) => {
+export const getServerSideProps = middleware(
+  async (ctx) => {
     // get the personal access tokens from the user
     const apiClient = getApiClientFromContext(ctx);
 
@@ -457,7 +458,11 @@ export const getServerSideProps = withSession(
         personalAccessTokens,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
 );
 
 export default Settings;

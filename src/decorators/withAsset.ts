@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Tim Bastin, l3montree UG (haftungsbeschränkt)
+// Copyright (C) 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -11,33 +11,39 @@
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ProjectDTO } from "@/types/api/api";
+import { getApiClientFromContext } from "@/services/flawFixApi";
+import { AssetDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/flawFixApi";
 import { HttpError } from "./middleware";
 
-export async function withProject(ctx: GetServerSidePropsContext) {
+export async function withAsset(ctx: GetServerSidePropsContext) {
   // get the flawFixApiClient
   const flawFixApiClient = getApiClientFromContext(ctx);
 
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
+  const assetSlug = ctx.params?.assetSlug;
   // get the organization
   const r = await flawFixApiClient(
-    "/organizations/" + organization + "/projects/" + projectSlug,
+    "/organizations/" +
+      organization +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug,
   );
 
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination: "/" + organization + "/projects/",
+        destination:
+          "/" + organization + "/projects/" + projectSlug + "/assets/",
         permanent: false,
       },
     });
   }
   // parse the organization
-  const project: ProjectDTO = await r.json();
-  return project;
+  const asset: AssetDTO = await r.json();
+  return asset;
 }

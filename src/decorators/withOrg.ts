@@ -13,31 +13,48 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ProjectDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { HttpError } from "./middleware";
+import { OrganizationDTO } from "@/types/api/api";
 
-export async function withProject(ctx: GetServerSidePropsContext) {
+export async function withOrg(ctx: GetServerSidePropsContext) {
   // get the flawFixApiClient
   const flawFixApiClient = getApiClientFromContext(ctx);
 
-  const organization = ctx.params?.organizationSlug;
-  const projectSlug = ctx.params?.projectSlug;
   // get the organization
-  const r = await flawFixApiClient(
-    "/organizations/" + organization + "/projects/" + projectSlug,
-  );
+  const r = await flawFixApiClient("/organizations/");
 
   if (!r.ok) {
+    // it must be an 500
     throw new HttpError({
       redirect: {
-        destination: "/" + organization + "/projects/",
+        destination: "/login",
         permanent: false,
       },
     });
   }
   // parse the organization
-  const project: ProjectDTO = await r.json();
-  return project;
+  const organizations: OrganizationDTO[] = await r.json();
+
+  // check if there is a slug in the query
+  const organizationSlug = ctx.params?.organizationSlug;
+
+  if (organizationSlug) {
+    // check if the organizationSlug is valid
+    const organization = organizations.find(
+      (o: any) => o.slug === organizationSlug,
+    );
+
+    if (!organization) {
+      // it must be an 404
+      throw new HttpError({
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      });
+    }
+  }
+  return organizations;
 }
