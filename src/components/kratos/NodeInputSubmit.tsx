@@ -24,7 +24,7 @@ export function NodeInputSubmit<T>({
   disabled,
 }: NodeInputProps) {
   return (
-    <div className="flex flex-row justify-end mt-6">
+    <div className="mt-6 flex flex-row justify-end">
       <Button
         name={attributes.name}
         value={attributes.value || ""}

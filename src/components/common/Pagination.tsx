@@ -35,11 +35,11 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
 
   return (
     <div>
-      <div className="flex gap-2 flex-row justify-center">
+      <div className="flex flex-row justify-center gap-2">
         {renderFirstPage && (
           <div className="flex flex-row items-center gap-2">
             <Button
-              className="w-9 flex justify-center items-center h-9 whitespace-nowrap"
+              className="flex h-9 w-9 items-center justify-center whitespace-nowrap"
               variant="outline"
               onClick={() => navigateToPage(1)}
             >
@@ -50,7 +50,7 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
         )}
         {renderPages.map((pageNumber) => (
           <Button
-            className="w-9 flex justify-center items-center h-9 whitespace-nowrap"
+            className="flex h-9 w-9 items-center justify-center whitespace-nowrap"
             variant={page === pageNumber ? "solid" : "outline"}
             key={pageNumber}
             onClick={() => navigateToPage(pageNumber)}
@@ -62,7 +62,7 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
           <div className="flex flex-row items-center gap-2">
             ·
             <Button
-              className="w-9 flex justify-center items-center h-9 whitespace-nowrap"
+              className="flex h-9 w-9 items-center justify-center whitespace-nowrap"
               variant="outline"
               onClick={() => navigateToPage(pages)}
             >
@@ -71,7 +71,7 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
           </div>
         )}
       </div>
-      <p className="text-sm mt-2 text-gray-500 text-center">
+      <p className="mt-2 text-center text-sm text-gray-500">
         Showing {page} of {Math.max(1, pages)} pages ({total} items)
       </p>
     </div>

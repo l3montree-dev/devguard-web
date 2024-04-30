@@ -58,7 +58,7 @@ export const DependencyGraphNode: FunctionComponent<
         border: `1.5px solid ${color}`,
       }}
       className={classNames(
-        "bg-white relative p-3 shadow-lg text-xs rounded-lg",
+        "relative rounded-lg bg-white p-3 text-xs shadow-lg",
       )}
     >
       <Handle type="target" position={Position.Right} />

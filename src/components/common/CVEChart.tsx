@@ -8,7 +8,7 @@ interface Props {
 const CVEChart: FunctionComponent<Props> = ({ baseScore, severity }) => {
   return (
     <div
-      className="flex flex-row items-center justify-center relative"
+      className="relative flex flex-row items-center justify-center"
       style={{
         width: 200,
         height: 200,
@@ -36,7 +36,7 @@ const CVEChart: FunctionComponent<Props> = ({ baseScore, severity }) => {
           },
         ]}
       />
-      <div className="text-xl text-center font-semibold absolute">
+      <div className="absolute text-center text-xl font-semibold">
         <b className="text-4xl font-semibold">{baseScore}</b>
         <br />
         {severity}

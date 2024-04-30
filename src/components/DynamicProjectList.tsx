@@ -42,7 +42,7 @@ export default function DynamicProjectList({
   };
   return (
     <>
-      <ul role="list" className="-mt-4 divide-y divide-gray-800 space-y-4">
+      <ul role="list" className="-mt-4 space-y-4 divide-y divide-gray-800">
         {groupAndProjects.projects.map((project) => (
           <li
             key={project.name}
@@ -61,7 +61,7 @@ export default function DynamicProjectList({
                 <p
                   className={classNames(
                     statuses[project.status],
-                    "rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset",
+                    "mt-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset",
                   )}
                 >
                   {project.status}
@@ -109,7 +109,7 @@ export default function DynamicProjectList({
                           onClick={handleRemoveProject}
                           className={classNames(
                             active ? "bg-gray-700" : "",
-                            "block px-3 py-1 text-sm leading-6 text-red-500 w-full text-left",
+                            "block w-full px-3 py-1 text-left text-sm leading-6 text-red-500",
                           )}
                         >
                           Delete

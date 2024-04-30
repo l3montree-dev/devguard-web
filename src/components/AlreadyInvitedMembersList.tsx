@@ -42,7 +42,7 @@ export default function AlreadyInvitedMembersList({ members }: Props) {
                 </p>
               </div>
             </div>
-            <div className="flex-shrink-0 grid grid-cols-2 space-x-4">
+            <div className="grid flex-shrink-0 grid-cols-2 space-x-4">
               <p className="text-sm text-gray-300">Invitation sent</p>
               <CheckIcon className="h-5 w-5 text-green-500" />
             </div>

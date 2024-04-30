@@ -58,17 +58,17 @@ const Filter: FunctionComponent<Props> = ({ columnsDef }) => {
   );
 
   return (
-    <div className="flex gap-2 flex-row">
+    <div className="flex flex-row gap-2">
       {appliedFilters.map((f) => (
         <div
           key={f.field + f.operator + f.value}
-          className="flex dark:text-white text-sm font-semibold flex-row gap-2 items-center border dark:border-gray-500 shadow-sm rounded-lg p-2"
+          className="flex flex-row items-center gap-2 rounded-lg border p-2 text-sm font-semibold shadow-sm dark:border-gray-500 dark:text-white"
         >
           <span>
             {f.header} {f.operator} {f.value}
           </span>
           <button onClick={() => removeFilter(f)}>
-            <XMarkIcon className="w-4 h-4" />
+            <XMarkIcon className="h-4 w-4" />
           </button>
         </div>
       ))}
@@ -91,7 +91,7 @@ const Filter: FunctionComponent<Props> = ({ columnsDef }) => {
           style={{
             minWidth: "400px",
           }}
-          className="p-4 gap-4 flex flex-col"
+          className="flex flex-col gap-4 p-4"
         >
           <div className="flex flex-row gap-4">
             <div className="flex-1">

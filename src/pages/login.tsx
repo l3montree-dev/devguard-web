@@ -115,8 +115,8 @@ const Login: NextPage = () => {
         <title>FlawFix - Sign in</title>
         <meta name="description" content="FlawFix Sign in" />
       </Head>
-      <div className="flex min-h-screen flex-1 bg-white flex-row ">
-        <div className="w-3/5 relative bg-gray-500">
+      <div className="flex min-h-screen flex-1 flex-row bg-white ">
+        <div className="relative w-3/5 bg-gray-500">
           <Image
             src={"/bg.png"}
             alt="FlawFix by l3montree Logo"
@@ -124,11 +124,11 @@ const Login: NextPage = () => {
             fill
           />
         </div>
-        <div className="dark:bg-gray-950 dark:text-white text-gray-900 bg-white w-2/5 flex-col flex justify-center items-center">
+        <div className="flex w-2/5 flex-col items-center justify-center bg-white text-gray-900 dark:bg-gray-950 dark:text-white">
           <div className="w-full px-8">
             <div className="">
               <Image
-                className="h-20 w-auto hidden dark:block"
+                className="hidden h-20 w-auto dark:block"
                 src={"/logo_inverse_horizontal.svg"}
                 alt="FlawFix by l3montree Logo"
                 width={300}

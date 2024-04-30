@@ -21,7 +21,7 @@ const Severity = ({ severity }: { severity: string }) => {
     <div className="flex">
       <div
         className={classNames(
-          cls + " px-2 py-1 whitespace-nowrap font-semibold rounded-full",
+          cls + " whitespace-nowrap rounded-full px-2 py-1 font-semibold",
         )}
       >
         {severity}

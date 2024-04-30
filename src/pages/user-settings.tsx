@@ -282,12 +282,12 @@ const Settings: FunctionComponent<{
           <div className="mb-6 flex flex-col gap-2">
             {personalAccessTokens.map((pat) => (
               <div
-                className="rounded-md border dark:bg-gray-950 dark:border-gray-700 bg-white overflow-hidden p-4 text-sm"
+                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-700 dark:bg-gray-950"
                 key={pat.id}
               >
-                <div className="flex items-center flex-row justify-between">
+                <div className="flex flex-row items-center justify-between">
                   <div className="flex-1">
-                    <div className="mb-2 flex gap-2 flex-row">
+                    <div className="mb-2 flex flex-row gap-2">
                       <Input
                         variant="dark"
                         readOnly
@@ -312,7 +312,7 @@ const Settings: FunctionComponent<{
                       </Button>
                     </div>
                     {pat.token && (
-                      <span className="block text-red-500 mb-4">
+                      <span className="mb-4 block text-red-500">
                         Make sure to copy the token. You won&apos;t be able to
                         see it ever again
                       </span>
@@ -327,10 +327,10 @@ const Settings: FunctionComponent<{
             ))}
           </div>
           <form
-            className="border dark:border-gray-700 dark:bg-gray-950 bg-white rounded-md p-4 shadow-sm"
+            className="rounded-md border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-950"
             onSubmit={handleSubmit(handleCreatePat)}
           >
-            <span className="font-medium block pb-2">
+            <span className="block pb-2 font-medium">
               Create new Personal Access Token
             </span>
             <Input
@@ -338,7 +338,7 @@ const Settings: FunctionComponent<{
               {...register("description")}
               label="Description"
             />
-            <div className="mt-2 justify-end flex flex-row">
+            <div className="mt-2 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>
           </form>

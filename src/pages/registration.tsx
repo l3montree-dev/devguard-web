@@ -118,8 +118,8 @@ const Registration: NextPage = () => {
         <title>Create your FlawFix account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1  bg-white flex-row ">
-        <div className="w-3/5 relative bg-gray-500">
+      <div className="flex min-h-screen flex-1  flex-row bg-white ">
+        <div className="relative w-3/5 bg-gray-500">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"
@@ -127,18 +127,18 @@ const Registration: NextPage = () => {
             fill
           />
         </div>
-        <div className="bg-white dark:text-white text-black dark:bg-gray-950 w-2/5 flex-col flex justify-center items-center">
+        <div className="flex w-2/5 flex-col items-center justify-center bg-white text-black dark:bg-gray-950 dark:text-white">
           <div className="w-full px-8">
             <div>
               <Image
-                className="h-20 hidden dark:block w-auto"
+                className="hidden h-20 w-auto dark:block"
                 src="/logo_inverse_horizontal.svg"
                 alt="FlawFix by l3montree Logo"
                 width={300}
                 height={300}
               />
               <Image
-                className="h-20 dark:hidden w-auto"
+                className="h-20 w-auto dark:hidden"
                 src="/logo_horizontal.svg"
                 alt="FlawFix by l3montree Logo"
                 width={300}

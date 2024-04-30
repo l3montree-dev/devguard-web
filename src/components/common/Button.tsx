@@ -65,7 +65,7 @@ const Button: FunctionComponent<
         )}
       >
         {Boolean(Icon) && (
-          <span className="mr-2 w-6 h-6 flex justify-center items-center">
+          <span className="mr-2 flex h-6 w-6 items-center justify-center">
             {Icon}
           </span>
         )}
@@ -80,13 +80,13 @@ const Button: FunctionComponent<
         applyClsxConfig(cslxConfig, {
           variant: variant + "+" + intent,
         }),
-        rest.disabled ? "opacity-75 cursor-not-allowed" : "",
+        rest.disabled ? "cursor-not-allowed opacity-75" : "",
         className,
       )}
       {...rest}
     >
       {Boolean(Icon) && (
-        <span className="mr-2 w-4 h-4 flex justify-center items-center">
+        <span className="mr-2 flex h-4 w-4 items-center justify-center">
           {Icon}
         </span>
       )}

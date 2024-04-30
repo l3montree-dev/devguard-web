@@ -37,20 +37,20 @@ export const toast = (msg: ToastMsg) => {
 const getIcon = (type: ToastMsg["intent"]) => {
   switch (type) {
     case "info":
-      return <InformationCircleIcon className="w-6 h-6 text-blue-600" />;
+      return <InformationCircleIcon className="h-6 w-6 text-blue-600" />;
     case "success":
       return (
         <CheckCircleIcon
-          className="w-6 h-6 text-green-600"
+          className="h-6 w-6 text-green-600"
           aria-hidden="true"
         />
       );
     case "warning":
-      return <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600" />;
+      return <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600" />;
     case "error":
       return (
         <ExclamationCircleIcon
-          className="w-6 h-6 text-red-600"
+          className="h-6 w-6 text-red-600"
           aria-hidden="true"
         />
       );
@@ -75,8 +75,8 @@ const Msg = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-md bg-white dark:bg-gray-800 dark:text-white shadow-lg ring-1 ring-black ring-opacity-5">
-        <div className="flex flex-row p-4 items-start">
+      <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:text-white">
+        <div className="flex flex-row items-start p-4">
           <div className="flex-shrink-0">{getIcon(intent)}</div>
           <div className="ml-3  flex-1 pt-0.5">
             <p className="font-medium ">{title}</p>
@@ -85,7 +85,7 @@ const Msg = ({
           <div className="ml-4 flex flex-shrink-0">
             <button
               type="button"
-              className="inline-flex rounded-md dark:bg-gray-700 bg-white text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              className="inline-flex rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:bg-gray-700 dark:text-white"
               onClick={() => {
                 setShow(false);
                 setTimeout(onRemove, 1000);
@@ -118,7 +118,7 @@ const Toaster = () => {
     };
   }, []);
   return (
-    <div className="fixed flex flex-col gap-2 right-4 top-4 toaster">
+    <div className="toaster fixed right-4 top-4 flex flex-col gap-2">
       {msgs.map((msg, i) => (
         <Msg
           key={msg.id}

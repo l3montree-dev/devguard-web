@@ -26,10 +26,10 @@ interface Props {
 export default function SubnavSidebar({ links }: Props) {
   return (
     <Sidebar title="Navigation">
-      <ol role="list" className="flex flex-col gap-4 py-4 px-4">
+      <ol role="list" className="flex flex-col gap-4 px-4 py-4">
         {links.map((link) => (
           <Link className="hover:no-underline" key={link.href} href={link.href}>
-            <li className="text-sm transition-all px-2 rounded-md py-2 hover:no-underline dark:hover:bg-gray-800 hover:bg-gray-200 dark:text-white text-black">
+            <li className="rounded-md px-2 py-2 text-sm text-black transition-all hover:bg-gray-200 hover:no-underline dark:text-white dark:hover:bg-gray-800">
               {link.title}
             </li>
           </Link>

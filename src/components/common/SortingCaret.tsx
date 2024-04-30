@@ -10,9 +10,9 @@ const SortingCaret: FunctionComponent<Props> = ({ sortDirection }) => {
     case false:
       return null;
     case "asc":
-      return <ChevronUpIcon className="w-4 h-4 black" />;
+      return <ChevronUpIcon className="black h-4 w-4" />;
     case "desc":
-      return <ChevronUpIcon className="w-4 h-4 black transform rotate-180" />;
+      return <ChevronUpIcon className="black h-4 w-4 rotate-180 transform" />;
   }
 };
 

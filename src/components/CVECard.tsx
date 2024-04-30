@@ -33,32 +33,32 @@ const CVECard: FunctionComponent<Props> = ({ cve }) => {
     return null;
   }
   return (
-    <div className="w-full text-black text-sm p-4 relative rounded-lg">
-      <div className="absolute -top-10 right-4 flex items-center flex-row gap-2"></div>
+    <div className="relative w-full rounded-lg p-4 text-sm text-black">
+      <div className="absolute -top-10 right-4 flex flex-row items-center gap-2"></div>
       {cve && (
-        <div className="flex flex-row justify-center mb-4">
+        <div className="mb-4 flex flex-row justify-center">
           <CVEChart severity={cve.severity} baseScore={cve.cvss} />
         </div>
       )}
       <b>Description:</b>
       <P value={cve.description} />
 
-      <div className="flex flex-row justify-end mt-4">
+      <div className="mt-4 flex flex-row justify-end">
         <button
           onClick={() => setMoreDetails(!moreDetails)}
-          className="text-blue-600 gap-2 flex flex-row items-center whitespace-nowrap"
+          className="flex flex-row items-center gap-2 whitespace-nowrap text-blue-600"
         >
           {moreDetails ? "Less" : "More"} Details{" "}
           {moreDetails ? (
-            <ChevronUpIcon className="w-5 h-5" />
+            <ChevronUpIcon className="h-5 w-5" />
           ) : (
-            <ChevronDownIcon className="w-5 h-5" />
+            <ChevronDownIcon className="h-5 w-5" />
           )}
         </button>
       </div>
       <div className={classNames(!moreDetails ? "hidden" : "visible")}>
         <div>
-          <table className="border-separate border-spacing-2 -ml-2">
+          <table className="-ml-2 border-separate border-spacing-2">
             <tbody>
               <tr>
                 <td>

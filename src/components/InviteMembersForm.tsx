@@ -63,7 +63,7 @@ export default function InviteMembersForm({ inviteMembers }: Props) {
             of this project, you can manage team member permissions.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="mt-6 items-end gap-2 flex">
+        <form onSubmit={handleSubmit} className="mt-6 flex items-end gap-2">
           <label htmlFor="email" className="sr-only">
             Email address
           </label>

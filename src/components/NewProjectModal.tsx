@@ -81,7 +81,7 @@ export default function NewProjectModal({
                   </Dialog.Title>
                   <form className="mt-8" onSubmit={handleSubmit}>
                     <div className="space-y-12">
-                      <div className="grid gap-x-6 grid-cols-1 gap-y-8 sm:grid-cols-6">
+                      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                         <div className="sm:col-span-4">
                           <label
                             htmlFor="projectName"
@@ -125,7 +125,7 @@ export default function NewProjectModal({
                                 type="radio"
                                 defaultChecked={env.id === "prod"}
                                 value={env.id}
-                                className="h-4 w-4 bg-gray-400 border-gray-200 text-blue-600 focus:ring-blue-600"
+                                className="h-4 w-4 border-gray-200 bg-gray-400 text-blue-600 focus:ring-blue-600"
                               />
                               <label
                                 htmlFor={env.id}
