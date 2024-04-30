@@ -245,15 +245,15 @@ const Index: FunctionComponent<Props> = (props) => {
       Title={
         <span className="flex flex-row gap-2">
           <Link
-            href={`/${activeOrg?.slug}`}
-            className="hover:no-underline text-white"
+            href={`/${activeOrg.slug}`}
+            className="text-white hover:no-underline"
           >
-            {activeOrg?.name}
+            {activeOrg.name}
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="hover:no-underline text-white"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+            className="text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project?.slug}`}
           >
             {project?.name}
           </Link>
@@ -276,7 +276,7 @@ const Index: FunctionComponent<Props> = (props) => {
         >
           {table.getAllLeafColumns().map((column) => {
             return (
-              <div className="p-2 whitespace-nowrap" key={column.id}>
+              <div className="whitespace-nowrap p-2" key={column.id}>
                 <Checkbox
                   checked={column.getIsVisible()}
                   onChange={column.getToggleVisibilityHandler()}
@@ -292,14 +292,14 @@ const Index: FunctionComponent<Props> = (props) => {
           )}
         />
       </div>
-      <div className="border dark:border-gray-700 shadow-sm rounded-lg overflow-hidden">
+      <div className="overflow-hidden rounded-lg border shadow-sm dark:border-gray-700">
         <table className="w-full text-sm">
-          <thead className="border-b dark:border-gray-700 dark:bg-gray-950 dark:text-white bg-gray-50">
+          <thead className="border-b bg-gray-50 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
-                    className="text-left cursor-pointer p-4 break-normal"
+                    className="cursor-pointer break-normal p-4 text-left"
                     onClick={
                       header.column.columnDef.enableSorting
                         ? header.column.getToggleSortingHandler()
@@ -324,14 +324,14 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody className="text-sm dark:bg-gray-900 dark:text-white bg-white">
+          <tbody className="bg-white text-sm dark:bg-gray-900 dark:text-white">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
                   router.push(router.asPath + "/flaws/" + row.original.id);
                 }}
                 className={classNames(
-                  "align-top relative cursor-pointer transition-all",
+                  "relative cursor-pointer align-top transition-all",
                   i === arr.length - 1 ? "" : "border-b dark:border-b-gray-700",
                   "hover:bg-gray-50 dark:hover:bg-gray-800",
                 )}

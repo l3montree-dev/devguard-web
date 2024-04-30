@@ -32,7 +32,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
-  const activeOrg = useActiveOrg()!;
+  const activeOrg = useActiveOrg();
   const { register, getFieldState, formState, handleSubmit } =
     useForm<CreateAssetReq>();
 
@@ -73,13 +73,13 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           <span className="flex flex-row gap-2">
             <Link
               href={`/${activeOrg.slug}`}
-              className="hover:no-underline text-white"
+              className="text-white hover:no-underline"
             >
               {activeOrg.name}
             </Link>
             <span className="opacity-75">/</span>
             <Link
-              className="hover:no-underline text-white"
+              className="text-white hover:no-underline"
               href={`/${activeOrg.slug}/projects/${project.slug}`}
             >
               {project.name}

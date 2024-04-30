@@ -50,7 +50,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
   const handleCreateProject = async (req: CreateProjectReq) => {
     const resp = await browserApiClient(
-      "/organizations/" + activeOrg?.slug + "/projects",
+      "/organizations/" + activeOrg.slug + "/projects",
       {
         method: "POST",
         body: JSON.stringify(req),
@@ -58,7 +58,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
     );
     if (resp.ok) {
       const res: ProjectDTO = await resp.json();
-      router.push(`/${activeOrg?.slug}/projects/${res.slug}`);
+      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
     } else {
       toast({
         title: "Error",
@@ -75,7 +75,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           New Project
         </Button>
       }
-      title={activeOrg?.name ?? "Loading..."}
+      title={activeOrg.name ?? "Loading..."}
     >
       <Modal title="Create new Project" open={open} setOpen={setOpen}>
         <form onSubmit={handleSubmit(handleCreateProject)}>
@@ -92,7 +92,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
               {...register("description")}
             />
           </div>
-          <div className="flex flex-row justify-end mt-4">
+          <div className="mt-4 flex flex-row justify-end">
             <Button disabled={hasErrors(formState.errors)} type="submit">
               Create
             </Button>

@@ -55,20 +55,20 @@ const DependencyGraphPage: FunctionComponent<{
         <span className="flex flex-row gap-2">
           <Link
             href={`/${activeOrg?.slug}`}
-            className="hover:no-underline text-white"
+            className="text-white hover:no-underline"
           >
             {activeOrg?.name}
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="hover:no-underline text-white"
+            className="text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}`}
           >
             {project?.name}
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="hover:no-underline text-white"
+            className="text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
           >
             {asset?.name}
@@ -79,7 +79,7 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="px-5 py-3 dark:bg-gray-900 bg-white flex-row flex justify-end border-b dark:border-b-gray-800 dark:text-white">
+      <div className="flex flex-row justify-end border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
         <FormField
           className="flex flex-row gap-2"
           label="Only show affected packages"
