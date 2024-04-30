@@ -113,7 +113,16 @@ export const getServerSideProps: GetServerSideProps = middleware(
       },
     );
 
-    if (orgProduct.status !== 403) {
+    if (orgProduct.ok) {
+      const orgProductData = await orgProduct.json();
+      const orgProductID = orgProductData?.productID;
+      return {
+        props: {
+          productsData,
+          orgProductID,
+        },
+      };
+    } else {
       // the user is not allowed to see the billing page -
       // redirect the user to the organization overview
       return {
@@ -123,20 +132,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
         },
       };
     }
-
-    let orgProductData = null;
-    let orgProductID = null;
-    if (orgProduct.ok) {
-      orgProductData = await orgProduct.json();
-      orgProductID = orgProductData?.productID;
-    }
-
-    return {
-      props: {
-        productsData,
-        orgProductID,
-      },
-    };
   },
   {
     session: withSession,
