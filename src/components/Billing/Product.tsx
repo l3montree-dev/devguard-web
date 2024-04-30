@@ -14,10 +14,10 @@ function Product({
     <div
       key={product.id}
       className={classNames(
-        " dark:text-white rounded-3xl bg-white p-8 dark:bg-gray-900",
+        " dark:text-white rounded-3xl bg-white p-8 shadow-sm dark:bg-gray-900",
         product.name === "Gold"
           ? "ring-2 ring-yellow-400"
-          : "ring-1 ring-gray-300 dark:ring-gray-600",
+          : "ring-1 ring-gray-200 dark:ring-gray-600",
       )}
     >
       <h3
