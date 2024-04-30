@@ -93,7 +93,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
       },
     );
 
-    if (orgProduct.status !== 403) {
+    if (orgProduct.status === 403) {
       // the user is not allowed to see the billing page -
       // redirect the user to the organization overview
       return {
