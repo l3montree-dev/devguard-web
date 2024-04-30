@@ -44,6 +44,7 @@
         "zustand": "^4.4.6"
     },
     "devDependencies": {
+        "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.0.1",
         "prettier": "^3.2.5",
         "prettier-plugin-tailwindcss": "^0.5.13",
