@@ -3,7 +3,6 @@ import Button from "@/components/common/Button";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { classNames } from "@/utils/common";
 
-
 function Product({
   product,
   onButtonClick,

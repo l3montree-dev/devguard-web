@@ -25,14 +25,11 @@ export default function Billing({
   const orgName = activeOrg.name;
   const orgID = activeOrg.id;
 
-
   const orgProduct = productsData.find(
     (product) => product.id === orgProductID,
   );
 
-
   const orgProductName = orgProduct ? orgProduct.name : "Free";
-  
 
   const productsDataSorted = useMemo(
     () => productsData.sort((a, b) => a.price - b.price),
@@ -47,7 +44,10 @@ export default function Billing({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ lookupKey: selectedPlan, orgID: activeOrg.id }),
+        body: JSON.stringify({
+          lookupKey: selectedPlan,
+          orgSlug: activeOrg.name.toLowerCase(),
+        }),
       },
       "",
     );
@@ -62,19 +62,17 @@ export default function Billing({
         <div>
           <h1>Organization not found</h1>
         </div>
+      ) : orgProductID === null ? (
+        <Products
+          productsDataWithFreeSorted={productsDataSorted}
+          onButtonClick={handleClick}
+        />
       ) : (
-        orgProductID === null ? (
-          <Products
-            productsDataWithFreeSorted={productsDataSorted}
-            onButtonClick={handleClick}
-          />
-        ) : (
-          <ProductManagement
-            orgName={orgName}
-            orgProductName={orgProductName}
-            orgID={orgID}
-          />
-        )
+        <ProductManagement
+          orgName={orgName}
+          orgProductName={orgProductName}
+          orgID={orgID}
+        />
       )}
     </Page>
   );
