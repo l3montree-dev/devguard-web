@@ -1,21 +1,23 @@
 import Page from "@/components/Page";
-import RiskAssessment from "@/components/RiskAssessment";
 import Sidebar from "@/components/Sidebar";
 
 import FlawState from "@/components/common/FlawState";
 import Severity from "@/components/common/Severity";
-import { withInitialState } from "@/decorators/withInitialState";
+import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
+import { withOrg } from "@/decorators/withOrg";
+import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/flawFixApi";
 import { FlawWithCVE } from "@/types/api/api";
-import { GetServerSidePropsContext } from "next";
-import dynamic from "next/dynamic";
-import { FunctionComponent, useState } from "react";
-import Markdown from "react-markdown";
-import Image from "next/image";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import { GetServerSidePropsContext } from "next";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { FunctionComponent, useState } from "react";
+import Markdown from "react-markdown";
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
 });
@@ -67,7 +69,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
           </div>
 
           <div className="mt-4 overflow-hidden rounded-lg border ">
-            <div className="flex flex-row justify-between border-b bg-slate-50 p-4 font-semibold">
+            <div className="flex flex-row justify-between border-b bg-gray-50 p-4 font-semibold">
               Risk Assessment
               <button
                 onClick={() => setShowRiskAssessment((prev) => !prev)}
@@ -93,8 +95,8 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
   );
 };
 
-export const getServerSideProps = withSession(
-  withInitialState(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
     // fetch the project
     const { organizationSlug, projectSlug, applicationSlug, envSlug, flawId } =
       context.params!;
@@ -119,7 +121,13 @@ export const getServerSideProps = withSession(
         flaw: resp,
       },
     };
-  }),
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+    asset: withAsset,
+    project: withProject,
+  },
 );
 
 export default Index;

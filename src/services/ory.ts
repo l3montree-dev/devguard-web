@@ -13,16 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Configuration, FrontendApi, Session } from "@ory/client";
+import { Configuration, FrontendApi } from "@ory/client";
 import { edgeConfig } from "@ory/integrations/next";
-import { isAxiosError } from "axios";
-import { GetServerSidePropsContext } from "next";
 import { NextRouter } from "next/router";
 import { Dispatch, SetStateAction } from "react";
-import { config } from "../config";
-import { User } from "../types/auth";
-import { OrganizationDTO } from "../types/api/api";
-import { getApiClientFromContext } from "./flawFixApi";
 
 export const ory = new FrontendApi(new Configuration(edgeConfig));
 

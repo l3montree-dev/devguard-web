@@ -62,7 +62,7 @@ const Filter: FunctionComponent<Props> = ({ columnsDef }) => {
       {appliedFilters.map((f) => (
         <div
           key={f.field + f.operator + f.value}
-          className="flex text-sm font-semibold flex-row gap-2 items-center border shadow-sm rounded-lg p-2"
+          className="flex dark:text-white text-sm font-semibold flex-row gap-2 items-center border dark:border-gray-500 shadow-sm rounded-lg p-2"
         >
           <span>
             {f.header} {f.operator} {f.value}

@@ -124,6 +124,11 @@ export interface CVE {
   severity: string;
   userInteractionRequired: string;
   epss: number;
+
+  cisaExploitAdd?: string;
+  cisaActionDue?: string;
+  cisaRequiredAction?: string;
+  cisaVulnerabilityName?: string;
 }
 export interface FlawWithCVE extends FlawDTO {
   cve: Modify<
@@ -135,6 +140,9 @@ export interface FlawWithCVE extends FlawDTO {
   arbitraryJsonData: {
     packageName?: string;
   };
+  component: {
+    purlOrCpe: string;
+  };
 }
 
 export interface AssetDTO {
@@ -142,4 +150,18 @@ export interface AssetDTO {
   description: string;
   slug: string;
   id: string;
+}
+
+export interface DependencyTreeNode {
+  name: string;
+  children: DependencyTreeNode[];
+}
+
+export interface AffectedPackage {
+  CVE: CVE;
+  CVEID: string;
+  FixedVersion: string;
+  IntroducedVersion: string;
+  PackageName: string;
+  PurlWithVersion: string;
 }

@@ -28,7 +28,7 @@ interface Props {
 export default function MobileNav({ navigation }: Props) {
   const pathname = useRouter().pathname;
   return (
-    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-900 px-6 ring-1 ring-white/10">
+    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 ring-1 ring-white/10">
       <div className="flex h-24 shrink-0 items-center">
         <Image
           className="mt-6 h-10 w-auto"
@@ -48,8 +48,8 @@ export default function MobileNav({ navigation }: Props) {
                     href={item.href}
                     className={classNames(
                       item.href === pathname
-                        ? "bg-slate-800 text-white"
-                        : "text-blue-100 hover:bg-slate-800 hover:text-white",
+                        ? "bg-gray-800 text-white"
+                        : "text-blue-100 hover:bg-gray-800 hover:text-white",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6",
                     )}
                   >
@@ -66,10 +66,10 @@ export default function MobileNav({ navigation }: Props) {
           <li className="-mx-6 mt-auto">
             <a
               href="#"
-              className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-slate-800"
+              className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
             >
               <Image
-                className="h-8 w-8 rounded-full bg-slate-800"
+                className="h-8 w-8 rounded-full bg-gray-800"
                 src="/examples/tim.jpg"
                 alt=""
                 width={32}

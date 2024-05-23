@@ -27,7 +27,6 @@ interface Props {}
 
 export default function Sidenav() {
   const router = useRouter();
-  const currentPath = router.asPath;
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
@@ -48,12 +47,12 @@ export default function Sidenav() {
 
   return (
     <div className="flex grow flex-row">
-      <div className="flex w-16 flex-col justify-between border-r border-r-gray-200 bg-white p-2 pb-2 pt-4 dark:border-r-slate-700 dark:bg-slate-950">
+      <div className="flex w-16 flex-col justify-between border-r border-r-gray-200 bg-white p-2 pb-2 pt-4 dark:border-r-gray-700 dark:bg-gray-950">
         <div>
           <div className="flex flex-row justify-center">
             <PopupMenu
               Button={
-                <div className="relative z-30 m-1 flex aspect-square h-9 w-9 flex-col items-center justify-center rounded-lg bg-black font-display text-2xl font-semibold text-white dark:bg-slate-700">
+                <div className="relative z-30 m-1 flex aspect-square h-9 w-9 flex-col items-center justify-center rounded-lg bg-black font-display text-2xl font-semibold text-white dark:bg-gray-700">
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
                 </div>
               }
@@ -89,7 +88,7 @@ export default function Sidenav() {
           {user && (
             <Link href="/user-settings">
               <Image
-                className="rounded-lg bg-slate-800"
+                className="rounded-lg bg-gray-800"
                 src="/examples/tim.jpg"
                 alt=""
                 width={40}

@@ -9,6 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@dagrejs/dagre": "^1.1.1",
         "@headlessui/react": "^1.7.17",
         "@heroicons/react": "^2.0.18",
         "@mdxeditor/editor": "^1.14.3",
@@ -27,15 +28,18 @@
         "eslint": "8.53.0",
         "eslint-config-next": "14.0.3",
         "focus-visible": "^5.2.0",
+        "lodash": "^4.17.21",
         "next": "14.0.3",
         "postcss": "8.4.31",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-hook-form": "^7.48.2",
         "react-markdown": "^9.0.1",
+        "reactflow": "^11.11.0",
         "sass": "^1.69.5",
         "sharp": "^0.33.2",
         "tailwindcss": "3.3.5",
+        "tinycolor2": "^1.6.0",
         "typescript": "5.2.2",
         "zustand": "^4.4.6"
     },
@@ -43,6 +47,8 @@
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.0.1",
         "prettier": "^3.2.5",
-        "prettier-plugin-tailwindcss": "^0.5.13"
+        "prettier-plugin-tailwindcss": "^0.5.13",
+        "@types/lodash": "^4.17.0",
+        "@types/tinycolor2": "^1.4.6"
     }
 }
