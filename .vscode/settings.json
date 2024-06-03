@@ -2,6 +2,6 @@
     "licenser.license": "AGPLv3",
     "sarif-viewer.connectToGithubCodeScanning": "off",
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
 }
