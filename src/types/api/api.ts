@@ -68,7 +68,6 @@ export interface FlawDTO {
   message: string | null;
   ruleId: string;
   level: string | null;
-  events: FlawEventDTO[] | null;
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -79,7 +78,8 @@ export interface FlawDTO {
     | "fixed"
     | "accepted"
     | "falsePositive"
-    | "markedForMitigation";
+    | "markedForMitigation"
+    | "markedForTransfer";
 
   priority: number | null; // will be null, if not prioritized yet.
 }
@@ -92,11 +92,18 @@ export interface Paged<T> {
 }
 
 export interface FlawEventDTO {
-  type: "fixed" | "detected";
+  type:
+    | "fixed"
+    | "detected"
+    | "accepted"
+    | "falsePositive"
+    | "markedForMitigation"
+    | "markedForTransfer";
   userId: string;
   createdAt: string;
   id: string;
   flawId: string;
+  justification: string;
 }
 
 export interface CWE {
@@ -143,6 +150,10 @@ export interface FlawWithCVE extends FlawDTO {
   component: {
     purlOrCpe: string;
   };
+}
+
+export interface DetailedFlawDTO extends FlawWithCVE {
+  events: FlawEventDTO[];
 }
 
 export interface AssetDTO {
