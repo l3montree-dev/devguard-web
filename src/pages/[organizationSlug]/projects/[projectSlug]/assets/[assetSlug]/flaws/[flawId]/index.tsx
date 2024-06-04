@@ -24,8 +24,8 @@ import Image from "next/image";
 import { FormEvent, FunctionComponent, useState } from "react";
 import Markdown from "react-markdown";
 import { useRouter } from "next/router";
-import RiskAssessment from "@/components/RiskAssessment";
-import RiskAssessmentFeed from "@/components/RiskAssessmentFeed";
+import RiskAssessment from "@/components/RiskAssessment/RiskAssessment";
+import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
 });
@@ -36,12 +36,8 @@ interface Props {
 
 const Index: FunctionComponent<Props> = ({ flaw }) => {
   const router = useRouter();
-
-  // console.log(r);
-
-  //console.log("Hier", flaw);
   const cve = flaw.cve;
-  const [showRiskAssessment, setShowRiskAssessment] = useState(false);
+  const [showRiskAssessment, setShowRiskAssessment] = useState(true);
 
   //status state
   const [status, setStatus] = useState("");
@@ -56,7 +52,12 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
   };
 
   const events = flaw.events;
-  //console.log("Events", events);
+  const sortedEvents = events.sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateA - dateB;
+  });
+
   const handleSubmit = (ev: FormEvent) => {
     ev.preventDefault();
 
@@ -78,7 +79,6 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
       },
       "",
     );
-    //console.log(status, message);
     window.location.href = router.asPath;
   };
 
@@ -119,8 +119,8 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
             <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-lg border ">
-            <div className="flex flex-row justify-between border-b bg-gray-50 p-4 font-semibold">
+          <div className="mt-4 overflow-hidden rounded-lg border  bg-gray-50 ">
+            <div className="flex flex-row justify-between border-b p-4 font-semibold">
               Risk Assessment
               <button
                 onClick={() => setShowRiskAssessment((prev) => !prev)}
@@ -133,36 +133,47 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
                 )}
               </button>
             </div>
+            {showRiskAssessment && sortedEvents && (
+              <RiskAssessmentFeed
+                events={sortedEvents}
+                eventIdx={sortedEvents.length}
+              />
+            )}
             <div className=" bg-white">
               <div>
-                {events && <RiskAssessmentFeed events={events} eventIdx={0} />}
-
                 <div>
-                  <form onSubmit={handleSubmit}>
-                    <Select
-                      label={""}
-                      value={status}
-                      onChange={handleStatusChange}
-                    >
-                      <option value="" disabled selected hidden>
-                        Choose status
-                      </option>
-                      <option value="accepted">Accepted</option>
-                      <option value="markedForMitigation">
-                        Marked for Mitigation
-                      </option>
-                      <option value="falsePositive">False Positive</option>
-                      <option value="markedForTransfer">
-                        Marked for Transfer
-                      </option>
-                    </Select>
-                    <input
-                      type="text"
-                      placeholder="Justification Message"
-                      value={message}
-                      onChange={handleMessageChange}
-                    />
-                    <Button>Submit</Button>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col items-center"
+                  >
+                    <div className="mb-4 flex w-full space-x-4 p-2">
+                      <Select
+                        label=""
+                        value={status}
+                        onChange={handleStatusChange}
+                        className="w-1/3 rounded border p-2"
+                      >
+                        <option value="" disabled hidden>
+                          Choose status
+                        </option>
+                        <option value="accepted">Accepted</option>
+                        <option value="markedForMitigation">
+                          Marked for Mitigation
+                        </option>
+                        <option value="falsePositive">False Positive</option>
+                        <option value="markedForTransfer">
+                          Marked for Transfer
+                        </option>
+                      </Select>
+                      <input
+                        type="text"
+                        placeholder="Justification Message"
+                        value={message}
+                        onChange={handleMessageChange}
+                        className="w-3/4 rounded border p-2"
+                      />
+                    </div>
+                    <Button className="mb-2 mt-4">Submit</Button>
                   </form>
                 </div>
               </div>
