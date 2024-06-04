@@ -241,24 +241,31 @@ const Index: FunctionComponent<Props> = (props) => {
   return (
     <Page
       Menu={assetMenu}
-      title={props.asset.name}
+      title={"Risk Handling"}
       Title={
         <span className="flex flex-row gap-2">
           <Link
-            href={`/${activeOrg.slug}`}
+            href={`/${activeOrg?.slug}`}
             className="text-white hover:no-underline"
           >
-            {activeOrg.name}
+            {activeOrg?.name}
           </Link>
           <span className="opacity-75">/</span>
           <Link
             className="text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}`}
+            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
           >
             {project?.name}
           </Link>
           <span className="opacity-75">/</span>
-          {props.asset.name}
+          <Link
+            className="text-white hover:no-underline"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
+          >
+            {asset?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <span>Risk Handling</span>
         </span>
       }
     >
