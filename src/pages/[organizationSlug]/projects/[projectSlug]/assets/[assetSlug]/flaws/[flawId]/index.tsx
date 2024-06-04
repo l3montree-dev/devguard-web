@@ -24,6 +24,8 @@ import Image from "next/image";
 import { FormEvent, FunctionComponent, useState } from "react";
 import Markdown from "react-markdown";
 import { useRouter } from "next/router";
+import RiskAssessment from "@/components/RiskAssessment";
+import RiskAssessmentFeed from "@/components/RiskAssessmentFeed";
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
 });
@@ -34,9 +36,8 @@ interface Props {
 
 const Index: FunctionComponent<Props> = ({ flaw }) => {
   const router = useRouter();
-  const r = router.asPath + "/events/";
 
-  console.log(r);
+  // console.log(r);
 
   //console.log("Hier", flaw);
   const cve = flaw.cve;
@@ -55,7 +56,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
   };
 
   const events = flaw.events;
-  console.log("Events", events);
+  //console.log("Events", events);
   const handleSubmit = (ev: FormEvent) => {
     ev.preventDefault();
 
@@ -77,7 +78,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
       },
       "",
     );
-
+    //console.log(status, message);
     window.location.href = router.asPath;
   };
 
@@ -134,15 +135,7 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
             </div>
             <div className=" bg-white">
               <div>
-                {events &&
-                  events.map((event) => (
-                    <div key={event.id}>
-                      <div>event type: {event.type}</div>
-                      <div>createdAt: {event.createdAt}</div>
-                      <div> message : {event.justification}</div>
-                      <div> userId : {event.userId}</div>
-                    </div>
-                  ))}
+                {events && <RiskAssessmentFeed events={events} eventIdx={0} />}
 
                 <div>
                   <form onSubmit={handleSubmit}>
@@ -151,10 +144,17 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
                       value={status}
                       onChange={handleStatusChange}
                     >
-                      <option>accepted</option>
-                      <option>markedForMitigation</option>
-                      <option>falsePositive</option>
-                      <option>markedForTransfer</option>
+                      <option value="" disabled selected hidden>
+                        Choose status
+                      </option>
+                      <option value="accepted">Accepted</option>
+                      <option value="markedForMitigation">
+                        Marked for Mitigation
+                      </option>
+                      <option value="falsePositive">False Positive</option>
+                      <option value="markedForTransfer">
+                        Marked for Transfer
+                      </option>
                     </Select>
                     <input
                       type="text"
