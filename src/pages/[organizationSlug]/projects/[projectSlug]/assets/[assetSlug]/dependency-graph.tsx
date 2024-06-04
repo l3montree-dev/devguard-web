@@ -45,7 +45,7 @@ const DependencyGraphPage: FunctionComponent<{
   const dimensions = useDimensions();
 
   const router = useRouter();
-  const onlyRisk = router.query.onlyRisk === "1";
+  const all = router.query.all === "1";
   const menu = useAssetMenu();
   return (
     <Page
@@ -82,17 +82,21 @@ const DependencyGraphPage: FunctionComponent<{
       <div className="flex flex-row justify-end border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
         <FormField
           className="flex flex-row gap-2"
-          label="Only show affected packages"
+          label="Show all packages"
           Element={() => (
             <Toggle
-              checked={onlyRisk}
+              checked={all}
               onChange={(onlyRisk) => {
-                router.push({
-                  query: {
-                    ...router.query,
-                    onlyRisk: onlyRisk ? "1" : undefined,
+                router.push(
+                  {
+                    query: {
+                      ...router.query,
+                      all: all ? undefined : "1",
+                    },
                   },
-                });
+                  undefined,
+                  { scroll: false },
+                );
               }}
             />
           )}
@@ -217,7 +221,7 @@ export const getServerSideProps = middleware(
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
 
-    if (context.query.onlyRisk === "1") {
+    if (context.query.all !== "1") {
       recursiveRemoveWithoutRisk(converted);
     }
 

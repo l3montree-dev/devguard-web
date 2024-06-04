@@ -15,6 +15,7 @@
 import { classNames } from "@/utils/common";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { FunctionComponent } from "react";
 
 interface Props {
@@ -37,6 +38,7 @@ const Main: FunctionComponent<Props> = ({
   Menu,
   fullscreen,
 }) => {
+  const router = useRouter();
   return (
     <main>
       <header
@@ -62,10 +64,15 @@ const Main: FunctionComponent<Props> = ({
             <div className="mt-2 flex flex-row gap-6 text-sm">
               {Menu.map((item) => (
                 <Link
-                  className="cursor:pointer hover:no-underline"
+                  className={classNames(
+                    "cursor:pointer relative hover:no-underline",
+                  )}
                   key={item.title}
                   href={item.href}
                 >
+                  {router.asPath === item.href && (
+                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
+                  )}
                   <div className="mt-4 flex flex-row items-center gap-1">
                     <item.Icon className="h-5 w-5 text-gray-400" />
                     <span className="text-white ">{item.title}</span>
