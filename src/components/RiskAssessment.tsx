@@ -57,10 +57,10 @@ const RiskAssessment: FunctionComponent<Props> = ({
   return (
     <div>
       <div className="risk-assessment gap-2">
-        <div className="row-span-4 relative flex flex-col items-center justify-end">
+        <div className="relative row-span-4 flex flex-col items-center justify-end">
           <div className="rotated-text font-semibold">Extent of damage</div>
-          <div className="absolute right-0 h-full flex flex-col items-center bg-black w-0.5">
-            <ChevronUpIcon className="w-6 h-6 absolute -top-2" />
+          <div className="absolute right-0 flex h-full w-0.5 flex-col items-center bg-black">
+            <ChevronUpIcon className="absolute -top-2 h-6 w-6" />
           </div>
         </div>
         {risks.flat(1).map((el, idx) => {
@@ -70,7 +70,7 @@ const RiskAssessment: FunctionComponent<Props> = ({
                 key={idx}
                 onClick={() => handleIndexClick(idx)}
                 className={classNames(
-                  `rounded-lg border cursor-pointer hover:ring ring-blue-400 flex flex-row justify-center items-center`,
+                  `flex cursor-pointer flex-row items-center justify-center rounded-lg border ring-blue-400 hover:ring`,
                   getRawRepresentation(idx) === selected
                     ? "ring-2 ring-blue-400"
                     : "",
@@ -85,24 +85,24 @@ const RiskAssessment: FunctionComponent<Props> = ({
             <span
               key={idx}
               style={{ height: 100 }}
-              className="rotated-text text-sm justify-center items-center flex flex-col"
+              className="rotated-text flex flex-col items-center justify-center text-sm"
             >
               {el}
             </span>
           );
         })}
-        <div className="col-start-3 text-sm text-center">rare</div>
-        <div className="text-sm text-center">medium</div>
-        <div className="text-sm text-center">frequently</div>
-        <div className="text-sm text-center">very frequently</div>
-        <div className="col-span-4 pt-2 col-start-3 font-semibold relative">
+        <div className="col-start-3 text-center text-sm">rare</div>
+        <div className="text-center text-sm">medium</div>
+        <div className="text-center text-sm">frequently</div>
+        <div className="text-center text-sm">very frequently</div>
+        <div className="relative col-span-4 col-start-3 pt-2 font-semibold">
           Frequency of occurrence
-          <div className="absolute top-0 h-0.5 flex flex-row items-center justify-end bg-black w-full">
-            <ChevronRightIcon className="w-6 h-6 relative left-2" />
+          <div className="absolute top-0 flex h-0.5 w-full flex-row items-center justify-end bg-black">
+            <ChevronRightIcon className="relative left-2 h-6 w-6" />
           </div>
         </div>
       </div>
-      <div className="flex flex-row justify-end mt-10">
+      <div className="mt-10 flex flex-row justify-end">
         <div>
           <Select label="Mitigation Type">
             <option>Select mitigation type</option>
@@ -113,7 +113,7 @@ const RiskAssessment: FunctionComponent<Props> = ({
           </Select>
         </div>
       </div>
-      <div className="mt-10 mb-4">
+      <div className="mb-4 mt-10">
         <span className="font-semibold">Justification</span>
       </div>
       <MarkdownEditor

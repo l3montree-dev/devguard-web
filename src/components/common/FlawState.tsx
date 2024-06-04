@@ -20,10 +20,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-green-200 border-green-400 text-green-900 dark:bg-green-400/10 dark:text-green-500",
+            "border-green-400 bg-green-200 text-green-900 dark:bg-green-400/10 dark:text-green-500",
           )}
         >
-          <CheckCircleIcon className="w-4 h-4 inline-block" />
+          <CheckCircleIcon className="inline-block h-4 w-4" />
           Fixed
         </div>
       );
@@ -33,10 +33,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-gray-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
+            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
           )}
         >
-          <SpeakerXMarkIcon className="w-4 h-4 inline-block" />
+          <SpeakerXMarkIcon className="inline-block h-4 w-4" />
           Ignored
         </div>
       );
@@ -46,10 +46,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-gray-200 text-gray-800 dark:text-gray-400 dark:bg-gray-500/10 dark:border-gray-500 border-gray-400",
+            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
           )}
         >
-          <StopIcon className="w-4 h-4 inline-block" />
+          <StopIcon className="inline-block h-4 w-4" />
           False Positive
         </div>
       );
@@ -59,10 +59,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-purple-200 border-purple-300 dark:text-purple-500 dark:bg-purple-500/10 dark:border-purple-500 text-purple-800",
+            "border-purple-300 bg-purple-200 text-purple-800 dark:border-purple-500 dark:bg-purple-500/10 dark:text-purple-500",
           )}
         >
-          <ClockIcon className="w-4 h-4 inline-block" />
+          <ClockIcon className="inline-block h-4 w-4" />
           Marked for Mitigation
         </div>
       );
@@ -72,10 +72,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "bg-red-200 dark:border-red-500 border-red-300 dark:text-red-500 text-red-800 dark:bg-red-500/10",
+            "border-red-300 bg-red-200 text-red-800 dark:border-red-500 dark:bg-red-500/10 dark:text-red-500",
           )}
         >
-          <BugAntIcon className="w-4 h-4 inline-block" />
+          <BugAntIcon className="inline-block h-4 w-4" />
           Open
         </div>
       );
