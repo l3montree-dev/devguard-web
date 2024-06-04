@@ -15,7 +15,7 @@
 
 import { useOrg } from "@/hooks/useOrg";
 import { UserGroupIcon } from "@heroicons/react/20/solid";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -86,13 +86,14 @@ export default function Sidenav() {
         </div>
         <div className="flex flex-row justify-center">
           {user && (
-            <Link href="/user-settings">
-              <Image
-                className="rounded-lg bg-gray-800"
-                src="/examples/tim.jpg"
-                alt=""
-                width={40}
-                height={40}
+            <Link
+              className="rounded-lg bg-gray-200 p-1.5 text-black dark:bg-slate-700"
+              href="/user-settings"
+            >
+              <UserIcon
+                className="text-gray-600 dark:text-slate-400"
+                width={25}
+                height={25}
               />
             </Link>
           )}
