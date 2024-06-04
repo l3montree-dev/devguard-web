@@ -41,6 +41,7 @@ import { PersonalAccessTokenDTO } from "../types/api/api";
 import { createPat } from "../services/patService";
 import DateString from "@/components/common/DateString";
 import { middleware } from "@/decorators/middleware";
+import { UserIcon } from "@heroicons/react/24/solid";
 
 interface Props {
   flow?: SettingsFlow;
@@ -230,15 +231,11 @@ const Settings: FunctionComponent<{
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-full flex items-center gap-x-8">
-              <Image
-                src="/examples/tim.jpg"
-                alt=""
-                width={96}
-                height={96}
-                className="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover"
-              />
+              <div className="rounded-lg bg-gray-300 p-2 dark:bg-slate-700 dark:text-slate-400">
+                <UserIcon width={60} height={60} />
+              </div>
               <div>
-                <Button>Change avatar</Button>
+                <Button disabled>Change avatar</Button>
                 <p className="mt-2 text-xs leading-5 text-black/80">
                   JPG, GIF or PNG. 1MB max.
                 </p>
