@@ -75,7 +75,7 @@ const Msg = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="pointer-events-auto  w-full max-w-sm overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:text-white">
+      <div className="pointer-events-auto  w-full max-w-sm overflow-hidden rounded-md bg-white text-black shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:text-white">
         <div className="flex flex-row items-start p-4">
           <div className="flex-shrink-0">{getIcon(intent)}</div>
           <div className="ml-3  flex-1 pt-0.5">

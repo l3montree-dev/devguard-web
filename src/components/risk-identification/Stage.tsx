@@ -36,7 +36,7 @@ function Stage({
     <div
       className={classNames(
         "flex w-60 items-center justify-between gap-x-6 rounded-lg border bg-white px-5 py-5 text-sm shadow-sm   transition-all dark:border-gray-700 dark:bg-gray-900 dark:text-white",
-        comingSoon ? "opacity-60" : "scale-105 ring ring-blue-500",
+        comingSoon ? "" : "scale-105 ring ring-blue-500",
       )}
     >
       {targetHandle && (
