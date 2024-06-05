@@ -1,5 +1,11 @@
 import Page from "@/components/Page";
-import { SIDEBAR_WIDTH, HEADER_HEIGHT } from "@/const/viewConstants";
+import ContainerScanning from "@/components/risk-identification/ContainerScanningNode";
+import DAST from "@/components/risk-identification/DASTNode";
+import IaC from "@/components/risk-identification/IaCNode";
+import SAST from "@/components/risk-identification/SASTNode";
+import SCA from "@/components/risk-identification/SCANode";
+import SecretScanning from "@/components/risk-identification/SecretScanningNode";
+import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withOrg } from "@/decorators/withOrg";
@@ -11,155 +17,10 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/flawFixApi";
-import "reactflow/dist/style.css";
-
 import Link from "next/link";
 import { useRouter } from "next/router";
-import ReactFlow, { Edge, Handle, Position } from "reactflow";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import Button from "@/components/common/Button";
-import { classNames } from "@/utils/common";
-import Modal from "@/components/common/Modal";
-import { useState } from "react";
-
-const handleStyle = { left: 10 };
-
-function Stage({
-  title,
-  description,
-  sourceHandle,
-  targetHandle,
-  onButtonClick,
-  comingSoon,
-}: {
-  title: string;
-  description: string;
-  sourceHandle?: boolean;
-  targetHandle?: boolean;
-  comingSoon?: boolean;
-  onButtonClick?: () => void;
-}) {
-  return (
-    <div
-      className={classNames(
-        "flex w-60 items-center justify-between gap-x-6 rounded-lg border bg-white px-5 py-5 text-sm shadow-sm   transition-all dark:border-gray-700 dark:bg-gray-900 dark:text-white",
-        comingSoon ? "opacity-60" : "scale-105 ring-1 ring-blue-500",
-      )}
-    >
-      {targetHandle && (
-        <Handle
-          className="!border-2 border-white !bg-gray-400 p-1"
-          type="target"
-          id="left"
-          position={Position.Left}
-        />
-      )}
-      <div>
-        <div>
-          <span className="font-semibold">{title}</span>
-          <p className="mt-2 text-slate-400">{description}</p>
-        </div>
-        <div className="mt-10 flex flex-row">
-          <Button
-            className="flex-1"
-            disabled={comingSoon}
-            intent="primary"
-            variant="outline"
-            onClick={onButtonClick}
-          >
-            {comingSoon ? "Coming soon" : "Open Instructions"}
-          </Button>
-        </div>
-      </div>
-      {sourceHandle && (
-        <Handle
-          className="!border-2 border-white !bg-gray-400 p-1"
-          type="source"
-          id="right"
-          position={Position.Right}
-        />
-      )}
-    </div>
-  );
-}
-
-function SecretScanning({ data }) {
-  return (
-    <Stage
-      title="Secret Scanning"
-      description="Scan git repositories for finding potential credentials leakage."
-      sourceHandle
-      comingSoon
-    />
-  );
-}
-
-function SCA() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Stage
-        title="Software Composition Analysis"
-        description="Find known vulnerabilities in third-party and open source dependencies."
-        sourceHandle
-        targetHandle
-        onButtonClick={() => setOpen(true)}
-      />
-      <Modal
-        title="Software Composition Analysis"
-        open={open}
-        setOpen={setOpen}
-      ></Modal>
-    </>
-  );
-}
-
-function SAST({ data }) {
-  return (
-    <Stage
-      title="Static Application Security Testing"
-      description="Find security vulnerabilities in produced source code."
-      sourceHandle
-      targetHandle
-      comingSoon
-    />
-  );
-}
-
-function IaC({ data }) {
-  return (
-    <Stage
-      title="Infrastructure as Code"
-      description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
-      sourceHandle
-      targetHandle
-      comingSoon
-    />
-  );
-}
-
-function ContainerScanning({ data }) {
-  return (
-    <Stage
-      title="Container Scanning"
-      description="Find known security vulnerabilities in OCI images, like Docker Images."
-      sourceHandle
-      targetHandle
-      comingSoon
-    />
-  );
-}
-
-function DAST({ data }) {
-  return (
-    <Stage
-      title="Dynamic Application Security Testing"
-      description="Find security vulnerabilities in running applications."
-      targetHandle
-      comingSoon
-    />
-  );
-}
+import ReactFlow, { Edge } from "reactflow";
+import "reactflow/dist/style.css";
 
 const paddingX = 35;
 const paddingY = 55;
@@ -323,6 +184,7 @@ const RiskIdentification = () => {
         }}
       >
         <ReactFlow
+          disableKeyboardA11y
           maxZoom={1}
           minZoom={1}
           nodes={nodes}

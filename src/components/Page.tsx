@@ -51,7 +51,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       <Head>
         <title>{props.title}</title>
       </Head>
-      <Toaster />
+
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -132,6 +132,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </aside>
         )}
       </div>
+      <Toaster />
     </>
   );
 };

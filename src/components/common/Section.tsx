@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { classNames } from "@/utils/common";
 import React, { FunctionComponent, ReactNode } from "react";
 
 interface Props {
@@ -20,11 +21,19 @@ interface Props {
   description?: ReactNode;
   children: React.ReactNode;
   id?: string;
+  highlightBg?: boolean;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
-    <div id={props.id} className="mb-6 pb-6">
-      <h2 className="text-base font-semibold leading-7 text-blue-950 dark:text-white">
+    <div
+      id={props.id}
+      className={classNames(
+        props.highlightBg
+          ? "rounded-lg bg-zinc-200 p-3 dark:bg-slate-800"
+          : "mb-6 pb-6",
+      )}
+    >
+      <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
         {props.title}
       </h2>
       {props.description !== undefined && (
@@ -32,7 +41,7 @@ const Section: FunctionComponent<Props> = (props) => {
           {props.description}
         </p>
       )}
-      <div className="mt-6">{props.children}</div>
+      <div className="mt-4">{props.children}</div>
     </div>
   );
 };

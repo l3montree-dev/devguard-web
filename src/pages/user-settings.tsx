@@ -15,8 +15,10 @@
 
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
+import DateString from "@/components/common/DateString";
+import { middleware } from "@/decorators/middleware";
+import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, ReactNode, useEffect, useState } from "react";
@@ -32,16 +34,10 @@ import { Messages } from "../components/kratos/Messages";
 import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../services/flawFixApi";
+import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import { createPat } from "../services/patService";
-import DateString from "@/components/common/DateString";
-import { middleware } from "@/decorators/middleware";
-import { UserIcon } from "@heroicons/react/24/solid";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 
 interface Props {
   flow?: SettingsFlow;
@@ -77,17 +73,10 @@ const Settings: FunctionComponent<{
   const router = useRouter();
   const { flow: flowId, return_to: returnTo } = router.query;
 
-  const [personalAccessTokens, setPersonalAccessTokens] =
-    useState<Array<PersonalAccessTokenDTO & { token?: string }>>(pats);
-
   const { register, handleSubmit, reset } = useForm<{ description: string }>();
 
-  const handleCreatePat = async (data: { description: string }) => {
-    const pat = await createPat(data);
-
-    setPersonalAccessTokens([...personalAccessTokens, pat]);
-    reset();
-  };
+  const { personalAccessTokens, onDeletePat, onCreatePat } =
+    usePersonalAccessToken(pats);
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
@@ -174,13 +163,9 @@ const Settings: FunctionComponent<{
     }
   };
 
-  const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
-    await browserApiClient(`/pats/${pat.id}/`, {
-      method: "DELETE",
-    });
-    setPersonalAccessTokens(
-      personalAccessTokens.filter((p) => p.id !== pat.id),
-    );
+  const handleCreatePat = async (data: { description: string }) => {
+    await onCreatePat(data);
+    reset();
   };
 
   const handleLogout = LogoutLink();
@@ -303,7 +288,7 @@ const Settings: FunctionComponent<{
                         intent="danger"
                         className="whitespace-nowrap"
                         variant="outline"
-                        onClick={() => handleDeletePat(pat)}
+                        onClick={() => onDeletePat(pat)}
                       >
                         Delete
                       </Button>

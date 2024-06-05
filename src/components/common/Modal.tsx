@@ -9,18 +9,16 @@ interface Props {
   open: boolean;
   title: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  Help?: React.ReactNode;
 }
 const Modal: FunctionComponent<PropsWithChildren<Props>> = ({
   open,
   setOpen,
   title,
   children,
-  Help,
 }) => {
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog as="div" className="relative" onClose={setOpen}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -45,11 +43,11 @@ const Modal: FunctionComponent<PropsWithChildren<Props>> = ({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className={"bg-transparent shadow-none"}>
-                <div className="w-screen-md relative z-10 w-96 transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left text-black shadow-xl transition-all dark:border dark:border-gray-800 dark:bg-gray-900 dark:text-white sm:p-6">
+                <div className="w-screen-md modal relative z-10 my-10 transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left text-black shadow-xl transition-all dark:border dark:border-gray-800 dark:bg-gray-900 dark:text-white sm:p-6">
                   <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                     <button
                       type="button"
-                      className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-800"
+                      className="rounded-lg bg-white p-1 text-gray-400 hover:text-gray-500  dark:bg-gray-800"
                       onClick={() => setOpen(false)}
                     >
                       <span className="sr-only">Close</span>
@@ -67,11 +65,6 @@ const Modal: FunctionComponent<PropsWithChildren<Props>> = ({
                     <div className="mt-2">{children}</div>
                   </div>
                 </div>
-                {Boolean(Help) && (
-                  <div className="absolute right-2 top-0 translate-x-full rounded-br-lg rounded-tr-lg bg-yellow-400 p-4">
-                    {Help}
-                  </div>
-                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>
