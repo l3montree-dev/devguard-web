@@ -81,6 +81,7 @@ const Button: FunctionComponent<
           variant: variant + "+" + intent,
         }),
         rest.disabled ? "cursor-not-allowed opacity-75" : "",
+        !Boolean(Icon) ? "justify-center" : "justify-between",
         className,
       )}
       {...rest}

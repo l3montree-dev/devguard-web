@@ -47,18 +47,6 @@ export const useAssetMenu = () => {
       Icon: DocumentMagnifyingGlassIcon,
     },
     {
-      title: "Risk assessment",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/risk-assessment",
-      Icon: CursorArrowRippleIcon,
-    },
-    {
       title: "Risk handling",
       href:
         "/" +

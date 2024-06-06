@@ -49,7 +49,19 @@
     src: url('/fonts/Lexend/Lexend-Bold.ttf') format('truetype');
 }
 
+pre {
+    margin-bottom: 0px!important;
+    background-color: transparent!important;
+    code {
+        display: block;
+        width: 1px // i don't know why this is necessary
+    }
+}
 
+.modal {
+    width: 66vw;
+    min-width: 500px;
+}
 body, html {
     hyphens: auto;
     word-break: break-word;
