@@ -44,17 +44,18 @@ export function NodeInputButton<T>({
   };
 
   return (
-    <>
+    <div className="flex flex-row justify-end">
       <Button
         name={attributes.name}
         onClick={(e) => {
           onClick(e);
         }}
+        className="mt-6 capitalize"
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
         {getNodeLabel(node)}
       </Button>
-    </>
+    </div>
   );
 }

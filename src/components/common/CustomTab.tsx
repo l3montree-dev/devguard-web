@@ -2,7 +2,6 @@ import { classNames } from "@/utils/common";
 import { Tab as BaseTab } from "@headlessui/react";
 import { Fragment, FunctionComponent, PropsWithChildren } from "react";
 const CustomTab: FunctionComponent<PropsWithChildren<{}>> = (props) => {
-  console.log(props);
   return (
     <BaseTab as={Fragment}>
       {({ selected }) => (
