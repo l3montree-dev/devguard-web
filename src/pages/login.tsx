@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
+import {
+  LoginFlow,
+  UiNodeGroupEnum,
+  UiNodeScriptAttributes,
+  UpdateLoginFlowBody,
+} from "@ory/client";
 
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
@@ -21,10 +26,22 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import {
+  HTMLAttributeReferrerPolicy,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
+import { filterNodesByGroups } from "@ory/integrations/ui";
+import { Tab } from "@headlessui/react";
+import { classNames } from "@/utils/common";
+import CustomTab from "@/components/common/CustomTab";
+import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import Callout from "@/components/common/Callout";
+import Carriage from "@/components/common/Carriage";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -75,6 +92,40 @@ const Login: NextPage = () => {
       .catch(handleFlowError(router, "login", setFlow));
   }, [flowId, router, router.isReady, aal, refresh, returnTo, flow]);
 
+  // Add the WebAuthn script to the DOM
+  useEffect(() => {
+    if (!flow?.ui.nodes) {
+      return;
+    }
+
+    const scriptNodes = filterNodesByGroups({
+      nodes: flow.ui.nodes,
+      groups: "webauthn",
+      attributes: "text/javascript",
+      withoutDefaultGroup: true,
+      withoutDefaultAttributes: true,
+    }).map((node) => {
+      const attr = node.attributes as UiNodeScriptAttributes;
+      const script = document.createElement("script");
+      script.src = attr.src;
+      script.type = attr.type;
+      script.async = attr.async;
+      script.referrerPolicy =
+        attr.referrerpolicy as HTMLAttributeReferrerPolicy;
+      script.crossOrigin = attr.crossorigin;
+      script.integrity = attr.integrity;
+      document.body.appendChild(script);
+      return script;
+    });
+
+    // cleanup
+    return () => {
+      scriptNodes.forEach((script) => {
+        document.body.removeChild(script);
+      });
+    };
+  }, [flow?.ui.nodes]);
+
   const onSubmit = (values: UpdateLoginFlowBody) =>
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
@@ -108,6 +159,33 @@ const Login: NextPage = () => {
             return Promise.reject(err);
           }),
       );
+
+  const passwordlessFlow = useMemo(() => {
+    return {
+      ...flow,
+      ui: {
+        ...flow?.ui,
+        nodes:
+          flow?.ui.nodes?.filter(
+            (n) =>
+              n.group === UiNodeGroupEnum.Webauthn ||
+              n.group === UiNodeGroupEnum.Default,
+          ) ?? [],
+      },
+    };
+  }, [flow]);
+
+  const passwordFlow = useMemo(() => {
+    return {
+      ...flow,
+      ui: {
+        ...flow?.ui,
+        nodes:
+          flow?.ui.nodes?.filter((n) => n.group !== UiNodeGroupEnum.Webauthn) ??
+          [],
+      },
+    };
+  }, [flow]);
 
   return (
     <>
@@ -153,7 +231,37 @@ const Login: NextPage = () => {
               </h2>
             </div>
             <div className="mt-10 sm:mx-auto">
-              <Flow onSubmit={onSubmit} flow={flow} />
+              <Tab.Group>
+                <CustomTab>Passwordless</CustomTab>
+                <CustomTab>Legacy Password login</CustomTab>
+                <Tab.Panels className={"mt-6"}>
+                  <Tab.Panel>
+                    <Flow
+                      onSubmit={onSubmit}
+                      flow={passwordlessFlow as LoginFlow}
+                    />
+                  </Tab.Panel>
+                  <Tab.Panel>
+                    <div className="mt-4">
+                      <Callout intent="warning">
+                        <div className="flex flex-row gap-4">
+                          <div className="w-20">
+                            <Carriage />
+                          </div>
+                          <p className="flex-1">
+                            Passwords are insecure by design. We recommend using
+                            passwordless authentication methods.
+                          </p>
+                        </div>
+                      </Callout>
+                    </div>
+                    <Flow
+                      onSubmit={onSubmit}
+                      flow={passwordFlow as LoginFlow}
+                    />
+                  </Tab.Panel>
+                </Tab.Panels>
+              </Tab.Group>
             </div>
 
             {aal || refresh ? (

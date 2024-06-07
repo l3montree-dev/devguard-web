@@ -203,7 +203,6 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
         method={flow.ui.method}
         onSubmit={this.handleSubmit}
       >
-        {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
           return (
@@ -230,6 +229,11 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
             />
           );
         })}
+        {!hideGlobalMessages ? (
+          <div className="mt-6">
+            <Messages messages={flow.ui.messages} />
+          </div>
+        ) : null}
       </form>
     );
   }

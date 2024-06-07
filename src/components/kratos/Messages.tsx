@@ -14,6 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { UiText } from "@ory/client";
+import Callout from "../common/Callout";
 
 interface MessageProps {
   message: UiText;
@@ -21,10 +22,7 @@ interface MessageProps {
 
 export const Message = ({ message }: MessageProps) => {
   return (
-    <p
-      className="text-sm text-black/80"
-      data-testid={`ui/message/${message.id}`}
-    >
+    <p className="text-sm" data-testid={`ui/message/${message.id}`}>
       {message.text}
     </p>
   );
@@ -41,10 +39,10 @@ export const Messages = ({ messages }: MessagesProps) => {
   }
 
   return (
-    <div>
+    <Callout intent="danger">
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
-    </div>
+    </Callout>
   );
 };

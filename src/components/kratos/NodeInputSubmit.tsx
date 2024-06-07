@@ -17,15 +17,34 @@ import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
 import Button from "../common/Button";
+import { UiNodeGroupEnum } from "@ory/client";
+import { FingerPrintIcon } from "@heroicons/react/24/outline";
 
 export function NodeInputSubmit<T>({
   node,
   attributes,
   disabled,
 }: NodeInputProps) {
+  if (node.group === UiNodeGroupEnum.Webauthn) {
+    // render the webauthn node
+    return (
+      <div className="mt-6 flex flex-row justify-end">
+        <Button
+          Icon={<FingerPrintIcon />}
+          className="capitalize"
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          {getNodeLabel(node)}
+        </Button>
+      </div>
+    );
+  }
   return (
     <div className="mt-6 flex flex-row justify-end">
       <Button
+        className="capitalize"
         name={attributes.name}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}

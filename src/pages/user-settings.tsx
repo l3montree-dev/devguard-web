@@ -418,7 +418,7 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
-        <div className="flex flex-row justify-end">
+        <div className="flex flex-row justify-end border-t pt-6 dark:border-t-slate-700">
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>
