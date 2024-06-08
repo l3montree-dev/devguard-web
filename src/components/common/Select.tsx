@@ -20,13 +20,14 @@ type Props = React.DetailedHTMLProps<
   HTMLSelectElement
 > & {
   label: string;
+  containerClassName?: string;
 };
 
 const Select = React.forwardRef<any, Props>((props, ref) => {
-  const { label, ...rest } = props;
+  const { label, containerClassName, ...rest } = props;
   const id = useId();
   return (
-    <>
+    <div className={containerClassName}>
       <label htmlFor={id} className="block text-sm font-medium leading-6">
         {label}
       </label>
@@ -36,7 +37,7 @@ const Select = React.forwardRef<any, Props>((props, ref) => {
         className="mt-2  block w-full rounded-md border-gray-300 bg-white py-2 shadow-sm ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 sm:leading-6 [&_*]:text-black"
         {...rest}
       />
-    </>
+    </div>
   );
 });
 
