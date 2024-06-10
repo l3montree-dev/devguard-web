@@ -43,7 +43,7 @@ const Modal: FunctionComponent<PropsWithChildren<Props>> = ({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className={"bg-transparent shadow-none"}>
-                <div className="w-screen-md modal relative z-10 my-10 transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left text-black shadow-xl transition-all dark:border dark:border-gray-800 dark:bg-gray-900 dark:text-white sm:p-6">
+                <div className="modal relative z-10 my-10 transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left text-black shadow-xl transition-all dark:border dark:border-gray-800 dark:bg-gray-900 dark:text-white sm:p-6">
                   <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
                     <button
                       type="button"
