@@ -15,7 +15,9 @@
 
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
+import Button from "@/components/common/Button";
 import FormField from "@/components/common/FormField";
+import Select from "@/components/common/Select";
 import { Toggle } from "@/components/common/Toggle";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
@@ -37,8 +39,9 @@ import { FunctionComponent } from "react";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
+  versions: string[];
   affectedPackages: Array<AffectedPackage>;
-}> = ({ graph, affectedPackages }) => {
+}> = ({ graph, affectedPackages, versions }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -79,28 +82,60 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="flex flex-row justify-end border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
-        <FormField
-          className="flex flex-row gap-2"
-          label="Show all packages"
-          Element={() => (
-            <Toggle
-              checked={all}
-              onChange={(onlyRisk) => {
-                router.push(
-                  {
-                    query: {
-                      ...router.query,
-                      all: all ? undefined : "1",
-                    },
+      <div className="flex flex-row justify-end gap-4 border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
+        <div className="flex flex-row items-center gap-2">
+          <label
+            htmlFor={"version-select"}
+            className="block whitespace-nowrap text-sm font-medium leading-6"
+          >
+            Version
+          </label>
+          <select
+            id="version-select"
+            onChange={(e) => {
+              router.push(
+                {
+                  query: {
+                    ...router.query,
+                    version: e.target.value,
                   },
-                  undefined,
-                  { scroll: false },
-                );
-              }}
-            />
-          )}
-        ></FormField>
+                },
+                undefined,
+                { scroll: false },
+              );
+            }}
+            className="block w-full rounded-md border-gray-300 bg-white py-2 text-sm shadow-sm ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 sm:leading-6 [&_*]:text-black"
+          >
+            {versions.map((version) => (
+              <option className="text-sm" key={version} value={version}>
+                {version}
+              </option>
+            ))}
+          </select>
+        </div>
+        {graph.root.risk !== 0 && (
+          <FormField
+            className="flex flex-row gap-2"
+            label="Show all packages"
+            Element={() => (
+              <Toggle
+                checked={all}
+                onChange={(onlyRisk) => {
+                  router.push(
+                    {
+                      query: {
+                        ...router.query,
+                        all: all ? undefined : "1",
+                      },
+                    },
+                    undefined,
+                    { scroll: false },
+                  );
+                }}
+              />
+            )}
+          ></FormField>
+        )}
       </div>
       <DependencyGraph
         affectedPackages={affectedPackages}
@@ -204,16 +239,25 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const [resp, affectedResp] = await Promise.all([
-      apiClient(uri + "dependency-graph/"),
-      apiClient(uri + "affected-packages/"),
+    // check for version query parameter
+    const version = context.query.version as string | undefined;
+
+    const [resp, affectedResp, versionsResp] = await Promise.all([
+      apiClient(
+        uri + "dependency-graph" + (version ? "?version=" + version : " "),
+      ),
+      apiClient(
+        uri + "affected-packages" + (version ? "?version=" + version : " "),
+      ),
+      apiClient(uri + "versions"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [graph, affected] = await Promise.all([
+    const [graph, affected, versions] = await Promise.all([
       resp.json() as Promise<{ root: DependencyTreeNode }>,
       affectedResp.json() as Promise<Array<AffectedPackage>>,
+      versionsResp.json() as Promise<Array<string>>,
     ]);
 
     const converted = convertGraph(graph.root);
@@ -221,6 +265,7 @@ export const getServerSideProps = middleware(
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
 
+    // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
     if (context.query.all !== "1") {
       recursiveRemoveWithoutRisk(converted);
     }
@@ -229,6 +274,7 @@ export const getServerSideProps = middleware(
       props: {
         graph: { root: converted },
         affectedPackages: affected,
+        versions,
       },
     };
   },
