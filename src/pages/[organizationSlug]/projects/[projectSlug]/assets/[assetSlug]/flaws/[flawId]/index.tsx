@@ -26,6 +26,7 @@ import Markdown from "react-markdown";
 import { useRouter } from "next/router";
 import RiskAssessment from "@/components/RiskAssessment/RiskAssessment";
 import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
+
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
 });
@@ -34,8 +35,9 @@ interface Props {
   flaw: DetailedFlawDTO;
 }
 
-const Index: FunctionComponent<Props> = ({ flaw }) => {
+const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
+  const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
   const cve = flaw.cve;
   const [showRiskAssessment, setShowRiskAssessment] = useState(true);
 
@@ -58,14 +60,14 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
     return dateA - dateB;
   });
 
-  const handleSubmit = (ev: FormEvent) => {
+  const handleSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
 
     if (message === "") {
       message = "set as " + status;
     }
 
-    const resp = browserApiClient(
+    const resp = await browserApiClient(
       "/api/v1/organizations/" + router.asPath,
       {
         method: "POST",
@@ -79,7 +81,8 @@ const Index: FunctionComponent<Props> = ({ flaw }) => {
       },
       "",
     );
-    window.location.href = router.asPath;
+
+    setFlaw(await resp.json());
   };
 
   return (
