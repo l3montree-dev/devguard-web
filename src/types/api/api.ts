@@ -82,6 +82,7 @@ export interface FlawDTO {
     | "markedForMitigation";
 
   priority: number | null; // will be null, if not prioritized yet.
+  rawRiskAssessment: number;
 }
 
 export interface Paged<T> {
@@ -150,6 +151,10 @@ export interface AssetDTO {
   description: string;
   slug: string;
   id: string;
+
+  confidentialityRequirement: RequirementsLevel;
+  integrityRequirement: RequirementsLevel;
+  availabilityRequirement: RequirementsLevel;
 }
 
 export interface DependencyTreeNode {

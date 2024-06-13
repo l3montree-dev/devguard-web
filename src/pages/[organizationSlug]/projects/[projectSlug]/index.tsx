@@ -37,6 +37,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
     useForm<CreateAssetReq>();
 
   const handleCreateAsset = async (data: CreateAssetReq) => {
+    //console.log(data);
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -131,9 +132,9 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               {...register("confidentialityRequirement")}
               label="Confidentiality Requirement"
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
+              <option value={"low"}>Low</option>
+              <option value={"medium"}>Medium</option>
+              <option value={"high"}>High</option>
             </Select>
           </div>
           <div className="mt-4">
@@ -141,9 +142,9 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               {...register("integrityRequirement")}
               label="Integrity Requirement"
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
+              <option value={"low"}>Low</option>
+              <option value={"medium"}>Medium</option>
+              <option value={"high"}>High</option>
             </Select>
           </div>
           <div className="mt-4">
@@ -151,9 +152,9 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               {...register("availabilityRequirement")}
               label="Availability Requirement"
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
+              <option value={"low"}>Low</option>
+              <option value={"medium"}>Medium</option>
+              <option value={"high"}>High</option>
             </Select>
           </div>
           <div className="mt-4">

@@ -41,6 +41,7 @@ import { ViewColumnsIcon } from "@heroicons/react/24/outline";
 import PopupMenu from "@/components/common/PopupMenu";
 import PopupMenuItem from "@/components/common/PopupMenuItem";
 import Checkbox from "@/components/common/Checkbox";
+import SecRequirementDialog from "@/components/common/SecRequirementDialog";
 
 interface Props {
   asset: AssetDTO;
@@ -83,6 +84,14 @@ const columnsDef = [
           <span className="whitespace-nowrap">{row.getValue()}</span>
         </div>
       ),
+    }),
+  },
+  {
+    ...columnHelper.accessor("rawRiskAssessment", {
+      header: "Angepasster CVSS",
+      id: "rawRiskAssessment",
+      enableSorting: true,
+      cell: (row) => row.getValue(),
     }),
   },
   {
@@ -299,6 +308,7 @@ const Index: FunctionComponent<Props> = (props) => {
           )}
         />
       </div>
+
       <div className="overflow-hidden rounded-lg border shadow-sm dark:border-gray-700">
         <table className="w-full text-sm">
           <thead className="border-b bg-gray-50 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
@@ -402,6 +412,9 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
 
     const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+    console.log("Asset:", asset, "flaw:", flaws.data);
+    //console.log("flaw:", flaws.data);
+    //console.log("Asset:", asset);
 
     return {
       props: {
