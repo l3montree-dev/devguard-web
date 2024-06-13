@@ -82,8 +82,8 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="flex flex-row justify-end gap-4 border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
-        <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center justify-end gap-4 border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
+        <div className="flex flex-row items-center gap-4">
           <label
             htmlFor={"version-select"}
             className="block whitespace-nowrap text-sm font-medium leading-6"
@@ -114,27 +114,29 @@ const DependencyGraphPage: FunctionComponent<{
           </select>
         </div>
         {graph.root.risk !== 0 && (
-          <FormField
-            className="flex flex-row gap-2"
-            label="Show all packages"
-            Element={() => (
-              <Toggle
-                checked={all}
-                onChange={(onlyRisk) => {
-                  router.push(
-                    {
-                      query: {
-                        ...router.query,
-                        all: all ? undefined : "1",
+          <div>
+            <FormField
+              className="flex flex-row gap-2"
+              label="Show all packages"
+              Element={() => (
+                <Toggle
+                  checked={all}
+                  onChange={(onlyRisk) => {
+                    router.push(
+                      {
+                        query: {
+                          ...router.query,
+                          all: all ? undefined : "1",
+                        },
                       },
-                    },
-                    undefined,
-                    { scroll: false },
-                  );
-                }}
-              />
-            )}
-          ></FormField>
+                      undefined,
+                      { scroll: false },
+                    );
+                  }}
+                />
+              )}
+            ></FormField>
+          </div>
         )}
       </div>
       <DependencyGraph
@@ -169,27 +171,24 @@ const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   affected: Array<AffectedPackage>,
 ) => {
-  if (node.children.length === 0) {
-    const affectedPackage = affected.find(
-      (p) => p.PurlWithVersion === node.name,
-    );
-    // if there are no children, the risk is the risk of the affected package
-    if (affectedPackage) {
-      node.risk = severityToRisk(affectedPackage.CVE.severity);
-      // update the parent node with the risk of this node
-      let parent = node.parent;
-      let i = 0;
-      while (parent != null) {
-        i++;
-        parent.risk = parent.risk
-          ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
-          : node.risk * (RISK_INHERITANCE_FACTOR / i);
-        parent = parent.parent;
-      }
+  const affectedPackage = affected.find((p) => p.PurlWithVersion === node.name);
+
+  // if there are no children, the risk is the risk of the affected package
+  if (affectedPackage) {
+    node.risk = severityToRisk(affectedPackage.CVE.severity);
+    // update the parent node with the risk of this node
+    let parent = node.parent;
+    let i = 0;
+    while (parent != null) {
+      i++;
+      parent.risk = parent.risk
+        ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
+        : node.risk * (RISK_INHERITANCE_FACTOR / i);
+      parent = parent.parent;
     }
-  } else {
-    node.children.forEach((child) => recursiveAddRisk(child, affected));
   }
+  node.children.forEach((child) => recursiveAddRisk(child, affected));
+
   return node;
 };
 
@@ -261,6 +260,7 @@ export const getServerSideProps = middleware(
     ]);
 
     const converted = convertGraph(graph.root);
+
     recursiveAddRisk(converted, affected);
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
