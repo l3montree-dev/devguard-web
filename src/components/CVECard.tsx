@@ -138,6 +138,7 @@ const CVECard: FunctionComponent<Props> = ({ cve }) => {
             </tbody>
           </table>
         </div>
+        {/* TODO 
         {cve.cwes.length > 0 && (
           <div className="mt-4">
             <span className="font-semibold">Related CWEs</span>
@@ -150,6 +151,7 @@ const CVECard: FunctionComponent<Props> = ({ cve }) => {
             ))}
           </div>
         )}
+        */}
       </div>
     </div>
   );

@@ -2,10 +2,10 @@ import { classNames } from "@/utils/common";
 import { ChevronRightIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import React, { FunctionComponent, useState } from "react";
-import Button from "./common/Button";
-import Select from "./common/Select";
+import Button from "../common/Button";
+import Select from "../common/Select";
 
-const MarkdownEditor = dynamic(() => import("./common/MarkdownEditor"), {
+const MarkdownEditor = dynamic(() => import("../common/MarkdownEditor"), {
   ssr: false,
 });
 
