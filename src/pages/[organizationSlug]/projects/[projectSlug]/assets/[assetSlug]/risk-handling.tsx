@@ -88,7 +88,7 @@ const columnsDef = [
   },
   {
     ...columnHelper.accessor("rawRiskAssessment", {
-      header: "Angepasster CVSS",
+      header: "Risk",
       id: "rawRiskAssessment",
       enableSorting: true,
       cell: (row) => row.getValue(),
@@ -412,7 +412,7 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
 
     const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
-    console.log("Asset:", asset, "flaw:", flaws.data);
+    console.log("Asset:", asset, "flaw:", flaws);
     //console.log("flaw:", flaws.data);
     //console.log("Asset:", asset);
 
