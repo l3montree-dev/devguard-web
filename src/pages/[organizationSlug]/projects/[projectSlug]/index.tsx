@@ -37,7 +37,6 @@ const Index: FunctionComponent<Props> = ({ project }) => {
     useForm<CreateAssetReq>();
 
   const handleCreateAsset = async (data: CreateAssetReq) => {
-    //console.log(data);
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +

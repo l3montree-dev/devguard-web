@@ -52,10 +52,8 @@ export default function SecRequirementDialog(props: {
         body: JSON.stringify(data),
       },
     );
-    if (resp.ok) {
-      console.log("Requirements updated");
-    } else {
-      console.log("Requirements not updated");
+    if (!resp.ok) {
+      console.error("Could not update asset");
     }
   };
 

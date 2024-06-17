@@ -26,6 +26,11 @@ import Markdown from "react-markdown";
 import { useRouter } from "next/router";
 import RiskAssessment from "@/components/RiskAssessment/RiskAssessment";
 import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import Link from "next/link";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
@@ -40,6 +45,12 @@ const Index: FunctionComponent<Props> = (props) => {
   const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
   const cve = flaw.cve;
   const [showRiskAssessment, setShowRiskAssessment] = useState(true);
+
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+
+  const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
 
   //status state
   const [status, setStatus] = useState("");
@@ -87,6 +98,33 @@ const Index: FunctionComponent<Props> = (props) => {
 
   return (
     <Page
+      Menu={assetMenu}
+      Title={
+        <span className="flex flex-row gap-2">
+          <Link
+            href={`/${activeOrg?.slug}`}
+            className="text-white hover:no-underline"
+          >
+            {activeOrg?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="text-white hover:no-underline"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+          >
+            {project?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="text-white hover:no-underline"
+            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
+          >
+            {asset?.name}
+          </Link>
+          <span className="opacity-75">/</span>
+          <span>Flaw Details</span>
+        </span>
+      }
       Sidebar={
         cve && (
           <Sidebar

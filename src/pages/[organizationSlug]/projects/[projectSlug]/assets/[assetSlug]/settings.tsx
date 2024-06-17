@@ -65,7 +65,10 @@ const Index: FunctionComponent<Props> = ({
           <Link
             className="text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
-          ></Link>
+          >
+            {" "}
+            {asset?.name}
+          </Link>
           <span className="opacity-75">/</span>
           <span>Settings</span>
         </span>
@@ -125,9 +128,7 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
 
     const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
-    //console.log("Asset:", asset, "flaw:", flaws.data);
-    //console.log("flaw:", flaws.data);
-    //console.log("Asset:", asset);
+
 
     return {
       props: {
