@@ -17,6 +17,7 @@ import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import DateString from "@/components/common/DateString";
 import { middleware } from "@/decorators/middleware";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
 import Link from "next/link";
@@ -30,14 +31,12 @@ import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
-import { Messages } from "../components/kratos/Messages";
 import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 
 interface Props {
   flow?: SettingsFlow;
@@ -110,7 +109,7 @@ const Settings: FunctionComponent<{
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/settings?flow=${flow?.id}`, undefined, { shallow: true })
+      .push(`/user-settings?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
           .updateSettingsFlow({
@@ -169,6 +168,18 @@ const Settings: FunctionComponent<{
   };
 
   const handleLogout = LogoutLink();
+
+  useEffect(() => {
+    if (flow?.ui.messages) {
+      flow.ui.messages.forEach((message) => {
+        toast({
+          title: message.type.toLocaleUpperCase(),
+          msg: message.text,
+          intent: message.type,
+        });
+      });
+    }
+  }, [flow?.ui.messages]);
 
   return (
     <Page
@@ -229,7 +240,6 @@ const Settings: FunctionComponent<{
 
             <div className="col-span-full">
               <SettingsCard only="profile" flow={flow}>
-                <Messages messages={flow?.ui.messages} />
                 <Flow
                   hideGlobalMessages
                   onSubmit={onSubmit}
@@ -247,7 +257,6 @@ const Settings: FunctionComponent<{
           description="Update your password associated with your account."
         >
           <SettingsCard only="password" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -332,7 +341,6 @@ const Settings: FunctionComponent<{
           description="Update your password associated with your account."
         >
           <SettingsCard only="oidc" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -349,7 +357,6 @@ const Settings: FunctionComponent<{
         access to your 2FA device."
         >
           <SettingsCard only="lookup_secret" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -393,7 +400,6 @@ const Settings: FunctionComponent<{
           }
         >
           <SettingsCard only="totp" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -409,7 +415,6 @@ const Settings: FunctionComponent<{
           description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
         >
           <SettingsCard only="webauthn" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}

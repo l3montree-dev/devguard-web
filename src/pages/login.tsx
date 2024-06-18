@@ -175,14 +175,28 @@ const Login: NextPage = () => {
     };
   }, [flow]);
 
+  const oidcFlow = useMemo(() => {
+    return {
+      ...flow,
+      ui: {
+        ...flow?.ui,
+        nodes:
+          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Oidc) ?? [],
+      },
+    };
+  }, [flow]);
+
   const passwordFlow = useMemo(() => {
     return {
       ...flow,
       ui: {
         ...flow?.ui,
         nodes:
-          flow?.ui.nodes?.filter((n) => n.group !== UiNodeGroupEnum.Webauthn) ??
-          [],
+          flow?.ui.nodes?.filter(
+            (n) =>
+              n.group !== UiNodeGroupEnum.Webauthn &&
+              n.group !== UiNodeGroupEnum.Oidc,
+          ) ?? [],
       },
     };
   }, [flow]);
@@ -194,7 +208,7 @@ const Login: NextPage = () => {
         <meta name="description" content="FlawFix Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 flex-row bg-white ">
-        <div className="relative w-3/5 bg-gray-500">
+        <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
           <Image
             src={"/bg.png"}
             alt="FlawFix by l3montree Logo"
@@ -236,6 +250,9 @@ const Login: NextPage = () => {
                 <CustomTab>Legacy Password login</CustomTab>
                 <Tab.Panels className={"mt-6"}>
                   <Tab.Panel>
+                    <div className="border-b dark:border-b-slate-700">
+                      <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
+                    </div>
                     <Flow
                       onSubmit={onSubmit}
                       flow={passwordlessFlow as LoginFlow}
@@ -245,12 +262,12 @@ const Login: NextPage = () => {
                     <div className="mt-4">
                       <Callout intent="warning">
                         <div className="flex flex-row gap-4">
-                          <div className="w-20">
-                            <Carriage />
-                          </div>
                           <p className="flex-1">
                             Passwords are insecure by design. We recommend using
-                            passwordless authentication methods.
+                            a passwordless authentication methods.{" "}
+                            <div className="mr-2 inline-block w-10">
+                              <Carriage />
+                            </div>
                           </p>
                         </div>
                       </Callout>
