@@ -30,6 +30,8 @@ const cslxConfig = {
       "bg-white text-black dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700 shadow-sm border border-gray-300 hover:bg-gray-100",
     "outline+secondary":
       "bg-transparent text-blue-600 hover:bg-blue-100 border border-blue-500",
+    "solid+secondary":
+      "dark:bg-white bg-black dark:text-black text-white dark:hover:bg-gray-100 hover:bg-gray-700",
   },
 };
 
@@ -39,7 +41,7 @@ const Button: FunctionComponent<
     HTMLButtonElement
   > & {
     variant?: "solid" | "outline";
-    intent?: "primary" | "danger" | "secondary";
+    intent?: "primary" | "danger" | "secondary" | "white";
     href?: string;
     Icon?: JSX.Element;
   }

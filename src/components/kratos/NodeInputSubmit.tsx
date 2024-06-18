@@ -19,6 +19,7 @@ import { NodeInputProps } from "./helpers";
 import Button from "../common/Button";
 import { UiNodeGroupEnum } from "@ory/client";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 export function NodeInputSubmit<T>({
   node,
@@ -41,6 +42,34 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
+
+  if ((node.meta.label?.context as any)?.provider === "github") {
+    // render the github node
+    return (
+      <div className="mt-6 flex flex-row justify-end">
+        <Button
+          className="capitalize"
+          name={attributes.name}
+          Icon={
+            <Image
+              src="/assets/github.svg"
+              alt="GitHub Logo"
+              className="invert dark:invert-0"
+              width={24}
+              height={24}
+            />
+          }
+          variant="solid"
+          intent="secondary"
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          {getNodeLabel(node)}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 flex flex-row justify-end">
       <Button
