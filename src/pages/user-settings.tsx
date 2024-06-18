@@ -273,12 +273,12 @@ const Settings: FunctionComponent<{
                       <Input
                         variant="dark"
                         readOnly
-                        value={pat.token ? pat.token : "***********"}
+                        value={"privKey" in pat ? pat.privKey : "***********"}
                       />
-                      {pat.token && (
+                      {"privKey" in pat && (
                         <Button
                           className="whitespace-nowrap"
-                          onClick={() => handleCopy(pat.token!)}
+                          onClick={() => handleCopy(pat.privKey)}
                         >
                           Copy
                         </Button>
@@ -293,7 +293,7 @@ const Settings: FunctionComponent<{
                         Delete
                       </Button>
                     </div>
-                    {pat.token && (
+                    {"privKey" in pat && (
                       <span className="mb-4 block text-red-500">
                         Make sure to copy the token. You won&apos;t be able to
                         see it ever again
