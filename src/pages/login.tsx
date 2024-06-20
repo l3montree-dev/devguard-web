@@ -42,6 +42,8 @@ import CustomTab from "@/components/common/CustomTab";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import Callout from "@/components/common/Callout";
 import Carriage from "@/components/common/Carriage";
+import { Message, Messages } from "@/components/kratos/Messages";
+import { uniq } from "lodash";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -159,47 +161,9 @@ const Login: NextPage = () => {
             return Promise.reject(err);
           }),
       );
-
-  const passwordlessFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter(
-            (n) =>
-              n.group === UiNodeGroupEnum.Webauthn ||
-              n.group === UiNodeGroupEnum.Default,
-          ) ?? [],
-      },
-    };
-  }, [flow]);
-
-  const oidcFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Oidc) ?? [],
-      },
-    };
-  }, [flow]);
-
-  const passwordFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter(
-            (n) =>
-              n.group !== UiNodeGroupEnum.Webauthn &&
-              n.group !== UiNodeGroupEnum.Oidc,
-          ) ?? [],
-      },
-    };
-  }, [flow]);
+  const availableMethods = useMemo(() => {
+    return uniq(flow?.ui.nodes.map((node) => node.group));
+  }, [flow?.ui.nodes]);
 
   return (
     <>
@@ -244,22 +208,37 @@ const Login: NextPage = () => {
                 })()}
               </h2>
             </div>
+
             <div className="mt-10 sm:mx-auto">
               <Tab.Group>
                 <CustomTab>Passwordless</CustomTab>
                 <CustomTab>Legacy Password login</CustomTab>
                 <Tab.Panels className={"mt-6"}>
                   <Tab.Panel>
-                    <div className="border-b dark:border-b-slate-700">
-                      <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
-                    </div>
                     <Flow
+                      only="webauthn"
+                      hideGlobalMessages
                       onSubmit={onSubmit}
-                      flow={passwordlessFlow as LoginFlow}
+                      flow={flow as LoginFlow}
                     />
+                    {availableMethods.includes("oidc") && (
+                      <div className="mt-6 border-t pt-6 dark:border-t-gray-800">
+                        <div className="flex flex-row items-center justify-end gap-4">
+                          <span className="text-sm text-gray-400">
+                            Social-Login
+                          </span>
+                          <Flow
+                            only="oidc"
+                            hideGlobalMessages
+                            onSubmit={onSubmit}
+                            flow={flow as LoginFlow}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </Tab.Panel>
                   <Tab.Panel>
-                    <div className="mt-4">
+                    <div className="my-4">
                       <Callout intent="warning">
                         <div className="flex flex-row gap-4">
                           <p className="flex-1">
@@ -273,12 +252,17 @@ const Login: NextPage = () => {
                       </Callout>
                     </div>
                     <Flow
+                      only="password"
+                      hideGlobalMessages
                       onSubmit={onSubmit}
-                      flow={passwordFlow as LoginFlow}
+                      flow={flow as LoginFlow}
                     />
                   </Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>
+            </div>
+            <div className="mt-4">
+              <Messages messages={flow?.ui.messages} />
             </div>
 
             {aal || refresh ? (
