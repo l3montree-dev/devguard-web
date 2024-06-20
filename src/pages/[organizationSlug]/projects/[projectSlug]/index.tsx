@@ -22,6 +22,9 @@ import { toast } from "@/components/Toaster";
 import Checkbox from "@/components/common/Checkbox";
 import Link from "next/link";
 import { middleware } from "@/decorators/middleware";
+import ToggleWithIcon from "@/components/common/ToggleWithIcon";
+import SecReqSelectGroup from "@/components/SecReqSelectGroup";
+import NewAssetForm from "@/components/setup/NewAssetForm";
 
 interface Props {
   project: ProjectDTO & {
@@ -87,91 +90,57 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           </span>
         }
       >
-        <div className="flex flex-col gap-4">
-          {project.assets.map((asset) => (
-            <ListItem
-              key={asset.id}
-              title={asset.name}
-              description={asset.description}
-              Button={
-                <Button
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                  variant="outline"
-                  intent="primary"
-                >
-                  View Asset
-                </Button>
-              }
-            />
-          ))}
-        </div>
+        <>
+          <div>
+            {project.assets.length === 0 && (
+              <div className="flex min-h-screen justify-center py-24">
+                <div className="flex w-2/6 flex-col">
+                  <h2 className="text-base font-semibold leading-6 text-yellow-400">
+                    Add your first Asset
+                  </h2>
+                  <p className="mb-8 mt-1 text-sm text-gray-400">
+                    You have no assets in this project. Add your first asset to
+                    get started.
+                  </p>
+                  <NewAssetForm
+                    handleSubmit={handleSubmit}
+                    register={register}
+                    getFieldState={getFieldState}
+                    formState={formState}
+                    handleCreateAsset={handleCreateAsset}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-4">
+            {project.assets.map((asset) => (
+              <ListItem
+                key={asset.id}
+                title={asset.name}
+                description={asset.description}
+                Button={
+                  <Button
+                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
+                    variant="outline"
+                    intent="primary"
+                  >
+                    View Asset
+                  </Button>
+                }
+              />
+            ))}
+          </div>
+        </>
       </Page>
       <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
-        <form onSubmit={handleSubmit(handleCreateAsset)}>
-          <Input
-            variant="dark"
-            label="Name"
-            {...register("name", {
-              required: "Please enter a name",
-            })}
-            error={getFieldState("name")?.error}
-          />
-          <div className="mt-4">
-            <Input
-              variant="dark"
-              label="Description"
-              {...register("description", {
-                required: "Please enter a description",
-              })}
-              error={getFieldState("description")?.error}
-            />
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("confidentialityRequirement")}
-              label="Confidentiality Requirement"
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("integrityRequirement")}
-              label="Integrity Requirement"
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("availabilityRequirement")}
-              label="Availability Requirement"
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Checkbox
-              {...register("reachableFromTheInternet")}
-              label="Reachable from the internet"
-            />
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button
-              disabled={hasErrors(formState.errors)}
-              type="submit"
-              variant="solid"
-            >
-              Create
-            </Button>
-          </div>
-        </form>
+        <NewAssetForm
+          handleSubmit={handleSubmit}
+          register={register}
+          getFieldState={getFieldState}
+          formState={formState}
+          handleCreateAsset={handleCreateAsset}
+        />
       </Modal>
     </>
   );

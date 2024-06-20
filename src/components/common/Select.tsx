@@ -28,13 +28,16 @@ const Select = React.forwardRef<any, Props>((props, ref) => {
   const id = useId();
   return (
     <div className={containerClassName}>
-      <label htmlFor={id} className="block text-sm font-medium leading-6">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium leading-6 dark:text-white"
+      >
         {label}
       </label>
       <select
         ref={ref}
         id={id}
-        className="mt-2  block w-full rounded-md border-gray-300 bg-white py-2 shadow-sm ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 sm:leading-6 [&_*]:text-black"
+        className="mt-2 block w-full rounded-md border-gray-300 bg-white py-2 shadow-sm ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:leading-6 [&_*]:text-black"
         {...rest}
       />
     </div>

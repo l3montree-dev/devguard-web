@@ -34,6 +34,7 @@ import { ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 import { hasErrors } from "../../utils/common";
 import { middleware } from "@/decorators/middleware";
+import { PlusIcon } from "@heroicons/react/24/solid";
 interface Props {
   projects: Array<ProjectDTO>;
 }
@@ -100,6 +101,41 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
         </form>
       </Modal>
       <div>
+        {projects.length === 0 && (
+          <div className="flex min-h-screen justify-center py-24">
+            <div className="flex w-2/6 flex-col">
+              <h2 className="text-base font-semibold leading-6 text-yellow-400">
+                Create your first Project
+              </h2>
+              <p className="mb-8 mt-1 text-sm text-gray-400">
+                You haven’t created a project yet. Get started by creating your
+                first project.
+              </p>
+              <form onSubmit={handleSubmit(handleCreateProject)}>
+                <Input
+                  variant="dark"
+                  label="Name*"
+                  error={getFieldState("name", formState).error}
+                  {...register("name", {
+                    required: "Project name is required",
+                  })}
+                />
+                <div className="mt-4">
+                  <Input
+                    variant="dark"
+                    label="Description"
+                    {...register("description")}
+                  />
+                </div>
+                <div className="mt-4 flex flex-row justify-end">
+                  <Button disabled={hasErrors(formState.errors)} type="submit">
+                    Create
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
         <ProjectList projects={projects} />
       </div>
     </Page>

@@ -31,7 +31,10 @@ const Input = React.forwardRef<any, Props>((props, ref) => {
   return (
     <>
       {Boolean(label) && (
-        <label htmlFor={id} className="block text-sm font-medium leading-6">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium leading-6 dark:text-white"
+        >
           {label}
         </label>
       )}

@@ -34,7 +34,10 @@ const Checkbox = React.forwardRef<any, Props>((props, ref) => {
         {...rest}
       ></input>
       <div>
-        <label htmlFor={id} className="block text-sm font-medium leading-6">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium leading-6 dark:text-white"
+        >
           {label}
         </label>
         {props.help && <small className="text-sm">{props.help}</small>}
