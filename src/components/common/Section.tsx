@@ -30,18 +30,22 @@ const Section: FunctionComponent<Props> = (props) => {
       className={classNames(
         props.highlightBg
           ? "rounded-lg bg-zinc-200 p-3 dark:bg-slate-800"
-          : "mb-6 pb-6",
+          : "mb-6 border-b border-b-gray-300 pb-6 pt-6 dark:border-b-gray-700",
       )}
     >
-      <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
-        {props.title}
-      </h2>
-      {props.description !== undefined && (
-        <p className="mt-1 text-sm leading-6 text-black/80 dark:text-white">
-          {props.description}
-        </p>
-      )}
-      <div className="mt-4">{props.children}</div>
+      <div className="flex flex-row gap-8">
+        <div className="w-96">
+          <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
+            {props.title}
+          </h2>
+          {props.description !== undefined && (
+            <p className="mt-1 text-sm leading-6 text-black/80 dark:text-gray-400">
+              {props.description}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-1 flex-col justify-end">{props.children}</div>
+      </div>
     </div>
   );
 };
