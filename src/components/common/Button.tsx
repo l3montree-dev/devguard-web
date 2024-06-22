@@ -19,7 +19,7 @@ import Link from "next/link";
 
 const cslxConfig = {
   default:
-    "rounded-md px-3 shadow-sm flex flex-row items-center transition-all text-sm py-2 font-medium",
+    "rounded-md px-3 flex flex-row items-center transition-all text-sm py-2 font-medium",
   variant: {
     "solid+danger": "bg-blue-500 text-white hover:bg-blue-600",
     "outline+danger":
@@ -27,7 +27,7 @@ const cslxConfig = {
     "solid+primary":
       "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black",
     "outline+primary":
-      "bg-white text-black dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700 shadow-sm border border-gray-300 hover:bg-gray-100",
+      "bg-white text-black dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700 border border-gray-300 hover:bg-gray-100",
     "outline+secondary":
       "bg-transparent text-blue-600 hover:bg-blue-100 border border-blue-500",
     "solid+secondary":
