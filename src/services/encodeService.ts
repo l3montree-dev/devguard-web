@@ -13,28 +13,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useState } from "react";
-import SCADialog from "./SCADialog";
-import Stage from "./Stage";
-import { useRouter } from "next/router";
+export const encodeObjectBase64 = (input: Record<string, string>) => {
+  // first, we convert the input to a string
+  const inputString = JSON.stringify(input);
+  return Buffer.from(inputString).toString("base64");
+};
 
-function SCA() {
-  const router = useRouter();
-  const openDialog = router.query.openDialog;
-  const [open, setOpen] = useState(openDialog === "sca");
+export const encodeStringBase64 = (input: string) => {
+  return Buffer.from(input).toString("base64");
+};
 
-  return (
-    <>
-      <Stage
-        title="Software Composition Analysis"
-        description="Find known vulnerabilities in third-party and open source dependencies."
-        sourceHandle
-        targetHandle
-        onButtonClick={() => setOpen(true)}
-      />
-      <SCADialog open={open} setOpen={setOpen} />
-    </>
-  );
-}
+export const decodeStringBase64 = (input: string) => {
+  return Buffer.from(input, "base64").toString("utf-8");
+};
 
-export default SCA;
+export const decodeObjectBase64 = (input: string) => {
+  const decodedString = Buffer.from(input, "base64").toString("utf-8");
+  return JSON.parse(decodedString);
+};

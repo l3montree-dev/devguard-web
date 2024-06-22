@@ -1,19 +1,21 @@
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 
-import React, { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { config } from "@/config";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import { encodeObjectBase64 } from "@/services/encodeService";
+import { browserApiClient } from "@/services/flawFixApi";
+import { Tab } from "@headlessui/react";
+import Image from "next/image";
+import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
+import Button from "../common/Button";
 import CopyCode from "../common/CopyCode";
 import CustomTab from "../common/CustomTab";
+import Input from "../common/Input";
 import Modal from "../common/Modal";
 import Section from "../common/Section";
 import Small from "../common/Small";
 import Steps from "./Steps";
-import { Tab } from "@headlessui/react";
-import Button from "../common/Button";
-import { config } from "@/config";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
-import Input from "../common/Input";
-import Image from "next/image";
 
 interface Props {
   open: boolean;
@@ -24,6 +26,26 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
+
+  const handleOpenPullRequest = () => {};
+  const fetchAvailableGithubRepos = () => {};
+
+  useEffect(() => {
+    browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/integrations/repositories?provider=github",
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        return [];
+      })
+      .then((data) => {
+        console.log(data);
+      });
+  }, []);
 
   return (
     <Modal title="Software Composition Analysis" open={open} setOpen={setOpen}>
@@ -74,7 +96,17 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
         </Section>
       </div>
       <Tab.Group>
-        <Tab.List>
+        <Tab.List className={"flex flex-row flex-wrap gap-2"}>
+          <CustomTab>
+            <Image
+              src="/assets/github.svg"
+              width={20}
+              className="mr-2 inline dark:invert"
+              height={20}
+              alt="GitHub"
+            />
+            Using the FlawFix GitHub App (recommended)
+          </CustomTab>
           <CustomTab>
             <Image
               src="/assets/github.svg"
@@ -98,6 +130,19 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           <CustomTab>Using FlawFind CLI</CustomTab>
         </Tab.List>
         <Tab.Panels className={"mt-10"}>
+          <Tab.Panel>
+            <Button
+              href={
+                "https://github.com/apps/flawfix/installations/new?state=" +
+                encodeObjectBase64({
+                  orgSlug: activeOrg.slug,
+                  redirectTo: router.asPath + "?openDialog=sca",
+                })
+              }
+            >
+              Install GitHub App
+            </Button>
+          </Tab.Panel>
           <Tab.Panel>
             <Steps>
               <div className="mb-10">
