@@ -5,6 +5,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { encodeObjectBase64 } from "@/services/encodeService";
 import { browserApiClient } from "@/services/flawFixApi";
+import { Repository } from "@/types/github";
 import { Tab } from "@headlessui/react";
 import Image from "next/image";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
@@ -14,6 +15,7 @@ import CustomTab from "../common/CustomTab";
 import Input from "../common/Input";
 import Modal from "../common/Modal";
 import Section from "../common/Section";
+import Select from "../common/Select";
 import Small from "../common/Small";
 import Steps from "./Steps";
 
@@ -30,22 +32,19 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const handleOpenPullRequest = () => {};
   const fetchAvailableGithubRepos = () => {};
 
-  useEffect(() => {
-    browserApiClient(
+  useEffect(() => {}, []);
+
+  const promiseOptions = async (inputValue: string) => {
+    const res = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
         "/integrations/repositories?provider=github",
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-        return [];
-      })
-      .then((data) => {
-        console.log(data);
-      });
-  }, []);
+    );
+    return ((await res.json()) as Repository[]).map((repo) => ({
+      value: repo.id,
+      label: repo.name,
+    }));
+  };
 
   return (
     <Modal title="Software Composition Analysis" open={open} setOpen={setOpen}>
@@ -142,6 +141,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
             >
               Install GitHub App
             </Button>
+            <Select label="Select a repository"></Select>
           </Tab.Panel>
           <Tab.Panel>
             <Steps>
