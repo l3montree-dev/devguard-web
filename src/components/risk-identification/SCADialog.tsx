@@ -14,6 +14,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import Input from "../common/Input";
 import Image from "next/image";
+import { PatWithPrivKey } from "@/types/api/api";
 
 interface Props {
   open: boolean;
@@ -54,11 +55,11 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
             <div className="flex flex-row items-center justify-between">
               <div className="flex-1">
                 <div className="mb-2 flex flex-row gap-2">
-                  <Input
-                    variant="light"
-                    readOnly
-                    className="border-none bg-white dark:bg-slate-600"
-                    value={personalAccessTokens[0].token}
+                  <CopyCode
+                    language="shell"
+                    codeString={
+                      (personalAccessTokens[0] as PatWithPrivKey).privKey
+                    }
                   />
                 </div>
                 <p className="mb-4 text-right text-sm">
@@ -153,7 +154,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                       language="shell"
                       codeString={
                         personalAccessTokens.length > 0
-                          ? personalAccessTokens[0].token
+                          ? (personalAccessTokens[0] as PatWithPrivKey).privKey
                           : "<PERSONAL ACCESS TOKEN>"
                       }
                     />
@@ -208,7 +209,7 @@ jobs:
               codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
              --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --token="${personalAccessTokens.length > 0 ? (personalAccessTokens[0] as PatWithPrivKey).privKey : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
             ></CopyCode>
           </Tab.Panel>
           <Tab.Panel>
@@ -217,7 +218,7 @@ jobs:
               codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
              --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --token="${personalAccessTokens.length > 0 ? (personalAccessTokens[0] as PatWithPrivKey).privKey : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
             ></CopyCode>
           </Tab.Panel>
         </Tab.Panels>

@@ -1,6 +1,6 @@
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { browserApiClient } from "./flawFixApi";
-import { generateKeyPair } from "./keyService";
+import { generateKeyPair } from "./Key";
 
 const createPat = async (data: {
   description: string;
@@ -8,7 +8,7 @@ const createPat = async (data: {
   // generate public private key pair
   const { privateKey, publicKey } = await generateKeyPair();
 
-  const d = { ...data, pubKey: publicKey, fingerprint: "1" };
+  const d = { ...data, pubKey: publicKey };
 
   console.log("privateKey:  ", privateKey, "publicKey: ", publicKey);
 
