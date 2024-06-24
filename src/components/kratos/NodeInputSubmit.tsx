@@ -19,6 +19,8 @@ import { NodeInputProps } from "./helpers";
 import Button from "../common/Button";
 import { UiNodeGroupEnum } from "@ory/client";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import DateString from "../common/DateString";
 
 export function NodeInputSubmit<T>({
   node,
@@ -26,6 +28,39 @@ export function NodeInputSubmit<T>({
   disabled,
 }: NodeInputProps) {
   if (node.group === UiNodeGroupEnum.Webauthn) {
+    if ((node.attributes as any).name === "webauthn_remove") {
+      return (
+        <div className="mb-6 overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="flex flex-row items-center justify-between">
+            <div className="flex-1">
+              <span className="text-base font-semibold">
+                {(node.meta.label?.context as any)?.display_name}
+              </span>
+              <br />
+
+              <span className="text-sm text-gray-400">
+                Created at:{" "}
+                <DateString
+                  date={
+                    new Date(
+                      (node.meta.label?.context as any).added_at_unix * 1000,
+                    )
+                  }
+                />
+              </span>
+            </div>
+
+            <Button
+              intent="danger"
+              className="whitespace-nowrap"
+              variant="outline"
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
+      );
+    }
     // render the webauthn node
     return (
       <div className="mt-6 flex flex-row justify-end">
@@ -41,8 +76,36 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
+
+  if ((node.meta.label?.context as any)?.provider === "github") {
+    // render the github node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          className="capitalize"
+          name={attributes.name}
+          Icon={
+            <Image
+              src="/assets/github.svg"
+              alt="GitHub Logo"
+              className="invert dark:invert-0"
+              width={24}
+              height={24}
+            />
+          }
+          variant="solid"
+          intent="secondary"
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          {getNodeLabel(node)}
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-6 flex flex-row justify-end">
+    <div className="flex flex-row justify-end">
       <Button
         className="capitalize"
         name={attributes.name}

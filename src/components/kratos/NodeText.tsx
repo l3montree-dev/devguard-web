@@ -38,7 +38,7 @@ const Content = ({ node, attributes }: Props) => {
       );
       return (
         <div
-          className="container-fluid"
+          className="container-fluid mt-4 rounded-sm bg-white p-2 text-sm dark:bg-slate-800"
           data-testid={`node/text/${attributes.id}/text`}
         >
           <div className="row">{secrets}</div>

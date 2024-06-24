@@ -126,6 +126,9 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       if (!only) {
         return true;
       }
+      if (only === "oidc") {
+        return group === "oidc";
+      }
       return group === "default" || group === only;
     });
   };

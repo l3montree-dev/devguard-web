@@ -17,6 +17,7 @@ import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import DateString from "@/components/common/DateString";
 import { middleware } from "@/decorators/middleware";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
 import Link from "next/link";
@@ -30,14 +31,13 @@ import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
-import { Messages } from "../components/kratos/Messages";
 import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import CopyCode from "@/components/common/CopyCode";
 
 interface Props {
   flow?: SettingsFlow;
@@ -110,7 +110,7 @@ const Settings: FunctionComponent<{
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/settings?flow=${flow?.id}`, undefined, { shallow: true })
+      .push(`/user-settings?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
           .updateSettingsFlow({
@@ -127,7 +127,7 @@ const Settings: FunctionComponent<{
               for (const item of data.continue_with) {
                 switch (item.action) {
                   case "show_verification_ui":
-                    router.push("/verification?flow=" + item.flow.id);
+                    router.push("/login?flow=" + item.flow.id);
                     return;
                 }
               }
@@ -170,6 +170,18 @@ const Settings: FunctionComponent<{
 
   const handleLogout = LogoutLink();
 
+  useEffect(() => {
+    if (flow?.ui.messages) {
+      flow.ui.messages.forEach((message) => {
+        toast({
+          title: message.type.toLocaleUpperCase(),
+          msg: message.text,
+          intent: message.type,
+        });
+      });
+    }
+  }, [flow?.ui.messages]);
+
   return (
     <Page
       Sidebar={
@@ -192,16 +204,16 @@ const Settings: FunctionComponent<{
               title: "Manage Social Sign In",
             },
             {
-              href: "#lookup_secret",
-              title: "Manage 2FA Backup Recovery Codes",
+              href: "#webauthn",
+              title: "Manage Hardware Tokens and Biometrics",
             },
             {
               href: "#totp",
               title: "Manage 2FA TOTP Authenticator App",
             },
             {
-              href: "#webauthn",
-              title: "Manage Hardware Tokens and Biometrics",
+              href: "#lookup_secret",
+              title: "Manage 2FA Backup Recovery Codes",
             },
           ]}
         />
@@ -229,7 +241,6 @@ const Settings: FunctionComponent<{
 
             <div className="col-span-full">
               <SettingsCard only="profile" flow={flow}>
-                <Messages messages={flow?.ui.messages} />
                 <Flow
                   hideGlobalMessages
                   onSubmit={onSubmit}
@@ -247,7 +258,6 @@ const Settings: FunctionComponent<{
           description="Update your password associated with your account."
         >
           <SettingsCard only="password" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -264,7 +274,7 @@ const Settings: FunctionComponent<{
           <div className="mb-6 flex flex-col gap-2">
             {personalAccessTokens.map((pat) => (
               <div
-                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-700 dark:bg-gray-950"
+                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-900"
                 key={pat.id}
               >
                 <div className="flex flex-row items-center justify-between">
@@ -299,19 +309,12 @@ const Settings: FunctionComponent<{
                         see it ever again
                       </span>
                     )}
-                    <p>Description: {pat.description}</p>
-                    <p>
-                      Created: <DateString date={new Date(pat.createdAt)} />
-                    </p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <form
-            className="rounded-md border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-950"
-            onSubmit={handleSubmit(handleCreatePat)}
-          >
+          <form onSubmit={handleSubmit(handleCreatePat)}>
             <span className="block pb-2 font-medium">
               Create new Personal Access Token
             </span>
@@ -320,7 +323,7 @@ const Settings: FunctionComponent<{
               {...register("description")}
               label="Description"
             />
-            <div className="mt-2 flex flex-row justify-end">
+            <div className="mt-6 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>
           </form>
@@ -329,10 +332,9 @@ const Settings: FunctionComponent<{
         <Section
           id="oidc"
           title="Manage Social Sign In"
-          description="Update your password associated with your account."
+          description="Update your linked social network accounts."
         >
           <SettingsCard only="oidc" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -341,23 +343,21 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
-
         <Section
-          id="lookup_secret"
-          title="Manage 2FA Backup Recovery Codes"
-          description="Recovery codes can be used in panic situations where you have lost
-        access to your 2FA device."
+          id="webauthn"
+          title="Manage Hardware Tokens and Biometrics"
+          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
         >
-          <SettingsCard only="lookup_secret" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
+          <SettingsCard only="webauthn" flow={flow}>
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
-              only="lookup_secret"
+              only="webauthn"
               flow={flow}
             />
           </SettingsCard>
         </Section>
+
         <Section
           id="totp"
           title="Manage 2FA TOTP Authenticator App"
@@ -393,7 +393,6 @@ const Settings: FunctionComponent<{
           }
         >
           <SettingsCard only="totp" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -402,23 +401,23 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
-
         <Section
-          id="webauthn"
-          title="Manage Hardware Tokens and Biometrics"
-          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
+          id="lookup_secret"
+          title="Manage 2FA Backup Recovery Codes"
+          description="Recovery codes can be used in panic situations where you have lost
+        access to your 2FA device."
         >
-          <SettingsCard only="webauthn" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
+          <SettingsCard only="lookup_secret" flow={flow}>
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
-              only="webauthn"
+              only="lookup_secret"
               flow={flow}
             />
           </SettingsCard>
         </Section>
-        <div className="flex flex-row justify-end border-t pt-6 dark:border-t-slate-700">
+
+        <div className="flex flex-row justify-end dark:border-t-slate-700">
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>

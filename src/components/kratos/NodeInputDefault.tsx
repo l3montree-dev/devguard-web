@@ -35,7 +35,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
 
   // Render a generic text input field.
   return (
-    <div className="mt-4">
+    <div className="mb-4">
       <Input
         label={labelText ?? ""}
         type={attributes.type}
