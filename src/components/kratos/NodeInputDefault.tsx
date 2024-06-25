@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Input from "../common/Input";
+import { FormDescription, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { NodeInputProps } from "./helpers";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
@@ -35,9 +37,10 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
 
   // Render a generic text input field.
   return (
-    <div className="mb-4">
+    <div className="mb-4 grid w-full max-w-sm items-center gap-1.5">
+      <Label>{labelText ?? ""}</Label>
       <Input
-        label={labelText ?? ""}
+        placeholder="shadcn"
         type={attributes.type}
         name={attributes.name}
         value={value}

@@ -27,8 +27,6 @@ import { useForm } from "react-hook-form";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
 import { toast } from "../components/Toaster";
-import Button from "../components/common/Button";
-import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { withOrg } from "../decorators/withOrg";
@@ -38,6 +36,10 @@ import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import CopyCode from "@/components/common/CopyCode";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Props {
   flow?: SettingsFlow;
@@ -273,10 +275,7 @@ const Settings: FunctionComponent<{
         >
           <div className="mb-6 flex flex-col gap-2">
             {personalAccessTokens.map((pat) => (
-              <div
-                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-900"
-                key={pat.id}
-              >
+              <Card key={pat.id}>
                 <div className="flex flex-row items-center justify-between">
                   <div className="flex-1">
                     {pat.token !== undefined && (
@@ -291,9 +290,9 @@ const Settings: FunctionComponent<{
                         </span>
                       </div>
                     )}
-                    <span className="text-base font-semibold">
-                      {pat.description}
-                    </span>
+                    <CardHeader>
+                      <CardTitle>{pat.description}</CardTitle>
+                    </CardHeader>
                     <br />
                     {pat.token === undefined && (
                       <span className="text-sm text-gray-400">
@@ -302,30 +301,24 @@ const Settings: FunctionComponent<{
                       </span>
                     )}
                   </div>
-
                   {!pat.token && (
                     <Button
-                      intent="danger"
-                      className="whitespace-nowrap"
-                      variant="outline"
+                      variant="destructive"
                       onClick={() => onDeletePat(pat)}
                     >
                       Delete
                     </Button>
                   )}
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
           <form onSubmit={handleSubmit(handleCreatePat)}>
             <span className="block pb-2 font-medium">
               Create new Personal Access Token
             </span>
-            <Input
-              variant="dark"
-              {...register("description")}
-              label="Description"
-            />
+            <Label htmlFor="description">Description</Label>
+            <Input {...register("description")} />
             <div className="mt-6 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>

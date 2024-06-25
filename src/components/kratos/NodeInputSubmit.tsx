@@ -16,11 +16,11 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
-import Button from "../common/Button";
 import { UiNodeGroupEnum } from "@ory/client";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import DateString from "../common/DateString";
+import { Button } from "../ui/button";
 
 export function NodeInputSubmit<T>({
   node,
@@ -50,11 +50,7 @@ export function NodeInputSubmit<T>({
               </span>
             </div>
 
-            <Button
-              intent="danger"
-              className="whitespace-nowrap"
-              variant="outline"
-            >
+            <Button variant="destructive" className="whitespace-nowrap">
               Delete
             </Button>
           </div>
@@ -65,12 +61,12 @@ export function NodeInputSubmit<T>({
     return (
       <div className="mt-6 flex flex-row justify-end">
         <Button
-          Icon={<FingerPrintIcon />}
           className="capitalize"
           name={attributes.name}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
         >
+          <FingerPrintIcon className="mr-2 h-4 w-4" />
           {getNodeLabel(node)}
         </Button>
       </div>
@@ -84,20 +80,16 @@ export function NodeInputSubmit<T>({
         <Button
           className="capitalize"
           name={attributes.name}
-          Icon={
-            <Image
-              src="/assets/github.svg"
-              alt="GitHub Logo"
-              className="invert dark:invert-0"
-              width={24}
-              height={24}
-            />
-          }
-          variant="solid"
-          intent="secondary"
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
         >
+          <Image
+            src="/assets/github.svg"
+            alt="GitHub Logo"
+            className="mr-2 invert dark:invert-0"
+            width={20}
+            height={20}
+          />
           {getNodeLabel(node)}
         </Button>
       </div>
