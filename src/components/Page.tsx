@@ -111,7 +111,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         </Dialog>
       </Transition.Root>
       {/* Static sidebar for desktop */}
-      <div className="inset-y-0 z-10 hidden flex-col bg-blue-950 md:fixed md:flex">
+      <div className="inset-y-0 z-10 hidden flex-col md:fixed md:flex">
         <Sidenav />
       </div>
       <div className="md:pl-16">
@@ -127,7 +127,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="bottom-0 right-0 top-0 hidden w-72 flex-1 overflow-y-auto border-l bg-white dark:border-gray-700 dark:bg-gray-950 dark:text-white md:fixed lg:block">
+          <aside className="bottom-0 right-0 top-0 hidden w-72 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
             {props.Sidebar}
           </aside>
         )}

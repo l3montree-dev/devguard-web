@@ -39,7 +39,13 @@ import CopyCode from "@/components/common/CopyCode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface Props {
   flow?: SettingsFlow;
@@ -230,7 +236,7 @@ const Settings: FunctionComponent<{
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-full flex items-center gap-x-8">
-              <div className="rounded-lg bg-gray-300 p-2 dark:bg-slate-700 dark:text-slate-400">
+              <div className="rounded-lg border bg-card p-2">
                 <UserIcon width={60} height={60} />
               </div>
               <div>
@@ -290,25 +296,30 @@ const Settings: FunctionComponent<{
                         </span>
                       </div>
                     )}
-                    <CardHeader>
-                      <CardTitle>{pat.description}</CardTitle>
-                    </CardHeader>
-                    <br />
-                    {pat.token === undefined && (
-                      <span className="text-sm text-gray-400">
-                        Created at:{" "}
-                        <DateString date={new Date(pat.createdAt)} />
-                      </span>
-                    )}
+                    <div className="flex flex-row items-center justify-between">
+                      <CardHeader>
+                        <CardTitle>{pat.description}</CardTitle>
+                        <CardDescription>
+                          Created at:{" "}
+                          <DateString date={new Date(pat.createdAt)} />
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex flex-col justify-center pb-0">
+                        {pat.token === undefined && (
+                          <span className="text-sm text-muted-foreground"></span>
+                        )}
+
+                        {!pat.token && (
+                          <Button
+                            variant="destructive"
+                            onClick={() => onDeletePat(pat)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </CardContent>
+                    </div>
                   </div>
-                  {!pat.token && (
-                    <Button
-                      variant="destructive"
-                      onClick={() => onDeletePat(pat)}
-                    >
-                      Delete
-                    </Button>
-                  )}
                 </div>
               </Card>
             ))}
@@ -324,7 +335,6 @@ const Settings: FunctionComponent<{
             </div>
           </form>
         </Section>
-
         <Section
           id="oidc"
           title="Manage Social Sign In"
@@ -413,7 +423,7 @@ const Settings: FunctionComponent<{
           </SettingsCard>
         </Section>
 
-        <div className="flex flex-row justify-end dark:border-t-slate-700">
+        <div className="flex flex-row justify-end">
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>

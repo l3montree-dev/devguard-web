@@ -197,7 +197,7 @@ const Login: NextPage = () => {
                 width={300}
                 height={300}
               />
-              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
+              <h2 className="font-display mt-10 text-left text-2xl font-bold leading-9 tracking-tight">
                 {(() => {
                   if (flow?.refresh) {
                     return "Confirm Action";

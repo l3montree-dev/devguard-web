@@ -16,10 +16,11 @@
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { ProjectDTO } from "../types/api/api";
-import Button from "./common/Button";
 import ListItem from "./common/ListItem";
 import PopupMenu from "./common/PopupMenu";
 import PopupMenuItem from "./common/PopupMenuItem";
+import { Button, buttonVariants } from "./ui/button";
+import Link from "next/link";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -37,16 +38,15 @@ export default function ProjectList({ projects }: Props) {
             Button={
               <>
                 {" "}
-                <Button
-                  variant="outline"
-                  intent="primary"
+                <Link
+                  className={buttonVariants({ variant: "outline" })}
                   href={"/" + slug + "/projects/" + project.slug}
                 >
                   View project
-                </Button>
+                </Link>
                 <PopupMenu
                   Button={
-                    <Button variant="outline" intent="primary">
+                    <Button variant="outline">
                       <EllipsisVerticalIcon className="h-5 w-5" />
                     </Button>
                   }

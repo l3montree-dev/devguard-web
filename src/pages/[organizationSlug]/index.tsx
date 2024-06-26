@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
@@ -20,8 +23,6 @@ import { useForm } from "react-hook-form";
 import Page from "../../components/Page";
 import ProjectList from "../../components/ProjectList";
 import { toast } from "../../components/Toaster";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
 import Modal from "../../components/common/Modal";
 import { withOrg } from "../../decorators/withOrg";
 import { withSession } from "../../decorators/withSession";
@@ -31,22 +32,47 @@ import {
   getApiClientFromContext,
 } from "../../services/flawFixApi";
 import { ProjectDTO } from "../../types/api/api";
+import { z } from "zod";
 import { CreateProjectReq } from "../../types/api/req";
-import { hasErrors } from "../../utils/common";
-import { middleware } from "@/decorators/middleware";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { ZodConvert } from "@/types/common";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 interface Props {
   projects: Array<ProjectDTO>;
 }
+
+const formSchema = z.object<ZodConvert<CreateProjectReq>>({
+  name: z.string(),
+  description: z.string(),
+});
 
 const Home: FunctionComponent<Props> = ({ projects }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
 
-  const { register, handleSubmit, getFieldState, formState } =
-    useForm<CreateProjectReq>({
-      mode: "onBlur",
-    });
+  const form = useForm<CreateProjectReq>({
+    mode: "onBlur",
+    resolver: zodResolver(formSchema),
+  });
 
   const handleCreateProject = async (req: CreateProjectReq) => {
     const resp = await browserApiClient(
@@ -70,35 +96,61 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
   return (
     <Page
-      Button={
-        <Button intent="primary" onClick={() => setOpen(true)}>
-          New Project
-        </Button>
-      }
+      Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
       title={activeOrg.name ?? "Loading..."}
     >
-      <Modal title="Create new Project" open={open} setOpen={setOpen}>
-        <form onSubmit={handleSubmit(handleCreateProject)}>
-          <Input
-            variant="dark"
-            label="Name"
-            error={getFieldState("name", formState).error}
-            {...register("name", { required: "Project name is required" })}
-          />
-          <div className="mt-4">
-            <Input
-              variant="dark"
-              label="Description"
-              {...register("description")}
-            />
-          </div>
-          <div className="mt-4 flex flex-row justify-end">
-            <Button disabled={hasErrors(formState.errors)} type="submit">
-              Create
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <Dialog open={open}>
+        <DialogContent setOpen={setOpen}>
+          <DialogHeader>
+            <DialogTitle>Create new Project Create new Project</DialogTitle>
+            <DialogDescription>
+              A project groups multiple software projects (repositories) inside
+              a single enitity. Something like: frontend and backend
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="space-y-8"
+              onSubmit={form.handleSubmit(handleCreateProject)}
+            >
+              <FormField
+                name={"name"}
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>The name of the project.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name={"description"}
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      The description of the project.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
       <div>
         <ProjectList projects={projects} />
       </div>

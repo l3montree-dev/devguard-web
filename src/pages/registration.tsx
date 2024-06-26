@@ -243,24 +243,25 @@ const Registration: NextPage = () => {
                 <CustomTab>Legacy Password Sign Up</CustomTab>
                 <Tab.Panels className={"mt-6"}>
                   <Tab.Panel>
-                    <div className="border-b dark:border-b-slate-700">
+                    <div className="mb-6 border-b dark:border-b-slate-700">
                       <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
                     </div>
+
                     <Flow
                       onSubmit={onSubmit}
                       flow={passwordlessFlow as LoginFlow}
                     />
                   </Tab.Panel>
                   <Tab.Panel>
-                    <div className="mt-4">
+                    <div className="mb-6 mt-4">
                       <Callout intent="warning">
                         <div className="flex flex-row gap-4">
-                          <div className="w-20">
-                            <Carriage />
-                          </div>
                           <p className="flex-1">
                             Passwords are insecure by design. We recommend using
-                            passwordless authentication methods.
+                            passwordless authentication methods.{" "}
+                            <div className="mr-2 inline-block w-10">
+                              <Carriage />
+                            </div>
                           </p>
                         </div>
                       </Callout>

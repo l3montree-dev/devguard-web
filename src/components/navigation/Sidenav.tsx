@@ -15,18 +15,28 @@
 
 import { useOrg } from "@/hooks/useOrg";
 import { UserGroupIcon } from "@heroicons/react/20/solid";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { PlusIcon, UserIcon } from "@heroicons/react/24/solid";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useStore } from "../../zustand/globalStoreProvider";
 import PopupMenu from "../common/PopupMenu";
 import PopupMenuItem from "../common/PopupMenuItem";
+import { Button, buttonVariants } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { useTheme } from "next-themes";
 
 interface Props {}
 
 export default function Sidenav() {
   const router = useRouter();
+
+  const { setTheme } = useTheme();
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
@@ -46,57 +56,81 @@ export default function Sidenav() {
   };
 
   return (
-    <div className="flex grow flex-row">
-      <div className="flex w-16 flex-col justify-between border-r border-r-gray-200 bg-white p-2 pb-2 pt-4 dark:border-r-gray-700 dark:bg-gray-950">
+    <div className="flex grow flex-row bg-card">
+      <div className="flex w-16 flex-col justify-between border-r p-2 pb-2 pt-4 ">
         <div>
           <div className="flex flex-row justify-center">
-            <PopupMenu
-              Button={
-                <div className="relative z-30 m-1 flex aspect-square h-9 w-9 flex-col items-center justify-center rounded-lg bg-black font-display text-2xl font-semibold text-white dark:bg-gray-700">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  size={"icon"}
+                  className="text-2xl font-semibold"
+                >
                   {activeOrg?.name[0] ?? <PlusIcon className="h-6 w-6" />}
-                </div>
-              }
-            >
-              <div className="text-black">
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
                 {orgs.length !== 0 && (
                   <>
                     {orgs.map((o) => (
-                      <PopupMenuItem
-                        text={o.name}
-                        Icon={o.name[0]}
+                      <DropdownMenuItem
                         key={o.id}
                         onClick={handleActiveOrgChange(o.id)}
-                      />
+                      >
+                        {o.name}
+                      </DropdownMenuItem>
                     ))}
                   </>
                 )}
-                <PopupMenuItem
-                  text="Join Organization"
-                  onClick={handleNavigateToSetupOrg}
-                  Icon={<UserGroupIcon className="h-6 w-6" />}
-                />
-                <PopupMenuItem
-                  text="Create Organization"
-                  onClick={handleNavigateToSetupOrg}
-                  Icon={<PlusIcon className="h-6 w-6" />}
-                />
-              </div>
-            </PopupMenu>
+                <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+                  Join Organization
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+                  Create Organization
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-        <div className="flex flex-row justify-center">
-          {user && (
-            <Link
-              className="rounded-lg bg-gray-200 p-1.5 text-black dark:bg-slate-700"
-              href="/user-settings"
-            >
-              <UserIcon
-                className="text-gray-600 dark:text-slate-400"
-                width={25}
-                height={25}
-              />
-            </Link>
-          )}
+        <div className="flex flex-col gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex flex-row justify-center">
+                <Button variant="outline" size="icon">
+                  <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex flex-row justify-center">
+            {user && (
+              <Link
+                className={buttonVariants({ variant: "outline", size: "icon" })}
+                href="/user-settings"
+              >
+                <UserIcon
+                  className="text-card-foreground"
+                  width={25}
+                  height={25}
+                />
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

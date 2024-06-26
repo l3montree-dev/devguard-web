@@ -16,7 +16,7 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
-import Button from "../common/Button";
+import { Button } from "../ui/button";
 
 export function NodeInputButton<T>({
   node,

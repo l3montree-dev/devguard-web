@@ -37,10 +37,9 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
 
   // Render a generic text input field.
   return (
-    <div className="mb-4 grid w-full max-w-sm items-center gap-1.5">
+    <div className="mb-4 grid w-full items-center gap-1.5">
       <Label>{labelText ?? ""}</Label>
       <Input
-        placeholder="shadcn"
         type={attributes.type}
         name={attributes.name}
         value={value}

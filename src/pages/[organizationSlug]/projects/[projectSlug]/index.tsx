@@ -4,8 +4,6 @@ import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
-import Button from "../../../../components/common/Button";
-import Input from "../../../../components/common/Input";
 import ListItem from "../../../../components/common/ListItem";
 import Modal from "../../../../components/common/Modal";
 import { withOrg } from "../../../../decorators/withOrg";
@@ -22,6 +20,7 @@ import { toast } from "@/components/Toaster";
 import Checkbox from "@/components/common/Checkbox";
 import Link from "next/link";
 import { middleware } from "@/decorators/middleware";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 interface Props {
   project: ProjectDTO & {
@@ -94,13 +93,12 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               title={asset.name}
               description={asset.description}
               Button={
-                <Button
+                <Link
                   href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                  variant="outline"
-                  intent="primary"
+                  className={buttonVariants({ variant: "outline" })}
                 >
                   View Asset
-                </Button>
+                </Link>
               }
             />
           ))}

@@ -21,6 +21,13 @@ import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import DateString from "../common/DateString";
 import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export function NodeInputSubmit<T>({
   node,
@@ -30,31 +37,28 @@ export function NodeInputSubmit<T>({
   if (node.group === UiNodeGroupEnum.Webauthn) {
     if ((node.attributes as any).name === "webauthn_remove") {
       return (
-        <div className="mb-6 overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex flex-row items-center justify-between">
-            <div className="flex-1">
-              <span className="text-base font-semibold">
-                {(node.meta.label?.context as any)?.display_name}
-              </span>
-              <br />
-
-              <span className="text-sm text-gray-400">
-                Created at:{" "}
-                <DateString
-                  date={
-                    new Date(
-                      (node.meta.label?.context as any).added_at_unix * 1000,
-                    )
-                  }
-                />
-              </span>
-            </div>
-
+        <Card className="mb-6 flex flex-row items-center justify-between">
+          <CardHeader>
+            <CardTitle>
+              {(node.meta.label?.context as any)?.display_name}
+            </CardTitle>
+            <CardDescription>
+              Created at:{" "}
+              <DateString
+                date={
+                  new Date(
+                    (node.meta.label?.context as any).added_at_unix * 1000,
+                  )
+                }
+              />
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pb-0">
             <Button variant="destructive" className="whitespace-nowrap">
               Delete
             </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       );
     }
     // render the webauthn node
@@ -86,7 +90,7 @@ export function NodeInputSubmit<T>({
           <Image
             src="/assets/github.svg"
             alt="GitHub Logo"
-            className="mr-2 invert dark:invert-0"
+            className="mr-2"
             width={20}
             height={20}
           />
