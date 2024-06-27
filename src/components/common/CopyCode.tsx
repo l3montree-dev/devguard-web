@@ -14,8 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import React, { FunctionComponent } from "react";
-import { toast } from "../Toaster";
 import dynamic from "next/dynamic";
+import { toast } from "sonner";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 
 interface Props {
@@ -25,10 +25,8 @@ interface Props {
 const CopyCode: FunctionComponent<Props> = (props) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(props.codeString);
-    toast({
-      msg: "The code has been copied to your clipboard.",
-      intent: "info",
-      title: "Copied to clipboard",
+    toast("Copied to clipboard", {
+      description: "The code has been copied to your clipboard.",
     });
   };
   return (
@@ -36,12 +34,12 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       style={{
         height: 14 /*padding*/ + props.codeString.split("\n").length * 20,
       }}
-      className="relative w-full  overflow-hidden rounded-lg"
+      className="relative w-full overflow-hidden  rounded-lg border"
     >
-      <div className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-gray-800" />
+      <div className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-card" />
       <button
         onClick={handleCopy}
-        className="absolute right-1 top-1 z-10 rounded-lg bg-white/10 p-1 px-2 text-xs text-white transition-all hover:bg-white/30"
+        className="absolute right-1 top-1 z-10 rounded-lg bg-white/30 p-1 px-2 text-xs text-white transition-all hover:bg-white/40"
       >
         Copy
       </button>

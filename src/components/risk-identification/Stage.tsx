@@ -15,7 +15,14 @@
 
 import { classNames } from "@/utils/common";
 import { Handle, Position } from "reactflow";
-import Button from "../common/Button";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 function Stage({
   title,
@@ -33,10 +40,10 @@ function Stage({
   onButtonClick?: () => void;
 }) {
   return (
-    <div
+    <Card
       className={classNames(
-        "flex w-60 items-center justify-between gap-x-6 rounded-lg border bg-white px-5 py-5 text-sm shadow-sm   transition-all dark:border-gray-700 dark:bg-gray-900 dark:text-white",
-        comingSoon ? "" : "scale-105 ring ring-blue-500",
+        "w-72",
+        comingSoon ? "" : "scale-105 ring ring-blue-600",
       )}
     >
       {targetHandle && (
@@ -47,23 +54,22 @@ function Stage({
           position={Position.Left}
         />
       )}
-      <div>
-        <div>
-          <span className="font-semibold">{title}</span>
-          <p className="mt-2 text-slate-400">{description}</p>
-        </div>
-        <div className="mt-10 flex flex-row">
-          <Button
-            className="flex-1"
-            disabled={comingSoon}
-            intent="primary"
-            variant="outline"
-            onClick={onButtonClick}
-          >
-            {comingSoon ? "Coming soon" : "Open Instructions"}
-          </Button>
-        </div>
-      </div>
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+
+      <CardFooter>
+        <Button
+          className="flex-1"
+          disabled={comingSoon}
+          variant={comingSoon ? "outline" : "default"}
+          onClick={onButtonClick}
+        >
+          {comingSoon ? "Coming soon" : "Open Instructions"}
+        </Button>
+      </CardFooter>
+
       {sourceHandle && (
         <Handle
           className="!border-2 border-white !bg-gray-400 p-1"
@@ -72,7 +78,7 @@ function Stage({
           position={Position.Right}
         />
       )}
-    </div>
+    </Card>
   );
 }
 

@@ -1,7 +1,8 @@
 import { ProductsData } from "@/types/api/billing";
-import Button from "@/components/common/Button";
+
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { classNames } from "@/utils/common";
+import { Button } from "../ui/button";
 
 function Product({
   product,
@@ -62,8 +63,7 @@ function Product({
       <div className={`mt-6 py-2 ${product.name === "Free" ? "hidden" : ""}`}>
         <Button
           onClick={() => onButtonClick(product.name)}
-          variant={product.name === "Gold" ? "solid" : "outline"}
-          intent={product.name === "Gold" ? "primary" : "primary"}
+          variant={product.name === "Gold" ? "default" : "outline"}
         >
           {`Upgrade to ${product.name}`}
         </Button>

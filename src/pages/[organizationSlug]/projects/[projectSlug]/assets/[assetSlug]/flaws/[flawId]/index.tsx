@@ -2,7 +2,7 @@ import Page from "@/components/Page";
 import Sidebar from "@/components/Sidebar";
 
 import FlawState from "@/components/common/FlawState";
-import Select from "@/components/common/Select";
+
 import Severity from "@/components/common/Severity";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -13,19 +13,20 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "@/services/flawFixApi";
-import { DetailedFlawDTO, FlawWithCVE } from "@/types/api/api";
+import { DetailedFlawDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
-import Button from "@/components/common/Button";
+
+import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
 import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { FormEvent, FunctionComponent, useState } from "react";
 import Markdown from "react-markdown";
-import { useRouter } from "next/router";
-import RiskAssessment from "@/components/RiskAssessment/RiskAssessment";
-import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 
 const CVECard = dynamic(() => import("@/components/CVECard"), {
   ssr: false,
@@ -150,12 +151,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     className="flex flex-col items-center"
                   >
                     <div className="mb-4 flex w-full space-x-4 p-2">
-                      <Select
-                        label=""
-                        value={status}
-                        onChange={handleStatusChange}
-                        className="w-1/3 rounded border p-2"
-                      >
+                      <Select value={status} onValueChange={handleStatusChange}>
                         <option value="" disabled hidden>
                           Choose status
                         </option>
