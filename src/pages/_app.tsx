@@ -13,14 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import "focus-visible";
 import "@/styles/tailwind.scss";
-import { Lexend, Merriweather } from "next/font/google";
-import { Inter } from "next/font/google";
-import { useRouter } from "next/router";
+import "focus-visible";
+import { Inter, Lexend, Merriweather } from "next/font/google";
 import { useHydrate } from "../zustand/globalStore";
 import { StoreProvider } from "../zustand/globalStoreProvider";
-import { useEffect } from "react";
+import { ThemeProvider } from "next-themes";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -46,8 +44,15 @@ export default function App({ Component, pageProps }) {
   const store = useHydrate(pageProps.initialZustandState);
 
   return (
-    <StoreProvider store={store}>
-      <Component {...pageProps} />
-    </StoreProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <StoreProvider store={store}>
+        <Component {...pageProps} />
+      </StoreProvider>
+    </ThemeProvider>
   );
 }

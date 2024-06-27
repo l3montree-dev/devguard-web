@@ -12,10 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./globals.css";
 
 @font-face {
     font-family: 'Lexend';
@@ -57,6 +54,7 @@ pre {
         width: 1px // i don't know why this is necessary
     }
 }
+
 
 .modal {
     width: 50vw;
@@ -113,7 +111,11 @@ pre {
 }
 
 a {
-    @apply text-blue-600 hover:underline;
+    @apply dark:text-primary text-blue-600 hover:underline;
+}
+
+.dark header a {
+    @apply text-white;
 }
 
 .toaster {

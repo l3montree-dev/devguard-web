@@ -16,9 +16,18 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
-import Button from "../common/Button";
 import { UiNodeGroupEnum } from "@ory/client";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import DateString from "../common/DateString";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export function NodeInputSubmit<T>({
   node,
@@ -26,23 +35,73 @@ export function NodeInputSubmit<T>({
   disabled,
 }: NodeInputProps) {
   if (node.group === UiNodeGroupEnum.Webauthn) {
+    if ((node.attributes as any).name === "webauthn_remove") {
+      return (
+        <Card className="mb-6 flex flex-row items-center justify-between">
+          <CardHeader>
+            <CardTitle>
+              {(node.meta.label?.context as any)?.display_name}
+            </CardTitle>
+            <CardDescription>
+              Created at:{" "}
+              <DateString
+                date={
+                  new Date(
+                    (node.meta.label?.context as any).added_at_unix * 1000,
+                  )
+                }
+              />
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pb-0">
+            <Button variant="destructive" className="whitespace-nowrap">
+              Delete
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
     // render the webauthn node
     return (
       <div className="mt-6 flex flex-row justify-end">
         <Button
-          Icon={<FingerPrintIcon />}
           className="capitalize"
           name={attributes.name}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
         >
+          <FingerPrintIcon className="mr-2 h-4 w-4" />
           {getNodeLabel(node)}
         </Button>
       </div>
     );
   }
+
+  if ((node.meta.label?.context as any)?.provider === "github") {
+    // render the github node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          className="capitalize"
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/github.svg"
+            alt="GitHub Logo"
+            className="mr-2"
+            width={20}
+            height={20}
+          />
+          {getNodeLabel(node)}
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-6 flex flex-row justify-end">
+    <div className="flex flex-row justify-end">
       <Button
         className="capitalize"
         name={attributes.name}

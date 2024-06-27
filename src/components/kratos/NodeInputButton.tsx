@@ -16,7 +16,7 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { NodeInputProps } from "./helpers";
-import Button from "../common/Button";
+import { Button } from "../ui/button";
 
 export function NodeInputButton<T>({
   node,
@@ -50,7 +50,7 @@ export function NodeInputButton<T>({
         onClick={(e) => {
           onClick(e);
         }}
-        className="mt-6 capitalize"
+        className="mt-2 capitalize"
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >

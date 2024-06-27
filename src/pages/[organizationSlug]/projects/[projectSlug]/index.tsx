@@ -1,13 +1,43 @@
-import Select from "@/components/common/Select";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
-import Button from "../../../../components/common/Button";
-import Input from "../../../../components/common/Input";
 import ListItem from "../../../../components/common/ListItem";
-import Modal from "../../../../components/common/Modal";
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { middleware } from "@/decorators/middleware";
+import { ZodConvert } from "@/types/common";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import z from "zod";
 import { withOrg } from "../../../../decorators/withOrg";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
@@ -17,24 +47,33 @@ import {
 } from "../../../../services/flawFixApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
-import { hasErrors } from "../../../../utils/common";
-import { toast } from "@/components/Toaster";
-import Checkbox from "@/components/common/Checkbox";
-import Link from "next/link";
-import { middleware } from "@/decorators/middleware";
+import { toast } from "sonner";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
 }
+
+const formSchema = z.object<ZodConvert<CreateAssetReq>>({
+  name: z.string(),
+  description: z.string(),
+  importance: z.number(),
+  reachableFromTheInternet: z.boolean(),
+
+  confidentialityRequirement: z.string(),
+  integrityRequirement: z.string(),
+  availabilityRequirement: z.string(),
+});
+
 const Index: FunctionComponent<Props> = ({ project }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const { register, getFieldState, formState, handleSubmit } =
-    useForm<CreateAssetReq>();
+  const form = useForm<CreateAssetReq>({
+    resolver: zodResolver(formSchema),
+  });
 
   const handleCreateAsset = async (data: CreateAssetReq) => {
     const resp = await browserApiClient(
@@ -57,11 +96,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
     } else {
-      toast({
-        msg: "Could not create asset",
-        intent: "error",
-        title: "Error",
-      });
+      toast("Error", { description: "Could not create asset" });
     }
   };
   return (
@@ -73,13 +108,13 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           <span className="flex flex-row gap-2">
             <Link
               href={`/${activeOrg.slug}`}
-              className="text-white hover:no-underline"
+              className="!text-white hover:no-underline"
             >
               {activeOrg.name}
             </Link>
             <span className="opacity-75">/</span>
             <Link
-              className="text-white hover:no-underline"
+              className="!text-white hover:no-underline"
               href={`/${activeOrg.slug}/projects/${project.slug}`}
             >
               {project.name}
@@ -94,85 +129,185 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               title={asset.name}
               description={asset.description}
               Button={
-                <Button
+                <Link
                   href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                  variant="outline"
-                  intent="primary"
+                  className={buttonVariants({ variant: "outline" })}
                 >
                   View Asset
-                </Button>
+                </Link>
               }
             />
           ))}
         </div>
       </Page>
-      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
-        <form onSubmit={handleSubmit(handleCreateAsset)}>
-          <Input
-            variant="dark"
-            label="Name"
-            {...register("name", {
-              required: "Please enter a name",
-            })}
-            error={getFieldState("name")?.error}
-          />
-          <div className="mt-4">
-            <Input
-              variant="dark"
-              label="Description"
-              {...register("description", {
-                required: "Please enter a description",
-              })}
-              error={getFieldState("description")?.error}
-            />
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("confidentialityRequirement")}
-              label="Confidentiality Requirement"
+      <Dialog open={showModal}>
+        <DialogContent setOpen={setShowModal}>
+          <DialogHeader>
+            <DialogTitle>Create new asset</DialogTitle>
+            <DialogDescription>
+              An asset is a software project you would like to manage the risks
+              of.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="flex flex-col gap-6"
+              onSubmit={form.handleSubmit(handleCreateAsset)}
             >
-              <option value={"low"}>Low</option>
-              <option value={"medium"}>Medium</option>
-              <option value={"high"}>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("integrityRequirement")}
-              label="Integrity Requirement"
-            >
-              <option value={"low"}>Low</option>
-              <option value={"medium"}>Medium</option>
-              <option value={"high"}>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("availabilityRequirement")}
-              label="Availability Requirement"
-            >
-              <option value={"low"}>Low</option>
-              <option value={"medium"}>Medium</option>
-              <option value={"high"}>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Checkbox
-              {...register("reachableFromTheInternet")}
-              label="Reachable from the internet"
-            />
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button
-              disabled={hasErrors(formState.errors)}
-              type="submit"
-              variant="solid"
-            >
-              Create
-            </Button>
-          </div>
-        </form>
-      </Modal>
+              <FormField
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>The name of the asset.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="description"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      The description of the asset.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confidentialityRequirement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confidentiality Requirement</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose the confidentiality requirement based on how
+                      crucial it is to protect sensitive information from
+                      unauthorized access in your specific context, considering
+                      the potential impact on your organization.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="integrityRequirement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Integrity Requirement</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select the integrity requirement based on how crucial it
+                      is to maintain the accuracy and reliability of your
+                      information, ensuring it remains unaltered by unauthorized
+                      users.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="availabilityRequirement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Availability Requirement</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select the availability requirement based on how important
+                      it is for your information and systems to remain
+                      accessible and operational without interruptions.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="reachableFromTheInternet"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between gap-4 rounded-lg border bg-card p-4">
+                    <div className="space-y-0.5 ">
+                      <FormLabel className="text-base">
+                        Reachable from the internet
+                      </FormLabel>
+                      <FormDescription>
+                        Is the asset publicly availabe. Does it have a static
+                        IP-Address assigned to it or a domain name?
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit" variant="default">
+                  Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

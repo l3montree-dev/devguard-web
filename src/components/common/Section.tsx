@@ -21,27 +21,23 @@ interface Props {
   description?: ReactNode;
   children: React.ReactNode;
   id?: string;
-  highlightBg?: boolean;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
-    <div
-      id={props.id}
-      className={classNames(
-        props.highlightBg
-          ? "rounded-lg bg-zinc-200 p-3 dark:bg-slate-800"
-          : "mb-6 pb-6",
-      )}
-    >
-      <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
-        {props.title}
-      </h2>
-      {props.description !== undefined && (
-        <p className="mt-1 text-sm leading-6 text-black/80 dark:text-white">
-          {props.description}
-        </p>
-      )}
-      <div className="mt-4">{props.children}</div>
+    <div id={props.id} className={classNames("mb-6 pb-6 pt-6 ")}>
+      <div className="flex flex-row gap-8">
+        <div className="w-96">
+          <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
+            {props.title}
+          </h2>
+          {props.description !== undefined && (
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {props.description}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-1 flex-col justify-end">{props.children}</div>
+      </div>
     </div>
   );
 };

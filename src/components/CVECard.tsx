@@ -1,11 +1,9 @@
 import { FlawWithCVE } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import { FunctionComponent, useState } from "react";
 import CVEChart from "./common/CVEChart";
 import DateString from "./common/DateString";
-import P from "./common/P";
 
 interface Props {
   cve: FlawWithCVE["cve"];
@@ -41,7 +39,7 @@ const CVECard: FunctionComponent<Props> = ({ cve }) => {
         </div>
       )}
       <b>Description:</b>
-      <P value={cve.description} />
+      <p>{cve.description}</p>
 
       <div className="mt-4 flex flex-row justify-end">
         <button

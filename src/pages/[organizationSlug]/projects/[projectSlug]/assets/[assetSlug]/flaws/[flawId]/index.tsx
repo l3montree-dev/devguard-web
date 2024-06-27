@@ -1,8 +1,7 @@
 import Page from "@/components/Page";
-import Sidebar from "@/components/Sidebar";
 
 import FlawState from "@/components/common/FlawState";
-import Select from "@/components/common/Select";
+
 import Severity from "@/components/common/Severity";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -13,28 +12,23 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "@/services/flawFixApi";
-import { DetailedFlawDTO, FlawWithCVE } from "@/types/api/api";
+import { DetailedFlawDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
-import Button from "@/components/common/Button";
-import { GetServerSidePropsContext } from "next";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { FormEvent, FunctionComponent, useState } from "react";
-import Markdown from "react-markdown";
-import { useRouter } from "next/router";
-import RiskAssessment from "@/components/RiskAssessment/RiskAssessment";
+
 import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-
-const CVECard = dynamic(() => import("@/components/CVECard"), {
-  ssr: false,
-});
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { GetServerSidePropsContext } from "next";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FormEvent, FunctionComponent, useState } from "react";
+import Markdown from "react-markdown";
 
 interface Props {
   flaw: DetailedFlawDTO;
@@ -127,28 +121,6 @@ const Index: FunctionComponent<Props> = (props) => {
           <span>Flaw Details</span>
         </span>
       }
-      Sidebar={
-        cve && (
-          <Sidebar
-            title={
-              <div className="relative flex w-full flex-row items-center justify-between">
-                CVE Information
-                <span className="text-sm">
-                  Source:
-                  <Image
-                    alt="NIST logo"
-                    width={50}
-                    height={10}
-                    src="/NIST_logo.svg"
-                  />
-                </span>
-              </div>
-            }
-          >
-            <CVECard cve={cve} />
-          </Sidebar>
-        )
-      }
       title={flaw.ruleId}
     >
       <div className="flex flex-row gap-4">
@@ -190,12 +162,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     className="flex flex-col items-center"
                   >
                     <div className="mb-4 flex w-full space-x-4 p-2">
-                      <Select
-                        label=""
-                        value={status}
-                        onChange={handleStatusChange}
-                        className="w-1/3 rounded border p-2"
-                      >
+                      <Select value={status} onValueChange={handleStatusChange}>
                         <option value="" disabled hidden>
                           Choose status
                         </option>

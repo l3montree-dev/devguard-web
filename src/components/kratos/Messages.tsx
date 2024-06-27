@@ -20,6 +20,11 @@ interface MessageProps {
   message: UiText;
 }
 
+const messageType2Intent = {
+  error: "danger",
+  success: "success",
+  info: "info",
+};
 export const Message = ({ message }: MessageProps) => {
   return (
     <p className="text-sm" data-testid={`ui/message/${message.id}`}>
@@ -39,7 +44,11 @@ export const Messages = ({ messages }: MessagesProps) => {
   }
 
   return (
-    <Callout intent="danger">
+    <Callout
+      intent={
+        messageType2Intent[messages[0].type] as "danger" | "success" | "info"
+      }
+    >
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}

@@ -182,6 +182,7 @@ export interface FlawWithCVE extends FlawDTO {
     }
   > | null;
   arbitraryJsonData: {
+    fixedVersion?: string;
     packageName?: string;
   };
   component: {

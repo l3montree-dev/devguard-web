@@ -15,29 +15,32 @@
 
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
+import CopyCode from "@/components/common/CopyCode";
 import DateString from "@/components/common/DateString";
+import ListItem from "@/components/common/ListItem";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
-import { toast } from "../components/Toaster";
-import Button from "../components/common/Button";
-import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
-import { Messages } from "../components/kratos/Messages";
 import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 
 interface Props {
   flow?: SettingsFlow;
@@ -110,7 +113,7 @@ const Settings: FunctionComponent<{
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/settings?flow=${flow?.id}`, undefined, { shallow: true })
+      .push(`/user-settings?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
           .updateSettingsFlow({
@@ -127,7 +130,7 @@ const Settings: FunctionComponent<{
               for (const item of data.continue_with) {
                 switch (item.action) {
                   case "show_verification_ui":
-                    router.push("/verification?flow=" + item.flow.id);
+                    router.push("/login?flow=" + item.flow.id);
                     return;
                 }
               }
@@ -152,23 +155,22 @@ const Settings: FunctionComponent<{
           }),
       );
 
-  const handleCopy = (token: string) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(token);
-      toast({
-        title: "Successfully copied to clipboard",
-        msg: "The token has been copied to your clipboard",
-        intent: "success",
-      });
-    }
-  };
-
   const handleCreatePat = async (data: { description: string }) => {
     await onCreatePat(data);
     reset();
   };
 
   const handleLogout = LogoutLink();
+
+  useEffect(() => {
+    if (flow?.ui.messages) {
+      flow.ui.messages.forEach((message) => {
+        toast(message.type.toLocaleLowerCase(), {
+          description: message.text,
+        });
+      });
+    }
+  }, [flow?.ui.messages]);
 
   return (
     <Page
@@ -192,16 +194,16 @@ const Settings: FunctionComponent<{
               title: "Manage Social Sign In",
             },
             {
-              href: "#lookup_secret",
-              title: "Manage 2FA Backup Recovery Codes",
+              href: "#webauthn",
+              title: "Manage Hardware Tokens and Biometrics",
             },
             {
               href: "#totp",
               title: "Manage 2FA TOTP Authenticator App",
             },
             {
-              href: "#webauthn",
-              title: "Manage Hardware Tokens and Biometrics",
+              href: "#lookup_secret",
+              title: "Manage 2FA Backup Recovery Codes",
             },
           ]}
         />
@@ -216,7 +218,7 @@ const Settings: FunctionComponent<{
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-full flex items-center gap-x-8">
-              <div className="rounded-lg bg-gray-300 p-2 dark:bg-slate-700 dark:text-slate-400">
+              <div className="rounded-lg border bg-card p-2">
                 <UserIcon width={60} height={60} />
               </div>
               <div>
@@ -229,7 +231,6 @@ const Settings: FunctionComponent<{
 
             <div className="col-span-full">
               <SettingsCard only="profile" flow={flow}>
-                <Messages messages={flow?.ui.messages} />
                 <Flow
                   hideGlobalMessages
                   onSubmit={onSubmit}
@@ -247,7 +248,6 @@ const Settings: FunctionComponent<{
           description="Update your password associated with your account."
         >
           <SettingsCard only="password" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -261,78 +261,60 @@ const Settings: FunctionComponent<{
           title="Manage Personal Access Tokens"
           description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
         >
-          <div className="mb-6 flex flex-col gap-2">
-            {personalAccessTokens.map((pat) => (
-              <div
-                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-700 dark:bg-gray-950"
-                key={pat.id}
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex flex-row gap-2">
-                      <Input
-                        variant="dark"
-                        readOnly
-                        value={pat.token ? pat.token : "***********"}
-                      />
-                      {pat.token && (
-                        <Button
-                          className="whitespace-nowrap"
-                          onClick={() => handleCopy(pat.token!)}
-                        >
-                          Copy
-                        </Button>
-                      )}
-
+          <div className="mb-6 flex flex-col gap-4">
+            {personalAccessTokens.map((pat) =>
+              pat.token ? (
+                <>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <CopyCode
+                        codeString={pat.token}
+                        language="shell"
+                      ></CopyCode>
+                      <span className="mt-2 block text-sm text-destructive">
+                        Make sure to copy the token. You won&apos;t be able to
+                        see it ever again
+                      </span>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <ListItem
+                  key={pat.id}
+                  title={pat.description}
+                  description={
+                    <>
+                      Created at: <DateString date={new Date(pat.createdAt)} />
+                    </>
+                  }
+                  Button={
+                    !pat.token ? (
                       <Button
-                        intent="danger"
-                        className="whitespace-nowrap"
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => onDeletePat(pat)}
                       >
                         Delete
                       </Button>
-                    </div>
-                    {pat.token && (
-                      <span className="mb-4 block text-red-500">
-                        Make sure to copy the token. You won&apos;t be able to
-                        see it ever again
-                      </span>
-                    )}
-                    <p>Description: {pat.description}</p>
-                    <p>
-                      Created: <DateString date={new Date(pat.createdAt)} />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+                    ) : undefined
+                  }
+                />
+              ),
+            )}
           </div>
-          <form
-            className="rounded-md border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-950"
-            onSubmit={handleSubmit(handleCreatePat)}
-          >
-            <span className="block pb-2 font-medium">
-              Create new Personal Access Token
-            </span>
-            <Input
-              variant="dark"
-              {...register("description")}
-              label="Description"
-            />
-            <div className="mt-2 flex flex-row justify-end">
+          <form onSubmit={handleSubmit(handleCreatePat)}>
+            <Label htmlFor="description">Description</Label>
+            <Input {...register("description")} />
+            <div className="mt-6 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>
           </form>
         </Section>
-
         <Section
           id="oidc"
           title="Manage Social Sign In"
-          description="Update your password associated with your account."
+          description="Update your linked social network accounts."
         >
           <SettingsCard only="oidc" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -341,23 +323,21 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
-
         <Section
-          id="lookup_secret"
-          title="Manage 2FA Backup Recovery Codes"
-          description="Recovery codes can be used in panic situations where you have lost
-        access to your 2FA device."
+          id="webauthn"
+          title="Manage Hardware Tokens and Biometrics"
+          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
         >
-          <SettingsCard only="lookup_secret" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
+          <SettingsCard only="webauthn" flow={flow}>
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
-              only="lookup_secret"
+              only="webauthn"
               flow={flow}
             />
           </SettingsCard>
         </Section>
+
         <Section
           id="totp"
           title="Manage 2FA TOTP Authenticator App"
@@ -393,7 +373,6 @@ const Settings: FunctionComponent<{
           }
         >
           <SettingsCard only="totp" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
@@ -402,23 +381,23 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
-
         <Section
-          id="webauthn"
-          title="Manage Hardware Tokens and Biometrics"
-          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
+          id="lookup_secret"
+          title="Manage 2FA Backup Recovery Codes"
+          description="Recovery codes can be used in panic situations where you have lost
+        access to your 2FA device."
         >
-          <SettingsCard only="webauthn" flow={flow}>
-            <Messages messages={flow?.ui.messages} />
+          <SettingsCard only="lookup_secret" flow={flow}>
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
-              only="webauthn"
+              only="lookup_secret"
               flow={flow}
             />
           </SettingsCard>
         </Section>
-        <div className="flex flex-row justify-end border-t pt-6 dark:border-t-slate-700">
+
+        <div className="flex flex-row justify-end">
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>

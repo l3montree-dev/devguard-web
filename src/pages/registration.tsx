@@ -183,8 +183,19 @@ const Registration: NextPage = () => {
       ui: {
         ...flow?.ui,
         nodes:
-          flow?.ui.nodes?.filter((n) => n.group !== UiNodeGroupEnum.Webauthn) ??
+          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Default) ??
           [],
+      },
+    };
+  }, [flow]);
+
+  const oidcFlow = useMemo(() => {
+    return {
+      ...flow,
+      ui: {
+        ...flow?.ui,
+        nodes:
+          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Oidc) ?? [],
       },
     };
   }, [flow]);
@@ -196,7 +207,7 @@ const Registration: NextPage = () => {
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
-        <div className="relative w-3/5 bg-gray-500">
+        <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
           <Image
             src="/bg.png"
             alt="FlawFix by l3montree Logo"
@@ -204,7 +215,7 @@ const Registration: NextPage = () => {
             fill
           />
         </div>
-        <div className="flex w-2/5 flex-col items-center justify-center bg-white text-black dark:bg-gray-950 dark:text-white">
+        <div className="flex w-2/5 flex-col items-center justify-center bg-background">
           <div className="w-full px-8">
             <div>
               <Image
@@ -232,21 +243,24 @@ const Registration: NextPage = () => {
                 <CustomTab>Legacy Password Sign Up</CustomTab>
                 <Tab.Panels className={"mt-6"}>
                   <Tab.Panel>
+                    <div className="mb-6 border-b ">
+                      <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
+                    </div>
                     <Flow
                       onSubmit={onSubmit}
                       flow={passwordlessFlow as LoginFlow}
                     />
                   </Tab.Panel>
                   <Tab.Panel>
-                    <div className="mt-4">
+                    <div className="mb-6 mt-4">
                       <Callout intent="warning">
                         <div className="flex flex-row gap-4">
-                          <div className="w-20">
-                            <Carriage />
-                          </div>
                           <p className="flex-1">
                             Passwords are insecure by design. We recommend using
-                            passwordless authentication methods.
+                            passwordless authentication methods.{" "}
+                            <div className="mr-2 inline-block w-10">
+                              <Carriage />
+                            </div>
                           </p>
                         </div>
                       </Callout>
