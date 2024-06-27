@@ -15,10 +15,14 @@
 
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
-import Button from "@/components/common/Button";
-import FormField from "@/components/common/FormField";
-import Select from "@/components/common/Select";
-import { Toggle } from "@/components/common/Toggle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -33,6 +37,7 @@ import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/flawFixApi";
 import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
@@ -82,60 +87,62 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="flex flex-row items-center justify-end gap-4 border-b bg-white px-5 py-3 dark:border-b-gray-800 dark:bg-gray-900 dark:text-white">
+      <div className="flex flex-row items-center justify-end gap-4 border-b bg-card  px-5 py-3 text-foreground">
         <div className="flex flex-row items-center gap-4">
           <label
             htmlFor={"version-select"}
-            className="block whitespace-nowrap text-sm font-medium leading-6"
+            className="block whitespace-nowrap text-sm"
           >
             Version
           </label>
-          <select
-            id="version-select"
-            onChange={(e) => {
+          <Select
+            onValueChange={(value) => {
               router.push(
                 {
                   query: {
                     ...router.query,
-                    version: e.target.value,
+                    version: value,
                   },
                 },
                 undefined,
                 { scroll: false },
               );
             }}
-            className="block w-full rounded-md border-gray-300 bg-white py-2 text-sm shadow-sm ring-white/10 focus:ring-2 focus:ring-inset focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-800 sm:leading-6 [&_*]:text-black"
           >
-            {versions.map((version) => (
-              <option className="text-sm" key={version} value={version}>
-                {version}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="bg-background">
+              <SelectValue
+                defaultValue={versions[0]}
+                placeholder={versions[0]}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {versions.map((version) => (
+                <SelectItem className="text-sm" key={version} value={version}>
+                  {version}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        {graph.root.risk !== 0 && (
-          <div>
-            <FormField
-              className="flex flex-row gap-2"
-              label="Show all packages"
-              Element={() => (
-                <Toggle
-                  checked={all}
-                  onChange={(onlyRisk) => {
-                    router.push(
-                      {
-                        query: {
-                          ...router.query,
-                          all: all ? undefined : "1",
-                        },
-                      },
-                      undefined,
-                      { scroll: false },
-                    );
-                  }}
-                />
-              )}
-            ></FormField>
+        {graph.root.risk === 0 && (
+          <div className="flex flex-row items-center gap-4 text-sm">
+            <label htmlFor="allDependencies">Display all dependencies</label>
+            <Switch
+              id="allDependencies"
+              checked={all}
+              onCheckedChange={(onlyRisk) => {
+                router.push(
+                  {
+                    query: {
+                      ...router.query,
+                      all: all ? undefined : "1",
+                    },
+                  },
+                  undefined,
+                  { scroll: false },
+                );
+              }}
+            />
           </div>
         )}
       </div>

@@ -87,6 +87,7 @@ export interface FlawDTO {
     | "markedForTransfer";
 
   priority: number | null; // will be null, if not prioritized yet.
+  rawRiskAssessment: number;
 }
 
 export interface Paged<T> {
@@ -96,20 +97,56 @@ export interface Paged<T> {
   pageSize: number;
 }
 
-export interface FlawEventDTO {
-  type:
-    | "fixed"
-    | "detected"
-    | "accepted"
-    | "falsePositive"
-    | "markedForMitigation"
-    | "markedForTransfer";
+export interface RiskAssessmentValues {
+  oldRiskAssessment: number;
+  newRiskAssessment: number;
+}
+
+interface BaseFlawEventDTO {
   userId: string;
   createdAt: string;
   id: string;
   flawId: string;
   justification: string;
 }
+
+interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
+  type: "accepted";
+}
+
+interface FixedFlawEventDTO extends BaseFlawEventDTO {
+  type: "fixed";
+}
+
+interface DetectedFlawEventDTO extends BaseFlawEventDTO {
+  type: "detected";
+}
+
+interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
+  type: "falsePositive";
+}
+
+interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
+  type: "markedForMitigation";
+}
+
+interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
+  type: "markedForTransfer";
+}
+
+interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
+  type: "rawRiskAssessmentUpdated";
+  arbitraryJsonData: RiskAssessmentValues;
+}
+
+export type FlawEventDTO =
+  | AcceptedFlawEventDTO
+  | FixedFlawEventDTO
+  | DetectedFlawEventDTO
+  | FalsePositiveFlawEventDTO
+  | MarkedForMitigationFlawEventDTO
+  | MarkedForTransferFlawEventDTO
+  | RiskAssessmentUpdatedFlawEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -150,6 +187,7 @@ export interface FlawWithCVE extends FlawDTO {
     }
   > | null;
   arbitraryJsonData: {
+    fixedVersion?: string;
     packageName?: string;
   };
   component: {
@@ -166,6 +204,10 @@ export interface AssetDTO {
   description: string;
   slug: string;
   id: string;
+
+  confidentialityRequirement: RequirementsLevel;
+  integrityRequirement: RequirementsLevel;
+  availabilityRequirement: RequirementsLevel;
 }
 
 export interface DependencyTreeNode {

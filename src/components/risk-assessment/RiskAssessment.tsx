@@ -1,9 +1,24 @@
+// Copyright (C) 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { classNames } from "@/utils/common";
 import { ChevronRightIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import React, { FunctionComponent, useState } from "react";
-import Button from "../common/Button";
-import Select from "../common/Select";
+import { Select } from "../ui/select";
+import { Button } from "../ui/button";
 
 const MarkdownEditor = dynamic(() => import("../common/MarkdownEditor"), {
   ssr: false,
@@ -104,7 +119,7 @@ const RiskAssessment: FunctionComponent<Props> = ({
       </div>
       <div className="mt-10 flex flex-row justify-end">
         <div>
-          <Select label="Mitigation Type">
+          <Select>
             <option>Select mitigation type</option>
             <option>Accept</option>
             <option>Transfer</option>

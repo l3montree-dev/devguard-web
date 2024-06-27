@@ -25,6 +25,7 @@ import "reactflow/dist/style.css";
 const paddingX = 35;
 const paddingY = 55;
 
+const width = 325;
 const nodes = [
   {
     id: "node-1",
@@ -35,31 +36,31 @@ const nodes = [
   {
     id: "node-2",
     type: "sca",
-    position: { x: paddingX + 275, y: paddingY },
+    position: { x: paddingX + width, y: paddingY },
     data: { value: 456 },
   },
   {
     id: "node-3",
     type: "sast",
-    position: { x: paddingX + 275 * 2, y: paddingY },
+    position: { x: paddingX + width * 2, y: paddingY },
     data: { value: 789 },
   },
   {
     id: "node-4",
     type: "iac",
-    position: { x: paddingX + 3 * 275, y: paddingY },
+    position: { x: paddingX + 3 * width, y: paddingY },
     data: { value: 101 },
   },
   {
     id: "node-5",
     type: "containerScanning",
-    position: { x: paddingX + 4 * 275, y: paddingY },
+    position: { x: paddingX + 4 * width, y: paddingY },
     data: { value: 101 },
   },
   {
     id: "node-6",
     type: "dast",
-    position: { x: paddingX + 5 * 275, y: paddingY },
+    position: { x: paddingX + 5 * width, y: paddingY },
     data: { value: 101 },
   },
 ];
@@ -165,12 +166,12 @@ const RiskIdentification = () => {
       }
       title="Risk Identification"
     >
-      <div className="border-b bg-white px-10 pb-5 pt-5 dark:border-b-slate-700 dark:bg-transparent dark:text-white">
-        <h2 className="text-xl font-medium">
+      <div className="border-b bg-card px-10 pb-5 pt-5">
+        <h2 className="text-xl font-medium text-foreground">
           Risk Identification using the OWASP DevSecOps-Pipeline
         </h2>
 
-        <p className="mt-2  text-slate-400">
+        <p className="mt-2  text-muted-foreground">
           The OWASP DevSecOps Pipeline is a reference architecture for
           integrating security into a DevOps Pipeline. It is a set of security
           controls that can be integrated into a CI/CD pipeline to automate

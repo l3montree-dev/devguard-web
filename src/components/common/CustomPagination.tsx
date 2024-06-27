@@ -1,10 +1,15 @@
 import { Paged } from "@/types/api/api";
 import React, { FunctionComponent, useMemo } from "react";
-import Button from "./Button";
+
 import { useRouter } from "next/router";
+import { Button } from "../ui/button";
 
 interface Props extends Paged<any> {}
-const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
+const CustomPagination: FunctionComponent<Props> = ({
+  page,
+  pageSize,
+  total,
+}) => {
   // calculate the amount of pages
   const pages = Math.ceil(total / pageSize);
   const router = useRouter();
@@ -51,7 +56,7 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
         {renderPages.map((pageNumber) => (
           <Button
             className="flex h-9 w-9 items-center justify-center whitespace-nowrap"
-            variant={page === pageNumber ? "solid" : "outline"}
+            variant={page === pageNumber ? "default" : "outline"}
             key={pageNumber}
             onClick={() => navigateToPage(pageNumber)}
           >
@@ -78,4 +83,4 @@ const Pagination: FunctionComponent<Props> = ({ page, pageSize, total }) => {
   );
 };
 
-export default Pagination;
+export default CustomPagination;
