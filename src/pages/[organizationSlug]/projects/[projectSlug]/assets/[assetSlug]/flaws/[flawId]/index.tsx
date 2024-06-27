@@ -12,35 +12,58 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "@/services/flawFixApi";
-import { DetailedFlawDTO } from "@/types/api/api";
-import { classNames } from "@/utils/common";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import { DetailedFlawDTO, FlawEventDTO } from "@/types/api/api";
 
-import RiskAssessmentFeed from "@/components/RiskAssessment/RiskAssessmentFeed";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+
+const ScoreFunnel = dynamic(() => import("@/components/common/ScoreFunnel"), {
+  ssr: false,
+});
 interface Props {
   flaw: DetailedFlawDTO;
 }
 
 const Index: FunctionComponent<Props> = (props) => {
-  console.log(props);
-
   const router = useRouter();
   const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
   const cve = flaw.cve;
-  const [showRiskAssessment, setShowRiskAssessment] = useState(true);
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -48,30 +71,17 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  //status state
-  const [status, setStatus] = useState("");
-  let [message, setMessage] = useState("");
+  const form = useForm<{
+    status: FlawEventDTO["type"];
+    justification: string;
+  }>();
 
-  const handleStatusChange = (e: any) => {
-    setStatus(e.target.value);
-  };
-
-  const handleMessageChange = (e: any) => {
-    setMessage(e.target.value);
-  };
-
-  const events = flaw.events;
-  const sortedEvents = events.sort((a, b) => {
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
-    return dateA - dateB;
-  });
-
-  const handleSubmit = async (ev: FormEvent) => {
-    ev.preventDefault();
-
-    if (message === "") {
-      message = "set as " + status;
+  const handleSubmit = async (data: {
+    status: FlawEventDTO["type"];
+    justification: string;
+  }) => {
+    if (data.justification === "") {
+      data.justification = "set as " + data.status;
     }
 
     const resp = await browserApiClient(
@@ -81,10 +91,7 @@ const Index: FunctionComponent<Props> = (props) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          status: status,
-          justification: message,
-        }),
+        body: JSON.stringify(data),
       },
       "",
     );
@@ -118,14 +125,16 @@ const Index: FunctionComponent<Props> = (props) => {
             {asset?.name}
           </Link>
           <span className="opacity-75">/</span>
-          <span>Flaw Details</span>
+          <span>{flaw.cve?.cve ?? "Flaw Details"}</span>
         </span>
       }
-      title={flaw.ruleId}
+      title={flaw.cve?.cve ?? "Flaw Details"}
     >
       <div className="flex flex-row gap-4">
         <div className="flex-1">
-          <h1 className="font-display text-4xl font-bold">{flaw.ruleId}</h1>
+          <h1 className="font-display text-4xl font-bold">{flaw.cve?.cve}</h1>
+          <p className="mt-4 text-muted-foreground">{flaw.cve?.description}</p>
+
           <div className="mt-4 flex flex-row gap-2 text-sm">
             <FlawState state={flaw.state} />
             {cve && <Severity severity={cve.severity} />}
@@ -134,66 +143,83 @@ const Index: FunctionComponent<Props> = (props) => {
             <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-lg border  bg-gray-50 ">
-            <div className="flex flex-row justify-between border-b p-4 font-semibold">
-              Risk Assessment
-              <button
-                onClick={() => setShowRiskAssessment((prev) => !prev)}
-                className="cursor-pointer"
-              >
-                {showRiskAssessment ? (
-                  <ChevronUpIcon className="h-5 w-5" />
-                ) : (
-                  <ChevronDownIcon className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-            {showRiskAssessment && sortedEvents && (
-              <RiskAssessmentFeed
-                events={sortedEvents}
-                eventIdx={sortedEvents.length}
-              />
-            )}
-            <div className=" bg-white">
-              <div>
-                <div>
+          <RiskAssessmentFeed
+            flawName={flaw.cve?.cve ?? ""}
+            events={flaw.events}
+          />
+
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Update the status</CardTitle>
+                <CardDescription></CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
                   <form
-                    onSubmit={handleSubmit}
-                    className="flex flex-col items-center"
+                    className="flex flex-col gap-4"
+                    onSubmit={form.handleSubmit(handleSubmit)}
                   >
-                    <div className="mb-4 flex w-full space-x-4 p-2">
-                      <Select value={status} onValueChange={handleStatusChange}>
-                        <option value="" disabled hidden>
-                          Choose status
-                        </option>
-                        <option value="accepted">Accepted</option>
-                        <option value="markedForMitigation">
-                          Marked for Mitigation
-                        </option>
-                        <option value="falsePositive">False Positive</option>
-                        <option value="markedForTransfer">
-                          Marked for Transfer
-                        </option>
-                      </Select>
-                      <input
-                        type="text"
-                        placeholder="Justification Message"
-                        value={message}
-                        onChange={handleMessageChange}
-                        className="w-3/4 rounded border p-2"
-                      />
+                    <FormField
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger className="bg-background">
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="falsePositive">
+                                  False Positive
+                                </SelectItem>
+                                <SelectItem value="accepted">
+                                  Accepted
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <small className="text-muted-foreground">
+                      Select the current status to update the record accurately:
+                      <ol>
+                        <li>
+                          Accepted: Accepts the risk the flaw poses to the
+                          organization. It mutes the flaw. Detecting this flaw
+                          again won&apos;t have an impact on the pipeline
+                          result.
+                        </li>
+                        <li>
+                          False Positive: Mutes the flaw permanently as it is
+                          identified as a non-issue.
+                        </li>
+                      </ol>
+                    </small>
+
+                    <FormField
+                      name="justification"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Justification</FormLabel>
+                          <FormControl>
+                            <Textarea className="bg-background" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex flex-row justify-end">
+                      <Button type="submit">Submit</Button>
                     </div>
-                    <Button className="mb-2 mt-4">Submit</Button>
                   </form>
-                </div>
-              </div>
-              <div
-                className={classNames(
-                  "bg-white p-4",
-                  showRiskAssessment ? "visible" : "hidden",
-                )}
-              ></div>
-            </div>
+                </Form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -218,7 +244,7 @@ export const getServerSideProps = middleware(
       "/flaws/" +
       flawId;
 
-    const resp = await (await apiClient(uri)).json();
+    const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
 
     return {
       props: {

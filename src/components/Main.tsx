@@ -43,7 +43,7 @@ const Main: FunctionComponent<Props> = ({
     <main>
       <header
         className={classNames(
-          "relative flex items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-transparent sm:px-6 lg:px-8",
+          "relative flex items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
           Boolean(Menu) ? "pb-3" : "pb-5",
         )}
       >
@@ -70,7 +70,7 @@ const Main: FunctionComponent<Props> = ({
                   key={item.title}
                   href={item.href}
                 >
-                  {router.asPath === item.href && (
+                  {router.asPath.startsWith(item.href) && (
                     <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
                   )}
                   <div className="mt-4 flex flex-row items-center gap-1">
@@ -86,7 +86,6 @@ const Main: FunctionComponent<Props> = ({
       <div
         className={classNames(
           fullscreen ? "" : "mt-6 px-8 py-2 pb-8 sm:px-6 lg:px-8",
-          "text-black",
         )}
       >
         {children}

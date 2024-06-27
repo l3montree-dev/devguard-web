@@ -9,6 +9,13 @@ import { FunctionComponent, useEffect, useState } from "react";
 import Page from "../../../../../../components/Page";
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
+import { withOrg } from "@/decorators/withOrg";
+import { withProject } from "@/decorators/withProject";
+import { withSession } from "@/decorators/withSession";
+import { getApiClientFromContext } from "@/services/flawFixApi";
+import { GetServerSidePropsContext } from "next";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -17,7 +24,6 @@ const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  useEffect(() => {});
   return (
     <Page
       Menu={assetMenu}
@@ -53,3 +59,17 @@ const Index: FunctionComponent = () => {
 };
 
 export default Index;
+
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
+    return {
+      props: {},
+    };
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+    project: withProject,
+    asset: withAsset,
+  },
+);

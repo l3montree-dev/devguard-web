@@ -36,7 +36,9 @@ const Section: FunctionComponent<Props> = (props) => {
             </p>
           )}
         </div>
-        <div className="flex flex-1 flex-col justify-end">{props.children}</div>
+        <div className="flex flex-1 flex-col justify-end gap-4">
+          {props.children}
+        </div>
       </div>
     </div>
   );
