@@ -17,8 +17,7 @@
 // https://www.ory.sh/docs/guides/cli/proxy-and-tunnel
 import { config, createApiHandler } from "@ory/integrations/next-edge"
 
-// We need to export the config.
-export { config }
+
 
 // And create the Ory Network API "bridge".
 export default createApiHandler({

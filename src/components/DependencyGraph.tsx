@@ -203,7 +203,6 @@ const DependencyGraph: FunctionComponent<{
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        onNodeClick={console.log}
         defaultViewport={{
           zoom: 1,
           x: rootNode.position.x - width / 2,

@@ -22,7 +22,7 @@ export default function Sidebar({ title, children }: Props) {
   return (
     <>
       <header className="flex w-full items-center justify-between px-6 py-7">
-        <h2 className="w-full text-base font-semibold leading-7 text-black dark:text-white">
+        <h2 className="leading-7dark:text-white w-full text-base font-semibold">
           {title}
         </h2>
       </header>

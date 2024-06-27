@@ -89,6 +89,14 @@ const columnsDef = [
     }),
   },
   {
+    ...columnHelper.accessor("rawRiskAssessment", {
+      header: "Risk",
+      id: "rawRiskAssessment",
+      enableSorting: true,
+      cell: (row) => row.getValue(),
+    }),
+  },
+  {
     ...columnHelper.accessor("cve.cisaExploitAdd", {
       header: "CISA Exploit Add",
       id: "cve.cisaExploitAdd",
@@ -240,6 +248,14 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
+  const r =
+    "/" +
+    activeOrg.slug +
+    "/projects/" +
+    project?.slug +
+    "/assets/" +
+    asset?.slug;
+
   useEffect(() => {});
   return (
     <Page
@@ -338,7 +354,7 @@ const Index: FunctionComponent<Props> = (props) => {
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
-                  router.push(router.asPath + "/flaws/" + row.original.id);
+                  router.push(r + "/flaws/" + row.original.id);
                 }}
                 className={classNames(
                   "relative cursor-pointer align-top transition-all",

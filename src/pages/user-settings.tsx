@@ -223,7 +223,7 @@ const Settings: FunctionComponent<{
               </div>
               <div>
                 <Button disabled>Change avatar</Button>
-                <p className="mt-2 text-xs leading-5 text-black/80">
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   JPG, GIF or PNG. 1MB max.
                 </p>
               </div>

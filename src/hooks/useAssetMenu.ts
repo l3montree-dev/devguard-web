@@ -14,11 +14,10 @@
 
 import {
   ChartBarSquareIcon,
-  DocumentMagnifyingGlassIcon,
-  CursorArrowRippleIcon,
-  WrenchScrewdriverIcon,
   CogIcon,
+  DocumentMagnifyingGlassIcon,
   ShareIcon,
+  WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
