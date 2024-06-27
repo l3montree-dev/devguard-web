@@ -15,7 +15,13 @@
 
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
+import CopyCode from "@/components/common/CopyCode";
 import DateString from "@/components/common/DateString";
+import ListItem from "@/components/common/ListItem";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { UserIcon } from "@heroicons/react/24/solid";
@@ -24,9 +30,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
-import { toast } from "../components/Toaster";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { withOrg } from "../decorators/withOrg";
@@ -35,17 +41,6 @@ import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import CopyCode from "@/components/common/CopyCode";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 interface Props {
   flow?: SettingsFlow;
@@ -160,17 +155,6 @@ const Settings: FunctionComponent<{
           }),
       );
 
-  const handleCopy = (token: string) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(token);
-      toast({
-        title: "Successfully copied to clipboard",
-        msg: "The token has been copied to your clipboard",
-        intent: "success",
-      });
-    }
-  };
-
   const handleCreatePat = async (data: { description: string }) => {
     await onCreatePat(data);
     reset();
@@ -181,10 +165,8 @@ const Settings: FunctionComponent<{
   useEffect(() => {
     if (flow?.ui.messages) {
       flow.ui.messages.forEach((message) => {
-        toast({
-          title: message.type.toLocaleUpperCase(),
-          msg: message.text,
-          intent: message.type,
+        toast(message.type.toLocaleLowerCase(), {
+          description: message.text,
         });
       });
     }
@@ -279,55 +261,47 @@ const Settings: FunctionComponent<{
           title="Manage Personal Access Tokens"
           description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
         >
-          <div className="mb-6 flex flex-col gap-2">
-            {personalAccessTokens.map((pat) => (
-              <Card key={pat.id}>
-                <div className="flex flex-row items-center justify-between">
-                  <div className="flex-1">
-                    {pat.token !== undefined && (
-                      <div className="mb-1">
-                        <CopyCode
-                          codeString={pat.token}
-                          language="shell"
-                        ></CopyCode>
-                        <span className="mt-1 block text-red-500">
-                          Make sure to copy the token. You won&apos;t be able to
-                          see it ever again
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex flex-row items-center justify-between">
-                      <CardHeader>
-                        <CardTitle>{pat.description}</CardTitle>
-                        <CardDescription>
-                          Created at:{" "}
-                          <DateString date={new Date(pat.createdAt)} />
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex flex-col justify-center pb-0">
-                        {pat.token === undefined && (
-                          <span className="text-sm text-muted-foreground"></span>
-                        )}
-
-                        {!pat.token && (
-                          <Button
-                            variant="destructive"
-                            onClick={() => onDeletePat(pat)}
-                          >
-                            Delete
-                          </Button>
-                        )}
-                      </CardContent>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+          <div className="mb-6 flex flex-col gap-4">
+            {personalAccessTokens.map((pat) =>
+              pat.token ? (
+                <>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <CopyCode
+                        codeString={pat.token}
+                        language="shell"
+                      ></CopyCode>
+                      <span className="mt-2 block text-sm text-destructive">
+                        Make sure to copy the token. You won&apos;t be able to
+                        see it ever again
+                      </span>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <ListItem
+                  key={pat.id}
+                  title={pat.description}
+                  description={
+                    <>
+                      Created at: <DateString date={new Date(pat.createdAt)} />
+                    </>
+                  }
+                  Button={
+                    !pat.token ? (
+                      <Button
+                        variant="destructive"
+                        onClick={() => onDeletePat(pat)}
+                      >
+                        Delete
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              ),
+            )}
           </div>
           <form onSubmit={handleSubmit(handleCreatePat)}>
-            <span className="block pb-2 font-medium">
-              Create new Personal Access Token
-            </span>
             <Label htmlFor="description">Description</Label>
             <Input {...register("description")} />
             <div className="mt-6 flex flex-row justify-end">

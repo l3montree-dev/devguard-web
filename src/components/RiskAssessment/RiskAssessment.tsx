@@ -2,8 +2,8 @@ import { classNames } from "@/utils/common";
 import { ChevronRightIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import React, { FunctionComponent, useState } from "react";
-import Button from "../common/Button";
-import Select from "../common/Select";
+import { Select } from "../ui/select";
+import { Button } from "../ui/button";
 
 const MarkdownEditor = dynamic(() => import("../common/MarkdownEditor"), {
   ssr: false,
@@ -104,7 +104,7 @@ const RiskAssessment: FunctionComponent<Props> = ({
       </div>
       <div className="mt-10 flex flex-row justify-end">
         <div>
-          <Select label="Mitigation Type">
+          <Select>
             <option>Select mitigation type</option>
             <option>Accept</option>
             <option>Transfer</option>

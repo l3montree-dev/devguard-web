@@ -17,7 +17,7 @@
     --primary: 43 95% 56%;
     --primary-foreground: 0 0% 2%;
 
-    --secondary: 0 0% 96%;
+    --secondary: 0 0% 90%;
     --secondary-foreground: 0 0% 5%;
 
     --muted: 0 0% 96%;
@@ -49,7 +49,7 @@
     --primary: 43 95% 56%;
     --primary-foreground: 0 0% 2%;
 
-    --secondary: 0 0% 6%;
+    --secondary: 0 0% 11%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 0 0% 9%;
@@ -75,3 +75,4 @@
         @apply bg-background text-foreground;
     }
 }
+

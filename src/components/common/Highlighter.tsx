@@ -26,7 +26,7 @@ const Highlighter: FunctionComponent<{
   language: "yaml" | "shell";
 }> = (props) => {
   return (
-    <div className="w-full bg-slate-800">
+    <div className="w-full bg-black">
       <SyntaxHighlighter
         showLineNumbers
         lineNumberStyle={{ color: "rgba(255, 255, 255, 0.3)" }}

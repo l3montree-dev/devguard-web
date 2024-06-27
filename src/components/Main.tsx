@@ -94,21 +94,21 @@ const Main: FunctionComponent<Props> = ({
       <footer className="px-8 pb-8 text-sm text-muted-foreground">
         <div className="mb-2 flex flex-row gap-5">
           <Link
-            className="text-muted-foreground"
+            className="!text-muted-foreground"
             target="_blank"
             href="https://github.com/l3montree-dev/flawfix"
           >
             GitHub
           </Link>
           <Link
-            className="text-muted-foreground"
+            className="!text-muted-foreground"
             target="_blank"
             href="https://flawfix.dev/impressum"
           >
             Imprint
           </Link>
           <Link
-            className="text-muted-foreground"
+            className="!text-muted-foreground"
             href="https://flawfix.dev/datenschutzerklaerung/"
           >
             Privacy

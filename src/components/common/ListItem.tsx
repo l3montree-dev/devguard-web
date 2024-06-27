@@ -10,13 +10,13 @@ import {
 interface Props {
   Button?: React.ReactNode;
   title: string;
-  description?: string;
+  description?: string | JSX.Element;
 }
 const ListItem: FunctionComponent<Props> = ({ Button, title, description }) => {
   return (
-    <Card className="flex flex-row justify-between">
+    <Card className="flex flex-row items-center justify-between">
       <CardHeader className="justify-center">
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         {Boolean(description) && (
           <CardDescription>{description}</CardDescription>
         )}

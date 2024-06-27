@@ -1,13 +1,16 @@
 import DateString from "@/components/common/DateString";
 import Filter from "@/components/common/Filter";
 import FlawState from "@/components/common/FlawState";
-import P from "@/components/common/P";
 import SortingCaret from "@/components/common/SortingCaret";
+import { middleware } from "@/decorators/middleware";
+import { withAsset } from "@/decorators/withAsset";
 import { withProject } from "@/decorators/withProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import useFilter from "@/hooks/useFilter";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useColumnVisibility } from "@/hooks/useColumnVisibility";
+import useFilter from "@/hooks/useFilter";
 import {
   FilterableColumnDef,
   dateOperators,
@@ -15,8 +18,8 @@ import {
   stringOperators,
 } from "@/services/filter";
 import { AssetDTO, FlawWithCVE, Paged } from "@/types/api/api";
+import { ViewColumnsIcon } from "@heroicons/react/24/outline";
 import {
-  Cell,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -25,22 +28,22 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect } from "react";
 import Page from "../../../../../../components/Page";
-import Pagination from "../../../../../../components/common/Pagination";
+
 import { withOrg } from "../../../../../../decorators/withOrg";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
 import { classNames } from "../../../../../../utils/common";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { useColumnVisibility } from "@/hooks/useColumnVisibility";
-import Button from "@/components/common/Button";
-import { ViewColumnsIcon } from "@heroicons/react/24/outline";
-import PopupMenu from "@/components/common/PopupMenu";
-import PopupMenuItem from "@/components/common/PopupMenuItem";
-import Checkbox from "@/components/common/Checkbox";
+
+import CustomPagination from "@/components/common/CustomPagination";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   asset: AssetDTO;
@@ -157,7 +160,7 @@ const columnsDef = [
       enableSorting: true,
       cell: (row) => (
         <div className="line-clamp-3 max-w-5xl">
-          <P value={row.getValue()} />
+          <p>{row.getValue()}</p>
         </div>
       ),
     }),
@@ -270,38 +273,38 @@ const Index: FunctionComponent<Props> = (props) => {
       }
     >
       <div className="mb-4 flex flex-row gap-2">
-        <PopupMenu
-          Button={
-            <Button
-              Icon={<ViewColumnsIcon />}
-              intent="primary"
-              variant="outline"
-            >
-              Columns
-            </Button>
-          }
-        >
-          {table.getAllLeafColumns().map((column) => {
-            return (
-              <div className="whitespace-nowrap p-2" key={column.id}>
-                <Checkbox
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={buttonVariants({
+              variant: "secondary",
+            })}
+          >
+            <ViewColumnsIcon className="mr-2 h-4 w-4" />
+            Columns
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {table.getAllLeafColumns().map((column) => {
+              return (
+                <DropdownMenuCheckboxItem
                   checked={column.getIsVisible()}
-                  onChange={column.getToggleVisibilityHandler()}
-                  label={(column.columnDef.header as string) ?? ""}
-                />
-              </div>
-            );
-          })}
-        </PopupMenu>
+                  onCheckedChange={column.getToggleVisibilityHandler()}
+                  key={column.id}
+                >
+                  {(column.columnDef.header as string) ?? ""}
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Filter
           columnsDef={columnsDef.filter(
             (c): c is FilterableColumnDef => "operators" in c,
           )}
         />
       </div>
-      <div className="overflow-hidden rounded-lg border shadow-sm dark:border-gray-700">
+      <div className="overflow-hidden rounded-lg border shadow-sm">
         <table className="w-full text-sm">
-          <thead className="border-b bg-gray-50 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+          <thead className="border-b bg-card text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -331,7 +334,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white text-sm dark:bg-gray-900 dark:text-white">
+          <tbody className="text-sm text-foreground">
             {table.getRowModel().rows.map((row, i, arr) => (
               <tr
                 onClick={() => {
@@ -339,8 +342,9 @@ const Index: FunctionComponent<Props> = (props) => {
                 }}
                 className={classNames(
                   "relative cursor-pointer align-top transition-all",
-                  i === arr.length - 1 ? "" : "border-b dark:border-b-gray-700",
-                  "hover:bg-gray-50 dark:hover:bg-gray-800",
+                  i === arr.length - 1 ? "" : "border-b",
+                  i % 2 != 0 && "bg-card",
+                  "hover:bg-gray-50 dark:hover:bg-secondary",
                 )}
                 key={row.id}
               >
@@ -355,7 +359,7 @@ const Index: FunctionComponent<Props> = (props) => {
         </table>
       </div>
       <div className="mt-4">
-        <Pagination {...props.flaws} />
+        <CustomPagination {...props.flaws} />
       </div>
     </Page>
   );

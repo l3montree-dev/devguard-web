@@ -14,14 +14,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useOrg } from "@/hooks/useOrg";
-import { UserGroupIcon } from "@heroicons/react/20/solid";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { PlusIcon, UserIcon } from "@heroicons/react/24/solid";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useStore } from "../../zustand/globalStoreProvider";
-import PopupMenu from "../common/PopupMenu";
-import PopupMenuItem from "../common/PopupMenuItem";
 import { Button, buttonVariants } from "../ui/button";
 import {
   DropdownMenu,
@@ -29,7 +27,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useTheme } from "next-themes";
 
 interface Props {}
 

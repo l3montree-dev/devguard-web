@@ -215,7 +215,7 @@ const Registration: NextPage = () => {
             fill
           />
         </div>
-        <div className="flex w-2/5 flex-col items-center justify-center bg-white text-black dark:bg-gray-950 dark:text-white">
+        <div className="flex w-2/5 flex-col items-center justify-center bg-background">
           <div className="w-full px-8">
             <div>
               <Image
@@ -243,10 +243,9 @@ const Registration: NextPage = () => {
                 <CustomTab>Legacy Password Sign Up</CustomTab>
                 <Tab.Panels className={"mt-6"}>
                   <Tab.Panel>
-                    <div className="mb-6 border-b dark:border-b-slate-700">
+                    <div className="mb-6 border-b ">
                       <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
                     </div>
-
                     <Flow
                       onSubmit={onSubmit}
                       flow={passwordlessFlow as LoginFlow}

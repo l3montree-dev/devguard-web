@@ -14,13 +14,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+
+import Link from "next/link";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { ProjectDTO } from "../types/api/api";
 import ListItem from "./common/ListItem";
-import PopupMenu from "./common/PopupMenu";
-import PopupMenuItem from "./common/PopupMenuItem";
-import { Button, buttonVariants } from "./ui/button";
-import Link from "next/link";
+import { buttonVariants } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -44,15 +49,19 @@ export default function ProjectList({ projects }: Props) {
                 >
                   View project
                 </Link>
-                <PopupMenu
-                  Button={
-                    <Button variant="outline">
-                      <EllipsisVerticalIcon className="h-5 w-5" />
-                    </Button>
-                  }
-                >
-                  <PopupMenuItem text="Edit" />
-                </PopupMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "icon",
+                    })}
+                  >
+                    <EllipsisVerticalIcon className="h-5 w-5" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             }
           />

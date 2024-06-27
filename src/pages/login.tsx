@@ -180,7 +180,7 @@ const Login: NextPage = () => {
             fill
           />
         </div>
-        <div className="flex w-2/5 flex-col items-center justify-center bg-white text-gray-900 dark:bg-gray-950 dark:text-white">
+        <div className="flex w-2/5 flex-col items-center justify-center bg-background">
           <div className="w-full px-8">
             <div className="">
               <Image
@@ -197,7 +197,7 @@ const Login: NextPage = () => {
                 width={300}
                 height={300}
               />
-              <h2 className="font-display mt-10 text-left text-2xl font-bold leading-9 tracking-tight">
+              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
                 {(() => {
                   if (flow?.refresh) {
                     return "Confirm Action";
@@ -222,7 +222,7 @@ const Login: NextPage = () => {
                       flow={flow as LoginFlow}
                     />
                     {availableMethods.includes("oidc") && (
-                      <div className="mt-6 border-t pt-6 dark:border-t-gray-800">
+                      <div className="mt-6 border-t pt-6">
                         <div className="flex flex-row items-center justify-end gap-4">
                           <span className="text-sm text-gray-400">
                             Social-Login

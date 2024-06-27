@@ -20,10 +20,9 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import Page from "../../components/Page";
 import ProjectList from "../../components/ProjectList";
-import { toast } from "../../components/Toaster";
-import Modal from "../../components/common/Modal";
 import { withOrg } from "../../decorators/withOrg";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
@@ -32,16 +31,15 @@ import {
   getApiClientFromContext,
 } from "../../services/flawFixApi";
 import { ProjectDTO } from "../../types/api/api";
-import { z } from "zod";
 import { CreateProjectReq } from "../../types/api/req";
 
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -54,6 +52,7 @@ import {
 } from "@/components/ui/form";
 import { ZodConvert } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -86,10 +85,8 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
       const res: ProjectDTO = await resp.json();
       router.push(`/${activeOrg.slug}/projects/${res.slug}`);
     } else {
-      toast({
-        title: "Error",
-        msg: "Could not create project",
-        intent: "error",
+      toast("Error", {
+        description: "Could not create project",
       });
     }
   };
