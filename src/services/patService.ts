@@ -15,7 +15,7 @@ const createPat = async (data: {
   const pat: PersonalAccessTokenDTO = await (
     await browserApiClient("/pats/", {
       method: "POST",
-      // send pubkey - maybe hex encode it beforehand
+      // send hex-encoded pubkey
       body: JSON.stringify(d),
     })
   ).json();
