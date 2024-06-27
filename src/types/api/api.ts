@@ -92,6 +92,11 @@ export interface Paged<T> {
   pageSize: number;
 }
 
+export interface RiskAssessmentValues {
+  oldRiskAssessment: number;
+  newRiskAssessment: number;
+}
+
 export interface FlawEventDTO {
   type:
     | "fixed"
@@ -105,6 +110,11 @@ export interface FlawEventDTO {
   id: string;
   flawId: string;
   justification: string;
+
+  arbitraryJsonData: {
+    oldRiskAssessment: RiskAssessmentValues["oldRiskAssessment"];
+    newRiskAssessment: RiskAssessmentValues["newRiskAssessment"];
+  };
 }
 
 export interface CWE {

@@ -41,6 +41,8 @@ interface Props {
 }
 
 const Index: FunctionComponent<Props> = (props) => {
+  console.log(props);
+
   const router = useRouter();
   const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
   const cve = flaw.cve;
