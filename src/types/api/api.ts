@@ -97,25 +97,51 @@ export interface RiskAssessmentValues {
   newRiskAssessment: number;
 }
 
-export interface FlawEventDTO {
-  type:
-    | "fixed"
-    | "detected"
-    | "accepted"
-    | "falsePositive"
-    | "markedForMitigation"
-    | "markedForTransfer";
+interface BaseFlawEventDTO {
   userId: string;
   createdAt: string;
   id: string;
   flawId: string;
   justification: string;
-
-  arbitraryJsonData: {
-    oldRiskAssessment: RiskAssessmentValues["oldRiskAssessment"];
-    newRiskAssessment: RiskAssessmentValues["newRiskAssessment"];
-  };
 }
+
+interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
+  type: "accepted";
+}
+
+interface FixedFlawEventDTO extends BaseFlawEventDTO {
+  type: "fixed";
+}
+
+interface DetectedFlawEventDTO extends BaseFlawEventDTO {
+  type: "detected";
+}
+
+interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
+  type: "falsePositive";
+}
+
+interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
+  type: "markedForMitigation";
+}
+
+interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
+  type: "markedForTransfer";
+}
+
+interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
+  type: "rawRiskAssessmentUpdated";
+  arbitraryJsonData: RiskAssessmentValues;
+}
+
+export type FlawEventDTO =
+  | AcceptedFlawEventDTO
+  | FixedFlawEventDTO
+  | DetectedFlawEventDTO
+  | FalsePositiveFlawEventDTO
+  | MarkedForMitigationFlawEventDTO
+  | MarkedForTransferFlawEventDTO
+  | RiskAssessmentUpdatedFlawEventDTO;
 
 export interface CWE {
   cwe: string;

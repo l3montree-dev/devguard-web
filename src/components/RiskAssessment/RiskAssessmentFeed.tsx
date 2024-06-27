@@ -50,11 +50,13 @@ export default function RiskAssessmentFeed({
                     <p className="mb-1 text-sm text-gray-500">
                       {event.justification}
                     </p>
-                    <p className="font-medium text-gray-900">
-                      Risk Assessment changed from{" "}
-                      {event.arbitraryJsonData.oldRiskAssessment} to{" "}
-                      {event.arbitraryJsonData.newRiskAssessment}
-                    </p>
+                    {event.type === "rawRiskAssessmentUpdated" && (
+                      <p className="font-medium text-gray-900">
+                        Risk Assessment changed from{" "}
+                        {event.arbitraryJsonData.oldRiskAssessment} to{" "}
+                        {event.arbitraryJsonData.newRiskAssessment}
+                      </p>
+                    )}
                   </div>
                   <div className="whitespace-nowrap text-right text-sm text-gray-500">
                     <FormatDate dateString={event.createdAt} />
