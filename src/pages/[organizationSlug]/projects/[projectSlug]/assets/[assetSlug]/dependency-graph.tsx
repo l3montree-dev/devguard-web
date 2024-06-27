@@ -109,7 +109,7 @@ const DependencyGraphPage: FunctionComponent<{
               );
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-background">
               <SelectValue
                 defaultValue={versions[0]}
                 placeholder={versions[0]}

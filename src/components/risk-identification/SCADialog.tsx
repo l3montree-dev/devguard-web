@@ -5,7 +5,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { Tab } from "@headlessui/react";
 import Image from "next/image";
-import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
+import { Dispatch, FunctionComponent, SetStateAction } from "react";
 
 import CopyCode from "../common/CopyCode";
 import CustomTab from "../common/CustomTab";
@@ -20,6 +20,7 @@ import {
 } from "../ui/dialog";
 import Steps from "./Steps";
 
+import { PatWithPrivKey } from "@/types/api/api";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -40,6 +41,10 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const activeOrg = useActiveOrg();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
 
+  const pat =
+    personalAccessTokens.length > 0
+      ? (personalAccessTokens[0] as PatWithPrivKey)
+      : undefined;
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
@@ -63,15 +68,12 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                 Token. You can create such a token by clicking the button below.
               </CardDescription>
             </CardHeader>
-            {personalAccessTokens.length > 0 && (
+            {pat && (
               <CardContent>
                 <div className="flex flex-row items-center justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex flex-row gap-2">
-                      <CopyCode
-                        language="shell"
-                        codeString={personalAccessTokens[0].token}
-                      />
+                      <CopyCode language="shell" codeString={pat.privKey} />
                     </div>
 
                     <span className=" block text-right text-sm text-destructive">
@@ -82,7 +84,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                 </div>
               </CardContent>
             )}
-            {personalAccessTokens.length === 0 && (
+            {!pat && (
               <CardFooter>
                 <Button
                   variant={"default"}
@@ -178,11 +180,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                         </span>
                         <CopyCode
                           language="shell"
-                          codeString={
-                            personalAccessTokens.length > 0
-                              ? personalAccessTokens[0].token
-                              : "<PERSONAL ACCESS TOKEN>"
-                          }
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
                         />
                       </div>
                     </CardContent>
@@ -236,7 +234,7 @@ jobs:
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
              --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
             <Tab.Panel>
@@ -245,7 +243,7 @@ jobs:
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
              --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
           </Tab.Panels>

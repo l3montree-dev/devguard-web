@@ -263,12 +263,12 @@ const Settings: FunctionComponent<{
         >
           <div className="mb-6 flex flex-col gap-4">
             {personalAccessTokens.map((pat) =>
-              pat.token ? (
+              "privKey" in pat ? (
                 <>
                   <Card>
                     <CardContent className="pt-6">
                       <CopyCode
-                        codeString={pat.token}
+                        codeString={pat.privKey}
                         language="shell"
                       ></CopyCode>
                       <span className="mt-2 block text-sm text-destructive">
@@ -288,14 +288,12 @@ const Settings: FunctionComponent<{
                     </>
                   }
                   Button={
-                    !pat.token ? (
-                      <Button
-                        variant="destructive"
-                        onClick={() => onDeletePat(pat)}
-                      >
-                        Delete
-                      </Button>
-                    ) : undefined
+                    <Button
+                      variant="destructive"
+                      onClick={() => onDeletePat(pat)}
+                    >
+                      Delete
+                    </Button>
                   }
                 />
               ),
