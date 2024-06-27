@@ -1,5 +1,6 @@
-import Button from "@/components/common/Button";
 import { config as appConfig } from "@/config";
+import Link from "next/link";
+import { buttonVariants } from "../ui/button";
 
 function ProductManagement({
   orgName,
@@ -18,15 +19,14 @@ function ProductManagement({
         </h1>
       </div>
       <div>
-        <Button
+        <Link
           href={
             appConfig.flawFixApiUrl + `/billing/create-portal-session/${orgID}`
           }
-          variant="solid"
-          intent="primary"
+          className={buttonVariants({ variant: "default" })}
         >
           Manage subscription
-        </Button>
+        </Link>
       </div>
     </div>
   );

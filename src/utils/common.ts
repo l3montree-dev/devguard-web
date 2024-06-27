@@ -76,3 +76,44 @@ export const windowInnerHeight = () => {
   if (typeof window === "undefined") return 0;
   return window.innerHeight;
 };
+
+export function cvssToColor(value: number) {
+  if (value < 1 || value > 10) {
+    return "rgb(255, 255, 255)";
+    throw new Error("Value should be between 1 and 10 but was:" + value);
+  }
+
+  const colorStops = [
+    { stop: 10, color: [225, 29, 72] }, // Red
+    { stop: 8, color: [234, 88, 12] }, // Orange
+    { stop: 6, color: [250, 204, 21] }, // Yellow
+    { stop: 4, color: [5, 150, 105] }, // YellowGreen
+    { stop: 1, color: [5, 150, 105] }, // Green
+  ];
+
+  function interpolateColor(
+    color1: number[],
+    color2: number[],
+    factor: number,
+  ) {
+    const result = color1.slice();
+    for (let i = 0; i < 3; i++) {
+      result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+    }
+    return result;
+  }
+
+  for (let i = 0; i < colorStops.length - 1; i++) {
+    const stop1 = colorStops[i];
+    const stop2 = colorStops[i + 1];
+
+    if (value <= stop1.stop && value >= stop2.stop) {
+      const factor = (value - stop2.stop) / (stop1.stop - stop2.stop);
+      const color = interpolateColor(stop2.color, stop1.color, factor);
+      return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    }
+  }
+
+  // If value is exactly 1
+  return `rgb(${colorStops[colorStops.length - 1].color.join(", ")})`;
+}

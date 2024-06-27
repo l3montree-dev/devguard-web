@@ -2,6 +2,7 @@ import { config as appConfig } from "@/config";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "node:stream";
 
+const discardBodyMethods = ["GET", "HEAD", "OPTIONS"];
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -21,7 +22,9 @@ export default async function handler(
     },
     credentials: "include",
     // TODO: Remove body parser to avoid parsing and stringifying afterwards
-    body: req.method === "POST" ? JSON.stringify(req.body) : undefined,
+    body: discardBodyMethods.includes(req.method!)
+      ? undefined
+      : JSON.stringify(req.body),
   });
 
   // set all headers and copy the status code

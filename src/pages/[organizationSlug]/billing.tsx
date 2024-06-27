@@ -5,8 +5,8 @@ import Page from "@/components/Page";
 import { withSession } from "@/decorators/withSession";
 import { browserApiClient } from "@/services/flawFixApi";
 
-import ProductManagement from "@/components/Billing/ProductManagement";
-import Products from "@/components/Billing/ProductsList";
+import ProductManagement from "@/components/billling/ProductManagement";
+import Products from "@/components/billling/ProductsList";
 import { config as appConfig } from "@/config";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ProductsData } from "@/types/api/billing";

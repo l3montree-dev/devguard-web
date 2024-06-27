@@ -15,7 +15,13 @@
 
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
+import CopyCode from "@/components/common/CopyCode";
 import DateString from "@/components/common/DateString";
+import ListItem from "@/components/common/ListItem";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { UserIcon } from "@heroicons/react/24/solid";
@@ -24,11 +30,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
-import { toast } from "../components/Toaster";
-import Button from "../components/common/Button";
-import Input from "../components/common/Input";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 import { withOrg } from "../decorators/withOrg";
@@ -37,7 +41,6 @@ import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/flawFixApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import CopyCode from "@/components/common/CopyCode";
 
 interface Props {
   flow?: SettingsFlow;
@@ -152,17 +155,6 @@ const Settings: FunctionComponent<{
           }),
       );
 
-  const handleCopy = (token: string) => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(token);
-      toast({
-        title: "Successfully copied to clipboard",
-        msg: "The token has been copied to your clipboard",
-        intent: "success",
-      });
-    }
-  };
-
   const handleCreatePat = async (data: { description: string }) => {
     await onCreatePat(data);
     reset();
@@ -173,10 +165,8 @@ const Settings: FunctionComponent<{
   useEffect(() => {
     if (flow?.ui.messages) {
       flow.ui.messages.forEach((message) => {
-        toast({
-          title: message.type.toLocaleUpperCase(),
-          msg: message.text,
-          intent: message.type,
+        toast(message.type.toLocaleLowerCase(), {
+          description: message.text,
         });
       });
     }
@@ -228,12 +218,12 @@ const Settings: FunctionComponent<{
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-full flex items-center gap-x-8">
-              <div className="rounded-lg bg-gray-300 p-2 dark:bg-slate-700 dark:text-slate-400">
+              <div className="rounded-lg border bg-card p-2">
                 <UserIcon width={60} height={60} />
               </div>
               <div>
                 <Button disabled>Change avatar</Button>
-                <p className="mt-2 text-xs leading-5 text-black/80">
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   JPG, GIF or PNG. 1MB max.
                 </p>
               </div>
@@ -271,67 +261,54 @@ const Settings: FunctionComponent<{
           title="Manage Personal Access Tokens"
           description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
         >
-          <div className="mb-6 flex flex-col gap-2">
-            {personalAccessTokens.map((pat) => (
-              <div
-                className="overflow-hidden rounded-md border bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-900"
-                key={pat.id}
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <div className="flex-1">
-                    {pat.token !== undefined && (
-                      <div className="mb-1">
-                        <CopyCode
-                          codeString={pat.token}
-                          language="shell"
-                        ></CopyCode>
-                        <span className="mt-1 block text-red-500">
-                          Make sure to copy the token. You won&apos;t be able to
-                          see it ever again
-                        </span>
-                      </div>
-                    )}
-                    <span className="text-base font-semibold">
-                      {pat.description}
-                    </span>
-                    <br />
-                    {pat.token === undefined && (
-                      <span className="text-sm text-gray-400">
-                        Created at:{" "}
-                        <DateString date={new Date(pat.createdAt)} />
+          <div className="mb-6 flex flex-col gap-4">
+            {personalAccessTokens.map((pat) =>
+              pat.token ? (
+                <>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <CopyCode
+                        codeString={pat.token}
+                        language="shell"
+                      ></CopyCode>
+                      <span className="mt-2 block text-sm text-destructive">
+                        Make sure to copy the token. You won&apos;t be able to
+                        see it ever again
                       </span>
-                    )}
-                  </div>
-
-                  {!pat.token && (
-                    <Button
-                      intent="danger"
-                      className="whitespace-nowrap"
-                      variant="outline"
-                      onClick={() => onDeletePat(pat)}
-                    >
-                      Delete
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <ListItem
+                  key={pat.id}
+                  title={pat.description}
+                  description={
+                    <>
+                      Created at: <DateString date={new Date(pat.createdAt)} />
+                    </>
+                  }
+                  Button={
+                    !pat.token ? (
+                      <Button
+                        variant="destructive"
+                        onClick={() => onDeletePat(pat)}
+                      >
+                        Delete
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              ),
+            )}
           </div>
           <form onSubmit={handleSubmit(handleCreatePat)}>
-            <span className="block pb-2 font-medium">
-              Create new Personal Access Token
-            </span>
-            <Input
-              variant="dark"
-              {...register("description")}
-              label="Description"
-            />
+            <Label htmlFor="description">Description</Label>
+            <Input {...register("description")} />
             <div className="mt-6 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>
           </form>
         </Section>
-
         <Section
           id="oidc"
           title="Manage Social Sign In"
@@ -420,7 +397,7 @@ const Settings: FunctionComponent<{
           </SettingsCard>
         </Section>
 
-        <div className="flex flex-row justify-end dark:border-t-slate-700">
+        <div className="flex flex-row justify-end">
           <Button onClick={handleLogout}>Logout</Button>
         </div>
       </div>

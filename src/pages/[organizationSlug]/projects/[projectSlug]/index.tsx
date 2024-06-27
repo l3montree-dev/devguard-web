@@ -1,13 +1,43 @@
-import Select from "@/components/common/Select";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
-import Button from "../../../../components/common/Button";
-import Input from "../../../../components/common/Input";
 import ListItem from "../../../../components/common/ListItem";
-import Modal from "../../../../components/common/Modal";
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { middleware } from "@/decorators/middleware";
+import { ZodConvert } from "@/types/common";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import z from "zod";
 import { withOrg } from "../../../../decorators/withOrg";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
@@ -17,24 +47,34 @@ import {
 } from "../../../../services/flawFixApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
-import { hasErrors } from "../../../../utils/common";
-import { toast } from "@/components/Toaster";
-import Checkbox from "@/components/common/Checkbox";
-import Link from "next/link";
-import { middleware } from "@/decorators/middleware";
+import { toast } from "sonner";
+import AssetForm from "@/components/asset/AssetForm";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
 }
+
+const formSchema = z.object<ZodConvert<CreateAssetReq>>({
+  name: z.string(),
+  description: z.string(),
+  importance: z.number(),
+  reachableFromTheInternet: z.boolean(),
+
+  confidentialityRequirement: z.string(),
+  integrityRequirement: z.string(),
+  availabilityRequirement: z.string(),
+});
+
 const Index: FunctionComponent<Props> = ({ project }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const { register, getFieldState, formState, handleSubmit } =
-    useForm<CreateAssetReq>();
+  const form = useForm<CreateAssetReq>({
+    resolver: zodResolver(formSchema),
+  });
 
   const handleCreateAsset = async (data: CreateAssetReq) => {
     const resp = await browserApiClient(
@@ -57,11 +97,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
     } else {
-      toast({
-        msg: "Could not create asset",
-        intent: "error",
-        title: "Error",
-      });
+      toast("Error", { description: "Could not create asset" });
     }
   };
   return (
@@ -73,13 +109,13 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           <span className="flex flex-row gap-2">
             <Link
               href={`/${activeOrg.slug}`}
-              className="text-white hover:no-underline"
+              className="!text-white hover:no-underline"
             >
               {activeOrg.name}
             </Link>
             <span className="opacity-75">/</span>
             <Link
-              className="text-white hover:no-underline"
+              className="!text-white hover:no-underline"
               href={`/${activeOrg.slug}/projects/${project.slug}`}
             >
               {project.name}
@@ -94,85 +130,41 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               title={asset.name}
               description={asset.description}
               Button={
-                <Button
+                <Link
                   href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                  variant="outline"
-                  intent="primary"
+                  className={buttonVariants({ variant: "outline" })}
                 >
                   View Asset
-                </Button>
+                </Link>
               }
             />
           ))}
         </div>
       </Page>
-      <Modal open={showModal} setOpen={setShowModal} title="Create new Asset">
-        <form onSubmit={handleSubmit(handleCreateAsset)}>
-          <Input
-            variant="dark"
-            label="Name"
-            {...register("name", {
-              required: "Please enter a name",
-            })}
-            error={getFieldState("name")?.error}
-          />
-          <div className="mt-4">
-            <Input
-              variant="dark"
-              label="Description"
-              {...register("description", {
-                required: "Please enter a description",
-              })}
-              error={getFieldState("description")?.error}
-            />
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("confidentialityRequirement")}
-              label="Confidentiality Requirement"
+      <Dialog open={showModal}>
+        <DialogContent setOpen={setShowModal}>
+          <DialogHeader>
+            <DialogTitle>Create new asset</DialogTitle>
+            <DialogDescription>
+              An asset is a software project you would like to manage the risks
+              of.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="flex flex-col gap-6"
+              onSubmit={form.handleSubmit(handleCreateAsset)}
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("integrityRequirement")}
-              label="Integrity Requirement"
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Select
-              {...register("availabilityRequirement")}
-              label="Availability Requirement"
-            >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </Select>
-          </div>
-          <div className="mt-4">
-            <Checkbox
-              {...register("reachableFromTheInternet")}
-              label="Reachable from the internet"
-            />
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button
-              disabled={hasErrors(formState.errors)}
-              type="submit"
-              variant="solid"
-            >
-              Create
-            </Button>
-          </div>
-        </form>
-      </Modal>
+              <AssetForm form={form} />
+              <DialogFooter>
+                <Button type="submit" variant="default">
+                  Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import z from "zod";
 
 export type Modify<T, U> = Omit<T, keyof U> & U;
 
@@ -69,3 +70,18 @@ export interface IActivityItem {
 export interface IActivityItems {
   items: IActivityItem[];
 }
+
+export type ZodConvert<T> = {
+  [P in keyof T]: T[P] extends string
+    ? z.ZodString
+    : T[P] extends number
+      ? z.ZodNumber
+      : T[P] extends boolean
+        ? z.ZodBoolean
+        : T[P] extends Array<infer U>
+          ? // @ts-expect-error
+            z.ZodArray<ZodConvert<U>>
+          : T[P] extends object
+            ? z.ZodObject<ZodConvert<T[P]>>
+            : never;
+};
