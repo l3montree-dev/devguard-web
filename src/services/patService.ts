@@ -1,6 +1,6 @@
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { browserApiClient } from "./flawFixApi";
-import { generateKeyPair } from "./Key";
+import { generateKeyPair } from "./keyService";
 
 const createPat = async (data: {
   description: string;
@@ -9,8 +9,6 @@ const createPat = async (data: {
   const { privateKey, publicKey } = await generateKeyPair();
 
   const d = { ...data, pubKey: publicKey };
-
-  console.log("privateKey:  ", privateKey, "publicKey: ", publicKey);
 
   const pat: PersonalAccessTokenDTO = await (
     await browserApiClient("/pats/", {
