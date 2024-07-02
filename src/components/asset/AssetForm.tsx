@@ -162,6 +162,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
             </FormControl>
           }
         />
+        <FormMessage />
       </FormItem>
     )}
   />

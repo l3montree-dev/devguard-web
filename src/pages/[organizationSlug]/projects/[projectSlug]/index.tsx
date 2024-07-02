@@ -14,29 +14,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import AssetForm from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { ZodConvert } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { toast } from "sonner";
 import z from "zod";
 import { withOrg } from "../../../../decorators/withOrg";
 import { withSession } from "../../../../decorators/withSession";
@@ -47,8 +32,6 @@ import {
 } from "../../../../services/flawFixApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
-import { toast } from "sonner";
-import AssetForm from "@/components/asset/AssetForm";
 
 interface Props {
   project: ProjectDTO & {
@@ -56,11 +39,11 @@ interface Props {
   };
 }
 
-const formSchema = z.object<ZodConvert<CreateAssetReq>>({
+const formSchema = z.object({
   name: z.string(),
   description: z.string(),
-  importance: z.number(),
-  reachableFromTheInternet: z.boolean(),
+
+  reachableFromTheInternet: z.boolean().optional(),
 
   confidentialityRequirement: z.string(),
   integrityRequirement: z.string(),
@@ -100,6 +83,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
       toast("Error", { description: "Could not create asset" });
     }
   };
+
   return (
     <>
       <Page
