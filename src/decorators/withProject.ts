@@ -15,17 +15,17 @@
 
 import { ProjectDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/flawFixApi";
+import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
 
 export async function withProject(ctx: GetServerSidePropsContext) {
-  // get the flawFixApiClient
-  const flawFixApiClient = getApiClientFromContext(ctx);
+  // get the devGuardApiClient
+  const devGuardApiClient = getApiClientFromContext(ctx);
 
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
   // get the organization
-  const r = await flawFixApiClient(
+  const r = await devGuardApiClient(
     "/organizations/" + organization + "/projects/" + projectSlug,
   );
 

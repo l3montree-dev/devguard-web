@@ -38,7 +38,7 @@ import { Flow, Methods } from "../components/kratos/Flow";
 import { withOrg } from "../decorators/withOrg";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
-import { getApiClientFromContext } from "../services/flawFixApi";
+import { getApiClientFromContext } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 
@@ -259,7 +259,7 @@ const Settings: FunctionComponent<{
         <Section
           id="pat"
           title="Manage Personal Access Tokens"
-          description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to FlawFix"
+          description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to DevGuard"
         >
           <div className="mb-6 flex flex-col gap-4">
             {personalAccessTokens.map((pat) =>

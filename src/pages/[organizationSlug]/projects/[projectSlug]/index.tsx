@@ -29,7 +29,7 @@ import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "../../../../services/flawFixApi";
+} from "../../../../services/devGuardApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
 

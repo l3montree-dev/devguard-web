@@ -1,4 +1,4 @@
-import { browserApiClient } from "@/services/flawFixApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { useState } from "react";

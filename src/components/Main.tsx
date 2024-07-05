@@ -52,7 +52,7 @@ const Main: FunctionComponent<Props> = ({
           <div className="flex flex-row items-center gap-4">
             <Image
               src="/logo_inverse_icon.svg"
-              alt="Flawfix Logo"
+              alt="DevGuard Logo"
               width={40}
               height={40}
             />
@@ -95,20 +95,20 @@ const Main: FunctionComponent<Props> = ({
           <Link
             className="!text-muted-foreground"
             target="_blank"
-            href="https://github.com/l3montree-dev/flawfix"
+            href="https://github.com/l3montree-dev/devguard"
           >
             GitHub
           </Link>
           <Link
             className="!text-muted-foreground"
             target="_blank"
-            href="https://flawfix.dev/impressum"
+            href="https://l3montree.com/impressum"
           >
             Imprint
           </Link>
           <Link
             className="!text-muted-foreground"
-            href="https://flawfix.dev/datenschutzerklaerung/"
+            href="https://l3montree.com/datenschutz"
           >
             Privacy
           </Link>

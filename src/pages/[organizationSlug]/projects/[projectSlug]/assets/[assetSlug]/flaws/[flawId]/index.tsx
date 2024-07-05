@@ -11,7 +11,7 @@ import { withSession } from "@/decorators/withSession";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "@/services/flawFixApi";
+} from "@/services/devGuardApi";
 import { DetailedFlawDTO, FlawEventDTO } from "@/types/api/api";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";

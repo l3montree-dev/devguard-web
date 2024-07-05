@@ -29,7 +29,7 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "../../services/flawFixApi";
+} from "../../services/devGuardApi";
 import { ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 

@@ -18,7 +18,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "@/services/flawFixApi";
+} from "@/services/devGuardApi";
 import { AssetDTO, FlawWithCVE, Paged } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";

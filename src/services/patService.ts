@@ -1,5 +1,5 @@
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
-import { browserApiClient } from "./flawFixApi";
+import { browserApiClient } from "./devGuardApi";
 import { generateKeyPair } from "./keyService";
 
 const createPat = async (data: {

@@ -1,4 +1,4 @@
-const prefix = "flawfix:";
+const prefix = "devguard:";
 const memory: Record<string, string> = {}; // use a local object to store the data
 
 function get(key: string, d: string): string;

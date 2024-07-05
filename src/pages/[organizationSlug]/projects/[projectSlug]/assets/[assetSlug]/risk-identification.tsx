@@ -16,7 +16,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
-import { getApiClientFromContext } from "@/services/flawFixApi";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ReactFlow, { Edge } from "reactflow";
