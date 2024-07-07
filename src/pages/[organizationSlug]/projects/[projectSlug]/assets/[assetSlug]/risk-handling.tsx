@@ -33,7 +33,7 @@ import Page from "../../../../../../components/Page";
 
 import { withOrg } from "../../../../../../decorators/withOrg";
 import { withSession } from "../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
+import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
 import { classNames } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";

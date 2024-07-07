@@ -21,7 +21,7 @@ function ProductManagement({
       <div>
         <Link
           href={
-            appConfig.flawFixApiUrl + `/billing/create-portal-session/${orgID}`
+            appConfig.devGuardApiUrl + `/billing/create-portal-session/${orgID}`
           }
           className={buttonVariants({ variant: "default" })}
         >

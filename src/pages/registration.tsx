@@ -203,14 +203,14 @@ const Registration: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Create your FlawFix account</title>
+        <title>Create your DevGuard account</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
         <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
           <Image
             src="/bg.png"
-            alt="FlawFix by l3montree Logo"
+            alt="DevGuard by l3montree Logo"
             objectFit="cover"
             fill
           />
@@ -221,19 +221,19 @@ const Registration: NextPage = () => {
               <Image
                 className="hidden h-20 w-auto dark:block"
                 src="/logo_inverse_horizontal.svg"
-                alt="FlawFix by l3montree Logo"
+                alt="DevGuard by l3montree Logo"
                 width={300}
                 height={300}
               />
               <Image
                 className="h-20 w-auto dark:hidden"
                 src="/logo_horizontal.svg"
-                alt="FlawFix by l3montree Logo"
+                alt="DevGuard by l3montree Logo"
                 width={300}
                 height={300}
               />
               <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight ">
-                Create your FlawFix account
+                Create your DevGuard account
               </h2>
             </div>
 
