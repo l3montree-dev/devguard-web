@@ -21,20 +21,38 @@ interface Props {
   description?: ReactNode;
   children: React.ReactNode;
   id?: string;
+  Button?: ReactNode;
+  forceVertical?: boolean;
+  Icon?: ReactNode;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
     <div id={props.id} className={classNames("mb-6 pb-6 pt-6 ")}>
-      <div className="flex flex-row gap-8">
-        <div className="w-96">
-          <h2 className="text-base font-semibold leading-7 text-black dark:text-white">
-            {props.title}
-          </h2>
-          {props.description !== undefined && (
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              {props.description}
-            </p>
+      <div
+        className={classNames(
+          "flex",
+          props.forceVertical ? "flex-col gap-4" : "flex-row gap-8",
+        )}
+      >
+        <div
+          className={classNames(
+            props.forceVertical
+              ? "flex flex-row items-end justify-between gap-6"
+              : "w-96",
           )}
+        >
+          <div>
+            <h2 className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-black dark:text-white">
+              {props.Icon}
+              {props.title}
+            </h2>
+            {props.description !== undefined && (
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {props.description}
+              </p>
+            )}
+          </div>
+          {props.Button}
         </div>
         <div className="flex flex-1 flex-col justify-end gap-4">
           {props.children}

@@ -15,9 +15,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-# Contributing to FlawFix
+# Contributing to DevGuard
 
 ## Code of Conduct
 
-The FlawFix project has a Code of Conduct
+The DevGuard project has a Code of Conduct
 to which all contributors must adhere.

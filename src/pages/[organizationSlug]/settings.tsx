@@ -25,7 +25,6 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
-
   const orgMenu = useOrganizationMenu();
 
   return <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}></Page>;

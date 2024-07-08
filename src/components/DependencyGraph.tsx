@@ -17,12 +17,7 @@ import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
-import ReactFlow, {
-  Background,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-} from "reactflow";
+import ReactFlow, { addEdge, useEdgesState, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
 import { DependencyGraphNode, riskToBgColor } from "./DependencyGraphNode";
 
@@ -189,29 +184,20 @@ const DependencyGraph: FunctionComponent<{
   );
 
   return (
-    <div
-      style={{
-        width,
-        height,
+    <ReactFlow
+      nodes={nodes}
+      nodeTypes={nodeTypes}
+      nodesConnectable={false}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
+      defaultViewport={{
+        zoom: 1,
+        x: rootNode.position.x - width / 2,
+        y: -(rootNode.position.y - height * -3), // i have no idea why it fits with a -3 factor
       }}
-    >
-      <ReactFlow
-        nodes={nodes}
-        nodeTypes={nodeTypes}
-        nodesConnectable={false}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        defaultViewport={{
-          zoom: 1,
-          x: rootNode.position.x - width / 2,
-          y: -(rootNode.position.y - height * -3), // i have no idea why it fits with a -3 factor
-        }}
-      >
-        <Background />
-      </ReactFlow>
-    </div>
+    ></ReactFlow>
   );
 };
 

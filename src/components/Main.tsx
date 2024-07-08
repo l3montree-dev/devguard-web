@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent } from "react";
+import UserNav from "./navigation/UserNav";
 
 interface Props {
   title: string;
@@ -47,21 +48,23 @@ const Main: FunctionComponent<Props> = ({
           Boolean(Menu) ? "pb-3" : "pb-5",
         )}
       >
-        {Boolean(Button) && <div className="absolute right-4">{Button}</div>}
-        <div>
+        <div className="mx-auto w-full max-w-screen-2xl">
           <div className="flex flex-row items-center gap-4">
             <Image
               src="/logo_inverse_icon.svg"
-              alt="Flawfix Logo"
-              width={40}
-              height={40}
+              alt="DevGuard Logo"
+              width={35}
+              height={35}
             />
-            <h1 className="font-display text-lg font-semibold leading-7 text-white">
-              {Title ?? title}
-            </h1>
+            <div className="flex w-full flex-row items-center justify-between">
+              <h1 className="font-display text-lg font-semibold leading-7 text-white">
+                {Title ?? title}
+              </h1>
+              <UserNav />
+            </div>
           </div>
           {Menu !== undefined && (
-            <div className="mt-2 flex flex-row gap-6 text-sm">
+            <div className="flex flex-row gap-6 text-sm">
               {Menu.map((item) => (
                 <Link
                   className={classNames(
@@ -70,7 +73,7 @@ const Main: FunctionComponent<Props> = ({
                   key={item.title}
                   href={item.href}
                 >
-                  {router.asPath.startsWith(item.href) && (
+                  {router.asPath == item.href && (
                     <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
                   )}
                   <div className="mt-4 flex flex-row items-center gap-1">
@@ -85,30 +88,30 @@ const Main: FunctionComponent<Props> = ({
       </header>
       <div
         className={classNames(
-          fullscreen ? "" : "mt-6 px-8 py-2 pb-8 sm:px-6 lg:px-8",
+          fullscreen ? "" : "mx-auto max-w-screen-xl px-6 pb-8 pt-6 lg:px-8",
         )}
       >
         {children}
       </div>
-      <footer className="px-8 pb-8 text-sm text-muted-foreground">
+      <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8">
         <div className="mb-2 flex flex-row gap-5">
           <Link
             className="!text-muted-foreground"
             target="_blank"
-            href="https://github.com/l3montree-dev/flawfix"
+            href="https://github.com/l3montree-dev/devguard"
           >
             GitHub
           </Link>
           <Link
             className="!text-muted-foreground"
             target="_blank"
-            href="https://flawfix.dev/impressum"
+            href="https://l3montree.com/impressum"
           >
             Imprint
           </Link>
           <Link
             className="!text-muted-foreground"
-            href="https://flawfix.dev/datenschutzerklaerung/"
+            href="https://l3montree.com/datenschutz"
           >
             Privacy
           </Link>

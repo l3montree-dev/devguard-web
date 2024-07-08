@@ -1,13 +1,13 @@
-import { browserApiClient } from "@/services/flawFixApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
-import { PersonalAccessTokenDTO } from "@/types/api/api";
+import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { useState } from "react";
 
 export default function usePersonalAccessToken(
   existingPats?: PersonalAccessTokenDTO[],
 ) {
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
-    Array<PersonalAccessTokenDTO & { token?: string }>
+    Array<PersonalAccessTokenDTO | PatWithPrivKey>
   >(existingPats ?? []);
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
     await browserApiClient(`/pats/${pat.id}/`, {
@@ -20,7 +20,6 @@ export default function usePersonalAccessToken(
 
   const handleCreatePat = async (data: { description: string }) => {
     const pat = await createPat(data);
-
     setPersonalAccessTokens([...personalAccessTokens, pat]);
   };
 

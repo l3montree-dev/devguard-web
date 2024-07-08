@@ -45,7 +45,12 @@ export interface PersonalAccessTokenDTO {
   userId: string;
   createdAt: string;
   id: string;
-  token: string;
+  pubKey: string;
+  fingerprint: string;
+}
+
+export interface PatWithPrivKey extends PersonalAccessTokenDTO {
+  privKey: string;
 }
 
 export interface ProjectDTO {

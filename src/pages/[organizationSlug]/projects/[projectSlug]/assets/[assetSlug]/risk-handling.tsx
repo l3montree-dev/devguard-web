@@ -33,7 +33,7 @@ import Page from "../../../../../../components/Page";
 
 import { withOrg } from "../../../../../../decorators/withOrg";
 import { withSession } from "../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../services/flawFixApi";
+import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
 import { classNames } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
@@ -44,6 +44,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Section from "@/components/common/Section";
+import EmptyList from "@/components/common/EmptyList";
 
 interface Props {
   asset: AssetDTO;
@@ -288,95 +290,119 @@ const Index: FunctionComponent<Props> = (props) => {
         </span>
       }
     >
-      <div className="mb-4 flex flex-row gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={buttonVariants({
-              variant: "secondary",
-            })}
-          >
-            <ViewColumnsIcon className="mr-2 h-4 w-4" />
-            Columns
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {table.getAllLeafColumns().map((column) => {
-              return (
-                <DropdownMenuCheckboxItem
-                  checked={column.getIsVisible()}
-                  onCheckedChange={column.getToggleVisibilityHandler()}
-                  key={column.id}
-                >
-                  {(column.columnDef.header as string) ?? ""}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Filter
-          columnsDef={columnsDef.filter(
-            (c): c is FilterableColumnDef => "operators" in c,
-          )}
+      {table.getRowCount() === 0 ? (
+        <EmptyList
+          title="You do not have any identified risks for this asset."
+          description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
+          buttonTitle="Start identifying risks"
+          onClick={() =>
+            router.push(
+              `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-identification`,
+            )
+          }
         />
-      </div>
-      <div className="overflow-hidden rounded-lg border shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b bg-card text-foreground">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    className="cursor-pointer break-normal p-4 text-left"
-                    onClick={
-                      header.column.columnDef.enableSorting
-                        ? header.column.getToggleSortingHandler()
-                        : undefined
-                    }
-                    key={header.id}
-                  >
-                    <div className="flex flex-row items-center gap-2">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-
-                      <SortingCaret
-                        sortDirection={header.column.getIsSorted()}
-                      />
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="text-sm text-foreground">
-            {table.getRowModel().rows.map((row, i, arr) => (
-              <tr
-                onClick={() => {
-                  router.push(r + "/flaws/" + row.original.id);
-                }}
-                className={classNames(
-                  "relative cursor-pointer align-top transition-all",
-                  i === arr.length - 1 ? "" : "border-b",
-                  i % 2 != 0 && "bg-card",
-                  "hover:bg-gray-50 dark:hover:bg-secondary",
+      ) : (
+        <Section
+          forceVertical
+          title="Identified Risks"
+          description="This table shows all the identified risks for this asset."
+          Button={
+            <div className="mb-4 flex flex-row gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={buttonVariants({
+                    variant: "secondary",
+                  })}
+                >
+                  <ViewColumnsIcon className="mr-2 h-4 w-4" />
+                  Columns
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {table.getAllLeafColumns().map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        checked={column.getIsVisible()}
+                        onCheckedChange={column.getToggleVisibilityHandler()}
+                        key={column.id}
+                      >
+                        {(column.columnDef.header as string) ?? ""}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Filter
+                columnsDef={columnsDef.filter(
+                  (c): c is FilterableColumnDef => "operators" in c,
                 )}
-                key={row.id}
-              >
-                {row.getVisibleCells().map((cell, i) => (
-                  <td className="p-4" key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+              />
+            </div>
+          }
+        >
+          <div className="overflow-hidden rounded-lg border shadow-sm">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-card text-foreground">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        className="cursor-pointer break-normal p-4 text-left"
+                        onClick={
+                          header.column.columnDef.enableSorting
+                            ? header.column.getToggleSortingHandler()
+                            : undefined
+                        }
+                        key={header.id}
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+
+                          <SortingCaret
+                            sortDirection={header.column.getIsSorted()}
+                          />
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-4">
-        <CustomPagination {...props.flaws} />
-      </div>
+              </thead>
+              <tbody className="text-sm text-foreground">
+                {table.getRowModel().rows.map((row, i, arr) => (
+                  <tr
+                    onClick={() => {
+                      router.push(r + "/flaws/" + row.original.id);
+                    }}
+                    className={classNames(
+                      "relative cursor-pointer align-top transition-all",
+                      i === arr.length - 1 ? "" : "border-b",
+                      i % 2 != 0 && "bg-card",
+                      "hover:bg-gray-50 dark:hover:bg-secondary",
+                    )}
+                    key={row.id}
+                  >
+                    {row.getVisibleCells().map((cell, i) => (
+                      <td className="p-4" key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4">
+            <CustomPagination {...props.flaws} />
+          </div>
+        </Section>
+      )}
     </Page>
   );
 };

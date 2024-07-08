@@ -20,6 +20,7 @@ import {
 } from "../ui/dialog";
 import Steps from "./Steps";
 
+import { PatWithPrivKey } from "@/types/api/api";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -42,10 +43,9 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const activeOrg = useActiveOrg();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
 
+
   const handleOpenPullRequest = () => {};
   const fetchAvailableGithubRepos = () => {};
-
-  useEffect(() => {}, []);
 
   const promiseOptions = async (inputValue: string) => {
     const res = await browserApiClient(
@@ -59,6 +59,22 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
     }));
   };
 
+  const pat =
+    personalAccessTokens.length > 0
+      ? (personalAccessTokens[0] as PatWithPrivKey)
+      : undefined;
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        const el = document.querySelector('[data-state="open"]');
+        if (el) {
+          el.scrollTo({ behavior: "instant", top: 0 });
+        }
+      });
+    }
+  }, [open]);
+
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
@@ -67,7 +83,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           <DialogDescription>
             Software Composition Analysis (SCA) is a security testing method
             that identifies known vulnerabilities in third-party and open source
-            libraries. FlawFix provides a CLI tool to scan your project for
+            libraries. DevGuard provides a CLI tool to scan your project for
             known vulnerabilities in your dependencies.
           </DialogDescription>
         </DialogHeader>
@@ -82,15 +98,12 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                 Token. You can create such a token by clicking the button below.
               </CardDescription>
             </CardHeader>
-            {personalAccessTokens.length > 0 && (
+            {pat && (
               <CardContent>
                 <div className="flex flex-row items-center justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex flex-row gap-2">
-                      <CopyCode
-                        language="shell"
-                        codeString={personalAccessTokens[0].token}
-                      />
+                      <CopyCode language="shell" codeString={pat.privKey} />
                     </div>
 
                     <span className=" block text-right text-sm text-destructive">
@@ -101,7 +114,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                 </div>
               </CardContent>
             )}
-            {personalAccessTokens.length === 0 && (
+            {!pat && (
               <CardFooter>
                 <Button
                   variant={"default"}
@@ -145,8 +158,8 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     Open the project settings in GitHub
                   </h3>
                   <small className="text-muted-foreground">
-                    For example, for the flawfix project its following url:
-                    https://github.com/l3montree-dev/flawfix/settings
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings
                   </small>
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
@@ -164,8 +177,8 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     Press the button {"<"}New repository secret{">"}
                   </h3>
                   <small className="text-muted-foreground">
-                    For example, for the flawfix project its following url:
-                    https://github.com/l3montree-dev/flawfix/settings/secrets/actions
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings/secrets/actions
                   </small>
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
@@ -188,7 +201,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                         </span>
                         <CopyCode
                           language="shell"
-                          codeString={`FLAWFIX_TOKEN`}
+                          codeString={`DEVGUARD_TOKEN`}
                         />
                       </div>
                       <div className="mb-4">
@@ -197,11 +210,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                         </span>
                         <CopyCode
                           language="shell"
-                          codeString={
-                            personalAccessTokens.length > 0
-                              ? personalAccessTokens[0].token
-                              : "<PERSONAL ACCESS TOKEN>"
-                          }
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
                         />
                       </div>
                     </CardContent>
@@ -229,15 +238,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Run FlawFix Software Composition Analysis
+    - name: Run DevGuard Software Composition Analysis
       uses: l3montree-dev/flawfind@1.0.0
       with:
         scan-type: "sca"
         scan-ref: "."
         severity: "CRITICAL,HIGH"
         assetName: "${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}"
-        apiUrl: "${config.flawFixApiUrl}"
-        token: "{{github.secrets.FLAWFIX_TOKEN}}"
+        apiUrl: "${config.devGuardApiUrl}"
+        token: "{{github.secrets.DEVGUARD_TOKEN}}"
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
@@ -254,8 +263,8 @@ jobs:
                 language="shell"
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --apiUrl="${config.devGuardApiUrl}" \\
+             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
             <Tab.Panel>
@@ -263,8 +272,8 @@ jobs:
                 language="shell"
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.flawFixApiUrl}" \\
-             --token="${personalAccessTokens.length > 0 ? personalAccessTokens[0].token : "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+             --apiUrl="${config.devGuardApiUrl}" \\
+             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
           </Tab.Panels>

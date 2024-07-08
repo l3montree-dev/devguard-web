@@ -44,7 +44,6 @@ export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = riskToBgColor(props.data.risk);
-
   return (
     <div
       style={{
@@ -55,11 +54,8 @@ export const DependencyGraphNode: FunctionComponent<
             : riskToTextColor(props.data.risk),
         backgroundColor:
           props.data.affectedPackage !== undefined ? color : "white",
-        border: `1.5px solid ${color}`,
       }}
-      className={classNames(
-        "relative rounded-lg bg-white p-3 text-xs shadow-lg",
-      )}
+      className={classNames("relative rounded border bg-white p-3 text-xs")}
     >
       <Handle type="target" position={Position.Right} />
       <div>

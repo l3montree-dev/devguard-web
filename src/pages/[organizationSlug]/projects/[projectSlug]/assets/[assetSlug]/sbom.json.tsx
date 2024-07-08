@@ -3,7 +3,7 @@ import { withAsset } from "@/decorators/withAsset";
 import { withOrg } from "@/decorators/withOrg";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/flawFixApi";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
 import { promisify } from "node:util";
 import { pipeline } from "node:stream";

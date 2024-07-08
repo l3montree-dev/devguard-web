@@ -132,14 +132,14 @@ const Verification: NextPage = () => {
             <Image
               className="mx-auto h-20 w-auto dark:hidden"
               src="/logo_horizontal.svg"
-              alt="FlawFix by l3montree Logo"
+              alt="DevGuard by l3montree Logo"
               width={300}
               height={300}
             />
             <Image
               className="mx-auto hidden h-20 w-auto dark:block"
               src="/logo_inverse_horizontal.svg"
-              alt="FlawFix by l3montree Logo"
+              alt="DevGuard by l3montree Logo"
               width={300}
               height={300}
             />

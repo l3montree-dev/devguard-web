@@ -13,6 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const config = {
-  flawFixApiUrl: process.env.NEXT_PUBLIC_FLAWFIX_API_URL,
+  devGuardApiUrl: process.env.NEXT_PUBLIC_DEVGUARD_API_URL,
   oryKratosUrl: process.env.ORY_KRATOS_URL,
 };

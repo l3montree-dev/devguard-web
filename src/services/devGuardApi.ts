@@ -28,7 +28,7 @@ export const getApiClientFromRequest = (req: {
 }) => {
   const orySessionCookie = req.cookies["ory_kratos_session"];
   return (input: string, init?: RequestInit) => {
-    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
+    return fetch(config.devGuardApiUrl + "/api/v1" + input, {
       ...init,
       headers: {
         ...init?.headers,
@@ -43,7 +43,7 @@ export const getApiClientFromCookies = (
   orySessionCookie: string | undefined,
 ) => {
   return (input: string, init?: RequestInit) => {
-    return fetch(config.flawFixApiUrl + "/api/v1" + input, {
+    return fetch(config.devGuardApiUrl + "/api/v1" + input, {
       ...init,
       headers: {
         ...init?.headers,
@@ -59,7 +59,7 @@ export const browserApiClient = (
   init?: RequestInit,
   prefix = "/api/v1",
 ) => {
-  return fetch("/api/flawfix-tunnel" + prefix + input, {
+  return fetch("/api/devguard-tunnel" + prefix + input, {
     ...init,
     headers: {
       "Content-Type": "application/json",
