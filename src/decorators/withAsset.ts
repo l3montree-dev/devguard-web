@@ -12,20 +12,20 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { getApiClientFromContext } from "@/services/flawFixApi";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import { AssetDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { HttpError } from "./middleware";
 
 export async function withAsset(ctx: GetServerSidePropsContext) {
-  // get the flawFixApiClient
-  const flawFixApiClient = getApiClientFromContext(ctx);
+  // get the devGuardApiClient
+  const devGuardApiClient = getApiClientFromContext(ctx);
 
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
   const assetSlug = ctx.params?.assetSlug;
   // get the organization
-  const r = await flawFixApiClient(
+  const r = await devGuardApiClient(
     "/organizations/" +
       organization +
       "/projects/" +

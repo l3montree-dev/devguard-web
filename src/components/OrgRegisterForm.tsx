@@ -19,7 +19,7 @@ import { countries, industryOptions } from "../const/organizationConstants";
 import { OrganizationDTO } from "../types/api/api";
 import Section from "./common/Section";
 
-import { browserApiClient } from "@/services/flawFixApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import {
   Form,
   FormControl,
@@ -116,7 +116,7 @@ export default function OrgRegisterForm(props: Props) {
         </Section>
 
         <Section
-          description="Help us to improve FlawFix."
+          description="Help us to improve DevGuard."
           title="Optional Information"
         >
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

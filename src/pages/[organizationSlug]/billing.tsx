@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import Page from "@/components/Page";
 import { withSession } from "@/decorators/withSession";
-import { browserApiClient } from "@/services/flawFixApi";
+import { browserApiClient } from "@/services/devGuardApi";
 
 import ProductManagement from "@/components/billling/ProductManagement";
 import Products from "@/components/billling/ProductsList";
@@ -96,7 +96,9 @@ export default function Billing({
 
 export const getServerSideProps: GetServerSideProps = middleware(
   async (ctx: GetServerSidePropsContext, { organizations }) => {
-    const products = await fetch(appConfig.flawFixApiUrl + "/billing/products");
+    const products = await fetch(
+      appConfig.devGuardApiUrl + "/billing/products",
+    );
     if (!products.ok)
       throw new Error("Something went wrong with fetching the products");
 
@@ -104,7 +106,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
 
     const orgID = organizations[0].id;
     const orgProduct = await fetch(
-      appConfig.flawFixApiUrl + "/billing/subscriptions/" + orgID,
+      appConfig.devGuardApiUrl + "/billing/subscriptions/" + orgID,
       {
         method: "GET",
         headers: {

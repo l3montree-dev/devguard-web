@@ -20,8 +20,8 @@ import AssetForm from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
-import SkeletonListItem from "@/components/common/SkeletonListItem";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -32,10 +32,9 @@ import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "../../../../services/flawFixApi";
+} from "../../../../services/devGuardApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
-import EmptyList from "@/components/common/EmptyList";
 
 interface Props {
   project: ProjectDTO & {

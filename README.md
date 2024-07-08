@@ -28,21 +28,21 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://flawfix.dev">
-    <img src="public/logo_horizontal.svg" alt="FlawFix by L3montree Logo" width="240" height="80">
-  </a>
 
-  <h3 align="center">FlawFix - Vulnerability Management</h3>
+  <picture>
+    <source srcset="public/logo_inverse_horizontal.svg"  media="(prefers-color-scheme: dark)">
+    <img src="public/logo_horizontal.svg" alt="DevGuard by L3montree Logo" width="240" height="80">
+  </picture>
+
+  <h3 align="center">DevGuard - Develop Secure Software - Frontend</h3>
 
   <p align="center">
     Manage your CVEs seamlessly, Integrate your Vulnerability Scanners, Documentation made easy, Compliance to security Frameworks
     <br />
-    <a href="https://flawfix.dev/docs/getting-started"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/l3montree-dev/flawfix/issues">Report Bug</a>
+    <a href="https://github.com/l3montree-dev/devguard-web/issues">Report Bug</a>
     ·
-    <a href="https://github.com/l3montree-dev/flawfix/issues">Request Feature</a>
+    <a href="https://github.com/l3montree-dev/devguard-web/issues">Request Feature</a>
   </p>
 </div>
 
@@ -72,8 +72,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-FlawFix is a vulnerability management that fits perfectly into any IT environment and ensures mitigation of vulnerabilities and complete documentation of the handling processes. It aims to be compliant to various security frameworks, like ISO 27001 or German BSI Grundschutz.
-With FlawFix you can easily go through the vulnerability management process: 
+DevGuard is a vulnerability management that fits perfectly into any IT environment and ensures mitigation of vulnerabilities and complete documentation of the handling processes. It aims to be compliant to various security frameworks, like ISO 27001 or German BSI Grundschutz.
+With DevGuard you can easily go through the vulnerability management process: 
 
 1. Consolidation of vulnerabilities
 2. Enhancing the data
@@ -88,7 +88,7 @@ With FlawFix you can easily go through the vulnerability management process:
 
 ### Built With
 
-FlawFix is divided into two projects: A frontend (FlawFix Web) and a backend (FlawFix Backend). 
+DevGuard is divided into two projects: A frontend (DevGuard Web) and a backend (DevGuard Backend). 
 
 **Frontend (this project):**
 * [![Next][Next.js]][Next-url]
@@ -108,7 +108,7 @@ To get a local copy up and running follow these simple example steps.
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/l3montree-dev/flawfix-web.git
+   git clone https://github.com/l3montree-dev/devguard-web.git
    ```
 2. Install NPM packages
    ```sh
@@ -121,31 +121,20 @@ To get a local copy up and running follow these simple example steps.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-_Please refer to the [Documentation](https://flawfix.dev/docs/getting-started)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- ROADMAP -->
-## Roadmap
+## Roadmap MVP
 
-- [ ] Consolidation of vulnerabilities
-- [ ] Enhancing the data
-- [ ] Risk Assessment
-- [ ] Selection of the mitigation type
+- [x] Consolidation of vulnerabilities
+- [X] Enhancing the data
+- [x] Risk Assessment
+- [x] Selection of the mitigation type
 - [ ] Sharing of the vulnerability information to responsible parties
 - [ ] Reporting
 - [ ] Multi-language Support
     - [ ] German
     - [ ] English
 
-See the [open issues](https://github.com/l3montree-dev/flawfix-web/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/l3montree-dev/devguard-web/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -162,7 +151,7 @@ Please read our contribution guide if you would like to report a bug, ask a ques
 <!-- Code of Conduct -->
 ## Code of Conduct
 
-Help us keep FlawFix open and inclusive. Please read and follow our Code of Conduct.
+Help us keep DevGuard open and inclusive. Please read and follow our Code of Conduct.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

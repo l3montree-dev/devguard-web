@@ -65,7 +65,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           <DialogDescription>
             Software Composition Analysis (SCA) is a security testing method
             that identifies known vulnerabilities in third-party and open source
-            libraries. FlawFix provides a CLI tool to scan your project for
+            libraries. DevGuard provides a CLI tool to scan your project for
             known vulnerabilities in your dependencies.
           </DialogDescription>
         </DialogHeader>
@@ -140,8 +140,8 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     Open the project settings in GitHub
                   </h3>
                   <small className="text-muted-foreground">
-                    For example, for the flawfix project its following url:
-                    https://github.com/l3montree-dev/flawfix/settings
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings
                   </small>
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
@@ -159,8 +159,8 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     Press the button {"<"}New repository secret{">"}
                   </h3>
                   <small className="text-muted-foreground">
-                    For example, for the flawfix project its following url:
-                    https://github.com/l3montree-dev/flawfix/settings/secrets/actions
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings/secrets/actions
                   </small>
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
@@ -183,7 +183,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                         </span>
                         <CopyCode
                           language="shell"
-                          codeString={`FLAWFIX_TOKEN`}
+                          codeString={`DEVGUARD_TOKEN`}
                         />
                       </div>
                       <div className="mb-4">
@@ -220,15 +220,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Run FlawFix Software Composition Analysis
+    - name: Run DevGuard Software Composition Analysis
       uses: l3montree-dev/flawfind@1.0.0
       with:
         scan-type: "sca"
         scan-ref: "."
         severity: "CRITICAL,HIGH"
         assetName: "${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}"
-        apiUrl: "${config.flawFixApiUrl}"
-        token: "{{github.secrets.FLAWFIX_TOKEN}}"
+        apiUrl: "${config.devGuardApiUrl}"
+        token: "{{github.secrets.DEVGUARD_TOKEN}}"
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
@@ -245,7 +245,7 @@ jobs:
                 language="shell"
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.flawFixApiUrl}" \\
+             --apiUrl="${config.devGuardApiUrl}" \\
              --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
@@ -254,7 +254,7 @@ jobs:
                 language="shell"
                 codeString={`flawfind sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.flawFixApiUrl}" \\
+             --apiUrl="${config.devGuardApiUrl}" \\
              --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>

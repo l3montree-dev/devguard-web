@@ -168,14 +168,14 @@ const Login: NextPage = () => {
   return (
     <>
       <Head>
-        <title>FlawFix - Sign in</title>
-        <meta name="description" content="FlawFix Sign in" />
+        <title>DevGuard - Sign in</title>
+        <meta name="description" content="DevGuard Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 flex-row bg-white ">
         <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
           <Image
             src={"/bg.png"}
-            alt="FlawFix by l3montree Logo"
+            alt="DevGuard by l3montree Logo"
             objectFit="cover"
             fill
           />
@@ -186,14 +186,14 @@ const Login: NextPage = () => {
               <Image
                 className="hidden h-20 w-auto dark:block"
                 src={"/logo_inverse_horizontal.svg"}
-                alt="FlawFix by l3montree Logo"
+                alt="DevGuard by l3montree Logo"
                 width={300}
                 height={300}
               />
               <Image
                 className="h-20 w-auto dark:hidden"
                 src={"/logo_horizontal.svg"}
-                alt="FlawFix by l3montree Logo"
+                alt="DevGuard by l3montree Logo"
                 width={300}
                 height={300}
               />

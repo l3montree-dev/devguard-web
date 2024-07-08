@@ -9,7 +9,7 @@ import Link from "next/link";
 import { withOrg } from "../../../../decorators/withOrg";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import { getApiClientFromContext } from "../../../../services/flawFixApi";
+import { getApiClientFromContext } from "../../../../services/devGuardApi";
 import { AssetDTO, ProjectDTO } from "../../../../types/api/api";
 
 interface Props {

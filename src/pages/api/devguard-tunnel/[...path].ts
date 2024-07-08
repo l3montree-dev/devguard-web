@@ -7,14 +7,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  // just forward the request to flawfix
+  // just forward the request to devguard
   // include the session cookie
   // check the url
   const url = new URL(req.url!, "http://localhost");
-  url.pathname = url.pathname.replace("/api/flawfix-tunnel", "");
+  url.pathname = url.pathname.replace("/api/devguard-tunnel", "");
 
   // get the path from the url
-  const resp = await fetch(appConfig.flawFixApiUrl + url.pathname, {
+  const resp = await fetch(appConfig.devGuardApiUrl + url.pathname, {
     method: req.method,
     headers: {
       "Content-Type": "application/json",

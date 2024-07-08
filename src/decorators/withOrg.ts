@@ -14,16 +14,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/flawFixApi";
+import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
 import { OrganizationDTO } from "@/types/api/api";
 
 export async function withOrg(ctx: GetServerSidePropsContext) {
-  // get the flawFixApiClient
-  const flawFixApiClient = getApiClientFromContext(ctx);
+  // get the devGuardApiClient
+  const devGuardApiClient = getApiClientFromContext(ctx);
 
   // get the organization
-  const r = await flawFixApiClient("/organizations/");
+  const r = await devGuardApiClient("/organizations/");
 
   if (!r.ok) {
     // it must be an 500
