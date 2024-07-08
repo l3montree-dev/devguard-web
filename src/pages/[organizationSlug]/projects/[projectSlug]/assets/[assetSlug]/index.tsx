@@ -50,8 +50,6 @@ const Index: FunctionComponent = () => {
           >
             {asset?.name}
           </Link>
-          <span className="opacity-75">/</span>
-          <span>Risk Handling</span>
         </span>
       }
     ></Page>

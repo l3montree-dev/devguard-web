@@ -13,13 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import Head from "next/head";
-import React, { Fragment, PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
-import Sidenav from "./navigation/Sidenav";
 import { Toaster } from "./ui/sonner";
 
 type PageProps = {
@@ -46,11 +43,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
         <title>{props.title}</title>
       </Head>
 
-      {/* Static sidebar for desktop */}
-      <div className="inset-y-0 z-10 hidden flex-col md:fixed md:flex">
-        <Sidenav />
-      </div>
-      <div className="md:pl-16">
+      <div>
         <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
           <Main
             fullscreen={props.fullscreen}

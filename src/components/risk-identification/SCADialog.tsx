@@ -5,7 +5,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { Tab } from "@headlessui/react";
 import Image from "next/image";
-import { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
 
 import CopyCode from "../common/CopyCode";
 import CustomTab from "../common/CustomTab";
@@ -45,6 +45,18 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
     personalAccessTokens.length > 0
       ? (personalAccessTokens[0] as PatWithPrivKey)
       : undefined;
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        const el = document.querySelector('[data-state="open"]');
+        if (el) {
+          el.scrollTo({ behavior: "instant", top: 0 });
+        }
+      });
+    }
+  }, [open]);
+
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>

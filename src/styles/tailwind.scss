@@ -196,3 +196,7 @@ a {
         @apply italic;
     }
 }
+
+.react-flow__attribution {
+    @apply text-xs text-gray-400 dark:bg-black
+}

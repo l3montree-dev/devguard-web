@@ -1,3 +1,4 @@
+import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import ContainerScanning from "@/components/risk-identification/ContainerScanningNode";
 import DAST from "@/components/risk-identification/DASTNode";
@@ -137,7 +138,6 @@ const RiskIdentification = () => {
   return (
     <Page
       Menu={menu}
-      fullscreen
       Title={
         <span className="flex flex-row gap-2">
           <Link
@@ -166,33 +166,34 @@ const RiskIdentification = () => {
       }
       title="Risk Identification"
     >
-      <div className="border-b bg-card px-10 pb-5 pt-5">
-        <h2 className="text-xl font-medium text-foreground">
-          Risk Identification using the OWASP DevSecOps-Pipeline
-        </h2>
-
-        <p className="mt-2  text-muted-foreground">
-          The OWASP DevSecOps Pipeline is a reference architecture for
-          integrating security into a DevOps Pipeline. It is a set of security
-          controls that can be integrated into a CI/CD pipeline to automate
-          security testing.
-        </p>
-      </div>
-      <div
-        style={{
-          width: dimensions.width - SIDEBAR_WIDTH,
-          height: dimensions.height - HEADER_HEIGHT - 85,
-        }}
+      <Section
+        description="The OWASP DevSecOps Pipeline is a reference architecture for
+            integrating security into a DevOps Pipeline. It is a set of security
+            controls that can be integrated into a CI/CD pipeline to automate
+            security testing."
+        title="Risk Identification using the OWASP DevSecOps-Pipeline"
+        forceVertical
       >
-        <ReactFlow
-          disableKeyboardA11y
-          maxZoom={1}
-          minZoom={1}
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-        />
-      </div>
+        <div
+          className="overflow-hidden rounded-lg border bg-white dark:bg-black"
+          style={{
+            width: "100%",
+            height: dimensions.height / 2,
+          }}
+        >
+          <ReactFlow
+            disableKeyboardA11y
+            defaultViewport={{
+              zoom: 0.9,
+              x: 0,
+              y: 0,
+            }}
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+          />
+        </div>
+      </Section>
     </Page>
   );
 };

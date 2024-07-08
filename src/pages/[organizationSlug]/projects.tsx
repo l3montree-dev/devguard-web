@@ -1,0 +1,243 @@
+// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { middleware } from "@/decorators/middleware";
+import { GetServerSidePropsContext } from "next";
+import { useRouter } from "next/router";
+import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import Page from "../../components/Page";
+
+import { withOrg } from "../../decorators/withOrg";
+import { withSession } from "../../decorators/withSession";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../../services/flawFixApi";
+import { ProjectDTO } from "../../types/api/api";
+import { CreateProjectReq } from "../../types/api/req";
+
+import Section from "@/components/common/Section";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { ZodConvert } from "@/types/common";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import ListItem from "@/components/common/ListItem";
+
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import EmptyList from "@/components/common/EmptyList";
+
+interface Props {
+  projects: Array<ProjectDTO>;
+}
+
+const formSchema = z.object<ZodConvert<CreateProjectReq>>({
+  name: z.string(),
+  description: z.string(),
+});
+
+const Home: FunctionComponent<Props> = ({ projects }) => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const activeOrg = useActiveOrg();
+
+  const form = useForm<CreateProjectReq>({
+    mode: "onBlur",
+    resolver: zodResolver(formSchema),
+  });
+
+  const handleCreateProject = async (req: CreateProjectReq) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/projects",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      },
+    );
+    if (resp.ok) {
+      const res: ProjectDTO = await resp.json();
+      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
+    } else {
+      toast("Error", {
+        description: "Could not create project",
+      });
+    }
+  };
+
+  const orgMenu = useOrganizationMenu();
+
+  return (
+    <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}>
+      <Dialog open={open}>
+        <DialogContent setOpen={setOpen}>
+          <DialogHeader>
+            <DialogTitle>Create new Project</DialogTitle>
+            <DialogDescription>
+              A project groups multiple software projects (repositories) inside
+              a single enitity. Something like: frontend and backend
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="space-y-8"
+              onSubmit={form.handleSubmit(handleCreateProject)}
+            >
+              <FormField
+                name={"name"}
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>The name of the project.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name={"description"}
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      The description of the project.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <div>
+        {projects.length === 0 ? (
+          <EmptyList
+            title="Here you will see all your projects"
+            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
+            buttonTitle="Create your first Project"
+            onClick={() => setOpen(true)}
+          />
+        ) : (
+          <Section
+            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            forceVertical
+            title="Projects"
+          >
+            <div className="flex flex-col gap-2">
+              {projects.map((project) => (
+                <ListItem
+                  key={project.id}
+                  title={project.name}
+                  description={project.description}
+                  Button={
+                    <>
+                      {" "}
+                      <Link
+                        className={buttonVariants({ variant: "outline" })}
+                        href={
+                          "/" + activeOrg.slug + "/projects/" + project.slug
+                        }
+                      >
+                        View project
+                      </Link>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "icon",
+                          })}
+                        >
+                          <EllipsisVerticalIcon className="h-5 w-5" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  }
+                />
+              ))}
+            </div>
+          </Section>
+        )}
+      </div>
+    </Page>
+  );
+};
+
+export default Home;
+
+export const getServerSideProps = middleware(
+  async (context: GetServerSidePropsContext) => {
+    // list the projects from the active organization
+    const apiClient = getApiClientFromContext(context);
+
+    const slug = context.params?.organizationSlug as string;
+
+    const resp = await apiClient("/organizations/" + slug + "/projects");
+
+    const projects = await resp.json();
+
+    return {
+      props: {
+        projects,
+      },
+    };
+  },
+  {
+    session: withSession,
+    organizations: withOrg,
+  },
+);

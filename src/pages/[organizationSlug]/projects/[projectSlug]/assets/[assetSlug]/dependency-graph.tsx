@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
 import {
@@ -58,7 +59,6 @@ const DependencyGraphPage: FunctionComponent<{
   return (
     <Page
       Menu={menu}
-      fullscreen
       Title={
         <span className="flex flex-row gap-2">
           <Link
@@ -87,71 +87,87 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependency Graph"
     >
-      <div className="flex flex-row items-center justify-end gap-4 border-b bg-card  px-5 py-3 text-foreground">
-        <div className="flex flex-row items-center gap-4">
-          <label
-            htmlFor={"version-select"}
-            className="block whitespace-nowrap text-sm"
-          >
-            Version
-          </label>
-          <Select
-            onValueChange={(value) => {
-              router.push(
-                {
-                  query: {
-                    ...router.query,
-                    version: value,
-                  },
-                },
-                undefined,
-                { scroll: false },
-              );
-            }}
-          >
-            <SelectTrigger className="bg-background">
-              <SelectValue
-                defaultValue={versions[0]}
-                placeholder={versions[0]}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {versions.map((version) => (
-                <SelectItem className="text-sm" key={version} value={version}>
-                  {version}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        {graph.root.risk === 0 && (
-          <div className="flex flex-row items-center gap-4 text-sm">
-            <label htmlFor="allDependencies">Display all dependencies</label>
-            <Switch
-              id="allDependencies"
-              checked={all}
-              onCheckedChange={(onlyRisk) => {
-                router.push(
-                  {
-                    query: {
-                      ...router.query,
-                      all: all ? undefined : "1",
+      <Section
+        forceVertical
+        title="Dependency Graph"
+        description="This graph shows the dependencies of the asset. The risk of each dependency is calculated based on the risk of the affected package."
+        Button={
+          <div className="flex flex-row items-center gap-4">
+            <div className="flex flex-row items-center gap-4">
+              <label
+                htmlFor={"version-select"}
+                className="block whitespace-nowrap text-sm"
+              >
+                Version
+              </label>
+              <Select
+                onValueChange={(value) => {
+                  router.push(
+                    {
+                      query: {
+                        ...router.query,
+                        version: value,
+                      },
                     },
-                  },
-                  undefined,
-                  { scroll: false },
-                );
-              }}
-            />
+                    undefined,
+                    { scroll: false },
+                  );
+                }}
+              >
+                <SelectTrigger className="bg-background">
+                  <SelectValue
+                    defaultValue={versions[0]}
+                    placeholder={versions[0]}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {versions.map((version) => (
+                    <SelectItem
+                      className="text-sm"
+                      key={version}
+                      value={version}
+                    >
+                      {version}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {graph.root.risk === 0 && (
+              <div className="flex flex-row items-center gap-4 whitespace-nowrap text-sm">
+                <label htmlFor="allDependencies">
+                  Display all dependencies
+                </label>
+                <Switch
+                  id="allDependencies"
+                  checked={all}
+                  onCheckedChange={(onlyRisk) => {
+                    router.push(
+                      {
+                        query: {
+                          ...router.query,
+                          all: all ? undefined : "1",
+                        },
+                      },
+                      undefined,
+                      { scroll: false },
+                    );
+                  }}
+                />
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      <DependencyGraph
-        affectedPackages={affectedPackages}
-        width={dimensions.width - SIDEBAR_WIDTH}
-        height={dimensions.height - HEADER_HEIGHT - 85}
-        graph={graph}
-      />
+        }
+      >
+        <div className="h-screen w-full rounded-lg border bg-white dark:bg-black">
+          <DependencyGraph
+            affectedPackages={affectedPackages}
+            width={dimensions.width - SIDEBAR_WIDTH}
+            height={dimensions.height - HEADER_HEIGHT - 85}
+            graph={graph}
+          />
+        </div>
+      </Section>
     </Page>
   );
 };

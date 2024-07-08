@@ -30,7 +30,7 @@ export const useAssetMenu = () => {
   return [
     {
       title: "Overview",
-      href: "/" + orgSlug + "/" + projectSlug + "/" + assetSlug,
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
       Icon: ChartBarSquareIcon,
     },
     {

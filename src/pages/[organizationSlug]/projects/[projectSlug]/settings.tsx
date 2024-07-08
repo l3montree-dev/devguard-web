@@ -41,6 +41,14 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           >
             {project.name}
           </Link>
+          <span className="opacity-75">/</span>
+
+          <Link
+            className="!text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+          >
+            Settings
+          </Link>
         </span>
       }
     ></Page>
