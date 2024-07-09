@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactNode } from "react";
 import {
   Card,
   CardContent,
@@ -9,14 +9,14 @@ import {
 
 interface Props {
   Button?: React.ReactNode;
-  title: string;
+  Title: ReactNode;
   description?: string | JSX.Element;
 }
-const ListItem: FunctionComponent<Props> = ({ Button, title, description }) => {
+const ListItem: FunctionComponent<Props> = ({ Button, Title, description }) => {
   return (
     <Card className="flex flex-row items-center justify-between">
       <CardHeader className="justify-center">
-        <CardTitle className="text-base">{title}</CardTitle>
+        <CardTitle className="text-base">{Title}</CardTitle>
         {Boolean(description) && (
           <CardDescription>{description}</CardDescription>
         )}

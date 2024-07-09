@@ -155,7 +155,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
           description={
             "Is the asset publicly availabe. Does it have a static IP-Address assigned to it or a domain name?"
           }
-          title="Reachable from the internet"
+          Title="Reachable from the internet"
           Button={
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />

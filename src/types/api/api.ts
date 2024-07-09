@@ -38,6 +38,15 @@ export interface OrganizationDTO extends AppModelDTO {
   grundschutz: boolean;
   slug: string;
   description: string;
+
+  githubAppInstallations: Array<{
+    installationId: number;
+    settingsUrl: string;
+
+    targetType: string;
+    targetLogin: string;
+    targetAvatarUrl: string;
+  }>;
 }
 
 export interface PersonalAccessTokenDTO {
@@ -208,6 +217,8 @@ export interface AssetDTO {
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;
+
+  repositoryId?: string;
 }
 
 export interface DependencyTreeNode {

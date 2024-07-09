@@ -21,13 +21,95 @@ import { withOrg } from "../../decorators/withOrg";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 
+import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
+import ListItem from "@/components/common/ListItem";
+import Section from "@/components/common/Section";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { cn } from "@/lib/utils";
+import { encodeObjectBase64 } from "@/services/encodeService";
+
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const orgMenu = useOrganizationMenu();
+  const router = useRouter();
 
-  return <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}></Page>;
+  return (
+    <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}>
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-semibold">Organization Settings</h1>
+      </div>
+      <div>
+        <Section
+          description={
+            "Manage any third party integrations. You can connect the organization with a GitHub App Installation, a JIRA Project any many more."
+          }
+          title="Third-Party Integrations"
+        >
+          {activeOrg.githubAppInstallations.map((installation) => (
+            <ListItem
+              key={installation.installationId}
+              Title={
+                <>
+                  <img
+                    alt={installation.targetLogin}
+                    src={installation.targetAvatarUrl}
+                    className="mr-2 inline-block h-6 w-6 rounded-full"
+                  />
+                  {installation.targetLogin}
+                </>
+              }
+              description={
+                "DevGuard uses a GitHub App to access your repositories and interact with your code."
+              }
+              Button={
+                <Link
+                  target="_blank"
+                  className={cn(
+                    buttonVariants({ variant: "secondary" }),
+                    "!text-secondary-foreground hover:no-underline",
+                  )}
+                  href={installation.settingsUrl}
+                >
+                  Manage GitHub App
+                </Link>
+              }
+            />
+          ))}
+          <ListItem
+            Title="Add a GitHub App"
+            description="DevGuard uses a GitHub App to access your repositories and interact with your code."
+            Button={
+              <GithubAppInstallationAlert
+                Button={
+                  <Link
+                    className={cn(
+                      buttonVariants({ variant: "default" }),
+                      "!text-black hover:no-underline",
+                    )}
+                    href={
+                      "https://github.com/apps/devguard-app/installations/new?state=" +
+                      encodeObjectBase64({
+                        orgSlug: activeOrg.slug,
+                        redirectTo: router.asPath,
+                      })
+                    }
+                  >
+                    Install GitHub App
+                  </Link>
+                }
+              >
+                <Button variant={"secondary"}>Install GitHub App</Button>
+              </GithubAppInstallationAlert>
+            }
+          />
+        </Section>
+      </div>
+    </Page>
+  );
 };
 
 export default Home;

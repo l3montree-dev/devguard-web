@@ -281,7 +281,7 @@ const Settings: FunctionComponent<{
               ) : (
                 <ListItem
                   key={pat.id}
-                  title={pat.description}
+                  Title={pat.description}
                   description={
                     <>
                       Created at: <DateString date={new Date(pat.createdAt)} />
