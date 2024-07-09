@@ -21,6 +21,7 @@ import { Toaster } from "./ui/sonner";
 
 type PageProps = {
   title: string;
+  description?: string;
   Title?: React.ReactNode;
   // searchActive: boolean;
   Sidebar?: React.ReactNode;
@@ -35,8 +36,6 @@ type PageProps = {
 
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <>
       <Head>

@@ -15,10 +15,9 @@
 
 import "@/styles/tailwind.scss";
 import "focus-visible";
-import { Inter, Lexend, Merriweather } from "next/font/google";
-import { useHydrate } from "../zustand/globalStore";
-import { StoreProvider } from "../zustand/globalStoreProvider";
 import { ThemeProvider } from "next-themes";
+import { Inter, Lexend, Merriweather } from "next/font/google";
+import { StoreProvider } from "../zustand/globalStoreProvider";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -41,8 +40,6 @@ export const merriweather = Merriweather({
 
 // @ts-ignore
 export default function App({ Component, pageProps }) {
-  const store = useHydrate(pageProps.initialZustandState);
-
   return (
     <ThemeProvider
       attribute="class"
@@ -50,7 +47,7 @@ export default function App({ Component, pageProps }) {
       enableSystem
       disableTransitionOnChange
     >
-      <StoreProvider store={store}>
+      <StoreProvider initialZustandState={pageProps.initialZustandState}>
         <Component {...pageProps} />
       </StoreProvider>
     </ThemeProvider>

@@ -136,7 +136,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             {project.assets.map((asset) => (
               <ListItem
                 key={asset.id}
-                title={asset.name}
+                Title={asset.name}
                 description={asset.description}
                 Button={
                   <Link

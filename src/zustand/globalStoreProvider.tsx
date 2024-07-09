@@ -18,19 +18,27 @@ import {
   FunctionComponent,
   PropsWithChildren,
   useContext,
+  useRef,
 } from "react";
-import { StoreApi, UseBoundStore } from "zustand";
-import { GlobalStore } from "./globalStore";
+import { StoreApi, useStore as useZustandStore } from "zustand";
+import { createGlobalStore, GlobalStore } from "./globalStore";
 
-export const StoreContext = createContext<UseBoundStore<
-  StoreApi<GlobalStore>
-> | null>(null);
+export const StoreContext = createContext<StoreApi<GlobalStore> | null>(null);
 
 export const StoreProvider: FunctionComponent<
-  PropsWithChildren<{ store: UseBoundStore<StoreApi<GlobalStore>> }>
-> = ({ children, store }) => {
+  PropsWithChildren<{
+    initialZustandState: any;
+  }>
+> = ({ children, initialZustandState }) => {
+  const storeRef = useRef<ReturnType<typeof createGlobalStore>>();
+  if (!storeRef.current) {
+    storeRef.current = createGlobalStore(initialZustandState);
+  }
+
   return (
-    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={storeRef.current}>
+      {children}
+    </StoreContext.Provider>
   );
 };
 
@@ -43,7 +51,6 @@ export function useStore<T>(
   if (!store) {
     throw new Error("useStore must be used within a StoreProvider.");
   }
-  const values = store(selector);
 
-  return values;
+  return useZustandStore(store, selector);
 }

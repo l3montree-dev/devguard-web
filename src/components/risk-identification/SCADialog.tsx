@@ -30,8 +30,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { browserApiClient } from "@/services/flawFixApi";
-import { Repository } from "@/types/github";
 
 interface Props {
   open: boolean;
@@ -42,22 +40,6 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
-
-
-  const handleOpenPullRequest = () => {};
-  const fetchAvailableGithubRepos = () => {};
-
-  const promiseOptions = async (inputValue: string) => {
-    const res = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/integrations/repositories?provider=github",
-    );
-    return ((await res.json()) as Repository[]).map((repo) => ({
-      value: repo.id,
-      label: repo.name,
-    }));
-  };
 
   const pat =
     personalAccessTokens.length > 0

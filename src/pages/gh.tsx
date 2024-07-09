@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { getApiClientFromContext } from "@/services/flawFixApi";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
 import React from "react";
 import Image from "next/image";
@@ -64,6 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   );
 
   if (!installation.ok) {
+    console.log("Installation failed", installation);
     return {
       props: {
         error: "Installation failed",

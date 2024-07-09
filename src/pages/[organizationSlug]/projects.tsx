@@ -179,7 +179,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
               {projects.map((project) => (
                 <ListItem
                   key={project.id}
-                  title={project.name}
+                  Title={project.name}
                   description={project.description}
                   Button={
                     <>
