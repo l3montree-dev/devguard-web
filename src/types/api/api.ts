@@ -41,8 +41,11 @@ export interface OrganizationDTO extends AppModelDTO {
 
   githubAppInstallations: Array<{
     installationId: number;
-    targetType: string;
     settingsUrl: string;
+
+    targetType: string;
+    targetLogin: string;
+    targetAvatarUrl: string;
   }>;
 }
 
