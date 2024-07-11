@@ -9,7 +9,6 @@ import GithubAppInstallationAlert from "@/components/common/GithubAppInstallatio
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -27,7 +26,6 @@ import {
 } from "@/services/devGuardApi";
 import { encodeObjectBase64 } from "@/services/encodeService";
 import { AssetDTO } from "@/types/api/api";
-import { Repository } from "@/types/github";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
@@ -45,7 +43,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const asset = useActiveAsset()!;
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
-  const form = useForm<Partial<AssetDTO>>({ defaultValues: asset });
+  const form = useForm<AssetDTO>({ defaultValues: asset });
   const [selectedRepo, setSelectedRepo] = useState<string | null>(
     asset.repositoryId ?? null,
   );
@@ -154,6 +152,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                       Remove connection
                     </Button>
                     <Button
+                      variant={"secondary"}
                       onClick={() => {
                         setEditRepo(true);
                       }}
@@ -192,34 +191,35 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                 </Button>
               }
             />
-          ) : undefined}
-          <ListItem
-            Title="Add a GitHub App"
-            description="DevGuard uses a GitHub App to access your repositories and interact with your code."
-            Button={
-              <GithubAppInstallationAlert
-                Button={
-                  <Link
-                    className={cn(
-                      buttonVariants({ variant: "default" }),
-                      "!text-black hover:no-underline",
-                    )}
-                    href={
-                      "https://github.com/apps/devguard-app/installations/new?state=" +
-                      encodeObjectBase64({
-                        orgSlug: activeOrg.slug,
-                        redirectTo: router.asPath,
-                      })
-                    }
-                  >
-                    Install GitHub App
-                  </Link>
-                }
-              >
-                <Button>Install GitHub App</Button>
-              </GithubAppInstallationAlert>
-            }
-          />
+          ) : (
+            <ListItem
+              Title="Add a GitHub App"
+              description="DevGuard uses a GitHub App to access your repositories and interact with your code."
+              Button={
+                <GithubAppInstallationAlert
+                  Button={
+                    <Link
+                      className={cn(
+                        buttonVariants({ variant: "default" }),
+                        "!text-black hover:no-underline",
+                      )}
+                      href={
+                        "https://github.com/apps/devguard-app/installations/new?state=" +
+                        encodeObjectBase64({
+                          orgSlug: activeOrg.slug,
+                          redirectTo: router.asPath,
+                        })
+                      }
+                    >
+                      Install GitHub App
+                    </Link>
+                  }
+                >
+                  <Button variant={"secondary"}>Install GitHub App</Button>
+                </GithubAppInstallationAlert>
+              }
+            />
+          )}
         </Section>
       </div>
       <div>
@@ -267,18 +267,18 @@ export const getServerSideProps = middleware(
     const [resp, repoResp] = await Promise.all([
       apiClient(uri),
       apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/integrations/repositories?provider=github",
+        "/organizations/" + organizationSlug + "/integrations/repositories",
       ),
     ]);
 
     let repos: Array<{ value: string; label: string }> | null = null;
     if (repoResp.ok) {
-      repos = (await repoResp.json()).map((r: Repository) => ({
-        value: "github:" + r.id.toString(),
-        label: r.full_name,
-      }));
+      repos = (await repoResp.json()).map(
+        (r: { label: string; id: string }) => ({
+          value: r.id,
+          label: r.label,
+        }),
+      );
     }
     // fetch a personal access token from the user
 

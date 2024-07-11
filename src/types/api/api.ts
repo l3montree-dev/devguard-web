@@ -219,6 +219,8 @@ export interface AssetDTO {
   availabilityRequirement: RequirementsLevel;
 
   repositoryId?: string;
+
+  reachableFromTheInternet: boolean;
 }
 
 export interface DependencyTreeNode {

@@ -18,9 +18,11 @@ import {
 } from "../ui/select";
 import { Switch } from "../ui/switch";
 import ListItem from "../common/ListItem";
+import { UseFormReturn } from "react-hook-form";
+import { AssetDTO } from "@/types/api/api";
 
 interface Props {
-  form: any;
+  form: UseFormReturn<AssetDTO, any, undefined>;
 }
 
 export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (

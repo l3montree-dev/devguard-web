@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   );
 
   const installation = await apiClient(
-    `/organizations/${stateObj.orgSlug}/integrations/github/finish-installation?installationId=${installationId}`,
+    `/organizations/${stateObj.orgSlug}/integrations/finish-installation?installationId=${installationId}`,
   );
 
   if (!installation.ok) {

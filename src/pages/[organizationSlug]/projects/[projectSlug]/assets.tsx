@@ -58,13 +58,13 @@ const Index: FunctionComponent<Props> = ({ project }) => {
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const form = useForm<CreateAssetReq>({
+  const form = useForm<AssetDTO>({
     resolver: zodResolver(formSchema),
   });
 
   const projectMenu = useProjectMenu();
 
-  const handleCreateAsset = async (data: CreateAssetReq) => {
+  const handleCreateAsset = async (data: AssetDTO) => {
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
