@@ -35,6 +35,7 @@ import {
 } from "../../../../services/devGuardApi";
 import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
 import { CreateAssetReq } from "../../../../types/api/req";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   project: ProjectDTO & {
@@ -99,19 +100,29 @@ const Index: FunctionComponent<Props> = ({ project }) => {
           <span className="flex flex-row gap-2">
             <Link
               href={`/${activeOrg.slug}`}
-              className="!text-white hover:no-underline"
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
             >
-              {activeOrg.name}
+              {activeOrg.name}{" "}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Organization
+              </Badge>
             </Link>
             <span className="opacity-75">/</span>
             <Link
-              className="!text-white hover:no-underline"
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
               href={`/${activeOrg.slug}/projects/${project.slug}`}
             >
               {project.name}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Project
+              </Badge>
             </Link>
-            <span className="opacity-75">/</span>
-            <span className="!text-white">Assets</span>
           </span>
         }
       >

@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Section from "@/components/common/Section";
 import EmptyList from "@/components/common/EmptyList";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   asset: AssetDTO;
@@ -266,27 +267,43 @@ const Index: FunctionComponent<Props> = (props) => {
       Title={
         <span className="flex flex-row gap-2">
           <Link
-            href={`/${activeOrg?.slug}`}
-            className="text-white hover:no-underline"
+            href={`/${activeOrg.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
           >
-            {activeOrg?.name}
+            {activeOrg.name}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Organization
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project?.slug}`}
           >
             {project?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Project
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
+            className="flex items-center gap-1 text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
           >
             {asset?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Asset
+            </Badge>
           </Link>
-          <span className="opacity-75">/</span>
-          <span>Risk Handling</span>
         </span>
       }
     >

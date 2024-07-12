@@ -33,6 +33,14 @@ export const StoreProvider: FunctionComponent<
   const storeRef = useRef<ReturnType<typeof createGlobalStore>>();
   if (!storeRef.current) {
     storeRef.current = createGlobalStore(initialZustandState);
+  } else {
+    // merge the initial zustand state with the current state
+    storeRef.current.setState((state) => {
+      return {
+        ...initialZustandState,
+        ...state,
+      };
+    });
   }
 
   return (

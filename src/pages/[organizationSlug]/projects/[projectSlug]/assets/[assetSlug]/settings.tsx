@@ -8,6 +8,7 @@ import { Combobox } from "@/components/common/Combobox";
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { middleware } from "@/decorators/middleware";
@@ -91,27 +92,43 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       Title={
         <span className="flex flex-row gap-2">
           <Link
-            href={`/${activeOrg?.slug}`}
-            className="text-white hover:no-underline"
+            href={`/${activeOrg.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
           >
-            {activeOrg?.name}
+            {activeOrg.name}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Organization
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project?.slug}`}
           >
             {project?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Project
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
+            className="flex items-center gap-1 text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
           >
             {asset?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Asset
+            </Badge>
           </Link>
-          <span className="opacity-75">/</span>
-          <span>Settings</span>
         </span>
       }
     >

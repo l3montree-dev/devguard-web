@@ -17,7 +17,8 @@ module.exports = {
             },
         },
         fontFamily: {
-            display: ["Lexend"]
+            display: ["Lexend"],
+            body: ["Inter"],
         },
         extend: {
             colors: {
