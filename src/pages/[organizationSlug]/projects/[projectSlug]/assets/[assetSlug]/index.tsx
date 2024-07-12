@@ -11,11 +11,12 @@ import Page from "../../../../../../components/Page";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
-import { withOrg } from "@/decorators/withOrg";
+import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { GetServerSidePropsContext } from "next";
 import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -84,7 +85,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     project: withProject,
     asset: withAsset,
   },

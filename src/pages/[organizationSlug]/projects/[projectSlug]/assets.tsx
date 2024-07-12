@@ -22,20 +22,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
+import { Badge } from "@/components/ui/badge";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import Link from "next/link";
 import { toast } from "sonner";
 import z from "zod";
-import { withOrg } from "../../../../decorators/withOrg";
+import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/devGuardApi";
-import { AssetDTO, EnvDTO, ProjectDTO } from "../../../../types/api/api";
-import { CreateAssetReq } from "../../../../types/api/req";
-import { Badge } from "@/components/ui/badge";
+import {
+  AssetDTO,
+  EnvDTO,
+  ProjectDTO,
+  RequirementsLevel,
+} from "../../../../types/api/api";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   project: ProjectDTO & {
@@ -61,6 +66,11 @@ const Index: FunctionComponent<Props> = ({ project }) => {
   const activeOrg = useActiveOrg();
   const form = useForm<AssetDTO>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      confidentialityRequirement: RequirementsLevel.Medium,
+      integrityRequirement: RequirementsLevel.Medium,
+      availabilityRequirement: RequirementsLevel.Medium,
+    },
   });
 
   const projectMenu = useProjectMenu();
@@ -209,7 +219,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );
 

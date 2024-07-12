@@ -17,7 +17,7 @@ import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { FunctionComponent } from "react";
 import Page from "../../components/Page";
-import { withOrg } from "../../decorators/withOrg";
+import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 
@@ -31,6 +31,8 @@ import { encodeObjectBase64 } from "@/services/encodeService";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -38,7 +40,24 @@ const Home: FunctionComponent = () => {
   const router = useRouter();
 
   return (
-    <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}>
+    <Page
+      Title={
+        <Link
+          href={`/${activeOrg.slug}`}
+          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+        >
+          {activeOrg.name}{" "}
+          <Badge
+            className="font-body font-normal !text-white"
+            variant="outline"
+          >
+            Organization
+          </Badge>
+        </Link>
+      }
+      title={activeOrg.name ?? "Loading..."}
+      Menu={orgMenu}
+    >
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Organization Settings</h1>
       </div>
@@ -122,6 +141,7 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );

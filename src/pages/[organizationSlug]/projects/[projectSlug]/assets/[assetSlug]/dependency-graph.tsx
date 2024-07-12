@@ -28,7 +28,8 @@ import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
-import { withOrg } from "@/decorators/withOrg";
+import { withOrganization } from "@/decorators/withOrganization";
+import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -150,7 +151,7 @@ const DependencyGraphPage: FunctionComponent<{
                 </SelectContent>
               </Select>
             </div>
-            {graph.root.risk === 0 && (
+            {graph.root.risk !== 0 && (
               <div className="flex flex-row items-center gap-4 whitespace-nowrap text-sm">
                 <label htmlFor="allDependencies">
                   Display all dependencies
@@ -320,7 +321,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     project: withProject,
     asset: withAsset,
   },

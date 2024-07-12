@@ -18,7 +18,7 @@ import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
 import { OrganizationDTO } from "@/types/api/api";
 
-export async function withOrg(ctx: GetServerSidePropsContext) {
+export async function withOrgs(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient
   const devGuardApiClient = getApiClientFromContext(ctx);
 

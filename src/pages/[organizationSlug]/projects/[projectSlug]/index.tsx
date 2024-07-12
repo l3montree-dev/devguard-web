@@ -4,14 +4,15 @@ import Page from "../../../../components/Page";
 
 import { middleware } from "@/decorators/middleware";
 
+import { Badge } from "@/components/ui/badge";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import Link from "next/link";
-import { withOrg } from "../../../../decorators/withOrg";
+import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { getApiClientFromContext } from "../../../../services/devGuardApi";
 import { AssetDTO, ProjectDTO } from "../../../../types/api/api";
-import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   project: ProjectDTO & {
@@ -79,7 +80,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );
 

@@ -1,11 +1,17 @@
 import { Session } from "@ory/client";
-import { StoreApi, createStore } from "zustand";
-import { AssetDTO, OrganizationDTO, ProjectDTO } from "../types/api/api";
+import { createStore } from "zustand";
+import {
+  AssetDTO,
+  OrganizationDetailsDTO,
+  OrganizationDTO,
+  ProjectDTO,
+} from "../types/api/api";
 import { User } from "../types/auth";
 
 export interface InitialState {
   session: Omit<Session, "identity"> & { identity: User };
   organizations: OrganizationDTO[];
+  organization: OrganizationDetailsDTO;
 }
 
 export interface GlobalStoreActions {
@@ -20,6 +26,7 @@ export const createGlobalStore = (
   preloadedState: Partial<GlobalStore> & {
     session: Omit<Session, "identity"> & { identity: User };
     organizations: OrganizationDTO[];
+    organization: OrganizationDetailsDTO;
   },
 ) =>
   createStore<GlobalStore>((set, get) => {

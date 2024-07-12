@@ -6,7 +6,7 @@ import {
   StopIcon,
   ClockIcon,
   BugAntIcon,
-} from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
 
 const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
@@ -33,7 +33,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
           <SpeakerXMarkIcon className="inline-block h-4 w-4" />
@@ -46,7 +46,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
           <StopIcon className="inline-block h-4 w-4" />
@@ -54,25 +54,13 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         </div>
       );
 
-    case "markedForMitigation":
-      return (
-        <div
-          className={classNames(
-            defaultClasses,
-            "border-purple-300 bg-purple-200 text-purple-800 dark:border-purple-500 dark:bg-purple-500/10 dark:text-purple-500",
-          )}
-        >
-          <ClockIcon className="inline-block h-4 w-4" />
-          Marked for Mitigation
-        </div>
-      );
     case "open":
     default:
       return (
         <div
           className={classNames(
             defaultClasses,
-            "border-red-300 bg-red-200 text-red-800 dark:border-red-500 dark:bg-red-500/10 dark:text-red-500",
+            "border-destructive-300 border-destructive text-destructive",
           )}
         >
           <BugAntIcon className="inline-block h-4 w-4" />

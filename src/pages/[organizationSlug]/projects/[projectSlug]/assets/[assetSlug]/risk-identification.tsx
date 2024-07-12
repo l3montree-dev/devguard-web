@@ -9,7 +9,8 @@ import SecretScanning from "@/components/risk-identification/SecretScanningNode"
 import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
-import { withOrg } from "@/decorators/withOrg";
+import { withOrganization } from "@/decorators/withOrganization";
+import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -237,7 +238,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     project: withProject,
     asset: withAsset,
   },

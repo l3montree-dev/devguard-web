@@ -35,12 +35,14 @@ import Page from "../components/Page";
 import SubnavSidebar from "../components/SubnavSidebar";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
-import { withOrg } from "../decorators/withOrg";
+
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
+import { withOrgs } from "@/decorators/withOrgs";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   flow?: SettingsFlow;
@@ -420,7 +422,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );
 

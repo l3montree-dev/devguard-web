@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 interface Props {}
 
@@ -87,15 +88,17 @@ export default function UserNav() {
             <Link
               className={classNames(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                "hover:bg-transparent",
+                "hover:bg-transparent hover:no-underline",
               )}
               href="/user-settings"
             >
-              <UserIcon
-                className="text-background dark:text-muted-foreground"
-                width={20}
-                height={20}
-              />
+              <Avatar>
+                {/*<AvatarImage src="https://github.com/shadcn.png" />*/}
+                <AvatarFallback>
+                  {(user.traits.name.first ?? "").charAt(0).toUpperCase() +
+                    (user.traits.name.last ?? "").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </Link>
           )}
         </DropdownMenuTrigger>

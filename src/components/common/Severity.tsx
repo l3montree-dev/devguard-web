@@ -5,7 +5,7 @@ const getClassNames = (severity: string) => {
     case "CRITICAL":
       return "bg-red-200 text-red-700 border border-red-300";
     case "HIGH":
-      return "bg-orange-200 text-orange-700 border border-red-300";
+      return "text-orange-500 border border-orange-500";
     case "MEDIUM":
       return "bg-yellow-300 border border-yellow-500 text-yellow-900";
     case "LOW":

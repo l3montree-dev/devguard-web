@@ -5,7 +5,7 @@ import FlawState from "@/components/common/FlawState";
 import Severity from "@/components/common/Severity";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
-import { withOrg } from "@/decorators/withOrg";
+import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import {
@@ -38,20 +38,20 @@ import { GetServerSidePropsContext } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FormEvent, FunctionComponent, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 const ScoreFunnel = dynamic(() => import("@/components/common/ScoreFunnel"), {
   ssr: false,
@@ -105,41 +105,69 @@ const Index: FunctionComponent<Props> = (props) => {
       Title={
         <span className="flex flex-row gap-2">
           <Link
-            href={`/${activeOrg?.slug}`}
-            className="text-white hover:no-underline"
+            href={`/${activeOrg.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
           >
-            {activeOrg?.name}
+            {activeOrg.name}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Organization
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project?.slug}`}
           >
             {project?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Project
+            </Badge>
           </Link>
           <span className="opacity-75">/</span>
           <Link
-            className="text-white hover:no-underline"
+            className="flex items-center gap-1 text-white hover:no-underline"
             href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
           >
             {asset?.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Asset
+            </Badge>
           </Link>
+
           <span className="opacity-75">/</span>
-          <span>{flaw.cve?.cve ?? "Flaw Details"}</span>
+          <span className="flex flex-row items-center gap-1">
+            {flaw.cve?.cve ?? "Flaw Details"}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Flaw
+            </Badge>
+          </span>
         </span>
       }
       title={flaw.cve?.cve ?? "Flaw Details"}
     >
       <div className="flex flex-row gap-4">
         <div className="flex-1">
-          <h1 className="font-display text-4xl font-bold">{flaw.cve?.cve}</h1>
+          <h1 className="text-2xl font-semibold">{flaw.cveId}</h1>
+
           <p className="mt-4 text-muted-foreground">{flaw.cve?.description}</p>
 
           <div className="mt-4 flex flex-row gap-2 text-sm">
             <FlawState state={flaw.state} />
             {cve && <Severity severity={cve.severity} />}
           </div>
-          <div className="mt-4">
+          <div className="mb-16 mt-4">
             <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
           </div>
 
@@ -254,7 +282,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     asset: withAsset,
     project: withProject,
   },

@@ -31,7 +31,7 @@ import { useRouter } from "next/router";
 import { FunctionComponent, useEffect } from "react";
 import Page from "../../../../../../components/Page";
 
-import { withOrg } from "../../../../../../decorators/withOrg";
+import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
 import { classNames } from "../../../../../../utils/common";
@@ -47,6 +47,7 @@ import {
 import Section from "@/components/common/Section";
 import EmptyList from "@/components/common/EmptyList";
 import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   asset: AssetDTO;
@@ -475,7 +476,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     project: withProject,
     asset: withAsset,
   },

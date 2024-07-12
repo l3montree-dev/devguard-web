@@ -49,6 +49,16 @@ export interface OrganizationDTO extends AppModelDTO {
   }>;
 }
 
+export interface OrganizationDetailsDTO extends OrganizationDTO {
+  members: Array<{
+    id: string;
+    name: {
+      first: string;
+      last: string;
+    };
+  }>;
+}
+
 export interface PersonalAccessTokenDTO {
   description: string;
   userId: string;

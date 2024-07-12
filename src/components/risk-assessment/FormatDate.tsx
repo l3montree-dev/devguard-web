@@ -26,6 +26,7 @@ const timeAgo = (prevDate: Date) => {
   switch (true) {
     case diff < minute:
       const seconds = Math.round(diff / 1000);
+      if (seconds <= 10) return "Now";
       return `${seconds} ${seconds > 1 ? "seconds" : "second"} ago`;
     case diff < hour:
       return Math.round(diff / minute) + " minutes ago";
