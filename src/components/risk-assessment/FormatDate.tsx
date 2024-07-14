@@ -44,10 +44,11 @@ const timeAgo = (prevDate: Date) => {
 };
 
 const FormatDate = ({ dateString }: { dateString: string }) => {
-  const [time, setTime] = useState(dateString);
+  const [time, setTime] = useState<string | null>(null);
   useEffect(() => {
     setTime(timeAgo(new Date(dateString)));
   }, [dateString]);
+  if (!time) return null;
   return <time dateTime={dateString}>{time}</time>;
 };
 

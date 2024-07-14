@@ -18,6 +18,7 @@ import "focus-visible";
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
 import { StoreProvider } from "../zustand/globalStoreProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -47,9 +48,11 @@ export default function App({ Component, pageProps }) {
       enableSystem
       disableTransitionOnChange
     >
-      <StoreProvider initialZustandState={pageProps.initialZustandState}>
-        <Component {...pageProps} />
-      </StoreProvider>
+      <TooltipProvider>
+        <StoreProvider initialZustandState={pageProps.initialZustandState}>
+          <Component {...pageProps} />
+        </StoreProvider>
+      </TooltipProvider>
     </ThemeProvider>
   );
 }

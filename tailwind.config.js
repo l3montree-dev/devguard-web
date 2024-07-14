@@ -18,7 +18,7 @@ module.exports = {
         },
         fontFamily: {
             display: ["Lexend"],
-            body: ["Inter"],
+            body: ["Inter, Roboto, sans-serif"],
         },
         extend: {
             colors: {

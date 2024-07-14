@@ -197,14 +197,43 @@ export interface CVE {
   cisaActionDue?: string;
   cisaRequiredAction?: string;
   cisaVulnerabilityName?: string;
+
+  vector?: string;
+}
+
+export interface Exploit {
+  id: string;
+  pushed_at: string;
+  updated_at: string;
+  author: string;
+  type: string;
+  verified: boolean;
+  sourceURL: string;
+  description: string;
+  cveID: string;
+  tags: string;
+  forks: number;
+  watchers: number;
+  subscribers_count: number;
+  stargazers_count: number;
 }
 export interface FlawWithCVE extends FlawDTO {
-  cve: Modify<
-    CVE,
-    {
-      cwes: Array<CWE>;
-    }
-  > | null;
+  cve:
+    | (Modify<
+        CVE,
+        {
+          cwes: Array<CWE>;
+        }
+      > & {
+        risk: {
+          baseScore: number;
+          withEnvironment: number;
+          withThreatIntelligence: number;
+          withEnvironmentAndThreatIntelligence: number;
+        };
+        exploits: Array<Exploit>;
+      })
+    | null;
   arbitraryJsonData: {
     fixedVersion?: string;
     packageName?: string;

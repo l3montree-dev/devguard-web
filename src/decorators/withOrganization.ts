@@ -31,6 +31,7 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
     const organization: OrganizationDetailsDTO = await r.json();
 
     if (!r.ok) {
+      console.log("LOGIN REDIRECT");
       // it must be an 500
       throw new HttpError({
         redirect: {
@@ -42,12 +43,6 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
 
     return organization;
   } else {
-    // it must be an 500
-    throw new HttpError({
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    });
+    return null;
   }
 }
