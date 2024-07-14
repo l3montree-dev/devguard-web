@@ -15,7 +15,7 @@
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { FlawEventDTO } from "@/types/api/api";
+import { FlawEventDTO, RiskCalculationReport } from "@/types/api/api";
 import { getUsername } from "@/utils/view";
 import {
   ArrowPathIcon,
@@ -50,18 +50,107 @@ function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   }
 }
 
-const eventTypeMessages = (type: FlawEventDTO["type"], flawName: string) => {
-  switch (type) {
+const diffReports = (
+  old: RiskCalculationReport,
+  n: RiskCalculationReport,
+): string => {
+  // check what changed
+  const changes = [];
+  if (old.epss < n.epss) {
+    // epss increased
+    changes.push(
+      `The probability of exploitation (EPSS) increased from ${old.epss * 100}% to ${n.epss * 100}%.`,
+    );
+  } else if (old.epss > n.epss) {
+    // epss decreased
+    changes.push(
+      `The probability of exploitation (EPSS) decreased from ${old.epss * 100}% to ${n.epss * 100}%.`,
+    );
+  }
+
+  if (!old.exploitExists && n.exploitExists && n.verifiedExploitExists) {
+    changes.push("An exploit was discovered and verified.");
+  } else if (old.exploitExists && !n.exploitExists) {
+    changes.push("An already discovered exploit was removed.");
+  } else if (!old.verifiedExploitExists && n.verifiedExploitExists) {
+    changes.push("An exploit was verified.");
+  }
+
+  if (old.confidentialityRequirement !== n.confidentialityRequirement) {
+    changes.push(
+      `Confidentiality requirement changed from ${old.confidentialityRequirement} to ${n.confidentialityRequirement}.`,
+    );
+  }
+
+  if (old.integrityRequirement !== n.integrityRequirement) {
+    changes.push(
+      `Integrity requirement changed from ${old.integrityRequirement} to ${n.integrityRequirement}.`,
+    );
+  }
+
+  if (old.availabilityRequirement !== n.availabilityRequirement) {
+    changes.push(
+      `Availability requirement changed from ${old.availabilityRequirement} to ${n.availabilityRequirement}.`,
+    );
+  }
+
+  return changes.join(" ");
+};
+
+const eventMessages = (
+  event: FlawEventDTO,
+  index: number,
+  events: FlawEventDTO[],
+  flawName: string,
+) => {
+  switch (event.type) {
+    case "rawRiskAssessmentUpdated":
+      // get the last risk calculation report.
+      const beforeThisEvent = events.slice(0, index);
+      const lastRiskEvent = beforeThisEvent.findLast(
+        (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
+      );
+      if (!lastRiskEvent) return "";
+      return diffReports(
+        lastRiskEvent?.arbitraryJsonData,
+        event.arbitraryJsonData,
+      );
+  }
+  return "";
+};
+
+const eventTypeMessages = (
+  event: FlawEventDTO,
+  index: number,
+  events: FlawEventDTO[],
+  flawName: string,
+) => {
+  switch (event.type) {
     case "accepted":
       return "accepted the risk of " + flawName;
     case "fixed":
       return "fixed " + flawName;
     case "detected":
-      return "detected " + flawName;
+      return (
+        "detected " +
+        flawName +
+        " with a risk of " +
+        event.arbitraryJsonData.risk
+      );
     case "falsePositive":
       return "marked " + flawName + " as false positive ";
     case "rawRiskAssessmentUpdated":
-      return "updated the risk assessment of " + flawName + " automatically";
+      // get the last risk calculation report.
+      const beforeThisEvent = events.slice(0, index);
+      const lastRiskEvent = beforeThisEvent.findLast(
+        (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
+      );
+      return (
+        "updated the risk assessment from " +
+        (lastRiskEvent?.arbitraryJsonData.risk ?? 0) +
+        " to " +
+        event.arbitraryJsonData.risk
+      );
   }
   return "";
 };
@@ -116,17 +205,17 @@ export default function RiskAssessmentFeed({
                   <div>
                     <p className="font-medium">
                       {getUsername(event.userId, org, currentUser).displayName}{" "}
-                      {eventTypeMessages(event.type, flawName)}
+                      {eventTypeMessages(event, index, events, flawName)}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {maybeAddDot(event.justification)}
 
                       {event.type === "rawRiskAssessmentUpdated" && (
                         <>
-                          {" "}
-                          Risk Assessment changed from{" "}
-                          {event.arbitraryJsonData.oldRiskAssessment} to{" "}
-                          {event.arbitraryJsonData.newRiskAssessment}
+                          <span>
+                            {" "}
+                            {eventMessages(event, index, events, flawName)}
+                          </span>
                         </>
                       )}
                     </p>

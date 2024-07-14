@@ -116,9 +116,16 @@ export interface Paged<T> {
   pageSize: number;
 }
 
-export interface RiskAssessmentValues {
-  oldRiskAssessment: number;
-  newRiskAssessment: number;
+export interface RiskCalculationReport {
+  epss: number;
+  baseScore: number;
+  exploitExists: boolean;
+  verifiedExploitExists: boolean;
+  underAttack: boolean;
+  confidentialityRequirement: string;
+  integrityRequirement: string;
+  availabilityRequirement: string;
+  risk: number;
 }
 
 interface BaseFlawEventDTO {
@@ -139,6 +146,7 @@ interface FixedFlawEventDTO extends BaseFlawEventDTO {
 
 interface DetectedFlawEventDTO extends BaseFlawEventDTO {
   type: "detected";
+  arbitraryJsonData: RiskCalculationReport;
 }
 
 interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
@@ -155,7 +163,7 @@ interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
 
 interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJsonData: RiskAssessmentValues;
+  arbitraryJsonData: RiskCalculationReport;
 }
 
 export type FlawEventDTO =

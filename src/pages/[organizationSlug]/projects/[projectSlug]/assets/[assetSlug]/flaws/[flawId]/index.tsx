@@ -466,16 +466,17 @@ const Index: FunctionComponent<Props> = (props) => {
                     <Pie
                       data={[
                         {
-                          name: "Risk",
-                          score: (flaw.rawRiskAssessment * 5) / 10,
-                          fill: "hsl(var(--primary))",
-                        },
-                        {
                           name: "Total",
-                          score: ((20 - flaw.rawRiskAssessment) * 5) / 10,
+                          score: 10 - flaw.rawRiskAssessment,
                           fill: "hsl(var(--secondary))",
                         },
+                        {
+                          name: "Risk",
+                          score: flaw.rawRiskAssessment,
+                          fill: "hsl(var(--primary))",
+                        },
                       ]}
+                      startAngle={-270}
                       dataKey="score"
                       nameKey="name"
                       innerRadius={80}
@@ -496,7 +497,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   y={viewBox.cy}
                                   className="fill-foreground text-3xl font-bold"
                                 >
-                                  {(flaw.rawRiskAssessment * 5) / 10}
+                                  {flaw.rawRiskAssessment}
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
