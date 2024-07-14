@@ -18,6 +18,7 @@ import {
   FlawEventDTO,
   RequirementsLevel,
 } from "@/types/api/api";
+import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -62,15 +63,15 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Textarea } from "@/components/ui/textarea";
-import { withOrganization } from "@/decorators/withOrganization";
-import { CaretDownIcon } from "@radix-ui/react-icons";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { withOrganization } from "@/decorators/withOrganization";
+import { classNames } from "@/utils/common";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { CaretDownIcon } from "@radix-ui/react-icons";
 
 interface Props {
   flaw: DetailedFlawDTO;
@@ -304,6 +305,8 @@ const Index: FunctionComponent<Props> = (props) => {
     flaw,
     cvssVectorObj,
   );
+
+  console.log(flaw);
   return (
     <Page
       Menu={assetMenu}
@@ -517,7 +520,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               <div className="p-5">
                 <Collapsible>
-                  <CollapsibleTrigger className="flex w-full flex-row items-center justify-between text-sm">
+                  <CollapsibleTrigger className="flex w-full flex-row items-center justify-between text-sm font-semibold">
                     Show detailed risk assessment
                     <CaretDownIcon />
                   </CollapsibleTrigger>
@@ -626,6 +629,64 @@ const Index: FunctionComponent<Props> = (props) => {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
+              {(flaw.cve?.affectedComponents.length ?? 0) !== 0 && (
+                <div className="p-5">
+                  <h3 className="mb-2 text-sm font-semibold">
+                    Affected components
+                  </h3>
+                  <div className="flex flex-col gap-4">
+                    {flaw.cve?.affectedComponents.map((component, i, arr) => (
+                      <div key={i}>
+                        <div className="rounded bg-card p-4">
+                          <p className="text-sm">
+                            <span className="flex flex-row gap-2">
+                              {[
+                                "Go",
+                                "npm",
+                                "Maven",
+                                "crates.io",
+                                "Packagist",
+                                "RubyGems",
+                                "NuGet",
+                              ].includes(component.ecosystem) && (
+                                <Image
+                                  alt={"Logo von " + component.ecosystem}
+                                  width={15}
+                                  height={15}
+                                  src={
+                                    "/logos/" +
+                                    component.ecosystem.toLowerCase() +
+                                    "-svgrepo-com.svg"
+                                  }
+                                />
+                              )}{" "}
+                              {component.purl.replace("pkg:", "")}
+                            </span>
+                          </p>
+                          <div className="mt-4 text-sm">
+                            <p className="flex flex-row justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Introduced in:{" "}
+                              </span>
+                              <Badge variant={"outline"}>
+                                {component.semverStart ?? "von Beginn an"}
+                              </Badge>
+                            </p>
+                            <p className="mt-1 flex flex-row justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Fixed in:{" "}
+                              </span>
+                              <Badge variant={"outline"}>
+                                {component.semverEnd ?? "kein Patch verfügbar"}
+                              </Badge>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
