@@ -17,10 +17,19 @@ import { withSession } from "@/decorators/withSession";
 import { GetServerSidePropsContext } from "next";
 import { Badge } from "@/components/ui/badge";
 import { withOrganization } from "@/decorators/withOrganization";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { useRouter } from "next/router";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+  const router = useRouter();
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -71,7 +80,33 @@ const Index: FunctionComponent = () => {
           </Link>
         </span>
       }
-    ></Page>
+    >
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button variant={"secondary"}>Download SBOM</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <Link
+            download
+            target="_blank"
+            prefetch={false}
+            href={router.asPath + `/sbom.json`}
+            className="!text-foreground hover:no-underline"
+          >
+            <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+          </Link>
+          <Link
+            download
+            target="_blank"
+            prefetch={false}
+            href={router.asPath + `/sbom.xml`}
+            className="!text-foreground hover:no-underline"
+          >
+            <DropdownMenuItem>XML-Format</DropdownMenuItem>
+          </Link>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Page>
   );
 };
 

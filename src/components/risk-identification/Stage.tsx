@@ -48,7 +48,7 @@ function Stage({
     >
       {targetHandle && (
         <Handle
-          className="!border-2 border-white !bg-gray-400 p-1"
+          className="rounded-full !border-2 border-white !bg-gray-400 p-1"
           type="target"
           id="left"
           position={Position.Left}
@@ -72,7 +72,7 @@ function Stage({
 
       {sourceHandle && (
         <Handle
-          className="!border-2 border-white !bg-gray-400 p-1"
+          className="rounded-full !border-2 border-white !bg-gray-400 p-1"
           type="source"
           id="right"
           position={Position.Right}
