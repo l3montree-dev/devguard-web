@@ -254,6 +254,7 @@ export interface FlawWithCVE extends FlawDTO {
     packageName: string;
     installedVersion: string;
     cveId: string;
+    componentDepth: number;
   };
   component: {
     purlOrCpe: string;

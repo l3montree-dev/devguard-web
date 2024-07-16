@@ -25,7 +25,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
             "border-green-400 bg-green-200 text-green-900 dark:bg-green-400/10 dark:text-green-500",
           )}
         >
-          <CheckCircleIcon className="inline-block h-4 w-4" />
+          <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
           Fixed
         </Badge>
       );
@@ -39,7 +39,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
             "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <SpeakerXMarkIcon className="inline-block h-4 w-4" />
+          <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
           Accepted
         </Badge>
       );
@@ -53,7 +53,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
             "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <StopIcon className="inline-block h-4 w-4" />
+          <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
         </Badge>
       );
@@ -68,7 +68,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
             "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <BugAntIcon className="inline-block h-4 w-4" />
+          <BugAntIcon className="-ml-1 inline-block h-4 w-4" />
           Open
         </Badge>
       );

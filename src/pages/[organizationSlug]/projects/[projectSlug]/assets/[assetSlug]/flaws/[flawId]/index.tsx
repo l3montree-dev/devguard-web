@@ -167,6 +167,14 @@ const epssMessage = (epss: number) => {
   }
 };
 
+const componentDepthMessages = (depth: number) => {
+  if (depth === 1) {
+    return "The vulnerability is a direct dependency of your project.";
+  } else {
+    return `The vulnerability is in a dependency of a dependency your project. It is ${depth} levels deep.`;
+  }
+};
+
 const cvssBE = (
   asset: AssetDTO,
   cvssObj: {
@@ -624,6 +632,39 @@ const Index: FunctionComponent<Props> = (props) => {
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {ExploitLong}
+                      </p>
+                    </div>
+                    <div className="w-full border-b pb-4">
+                      <div className="flex w-full flex-row items-center justify-between">
+                        <span className="font-semibold">
+                          Depth of the component{" "}
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-screen-sm font-normal">
+                              <p>
+                                The depth of the component describes how many
+                                levels deep the vulnerability is in your
+                                project. The deeper a vulnerability is inside
+                                the tree, the propability decreases, that it can
+                                be exploited.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </span>
+                        <div className="whitespace-nowrap">
+                          <Badge variant="outline">
+                            {flaw.arbitraryJsonData?.componentDepth === 1
+                              ? "Direct"
+                              : "Transitive"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {componentDepthMessages(
+                          flaw.arbitraryJsonData?.componentDepth ?? 0,
+                        )}
                       </p>
                     </div>
                     <div className="w-full border-b pb-4">
