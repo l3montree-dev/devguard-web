@@ -25,13 +25,11 @@ import {
   SpeakerXMarkIcon,
   StopIcon,
   WrenchIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import Markdown from "react-markdown";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import FormatDate from "./FormatDate";
-import { Badge } from "../ui/badge";
-import Markdown from "react-markdown";
-import Image from "next/image";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -49,6 +47,8 @@ function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
       return <ArrowRightStartOnRectangleIcon />;
     case "rawRiskAssessmentUpdated":
       return <ArrowPathIcon />;
+    case "reopened":
+      return <MagnifyingGlassIcon />;
   }
 }
 
@@ -128,6 +128,8 @@ const eventTypeMessages = (
   flawName: string,
 ) => {
   switch (event.type) {
+    case "reopened":
+      return "reopened " + flawName;
     case "accepted":
       return "accepted the risk of " + flawName;
     case "fixed":

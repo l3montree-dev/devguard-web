@@ -318,6 +318,7 @@ const Index: FunctionComponent<Props> = (props) => {
     const json = await resp.json();
 
     setFlaw((prev) => ({ ...prev, ...json }));
+    form.reset();
   };
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
@@ -406,77 +407,117 @@ const Index: FunctionComponent<Props> = (props) => {
               <div>
                 <Card>
                   <CardHeader>
-                    <CardTitle>Update the status</CardTitle>
+                    <CardTitle>
+                      {flaw.state === "open"
+                        ? "Update the status of this vulnerability"
+                        : "Reopen this vulnerability"}
+                    </CardTitle>
                     <CardDescription></CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Form {...form}>
-                      <form
-                        className="flex flex-col gap-4"
-                        onSubmit={form.handleSubmit(handleSubmit)}
-                      >
-                        <FormField
-                          name="status"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Status</FormLabel>
-                              <FormControl>
-                                <Select
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                >
-                                  <SelectTrigger className="bg-background">
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="falsePositive">
-                                      False Positive
-                                    </SelectItem>
-                                    <SelectItem value="accepted">
-                                      Accepted
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <small className="text-muted-foreground">
-                          Select the current status to update the record
-                          accurately:
-                          <ol>
-                            <li>
-                              Accepted: Accepts the risk the flaw poses to the
-                              organization. It mutes the flaw. Detecting this
-                              flaw again won&apos;t have an impact on the
-                              pipeline result.
-                            </li>
-                            <li>
-                              False Positive: Mutes the flaw permanently as it
-                              is identified as a non-issue.
-                            </li>
-                          </ol>
-                        </small>
+                    {flaw.state === "open" ? (
+                      <Form {...form}>
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={form.handleSubmit(handleSubmit)}
+                        >
+                          <FormField
+                            name="status"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Status</FormLabel>
+                                <FormControl>
+                                  <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <SelectTrigger className="bg-background">
+                                      <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="falsePositive">
+                                        False Positive
+                                      </SelectItem>
+                                      <SelectItem value="accepted">
+                                        Accepted
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <small className="text-muted-foreground">
+                            Select the current status to update the record
+                            accurately:
+                            <ol>
+                              <li>
+                                Accepted: Accepts the risk the flaw poses to the
+                                organization. It mutes the flaw. Detecting this
+                                flaw again won&apos;t have an impact on the
+                                pipeline result.
+                              </li>
+                              <li>
+                                False Positive: Mutes the flaw permanently as it
+                                is identified as a non-issue.
+                              </li>
+                            </ol>
+                          </small>
 
-                        <FormField
-                          name="justification"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Justification</FormLabel>
-                              <FormControl>
-                                <MarkdownEditor
-                                  value={field.value ?? ""}
-                                  setValue={(v) => field.onChange(v)}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <div className="flex flex-row justify-end">
-                          <Button type="submit">Submit</Button>
-                        </div>
-                      </form>
-                    </Form>
+                          <FormField
+                            name="justification"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Justification</FormLabel>
+                                <FormControl>
+                                  <MarkdownEditor
+                                    value={field.value ?? ""}
+                                    setValue={(v) => field.onChange(v)}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <div className="flex flex-row justify-end">
+                            <Button type="submit">Submit</Button>
+                          </div>
+                        </form>
+                      </Form>
+                    ) : (
+                      <Form {...form}>
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={(e) => {
+                            form.setValue("status", "reopened");
+                            form.handleSubmit(handleSubmit)(e);
+                          }}
+                        >
+                          <FormField
+                            name="justification"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Justification</FormLabel>
+                                <FormControl>
+                                  <MarkdownEditor
+                                    value={field.value ?? ""}
+                                    setValue={(v) => field.onChange(v)}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <p className="text-sm text-muted-foreground">
+                            You can reopen this flaw, if you plan to mitigate
+                            the risk now, or accepted this flaw by accident.
+                          </p>
+                          <div className="flex flex-row justify-end">
+                            <Button variant={"secondary"} type="submit">
+                              Reopen
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    )}
                   </CardContent>
                 </Card>
               </div>

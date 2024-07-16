@@ -37,7 +37,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
           )}
         >
           <SpeakerXMarkIcon className="inline-block h-4 w-4" />
-          Ignored
+          Accepted
         </div>
       );
 

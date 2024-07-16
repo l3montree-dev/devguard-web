@@ -140,6 +140,10 @@ interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
   type: "accepted";
 }
 
+interface ReopenedFlawEventDTO extends BaseFlawEventDTO {
+  type: "reopened";
+}
+
 interface FixedFlawEventDTO extends BaseFlawEventDTO {
   type: "fixed";
 }
@@ -173,7 +177,8 @@ export type FlawEventDTO =
   | FalsePositiveFlawEventDTO
   | MarkedForMitigationFlawEventDTO
   | MarkedForTransferFlawEventDTO
-  | RiskAssessmentUpdatedFlawEventDTO;
+  | RiskAssessmentUpdatedFlawEventDTO
+  | ReopenedFlawEventDTO;
 
 export interface CWE {
   cwe: string;
