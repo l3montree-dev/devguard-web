@@ -23,20 +23,6 @@ import { Label, Pie, PieChart } from "recharts";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -45,7 +31,6 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, ReactNode, useState } from "react";
-import { useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
@@ -63,12 +48,19 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 const MarkdownEditor = dynamic(
@@ -294,10 +286,10 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  const form = useForm<{
-    status: FlawEventDTO["type"];
-    justification: string;
-  }>();
+  const [justification, setJustification] = useState<string | undefined>(
+    undefined,
+  );
+  const [status, setStatus] = useState<FlawEventDTO["type"]>("accepted");
 
   const handleSubmit = async (data: {
     status?: FlawEventDTO["type"];
@@ -325,7 +317,8 @@ const Index: FunctionComponent<Props> = (props) => {
     const json = await resp.json();
 
     setFlaw((prev) => ({ ...prev, ...json }));
-    form.reset();
+    setJustification("");
+    setStatus("accepted");
   };
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
@@ -417,117 +410,157 @@ const Index: FunctionComponent<Props> = (props) => {
                   <CardHeader>
                     <CardTitle>
                       {flaw.state === "open"
-                        ? "Update the status of this vulnerability"
+                        ? "Add a comment"
                         : "Reopen this vulnerability"}
                     </CardTitle>
                     <CardDescription></CardDescription>
                   </CardHeader>
                   <CardContent>
                     {flaw.state === "open" ? (
-                      <Form {...form}>
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={form.handleSubmit(handleSubmit)}
-                        >
-                          <FormField
-                            name="status"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <FormControl>
-                                  <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                  >
-                                    <SelectTrigger className="bg-background">
-                                      <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="falsePositive">
-                                        False Positive
-                                      </SelectItem>
-                                      <SelectItem value="accepted">
-                                        Accepted
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                              </FormItem>
-                            )}
+                      <form
+                        className="flex flex-col gap-4"
+                        onSubmit={(e) => e.preventDefault()}
+                      >
+                        <div>
+                          <label className="mb-2 block text-sm font-semibold">
+                            Comment
+                          </label>
+                          <MarkdownEditor
+                            placeholder="Add your comment here..."
+                            value={justification ?? ""}
+                            setValue={setJustification}
                           />
-                          <small className="text-muted-foreground">
-                            Select the current status to update the record
-                            accurately:
-                            <ol>
-                              <li>
-                                Accepted: Accepts the risk the flaw poses to the
-                                organization. It mutes the flaw. Detecting this
-                                flaw again won&apos;t have an impact on the
-                                pipeline result.
-                              </li>
-                              <li>
-                                False Positive: Mutes the flaw permanently as it
-                                is identified as a non-issue.
-                              </li>
-                            </ol>
-                          </small>
+                        </div>
 
-                          <FormField
-                            name="justification"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Justification</FormLabel>
-                                <FormControl>
-                                  <MarkdownEditor
-                                    value={field.value ?? ""}
-                                    setValue={(v) => field.onChange(v)}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                          <div className="flex flex-row justify-end">
-                            <Button type="submit">Submit</Button>
-                          </div>
-                        </form>
-                      </Form>
-                    ) : (
-                      <Form {...form}>
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={(e) => {
-                            form.setValue("status", "reopened");
-                            form.handleSubmit(handleSubmit)(e);
-                          }}
-                        >
-                          <FormField
-                            name="justification"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Justification</FormLabel>
-                                <FormControl>
-                                  <MarkdownEditor
-                                    value={field.value ?? ""}
-                                    setValue={(v) => field.onChange(v)}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                          <p className="text-sm text-muted-foreground">
-                            You can reopen this flaw, if you plan to mitigate
-                            the risk now, or accepted this flaw by accident.
-                          </p>
-                          <div className="flex flex-row justify-end">
-                            <Button variant={"secondary"} type="submit">
-                              Reopen
+                        <div className="flex flex-row justify-end gap-1">
+                          <div className="flex flex-row items-center">
+                            <Button
+                              onClick={() => {
+                                handleSubmit({
+                                  status,
+                                  justification,
+                                });
+                              }}
+                              variant={"secondary"}
+                            >
+                              {status === "accepted"
+                                ? "Accept risk"
+                                : "Mark risk as False Positive"}
                             </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size={"icon"}
+                                  className="relative right-2"
+                                  variant={"secondary"}
+                                >
+                                  <CaretDownIcon />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuCheckboxItem
+                                  checked={status === "accepted"}
+                                  onCheckedChange={() => {
+                                    setStatus("accepted");
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    Mark as accepted
+                                    <small className="text-muted-foreground">
+                                      Accepts the risk the flaw poses to the
+                                      organization.
+                                      <br /> Detecting this flaw again
+                                      won&apos;t have an impact on the pipeline
+                                      result.
+                                    </small>
+                                  </div>
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                  checked={status === "falsePositive"}
+                                  onCheckedChange={() => {
+                                    setStatus("falsePositive");
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    Mark as false positive
+                                    <small className="text-muted-foreground">
+                                      Mutes the flaw permanently as it is
+                                      identified as a non-issue.
+                                    </small>
+                                  </div>
+                                </DropdownMenuCheckboxItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                        </form>
-                      </Form>
+                          <Button
+                            type="submit"
+                            onClick={() => {
+                              handleSubmit({
+                                status: "comment",
+                                justification,
+                              });
+                            }}
+                          >
+                            Comment
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      <form
+                        className="flex flex-col gap-4"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <div>
+                          <label className="mb-2 block text-sm font-semibold">
+                            Comment
+                          </label>
+                          <MarkdownEditor
+                            value={justification ?? ""}
+                            setValue={setJustification}
+                            placeholder="Add your comment here..."
+                          />
+                        </div>
+
+                        <p className="text-sm text-muted-foreground">
+                          You can reopen this flaw, if you plan to mitigate the
+                          risk now, or accepted this flaw by accident.
+                        </p>
+                        <div className="flex flex-row justify-end">
+                          <Button
+                            onClick={() => {
+                              handleSubmit({
+                                status: "reopened",
+                                justification,
+                              });
+                            }}
+                            variant={"secondary"}
+                            type="submit"
+                          >
+                            Reopen
+                          </Button>
+                        </div>
+                      </form>
                     )}
                   </CardContent>
                 </Card>
+                {flaw.state === "open" && (
+                  <small className="mt-1 block text-muted-foreground">
+                    Select the current status to update the record accurately:
+                    <ol>
+                      <li>
+                        Accepted: Accepts the risk the flaw poses to the
+                        organization. It mutes the flaw. Detecting this flaw
+                        again won&apos;t have an impact on the pipeline result.
+                      </li>
+                      <li>
+                        False Positive: Mutes the flaw permanently as it is
+                        identified as a non-issue.
+                      </li>
+                    </ol>
+                  </small>
+                )}
               </div>
             </div>
             <div className="border-l">

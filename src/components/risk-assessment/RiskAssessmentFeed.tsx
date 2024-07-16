@@ -134,6 +134,8 @@ const eventTypeMessages = (
       return "accepted the risk of " + flawName;
     case "fixed":
       return "fixed " + flawName;
+    case "comment":
+      return "added a comment";
     case "detected":
       return (
         "detected " +

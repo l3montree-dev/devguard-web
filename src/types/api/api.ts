@@ -171,6 +171,10 @@ interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
   arbitraryJsonData: RiskCalculationReport;
 }
 
+interface CommentFlawEventDTO extends BaseFlawEventDTO {
+  type: "comment";
+}
+
 export type FlawEventDTO =
   | AcceptedFlawEventDTO
   | FixedFlawEventDTO
@@ -179,7 +183,8 @@ export type FlawEventDTO =
   | MarkedForMitigationFlawEventDTO
   | MarkedForTransferFlawEventDTO
   | RiskAssessmentUpdatedFlawEventDTO
-  | ReopenedFlawEventDTO;
+  | ReopenedFlawEventDTO
+  | CommentFlawEventDTO;
 
 export interface CWE {
   cwe: string;
