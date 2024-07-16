@@ -1,4 +1,5 @@
 import { classNames } from "@/utils/common";
+import { Badge } from "../ui/badge";
 
 export const getClassNames = (severity: string) => {
   switch (severity) {
@@ -41,15 +42,9 @@ const Severity = ({ risk }: { risk: number }) => {
   const cls = getClassNames(riskToSeverity(risk));
 
   return (
-    <div className="flex">
-      <div
-        className={classNames(
-          cls + " whitespace-nowrap rounded-full px-2 py-1 font-semibold",
-        )}
-      >
-        {riskToSeverity(risk)}
-      </div>
-    </div>
+    <Badge variant={"outline"} className={cls}>
+      {riskToSeverity(risk)}
+    </Badge>
   );
 };
 

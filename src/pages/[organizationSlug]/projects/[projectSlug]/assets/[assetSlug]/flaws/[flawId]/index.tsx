@@ -62,7 +62,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -394,6 +393,7 @@ const Index: FunctionComponent<Props> = (props) => {
           <div className="mt-4 flex flex-row gap-2 text-sm">
             <FlawState state={flaw.state} />
             {cve && <Severity risk={flaw.rawRiskAssessment} />}
+            <Badge variant={"outline"}>{flaw.scanner}</Badge>
           </div>
           <div className="mb-16 mt-4">
             <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
@@ -809,6 +809,7 @@ export const getServerSideProps = middleware(
 
     const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
 
+    console.log(resp);
     return {
       props: {
         flaw: resp,

@@ -97,7 +97,7 @@ export interface FlawDTO {
   updatedAt: string;
   cveId: string | null;
   componentPurlOrCpe: string | null;
-
+  scanner: string;
   state:
     | "open"
     | "fixed"
