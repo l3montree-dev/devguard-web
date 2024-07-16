@@ -240,22 +240,14 @@ export interface FlawWithCVE extends FlawDTO {
           withEnvironmentAndThreatIntelligence: number;
         };
         exploits: Array<Exploit>;
-        affectedComponents: Array<{
-          purl: string;
-          scheme: string;
-          type: string;
-          name: string;
-          namespace: string;
-          ecosystem: string;
-          version: string | null;
-          semverStart: string;
-          semverEnd: string;
-        }>;
       })
     | null;
-  arbitraryJsonData: {
-    fixedVersion?: string;
-    packageName?: string;
+  arbitraryJsonData: null | {
+    introducedVersion: string;
+    fixedVersion: string;
+    packageName: string;
+    installedVersion: string;
+    cveId: string;
   };
   component: {
     purlOrCpe: string;

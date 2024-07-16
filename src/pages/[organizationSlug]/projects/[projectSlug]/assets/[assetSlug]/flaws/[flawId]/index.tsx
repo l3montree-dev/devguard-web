@@ -69,7 +69,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withOrganization } from "@/decorators/withOrganization";
-import { classNames } from "@/utils/common";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 
@@ -259,6 +258,15 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     `${baseScores["I"][cvss["I"]]}\n` +
     `${baseScores["A"][cvss["A"]]}`
   );
+};
+
+const getEcosystem = (packageName: string) => {
+  if (packageName.startsWith("pkg:")) {
+    return packageName.split(":")[1].split("/")[0];
+  } else if (packageName.includes("/")) {
+    return packageName.split("/")[0];
+  }
+  return packageName;
 };
 
 const Index: FunctionComponent<Props> = (props) => {
@@ -629,61 +637,82 @@ const Index: FunctionComponent<Props> = (props) => {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              {(flaw.cve?.affectedComponents.length ?? 0) !== 0 && (
+              {flaw.arbitraryJsonData !== null && (
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
-                    Affected components
+                    Affected component
                   </h3>
                   <div className="flex flex-col gap-4">
-                    {flaw.cve?.affectedComponents.map((component, i, arr) => (
-                      <div key={i}>
-                        <div className="rounded bg-card p-4">
-                          <p className="text-sm">
-                            <span className="flex flex-row gap-2">
-                              {[
-                                "Go",
-                                "npm",
-                                "Maven",
-                                "crates.io",
-                                "Packagist",
-                                "RubyGems",
-                                "NuGet",
-                              ].includes(component.ecosystem) && (
-                                <Image
-                                  alt={"Logo von " + component.ecosystem}
-                                  width={15}
-                                  height={15}
-                                  src={
-                                    "/logos/" +
-                                    component.ecosystem.toLowerCase() +
-                                    "-svgrepo-com.svg"
-                                  }
-                                />
-                              )}{" "}
-                              {component.purl.replace("pkg:", "")}
+                    <div>
+                      <div className="rounded bg-card p-4">
+                        <p className="text-sm">
+                          <span className="flex flex-row gap-2">
+                            {[
+                              "Go",
+                              "npm",
+                              "Maven",
+                              "crates.io",
+                              "Packagist",
+                              "RubyGems",
+                              "NuGet",
+                            ].includes(
+                              getEcosystem(flaw.arbitraryJsonData.packageName),
+                            ) && (
+                              <Image
+                                alt={
+                                  "Logo von " +
+                                  getEcosystem(
+                                    flaw.arbitraryJsonData.packageName,
+                                  )
+                                }
+                                width={15}
+                                height={15}
+                                src={
+                                  "/logos/" +
+                                  getEcosystem(
+                                    flaw.arbitraryJsonData.packageName,
+                                  ).toLowerCase() +
+                                  "-svgrepo-com.svg"
+                                }
+                              />
+                            )}{" "}
+                            {flaw.arbitraryJsonData.packageName.replace(
+                              "pkg:",
+                              "",
+                            )}
+                          </span>
+                        </p>
+                        <div className="mt-4 text-sm">
+                          <p className="flex flex-row justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              Introduced in:{" "}
                             </span>
+                            <Badge variant={"outline"}>
+                              {flaw.arbitraryJsonData.introducedVersion ??
+                                "von Beginn an"}
+                            </Badge>
                           </p>
-                          <div className="mt-4 text-sm">
-                            <p className="flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Introduced in:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {component.semverStart ?? "von Beginn an"}
-                              </Badge>
-                            </p>
-                            <p className="mt-1 flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Fixed in:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {component.semverEnd ?? "kein Patch verfügbar"}
-                              </Badge>
-                            </p>
-                          </div>
+                          <p className="mt-1 flex flex-row justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              Installed version:{" "}
+                            </span>
+                            <Badge variant={"outline"}>
+                              {flaw.arbitraryJsonData.installedVersion ??
+                                "von Beginn an"}
+                            </Badge>
+                          </p>
+                          <p className="mt-1 flex flex-row justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              Fixed in:{" "}
+                            </span>
+                            <Badge variant={"outline"}>
+                              {flaw.arbitraryJsonData.fixedVersion ??
+                                "kein Patch verfügbar"}
+                            </Badge>
+                          </p>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               )}
