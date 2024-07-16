@@ -393,7 +393,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
           <div className="mt-4 flex flex-row gap-2 text-sm">
             <FlawState state={flaw.state} />
-            {cve && <Severity severity={cve.severity} />}
+            {cve && <Severity risk={flaw.rawRiskAssessment} />}
           </div>
           <div className="mb-16 mt-4">
             <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
