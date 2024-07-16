@@ -169,7 +169,7 @@ const epssMessage = (epss: number) => {
 
 const componentDepthMessages = (depth: number) => {
   if (depth === 1) {
-    return "The vulnerability is a direct dependency of your project.";
+    return "The vulnerability is in a direct dependency of your project.";
   } else {
     return `The vulnerability is in a dependency of a dependency your project. It is ${depth} levels deep.`;
   }
@@ -625,7 +625,26 @@ const Index: FunctionComponent<Props> = (props) => {
                     </div>
                     <div className="w-full border-b pb-4">
                       <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">Exploit</span>
+                        <span className="font-semibold">
+                          Exploit{" "}
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-screen-sm font-normal">
+                              <p>
+                                An exploit is software or commands that take
+                                advantage of a bug to cause unintended behavior,
+                                like unauthorized access or system disruption.
+                                Exploits can be shared on the dark web or
+                                GitHub. Many use these shared exploits because
+                                they can&quot;t create their own. If an exploit
+                                is available, <i>script kiddies</i> are more
+                                likely to use it.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">{exploitShort}</Badge>
                         </div>
@@ -637,7 +656,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     <div className="w-full border-b pb-4">
                       <div className="flex w-full flex-row items-center justify-between">
                         <span className="font-semibold">
-                          Depth of the component{" "}
+                          Vulnerability depth{" "}
                           <Tooltip>
                             <TooltipTrigger>
                               <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
