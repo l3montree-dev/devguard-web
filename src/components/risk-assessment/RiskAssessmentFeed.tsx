@@ -30,6 +30,8 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import FormatDate from "./FormatDate";
 import { Badge } from "../ui/badge";
+import Markdown from "react-markdown";
+import Image from "next/image";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -188,10 +190,21 @@ export default function RiskAssessmentFeed({
             <div className="h-7 w-7 rounded-full border-2 border-background bg-secondary p-1 text-muted-foreground">
               <EventTypeIcon eventType={event.type} />
             </div>
-            <div className="">
-              <div className="flex flex-col">
-                <div className="flex flex-row items-center gap-2">
-                  {event.userId !== "system" && (
+            <div className="w-full">
+              <div className="flex w-full flex-col">
+                <div className="flex flex-row items-start gap-2">
+                  {event.userId === "system" ? (
+                    <Avatar>
+                      <AvatarFallback className="bg-secondary">
+                        <Image
+                          width={20}
+                          height={20}
+                          src="/logo_icon.svg"
+                          alt="logo"
+                        />
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : (
                     <Avatar>
                       <AvatarFallback className="bg-secondary">
                         {getUsername(
@@ -202,27 +215,31 @@ export default function RiskAssessmentFeed({
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div>
-                    <p className="font-medium">
+                  <div className="w-full rounded border ">
+                    <p className="bg-card px-2 py-2 font-medium">
                       {getUsername(event.userId, org, currentUser).displayName}{" "}
                       {eventTypeMessages(event, index, events, flawName)}
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {maybeAddDot(event.justification)}
+                    {Boolean(event.justification) && (
+                      <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
+                        <Markdown className={"text-foreground"}>
+                          {maybeAddDot(event.justification)}
+                        </Markdown>
 
-                      {event.type === "rawRiskAssessmentUpdated" && (
-                        <>
-                          <span>
-                            {" "}
-                            {eventMessages(event, index, events, flawName)}
-                          </span>
-                        </>
-                      )}
-                    </p>
+                        {event.type === "rawRiskAssessmentUpdated" && (
+                          <>
+                            <span>
+                              {" "}
+                              {eventMessages(event, index, events, flawName)}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="mt-2 text-xs font-normal text-muted-foreground">
+              <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
                 <FormatDate dateString={event.createdAt} />
               </div>
             </div>

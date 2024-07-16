@@ -60,7 +60,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
         <div
           className={classNames(
             defaultClasses,
-            "border-destructive-300 border-destructive text-destructive",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
           <BugAntIcon className="inline-block h-4 w-4" />

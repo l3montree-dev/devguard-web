@@ -1,4 +1,4 @@
-import { CodeBlockEditorDescriptor, MDXEditorProps } from "@mdxeditor/editor";
+import { DiffSourceToggleWrapper, MDXEditorProps } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { FunctionComponent } from "react";
 
@@ -19,8 +19,10 @@ const {
   frontmatterPlugin,
 
   codeMirrorPlugin,
-  UndoRedo,
+
   BoldItalicUnderlineToggles,
+  ListsToggle,
+  CodeToggle,
   diffSourcePlugin,
   // @ts-expect-error
 } = await import("@mdxeditor/editor");
@@ -37,8 +39,9 @@ const MarkdownEditor: FunctionComponent<Props> = ({
 }) => {
   return (
     <MDXEditor
-      className="mdx-editor"
+      className="mdx-editor rounded border focus-within:ring focus:ring"
       onChange={(value) => setValue(value)}
+      placeholder="Add your justification here..."
       markdown={value}
       contentEditableClassName="mdx-editor-content"
       plugins={[
@@ -46,8 +49,11 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         toolbarPlugin({
           toolbarContents: () => (
             <>
-              <UndoRedo />
-              <BoldItalicUnderlineToggles />
+              <DiffSourceToggleWrapper>
+                <BoldItalicUnderlineToggles />
+                <CodeToggle />
+                <ListsToggle />
+              </DiffSourceToggleWrapper>
             </>
           ),
         }),
@@ -60,18 +66,18 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
-
+        codeBlockPlugin({ defaultCodeBlockLanguage: "go" }),
         codeMirrorPlugin({
           codeBlockLanguages: {
             js: "JavaScript",
             css: "CSS",
             txt: "text",
             tsx: "TypeScript",
+            go: "Go",
           },
         }),
 
-        diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "boo" }),
+        diffSourcePlugin({ viewMode: "rich-text" }),
         markdownShortcutPlugin(),
       ]}
     />

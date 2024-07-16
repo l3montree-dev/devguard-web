@@ -71,6 +71,13 @@ import {
 import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import dynamic from "next/dynamic";
+const MarkdownEditor = dynamic(
+  () => import("@/components/common/MarkdownEditor"),
+  {
+    ssr: false,
+  },
+);
 
 interface Props {
   flaw: DetailedFlawDTO;
@@ -286,10 +293,14 @@ const Index: FunctionComponent<Props> = (props) => {
   }>();
 
   const handleSubmit = async (data: {
-    status: FlawEventDTO["type"];
-    justification: string;
+    status?: FlawEventDTO["type"];
+    justification?: string;
   }) => {
-    if (data.justification === "") {
+    if (data.status === undefined) {
+      return;
+    }
+
+    if (!Boolean(data.justification)) {
       data.justification = "set as " + data.status;
     }
 
@@ -304,8 +315,9 @@ const Index: FunctionComponent<Props> = (props) => {
       },
       "",
     );
+    const json = await resp.json();
 
-    setFlaw(await resp.json());
+    setFlaw((prev) => ({ ...prev, ...json }));
   };
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
@@ -314,7 +326,6 @@ const Index: FunctionComponent<Props> = (props) => {
     cvssVectorObj,
   );
 
-  console.log(flaw);
   return (
     <Page
       Menu={assetMenu}
@@ -453,9 +464,9 @@ const Index: FunctionComponent<Props> = (props) => {
                             <FormItem>
                               <FormLabel>Justification</FormLabel>
                               <FormControl>
-                                <Textarea
-                                  className="bg-background"
-                                  {...field}
+                                <MarkdownEditor
+                                  value={field.value ?? ""}
+                                  setValue={(v) => field.onChange(v)}
                                 />
                               </FormControl>
                             </FormItem>
@@ -683,7 +694,7 @@ const Index: FunctionComponent<Props> = (props) => {
                           </span>
                         </p>
                         <div className="mt-4 text-sm">
-                          <p className="flex flex-row justify-between">
+                          <div className="flex flex-row justify-between">
                             <span className="text-xs text-muted-foreground">
                               Introduced in:{" "}
                             </span>
@@ -691,8 +702,8 @@ const Index: FunctionComponent<Props> = (props) => {
                               {flaw.arbitraryJsonData.introducedVersion ??
                                 "von Beginn an"}
                             </Badge>
-                          </p>
-                          <p className="mt-1 flex flex-row justify-between">
+                          </div>
+                          <div className="mt-1 flex flex-row justify-between">
                             <span className="text-xs text-muted-foreground">
                               Installed version:{" "}
                             </span>
@@ -700,8 +711,8 @@ const Index: FunctionComponent<Props> = (props) => {
                               {flaw.arbitraryJsonData.installedVersion ??
                                 "von Beginn an"}
                             </Badge>
-                          </p>
-                          <p className="mt-1 flex flex-row justify-between">
+                          </div>
+                          <div className="mt-1 flex flex-row justify-between">
                             <span className="text-xs text-muted-foreground">
                               Fixed in:{" "}
                             </span>
@@ -709,7 +720,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               {flaw.arbitraryJsonData.fixedVersion ??
                                 "kein Patch verfügbar"}
                             </Badge>
-                          </p>
+                          </div>
                         </div>
                       </div>
                     </div>
