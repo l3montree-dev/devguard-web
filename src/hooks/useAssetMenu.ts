@@ -20,6 +20,7 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
+import { isAccessor } from "typescript";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -27,6 +28,7 @@ export const useAssetMenu = () => {
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const assetSlug = router.query.assetSlug as string;
+
   return [
     {
       title: "Overview",
@@ -56,6 +58,7 @@ export const useAssetMenu = () => {
         assetSlug +
         "/risk-handling",
       Icon: WrenchScrewdriverIcon,
+      isActive: router.pathname.includes("[flawId]"),
     },
     {
       title: "Dependency graph",
@@ -68,6 +71,7 @@ export const useAssetMenu = () => {
         assetSlug +
         "/dependency-graph",
       Icon: ShareIcon,
+      isActive: router.pathname.includes("dependency-graph"),
     },
     {
       title: "Settings",

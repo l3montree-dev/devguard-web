@@ -22,7 +22,7 @@ import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -761,6 +761,20 @@ const Index: FunctionComponent<Props> = (props) => {
                               {flaw.arbitraryJsonData.fixedVersion ??
                                 "kein Patch verfügbar"}
                             </Badge>
+                          </div>
+                          <div className="mt-4">
+                            <Link
+                              className={buttonVariants({ variant: "outline" })}
+                              href={
+                                router.asPath +
+                                "/../../dependency-graph?pkg=" +
+                                flaw.arbitraryJsonData.packageName +
+                                "@" +
+                                flaw.arbitraryJsonData.installedVersion
+                              }
+                            >
+                              Show in dependency graph
+                            </Link>
                           </div>
                         </div>
                       </div>

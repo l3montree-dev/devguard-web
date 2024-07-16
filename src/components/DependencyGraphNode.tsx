@@ -15,10 +15,11 @@
 
 import { AffectedPackage } from "@/types/api/api";
 import { FunctionComponent } from "react";
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import tinycolor from "tinycolor2";
 
 import { classNames } from "@/utils/common";
+import { useRouter } from "next/router";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -44,6 +45,7 @@ export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = riskToBgColor(props.data.risk);
+  const shouldFocus = useRouter().query.pkg === props.data.label;
   return (
     <div
       style={{
@@ -55,7 +57,11 @@ export const DependencyGraphNode: FunctionComponent<
         backgroundColor:
           props.data.affectedPackage !== undefined ? color : "white",
       }}
-      className={classNames("relative rounded border bg-white p-3 text-xs")}
+      className={classNames(
+        "relative rounded border bg-white p-3 text-xs",
+
+        shouldFocus ? "border-2 border-primary" : "",
+      )}
     >
       <Handle type="target" position={Position.Right} />
       <div>

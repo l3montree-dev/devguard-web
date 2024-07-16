@@ -28,6 +28,7 @@ interface Props {
     title: string;
     href: string;
     Icon: FunctionComponent<{ className: string }>;
+    isActive?: boolean;
   }>;
   fullscreen?: boolean;
 }
@@ -73,7 +74,7 @@ const Main: FunctionComponent<Props> = ({
                   key={item.title}
                   href={item.href}
                 >
-                  {router.asPath == item.href && (
+                  {(item.isActive || router.asPath == item.href) && (
                     <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
                   )}
                   <div className="mt-4 flex flex-row items-center gap-1">

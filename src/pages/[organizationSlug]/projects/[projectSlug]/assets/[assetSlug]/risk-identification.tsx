@@ -21,8 +21,8 @@ import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import ReactFlow, { Edge } from "reactflow";
-import "reactflow/dist/style.css";
+import { ReactFlow, Edge } from "@xyflow/react";
+import "@xyflow/react/dist/base.css";
 
 const paddingX = 35;
 const paddingY = 55;

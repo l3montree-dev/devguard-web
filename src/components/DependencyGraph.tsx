@@ -16,10 +16,25 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
-import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
-import ReactFlow, { addEdge, useEdgesState, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  ReactFlow,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
+
 import { DependencyGraphNode, riskToBgColor } from "./DependencyGraphNode";
+import { useRouter } from "next/router";
+
+// or if you just want basic styles
+import "@xyflow/react/dist/base.css";
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -160,6 +175,9 @@ const DependencyGraph: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
 }> = ({ graph, width, height, affectedPackages }) => {
   const asset = useActiveAsset();
+  const router = useRouter();
+
+  const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     graph.root.name = asset?.name ?? "";
@@ -176,7 +194,37 @@ const DependencyGraph: FunctionComponent<{
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [initialNodes, initialEdges, setEdges, setNodes]);
+
+    // check if we want to focus a specific node
+    if (router.query.pkg) {
+      const focusNode = initialNodes.find(
+        (n) => n.data.label === router.query.pkg,
+      );
+      if (focusNode) {
+        setViewPort({
+          x: -focusNode.position.x + width / 2,
+          y: -focusNode.position.y + height / 2,
+          zoom: 1,
+        });
+      }
+      return;
+    }
+    // just use the root node
+    setViewPort({
+      x: rootNode.position.x + 10,
+      y: rootNode.position.y, // i have no idea why it fits with a -3 factor
+      zoom: 1,
+    });
+  }, [
+    initialNodes,
+    initialEdges,
+    setEdges,
+    setNodes,
+    rootNode,
+    width,
+    height,
+    router.query.pkg,
+  ]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -192,11 +240,8 @@ const DependencyGraph: FunctionComponent<{
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      defaultViewport={{
-        zoom: 1,
-        x: rootNode.position.x - width / 2,
-        y: -(rootNode.position.y - height * -3), // i have no idea why it fits with a -3 factor
-      }}
+      viewport={viewPort}
+      onViewportChange={setViewPort}
     ></ReactFlow>
   );
 };
