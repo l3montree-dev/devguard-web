@@ -15,9 +15,10 @@
 
 import OrgRegisterForm from "@/components/OrgRegisterForm";
 import Page from "@/components/Page";
-import { withOrg } from "../decorators/withOrg";
-import { withSession } from "../decorators/withSession";
 import { middleware } from "@/decorators/middleware";
+import { withOrgs } from "@/decorators/withOrgs";
+import { withSession } from "../decorators/withSession";
+import { withOrganization } from "@/decorators/withOrganization";
 
 export default function SetupOrg() {
   return (
@@ -35,6 +36,7 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );

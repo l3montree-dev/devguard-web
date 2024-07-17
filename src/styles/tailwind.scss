@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-@import "./globals.css";
+@import "./globals.scss";
 
 @font-face {
     font-family: 'Lexend';
@@ -132,13 +132,9 @@ a {
     transform: rotate(180deg);
 }
 
-.mdx-editor  {
-    background: theme('colors.white');
-}
 
-.mdx-editor {
-    @apply border rounded-lg;
-}
+
+
 
 .mdx-editor-content {
     h1 {
@@ -180,12 +176,8 @@ a {
         @apply mb-2;
     }
 
-    a {
-        @apply text-blue-600 hover:underline;
-    }
-
     blockquote {
-        @apply border-l-4 border-gray-400 pl-2 mb-2;
+        @apply border-l-4 border-l-card pl-2 mb-2;
     }
 
     strong {

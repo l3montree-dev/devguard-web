@@ -13,55 +13,94 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AffectedPackage } from "@/types/api/api";
+import { FlawDTO } from "@/types/api/api";
+import { Handle, Position } from "@xyflow/react";
 import { FunctionComponent } from "react";
-import { Handle, Position } from "reactflow";
-import tinycolor from "tinycolor2";
 
 import { classNames } from "@/utils/common";
+import { useRouter } from "next/router";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import FlawState from "./common/FlawState";
+import Link from "next/link";
+import Severity, { riskToSeverity, severityToColor } from "./common/Severity";
 
 export interface DependencyGraphNodeProps {
   data: {
     label: string;
-    affectedPackage: AffectedPackage;
+    flaw: FlawDTO;
     risk: number;
   };
 }
 
 const riskToTextColor = (risk: number) => {
-  const red = new tinycolor("red");
-  return red.lighten((1 - risk) * 50).isLight() ? "black" : "white";
-};
-
-export const riskToBgColor = (risk: number) => {
-  const red = new tinycolor("red");
-  const color = red.lighten((1 - risk) * 50).toString("hex");
-
-  return color;
+  if (risk > 4) {
+    return "black";
+  }
+  return "white";
 };
 
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
-  const color = riskToBgColor(props.data.risk);
-  return (
+  const color = severityToColor(riskToSeverity(props.data.risk));
+  const shouldFocus = useRouter().query.pkg === props.data.label;
+  const router = useRouter();
+  const Node = (
     <div
       style={{
-        maxWidth: 200,
-        color:
-          props.data.affectedPackage === undefined
-            ? "black"
-            : riskToTextColor(props.data.risk),
-        backgroundColor:
-          props.data.affectedPackage !== undefined ? color : "white",
+        maxWidth: 300,
+        borderColor: props.data.flaw !== undefined ? color : undefined,
+        //backgroundColor: props.data.flaw !== undefined ? color : "white",
       }}
-      className={classNames("relative rounded border bg-white p-3 text-xs")}
+      className={classNames(
+        "relative rounded border bg-card p-3 text-xs text-card-foreground",
+        shouldFocus ? "border-2 border-primary" : "",
+      )}
     >
-      <Handle type="target" position={Position.Right} />
-      <div>
+      <Handle
+        className="rounded-full"
+        type="target"
+        position={Position.Right}
+      />
+      <div className="flex flex-col items-start justify-center gap-2">
         <label htmlFor="text">{props.data.label}</label>
       </div>
-      <Handle type="source" position={Position.Left} id="a" />
+      <Handle
+        className="rounded-full"
+        type="source"
+        position={Position.Left}
+        id="a"
+      />
     </div>
+  );
+
+  if (!props.data.flaw) {
+    return Node;
+  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>
+      <DropdownMenuContent className="text-xs">
+        <div className="p-2">{props.data.flaw.cveId}</div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Link
+            className="!text-foreground hover:no-underline"
+            href={
+              router.asPath.split("?")[0] + `/../flaws/${props.data.flaw.id}`
+            }
+          >
+            Go to risk assessment
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

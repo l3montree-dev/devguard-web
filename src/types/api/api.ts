@@ -49,6 +49,16 @@ export interface OrganizationDTO extends AppModelDTO {
   }>;
 }
 
+export interface OrganizationDetailsDTO extends OrganizationDTO {
+  members: Array<{
+    id: string;
+    name: {
+      first: string;
+      last: string;
+    };
+  }>;
+}
+
 export interface PersonalAccessTokenDTO {
   description: string;
   userId: string;
@@ -86,7 +96,8 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
-
+  componentPurlOrCpe: string | null;
+  scanner: string;
   state:
     | "open"
     | "fixed"
@@ -106,9 +117,16 @@ export interface Paged<T> {
   pageSize: number;
 }
 
-export interface RiskAssessmentValues {
-  oldRiskAssessment: number;
-  newRiskAssessment: number;
+export interface RiskCalculationReport {
+  epss: number;
+  baseScore: number;
+  exploitExists: boolean;
+  verifiedExploitExists: boolean;
+  underAttack: boolean;
+  confidentialityRequirement: string;
+  integrityRequirement: string;
+  availabilityRequirement: string;
+  risk: number;
 }
 
 interface BaseFlawEventDTO {
@@ -123,12 +141,17 @@ interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
   type: "accepted";
 }
 
+interface ReopenedFlawEventDTO extends BaseFlawEventDTO {
+  type: "reopened";
+}
+
 interface FixedFlawEventDTO extends BaseFlawEventDTO {
   type: "fixed";
 }
 
 interface DetectedFlawEventDTO extends BaseFlawEventDTO {
   type: "detected";
+  arbitraryJsonData: RiskCalculationReport;
 }
 
 interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
@@ -145,7 +168,11 @@ interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
 
 interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJsonData: RiskAssessmentValues;
+  arbitraryJsonData: RiskCalculationReport;
+}
+
+interface CommentFlawEventDTO extends BaseFlawEventDTO {
+  type: "comment";
 }
 
 export type FlawEventDTO =
@@ -155,7 +182,9 @@ export type FlawEventDTO =
   | FalsePositiveFlawEventDTO
   | MarkedForMitigationFlawEventDTO
   | MarkedForTransferFlawEventDTO
-  | RiskAssessmentUpdatedFlawEventDTO;
+  | RiskAssessmentUpdatedFlawEventDTO
+  | ReopenedFlawEventDTO
+  | CommentFlawEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -187,17 +216,50 @@ export interface CVE {
   cisaActionDue?: string;
   cisaRequiredAction?: string;
   cisaVulnerabilityName?: string;
+
+  vector?: string;
+}
+
+export interface Exploit {
+  id: string;
+  pushed_at: string;
+  updated_at: string;
+  author: string;
+  type: string;
+  verified: boolean;
+  sourceURL: string;
+  description: string;
+  cveID: string;
+  tags: string;
+  forks: number;
+  watchers: number;
+  subscribers_count: number;
+  stargazers_count: number;
 }
 export interface FlawWithCVE extends FlawDTO {
-  cve: Modify<
-    CVE,
-    {
-      cwes: Array<CWE>;
-    }
-  > | null;
-  arbitraryJsonData: {
-    fixedVersion?: string;
-    packageName?: string;
+  cve:
+    | (Modify<
+        CVE,
+        {
+          cwes: Array<CWE>;
+        }
+      > & {
+        risk: {
+          baseScore: number;
+          withEnvironment: number;
+          withThreatIntelligence: number;
+          withEnvironmentAndThreatIntelligence: number;
+        };
+        exploits: Array<Exploit>;
+      })
+    | null;
+  arbitraryJsonData: null | {
+    introducedVersion: string;
+    fixedVersion: string;
+    packageName: string;
+    installedVersion: string;
+    cveId: string;
+    componentDepth: number;
   };
   component: {
     purlOrCpe: string;

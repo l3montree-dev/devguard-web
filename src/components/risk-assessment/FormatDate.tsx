@@ -26,6 +26,7 @@ const timeAgo = (prevDate: Date) => {
   switch (true) {
     case diff < minute:
       const seconds = Math.round(diff / 1000);
+      if (seconds <= 10) return "Now";
       return `${seconds} ${seconds > 1 ? "seconds" : "second"} ago`;
     case diff < hour:
       return Math.round(diff / minute) + " minutes ago";
@@ -43,10 +44,11 @@ const timeAgo = (prevDate: Date) => {
 };
 
 const FormatDate = ({ dateString }: { dateString: string }) => {
-  const [time, setTime] = useState(dateString);
+  const [time, setTime] = useState<string | null>(null);
   useEffect(() => {
     setTime(timeAgo(new Date(dateString)));
   }, [dateString]);
+  if (!time) return null;
   return <time dateTime={dateString}>{time}</time>;
 };
 

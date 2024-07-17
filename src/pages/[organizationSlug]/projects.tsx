@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Page from "../../components/Page";
 
-import { withOrg } from "../../decorators/withOrg";
+import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import {
@@ -66,6 +66,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import EmptyList from "@/components/common/EmptyList";
+import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -107,7 +109,24 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
   const orgMenu = useOrganizationMenu();
 
   return (
-    <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}>
+    <Page
+      Title={
+        <Link
+          href={`/${activeOrg.slug}`}
+          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+        >
+          {activeOrg.name}{" "}
+          <Badge
+            className="font-body font-normal !text-white"
+            variant="outline"
+          >
+            Organization
+          </Badge>
+        </Link>
+      }
+      title={activeOrg.name ?? "Loading..."}
+      Menu={orgMenu}
+    >
       <Dialog open={open}>
         <DialogContent setOpen={setOpen}>
           <DialogHeader>
@@ -238,6 +257,7 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );

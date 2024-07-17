@@ -1,6 +1,10 @@
-import { CodeBlockEditorDescriptor, MDXEditorProps } from "@mdxeditor/editor";
+import {
+  DiffSourceToggleWrapper,
+  MDXEditorMethods,
+  MDXEditorProps,
+} from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useRef } from "react";
 
 const {
   MDXEditor,
@@ -19,8 +23,10 @@ const {
   frontmatterPlugin,
 
   codeMirrorPlugin,
-  UndoRedo,
+
   BoldItalicUnderlineToggles,
+  ListsToggle,
+  CodeToggle,
   diffSourcePlugin,
   // @ts-expect-error
 } = await import("@mdxeditor/editor");
@@ -28,17 +34,26 @@ const {
 interface Props extends Partial<MDXEditorProps> {
   value: string;
   setValue: (value?: string) => void;
+  placeholder?: string;
 }
 
 const MarkdownEditor: FunctionComponent<Props> = ({
   value,
   setValue,
+  placeholder,
   ...rest
 }) => {
+  const markdownRef = useRef<MDXEditorMethods>(null);
+
+  useEffect(() => {
+    markdownRef.current?.setMarkdown(value);
+  }, [value]);
   return (
     <MDXEditor
-      className="mdx-editor"
+      ref={markdownRef}
+      className="mdx-editor rounded border focus-within:ring focus:ring"
       onChange={(value) => setValue(value)}
+      placeholder={placeholder}
       markdown={value}
       contentEditableClassName="mdx-editor-content"
       plugins={[
@@ -46,8 +61,11 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         toolbarPlugin({
           toolbarContents: () => (
             <>
-              <UndoRedo />
-              <BoldItalicUnderlineToggles />
+              <DiffSourceToggleWrapper>
+                <BoldItalicUnderlineToggles />
+                <CodeToggle />
+                <ListsToggle />
+              </DiffSourceToggleWrapper>
             </>
           ),
         }),
@@ -60,18 +78,18 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
-
+        codeBlockPlugin({ defaultCodeBlockLanguage: "go" }),
         codeMirrorPlugin({
           codeBlockLanguages: {
             js: "JavaScript",
             css: "CSS",
             txt: "text",
             tsx: "TypeScript",
+            go: "Go",
           },
         }),
 
-        diffSourcePlugin({ viewMode: "rich-text", diffMarkdown: "boo" }),
+        diffSourcePlugin({ viewMode: "rich-text" }),
         markdownShortcutPlugin(),
       ]}
     />

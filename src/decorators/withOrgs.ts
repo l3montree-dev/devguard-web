@@ -18,7 +18,7 @@ import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
 import { OrganizationDTO } from "@/types/api/api";
 
-export async function withOrg(ctx: GetServerSidePropsContext) {
+export async function withOrgs(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient
   const devGuardApiClient = getApiClientFromContext(ctx);
 
@@ -26,6 +26,7 @@ export async function withOrg(ctx: GetServerSidePropsContext) {
   const r = await devGuardApiClient("/organizations/");
 
   if (!r.ok) {
+    console.log("LOGIN REDIRECT");
     // it must be an 500
     throw new HttpError({
       redirect: {
@@ -36,25 +37,5 @@ export async function withOrg(ctx: GetServerSidePropsContext) {
   }
   // parse the organization
   const organizations: OrganizationDTO[] = await r.json();
-
-  // check if there is a slug in the query
-  const organizationSlug = ctx.params?.organizationSlug;
-
-  if (organizationSlug) {
-    // check if the organizationSlug is valid
-    const organization = organizations.find(
-      (o: any) => o.slug === organizationSlug,
-    );
-
-    if (!organization) {
-      // it must be an 404
-      throw new HttpError({
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      });
-    }
-  }
   return organizations;
 }

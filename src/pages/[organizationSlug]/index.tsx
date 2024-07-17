@@ -17,18 +17,40 @@ import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { FunctionComponent } from "react";
 import Page from "../../components/Page";
-import { withOrg } from "../../decorators/withOrg";
+import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
 
   const orgMenu = useOrganizationMenu();
 
-  return <Page title={activeOrg.name ?? "Loading..."} Menu={orgMenu}></Page>;
+  return (
+    <Page
+      Title={
+        <Link
+          href={`/${activeOrg.slug}`}
+          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+        >
+          {activeOrg.name}{" "}
+          <Badge
+            className="font-body font-normal !text-white"
+            variant="outline"
+          >
+            Organization
+          </Badge>
+        </Link>
+      }
+      title={activeOrg.name ?? "Loading..."}
+      Menu={orgMenu}
+    ></Page>
+  );
 };
 
 export default Home;
@@ -41,6 +63,7 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );

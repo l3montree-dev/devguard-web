@@ -31,7 +31,7 @@ import { useRouter } from "next/router";
 import { FunctionComponent, useEffect } from "react";
 import Page from "../../../../../../components/Page";
 
-import { withOrg } from "../../../../../../decorators/withOrg";
+import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
 import { classNames } from "../../../../../../utils/common";
@@ -47,6 +47,7 @@ import {
 import Section from "@/components/common/Section";
 import EmptyList from "@/components/common/EmptyList";
 import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   asset: AssetDTO;
@@ -229,6 +230,9 @@ const Index: FunctionComponent<Props> = (props) => {
       "cve.cisaExploitAdd": false,
       "cve.cisaRequiredAction": false,
       "cve.severity": false,
+      "cve.epss": false,
+      "cve.cvss": false,
+      "cve.createdAt": false,
     },
   );
   const table = useReactTable({
@@ -236,7 +240,10 @@ const Index: FunctionComponent<Props> = (props) => {
     data: props.flaws.data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSort,
-    onColumnVisibilityChange: setVisibleColumns,
+    onColumnVisibilityChange: (v) => {
+      console.log(v);
+      setVisibleColumns(v);
+    },
     manualSorting: true,
     state: {
       sorting: sortingState,
@@ -259,7 +266,8 @@ const Index: FunctionComponent<Props> = (props) => {
     "/assets/" +
     asset?.slug;
 
-  useEffect(() => {});
+  console.log(table.getAllLeafColumns());
+
   return (
     <Page
       Menu={assetMenu}
@@ -338,8 +346,13 @@ const Index: FunctionComponent<Props> = (props) => {
                   {table.getAllLeafColumns().map((column) => {
                     return (
                       <DropdownMenuCheckboxItem
-                        checked={column.getIsVisible()}
-                        onCheckedChange={column.getToggleVisibilityHandler()}
+                        checked={visibleColumns[column.id] !== false}
+                        onCheckedChange={() =>
+                          setVisibleColumns((prev) => ({
+                            ...prev,
+                            [column.id]: !prev[column.id],
+                          }))
+                        }
                         key={column.id}
                       >
                         {(column.columnDef.header as string) ?? ""}
@@ -357,63 +370,65 @@ const Index: FunctionComponent<Props> = (props) => {
           }
         >
           <div className="overflow-hidden rounded-lg border shadow-sm">
-            <table className="w-full text-sm">
-              <thead className="border-b bg-card text-foreground">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        className="cursor-pointer break-normal p-4 text-left"
-                        onClick={
-                          header.column.columnDef.enableSorting
-                            ? header.column.getToggleSortingHandler()
-                            : undefined
-                        }
-                        key={header.id}
-                      >
-                        <div className="flex flex-row items-center gap-2">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+            <div className="overflow-auto">
+              <table className="w-full table-fixed overflow-x-auto text-sm">
+                <thead className="border-b bg-card text-foreground">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th
+                          className="w-40 cursor-pointer break-normal p-4 text-left"
+                          onClick={
+                            header.column.columnDef.enableSorting
+                              ? header.column.getToggleSortingHandler()
+                              : undefined
+                          }
+                          key={header.id}
+                        >
+                          <div className="flex flex-row items-center gap-2">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
 
-                          <SortingCaret
-                            sortDirection={header.column.getIsSorted()}
-                          />
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="text-sm text-foreground">
-                {table.getRowModel().rows.map((row, i, arr) => (
-                  <tr
-                    onClick={() => {
-                      router.push(r + "/flaws/" + row.original.id);
-                    }}
-                    className={classNames(
-                      "relative cursor-pointer align-top transition-all",
-                      i === arr.length - 1 ? "" : "border-b",
-                      i % 2 != 0 && "bg-card",
-                      "hover:bg-gray-50 dark:hover:bg-secondary",
-                    )}
-                    key={row.id}
-                  >
-                    {row.getVisibleCells().map((cell, i) => (
-                      <td className="p-4" key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                            <SortingCaret
+                              sortDirection={header.column.getIsSorted()}
+                            />
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody className="text-sm text-foreground">
+                  {table.getRowModel().rows.map((row, i, arr) => (
+                    <tr
+                      onClick={() => {
+                        router.push(r + "/flaws/" + row.original.id);
+                      }}
+                      className={classNames(
+                        "relative cursor-pointer align-top transition-all",
+                        i === arr.length - 1 ? "" : "border-b",
+                        i % 2 != 0 && "bg-card",
+                        "hover:bg-gray-50 dark:hover:bg-secondary",
+                      )}
+                      key={row.id}
+                    >
+                      {row.getVisibleCells().map((cell, i) => (
+                        <td className="p-4" key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="mt-4">
             <CustomPagination {...props.flaws} />
@@ -475,7 +490,8 @@ export const getServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
     project: withProject,
     asset: withAsset,
   },

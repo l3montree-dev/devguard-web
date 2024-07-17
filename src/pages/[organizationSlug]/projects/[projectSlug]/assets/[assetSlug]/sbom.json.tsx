@@ -1,13 +1,8 @@
 import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrg } from "@/decorators/withOrg";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
-import { promisify } from "node:util";
 import { pipeline } from "node:stream";
-import { ServerResponse } from "node:http";
+import { promisify } from "node:util";
 const pipelineAsync = promisify(pipeline);
 
 export default function SBOM() {
@@ -15,7 +10,7 @@ export default function SBOM() {
 }
 
 export const getServerSideProps: GetServerSideProps = middleware(
-  async (context, { asset }) => {
+  async (context, {}) => {
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
     // check for version query parameter
@@ -32,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
 
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {
+      console.log("sbom", sbom);
       context.res.statusCode = sbom.status;
       context.res.setHeader("Content-Type", "application/json");
       context.res.write(JSON.stringify(sbom));
@@ -55,10 +51,5 @@ export const getServerSideProps: GetServerSideProps = middleware(
       props: {},
     };
   },
-  {
-    session: withSession,
-    organizations: withOrg,
-    project: withProject,
-    asset: withAsset,
-  },
+  {},
 );

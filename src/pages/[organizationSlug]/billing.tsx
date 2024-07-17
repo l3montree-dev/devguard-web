@@ -11,8 +11,9 @@ import { config as appConfig } from "@/config";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ProductsData } from "@/types/api/billing";
 import { middleware } from "@/decorators/middleware";
-import { withOrg } from "@/decorators/withOrg";
+import { withOrgs } from "@/decorators/withOrgs";
 import Link from "next/link";
+import { withOrganization } from "@/decorators/withOrganization";
 
 export default function Billing({
   productsData,
@@ -137,6 +138,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
   },
   {
     session: withSession,
-    organizations: withOrg,
+    organizations: withOrgs,
+    organization: withOrganization,
   },
 );

@@ -6,8 +6,9 @@ import {
   StopIcon,
   ClockIcon,
   BugAntIcon,
-} from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
+import { Badge } from "../ui/badge";
 
 const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
   state,
@@ -17,67 +18,59 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
   switch (state) {
     case "fixed":
       return (
-        <div
+        <Badge
+          variant={"outline"}
           className={classNames(
             defaultClasses,
             "border-green-400 bg-green-200 text-green-900 dark:bg-green-400/10 dark:text-green-500",
           )}
         >
-          <CheckCircleIcon className="inline-block h-4 w-4" />
+          <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
           Fixed
-        </div>
+        </Badge>
       );
 
     case "accepted":
       return (
-        <div
+        <Badge
+          variant={"outline"}
           className={classNames(
             defaultClasses,
-            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <SpeakerXMarkIcon className="inline-block h-4 w-4" />
-          Ignored
-        </div>
+          <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
+          Accepted
+        </Badge>
       );
 
     case "falsePositive":
       return (
-        <div
+        <Badge
+          variant={"outline"}
           className={classNames(
             defaultClasses,
-            "border-gray-400 bg-gray-200 text-gray-800 dark:border-gray-500 dark:bg-gray-500/10 dark:text-gray-400",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <StopIcon className="inline-block h-4 w-4" />
+          <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
-        </div>
+        </Badge>
       );
 
-    case "markedForMitigation":
-      return (
-        <div
-          className={classNames(
-            defaultClasses,
-            "border-purple-300 bg-purple-200 text-purple-800 dark:border-purple-500 dark:bg-purple-500/10 dark:text-purple-500",
-          )}
-        >
-          <ClockIcon className="inline-block h-4 w-4" />
-          Marked for Mitigation
-        </div>
-      );
     case "open":
     default:
       return (
-        <div
+        <Badge
+          variant={"outline"}
           className={classNames(
             defaultClasses,
-            "border-red-300 bg-red-200 text-red-800 dark:border-red-500 dark:bg-red-500/10 dark:text-red-500",
+            "border-gray-500 text-gray-500 dark:text-gray-300",
           )}
         >
-          <BugAntIcon className="inline-block h-4 w-4" />
+          <BugAntIcon className="-ml-1 inline-block h-4 w-4" />
           Open
-        </div>
+        </Badge>
       );
   }
 };

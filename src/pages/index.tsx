@@ -1,8 +1,7 @@
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React from "react";
-import { withSession } from "../decorators/withSession";
-import { withOrg } from "../decorators/withOrg";
 import { middleware } from "@/decorators/middleware";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { withOrgs } from "../decorators/withOrgs";
+import { withSession } from "../decorators/withSession";
 
 const Index = () => {
   return <div></div>;
@@ -29,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
     }
   },
   {
-    organizations: withOrg,
+    organizations: withOrgs,
     session: withSession,
   },
 );

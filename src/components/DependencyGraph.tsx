@@ -13,13 +13,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { AffectedPackage, DependencyTreeNode } from "@/types/api/api";
+import { AffectedPackage, DependencyTreeNode, FlawDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
-import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
-import ReactFlow, { addEdge, useEdgesState, useNodesState } from "reactflow";
-import "reactflow/dist/style.css";
-import { DependencyGraphNode, riskToBgColor } from "./DependencyGraphNode";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  ReactFlow,
+  addEdge,
+  useEdgesState,
+  useNodesState,
+} from "@xyflow/react";
+
+import { DependencyGraphNode } from "./DependencyGraphNode";
+import { useRouter } from "next/router";
+
+// or if you just want basic styles
+import "@xyflow/react/dist/base.css";
+import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -67,7 +83,7 @@ const recursiveFlatten = (
 
 const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
-  affectedPackages: Array<AffectedPackage> = [],
+  flaws: Array<FlawDTO> = [],
   direction = "LR",
 ): [
   Array<{
@@ -84,12 +100,12 @@ const getLayoutedElements = (
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   // build a map of all affected packages
-  const affectedMap = affectedPackages.reduce(
+  const flawMap = flaws.reduce(
     (acc, cur) => {
-      acc[cur.PurlWithVersion] = cur;
+      acc[cur.componentPurlOrCpe!] = cur;
       return acc;
     },
-    {} as { [key: string]: AffectedPackage },
+    {} as { [key: string]: FlawDTO },
   );
 
   const riskMap = recursiveFlatten(tree).reduce(
@@ -126,10 +142,11 @@ const getLayoutedElements = (
       data: {
         label: el,
         risk: riskMap[el],
-        affectedPackage: affectedMap[el],
+        flaw: flawMap[el],
       },
     };
   });
+
   const edges = dagreGraph.edges().map((el) => {
     const source = el.v;
     const target = el.w;
@@ -139,10 +156,12 @@ const getLayoutedElements = (
       target: source,
       source: target,
       // type: "smoothstep",
-      animated: true,
+      animated: false,
       style: {
         stroke:
-          riskMap[target] > 0 ? riskToBgColor(riskMap[target]) : "#a1a1aa",
+          riskMap[target] > 0
+            ? severityToColor(riskToSeverity(riskMap[target]))
+            : "#a1a1aa",
       },
     };
   });
@@ -156,19 +175,22 @@ const nodeTypes = {
 const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
-  affectedPackages: Array<AffectedPackage>;
+  flaws: Array<FlawDTO>;
   graph: { root: ViewDependencyTreeNode };
-}> = ({ graph, width, height, affectedPackages }) => {
+}> = ({ graph, width, height, flaws }) => {
   const asset = useActiveAsset();
+  const router = useRouter();
+
+  const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     graph.root.name = asset?.name ?? "";
 
-    const [nodes, edges] = getLayoutedElements(graph.root, affectedPackages);
+    const [nodes, edges] = getLayoutedElements(graph.root, flaws);
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, asset?.name, affectedPackages]);
+  }, [graph, asset?.name, flaws]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -176,7 +198,37 @@ const DependencyGraph: FunctionComponent<{
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [initialNodes, initialEdges, setEdges, setNodes]);
+
+    // check if we want to focus a specific node
+    if (router.query.pkg) {
+      const focusNode = initialNodes.find(
+        (n) => n.data.label === router.query.pkg,
+      );
+      if (focusNode) {
+        setViewPort({
+          x: -focusNode.position.x + width / 2,
+          y: -focusNode.position.y + height / 2,
+          zoom: 1,
+        });
+      }
+      return;
+    }
+    // just use the root node
+    setViewPort({
+      x: rootNode.position.x + 10,
+      y: rootNode.position.y, // i have no idea why it fits with a -3 factor
+      zoom: 1,
+    });
+  }, [
+    initialNodes,
+    initialEdges,
+    setEdges,
+    setNodes,
+    rootNode,
+    width,
+    height,
+    router.query.pkg,
+  ]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -189,14 +241,15 @@ const DependencyGraph: FunctionComponent<{
       nodeTypes={nodeTypes}
       nodesConnectable={false}
       edges={edges}
+      edgesFocusable={false}
+      defaultEdgeOptions={{
+        selectable: false,
+      }}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      defaultViewport={{
-        zoom: 1,
-        x: rootNode.position.x - width / 2,
-        y: -(rootNode.position.y - height * -3), // i have no idea why it fits with a -3 factor
-      }}
+      viewport={viewPort}
+      onViewportChange={setViewPort}
     ></ReactFlow>
   );
 };
