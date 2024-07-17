@@ -20,6 +20,8 @@ import { getUsername } from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
+  ChatBubbleBottomCenterIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
   CheckIcon,
   MagnifyingGlassIcon,
   SpeakerXMarkIcon,
@@ -49,6 +51,8 @@ function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
       return <ArrowPathIcon />;
     case "reopened":
       return <MagnifyingGlassIcon />;
+    case "comment":
+      return <ChatBubbleOvalLeftEllipsisIcon />;
   }
 }
 
