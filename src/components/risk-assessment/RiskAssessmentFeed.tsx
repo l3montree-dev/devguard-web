@@ -15,7 +15,13 @@
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { FlawEventDTO, RiskCalculationReport } from "@/types/api/api";
+import {
+  AcceptedFlawEventDTO,
+  DetectedFlawEventDTO,
+  FlawEventDTO,
+  RiskAssessmentUpdatedFlawEventDTO,
+  RiskCalculationReport,
+} from "@/types/api/api";
 import { getUsername } from "@/utils/view";
 import {
   ArrowPathIcon,
@@ -115,7 +121,7 @@ const eventMessages = (
       const beforeThisEvent = events.slice(0, index);
       const lastRiskEvent = beforeThisEvent.findLast(
         (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
-      );
+      ) as DetectedFlawEventDTO | RiskAssessmentUpdatedFlawEventDTO | undefined;
       if (!lastRiskEvent) return "";
       return diffReports(
         lastRiskEvent?.arbitraryJsonData,
@@ -157,7 +163,8 @@ const eventTypeMessages = (
       );
       return (
         "updated the risk assessment from " +
-        (lastRiskEvent?.arbitraryJsonData.risk ?? 0) +
+        ((lastRiskEvent as RiskAssessmentUpdatedFlawEventDTO)?.arbitraryJsonData
+          .risk ?? 0) +
         " to " +
         event.arbitraryJsonData.risk
       );

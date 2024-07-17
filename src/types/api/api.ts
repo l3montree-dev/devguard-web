@@ -137,41 +137,41 @@ interface BaseFlawEventDTO {
   justification: string;
 }
 
-interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
+export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
   type: "accepted";
 }
 
-interface ReopenedFlawEventDTO extends BaseFlawEventDTO {
+export interface ReopenedFlawEventDTO extends BaseFlawEventDTO {
   type: "reopened";
 }
 
-interface FixedFlawEventDTO extends BaseFlawEventDTO {
+export interface FixedFlawEventDTO extends BaseFlawEventDTO {
   type: "fixed";
 }
 
-interface DetectedFlawEventDTO extends BaseFlawEventDTO {
+export interface DetectedFlawEventDTO extends BaseFlawEventDTO {
   type: "detected";
   arbitraryJsonData: RiskCalculationReport;
 }
 
-interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
+export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
   type: "falsePositive";
 }
 
-interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
+export interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
   type: "markedForMitigation";
 }
 
-interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
+export interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
   type: "markedForTransfer";
 }
 
-interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
+export interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
   type: "rawRiskAssessmentUpdated";
   arbitraryJsonData: RiskCalculationReport;
 }
 
-interface CommentFlawEventDTO extends BaseFlawEventDTO {
+export interface CommentFlawEventDTO extends BaseFlawEventDTO {
   type: "comment";
 }
 

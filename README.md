@@ -174,3 +174,5 @@ Distributed under the AGPL-3.0-or-later License. See `LICENSE.txt` for more info
 [React-url]: https://reactjs.org/
 [go.dev]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
 [go-url]: https://go.dev
+
+docker run --network host -it -v ${PWD}:/application scanner devguard-scanner sca --assetName="test/projects/test/assets/devguard-frontend" --apiUrl="http://host.docker.internal:8080" --token="cb76b2575012202a6fdf4bdcabb35f0cb873e54eddfd1795bced05f1cd3c361a" --path="/application" --fail-on-risk=low
