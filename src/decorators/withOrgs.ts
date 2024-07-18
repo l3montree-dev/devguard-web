@@ -26,7 +26,7 @@ export async function withOrgs(ctx: GetServerSidePropsContext) {
   const r = await devGuardApiClient("/organizations/");
 
   if (!r.ok) {
-    console.log("LOGIN REDIRECT");
+    console.log("LOGIN REDIRECT", r);
     // it must be an 500
     throw new HttpError({
       redirect: {

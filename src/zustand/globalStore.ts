@@ -16,6 +16,7 @@ export interface InitialState {
 
 export interface GlobalStoreActions {
   updateAsset: (asset: AssetDTO) => void;
+  updateProject: (project: ProjectDTO) => void;
 }
 
 export interface GlobalStore extends InitialState, GlobalStoreActions {
