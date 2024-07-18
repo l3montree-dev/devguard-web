@@ -22,6 +22,8 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { withProject } from "@/decorators/withProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { toast } from "sonner";
+import { useStore } from "@/zustand/globalStoreProvider";
 
 
 interface Props {
@@ -31,6 +33,7 @@ interface Props {
 const Index: FunctionComponent<Props> = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+  const updateProject = useStore((s) => s.updateProject);
 
   const projectMenu = useProjectMenu();
 
@@ -52,8 +55,14 @@ const Index: FunctionComponent<Props> = () => {
       console.error("Failed to update project");
     }
 
+    toast("Success", {
+      
+      description: "Project updated",
+    });
     // check if the slug changed - if so, redirect to the new slug
     const newProject = await resp.json();
+    updateProject(newProject);
+
     if (newProject.slug !== project!.slug) {
       router.push(
         "/"+ activeOrg.slug + "/projects/" + newProject.slug + "/settings",
