@@ -19,6 +19,20 @@ export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
 }
 
+export function toSearchParams(obj: Record<string, any>): URLSearchParams {
+  const res = Object.keys(obj).reduce(
+    (acc, key) => {
+      if (obj[key] !== undefined) {
+        acc[key] = obj[key];
+      }
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
+
+  return new URLSearchParams(res as Record<string, string>);
+}
+
 export function getBGColorByState(state: State) {
   switch (state) {
     case "verifiedFix":

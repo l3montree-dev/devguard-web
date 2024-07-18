@@ -82,7 +82,7 @@ const Index: FunctionComponent = () => {
       }
     >
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button variant={"secondary"}>Download SBOM</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

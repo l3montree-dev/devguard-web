@@ -16,20 +16,17 @@
 import { FlawDTO } from "@/types/api/api";
 import { Handle, Position } from "@xyflow/react";
 import { FunctionComponent } from "react";
-
 import { classNames } from "@/utils/common";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { riskToSeverity, severityToColor } from "./common/Severity";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import FlawState from "./common/FlawState";
-import Link from "next/link";
-import Severity, { riskToSeverity, severityToColor } from "./common/Severity";
 
 export interface DependencyGraphNodeProps {
   data: {

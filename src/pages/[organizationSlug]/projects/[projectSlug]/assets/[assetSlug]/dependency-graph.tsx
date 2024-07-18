@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -40,6 +41,7 @@ import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+import { toSearchParams } from "@/utils/common";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -177,6 +179,36 @@ const DependencyGraphPage: FunctionComponent<{
           </div>
         }
       >
+        <Tabs defaultValue="sca">
+          <TabsList>
+            <TabsTrigger
+              onClick={() =>
+                router.push({
+                  query: {
+                    ...router.query,
+                    scanType: "sca",
+                  },
+                })
+              }
+              value="sca"
+            >
+              Application
+            </TabsTrigger>
+            <TabsTrigger
+              onClick={() =>
+                router.push({
+                  query: {
+                    ...router.query,
+                    scanType: "container-scanning",
+                  },
+                })
+              }
+              value="container-scanning"
+            >
+              Container Image
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
         <div className="h-screen w-full rounded-lg border bg-white dark:bg-black">
           <DependencyGraph
             flaws={flaws}
@@ -269,10 +301,21 @@ export const getServerSideProps = middleware(
 
     const [resp, flawResp, versionsResp] = await Promise.all([
       apiClient(
-        uri + "dependency-graph" + (version ? "?version=" + version : " "),
+        uri +
+          "dependency-graph?" +
+          toSearchParams({
+            all: context.query.all === "1" ? "1" : undefined,
+            version: version,
+            scanType: context.query.scanType ?? "sca",
+          }),
       ),
       apiClient(
-        uri + "affected-packages" + (version ? "?version=" + version : " "),
+        uri +
+          "affected-packages?" +
+          toSearchParams({
+            version: version,
+            scanType: context.query.scanType ?? "sca",
+          }),
       ),
       apiClient(uri + "versions"),
     ]);

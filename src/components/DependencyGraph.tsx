@@ -213,10 +213,11 @@ const DependencyGraph: FunctionComponent<{
       }
       return;
     }
+
     // just use the root node
     setViewPort({
-      x: rootNode.position.x + 10,
-      y: rootNode.position.y, // i have no idea why it fits with a -3 factor
+      x: -rootNode.position.x + 10,
+      y: -rootNode.position.y + height / 2, // i have no idea why it fits with a -3 factor
       zoom: 1,
     });
   }, [
@@ -230,11 +231,6 @@ const DependencyGraph: FunctionComponent<{
     router.query.pkg,
   ]);
 
-  const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
-  );
-
   return (
     <ReactFlow
       nodes={nodes}
@@ -247,7 +243,6 @@ const DependencyGraph: FunctionComponent<{
       }}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
       viewport={viewPort}
       onViewportChange={setViewPort}
     ></ReactFlow>
