@@ -119,11 +119,12 @@ const Index: FunctionComponent<Props> = () => {
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
+
     return {
       props: {
       },
     };
-  }
+  },
   {
     session: withSession,
     organizations: withOrgs,
