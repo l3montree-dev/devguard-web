@@ -16,6 +16,7 @@ export interface InitialState {
 
 export interface GlobalStoreActions {
   updateAsset: (asset: AssetDTO) => void;
+  updateProject: (project: ProjectDTO) => void;
 }
 
 export interface GlobalStore extends InitialState, GlobalStoreActions {
@@ -36,6 +37,9 @@ export const createGlobalStore = (
         : preloadedState;
 
     return {
+      updateProject: (project: ProjectDTO) => {
+        set({ project });
+      },
       updateAsset: (asset: AssetDTO) => {
         set({ asset });
       },

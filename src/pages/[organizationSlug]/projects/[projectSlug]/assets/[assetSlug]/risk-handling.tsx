@@ -241,7 +241,6 @@ const Index: FunctionComponent<Props> = (props) => {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSort,
     onColumnVisibilityChange: (v) => {
-      console.log(v);
       setVisibleColumns(v);
     },
     manualSorting: true,
@@ -266,7 +265,6 @@ const Index: FunctionComponent<Props> = (props) => {
     "/assets/" +
     asset?.slug;
 
-  console.log(table.getAllLeafColumns());
 
   return (
     <Page

@@ -902,7 +902,7 @@ export const getServerSideProps = middleware(
 
     const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
 
-    console.log(resp);
+
     return {
       props: {
         flaw: resp,
