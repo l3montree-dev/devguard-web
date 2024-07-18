@@ -5,6 +5,7 @@ import Page from "../../../../components/Page";
 import { middleware } from "@/decorators/middleware";
 
 import { Badge } from "@/components/ui/badge";
+import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import Link from "next/link";
 import { withOrgs } from "../../../../decorators/withOrgs";
@@ -12,33 +13,29 @@ import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { browserApiClient, getApiClientFromContext } from "../../../../services/devGuardApi";
 import { AssetDTO, ProjectDTO } from "../../../../types/api/api";
-import { withOrganization } from "@/decorators/withOrganization";
 
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useForm } from "react-hook-form";
 import Section from "@/components/common/Section";
 import { ProjectForm } from "@/components/project/ProjectForm";
-import { Form } from "@/components/ui/form";
-import { withProject } from "@/decorators/withProject";
-import { useStore } from "@/zustand/globalStoreProvider";
-import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+
+
 interface Props {
-  project: ProjectDTO & {
-    assets: Array<AssetDTO>;
-  };
+  project: ProjectDTO 
 }
 
 const Index: FunctionComponent<Props> = ({ project }: Props) => {
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
-  //const updateProject =  useStore((state) => state.updateProject);
+
   const router = useRouter();
 
   const form = useForm<ProjectDTO>({ defaultValues: project });
 
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
-    console.log("update project");
+  
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/projects/" + project.slug + "/",
       {
@@ -50,15 +47,15 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
     if (!resp.ok) {
       console.error("Failed to update project");
     }
-/*
+
+    // check if the slug changed - if so, redirect to the new slug
     const newProject = await resp.json();
-    updateProject(newProject);
     if (newProject.slug !== project.slug) {
       router.push(
         "/"+ activeOrg.slug + "/projects/" + newProject.slug + "/settings",
       );
     }
-    */
+    
   };
 
 
@@ -98,10 +95,12 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
       }
     >
       <div>
-        Settings
+      <div className="flex flex-row justify-between">
+          <h1 className="text-2xl font-semibold">Project Settings</h1>
+        </div>
         <Form {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>
-        <Section title="Project"  >
+        <Section title="General" description="General Settings of the project"  >
           <ProjectForm form={form} />
         </Section>
         <div className="mt-4 flex flex-row justify-end">
@@ -135,7 +134,7 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
-    organizations: withOrg,
+ 
  
   },
 );
