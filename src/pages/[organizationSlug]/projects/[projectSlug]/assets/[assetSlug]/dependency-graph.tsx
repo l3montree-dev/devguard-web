@@ -179,7 +179,9 @@ const DependencyGraphPage: FunctionComponent<{
           </div>
         }
       >
-        <Tabs defaultValue="sca">
+        <Tabs
+          defaultValue={(router.query.scanType as string | undefined) ?? "sca"}
+        >
           <TabsList>
             <TabsTrigger
               onClick={() =>

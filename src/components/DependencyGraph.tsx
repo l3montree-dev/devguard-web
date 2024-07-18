@@ -24,6 +24,7 @@ import {
   useState,
 } from "react";
 import {
+  MiniMap,
   ReactFlow,
   addEdge,
   useEdgesState,
@@ -36,6 +37,7 @@ import { useRouter } from "next/router";
 // or if you just want basic styles
 import "@xyflow/react/dist/base.css";
 import { riskToSeverity, severityToColor } from "./common/Severity";
+import { useTheme } from "next-themes";
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -231,6 +233,8 @@ const DependencyGraph: FunctionComponent<{
     router.query.pkg,
   ]);
 
+  const { theme } = useTheme();
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -245,7 +249,18 @@ const DependencyGraph: FunctionComponent<{
       onEdgesChange={onEdgesChange}
       viewport={viewPort}
       onViewportChange={setViewPort}
-    ></ReactFlow>
+    >
+      <MiniMap
+        maskColor="rgba(0, 0, 0, 0.3)"
+        zoomable
+        style={{
+          backgroundColor:
+            theme === "dark"
+              ? "rgba(255, 255, 255, 0.5)"
+              : "rgba(255, 255, 255, 0.5)",
+        }}
+      />
+    </ReactFlow>
   );
 };
 
