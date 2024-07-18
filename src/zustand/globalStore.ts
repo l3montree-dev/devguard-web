@@ -37,6 +37,9 @@ export const createGlobalStore = (
         : preloadedState;
 
     return {
+      updateProject: (project: ProjectDTO) => {
+        set({ project });
+      },
       updateAsset: (asset: AssetDTO) => {
         set({ asset });
       },

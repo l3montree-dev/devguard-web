@@ -177,7 +177,6 @@ const Registration: NextPage = () => {
     };
   }, [flow]);
 
-  console.log(flow)
 
   const passwordFlow = useMemo(() => {
     return {

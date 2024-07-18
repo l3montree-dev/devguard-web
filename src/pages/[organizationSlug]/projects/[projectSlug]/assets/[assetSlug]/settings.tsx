@@ -53,7 +53,6 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const [editRepo, setEditRepo] = useState(!Boolean(asset.repositoryId));
 
   const handleUpdate = async (data: Partial<AssetDTO>) => {
-    console.log("update project");
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +

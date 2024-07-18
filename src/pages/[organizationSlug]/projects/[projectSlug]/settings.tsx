@@ -20,14 +20,18 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { withProject } from "@/decorators/withProject";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 
 interface Props {
   project: ProjectDTO 
 }
 
-const Index: FunctionComponent<Props> = ({ project }: Props) => {
+const Index: FunctionComponent<Props> = () => {
   const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+
   const projectMenu = useProjectMenu();
 
   const router = useRouter();
@@ -37,7 +41,7 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
   
     const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/projects/" + project.slug + "/",
+      "/organizations/" + activeOrg.slug + "/projects/" + project!.slug + "/",
       {
         method: "PATCH",
         body: JSON.stringify(data),
@@ -50,7 +54,7 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
 
     // check if the slug changed - if so, redirect to the new slug
     const newProject = await resp.json();
-    if (newProject.slug !== project.slug) {
+    if (newProject.slug !== project!.slug) {
       router.push(
         "/"+ activeOrg.slug + "/projects/" + newProject.slug + "/settings",
       );
@@ -62,7 +66,7 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
 
   return (
     <Page
-      title={project.name}
+      title={project?.name || ""}
       Menu={projectMenu}
       Title={
         <span className="flex flex-row gap-2">
@@ -81,9 +85,9 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
           <span className="opacity-75">/</span>
           <Link
             className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project.slug}`}
+            href={`/${activeOrg.slug}/projects/${project!.slug}`}
           >
-            {project.name}
+            {project?.name}
             <Badge
               className="font-body font-normal !text-white"
               variant="outline"
@@ -115,25 +119,16 @@ const Index: FunctionComponent<Props> = ({ project }: Props) => {
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
-    // fetch the project
-    const { organizationSlug, projectSlug } = context.params!;
-    const apiClient = getApiClientFromContext(context);
-    const resp = await apiClient(
-      "/organizations/" + organizationSlug + "/projects/" + projectSlug + "/",
-    );
-
-    const project = await resp.json();
-
     return {
       props: {
-        project,
       },
     };
-  },
+  }
   {
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    project: withProject,
  
  
   },
