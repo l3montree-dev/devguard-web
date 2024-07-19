@@ -18,12 +18,13 @@ export const getServerSideProps: GetServerSideProps = middleware(
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/sbom.json";
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/sbom.json?scanType=" +
+        context.query.scanType ?? "sca";
 
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {

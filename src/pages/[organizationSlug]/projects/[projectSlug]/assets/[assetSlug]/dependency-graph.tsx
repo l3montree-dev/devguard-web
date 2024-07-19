@@ -17,6 +17,13 @@ import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -25,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -44,6 +51,7 @@ import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { toSearchParams } from "@/utils/common";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
 
@@ -58,6 +66,8 @@ const DependencyGraphPage: FunctionComponent<{
   const dimensions = useDimensions();
 
   const router = useRouter();
+  const pathname = usePathname();
+
   const all = router.query.all === "1";
   const menu = useAssetMenu();
   return (
@@ -111,7 +121,73 @@ const DependencyGraphPage: FunctionComponent<{
         forceVertical
         title="Dependency Graph"
         description="This graph shows the dependencies of the asset. The risk of each dependency is calculated based on the risk of the affected package."
-        Button={
+      >
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-row gap-4">
+            <Tabs
+              defaultValue={
+                (router.query.scanType as string | undefined) ?? "sca"
+              }
+            >
+              <TabsList>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        scanType: "sca",
+                      },
+                    })
+                  }
+                  value="sca"
+                >
+                  Application
+                </TabsTrigger>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        scanType: "container-scanning",
+                      },
+                    })
+                  }
+                  value="container-scanning"
+                >
+                  Container Image
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"secondary"}>Download SBOM</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <Link
+                  download
+                  target="_blank"
+                  prefetch={false}
+                  href={
+                    pathname + `/../sbom.json?scanType=${router.query.scanType}`
+                  }
+                  className="!text-foreground hover:no-underline"
+                >
+                  <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+                </Link>
+                <Link
+                  download
+                  target="_blank"
+                  prefetch={false}
+                  href={
+                    pathname + `/../sbom.xml?scanType=${router.query.scanType}`
+                  }
+                  className="!text-foreground hover:no-underline"
+                >
+                  <DropdownMenuItem>XML-Format</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <div className="flex flex-row items-center gap-4">
             <div className="flex flex-row items-center gap-4">
               <label
@@ -153,6 +229,7 @@ const DependencyGraphPage: FunctionComponent<{
                 </SelectContent>
               </Select>
             </div>
+
             {graph.root.risk !== 0 && (
               <div className="flex flex-row items-center gap-4 whitespace-nowrap text-sm">
                 <label htmlFor="allDependencies">
@@ -177,40 +254,7 @@ const DependencyGraphPage: FunctionComponent<{
               </div>
             )}
           </div>
-        }
-      >
-        <Tabs
-          defaultValue={(router.query.scanType as string | undefined) ?? "sca"}
-        >
-          <TabsList>
-            <TabsTrigger
-              onClick={() =>
-                router.push({
-                  query: {
-                    ...router.query,
-                    scanType: "sca",
-                  },
-                })
-              }
-              value="sca"
-            >
-              Application
-            </TabsTrigger>
-            <TabsTrigger
-              onClick={() =>
-                router.push({
-                  query: {
-                    ...router.query,
-                    scanType: "container-scanning",
-                  },
-                })
-              }
-              value="container-scanning"
-            >
-              Container Image
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        </div>
         <div className="h-screen w-full rounded-lg border bg-white dark:bg-black">
           <DependencyGraph
             flaws={flaws}
