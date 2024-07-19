@@ -177,15 +177,17 @@ const Registration: NextPage = () => {
     };
   }, [flow]);
 
-
   const passwordFlow = useMemo(() => {
     return {
       ...flow,
       ui: {
         ...flow?.ui,
         nodes:
-          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Default || n.group === UiNodeGroupEnum.Password) ??
-          [],
+          flow?.ui.nodes?.filter(
+            (n) =>
+              n.group === UiNodeGroupEnum.Default ||
+              n.group === UiNodeGroupEnum.Password,
+          ) ?? [],
       },
     };
   }, [flow]);
