@@ -131,3 +131,25 @@ export function cvssToColor(value: number) {
   // If value is exactly 1
   return `rgb(${colorStops[colorStops.length - 1].color.join(", ")})`;
 }
+
+export const getEcosystem = (packageName: string) => {
+  if (packageName.startsWith("pkg:")) {
+    packageName = packageName.split(":")[1].split("/")[0];
+  } else if (packageName.includes("/")) {
+    packageName = packageName.split("/")[0];
+  }
+
+  return packageName;
+};
+
+export const beautifyPurl = (purl: string) => {
+  const parts = purl.split("@");
+  let first = parts[0];
+  // remove everything before the first slash
+  const slashIndex = first.indexOf("/");
+  if (slashIndex > 0) {
+    first = first.substring(slashIndex + 1);
+  }
+
+  return first;
+};

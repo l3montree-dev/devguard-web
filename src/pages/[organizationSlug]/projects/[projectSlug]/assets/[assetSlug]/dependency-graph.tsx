@@ -275,11 +275,14 @@ const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<FlawDTO>,
 ) => {
-  const flaw = flaws.find((p) => p.componentPurlOrCpe === node.name);
+  const nodeFlaws = flaws.filter((p) => p.componentPurlOrCpe === node.name);
 
   // if there are no children, the risk is the risk of the affected package
-  if (flaw) {
-    node.risk = flaw.rawRiskAssessment;
+  if (nodeFlaws.length > 0) {
+    node.risk = nodeFlaws.reduce(
+      (acc, curr) => acc + curr.rawRiskAssessment,
+      0,
+    );
     // update the parent node with the risk of this node
     let parent = node.parent;
     let i = 0;

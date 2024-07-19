@@ -104,10 +104,13 @@ const getLayoutedElements = (
   // build a map of all affected packages
   const flawMap = flaws.reduce(
     (acc, cur) => {
-      acc[cur.componentPurlOrCpe!] = cur;
+      if (!acc[cur.componentPurlOrCpe!]) {
+        acc[cur.componentPurlOrCpe!] = [];
+      }
+      acc[cur.componentPurlOrCpe!].push(cur);
       return acc;
     },
-    {} as { [key: string]: FlawDTO },
+    {} as { [key: string]: FlawDTO[] },
   );
 
   const riskMap = recursiveFlatten(tree).reduce(

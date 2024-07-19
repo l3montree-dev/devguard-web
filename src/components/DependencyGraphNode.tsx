@@ -31,7 +31,7 @@ import {
 export interface DependencyGraphNodeProps {
   data: {
     label: string;
-    flaw: FlawDTO;
+    flaw: FlawDTO[];
     risk: number;
   };
 }
@@ -85,18 +85,16 @@ export const DependencyGraphNode: FunctionComponent<
     <DropdownMenu>
       <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>
       <DropdownMenuContent className="text-xs">
-        <div className="p-2">{props.data.flaw.cveId}</div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link
-            className="!text-foreground hover:no-underline"
-            href={
-              router.asPath.split("?")[0] + `/../flaws/${props.data.flaw.id}`
-            }
-          >
-            Go to risk assessment
-          </Link>
-        </DropdownMenuItem>
+        {props.data.flaw.map((flaw) => (
+          <DropdownMenuItem key={flaw.id}>
+            <Link
+              className="!text-foreground hover:no-underline"
+              href={router.asPath.split("?")[0] + `/../flaws/${flaw.id}`}
+            >
+              {flaw.cveId}
+            </Link>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

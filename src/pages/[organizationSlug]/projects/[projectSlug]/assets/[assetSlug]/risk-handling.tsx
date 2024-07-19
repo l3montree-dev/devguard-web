@@ -34,7 +34,7 @@ import Page from "../../../../../../components/Page";
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { classNames } from "../../../../../../utils/common";
+import { beautifyPurl, classNames } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { buttonVariants } from "@/components/ui/button";
@@ -48,6 +48,7 @@ import Section from "@/components/common/Section";
 import EmptyList from "@/components/common/EmptyList";
 import { Badge } from "@/components/ui/badge";
 import { withOrganization } from "@/decorators/withOrganization";
+import EcosystemImage from "@/components/common/EcosystemImage";
 
 interface Props {
   asset: AssetDTO;
@@ -58,10 +59,16 @@ const columnHelper = createColumnHelper<FlawWithCVE>();
 
 const extractVersion = (purl: string) => {
   const parts = purl.split("@");
-  const version = parts[parts.length - 1];
+  let version = parts[parts.length - 1];
   if (version.startsWith("v")) {
-    return version.substring(1);
+    version = version.substring(1);
   }
+  //remove any query parameters
+  const qIndex = version.indexOf("?");
+  if (qIndex > 0) {
+    version = version.substring(0, qIndex);
+  }
+
   return version;
 };
 
@@ -141,7 +148,12 @@ const columnsDef = [
       header: "Package",
       id: "packageName",
       cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue()}</span>
+        <span className="flex flex-row gap-2">
+          <span className="flex h-5 w-5 flex-row items-center justify-center rounded-full bg-muted">
+            <EcosystemImage packageName={row.getValue()} />
+          </span>
+          {beautifyPurl(row.getValue())}
+        </span>
       ),
     }),
   },
@@ -161,7 +173,9 @@ const columnsDef = [
       header: "Fixed in Version",
       id: "fixedVersion",
       cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue() as string}</span>
+        <span className="whitespace-nowrap">
+          {beautifyPurl(row.getValue() as string)}
+        </span>
       ),
     }),
   },
