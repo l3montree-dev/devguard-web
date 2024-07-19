@@ -284,7 +284,7 @@ export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
 };
 
 export const getServerSideProps = middleware(
-  async (context) => {
+  async (context, { asset }) => {
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
@@ -330,7 +330,7 @@ export const getServerSideProps = middleware(
       versionsResp.json() as Promise<Array<string>>,
     ]);
 
-    const converted = convertGraph(graph.root);
+    let converted = convertGraph(graph.root);
 
     recursiveAddRisk(converted, flaws);
     // we cannot return a circular data structure - remove the parent again
@@ -339,6 +339,28 @@ export const getServerSideProps = middleware(
     // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
     if (context.query.all !== "1") {
       recursiveRemoveWithoutRisk(converted);
+    }
+
+    // the first childrens are the detection targets.
+    // they might start with the asset id itself.
+    // if there is only a first level child, which starts with the asset id, we can remove the root node
+    if (
+      converted.children.length === 1 &&
+      converted.children[0].name.startsWith(asset.id)
+    ) {
+      converted = {
+        ...converted.children[0],
+        name: converted.children[0].name.replace(asset.id + "/", ""),
+        parent: null,
+      };
+    } else {
+      // check if thats the case, if so, remove the assetId prefix
+      converted.children = converted.children.map((c) => {
+        if (c.name.startsWith(asset.id)) {
+          c.name = c.name.replace(asset.id + "/", "");
+        }
+        return c;
+      });
     }
 
     return {

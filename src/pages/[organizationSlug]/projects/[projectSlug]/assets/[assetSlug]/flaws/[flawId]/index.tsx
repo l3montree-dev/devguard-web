@@ -648,7 +648,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.epss ?? 0) * 100}%
+                            {((flaw.cve?.epss ?? 0) * 100).toFixed(2)}%
                           </Badge>
                         </div>
                       </div>
@@ -902,7 +902,6 @@ export const getServerSideProps = middleware(
 
     const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
 
-    console.log(resp);
     return {
       props: {
         flaw: resp,
