@@ -15,6 +15,7 @@ export interface InitialState {
 }
 
 export interface GlobalStoreActions {
+  updateOrganization: (organization: OrganizationDetailsDTO) => void;
   updateAsset: (asset: AssetDTO) => void;
   updateProject: (project: ProjectDTO) => void;
 }
@@ -37,6 +38,9 @@ export const createGlobalStore = (
         : preloadedState;
 
     return {
+      updateOrganization: (organization: OrganizationDetailsDTO) => {
+        set({ organization });
+      },
       updateProject: (project: ProjectDTO) => {
         set({ project });
       },
