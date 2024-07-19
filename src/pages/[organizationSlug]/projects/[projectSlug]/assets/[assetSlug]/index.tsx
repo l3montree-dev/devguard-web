@@ -80,33 +80,7 @@ const Index: FunctionComponent = () => {
           </Link>
         </span>
       }
-    >
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant={"secondary"}>Download SBOM</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <Link
-            download
-            target="_blank"
-            prefetch={false}
-            href={router.asPath + `/sbom.json`}
-            className="!text-foreground hover:no-underline"
-          >
-            <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-          </Link>
-          <Link
-            download
-            target="_blank"
-            prefetch={false}
-            href={router.asPath + `/sbom.xml`}
-            className="!text-foreground hover:no-underline"
-          >
-            <DropdownMenuItem>XML-Format</DropdownMenuItem>
-          </Link>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </Page>
+    ></Page>
   );
 };
 

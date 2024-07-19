@@ -265,7 +265,6 @@ const Index: FunctionComponent<Props> = (props) => {
     "/assets/" +
     asset?.slug;
 
-
   return (
     <Page
       Menu={assetMenu}

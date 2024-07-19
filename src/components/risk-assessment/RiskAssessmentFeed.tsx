@@ -16,7 +16,6 @@
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
-  AcceptedFlawEventDTO,
   DetectedFlawEventDTO,
   FlawEventDTO,
   RiskAssessmentUpdatedFlawEventDTO,
@@ -26,7 +25,6 @@ import { getUsername } from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
-  ChatBubbleBottomCenterIcon,
   ChatBubbleOvalLeftEllipsisIcon,
   CheckIcon,
   MagnifyingGlassIcon,
@@ -71,12 +69,12 @@ const diffReports = (
   if (old.epss < n.epss) {
     // epss increased
     changes.push(
-      `The probability of exploitation (EPSS) increased from ${old.epss * 100}% to ${n.epss * 100}%.`,
+      `The probability of exploitation (EPSS) increased from ${(old.epss * 100).toFixed(2)}% to ${(n.epss * 100).toFixed(2)}%.`,
     );
   } else if (old.epss > n.epss) {
     // epss decreased
     changes.push(
-      `The probability of exploitation (EPSS) decreased from ${old.epss * 100}% to ${n.epss * 100}%.`,
+      `The probability of exploitation (EPSS) decreased from ${(old.epss * 100).toFixed(2)}% to ${(n.epss * 100).toFixed(2)}%.`,
     );
   }
 
@@ -238,17 +236,10 @@ export default function RiskAssessmentFeed({
                     {Boolean(event.justification) && (
                       <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
                         <Markdown className={"text-foreground"}>
-                          {maybeAddDot(event.justification)}
+                          {event.type === "rawRiskAssessmentUpdated"
+                            ? eventMessages(event, index, events, flawName)
+                            : maybeAddDot(event.justification)}
                         </Markdown>
-
-                        {event.type === "rawRiskAssessmentUpdated" && (
-                          <>
-                            <span>
-                              {" "}
-                              {eventMessages(event, index, events, flawName)}
-                            </span>
-                          </>
-                        )}
                       </div>
                     )}
                   </div>
