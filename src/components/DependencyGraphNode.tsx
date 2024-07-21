@@ -14,17 +14,16 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FlawDTO } from "@/types/api/api";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
-import { FunctionComponent } from "react";
-import { classNames } from "@/utils/common";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
@@ -36,24 +35,20 @@ export interface DependencyGraphNodeProps {
   };
 }
 
-const riskToTextColor = (risk: number) => {
-  if (risk > 4) {
-    return "black";
-  }
-  return "white";
-};
-
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = severityToColor(riskToSeverity(props.data.risk));
-  const shouldFocus = useRouter().query.pkg === props.data.label;
+  const shouldFocus =
+    beautifyPurl(useRouter().query.pkg as string) ===
+    beautifyPurl(props.data.label);
   const router = useRouter();
+  const version = extractVersion(props.data.label);
   const Node = (
     <div
       style={{
         maxWidth: 300,
-        borderColor: props.data.flaw !== undefined ? color : undefined,
+        //     borderColor: props.data.flaw !== undefined ? color : undefined,
         //backgroundColor: props.data.flaw !== undefined ? color : "white",
       }}
       className={classNames(
@@ -66,8 +61,27 @@ export const DependencyGraphNode: FunctionComponent<
         type="target"
         position={Position.Right}
       />
-      <div className="flex flex-col items-start justify-center gap-2">
-        <label htmlFor="text">{props.data.label}</label>
+      <div className="flex flex-row items-start gap-2">
+        {props.data.flaw && (
+          <span className="relative mt-0.5 flex h-3 w-3">
+            <span
+              style={{
+                backgroundColor: color,
+              }}
+              className="absolute inline-flex h-full w-full animate-ping rounded-full  opacity-75"
+            ></span>
+            <span
+              style={{
+                backgroundColor: color,
+              }}
+              className="relative inline-flex h-3 w-3 rounded-full"
+            ></span>
+          </span>
+        )}
+        <label htmlFor="text" className="text-left">
+          {beautifyPurl(props.data.label)}
+          {version ? `@${version}` : ""}
+        </label>
       </div>
       <Handle
         className="rounded-full"

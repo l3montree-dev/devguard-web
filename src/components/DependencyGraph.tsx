@@ -38,6 +38,7 @@ import { useRouter } from "next/router";
 import "@xyflow/react/dist/base.css";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 import { useTheme } from "next-themes";
+import { beautifyPurl } from "@/utils/common";
 
 const nodeWidth = 300;
 const nodeHeight = 100;
@@ -206,9 +207,12 @@ const DependencyGraph: FunctionComponent<{
 
     // check if we want to focus a specific node
     if (router.query.pkg) {
-      const focusNode = initialNodes.find(
-        (n) => n.data.label === router.query.pkg,
+      const focusNode = initialNodes.find((n) =>
+        beautifyPurl(n.data.label).startsWith(
+          beautifyPurl(router.query.pkg as string),
+        ),
       );
+
       if (focusNode) {
         setViewPort({
           x: -focusNode.position.x + width / 2,

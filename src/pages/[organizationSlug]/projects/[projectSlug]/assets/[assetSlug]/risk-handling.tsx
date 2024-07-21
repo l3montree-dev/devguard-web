@@ -28,15 +28,23 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import Page from "../../../../../../components/Page";
 
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { beautifyPurl, classNames } from "../../../../../../utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+} from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
+import EcosystemImage from "@/components/common/EcosystemImage";
+import EmptyList from "@/components/common/EmptyList";
+import Section from "@/components/common/Section";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,12 +52,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Section from "@/components/common/Section";
-import EmptyList from "@/components/common/EmptyList";
-import { Badge } from "@/components/ui/badge";
-import { withOrganization } from "@/decorators/withOrganization";
-import EcosystemImage from "@/components/common/EcosystemImage";
 import { Input } from "@/components/ui/input";
+import { withOrganization } from "@/decorators/withOrganization";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 
@@ -59,21 +63,6 @@ interface Props {
 }
 
 const columnHelper = createColumnHelper<FlawWithCVE>();
-
-const extractVersion = (purl: string) => {
-  const parts = purl.split("@");
-  let version = parts[parts.length - 1];
-  if (version.startsWith("v")) {
-    version = version.substring(1);
-  }
-  //remove any query parameters
-  const qIndex = version.indexOf("?");
-  if (qIndex > 0) {
-    version = version.substring(0, qIndex);
-  }
-
-  return version;
-};
 
 const columnsDef = [
   {
