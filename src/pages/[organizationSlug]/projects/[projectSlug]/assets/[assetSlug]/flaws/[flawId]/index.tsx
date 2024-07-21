@@ -111,7 +111,6 @@ const exploitMessage = (
       ),
     };
   } else if (obj["E"] === "F") {
-    console.log(flaw.cve?.exploits);
     return {
       short: "Functional",
       long: (

@@ -18,7 +18,6 @@ import Image from "next/image";
 import { getEcosystem } from "@/utils/common";
 
 const EcosystemImage = ({ packageName }: { packageName: string }) => {
-  console.log(getEcosystem(packageName));
   if (
     [
       "golang",
