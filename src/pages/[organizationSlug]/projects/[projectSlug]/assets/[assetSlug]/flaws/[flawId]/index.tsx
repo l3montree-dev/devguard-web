@@ -793,8 +793,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               Introduced in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {flaw.arbitraryJsonData.introducedVersion ??
-                                "von Beginn an"}
+                              {Boolean(flaw.arbitraryJsonData.introducedVersion)
+                                ? flaw.arbitraryJsonData.introducedVersion
+                                : "von Beginn an"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -811,8 +812,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               Fixed in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {flaw.arbitraryJsonData.fixedVersion ??
-                                "kein Patch verfügbar"}
+                              {Boolean(flaw.arbitraryJsonData.fixedVersion)
+                                ? flaw.arbitraryJsonData.fixedVersion
+                                : "kein Patch verfügbar"}
                             </Badge>
                           </div>
                           <div className="mt-4">
