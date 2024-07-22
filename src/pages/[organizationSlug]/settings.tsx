@@ -66,25 +66,22 @@ const Home: FunctionComponent = () => {
       }),
     });
 
-    if (!resp.ok)
+    if (!resp.ok) {
       console.error("Failed to update organization");
+    } else if (resp.ok) {
 
-    toast("Success", {
-      description: "Organization updated",
-    });
+      toast("Success", {
+        description: "Organization updated",
+      });
 
-    const newOrg = await resp.json();
-    updateOrganization(newOrg);
+      const newOrg = await resp.json();
+      updateOrganization(newOrg);
 
-
-
-
-    if (newOrg.slug !== activeOrg.slug) {
-      router.push("/" + newOrg.slug + "/settings");
-    };
+      if (newOrg.slug !== activeOrg.slug) {
+        router.push("/" + newOrg.slug + "/settings");
+      };
+    }
   }
-
-
 
   return (
     <Page
