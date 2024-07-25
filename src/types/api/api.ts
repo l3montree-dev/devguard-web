@@ -299,3 +299,12 @@ export interface AffectedPackage {
   PackageName: string;
   PurlWithVersion: string;
 }
+
+export interface FlawByPackage {
+  packageName: string;
+  maxRisk: number;
+  totalRisk: number;
+  flawCount: number;
+  avgRisk: number;
+  flaws: FlawWithCVE[];
+}

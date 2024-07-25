@@ -143,6 +143,9 @@ export const getEcosystem = (packageName: string) => {
 };
 
 export const beautifyPurl = (purl: string) => {
+  if (!purl) {
+    return "";
+  }
   const parts = purl.split("@");
   let first = parts[0];
   // remove everything before the first slash
