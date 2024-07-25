@@ -20,6 +20,7 @@ import { flexRender, Row } from "@tanstack/react-table";
 import React, { FunctionComponent } from "react";
 import FlawState from "../common/FlawState";
 import { useRouter } from "next/router";
+import { Badge } from "../ui/badge";
 
 interface Props {
   row: Row<FlawByPackage>;
@@ -40,16 +41,16 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         className={classNames(
           "relative cursor-pointer align-top transition-all",
           index === arrLength - 1 || isOpen ? "" : "border-b",
-          index % 2 != 0 && "bg-card",
-          "hover:bg-gray-50 dark:hover:bg-secondary",
+          index % 2 != 0 && "bg-card/50",
+          "hover:bg-gray-50 dark:hover:bg-card",
         )}
         key={row.id}
       >
-        <td className="text-center align-middle">
+        <td className="py-4 text-center align-baseline">
           {isOpen ? (
-            <ChevronDownIcon className="mx-auto w-4 text-muted-foreground" />
+            <ChevronDownIcon className="relative top-0.5 mx-auto w-4 text-muted-foreground" />
           ) : (
-            <ChevronRightIcon className="mx-auto w-4 text-muted-foreground" />
+            <ChevronRightIcon className="relative top-0.5 mx-auto w-4 text-muted-foreground" />
           )}
         </td>
         {row.getVisibleCells().map((cell, i) => (
@@ -63,10 +64,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           className={classNames(
             "relative cursor-pointer bg-background align-top transition-all",
             index === arrLength - 1 ? "" : "border-b",
-            index % 2 != 0 && "bg-card",
+            index % 2 != 0 && "bg-card/50",
           )}
         >
-          <td colSpan={6}>
+          <td colSpan={7}>
             <div className="m-2 ml-12">
               <table className="w-full table-fixed rounded border">
                 <thead
@@ -79,6 +80,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     <th className="w-40 p-4">State</th>
                     <th className="w-40 p-4">CVE</th>
                     <th className="w-40 p-4">Risk</th>
+                    <th className="w-40 p-4">Fixed in Version</th>
                     <th className="w-full p-4">Description</th>
                   </tr>
                 </thead>
@@ -98,9 +100,22 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       </td>
                       <td className="p-4">{flaw.cveId}</td>
                       <td className="p-4">{flaw.rawRiskAssessment}</td>
+                      <td className="p-4">
+                        {flaw.arbitraryJsonData?.fixedVersion ? (
+                          <span>
+                            <Badge variant={"secondary"}>
+                              {flaw.arbitraryJsonData.fixedVersion}
+                            </Badge>
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            No fix available
+                          </span>
+                        )}
+                      </td>
                       <td className="p-4" colSpan={2}>
                         <div className="line-clamp-3">
-                          {flaw.cve?.description}
+                          {flaw.cve?.description} 
                         </div>
                       </td>
                     </tr>

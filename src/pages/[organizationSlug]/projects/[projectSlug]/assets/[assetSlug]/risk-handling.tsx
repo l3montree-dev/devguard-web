@@ -23,18 +23,18 @@ import Page from "../../../../../../components/Page";
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { beautifyPurl, classNames } from "../../../../../../utils/common";
+import { beautifyPurl } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
+import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { withOrganization } from "@/decorators/withOrganization";
-import { debounce } from "lodash";
+import { debounce, filter } from "lodash";
 import { Loader2 } from "lucide-react";
-import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 
 interface Props {
   asset: AssetDTO;
@@ -42,6 +42,41 @@ interface Props {
 }
 
 const columnHelper = createColumnHelper<FlawByPackage>();
+
+const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
+  // order the flaws by fixedVersion
+  const orderedFlaws = flaws.sort((a, b) => {
+    if (
+      a.arbitraryJsonData?.fixedVersion &&
+      b.arbitraryJsonData?.fixedVersion
+    ) {
+      return a.arbitraryJsonData.fixedVersion.localeCompare(
+        b.arbitraryJsonData.fixedVersion,
+      );
+    }
+    return 0;
+  });
+
+  // remove all without fixed version
+  const filteredFlaws = orderedFlaws.filter(
+    (f) => f.arbitraryJsonData?.fixedVersion,
+  );
+
+  if (filteredFlaws.length === 0) {
+    return null;
+  }
+  // aggregate the risk
+  const totalRisk = filteredFlaws.reduce(
+    (acc, f) => acc + f.rawRiskAssessment,
+    0,
+  );
+
+  return {
+    version:
+      filteredFlaws[filteredFlaws.length - 1].arbitraryJsonData?.fixedVersion,
+    riskReduction: totalRisk,
+  };
+};
 
 const columnsDef = [
   {
@@ -71,14 +106,14 @@ const columnsDef = [
       ),
     }),
   },
-  {
+  /*{
     ...columnHelper.accessor("avgRisk", {
       header: "Average Risk",
       id: "avg_risk",
       enableSorting: true,
       cell: (row) => row.getValue().toFixed(2),
     }),
-  },
+  },*/
   {
     ...columnHelper.accessor("totalRisk", {
       header: "Total Risk",
@@ -94,6 +129,41 @@ const columnsDef = [
       enableSorting: true,
       cell: (row) => row.getValue(),
     }),
+  },
+  {
+    header: "Installed Version",
+    id: "installed",
+    enableSorting: false,
+    cell: ({ row }: any) => (
+      <span>
+        <Badge variant={"secondary"}>
+          {row.original.flaws[0].arbitraryJsonData["installedVersion"]}
+        </Badge>
+      </span>
+    ),
+  },
+  {
+    header: "Action",
+    id: "fixAvailable",
+    enableSorting: false,
+    cell: ({ row }: any) => {
+      const versionAndReduction = getMaxSemverVersionAndRiskReduce(
+        row.original.flaws,
+      );
+      if (versionAndReduction === null) {
+        return <span className="text-muted-foreground">No fix available</span>;
+      }
+      return (
+        <span>
+          <span className="text-muted-foreground">Update to version</span>{" "}
+          <span>
+            <Badge variant={"secondary"}>{versionAndReduction.version}</Badge>
+          </span>{" "}
+          <span className="text-muted-foreground">to reduce total risk by</span>{" "}
+          <span>{versionAndReduction.riskReduction.toFixed(2)}</span>
+        </span>
+      );
+    },
   },
 ];
 
