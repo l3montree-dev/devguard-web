@@ -54,8 +54,6 @@ const Home: FunctionComponent = () => {
   });
 
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
-
-
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
       method: "PATCH",
       body: JSON.stringify({
@@ -69,7 +67,6 @@ const Home: FunctionComponent = () => {
     if (!resp.ok) {
       console.error("Failed to update organization");
     } else if (resp.ok) {
-
       toast("Success", {
         description: "Organization updated",
       });
@@ -79,9 +76,9 @@ const Home: FunctionComponent = () => {
 
       if (newOrg.slug !== activeOrg.slug) {
         router.push("/" + newOrg.slug + "/settings");
-      };
+      }
     }
-  }
+  };
 
   return (
     <Page
@@ -169,15 +166,12 @@ const Home: FunctionComponent = () => {
               </GithubAppInstallationAlert>
             }
           />
-
         </Section>
       </div>
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-
             <OrgForm form={form} />
-
             <div className="mt-6 flex items-center justify-end gap-x-6">
               <Button type="submit">Save</Button>
             </div>

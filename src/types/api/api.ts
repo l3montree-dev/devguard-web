@@ -38,7 +38,7 @@ export interface OrganizationDTO extends AppModelDTO {
   grundschutz: boolean;
   slug: string;
   description: string;
-  
+
   githubAppInstallations: Array<{
     installationId: number;
     settingsUrl: string;

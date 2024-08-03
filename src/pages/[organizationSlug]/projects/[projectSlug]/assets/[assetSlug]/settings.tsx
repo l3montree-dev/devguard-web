@@ -69,7 +69,6 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       console.error("Could not update asset");
     }
 
- 
     // check if the slug changed - if so, redirect to the new slug
     const newAsset = await resp.json();
     updateAsset(newAsset);

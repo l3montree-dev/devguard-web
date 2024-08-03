@@ -38,7 +38,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 
-interface Props { }
+interface Props {}
 
 export default function UserNav() {
   const router = useRouter();
@@ -50,7 +50,6 @@ export default function UserNav() {
   const orgs = useStore((s) => s.organizations);
 
   const activeOrg = useOrg() ?? orgs[0];
-
 
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug

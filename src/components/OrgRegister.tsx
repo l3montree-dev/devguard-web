@@ -43,10 +43,7 @@ import { OrgForm } from "./OrgForm";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useStore } from "@/zustand/globalStoreProvider";
 
-interface Props {
-
-}
-
+interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
   const activeOrg = useActiveOrg();
@@ -67,7 +64,6 @@ export default function OrgRegisterForm(props: Props) {
       })
     ).json();
 
-
     updateOrganization(resp as OrganizationDetailsDTO);
 
     // move the user to the newly created organization
@@ -80,8 +76,6 @@ export default function OrgRegisterForm(props: Props) {
         className="text-black dark:text-white"
         onSubmit={form.handleSubmit(handleOrgCreation)}
       >
-
-
         <OrgForm form={form} />
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
