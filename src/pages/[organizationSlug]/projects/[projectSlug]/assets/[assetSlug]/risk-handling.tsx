@@ -1,6 +1,3 @@
-import DateString from "@/components/common/DateString";
-import Filter from "@/components/common/Filter";
-import FlawState from "@/components/common/FlawState";
 import SortingCaret from "@/components/common/SortingCaret";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -9,16 +6,8 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useColumnVisibility } from "@/hooks/useColumnVisibility";
 import useFilter from "@/hooks/useFilter";
-import {
-  FilterableColumnDef,
-  dateOperators,
-  numberOperators,
-  stringOperators,
-} from "@/services/filter";
-import { AssetDTO, FlawWithCVE, Paged } from "@/types/api/api";
-import { ViewColumnsIcon } from "@heroicons/react/24/outline";
+import { AssetDTO, FlawByPackage, FlawWithCVE, Paged } from "@/types/api/api";
 import {
   createColumnHelper,
   flexRender,
@@ -34,109 +23,64 @@ import Page from "../../../../../../components/Page";
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import {
-  beautifyPurl,
-  classNames,
-  extractVersion,
-} from "../../../../../../utils/common";
+import { beautifyPurl } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
+import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { withOrganization } from "@/decorators/withOrganization";
-import { debounce } from "lodash";
+import { debounce, filter } from "lodash";
 import { Loader2 } from "lucide-react";
 
 interface Props {
   asset: AssetDTO;
-  flaws: Paged<FlawWithCVE>;
+  flaws: Paged<FlawByPackage>;
 }
 
-const columnHelper = createColumnHelper<FlawWithCVE>();
+const columnHelper = createColumnHelper<FlawByPackage>();
+
+const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
+  // order the flaws by fixedVersion
+  const orderedFlaws = flaws.sort((a, b) => {
+    if (
+      a.arbitraryJsonData?.fixedVersion &&
+      b.arbitraryJsonData?.fixedVersion
+    ) {
+      return a.arbitraryJsonData.fixedVersion.localeCompare(
+        b.arbitraryJsonData.fixedVersion,
+      );
+    }
+    return 0;
+  });
+
+  // remove all without fixed version
+  const filteredFlaws = orderedFlaws.filter(
+    (f) => f.arbitraryJsonData?.fixedVersion,
+  );
+
+  if (filteredFlaws.length === 0) {
+    return null;
+  }
+  // aggregate the risk
+  const totalRisk = filteredFlaws.reduce(
+    (acc, f) => acc + f.rawRiskAssessment,
+    0,
+  );
+
+  return {
+    version:
+      filteredFlaws[filteredFlaws.length - 1].arbitraryJsonData?.fixedVersion,
+    riskReduction: totalRisk,
+  };
+};
 
 const columnsDef = [
   {
-    ...columnHelper.accessor("state", {
-      header: "State",
-      enableSorting: true,
-      id: "state",
-      cell: (row) => (
-        <div className="flex flex-row">
-          <FlawState state={row.getValue()} />
-        </div>
-      ),
-    }),
-    operators: stringOperators,
-    filterValues: ["open", "fixed", "ignored"],
-  },
-  {
-    ...columnHelper.accessor("cve.cve", {
-      header: "CVE",
-      enableSorting: true,
-      id: "cve.cve",
-      cell: (row) => (
-        <div>
-          <span className="whitespace-nowrap">{row.getValue()}</span>
-        </div>
-      ),
-    }),
-  },
-  {
-    ...columnHelper.accessor("rawRiskAssessment", {
-      header: "Risk",
-      id: "rawRiskAssessment",
-      enableSorting: true,
-      cell: (row) => row.getValue(),
-    }),
-  },
-  {
-    ...columnHelper.accessor("cve.cisaExploitAdd", {
-      header: "CISA Exploit Add",
-      id: "cve.cisaExploitAdd",
-      enableSorting: true,
-      cell: (row) => {
-        const value = row.getValue();
-        if (!value) {
-          return null;
-        }
-        return <DateString date={new Date(value)} />;
-      },
-    }),
-  },
-  {
-    ...columnHelper.accessor("cve.cisaActionDue", {
-      header: "CISA Action Due",
-      id: "cve.cisaActionDue",
-      enableSorting: true,
-      cell: (row) => {
-        const value = row.getValue();
-        if (!value) {
-          return null;
-        }
-        return <DateString date={new Date(value)} />;
-      },
-    }),
-  },
-  {
-    ...columnHelper.accessor("cve.cisaRequiredAction", {
-      header: "CISA Required Action",
-      id: "cve.cisaRequiredAction",
-      enableSorting: true,
-      cell: (row) => row.getValue(),
-    }),
-  },
-  {
-    ...columnHelper.accessor("arbitraryJsonData.packageName", {
+    ...columnHelper.accessor("packageName", {
       header: "Package",
       id: "packageName",
       cell: (row) => (
@@ -149,110 +93,99 @@ const columnsDef = [
       ),
     }),
   },
+
   {
-    ...columnHelper.accessor("component.purlOrCpe", {
-      header: "Installed Version",
-      id: "installedVersion",
-      cell: (row) => (
-        <span className="whitespace-nowrap">
-          {extractVersion(row.getValue())}
-        </span>
-      ),
-    }),
-  },
-  {
-    ...columnHelper.accessor("arbitraryJsonData.fixedVersion", {
-      header: "Fixed in Version",
-      id: "fixedVersion",
-      cell: (row) => (
-        <span className="whitespace-nowrap">
-          {beautifyPurl(row.getValue() as string)}
-        </span>
-      ),
-    }),
-  },
-  {
-    ...columnHelper.accessor("cve.description", {
-      header: "Message",
-      id: "message",
+    ...columnHelper.accessor("maxRisk", {
+      header: "Max Risk",
       enableSorting: true,
+      id: "max_risk",
       cell: (row) => (
-        <div className="line-clamp-3 max-w-5xl">
-          <p>{row.getValue()}</p>
+        <div>
+          <span className="whitespace-nowrap">{row.getValue().toFixed(1)}</span>
         </div>
       ),
     }),
   },
-  {
-    ...columnHelper.accessor("cve.cvss", {
-      header: "Base CVSS",
+  /*{
+    ...columnHelper.accessor("avgRisk", {
+      header: "Average Risk",
+      id: "avg_risk",
       enableSorting: true,
-      id: "cve.cvss",
-      cell: (row) => row.getValue(),
+      cell: (row) => row.getValue().toFixed(1),
     }),
-    operators: numberOperators,
-  },
+  },*/
   {
-    ...columnHelper.accessor("cve.severity", {
-      header: "Severity",
+    ...columnHelper.accessor("totalRisk", {
+      header: "Total Risk",
+      id: "total_risk",
       enableSorting: true,
-      id: "cve.severity",
-      cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue()}</span>
-      ),
+      cell: (row) => row.getValue().toFixed(1),
     }),
   },
   {
-    ...columnHelper.accessor("cve.epss", {
-      header: "Exploit Prediction Scoring System",
-      id: "cve.epss",
+    ...columnHelper.accessor("flawCount", {
+      header: "Flaw Count",
+      id: "flaw_count",
       enableSorting: true,
       cell: (row) => row.getValue(),
     }),
-    operators: numberOperators,
   },
-
   {
-    ...columnHelper.accessor("createdAt", {
-      header: "First reported",
-      id: "createdAt",
-      enableSorting: true,
-      cell: (row) => (
-        <span className="whitespace-nowrap">
-          <DateString date={new Date(row.getValue())} />
+    header: "Installed Version",
+    id: "installed",
+    enableSorting: false,
+    cell: ({ row }: any) => (
+      <span>
+        <Badge variant={"secondary"}>
+          {row.original.flaws[0].arbitraryJsonData["installedVersion"]}
+        </Badge>
+      </span>
+    ),
+  },
+  {
+    header: "Action",
+    id: "fixAvailable",
+    enableSorting: false,
+    cell: ({ row }: any) => {
+      const versionAndReduction = getMaxSemverVersionAndRiskReduce(
+        row.original.flaws,
+      );
+      if (versionAndReduction === null) {
+        if (row.original.flaws[0].component.componentType === "application") {
+          return (
+            <span className="text-muted-foreground">
+              No image security-update available
+            </span>
+          );
+        }
+        return <span className="text-muted-foreground">No fix available</span>;
+      }
+      return (
+        <span>
+          <span className="text-muted-foreground">Update to version</span>{" "}
+          <span>
+            <Badge variant={"secondary"}>{versionAndReduction.version}</Badge>
+          </span>{" "}
+          <span className="text-muted-foreground">to reduce total risk by</span>{" "}
+          <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
         </span>
-      ),
-    }),
-    operators: dateOperators,
+      );
+    },
   },
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
   const { sortingState, handleSort } = useFilter();
-  const { visibleColumns, setVisibleColumns } = useColumnVisibility(
-    "scaTable",
-    {
-      "cve.cisaActionDue": false,
-      "cve.cisaExploitAdd": false,
-      "cve.cisaRequiredAction": false,
-      "cve.severity": false,
-      "cve.epss": false,
-      "cve.cvss": false,
-      "cve.createdAt": false,
-    },
-  );
+
   const table = useReactTable({
     columns: columnsDef,
     data: props.flaws.data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSort,
-    onColumnVisibilityChange: (v) => {
-      setVisibleColumns(v);
-    },
+
     manualSorting: true,
     state: {
       sorting: sortingState,
-      columnVisibility: visibleColumns,
     },
   });
 
@@ -360,43 +293,6 @@ const Index: FunctionComponent<Props> = (props) => {
           forceVertical
           title="Identified Risks"
           description="This table shows all the identified risks for this asset."
-          Button={
-            <div className="mb-4 flex flex-row gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={buttonVariants({
-                    variant: "secondary",
-                  })}
-                >
-                  <ViewColumnsIcon className="mr-2 h-4 w-4" />
-                  Columns
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {table.getAllLeafColumns().map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        checked={visibleColumns[column.id] !== false}
-                        onCheckedChange={() =>
-                          setVisibleColumns((prev) => ({
-                            ...prev,
-                            [column.id]: !prev[column.id],
-                          }))
-                        }
-                        key={column.id}
-                      >
-                        {(column.columnDef.header as string) ?? ""}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Filter
-                columnsDef={columnsDef.filter(
-                  (c): c is FilterableColumnDef => "operators" in c,
-                )}
-              />
-            </div>
-          }
         >
           <div className="relative">
             <Input
@@ -416,6 +312,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
+                      <th className="w-6" />
                       {headerGroup.headers.map((header) => (
                         <th
                           className="w-40 cursor-pointer break-normal p-4 text-left"
@@ -445,27 +342,12 @@ const Index: FunctionComponent<Props> = (props) => {
                 </thead>
                 <tbody className="text-sm text-foreground">
                   {table.getRowModel().rows.map((row, i, arr) => (
-                    <tr
-                      onClick={() => {
-                        router.push(r + "/flaws/" + row.original.id);
-                      }}
-                      className={classNames(
-                        "relative cursor-pointer align-top transition-all",
-                        i === arr.length - 1 ? "" : "border-b",
-                        i % 2 != 0 && "bg-card",
-                        "hover:bg-gray-50 dark:hover:bg-secondary",
-                      )}
-                      key={row.id}
-                    >
-                      {row.getVisibleCells().map((cell, i) => (
-                        <td className="p-4" key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      ))}
-                    </tr>
+                    <RiskHandlingRow
+                      row={row}
+                      index={i}
+                      arrLength={arr.length}
+                      key={row.original.packageName}
+                    />
                   ))}
                 </tbody>
               </table>

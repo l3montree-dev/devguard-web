@@ -302,7 +302,7 @@ const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<FlawDTO>,
 ) => {
-  const nodeFlaws = flaws.filter((p) => p.componentPurlOrCpe === node.name);
+  const nodeFlaws = flaws.filter((p) => p.componentPurl === node.name);
 
   // if there are no children, the risk is the risk of the affected package
   if (nodeFlaws.length > 0) {
@@ -387,7 +387,7 @@ export const getServerSideProps = middleware(
       ),
       apiClient(
         uri +
-          "affected-packages?" +
+          "affected-components?" +
           toSearchParams({
             version: version,
             scanType: context.query.scanType ?? "sca",

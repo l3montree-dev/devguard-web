@@ -96,7 +96,7 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
-  componentPurlOrCpe: string | null;
+  componentPurl: string | null;
   scanner: string;
   state:
     | "open"
@@ -263,6 +263,7 @@ export interface FlawWithCVE extends FlawDTO {
     componentDepth: number;
   };
   component: {
+    componentType: "application" | "library";
     purlOrCpe: string;
   };
 }
@@ -298,4 +299,13 @@ export interface AffectedPackage {
   IntroducedVersion: string;
   PackageName: string;
   PurlWithVersion: string;
+}
+
+export interface FlawByPackage {
+  packageName: string;
+  maxRisk: number;
+  totalRisk: number;
+  flawCount: number;
+  avgRisk: number;
+  flaws: FlawWithCVE[];
 }
