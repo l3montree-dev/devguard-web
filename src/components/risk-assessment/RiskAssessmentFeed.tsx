@@ -69,12 +69,12 @@ const diffReports = (
   if (old.epss < n.epss) {
     // epss increased
     changes.push(
-      `The probability of exploitation (EPSS) increased from ${(old.epss * 100).toFixed(2)}% to ${(n.epss * 100).toFixed(2)}%.`,
+      `The probability of exploitation (EPSS) increased from ${(old.epss * 100).toFixed(1)}% to ${(n.epss * 100).toFixed(1)}%.`,
     );
   } else if (old.epss > n.epss) {
     // epss decreased
     changes.push(
-      `The probability of exploitation (EPSS) decreased from ${(old.epss * 100).toFixed(2)}% to ${(n.epss * 100).toFixed(2)}%.`,
+      `The probability of exploitation (EPSS) decreased from ${(old.epss * 100).toFixed(1)}% to ${(n.epss * 100).toFixed(1)}%.`,
     );
   }
 

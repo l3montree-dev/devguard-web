@@ -101,7 +101,7 @@ const columnsDef = [
       id: "max_risk",
       cell: (row) => (
         <div>
-          <span className="whitespace-nowrap">{row.getValue()}</span>
+          <span className="whitespace-nowrap">{row.getValue().toFixed(1)}</span>
         </div>
       ),
     }),
@@ -111,7 +111,7 @@ const columnsDef = [
       header: "Average Risk",
       id: "avg_risk",
       enableSorting: true,
-      cell: (row) => row.getValue().toFixed(2),
+      cell: (row) => row.getValue().toFixed(1),
     }),
   },*/
   {
@@ -119,7 +119,7 @@ const columnsDef = [
       header: "Total Risk",
       id: "total_risk",
       enableSorting: true,
-      cell: (row) => row.getValue().toFixed(2),
+      cell: (row) => row.getValue().toFixed(1),
     }),
   },
   {
@@ -151,6 +151,13 @@ const columnsDef = [
         row.original.flaws,
       );
       if (versionAndReduction === null) {
+        if (row.original.flaws[0].component.componentType === "application") {
+          return (
+            <span className="text-muted-foreground">
+              No image security-update available
+            </span>
+          );
+        }
         return <span className="text-muted-foreground">No fix available</span>;
       }
       return (
@@ -160,7 +167,7 @@ const columnsDef = [
             <Badge variant={"secondary"}>{versionAndReduction.version}</Badge>
           </span>{" "}
           <span className="text-muted-foreground">to reduce total risk by</span>{" "}
-          <span>{versionAndReduction.riskReduction.toFixed(2)}</span>
+          <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
         </span>
       );
     },

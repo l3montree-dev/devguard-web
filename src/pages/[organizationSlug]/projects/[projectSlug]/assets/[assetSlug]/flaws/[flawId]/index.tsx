@@ -637,7 +637,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {((flaw.cve?.epss ?? 0) * 100).toFixed(2)}%
+                            {((flaw.cve?.epss ?? 0) * 100).toFixed(1)}%
                           </Badge>
                         </div>
                       </div>
@@ -729,7 +729,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(2)}
+                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -760,7 +760,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(2)}
+                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -795,7 +795,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             <Badge variant={"outline"}>
                               {Boolean(flaw.arbitraryJsonData.introducedVersion)
                                 ? flaw.arbitraryJsonData.introducedVersion
-                                : "von Beginn an"}
+                                : "first version"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -804,7 +804,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             </span>
                             <Badge variant={"outline"}>
                               {flaw.arbitraryJsonData.installedVersion ??
-                                "von Beginn an"}
+                                "unknown"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -814,7 +814,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             <Badge variant={"outline"}>
                               {Boolean(flaw.arbitraryJsonData.fixedVersion)
                                 ? flaw.arbitraryJsonData.fixedVersion
-                                : "kein Patch verfügbar"}
+                                : "no patch available"}
                             </Badge>
                           </div>
                           <div className="mt-4">

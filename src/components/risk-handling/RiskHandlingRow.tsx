@@ -99,7 +99,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         </div>
                       </td>
                       <td className="p-4">{flaw.cveId}</td>
-                      <td className="p-4">{flaw.rawRiskAssessment}</td>
+                      <td className="p-4">
+                        {flaw.rawRiskAssessment.toFixed(1)}
+                      </td>
                       <td className="p-4">
                         {flaw.arbitraryJsonData?.fixedVersion ? (
                           <span>
@@ -109,7 +111,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                           </span>
                         ) : (
                           <span className="text-muted-foreground">
-                            No fix available
+                            {flaw.component.componentType === "application"
+                              ? "No image security-update available"
+                              : "No fix available"}
                           </span>
                         )}
                       </td>

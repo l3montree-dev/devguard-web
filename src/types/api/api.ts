@@ -96,7 +96,7 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
-  componentPurlOrCpe: string | null;
+  componentPurl: string | null;
   scanner: string;
   state:
     | "open"
@@ -263,6 +263,7 @@ export interface FlawWithCVE extends FlawDTO {
     componentDepth: number;
   };
   component: {
+    componentType: "application" | "library";
     purlOrCpe: string;
   };
 }

@@ -42,7 +42,7 @@ const Main: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
   return (
-    <main>
+    <main className="font-body">
       <header
         className={classNames(
           "relative flex items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
