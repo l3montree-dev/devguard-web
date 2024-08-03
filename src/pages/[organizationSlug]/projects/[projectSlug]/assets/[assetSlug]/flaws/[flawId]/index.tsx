@@ -18,7 +18,6 @@ import {
   FlawEventDTO,
   RequirementsLevel,
 } from "@/types/api/api";
-import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -61,8 +60,10 @@ import {
 import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
+import EcosystemImage from "@/components/common/EcosystemImage";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
+import { beautifyPurl } from "@/utils/common";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -114,7 +115,7 @@ const exploitMessage = (
       short: "Functional",
       long: (
         <>
-          A functional exploit is available for this vulnerability:
+          A functional exploit is available for this vulnerability
           <div>
             {flaw.cve?.exploits.map((exploit) => (
               <Link key={exploit.sourceURL} href={exploit.sourceURL}>
@@ -254,25 +255,13 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     };
   };
 
-  return (
-    `${baseScores["AV"][cvss["AV"]]}\n` +
-    `${baseScores["AC"][cvss["AC"]]}\n` +
-    `${baseScores["PR"][cvss["PR"]]}\n` +
-    `${baseScores["UI"][cvss["UI"]]}\n` +
-    `${baseScores["S"][cvss["S"]]}\n` +
-    `${baseScores["C"][cvss["C"]]}\n` +
-    `${baseScores["I"][cvss["I"]]}\n` +
-    `${baseScores["A"][cvss["A"]]}`
-  );
-};
-
-const getEcosystem = (packageName: string) => {
-  if (packageName.startsWith("pkg:")) {
-    return packageName.split(":")[1].split("/")[0];
-  } else if (packageName.includes("/")) {
-    return packageName.split("/")[0];
-  }
-  return packageName;
+  const order = ["AV", "AC", "PR", "UI", "S", "C", "I", "A"];
+  return order
+    .map((key) => {
+      return baseScores[key][cvss[key]];
+    })
+    .filter(Boolean)
+    .join("\n");
 };
 
 const Index: FunctionComponent<Props> = (props) => {
@@ -740,7 +729,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {flaw.cve?.risk.withEnvironment ?? 0}
+                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(2)}
                           </Badge>
                         </div>
                       </div>
@@ -771,7 +760,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {flaw.cve?.risk.baseScore ?? 0}
+                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(2)}
                           </Badge>
                         </div>
                       </div>
@@ -792,39 +781,10 @@ const Index: FunctionComponent<Props> = (props) => {
                       <div className="rounded bg-card p-4">
                         <p className="text-sm">
                           <span className="flex flex-row gap-2">
-                            {[
-                              "Go",
-                              "npm",
-                              "Maven",
-                              "crates.io",
-                              "Packagist",
-                              "RubyGems",
-                              "NuGet",
-                            ].includes(
-                              getEcosystem(flaw.arbitraryJsonData.packageName),
-                            ) && (
-                              <Image
-                                alt={
-                                  "Logo von " +
-                                  getEcosystem(
-                                    flaw.arbitraryJsonData.packageName,
-                                  )
-                                }
-                                width={15}
-                                height={15}
-                                src={
-                                  "/logos/" +
-                                  getEcosystem(
-                                    flaw.arbitraryJsonData.packageName,
-                                  ).toLowerCase() +
-                                  "-svgrepo-com.svg"
-                                }
-                              />
-                            )}{" "}
-                            {flaw.arbitraryJsonData.packageName.replace(
-                              "pkg:",
-                              "",
-                            )}
+                            <EcosystemImage
+                              packageName={flaw.arbitraryJsonData.packageName}
+                            />{" "}
+                            {beautifyPurl(flaw.arbitraryJsonData.packageName)}
                           </span>
                         </p>
                         <div className="mt-4 text-sm">
@@ -833,8 +793,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               Introduced in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {flaw.arbitraryJsonData.introducedVersion ??
-                                "von Beginn an"}
+                              {Boolean(flaw.arbitraryJsonData.introducedVersion)
+                                ? flaw.arbitraryJsonData.introducedVersion
+                                : "von Beginn an"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -851,8 +812,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               Fixed in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {flaw.arbitraryJsonData.fixedVersion ??
-                                "kein Patch verfügbar"}
+                              {Boolean(flaw.arbitraryJsonData.fixedVersion)
+                                ? flaw.arbitraryJsonData.fixedVersion
+                                : "kein Patch verfügbar"}
                             </Badge>
                           </div>
                           <div className="mt-4">
@@ -863,7 +825,9 @@ const Index: FunctionComponent<Props> = (props) => {
                                 "/../../dependency-graph?pkg=" +
                                 flaw.arbitraryJsonData.packageName +
                                 "@" +
-                                flaw.arbitraryJsonData.installedVersion
+                                flaw.arbitraryJsonData.installedVersion +
+                                "&scanType=" +
+                                flaw.arbitraryJsonData.scanType
                               }
                             >
                               Show in dependency graph

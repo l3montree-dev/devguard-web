@@ -11,7 +11,10 @@ import Link from "next/link";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import { browserApiClient, getApiClientFromContext } from "../../../../services/devGuardApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../../../../services/devGuardApi";
 import { AssetDTO, ProjectDTO } from "../../../../types/api/api";
 
 import Section from "@/components/common/Section";
@@ -25,9 +28,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "sonner";
 import { useStore } from "@/zustand/globalStoreProvider";
 
-
 interface Props {
-  project: ProjectDTO 
+  project: ProjectDTO;
 }
 
 const Index: FunctionComponent<Props> = () => {
@@ -42,7 +44,6 @@ const Index: FunctionComponent<Props> = () => {
   const form = useForm<ProjectDTO>({ defaultValues: project });
 
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
-  
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/projects/" + project!.slug + "/",
       {
@@ -56,7 +57,6 @@ const Index: FunctionComponent<Props> = () => {
     }
 
     toast("Success", {
-      
       description: "Project updated",
     });
     // check if the slug changed - if so, redirect to the new slug
@@ -65,13 +65,10 @@ const Index: FunctionComponent<Props> = () => {
 
     if (newProject.slug !== project!.slug) {
       router.push(
-        "/"+ activeOrg.slug + "/projects/" + newProject.slug + "/settings",
+        "/" + activeOrg.slug + "/projects/" + newProject.slug + "/settings",
       );
     }
-    
   };
-
-
 
   return (
     <Page
@@ -108,18 +105,21 @@ const Index: FunctionComponent<Props> = () => {
       }
     >
       <div>
-      <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold">Project Settings</h1>
         </div>
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleUpdate)}>
-        <Section title="General" description="General Settings of the project"  >
-          <ProjectForm form={form} />
-        </Section>
-        <div className="mt-4 flex flex-row justify-end">
+          <form onSubmit={form.handleSubmit(handleUpdate)}>
+            <Section
+              title="General"
+              description="General Settings of the project"
+            >
+              <ProjectForm form={form} />
+            </Section>
+            <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>
-        </form>
+          </form>
         </Form>
       </div>
     </Page>
@@ -128,10 +128,8 @@ const Index: FunctionComponent<Props> = () => {
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
-
     return {
-      props: {
-      },
+      props: {},
     };
   },
   {
@@ -139,8 +137,6 @@ export const getServerSideProps = middleware(
     organizations: withOrgs,
     organization: withOrganization,
     project: withProject,
- 
- 
   },
 );
 

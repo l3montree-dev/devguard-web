@@ -28,15 +28,23 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import Page from "../../../../../../components/Page";
 
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { classNames } from "../../../../../../utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+} from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
+import EcosystemImage from "@/components/common/EcosystemImage";
+import EmptyList from "@/components/common/EmptyList";
+import Section from "@/components/common/Section";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,10 +52,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Section from "@/components/common/Section";
-import EmptyList from "@/components/common/EmptyList";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { withOrganization } from "@/decorators/withOrganization";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   asset: AssetDTO;
@@ -55,15 +63,6 @@ interface Props {
 }
 
 const columnHelper = createColumnHelper<FlawWithCVE>();
-
-const extractVersion = (purl: string) => {
-  const parts = purl.split("@");
-  const version = parts[parts.length - 1];
-  if (version.startsWith("v")) {
-    return version.substring(1);
-  }
-  return version;
-};
 
 const columnsDef = [
   {
@@ -141,7 +140,12 @@ const columnsDef = [
       header: "Package",
       id: "packageName",
       cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue()}</span>
+        <span className="flex flex-row gap-2">
+          <span className="flex h-5 w-5 flex-row items-center justify-center rounded-full bg-muted">
+            <EcosystemImage packageName={row.getValue()} />
+          </span>
+          {beautifyPurl(row.getValue())}
+        </span>
       ),
     }),
   },
@@ -161,7 +165,9 @@ const columnsDef = [
       header: "Fixed in Version",
       id: "fixedVersion",
       cell: (row) => (
-        <span className="whitespace-nowrap">{row.getValue() as string}</span>
+        <span className="whitespace-nowrap">
+          {beautifyPurl(row.getValue() as string)}
+        </span>
       ),
     }),
   },
@@ -250,6 +256,8 @@ const Index: FunctionComponent<Props> = (props) => {
     },
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -264,6 +272,30 @@ const Index: FunctionComponent<Props> = (props) => {
     project?.slug +
     "/assets/" +
     asset?.slug;
+
+  const handleSearch = useMemo(
+    () =>
+      debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsLoading(true);
+        // remove all sorting query params
+        const params = router.query;
+        if (e.target.value === "") {
+          delete params["search"];
+          router.push({
+            query: params,
+          });
+        } else if (e.target.value.length >= 3) {
+          router.push({
+            query: {
+              ...params,
+              search: e.target.value,
+            },
+          });
+        }
+        setIsLoading(false);
+      }, 500),
+    [router],
+  );
 
   return (
     <Page
@@ -312,7 +344,7 @@ const Index: FunctionComponent<Props> = (props) => {
         </span>
       }
     >
-      {table.getRowCount() === 0 ? (
+      {table.getRowCount() === 0 && Object.keys(router.query).length === 0 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
@@ -366,6 +398,18 @@ const Index: FunctionComponent<Props> = (props) => {
             </div>
           }
         >
+          <div className="relative">
+            <Input
+              onChange={handleSearch}
+              defaultValue={router.query.search as string}
+              placeholder="Search for cve, package name or message..."
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
+          </div>
           <div className="overflow-hidden rounded-lg border shadow-sm">
             <div className="overflow-auto">
               <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -469,6 +513,9 @@ export const getServerSideProps = middleware(
           new URLSearchParams({
             page,
             pageSize,
+            ...(context.query.search
+              ? { search: context.query.search as string }
+              : {}),
             ...Object.fromEntries(filterQuery),
           }),
       ),

@@ -259,6 +259,7 @@ export interface FlawWithCVE extends FlawDTO {
     packageName: string;
     installedVersion: string;
     cveId: string;
+    scanType: string;
     componentDepth: number;
   };
   component: {

@@ -37,8 +37,8 @@ export const StoreProvider: FunctionComponent<
     // merge the initial zustand state with the current state
     storeRef.current.setState((state) => {
       return {
-        ...initialZustandState,
         ...state,
+        ...initialZustandState,
       };
     });
   }

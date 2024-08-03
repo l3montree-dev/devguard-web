@@ -48,12 +48,16 @@ import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
-import { toSearchParams } from "@/utils/common";
+import { classNames, toSearchParams } from "@/utils/common";
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+} from "@heroicons/react/24/outline";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
@@ -67,6 +71,9 @@ const DependencyGraphPage: FunctionComponent<{
 
   const router = useRouter();
   const pathname = usePathname();
+
+  const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
+    useState(false);
 
   const all = router.query.all === "1";
   const menu = useAssetMenu();
@@ -255,7 +262,27 @@ const DependencyGraphPage: FunctionComponent<{
             )}
           </div>
         </div>
-        <div className="h-screen w-full rounded-lg border bg-white dark:bg-black">
+        <div
+          className={classNames(
+            "h-screen w-full rounded-lg border bg-white dark:bg-black",
+            isDependencyGraphFullscreen
+              ? "absolute left-0 top-0 z-50 h-screen w-screen"
+              : "relative",
+          )}
+        >
+          <div className="absolute right-2 top-2 z-10 flex flex-row justify-end">
+            <Button
+              onClick={() => setIsDependencyGraphFullscreen((prev) => !prev)}
+              variant={"outline"}
+              size={"icon"}
+            >
+              {isDependencyGraphFullscreen ? (
+                <ArrowsPointingInIcon className="h-5 w-5" />
+              ) : (
+                <ArrowsPointingOutIcon className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
           <DependencyGraph
             flaws={flaws}
             width={dimensions.width - SIDEBAR_WIDTH}
@@ -275,11 +302,14 @@ const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<FlawDTO>,
 ) => {
-  const flaw = flaws.find((p) => p.componentPurlOrCpe === node.name);
+  const nodeFlaws = flaws.filter((p) => p.componentPurlOrCpe === node.name);
 
   // if there are no children, the risk is the risk of the affected package
-  if (flaw) {
-    node.risk = flaw.rawRiskAssessment;
+  if (nodeFlaws.length > 0) {
+    node.risk = nodeFlaws.reduce(
+      (acc, curr) => acc + curr.rawRiskAssessment,
+      0,
+    );
     // update the parent node with the risk of this node
     let parent = node.parent;
     let i = 0;
