@@ -63,6 +63,7 @@ pre {
 body, html {
     hyphens: auto;
     word-break: break-word;
+    @apply font-body
 }
 
 .globe-container {
