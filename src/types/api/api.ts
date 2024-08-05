@@ -98,16 +98,11 @@ export interface FlawDTO {
   cveId: string | null;
   componentPurl: string | null;
   scanner: string;
-  state:
-    | "open"
-    | "fixed"
-    | "accepted"
-    | "falsePositive"
-    | "markedForMitigation"
-    | "markedForTransfer";
-
+  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
   rawRiskAssessment: number;
+  ticketId: string | null;
+  ticketUrl: string | null;
 }
 
 export interface Paged<T> {
@@ -158,8 +153,12 @@ export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
   type: "falsePositive";
 }
 
-export interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
-  type: "markedForMitigation";
+export interface MitigateFlawEventDTO extends BaseFlawEventDTO {
+  type: "mitigate";
+  arbitraryJsonData: {
+    url: string;
+    ticketId: string;
+  };
 }
 
 export interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
@@ -180,7 +179,7 @@ export type FlawEventDTO =
   | FixedFlawEventDTO
   | DetectedFlawEventDTO
   | FalsePositiveFlawEventDTO
-  | MarkedForMitigationFlawEventDTO
+  | MitigateFlawEventDTO
   | MarkedForTransferFlawEventDTO
   | RiskAssessmentUpdatedFlawEventDTO
   | ReopenedFlawEventDTO

@@ -1,4 +1,3 @@
-import { classNames } from "@/utils/common";
 import { Badge } from "../ui/badge";
 
 export const getClassNames = (severity: string) => {

@@ -33,7 +33,7 @@ import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { withOrganization } from "@/decorators/withOrganization";
-import { debounce, filter } from "lodash";
+import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 
 interface Props {
