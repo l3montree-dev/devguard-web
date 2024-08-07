@@ -16,7 +16,7 @@ import { OrganizationDetailsDTO } from "@/types/api/api";
 import { Identity } from "@ory/client";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-export const getUsername = (
+export const findUser = (
   id: string,
   org: OrganizationDetailsDTO,
   currentUser: Identity,
@@ -30,15 +30,33 @@ export const getUsername = (
   if (currentUser.id === id) {
     return {
       displayName: "You",
+      avatarUrl: currentUser.traits?.picture,
       realName:
         currentUser.traits?.name.first + " " + currentUser.traits?.name.last,
     };
   }
-
   const user = org?.members.find((u) => u.id === id);
 
+  if (!user) {
+    return {
+      displayName: "Unknown",
+      realName: "Unknown",
+    };
+  }
+  if (id.startsWith("github:")) {
+    // the id is assembled like:
+    // github:<username>:<base64-avatar>
+
+    return {
+      displayName: user.name + " (GitHub)",
+      realName: user.name + " (GitHub)",
+      avatarUrl: user.avatarUrl,
+    };
+  }
+
   return {
-    displayName: user?.name.first + " " + user?.name.last,
-    realName: user?.name.first + " " + user?.name.last,
+    displayName: user?.name,
+    realName: user?.name,
+    avatarUrl: user?.avatarUrl,
   };
 };

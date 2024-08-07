@@ -286,7 +286,6 @@ const Index: FunctionComponent<Props> = (props) => {
   );
   const [status, setStatus] = useState<FlawEventDTO["type"]>("accepted");
 
-  console.log(flaw);
   const handleSubmit = async (data: {
     status?: FlawEventDTO["type"];
     justification?: string;

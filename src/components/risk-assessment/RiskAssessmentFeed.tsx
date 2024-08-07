@@ -21,7 +21,7 @@ import {
   RiskAssessmentUpdatedFlawEventDTO,
   RiskCalculationReport,
 } from "@/types/api/api";
-import { getUsername } from "@/utils/view";
+import { findUser } from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
@@ -34,7 +34,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Markdown from "react-markdown";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import FormatDate from "./FormatDate";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
@@ -198,6 +198,7 @@ export default function RiskAssessmentFeed({
 }) {
   const org = useActiveOrg();
   const currentUser = useCurrentUser();
+
   return (
     <div>
       <ul
@@ -206,6 +207,7 @@ export default function RiskAssessmentFeed({
       >
         <div className="absolute left-3 h-full border-l border-r bg-secondary" />
         {events.map((event, index) => {
+          const user = findUser(event.userId, org, currentUser);
           const msg = eventMessages(event, index, events, flawName);
           return (
             <li
@@ -231,21 +233,20 @@ export default function RiskAssessmentFeed({
                       </Avatar>
                     ) : (
                       <Avatar>
+                        {Boolean(user?.avatarUrl) && (
+                          <AvatarImage
+                            src={user?.avatarUrl}
+                            alt={event.userId}
+                          />
+                        )}
                         <AvatarFallback className="bg-secondary">
-                          {getUsername(
-                            event.userId,
-                            org,
-                            currentUser,
-                          ).realName.charAt(0)}
+                          {user.realName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                     )}
                     <div className="w-full rounded border ">
                       <p className="bg-card px-2 py-2 font-medium">
-                        {
-                          getUsername(event.userId, org, currentUser)
-                            .displayName
-                        }{" "}
+                        {findUser(event.userId, org, currentUser).displayName}{" "}
                         {eventTypeMessages(event, index, events, flawName)}
                       </p>
 
