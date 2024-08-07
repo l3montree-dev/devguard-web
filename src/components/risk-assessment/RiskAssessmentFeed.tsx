@@ -21,7 +21,7 @@ import {
   RiskAssessmentUpdatedFlawEventDTO,
   RiskCalculationReport,
 } from "@/types/api/api";
-import { getUsername } from "@/utils/view";
+import { findUser } from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
@@ -34,8 +34,9 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Markdown from "react-markdown";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import FormatDate from "./FormatDate";
+import { classNames } from "@/utils/common";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -47,7 +48,7 @@ function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
       return <MagnifyingGlassIcon />;
     case "falsePositive":
       return <StopIcon />;
-    case "markedForMitigation":
+    case "mitigate":
       return <WrenchIcon />;
     case "markedForTransfer":
       return <ArrowRightStartOnRectangleIcon />;
@@ -114,6 +115,14 @@ const eventMessages = (
   flawName: string,
 ) => {
   switch (event.type) {
+    case "mitigate":
+      return (
+        "Everything after this entry will be synced with the external system. The ticket can be found at [" +
+        event.arbitraryJsonData.url +
+        "](" +
+        event.arbitraryJsonData.url +
+        ")"
+      );
     case "rawRiskAssessmentUpdated":
       // get the last risk calculation report.
       const beforeThisEvent = events.slice(0, index);
@@ -126,7 +135,7 @@ const eventMessages = (
         event.arbitraryJsonData,
       );
   }
-  return "";
+  return event.justification;
 };
 
 const eventTypeMessages = (
@@ -136,6 +145,8 @@ const eventTypeMessages = (
   flawName: string,
 ) => {
   switch (event.type) {
+    case "mitigate":
+      return "created a ticket for " + flawName;
     case "reopened":
       return "reopened " + flawName;
     case "accepted":
@@ -179,6 +190,18 @@ const maybeAddDot = (str: string) => {
   return str + ".";
 };
 
+const evTypeBackground: { [key in FlawEventDTO["type"]]: string } = {
+  accepted: "bg-purple-600 text-white",
+  fixed: "bg-green-600 text-white",
+  detected: "bg-red-600 text-white",
+  falsePositive: "bg-purple-600 text-white",
+  mitigate: "bg-green-600 text-white",
+  markedForTransfer: "bg-blue-600 text-white",
+  rawRiskAssessmentUpdated: "bg-secondary",
+  reopened: "bg-red-600 text-white",
+  comment: "bg-secondary",
+};
+
 export default function RiskAssessmentFeed({
   events,
   flawName,
@@ -188,6 +211,7 @@ export default function RiskAssessmentFeed({
 }) {
   const org = useActiveOrg();
   const currentUser = useCurrentUser();
+
   return (
     <div>
       <ul
@@ -195,62 +219,72 @@ export default function RiskAssessmentFeed({
         role="list"
       >
         <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-        {events.map((event, index) => (
-          <li
-            className="relative flex flex-row items-start gap-4"
-            key={event.id}
-          >
-            <div className="h-7 w-7 rounded-full border-2 border-background bg-secondary p-1 text-muted-foreground">
-              <EventTypeIcon eventType={event.type} />
-            </div>
-            <div className="w-full">
-              <div className="flex w-full flex-col">
-                <div className="flex flex-row items-start gap-2">
-                  {event.userId === "system" ? (
-                    <Avatar>
-                      <AvatarFallback className="bg-secondary">
-                        <Image
-                          width={20}
-                          height={20}
-                          src="/logo_icon.svg"
-                          alt="logo"
-                        />
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <Avatar>
-                      <AvatarFallback className="bg-secondary">
-                        {getUsername(
-                          event.userId,
-                          org,
-                          currentUser,
-                        ).realName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div className="w-full rounded border ">
-                    <p className="bg-card px-2 py-2 font-medium">
-                      {getUsername(event.userId, org, currentUser).displayName}{" "}
-                      {eventTypeMessages(event, index, events, flawName)}
-                    </p>
-                    {Boolean(event.justification) && (
-                      <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                        <Markdown className={"text-foreground"}>
-                          {event.type === "rawRiskAssessmentUpdated"
-                            ? eventMessages(event, index, events, flawName)
-                            : maybeAddDot(event.justification)}
-                        </Markdown>
-                      </div>
+        {events.map((event, index) => {
+          const user = findUser(event.userId, org, currentUser);
+          const msg = eventMessages(event, index, events, flawName);
+          return (
+            <li
+              className="relative flex flex-row items-start gap-4"
+              key={event.id}
+            >
+              <div
+                className={classNames(
+                  evTypeBackground[event.type],
+                  "h-7 w-7 rounded-full border-2 border-background p-1",
+                )}
+              >
+                <EventTypeIcon eventType={event.type} />
+              </div>
+              <div className="w-full">
+                <div className="flex w-full flex-col">
+                  <div className="flex flex-row items-start gap-2">
+                    {event.userId === "system" ? (
+                      <Avatar>
+                        <AvatarFallback className="bg-secondary">
+                          <Image
+                            width={20}
+                            height={20}
+                            src="/logo_icon.svg"
+                            alt="logo"
+                          />
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <Avatar>
+                        {Boolean(user?.avatarUrl) && (
+                          <AvatarImage
+                            src={user?.avatarUrl}
+                            alt={event.userId}
+                          />
+                        )}
+                        <AvatarFallback className="bg-secondary">
+                          {user.realName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
                     )}
+                    <div className="w-full overflow-hidden rounded border">
+                      <p className="bg-card px-2 py-2 font-medium">
+                        {findUser(event.userId, org, currentUser).displayName}{" "}
+                        {eventTypeMessages(event, index, events, flawName)}
+                      </p>
+
+                      {Boolean(msg) && (
+                        <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
+                          <Markdown className={"text-foreground"}>
+                            {msg}
+                          </Markdown>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
+                  <FormatDate dateString={event.createdAt} />
+                </div>
               </div>
-              <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
-                <FormatDate dateString={event.createdAt} />
-              </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
