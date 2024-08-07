@@ -15,7 +15,7 @@
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function IaC() {
+function IaC({ data }: { data: { enabled: boolean } }) {
   return (
     <Stage
       title="Infrastructure as Code"
@@ -23,6 +23,7 @@ function IaC() {
       sourceHandle
       targetHandle
       comingSoon
+      data={data}
     />
   );
 }

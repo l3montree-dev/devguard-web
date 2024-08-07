@@ -15,12 +15,13 @@
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function SAST() {
+function SAST({ data }: { data: { enabled: boolean } }) {
   return (
     <Stage
       title="Static Application Security Testing"
       description="Find security vulnerabilities in produced source code."
       sourceHandle
+      data={data}
       targetHandle
       comingSoon
     />

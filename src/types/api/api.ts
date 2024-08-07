@@ -306,3 +306,7 @@ export interface FlawByPackage {
   avgRisk: number;
   flaws: FlawWithCVE[];
 }
+
+export interface AssetMetricsDTO {
+  enabledScanners: string[];
+}

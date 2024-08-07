@@ -5,26 +5,19 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 
 import Link from "next/link";
 
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
 
-import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { GetServerSidePropsContext } from "next";
-import { Badge } from "@/components/ui/badge";
-import { withOrganization } from "@/decorators/withOrganization";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { useRouter } from "next/router";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
