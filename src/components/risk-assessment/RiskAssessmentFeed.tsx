@@ -181,15 +181,6 @@ const eventTypeMessages = (
   return "";
 };
 
-const maybeAddDot = (str: string) => {
-  if (!str) return "";
-
-  // check if string ends with a dot, exclamtion mark or question mark
-  if (str.match(/(\.|!|\?)$/)) return str;
-
-  return str + ".";
-};
-
 const evTypeBackground: { [key in FlawEventDTO["type"]]: string } = {
   accepted: "bg-purple-600 text-white",
   fixed: "bg-green-600 text-white",
