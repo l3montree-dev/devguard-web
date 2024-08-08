@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { AssetOverviewDTO } from "@/types/api/api";
 import { forEach } from "lodash";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 
 export const colorPalette = [
   "#FFD700", // Gelb
@@ -57,6 +58,47 @@ export function dataToChart(
   return chartData;
 }
 
+export function DamagedPackage({ data }: { data: AssetOverviewDTO }) {
+  var i = 0;
+  const dataWithColors = data.assetHighestDamagedPackages.map((item) => ({
+    ...item,
+    fill: colorPalette[i++ % colorPalette.length],
+  }));
+  const d = dataToChart(dataWithColors, "component", "component");
+  const da = data.assetHighestDamagedPackages;
+
+  return (
+    <Card x-chunk="dashboard-01-chunk-5">
+      <CardHeader>
+        <CardTitle>most 3 highest damaged Packages</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-8">
+        <div>
+          {da.map((item, index) => (
+            <div key={index} className="flex items-center gap-4">
+              <Avatar className="hidden h-9 w-9 sm:flex">
+                <AvatarImage src={""} alt="Avatar" />
+                <AvatarFallback>Test</AvatarFallback>
+              </Avatar>
+              <div className="grid gap-1">
+                <p className="text-sm font-medium leading-none">
+                  Olivia Martin
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {item.component}
+                </p>
+              </div>
+              <div className="ml-auto font-medium"> {item.count} </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-4"></div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** 
 export function DamagedPackage({ data }: { data: AssetOverviewDTO }) {
   var i = 0;
   const dataWithColors = data.assetHighestDamagedPackages.map((item) => ({
@@ -104,3 +146,5 @@ export function DamagedPackage({ data }: { data: AssetOverviewDTO }) {
     </Card>
   );
 }
+
+*/

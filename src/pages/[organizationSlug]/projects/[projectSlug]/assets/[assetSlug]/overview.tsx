@@ -1,7 +1,7 @@
 import Page from "@/components/Page";
 import { TotalDependencies } from "@/components/overview/TotalDependenciesDiagram";
 import { CriticalDependencies } from "@/components/overview/CriticalDependenciesDiagram";
-import { RiskDistribution } from "@/components/overview/RiskDistributionDiagram";
+import { FlawsDistribution } from "@/components/overview/RiskDistributionDiagram";
 import { RiskTrend } from "@/components/overview/RiskTrendDiagram";
 
 import { Badge } from "@/components/ui/badge";
@@ -104,9 +104,9 @@ const Index: FunctionComponent<Props> = ({ data }) => {
         <div className="h-full flex-1">
           <CriticalDependencies data={data} />
         </div>
-        <div className="h-full flex-1">
-          <RiskDistribution data={data.assetRiskDistribution} />
-        </div>
+      </div>
+      <div className="h-full flex-1">
+        <FlawsDistribution data={data.assetRiskDistribution} />
       </div>
 
       <div>
@@ -155,9 +155,6 @@ export const getServerSideProps = middleware(
     }
 
     const data = await resp.json();
-
-    //console.log(data);
-    //console.log("hhh", data.flawEvents);
 
     data.assetRiskDistribution = transformAssetRiskDistribution(
       data.assetRiskDistribution,

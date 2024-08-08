@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -21,7 +21,53 @@ import {
 import { TransformedAssetRisk } from "@/types/api/api";
 import { ChartConfig } from "./TotalDependenciesDiagram";
 
-export function RiskDistribution({ data }: { data: TransformedAssetRisk[] }) {
+export function FlawsDistribution({ data }: { data: TransformedAssetRisk[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Flaws Distribution</CardTitle>
+        <CardDescription></CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={ChartConfig}>
+          <BarChart accessibilityLayer data={data}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="riskRange"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              //tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <YAxis
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => `${value}%`}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
+            <Bar
+              dataKey="container-scanning"
+              fill="hsl(var(--chart-5))"
+              radius={4}
+            />
+            <Bar dataKey="sca" fill="hsl(var(--chart-1))" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 font-medium leading-none"></div>
+        <div className="leading-none text-muted-foreground"></div>
+      </CardFooter>
+    </Card>
+  );
+}
+
+/**
+export function FlawsDistribution({ data }: { data: TransformedAssetRisk[] }) {
   return (
     <Card>
       <CardHeader className="items-center pb-4">
@@ -63,3 +109,5 @@ export function RiskDistribution({ data }: { data: TransformedAssetRisk[] }) {
     </Card>
   );
 }
+
+  */

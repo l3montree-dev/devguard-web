@@ -24,7 +24,6 @@ export default function AssetFlawsStateStatistics({
 }: {
   data: AssetOverviewDTO;
 }) {
-  console.log(data.assetFlawsStateStatistics);
   const handledFlaws = data.assetFlawsStateStatistics.handled;
   const openedFlaws = data.assetFlawsStateStatistics.open;
   const totalFlaws = handledFlaws + openedFlaws;
@@ -63,12 +62,10 @@ export default function AssetFlawsStateStatistics({
       changeType: changeType(openedChange),
     },
   ];
-  // console.log(stats)
+
   return (
     <div>
-      <h3 className="text-base font-semibold leading-6 text-gray-900">
-        Last 30 days
-      </h3>
+      <h3 className="text-base font-semibold leading-6">Last 30 days</h3>
 
       <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((item) => (
@@ -92,7 +89,7 @@ export default function AssetFlawsStateStatistics({
                     ? "text-green-600"
                     : item.changeType === "decrease"
                       ? "text-red-600"
-                      : "text-gray-600", // Farbe für "same"
+                      : "text-gray-600",
                   "ml-2 flex items-baseline text-sm font-semibold",
                 )}
               >
@@ -110,7 +107,7 @@ export default function AssetFlawsStateStatistics({
                   <MinusIcon
                     aria-hidden="true"
                     className="h-5 w-5 flex-shrink-0 self-center text-gray-500"
-                  /> // Icon für "same"
+                  />
                 )}
 
                 <span className="sr-only">
