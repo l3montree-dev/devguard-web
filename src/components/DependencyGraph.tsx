@@ -105,10 +105,10 @@ const getLayoutedElements = (
   // build a map of all affected packages
   const flawMap = flaws.reduce(
     (acc, cur) => {
-      if (!acc[cur.componentPurlOrCpe!]) {
-        acc[cur.componentPurlOrCpe!] = [];
+      if (!acc[cur.componentPurl!]) {
+        acc[cur.componentPurl!] = [];
       }
-      acc[cur.componentPurlOrCpe!].push(cur);
+      acc[cur.componentPurl!].push(cur);
       return acc;
     },
     {} as { [key: string]: FlawDTO[] },

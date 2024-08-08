@@ -5,7 +5,6 @@ import {
   AssetFormRequirements,
 } from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
-import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +25,6 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "@/services/devGuardApi";
-import { encodeObjectBase64 } from "@/services/encodeService";
 import { AssetDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
@@ -184,62 +182,53 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           ) : repositories && editRepo ? (
             <ListItem
               Title={
-                <Combobox
-                  placeholder="Search repository..."
-                  items={repositories}
-                  onSelect={setSelectedRepo}
-                  value={selectedRepo ?? undefined}
-                  emptyMessage="No repositories found"
-                />
+                <div className="flex flex-row gap-2">
+                  <div className="flex-1">
+                    <Combobox
+                      placeholder="Search repository..."
+                      items={repositories}
+                      onSelect={setSelectedRepo}
+                      value={selectedRepo ?? undefined}
+                      emptyMessage="No repositories found"
+                    />
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      if (selectedRepo) {
+                        await handleUpdate({ repositoryId: selectedRepo });
+                        setEditRepo(false);
+                      }
+                    }}
+                    disabled={!Boolean(selectedRepo)}
+                  >
+                    Connect
+                  </Button>
+                </div>
               }
               description={
                 "Select a repository to connect this asset to. This list contains all repositories of all GitHub App Installations belonging to this organization."
-              }
-              Button={
-                <Button
-                  onClick={async () => {
-                    if (selectedRepo) {
-                      await handleUpdate({ repositoryId: selectedRepo });
-                      setEditRepo(false);
-                    }
-                  }}
-                  disabled={!Boolean(selectedRepo)}
-                >
-                  Connect
-                </Button>
               }
             />
           ) : (
             <ListItem
               Title="Add a GitHub App"
-              description="DevGuard uses a GitHub App to access your repositories and interact with your code."
+              description="DevGuard uses a GitHub App to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
               Button={
-                <GithubAppInstallationAlert
-                  Button={
-                    <Link
-                      className={cn(
-                        buttonVariants({ variant: "default" }),
-                        "!text-black hover:no-underline",
-                      )}
-                      href={
-                        "https://github.com/apps/devguard-app/installations/new?state=" +
-                        encodeObjectBase64({
-                          orgSlug: activeOrg.slug,
-                          redirectTo: router.asPath,
-                        })
-                      }
-                    >
-                      Install GitHub App
-                    </Link>
-                  }
+                <Link
+                  className={cn(
+                    buttonVariants({ variant: "secondary" }),
+                    "hover:no-underline",
+                  )}
+                  href={"/" + activeOrg.slug + "/settings"}
                 >
-                  <Button variant={"secondary"}>Install GitHub App</Button>
-                </GithubAppInstallationAlert>
+                  Go to organization settings
+                </Link>
               }
             />
           )}
         </Section>
       </div>
+      <hr />
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
@@ -253,7 +242,10 @@ Security requirements are specific criteria or conditions that an application, s
             >
               <AssetFormRequirements form={form} />
             </Section>
-            <Section title="Additional settings">
+            <Section
+              description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
+              title="Environmental information"
+            >
               <AssetFormMisc form={form} />
             </Section>
             <div className="mt-4 flex flex-row justify-end">
@@ -299,7 +291,6 @@ export const getServerSideProps = middleware(
       );
     }
     // fetch a personal access token from the user
-
     const [asset] = await Promise.all([resp.json()]);
 
     return {

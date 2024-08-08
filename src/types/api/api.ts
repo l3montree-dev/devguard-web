@@ -52,10 +52,8 @@ export interface OrganizationDTO extends AppModelDTO {
 export interface OrganizationDetailsDTO extends OrganizationDTO {
   members: Array<{
     id: string;
-    name: {
-      first: string;
-      last: string;
-    };
+    name: string;
+    avatarUrl?: string;
   }>;
 }
 
@@ -96,18 +94,13 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
-  componentPurlOrCpe: string | null;
+  componentPurl: string | null;
   scanner: string;
-  state:
-    | "open"
-    | "fixed"
-    | "accepted"
-    | "falsePositive"
-    | "markedForMitigation"
-    | "markedForTransfer";
-
+  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
   rawRiskAssessment: number;
+  ticketId: string | null;
+  ticketUrl: string | null;
 }
 
 export interface Paged<T> {
@@ -159,8 +152,12 @@ export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
   type: "falsePositive";
 }
 
-export interface MarkedForMitigationFlawEventDTO extends BaseFlawEventDTO {
-  type: "markedForMitigation";
+export interface MitigateFlawEventDTO extends BaseFlawEventDTO {
+  type: "mitigate";
+  arbitraryJsonData: {
+    url: string;
+    ticketId: string;
+  };
 }
 
 export interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
@@ -181,7 +178,7 @@ export type FlawEventDTO =
   | FixedFlawEventDTO
   | DetectedFlawEventDTO
   | FalsePositiveFlawEventDTO
-  | MarkedForMitigationFlawEventDTO
+  | MitigateFlawEventDTO
   | MarkedForTransferFlawEventDTO
   | RiskAssessmentUpdatedFlawEventDTO
   | ReopenedFlawEventDTO
@@ -264,6 +261,7 @@ export interface FlawWithCVE extends FlawDTO {
     componentDepth: number;
   };
   component: {
+    componentType: "application" | "library";
     purlOrCpe: string;
   };
 }
@@ -370,3 +368,15 @@ export type AssetRisks = AssetOverviewDTO["assetRisks"][number];
 export type AssetFlaws = AssetOverviewDTO["assetFlaws"][number];
 export type AssetRiskDistribution =
   AssetOverviewDTO["assetRiskDistribution"][number];
+export interface FlawByPackage {
+  packageName: string;
+  maxRisk: number;
+  totalRisk: number;
+  flawCount: number;
+  avgRisk: number;
+  flaws: FlawWithCVE[];
+}
+
+export interface AssetMetricsDTO {
+  enabledScanners: string[];
+}

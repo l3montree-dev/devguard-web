@@ -35,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { OrganizationDetailsDTO } from "@/types/api/api";
 
 interface Props {}
 
@@ -42,6 +44,7 @@ export default function UserNav() {
   const router = useRouter();
 
   const { setTheme } = useTheme();
+  const updateOrganization = useStore((s) => s.updateOrganization);
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
@@ -53,6 +56,7 @@ export default function UserNav() {
     const org = orgs.find((o) => o.id === id);
     if (org) {
       router.push(`/${org.slug}`);
+      updateOrganization(org as OrganizationDetailsDTO);
     }
   };
 

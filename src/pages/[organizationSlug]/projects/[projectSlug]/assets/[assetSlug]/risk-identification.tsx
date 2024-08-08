@@ -23,6 +23,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactFlow, Edge } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
+import { AssetMetricsDTO } from "@/types/api/api";
+import { FunctionComponent, useMemo } from "react";
 
 const paddingX = 35;
 const paddingY = 55;
@@ -33,37 +35,44 @@ const nodes = [
     id: "node-1",
     type: "secretScanning",
     position: { x: paddingX, y: paddingY },
-    data: { value: 123 },
+    data: { enabled: false, scanner: "" },
   },
   {
     id: "node-2",
     type: "sca",
     position: { x: paddingX + width, y: paddingY },
-    data: { value: 456 },
+    data: {
+      enabled: false,
+      scanner: "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
+    },
   },
   {
     id: "node-3",
     type: "sast",
     position: { x: paddingX + width * 2, y: paddingY },
-    data: { value: 789 },
+    data: { enabled: false, scanner: "" },
   },
   {
     id: "node-4",
     type: "iac",
     position: { x: paddingX + 3 * width, y: paddingY },
-    data: { value: 101 },
+    data: { enabled: false, scanner: "" },
   },
   {
     id: "node-5",
     type: "containerScanning",
     position: { x: paddingX + 4 * width, y: paddingY },
-    data: { value: 101 },
+    data: {
+      enabled: false,
+      scanner:
+        "github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning",
+    },
   },
   {
     id: "node-6",
     type: "dast",
     position: { x: paddingX + 5 * width, y: paddingY },
-    data: { value: 101 },
+    data: { enabled: false, scanner: "" },
   },
 ];
 const edges: Array<Edge<any>> = [
@@ -128,14 +137,26 @@ const nodeTypes = {
   dast: DAST,
 };
 
-const RiskIdentification = () => {
+interface Props extends AssetMetricsDTO {}
+const RiskIdentification: FunctionComponent<Props> = (
+  props: AssetMetricsDTO,
+) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
 
-  const router = useRouter();
   const menu = useAssetMenu();
   const dimensions = useDimensions();
+
+  const n = useMemo(() => {
+    return nodes.map((el) => {
+      if (props.enabledScanners.includes(el.data.scanner)) {
+        el.data.enabled = true;
+      }
+      return el;
+    });
+  }, [props.enabledScanners]);
+
   return (
     <Page
       Menu={menu}
@@ -205,7 +226,7 @@ const RiskIdentification = () => {
               x: 0,
               y: 0,
             }}
-            nodes={nodes}
+            nodes={n}
             edges={edges}
             nodeTypes={nodeTypes}
           />
@@ -223,17 +244,22 @@ export const getServerSideProps = middleware(
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
     const apiClient = getApiClientFromContext(context);
-    const uri =
+    const metrics =
       "/organizations/" +
       organizationSlug +
       "/projects/" +
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/";
+      "/metrics";
+
+    const resp = await apiClient(metrics);
+    const data = await resp.json();
 
     return {
-      props: {},
+      props: {
+        ...data,
+      },
     };
   },
   {

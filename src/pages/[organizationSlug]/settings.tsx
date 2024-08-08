@@ -33,11 +33,52 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Badge } from "@/components/ui/badge";
 import { withOrganization } from "@/decorators/withOrganization";
+import { Form } from "@/components/ui/form";
+import { AssetFormGeneral } from "@/components/asset/AssetForm";
+import { useForm } from "react-hook-form";
+import { OrganizationDTO, OrganizationDetailsDTO } from "@/types/api/api";
+import OrgRegisterForm from "@/components/OrgRegister";
+import { OrgForm } from "@/components/OrgForm";
+import { toast } from "sonner";
+import { browserApiClient } from "@/services/devGuardApi";
+import { useStore } from "@/zustand/globalStoreProvider";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const orgMenu = useOrganizationMenu();
+  const updateOrganization = useStore((s) => s.updateOrganization);
   const router = useRouter();
+
+  const form = useForm<OrganizationDetailsDTO>({
+    defaultValues: activeOrg,
+  });
+
+  const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
+    const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
+      method: "PATCH",
+      body: JSON.stringify({
+        ...data,
+        numberOfEmployees: !!data.numberOfEmployees
+          ? Number(data.numberOfEmployees)
+          : undefined,
+      }),
+    });
+
+    if (!resp.ok) {
+      console.error("Failed to update organization");
+    } else if (resp.ok) {
+      toast("Success", {
+        description: "Organization updated",
+      });
+
+      const newOrg = await resp.json();
+      updateOrganization(newOrg);
+
+      if (newOrg.slug !== activeOrg.slug) {
+        router.push("/" + newOrg.slug + "/settings");
+      }
+    }
+  };
 
   return (
     <Page
@@ -68,7 +109,7 @@ const Home: FunctionComponent = () => {
           }
           title="Third-Party Integrations"
         >
-          {activeOrg.githubAppInstallations.map((installation) => (
+          {activeOrg.githubAppInstallations?.map((installation) => (
             <ListItem
               key={installation.installationId}
               Title={
@@ -127,6 +168,26 @@ const Home: FunctionComponent = () => {
           />
         </Section>
       </div>
+      <hr />
+      <div className="pb-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleUpdate)}>
+            <OrgForm form={form} />
+            <div className="mt-6 flex items-center justify-end gap-x-6">
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+      <hr />
+      <Section
+        title="Members"
+        description="Manage the members of your organization."
+      >
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <div className="sm:col-span-6"></div>
+        </div>
+      </Section>
     </Page>
   );
 };

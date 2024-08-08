@@ -50,7 +50,9 @@ export default function App({ Component, pageProps }) {
     >
       <TooltipProvider>
         <StoreProvider initialZustandState={pageProps.initialZustandState}>
-          <Component {...pageProps} />
+          <div className="font-body">
+            <Component {...pageProps} />
+          </div>
         </StoreProvider>
       </TooltipProvider>
     </ThemeProvider>

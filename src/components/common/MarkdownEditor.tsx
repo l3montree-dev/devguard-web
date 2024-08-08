@@ -51,7 +51,7 @@ const MarkdownEditor: FunctionComponent<Props> = ({
   return (
     <MDXEditor
       ref={markdownRef}
-      className="mdx-editor rounded border focus-within:ring focus:ring"
+      className="mdx-editor rounded border bg-white focus-within:ring focus:ring dark:bg-background"
       onChange={(value) => setValue(value)}
       placeholder={placeholder}
       markdown={value}

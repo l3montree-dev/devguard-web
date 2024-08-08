@@ -15,14 +15,14 @@
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function ContainerScanning() {
+function ContainerScanning({ data }: { data: { enabled: boolean } }) {
   return (
     <Stage
       title="Container Scanning"
       description="Find known security vulnerabilities in OCI images, like Docker Images."
       sourceHandle
       targetHandle
-      comingSoon
+      data={data}
     />
   );
 }

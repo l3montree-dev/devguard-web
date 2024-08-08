@@ -35,7 +35,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx tsc --showConfig
+ENV NEXT_SHARP_PATH=/usr/app/node_modules/sharp
 
 # Build
 RUN npm run build

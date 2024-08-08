@@ -19,6 +19,7 @@ import {
   RequirementsLevel,
 } from "@/types/api/api";
 import { Label, Pie, PieChart } from "recharts";
+import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -61,9 +62,10 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 import EcosystemImage from "@/components/common/EcosystemImage";
+import { beautifyPurl } from "@/utils/common";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
-import { beautifyPurl } from "@/utils/common";
+import { toast } from "sonner";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -102,7 +104,11 @@ const exploitMessage = (
           A proof of concept is available for this vulnerability:
           <div>
             {flaw.cve?.exploits.map((exploit) => (
-              <Link key={exploit.sourceURL} href={exploit.sourceURL}>
+              <Link
+                className="block"
+                key={exploit.sourceURL}
+                href={exploit.sourceURL}
+              >
                 {exploit.sourceURL}
               </Link>
             ))}
@@ -289,21 +295,41 @@ const Index: FunctionComponent<Props> = (props) => {
     }
 
     if (!Boolean(data.justification)) {
-      data.justification = "set as " + data.status;
+      return toast("Please provide a justification", {
+        description: "You need to provide a justification for your decision.",
+      });
     }
 
-    const resp = await browserApiClient(
-      "/api/v1/organizations/" + router.asPath,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    let json: any;
+    if (data.status === "mitigate") {
+      const resp = await browserApiClient(
+        "/api/v1/organizations/" + router.asPath + "/mitigate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            comment: data.justification,
+          }),
         },
-        body: JSON.stringify(data),
-      },
-      "",
-    );
-    const json = await resp.json();
+        "",
+      );
+      json = await resp.json();
+    } else {
+      const resp = await browserApiClient(
+        "/api/v1/organizations/" + router.asPath,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+        "",
+      );
+      json = await resp.json();
+    }
 
     setFlaw((prev) => ({ ...prev, ...json }));
     setJustification("");
@@ -376,20 +402,37 @@ const Index: FunctionComponent<Props> = (props) => {
     >
       <div className="flex flex-row gap-4">
         <div className="flex-1">
-          <h1 className="text-2xl font-semibold">{flaw.cveId}</h1>
-
-          <p className="mt-4 text-muted-foreground">{flaw.cve?.description}</p>
-
-          <div className="mt-4 flex flex-row gap-2 text-sm">
-            <FlawState state={flaw.state} />
-            {cve && <Severity risk={flaw.rawRiskAssessment} />}
-            <Badge variant={"outline"}>{flaw.scanner}</Badge>
-          </div>
-          <div className="mb-16 mt-4">
-            <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
-          </div>
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
+              <h1 className="text-2xl font-semibold">{flaw.cveId}</h1>
+              <p className="mt-4 text-muted-foreground">
+                {flaw.cve?.description}
+              </p>
+              <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
+                {flaw.ticketUrl && (
+                  <Link href={flaw.ticketUrl} target="_blank">
+                    <Badge className="h-full" variant={"secondary"}>
+                      <Image
+                        src="/assets/github.svg"
+                        alt="GitHub Logo"
+                        className="-ml-1 mr-2 dark:invert"
+                        width={15}
+                        height={15}
+                      />
+                      <span>{flaw.ticketUrl}</span>
+                    </Badge>
+                  </Link>
+                )}
+                <FlawState state={flaw.state} />
+                {cve && <Severity risk={flaw.rawRiskAssessment} />}
+                <Badge variant={"outline"}>
+                  <div>{flaw.scanner}</div>
+                </Badge>
+              </div>
+              <div className="mb-16 mt-4">
+                <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
+              </div>
+
               <RiskAssessmentFeed
                 flawName={flaw.cve?.cve ?? ""}
                 events={flaw.events}
@@ -434,7 +477,9 @@ const Index: FunctionComponent<Props> = (props) => {
                             >
                               {status === "accepted"
                                 ? "Accept risk"
-                                : "Mark risk as False Positive"}
+                                : status === "mitigate"
+                                  ? "Create GitHub Ticket"
+                                  : "Mark risk as False Positive"}
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -447,6 +492,29 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent>
+                                {flaw.ticketId === null && (
+                                  <DropdownMenuCheckboxItem
+                                    checked={status === "mitigate"}
+                                    onCheckedChange={() => {
+                                      setStatus("mitigate");
+                                    }}
+                                  >
+                                    <div className="flex flex-col">
+                                      <div className="flex">
+                                        Create GitHub Ticket
+                                      </div>
+                                      <small className="text-muted-foreground">
+                                        This asset is connected to a GitHub
+                                        Repository.
+                                        <br />
+                                        Automatically create a ticket in GitHub
+                                        with all the necessary
+                                        <br /> information and the comment you
+                                        provided.
+                                      </small>
+                                    </div>
+                                  </DropdownMenuCheckboxItem>
+                                )}
                                 <DropdownMenuCheckboxItem
                                   checked={status === "accepted"}
                                   onCheckedChange={() => {
@@ -532,24 +600,16 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </form>
                     )}
+                    {flaw.ticketUrl && (
+                      <small className="mt-2 block w-full text-right text-muted-foreground">
+                        Comment will be synced with{" "}
+                        <Link href={flaw.ticketUrl} target="_blank">
+                          {flaw.ticketUrl}
+                        </Link>
+                      </small>
+                    )}
                   </CardContent>
                 </Card>
-                {flaw.state === "open" && (
-                  <small className="mt-1 block text-muted-foreground">
-                    Select the current status to update the record accurately:
-                    <ol>
-                      <li>
-                        Accepted: Accepts the risk the flaw poses to the
-                        organization. It mutes the flaw. Detecting this flaw
-                        again won&apos;t have an impact on the pipeline result.
-                      </li>
-                      <li>
-                        False Positive: Mutes the flaw permanently as it is
-                        identified as a non-issue.
-                      </li>
-                    </ol>
-                  </small>
-                )}
               </div>
             </div>
             <div className="border-l">
@@ -637,7 +697,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {((flaw.cve?.epss ?? 0) * 100).toFixed(2)}%
+                            {((flaw.cve?.epss ?? 0) * 100).toFixed(1)}%
                           </Badge>
                         </div>
                       </div>
@@ -729,7 +789,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(2)}
+                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -760,7 +820,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(2)}
+                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -778,7 +838,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   </h3>
                   <div className="flex flex-col gap-4">
                     <div>
-                      <div className="rounded bg-card p-4">
+                      <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm">
                           <span className="flex flex-row gap-2">
                             <EcosystemImage
@@ -795,7 +855,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             <Badge variant={"outline"}>
                               {Boolean(flaw.arbitraryJsonData.introducedVersion)
                                 ? flaw.arbitraryJsonData.introducedVersion
-                                : "von Beginn an"}
+                                : "first version"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -804,7 +864,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             </span>
                             <Badge variant={"outline"}>
                               {flaw.arbitraryJsonData.installedVersion ??
-                                "von Beginn an"}
+                                "unknown"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -814,7 +874,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             <Badge variant={"outline"}>
                               {Boolean(flaw.arbitraryJsonData.fixedVersion)
                                 ? flaw.arbitraryJsonData.fixedVersion
-                                : "kein Patch verfügbar"}
+                                : "no patch available"}
                             </Badge>
                           </div>
                           <div className="mt-4">

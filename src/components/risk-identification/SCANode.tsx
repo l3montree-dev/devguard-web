@@ -18,7 +18,7 @@ import SCADialog from "./SCADialog";
 import Stage from "./Stage";
 import { useRouter } from "next/router";
 
-function SCA() {
+function SCA({ data }: { data: { enabled: boolean } }) {
   const router = useRouter();
   const openDialog = router.query.openDialog;
   const [open, setOpen] = useState(openDialog === "sca");
@@ -30,6 +30,7 @@ function SCA() {
         description="Find known vulnerabilities in third-party and open source dependencies."
         sourceHandle
         targetHandle
+        data={data}
         onButtonClick={() => setOpen(true)}
       />
       <SCADialog open={open} setOpen={setOpen} />

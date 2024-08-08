@@ -54,7 +54,7 @@ export function Combobox(props: Props) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[300px] justify-between"
+          className="w-full min-w-[300px] justify-between"
         >
           <span className="flex-1 overflow-hidden overflow-ellipsis text-left">
             {value
