@@ -34,9 +34,13 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import Markdown from "react-markdown";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import FormatDate from "./FormatDate";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import FormatDate from "./risk-assessment/FormatDate";
 import { FunctionComponent } from "react";
+import Link from "next/link";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { Button } from "./ui/button";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -146,7 +150,7 @@ const eventTypeMessages = (
     case "fixed":
       return "fixed " + flawName;
     case "comment":
-      return "added a comment";
+      return "added a comment to " + flawName;
     case "detected":
       return (
         "detected " +
@@ -158,7 +162,12 @@ const eventTypeMessages = (
       return "marked " + flawName + " as false positive ";
     case "rawRiskAssessmentUpdated":
       if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
+        return (
+          "Updated the risk assessment of " +
+          flawName +
+          " to " +
+          event.arbitraryJsonData.risk
+        );
       }
       // get the last risk calculation report.
       const beforeThisEvent = events.slice(0, index);
@@ -185,20 +194,30 @@ const maybeAddDot = (str: string) => {
   return str + ".";
 };
 
-interface RiskAssessmentElementProps {
+interface ActivityLogProps {
   event: FlawEventDTO;
   index: number;
   events?: FlawEventDTO[];
   flawName: string;
 }
 
-export const RiskAssessmentElement: FunctionComponent<
-  RiskAssessmentElementProps
-> = ({ event, index, events, flawName }) => {
+export const ActivityLogElement: FunctionComponent<ActivityLogProps> = ({
+  event,
+  index,
+  events,
+  flawName,
+}) => {
   const org = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
+
   const currentUser = useCurrentUser();
   return (
     <li className="relative flex flex-row items-start gap-4" key={event.id}>
+      <Link
+        href={`/organizations/${org}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.flawId}`}
+      ></Link>
+
       <div className="h-7 w-7 rounded-full border-2 border-background bg-secondary p-1 text-muted-foreground">
         <EventTypeIcon eventType={event.type} />
       </div>
@@ -230,18 +249,31 @@ export const RiskAssessmentElement: FunctionComponent<
                 {getUsername(event.userId, org, currentUser).displayName}{" "}
                 {eventTypeMessages(event, index, flawName, events)}
               </p>
-              {Boolean(event.justification) && (
-                <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                  <Markdown className={"text-foreground"}>
-                    {event.type === "rawRiskAssessmentUpdated"
-                      ? eventMessages(event, index, events)
-                      : maybeAddDot(event.justification)}
-                  </Markdown>
+              <div className="flex justify-between">
+                <div>
+                  {Boolean(event.justification) && (
+                    <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
+                      <Markdown className={"text-foreground"}>
+                        {event.type === "rawRiskAssessmentUpdated"
+                          ? eventMessages(event, index, events)
+                          : maybeAddDot(event.justification)}
+                      </Markdown>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <div>
+                  <Link
+                    href={`/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.flawId}`}
+                  >
+                    <Button size="sm">to Flaw</Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
         <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
           <FormatDate dateString={event.createdAt} />
         </div>
@@ -249,31 +281,3 @@ export const RiskAssessmentElement: FunctionComponent<
     </li>
   );
 };
-
-export default function RiskAssessmentFeed({
-  events,
-  flawName,
-}: {
-  events: FlawEventDTO[];
-  flawName: string;
-}) {
-  return (
-    <div>
-      <ul
-        className="relative flex flex-col gap-10 pb-10 text-foreground"
-        role="list"
-      >
-        <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-        {events.map((event, index) => (
-          <RiskAssessmentElement
-            key={event.id}
-            event={event}
-            index={index}
-            events={events}
-            flawName={flawName}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}

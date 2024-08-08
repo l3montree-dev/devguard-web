@@ -41,7 +41,7 @@ RUN npx tsc --showConfig
 RUN npm run build
 
 # Running the app
-FROM gcr.io/distroless/nodejs20-debian12 AS runner
+FROM node:20.11.1 AS runner
 WORKDIR /app
 
 # Mark as prod, disable telemetry, set port
