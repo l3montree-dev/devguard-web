@@ -219,11 +219,14 @@ const DependencyGraphPage: FunctionComponent<{
               >
                 <SelectTrigger className="bg-background">
                   <SelectValue
-                    defaultValue={versions[0]}
-                    placeholder={versions[0]}
+                    defaultValue={router.query.version ?? "latest"}
+                    placeholder={router.query.version ?? "latest"}
                   />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem className="text-sm" value={"latest"}>
+                    latest
+                  </SelectItem>
                   {versions.map((version) => (
                     <SelectItem
                       className="text-sm"
