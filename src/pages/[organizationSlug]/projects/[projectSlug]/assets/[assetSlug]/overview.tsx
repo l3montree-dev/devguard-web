@@ -144,8 +144,7 @@ export const getServerSideProps = middleware(
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/" +
-        "overview",
+        "/overview",
     );
     if (!resp.ok) {
       console.log("can't find asset");

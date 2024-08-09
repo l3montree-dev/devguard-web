@@ -15,6 +15,8 @@
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { Identity } from "@ory/client";
 
+export const defaultScanner =
+  "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const findUser = (
   id: string,

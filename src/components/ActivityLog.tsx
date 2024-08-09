@@ -21,7 +21,10 @@ import {
   RiskAssessmentUpdatedFlawEventDTO,
   RiskCalculationReport,
 } from "@/types/api/api";
-import { getUsername } from "@/utils/view";
+
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { findUser } from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
@@ -30,16 +33,13 @@ import {
   MagnifyingGlassIcon,
   SpeakerXMarkIcon,
   StopIcon,
-  WrenchIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import Markdown from "react-markdown";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import FormatDate from "./risk-assessment/FormatDate";
-import { FunctionComponent } from "react";
 import Link from "next/link";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { FunctionComponent } from "react";
+import Markdown from "react-markdown";
+import FormatDate from "./risk-assessment/FormatDate";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
@@ -52,8 +52,6 @@ function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
       return <MagnifyingGlassIcon />;
     case "falsePositive":
       return <StopIcon />;
-    case "markedForMitigation":
-      return <WrenchIcon />;
     case "markedForTransfer":
       return <ArrowRightStartOnRectangleIcon />;
     case "rawRiskAssessmentUpdated":
@@ -212,6 +210,7 @@ export const ActivityLogElement: FunctionComponent<ActivityLogProps> = ({
   const asset = useActiveAsset();
 
   const currentUser = useCurrentUser();
+  const user = findUser(event.userId, org, currentUser);
   return (
     <li className="relative flex flex-row items-start gap-4" key={event.id}>
       <Link
@@ -238,15 +237,13 @@ export const ActivityLogElement: FunctionComponent<ActivityLogProps> = ({
             ) : (
               <Avatar>
                 <AvatarFallback className="bg-secondary">
-                  {getUsername(event.userId, org, currentUser).realName.charAt(
-                    0,
-                  )}
+                  {user.realName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             )}
             <div className="w-full rounded border ">
               <p className="bg-card px-2 py-2 font-medium">
-                {getUsername(event.userId, org, currentUser).displayName}{" "}
+                {user.displayName}{" "}
                 {eventTypeMessages(event, index, flawName, events)}
               </p>
               <div className="flex justify-between">
