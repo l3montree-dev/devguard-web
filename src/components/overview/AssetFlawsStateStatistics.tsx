@@ -75,9 +75,12 @@ export default function AssetFlawsStateStatistics({
           >
             <dt>
               <div className="absolute rounded-md bg-secondary p-3">
-                <item.icon aria-hidden="true" className="h-6 w-6 text-white" />
+                <item.icon
+                  aria-hidden="true"
+                  className="h-6 w-6 text-muted-foreground"
+                />
               </div>
-              <p className="ml-16 truncate text-sm font-medium text-gray-500">
+              <p className="ml-16 truncate text-sm font-medium text-muted-foreground">
                 {item.name}
               </p>
             </dt>
@@ -85,28 +88,28 @@ export default function AssetFlawsStateStatistics({
               <p className="text-2xl font-semibold">{item.stat}</p>
               <p
                 className={classNames(
-                  item.changeType === "increase"
+                  item.changeType === "decrease"
                     ? "text-green-600"
-                    : item.changeType === "decrease"
+                    : item.changeType === "increase"
                       ? "text-red-600"
-                      : "text-gray-600",
+                      : "text-muted-foreground",
                   "ml-2 flex items-baseline text-sm font-semibold",
                 )}
               >
                 {item.changeType === "increase" ? (
                   <ArrowUpIcon
                     aria-hidden="true"
-                    className="h-5 w-5 flex-shrink-0 self-center text-green-500"
+                    className="h-5 w-5 flex-shrink-0 self-center text-red-600"
                   />
                 ) : item.changeType === "decrease" ? (
                   <ArrowDownIcon
                     aria-hidden="true"
-                    className="h-5 w-5 flex-shrink-0 self-center text-red-500"
+                    className="h-5 w-5 flex-shrink-0 self-center text-green-600"
                   />
                 ) : (
                   <MinusIcon
                     aria-hidden="true"
-                    className="h-5 w-5 flex-shrink-0 self-center text-gray-500"
+                    className="h-5 w-5 flex-shrink-0 self-center text-muted-foreground"
                   />
                 )}
 

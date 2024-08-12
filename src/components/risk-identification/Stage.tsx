@@ -57,21 +57,25 @@ function Stage({
         />
       )}
       <CardHeader>
+        {data.enabled && (
+          <span className="relative flex h-3 w-3">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500  opacity-75"></span>
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+          </span>
+        )}
         <CardTitle className="text-base">
-          <div className="flex flex-row items-center gap-2">
-            {data.enabled && (
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500  opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
-              </span>
-            )}
-            {title}
-          </div>
+          <div className="flex flex-row items-center gap-2">{title}</div>
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-
-      <CardFooter className="flex w-full flex-col">
+      {data.enabled && (
+        <div>
+          <small className="mb-2 mt-2 block text-center">
+            {title} is active
+          </small>
+        </div>
+      )}
+      <CardFooter className="flex w-full ">
         <Button
           className="flex-1"
           disabled={comingSoon}
@@ -80,12 +84,6 @@ function Stage({
         >
           {comingSoon ? "Coming soon" : "Open Instructions"}
         </Button>
-
-        {data.enabled && (
-          <div>
-            <small className="mt-2 block">{title} is active</small>
-          </div>
-        )}
       </CardFooter>
 
       {sourceHandle && (
