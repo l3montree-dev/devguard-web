@@ -27,7 +27,7 @@ interface Props {
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
-    <div id={props.id} className={classNames("mb-6 pb-6 pt-6 ")}>
+    <div id={props.id} className={classNames("mb-6 pb-6 pt-6")}>
       <div
         className={classNames(
           "flex",

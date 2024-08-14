@@ -1,13 +1,11 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,22 +16,69 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { TransformedAssetRisk } from "@/types/api/api";
-import { ChartConfig } from "./TotalDependenciesDiagram";
+import { RiskDistribution } from "@/types/api/api";
+import { beautifyScannerId } from "@/utils/common";
+import { uniq } from "lodash";
 
-export function FlawsDistribution({ data }: { data: TransformedAssetRisk[] }) {
+//  { range: "0-2", scanner1: 186, scanner2: 80 },
+const combineRanges = (data: RiskDistribution[]) => {
+  const uniqueRanges = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+  const scanner = uniq(data.map((item) => item.scannerId));
+  return uniqueRanges.map((range) => {
+    const rangeData = data.filter((item) => item.severity === range);
+    const rangeDataScanner = scanner.map((scannerId) => {
+      const scannerData = rangeData.find(
+        (item) => item.scannerId === scannerId,
+      );
+      return {
+        scannerId,
+        count: scannerData ? scannerData.count : 0,
+      };
+    });
+
+    return rangeDataScanner.reduce((acc, item) => {
+      return {
+        ...acc,
+        range,
+        [item.scannerId]: item.count,
+      };
+    }, {});
+  });
+};
+
+export function RiskDistributionDiagram({
+  data,
+}: {
+  data: RiskDistribution[];
+}) {
+  const chartConfig = uniq(data.map((item) => item.scannerId)).reduce(
+    (acc, scannerId, i) => ({
+      ...acc,
+      [scannerId]: {
+        label: beautifyScannerId(scannerId),
+        color: `hsl(var(--chart-${i + 1}))`,
+      },
+    }),
+    {} as any,
+  );
+
+  const chartData = combineRanges(data);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Flaws Distribution</CardTitle>
-        <CardDescription></CardDescription>
+        <CardTitle>Open Flaws</CardTitle>
+        <CardDescription>
+          Showing the distribution of flaws based on the risk range and the scan
+          type.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={ChartConfig}>
-          <BarChart accessibilityLayer data={data}>
+        <ChartContainer config={chartConfig}>
+          <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="riskRange"
+              dataKey="range"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -43,71 +88,24 @@ export function FlawsDistribution({ data }: { data: TransformedAssetRisk[] }) {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => `${value}%`}
+              tickFormatter={(value) => `${value}`}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dashed" />}
+              content={<ChartTooltipContent className="bg-background" />}
             />
-            <Bar
-              dataKey="container-scanning"
-              fill="hsl(var(--chart-5))"
-              radius={4}
-            />
-            <Bar dataKey="sca" fill="hsl(var(--chart-1))" radius={4} />
+            <ChartLegend content={<ChartLegendContent />} />
+            {Object.keys(chartConfig).map((scannerId, i, arr) => (
+              <Bar
+                key={scannerId}
+                dataKey={scannerId}
+                radius={4}
+                fill={chartConfig[scannerId].color}
+              />
+            ))}
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none"></div>
-        <div className="leading-none text-muted-foreground"></div>
-      </CardFooter>
     </Card>
   );
 }
-
-/**
-export function FlawsDistribution({ data }: { data: TransformedAssetRisk[] }) {
-  return (
-    <Card>
-      <CardHeader className="items-center pb-4">
-        <CardTitle>Flaws Distribution</CardTitle>
-        <CardDescription></CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={ChartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <RadarChart
-            data={data}
-            margin={{
-              top: -40,
-              bottom: -10,
-            }}
-          >
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <PolarAngleAxis dataKey="riskRange" />
-            <PolarGrid />
-            <Radar
-              dataKey="container-scanning"
-              fill="var(--color-container-scanning)  "
-            />
-            <Radar dataKey="sca" fill="var(--color-sca)" />
-
-            <ChartLegend className="mt-8" content={<ChartLegendContent />} />
-          </RadarChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 pt-4 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none"></div>
-        <div className="flex items-center gap-2 leading-none text-muted-foreground"></div>
-      </CardFooter>
-    </Card>
-  );
-}
-
-  */

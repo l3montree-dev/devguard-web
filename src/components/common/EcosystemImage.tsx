@@ -17,7 +17,13 @@ import React from "react";
 import Image from "next/image";
 import { getEcosystem } from "@/utils/common";
 
-const EcosystemImage = ({ packageName }: { packageName: string }) => {
+const EcosystemImage = ({
+  packageName,
+  size,
+}: {
+  packageName: string;
+  size?: number;
+}) => {
   if (
     [
       "golang",
@@ -33,8 +39,8 @@ const EcosystemImage = ({ packageName }: { packageName: string }) => {
     return (
       <Image
         alt={"Logo von " + getEcosystem(packageName)}
-        width={15}
-        height={15}
+        width={size ?? 15}
+        height={size ?? 15}
         src={
           "/logos/" +
           getEcosystem(packageName).toLowerCase() +

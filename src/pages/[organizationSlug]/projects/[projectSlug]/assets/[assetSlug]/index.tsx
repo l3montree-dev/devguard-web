@@ -1,8 +1,6 @@
 import Page from "@/components/Page";
-import { CriticalDependencies } from "@/components/overview/CriticalDependenciesDiagram";
-import { FlawsDistribution } from "@/components/overview/RiskDistributionDiagram";
-import { RiskTrend } from "@/components/overview/RiskTrendDiagram";
-import { TotalDependencies } from "@/components/overview/TotalDependenciesDiagram";
+
+import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
 
 import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
@@ -18,31 +16,56 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import {
-  AssetFlaws,
-  AssetOverviewDTO,
-  AssetRiskDistribution,
-  AssetRisks,
-  TransformedAssetRisk,
+  AverageFixingTime,
+  ComponentRisk,
+  DependencyCountByScanType,
+  FlawAggregationStateAndChange,
+  FlawCountByScanner,
+  RiskDistribution,
+  RiskHistory,
 } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 
-import { ActivityLogElement } from "@/components/ActivityLog";
-import AssetFlawsStateStatistics from "@/components/overview/AssetFlawsStateStatistics";
-import { DamagedPackage } from "@/components/overview/DamagedPackageDiagram";
-import { FlawsDiagram } from "@/components/overview/FlawsDiagram";
+import { DependenciesPieChart } from "@/components/overview/DependenciesPieChart";
+import FlawAggregationState from "@/components/overview/FlawAggregationState";
+import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
+import { VulnerableComponents } from "@/components/overview/VulnerableComponents";
 import Link from "next/link";
 import { FunctionComponent } from "react";
 
+import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
+
 interface Props {
-  data: AssetOverviewDTO;
+  componentRisk: ComponentRisk;
+  riskDistribution: RiskDistribution[];
+  riskHistory: RiskHistory[];
+  flawCountByScanner: FlawCountByScanner;
+  dependencyCountByScanType: DependencyCountByScanType;
+  flawAggregationStateAndChange: FlawAggregationStateAndChange;
+  avgLowFixingTime: AverageFixingTime;
+  avgMediumFixingTime: AverageFixingTime;
+  avgHighFixingTime: AverageFixingTime;
+  avgCriticalFixingTime: AverageFixingTime;
 }
 
-const Index: FunctionComponent<Props> = ({ data }) => {
+const Index: FunctionComponent<Props> = ({
+  componentRisk,
+  riskDistribution,
+  riskHistory,
+  flawCountByScanner,
+  dependencyCountByScanType,
+  flawAggregationStateAndChange,
+  avgLowFixingTime,
+  avgMediumFixingTime,
+  avgHighFixingTime,
+  avgCriticalFixingTime,
+}) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
 
+  console.log(avgLowFixingTime);
   return (
     <Page
       Menu={assetMenu}
@@ -91,77 +114,125 @@ const Index: FunctionComponent<Props> = ({ data }) => {
         </span>
       }
     >
-      <AssetFlawsStateStatistics data={data} />
-
-      <DamagedPackage data={data} />
-
-      <div className="flex gap-2">
-        <div className="h-full flex-1">
-          <TotalDependencies data={data} />
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-semibold">Overview</h1>
+      </div>
+      <div className="mt-4 grid gap-4">
+        <FlawAggregationState data={flawAggregationStateAndChange} />
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <RiskDistributionDiagram data={riskDistribution} />
+          </div>
+          <VulnerableComponents data={componentRisk} />
         </div>
-        <div className="h-full flex-1">
-          <CriticalDependencies data={data} />
+        <div className="grid grid-cols-4 gap-4">
+          <AverageFixingTimeChart
+            title="Low severity"
+            description="Average fixing time for low severity flaws"
+            avgFixingTime={avgLowFixingTime}
+          />
+          <AverageFixingTimeChart
+            title="Medium severity"
+            description="Average fixing time for medium severity flaws"
+            avgFixingTime={avgMediumFixingTime}
+          />
+          <AverageFixingTimeChart
+            title="High severity"
+            description="Average fixing time for high severity flaws"
+            avgFixingTime={avgHighFixingTime}
+          />
+          <AverageFixingTimeChart
+            title="Critical severity"
+            description="Average fixing time for critical severity flaws"
+            avgFixingTime={avgCriticalFixingTime}
+          />
         </div>
+        <RiskHistoryChart data={riskHistory} />
+        {/* <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2"></div>
+          <DependenciesPieChart data={dependencyCountByScanType} />
+        </div> */}
       </div>
-      <div className="h-full flex-1">
-        <FlawsDistribution data={data.assetRiskDistribution} />
-      </div>
-
-      <div>
-        <FlawsDiagram data={data.assetFlaws} />
-      </div>
-
-      <div>
-        <RiskTrend data={data.assetRisks} />
-      </div>
-
-      {data.flawEvents.map((event, index) => (
-        <ActivityLogElement
-          key={event.id}
-          event={event}
-          index={index}
-          flawName={event.flawName || ""}
-        />
-      ))}
-
-      <div></div>
     </Page>
   );
 };
 export default Index;
 
+const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
+
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    const last3Month = new Date();
+    last3Month.setMonth(last3Month.getMonth() - 3);
+
     const apiClient = getApiClientFromContext(context);
-    const resp = await apiClient(
+    const url =
       "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/overview",
-    );
-    if (!resp.ok) {
-      console.log("can't find asset");
-      return {
-        notFound: true,
-      };
-    }
-
-    const data = await resp.json();
-
-    data.assetRiskDistribution = transformAssetRiskDistribution(
-      data.assetRiskDistribution,
-    );
-    data.assetRisks = sortDate(data.assetRisks);
-    data.assetFlaws = sortAssetFlawsCenterHigh(data.assetFlaws);
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/stats";
+    const [
+      componentRisk,
+      riskDistribution,
+      riskHistory,
+      flawCountByScanner,
+      dependencyCountByScanType,
+      flawAggregationStateAndChange,
+      avgLowFixingTime,
+      avgMediumFixingTime,
+      avgHighFixingTime,
+      avgCriticalFixingTime,
+    ] = await Promise.all([
+      apiClient(url + "/component-risk").then((r) => r.json()),
+      apiClient(url + "/risk-distribution").then((r) => r.json()),
+      apiClient(
+        url +
+          "/risk-history?start=" +
+          extractDateOnly(last3Month) +
+          "&end=" +
+          extractDateOnly(new Date()),
+      ).then((r) => r.json()),
+      apiClient(url + "/flaw-count-by-scanner").then((r) => r.json()),
+      apiClient(url + "/dependency-count-by-scan-type").then((r) => r.json()),
+      apiClient(
+        url +
+          "/flaw-aggregation-state-and-change?compareTo=" +
+          lastMonth.toISOString().split("T")[0],
+      ).then((r) => r.json()),
+      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
+        r.json(),
+      ),
+      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
+        r.json(),
+      ),
+      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
+        r.json(),
+      ),
+      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
+        r.json(),
+      ),
+    ]);
 
     return {
       props: {
-        data,
+        componentRisk,
+        riskDistribution,
+        riskHistory,
+        flawCountByScanner,
+        dependencyCountByScanType,
+        flawAggregationStateAndChange,
+        avgLowFixingTime,
+        avgMediumFixingTime,
+        avgHighFixingTime,
+        avgCriticalFixingTime,
       },
     };
   },
@@ -173,61 +244,3 @@ export const getServerSideProps = middleware(
     asset: withAsset,
   },
 );
-
-function transformAssetRiskDistribution(
-  assetRiskDistribution: AssetRiskDistribution[],
-): TransformedAssetRisk[] {
-  const riskRanges = ["0-2", "2-4", "4-6", "6-8", "8-10"];
-
-  if (!Array.isArray(assetRiskDistribution)) {
-    throw new Error("assetRiskDistribution muss ein Array sein.");
-  }
-  const scannerIds = Array.from(
-    new Set(assetRiskDistribution.map((risk) => risk.scannerId)),
-  );
-
-  return riskRanges.map((range) => {
-    const risks = assetRiskDistribution.filter(
-      (risk) => risk.riskRange === range,
-    );
-    const res: TransformedAssetRisk = {
-      riskRange: range,
-    };
-
-    risks.forEach((risk) => {
-      res[risk.scannerId] = risk.count;
-    });
-    // check if all scanners are present
-    scannerIds.forEach((scannerId) => {
-      if (!res[scannerId]) {
-        res[scannerId] = 0;
-      }
-    });
-
-    return res;
-  });
-}
-
-// sort Asset Risks by date
-function sortDate(data: AssetRisks[]): AssetRisks[] {
-  return data.sort(
-    (a, b) => new Date(a.dayOfScan).getTime() - new Date(b.dayOfScan).getTime(),
-  );
-}
-
-// sort Asset Flaws by rawRiskAssessment
-function sortAssetFlawsCenterHigh(arr: AssetFlaws[]): AssetFlaws[] {
-  arr.sort((a, b) => b.rawRiskAssessment - a.rawRiskAssessment);
-
-  let result: AssetFlaws[] = [];
-
-  let n = arr.length - 1;
-  let z = arr.length - 1;
-  let i = 0;
-
-  while (z > 0) {
-    result[i++] = arr[z--];
-    result[n - i] = arr[z--];
-  }
-  return result;
-}

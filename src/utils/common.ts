@@ -14,9 +14,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { State } from "@/types/common";
+import { defaultScanner } from "./view";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
+}
+
+export const beautifyScannerId = (scannerId: string) => {
+    return scannerId.replace(defaultScanner, "")
 }
 
 export function toSearchParams(obj: Record<string, any>): URLSearchParams {

@@ -299,75 +299,52 @@ export interface AffectedPackage {
   PurlWithVersion: string;
 }
 
-export interface AssetOverviewDTO {
-  totalDependenciesNumber: number;
-  criticalDependenciesNumber: number;
-
-  assetCombinedDependencies: {
-    scanType: string;
-    count: number;
-    countCritical: number;
-  }[];
-
-  assetRiskSummary: {
-    scannerID: string;
-    rawRiskAssessment: number;
-    count: number;
-    average: number;
-    sum: number;
-  }[];
-  assetRiskDistribution: {
-    scannerId: string;
-    riskRange: string;
-    count: number;
-  }[];
-  assetRisks: {
-    dayOfRisk: string;
-    dayOfScan: string;
-    assetSumRisk: number;
-    assetAvgRisk: number;
-    assetMaxRisk: number;
-    assetMinRisk: number;
-  }[];
-  assetFlaws: {
-    flawId: string;
-    rawRiskAssessment: number;
-    fixedVersion: string;
-  }[];
-
-  assetFlawsStateStatistics: {
-    open: number;
-    handled: number;
-    lastOpen: number;
-    lastHandled: number;
-  };
-
-  assetFlawsStateDistribution: {
-    state: string;
-    count: number;
-  }[];
-
-  assetHighestDamagedPackages: {
-    component: string;
-    count: number;
-  }[];
-
-  assetComponents: {
-    component: string;
-    count: number;
-  }[];
-
-  flawEvents: FlawEventDTO[];
+export interface ComponentRisk {
+  [component: string]: number;
 }
 
-export type TransformedAssetRisk = {
-  riskRange: string;
-  [scannerId: string]: number | string;
-};
-export type AssetRisks = AssetOverviewDTO["assetRisks"][number];
-export type AssetFlaws = AssetOverviewDTO["assetFlaws"][number];
-export type AssetRiskDistribution =
-  AssetOverviewDTO["assetRiskDistribution"][number];
+export interface RiskDistribution {
+  scannerId: string;
+  severity: string;
+  count: number;
+}
+
+export interface RiskHistory {
+  assetId: string;
+  day: string;
+  sumOpenRisk: number;
+  averageOpenRisk: number;
+  maxOpenRisk: number;
+  minOpenRisk: number;
+
+  sumClosedRisk: number;
+  averageClosedRisk: number;
+  maxClosedRisk: number;
+  minClosedRisk: number;
+
+  openFlaws: number;
+  fixedFlaws: number;
+}
+
+export interface FlawCountByScanner {
+  [scannerId: string]: number;
+}
+
+export interface DependencyCountByScanType {
+  [scanType: string]: number;
+}
+
+export interface FlawAggregationStateAndChange {
+  was: {
+    open: number;
+    fixed: number;
+  };
+  now: {
+    open: number;
+    fixed: number;
+  };
+}
+
 export interface FlawByPackage {
   packageName: string;
   maxRisk: number;
@@ -377,6 +354,6 @@ export interface FlawByPackage {
   flaws: FlawWithCVE[];
 }
 
-export interface AssetMetricsDTO {
-  enabledScanners: string[];
+export interface AverageFixingTime {
+  averageFixingTimeSeconds: number;
 }
