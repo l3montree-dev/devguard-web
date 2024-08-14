@@ -128,6 +128,7 @@ interface BaseFlawEventDTO {
   id: string;
   flawId: string;
   justification: string;
+  flawName: string | null;
 }
 
 export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
@@ -298,6 +299,52 @@ export interface AffectedPackage {
   PurlWithVersion: string;
 }
 
+export interface ComponentRisk {
+  [component: string]: number;
+}
+
+export interface RiskDistribution {
+  scannerId: string;
+  severity: string;
+  count: number;
+}
+
+export interface RiskHistory {
+  assetId: string;
+  day: string;
+  sumOpenRisk: number;
+  averageOpenRisk: number;
+  maxOpenRisk: number;
+  minOpenRisk: number;
+
+  sumClosedRisk: number;
+  averageClosedRisk: number;
+  maxClosedRisk: number;
+  minClosedRisk: number;
+
+  openFlaws: number;
+  fixedFlaws: number;
+}
+
+export interface FlawCountByScanner {
+  [scannerId: string]: number;
+}
+
+export interface DependencyCountByScanType {
+  [scanType: string]: number;
+}
+
+export interface FlawAggregationStateAndChange {
+  was: {
+    open: number;
+    fixed: number;
+  };
+  now: {
+    open: number;
+    fixed: number;
+  };
+}
+
 export interface FlawByPackage {
   packageName: string;
   maxRisk: number;
@@ -307,6 +354,6 @@ export interface FlawByPackage {
   flaws: FlawWithCVE[];
 }
 
-export interface AssetMetricsDTO {
-  enabledScanners: string[];
+export interface AverageFixingTime {
+  averageFixingTimeSeconds: number;
 }

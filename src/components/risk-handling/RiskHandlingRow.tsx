@@ -21,12 +21,14 @@ import React, { FunctionComponent } from "react";
 import FlawState from "../common/FlawState";
 import { useRouter } from "next/router";
 import { Badge } from "../ui/badge";
+import { defaultScanner } from "@/utils/view";
 
 interface Props {
   row: Row<FlawByPackage>;
   index: number;
   arrLength: number;
 }
+
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
@@ -77,9 +79,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   )}
                 >
                   <tr className="">
-                    <th className="w-40 p-4">State</th>
+                    <th className="w-32 p-4">State</th>
+                    <th className="w-32 p-4">Scanner</th>
                     <th className="w-40 p-4">CVE</th>
-                    <th className="w-40 p-4">Risk</th>
+                    <th className="w-20 p-4">Risk</th>
                     <th className="w-40 p-4">Fixed in Version</th>
                     <th className="w-full p-4">Description</th>
                   </tr>
@@ -90,13 +93,18 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       onClick={() =>
                         router.push(router.asPath + "/../flaws/" + flaw.id)
                       }
-                      className="border-b align-baseline             hover:bg-gray-50 dark:hover:bg-secondary"
+                      className="border-b align-top             hover:bg-gray-50 dark:hover:bg-secondary"
                       key={flaw.id}
                     >
                       <td className="p-4">
                         <div className="flex flex-row">
                           <FlawState state={flaw.state} />
                         </div>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant={"secondary"}>
+                          {flaw.scanner.replace(defaultScanner, "")}
+                        </Badge>
                       </td>
                       <td className="p-4">{flaw.cveId}</td>
                       <td className="p-4">

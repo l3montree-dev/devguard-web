@@ -4,4 +4,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
+    "editor.formatOnSave": false,
+    "typescript.tsdk": "node_modules/typescript/lib",
 }

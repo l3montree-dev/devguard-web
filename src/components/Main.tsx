@@ -117,8 +117,8 @@ const Main: FunctionComponent<Props> = ({
             Privacy
           </Link>
         </div>
-        Copyright © 2023 L3montree. All rights reserved. Version{" "}
-        {process.env.NEXT_PUBLIC_VERSION}
+        Copyright © {new Date().getFullYear()} L3montree. All rights reserved.
+        Version {process.env.NEXT_PUBLIC_VERSION}
       </footer>
     </main>
   );
