@@ -65,7 +65,6 @@ const Index: FunctionComponent<Props> = ({
   const project = useActiveProject();
   const asset = useActiveAsset()!;
 
-  console.log(avgLowFixingTime);
   return (
     <Page
       Menu={assetMenu}
@@ -118,7 +117,10 @@ const Index: FunctionComponent<Props> = ({
         <h1 className="text-2xl font-semibold">Overview</h1>
       </div>
       <div className="mt-4 grid gap-4">
-        <FlawAggregationState data={flawAggregationStateAndChange} />
+        <FlawAggregationState
+          totalRisk={riskHistory[riskHistory.length - 1]?.sumOpenRisk ?? 0}
+          data={flawAggregationStateAndChange}
+        />
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2">
             <RiskDistributionDiagram data={riskDistribution} />

@@ -1,5 +1,6 @@
 import { FlawAggregationStateAndChange } from "@/types/api/api";
 import {
+  BoltIcon,
   BugAntIcon,
   CheckCircleIcon,
   WrenchIcon,
@@ -17,8 +18,10 @@ function changeType(change: number) {
 
 export default function FlawAggregationState({
   data,
+  totalRisk,
 }: {
   data: FlawAggregationStateAndChange;
+  totalRisk: number;
 }) {
   const stats = {
     total: {
@@ -26,6 +29,7 @@ export default function FlawAggregationState({
       name: "Total Flaws",
       stat: data.now.fixed + data.now.open,
       icon: WrenchIcon,
+      percentage: 0,
       change: data.now.fixed + data.now.open - (data.was.fixed + data.was.open),
       changeType: changeType(
         data.now.fixed + data.now.open - (data.was.fixed + data.was.open),
@@ -36,6 +40,7 @@ export default function FlawAggregationState({
       name: "Handled Flaws",
       stat: data.now.fixed,
       icon: CheckCircleIcon,
+      percentage: (data.now.fixed / (data.now.fixed + data.now.open)) * 100,
       change: data.now.fixed - data.was.fixed,
       changeType: changeType(data.now.fixed - data.was.fixed),
     },
@@ -43,6 +48,7 @@ export default function FlawAggregationState({
       id: 3,
       name: "Open Flaws",
       stat: data.now.open,
+      percentage: (data.now.open / (data.now.fixed + data.now.open)) * 100,
       icon: BugAntIcon,
       change: data.now.open - data.was.open,
       changeType: changeType(data.now.open - data.was.open),
@@ -51,6 +57,18 @@ export default function FlawAggregationState({
 
   return (
     <div className="flex flex-row gap-4">
+      <Card className="flex-1">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Asset Risk</CardTitle>
+          <BoltIcon className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{totalRisk.toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">
+            The total risk this asset poses to the organization
+          </p>
+        </CardContent>
+      </Card>
       <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Flaws</CardTitle>
@@ -69,7 +87,7 @@ export default function FlawAggregationState({
           <CheckCircleIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.handled.stat}</div>
+          <div className="text-2xl font-bold">{stats.handled.stat} </div>
           <p className="text-xs text-muted-foreground">
             {stats.handled.change} {stats.handled.changeType} compared to last
             month
@@ -82,7 +100,7 @@ export default function FlawAggregationState({
           <BugAntIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.open.stat}</div>
+          <div className="text-2xl font-bold">{stats.open.stat} </div>
           <p className="text-xs text-muted-foreground">
             {stats.open.change} {stats.open.changeType} compared to last month
           </p>
