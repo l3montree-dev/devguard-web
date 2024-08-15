@@ -21,8 +21,8 @@ export function classNames(...classes: Array<string | undefined | Boolean>) {
 }
 
 export const beautifyScannerId = (scannerId: string) => {
-    return scannerId.replace(defaultScanner, "")
-}
+  return scannerId.replace(defaultScanner, "");
+};
 
 export function toSearchParams(obj: Record<string, any>): URLSearchParams {
   const res = Object.keys(obj).reduce(
