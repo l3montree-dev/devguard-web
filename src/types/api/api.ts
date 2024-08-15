@@ -26,6 +26,10 @@ interface AppModelDTO {
   updatedAt: string;
 }
 
+export interface AssetMetricsDTO {
+  enabledScanners: string[];
+}
+
 export interface OrganizationDTO extends AppModelDTO {
   name: string;
   contactPhoneNumber?: string;
