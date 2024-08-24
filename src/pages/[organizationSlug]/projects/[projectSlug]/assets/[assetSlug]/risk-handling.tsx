@@ -198,14 +198,6 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  const r =
-    "/" +
-    activeOrg.slug +
-    "/projects/" +
-    project?.slug +
-    "/assets/" +
-    asset?.slug;
-
   const handleSearch = useMemo(
     () =>
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
