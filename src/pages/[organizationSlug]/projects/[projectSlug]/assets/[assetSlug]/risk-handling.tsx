@@ -270,10 +270,6 @@ const Index: FunctionComponent<Props> = (props) => {
         </span>
       }
     >
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Risk Handling</h1>
-      </div>
-
       {table.getRowCount() === 0 && Object.keys(router.query).length === 0 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
@@ -288,6 +284,7 @@ const Index: FunctionComponent<Props> = (props) => {
       ) : (
         <Section
           forceVertical
+          primaryHeadline
           title="Identified Risks"
           description="This table shows all the identified risks for this asset."
         >

@@ -24,6 +24,7 @@ interface Props {
   Button?: ReactNode;
   forceVertical?: boolean;
   Icon?: ReactNode;
+  primaryHeadline?: boolean;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
@@ -42,7 +43,12 @@ const Section: FunctionComponent<Props> = (props) => {
           )}
         >
           <div>
-            <h2 className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-black dark:text-white">
+            <h2
+              className={classNames(
+                "flex flex-row items-center gap-2 font-semibold leading-7 text-foreground",
+                props.primaryHeadline ? "text-2xl" : "text-base",
+              )}
+            >
               {props.Icon}
               {props.title}
             </h2>

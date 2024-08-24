@@ -36,7 +36,7 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-6">
-          {d.slice(0, 6).map((item, index) => (
+          {d.slice(0, 5).map((item, index) => (
             <div
               key={item.componentName}
               className={classNames("flex items-center gap-4")}

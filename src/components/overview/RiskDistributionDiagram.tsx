@@ -1,6 +1,13 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   Card,
@@ -74,37 +81,39 @@ export function RiskDistributionDiagram({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="range"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              //tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <YAxis
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => `${value}`}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent className="bg-background" />}
-            />
-            <ChartLegend content={<ChartLegendContent />} />
-            {Object.keys(chartConfig).map((scannerId, i, arr) => (
-              <Bar
-                key={scannerId}
-                dataKey={scannerId}
-                radius={4}
-                fill={chartConfig[scannerId].color}
+        <ResponsiveContainer width="100%" height={305}>
+          <ChartContainer config={chartConfig}>
+            <BarChart accessibilityLayer data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="range"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                //tickFormatter={(value) => value.slice(0, 3)}
               />
-            ))}
-          </BarChart>
-        </ChartContainer>
+              <YAxis
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => `${value}`}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent className="bg-background" />}
+              />
+              <ChartLegend content={<ChartLegendContent />} />
+              {Object.keys(chartConfig).map((scannerId, i, arr) => (
+                <Bar
+                  key={scannerId}
+                  dataKey={scannerId}
+                  radius={4}
+                  fill={chartConfig[scannerId].color}
+                />
+              ))}
+            </BarChart>
+          </ChartContainer>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );

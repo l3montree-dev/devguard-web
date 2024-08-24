@@ -36,7 +36,7 @@ import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart
 
 interface Props {
   componentRisk: ComponentRisk;
-  riskDistribution: RiskDistribution[];
+  riskDistribution: RiskDistribution[] | null;
   riskHistory: RiskHistory[];
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
@@ -51,8 +51,6 @@ const Index: FunctionComponent<Props> = ({
   componentRisk,
   riskDistribution,
   riskHistory,
-  flawCountByScanner,
-  dependencyCountByScanType,
   flawAggregationStateAndChange,
   avgLowFixingTime,
   avgMediumFixingTime,
@@ -117,12 +115,14 @@ const Index: FunctionComponent<Props> = ({
       </div>
       <div className="mt-4 grid gap-4">
         <FlawAggregationState
+          title="Asset Risk"
+          description="The total risk this asset poses to the organization"
           totalRisk={riskHistory[riskHistory.length - 1]?.sumOpenRisk ?? 0}
           data={flawAggregationStateAndChange}
         />
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2">
-            <RiskDistributionDiagram data={riskDistribution} />
+            <RiskDistributionDiagram data={riskDistribution ?? []} />
           </div>
           <VulnerableComponents data={componentRisk} />
         </div>
@@ -148,7 +148,9 @@ const Index: FunctionComponent<Props> = ({
             avgFixingTime={avgCriticalFixingTime}
           />
         </div>
-        <RiskHistoryChart data={riskHistory} />
+        <RiskHistoryChart
+          data={[{ label: "Total Risk", history: riskHistory }]}
+        />
         {/* <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2"></div>
           <DependenciesPieChart data={dependencyCountByScanType} />
@@ -184,8 +186,6 @@ export const getServerSideProps = middleware(
       componentRisk,
       riskDistribution,
       riskHistory,
-      flawCountByScanner,
-      dependencyCountByScanType,
       flawAggregationStateAndChange,
       avgLowFixingTime,
       avgMediumFixingTime,
@@ -201,8 +201,6 @@ export const getServerSideProps = middleware(
           "&end=" +
           extractDateOnly(new Date()),
       ).then((r) => r.json()),
-      apiClient(url + "/flaw-count-by-scanner").then((r) => r.json()),
-      apiClient(url + "/dependency-count-by-scan-type").then((r) => r.json()),
       apiClient(
         url +
           "/flaw-aggregation-state-and-change?compareTo=" +
@@ -227,8 +225,6 @@ export const getServerSideProps = middleware(
         componentRisk,
         riskDistribution,
         riskHistory,
-        flawCountByScanner,
-        dependencyCountByScanType,
         flawAggregationStateAndChange,
         avgLowFixingTime,
         avgMediumFixingTime,

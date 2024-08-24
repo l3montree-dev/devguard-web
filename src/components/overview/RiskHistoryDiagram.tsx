@@ -12,6 +12,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { RiskHistory } from "@/types/api/api";
+import { useMemo } from "react";
 import {
   Area,
   AreaChart,
@@ -21,7 +22,37 @@ import {
   YAxis,
 } from "recharts";
 
-export function RiskHistoryChart({ data }: { data: RiskHistory[] }) {
+export function RiskHistoryChart({
+  data,
+}: {
+  data: Array<{ label: string; history: RiskHistory[] }>;
+}) {
+  const reduced = useMemo(() => {
+    if (data.length === 0) {
+      return [];
+    }
+
+    const res = Array(data[0].history.length);
+    for (let i = 0; i < data.length; i++) {
+      const label = data[i].label;
+      for (let j = 0; j < data[i].history.length; j++) {
+        if (!Boolean(res[j])) {
+          res[j] = {
+            [label]: data[i].history[j].sumOpenRisk,
+            day: data[i].history[j].day,
+          };
+        } else {
+          res[j] = {
+            ...res[j],
+            day: data[i].history[j].day,
+            [label]: data[i].history[j].sumOpenRisk,
+          };
+        }
+      }
+    }
+    return res;
+  }, [data]);
+
   return (
     <Card>
       <CardHeader>
@@ -33,18 +64,18 @@ export function RiskHistoryChart({ data }: { data: RiskHistory[] }) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <ChartContainer
-            config={{
-              sumClosedRisk: {
-                label: "Fixed Risk",
-                color: "hsl(var(--chart-2))",
-              },
-              sumOpenRisk: {
-                label: "Open Risk",
-                color: "hsl(var(--chart-1))",
-              },
-            }}
+            config={data.reduce(
+              (acc, d, i) => ({
+                ...acc,
+                [d.label]: {
+                  label: d.label,
+                  color: "hsl(var(--chart-" + i + "))",
+                },
+              }),
+              {},
+            )}
           >
-            <AreaChart accessibilityLayer data={data}>
+            <AreaChart accessibilityLayer data={reduced}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="day"
@@ -75,40 +106,40 @@ export function RiskHistoryChart({ data }: { data: RiskHistory[] }) {
                 }
               />
               <defs>
-                <linearGradient id="fill-1" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="hsl(var(--chart-1))"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="hsl(var(--chart-1))"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fill-2" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="hsl(var(--chart-2))"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="hsl(var(--chart-2))"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
+                {data.map((d, i) => (
+                  <linearGradient
+                    key={d.label}
+                    id={"fill-" + (i + 1)}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="5%"
+                      stopColor={"hsl(var(--chart-" + (i + 1) + "))"}
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={"hsl(var(--chart-" + (i + 1) + "))"}
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                ))}
               </defs>
-              <Area
-                dataKey="sumOpenRisk"
-                type="monotone"
-                stroke="hsl(var(--chart-1))"
-                strokeWidth={2}
-                fill="url(#fill-1)"
-                fillOpacity={0.4}
-                dot={false}
-              />
+              {data.map((d, i) => (
+                <Area
+                  key={d.label}
+                  dataKey={d.label}
+                  type="monotone"
+                  stroke={"hsl(var(--chart-" + (i + 1) + "))"}
+                  strokeWidth={2}
+                  fill={"url(#fill-" + (i + 1) + ")"}
+                  fillOpacity={0.4}
+                  dot={false}
+                />
+              ))}
             </AreaChart>
           </ChartContainer>
         </ResponsiveContainer>
@@ -120,31 +151,3 @@ export function RiskHistoryChart({ data }: { data: RiskHistory[] }) {
     </Card>
   );
 }
-
-// Custom Tooltip component
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: {
-  active: boolean;
-  payload: any[];
-  label: string;
-}) => {
-  if (active && payload && payload.length && payload[0].payload) {
-    const avgRisk = payload[0].payload.assetAverageRisk;
-    const maxRisk = payload[0].payload.assetMaxRisk;
-    const minRisk = payload[0].payload.assetMinRisk;
-
-    return (
-      <div className="custom-tooltip">
-        <p className="intro">{`Risk: ${payload[0].value}`}</p>
-        <p className="label">{`average risk: ${avgRisk}`}</p>
-        <p className="label">{`max risk: ${maxRisk}`}</p>
-        <p className="label">{`min risk: ${minRisk}`}</p>
-      </div>
-    );
-  }
-
-  return null;
-};

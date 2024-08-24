@@ -124,10 +124,8 @@ const DependencyGraphPage: FunctionComponent<{
       }
       title="Dependencies"
     >
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Dependencies</h1>
-      </div>
       <Section
+        primaryHeadline
         forceVertical
         title="Dependency Graph"
         description="This graph shows the dependencies of the asset. The risk of each dependency is calculated based on the risk of the affected package."

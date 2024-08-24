@@ -7,10 +7,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 function changeType(change: number) {
   if (change === 0) return "same";
   return change > 0 ? "increase" : "decrease";
@@ -19,9 +15,13 @@ function changeType(change: number) {
 export default function FlawAggregationState({
   data,
   totalRisk,
+  description,
+  title,
 }: {
   data: FlawAggregationStateAndChange;
   totalRisk: number;
+  description: string;
+  title: string;
 }) {
   const stats = {
     total: {
@@ -59,14 +59,12 @@ export default function FlawAggregationState({
     <div className="flex flex-row gap-4">
       <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Asset Risk</CardTitle>
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
           <BoltIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{totalRisk.toFixed(2)}</div>
-          <p className="text-xs text-muted-foreground">
-            The total risk this asset poses to the organization
-          </p>
+          <p className="text-xs text-muted-foreground">{description}</p>
         </CardContent>
       </Card>
       <Card className="flex-1">

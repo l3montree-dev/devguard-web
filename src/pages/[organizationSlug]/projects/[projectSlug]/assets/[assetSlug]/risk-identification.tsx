@@ -203,10 +203,8 @@ const RiskIdentification: FunctionComponent<Props> = (
       }
       title="Risk Identification"
     >
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Risk Identification</h1>
-      </div>
       <Section
+        primaryHeadline
         description="The OWASP DevSecOps Pipeline is a reference architecture for
             integrating security into a DevOps Pipeline. It is a set of security
             controls that can be integrated into a CI/CD pipeline to automate

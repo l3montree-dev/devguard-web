@@ -150,6 +150,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             Button={
               <Button onClick={() => setShowModal(true)}>New Asset</Button>
             }
+            primaryHeadline
             description={"Assets managed by the " + project.name + " project"}
             forceVertical
             title="Assets"

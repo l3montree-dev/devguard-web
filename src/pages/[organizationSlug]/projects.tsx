@@ -189,6 +189,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           />
         ) : (
           <Section
+            primaryHeadline
             Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
             description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
             forceVertical
