@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { withOrganization } from "@/decorators/withOrganization";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {
   asset: AssetDTO;
@@ -269,6 +270,10 @@ const Index: FunctionComponent<Props> = (props) => {
         </span>
       }
     >
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-semibold">Risk Handling</h1>
+      </div>
+
       {table.getRowCount() === 0 && Object.keys(router.query).length === 0 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
@@ -286,7 +291,43 @@ const Index: FunctionComponent<Props> = (props) => {
           title="Identified Risks"
           description="This table shows all the identified risks for this asset."
         >
-          <div className="relative">
+          <div className="relative flex flex-row gap-2">
+            <Tabs
+              defaultValue={
+                (router.query.state as string | undefined)
+                  ? (router.query.state as string)
+                  : "open"
+              }
+            >
+              <TabsList>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        state: "open",
+                      },
+                    })
+                  }
+                  value="open"
+                >
+                  Open
+                </TabsTrigger>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        state: "closed",
+                      },
+                    })
+                  }
+                  value="closed"
+                >
+                  Closed
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
             <Input
               onChange={handleSearch}
               defaultValue={router.query.search as string}
@@ -362,6 +403,7 @@ export const getServerSideProps = middleware(
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 
     const apiClient = getApiClientFromContext(context);
+
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -371,9 +413,19 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const filterQuery = Object.entries(context.query).filter(
-      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+    const filterQuery = Object.fromEntries(
+      Object.entries(context.query).filter(
+        ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
+      ),
     );
+
+    // translate the state query param to a filter query
+    const state = context.query.state;
+    if (!Boolean(state) || state === "open") {
+      filterQuery["filterQuery[state][is]"] = "open";
+    } else {
+      filterQuery["filterQuery[state][is not]"] = "open";
+    }
 
     // check for page and page size query params
     // if they are there, append them to the uri
@@ -390,7 +442,7 @@ export const getServerSideProps = middleware(
             ...(context.query.search
               ? { search: context.query.search as string }
               : {}),
-            ...Object.fromEntries(filterQuery),
+            ...filterQuery,
           }),
       ),
     ]);

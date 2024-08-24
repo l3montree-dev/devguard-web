@@ -19,11 +19,10 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { ReactFlow, Edge } from "@xyflow/react";
-import "@xyflow/react/dist/base.css";
 import { AssetMetricsDTO } from "@/types/api/api";
+import { Edge, ReactFlow } from "@xyflow/react";
+import "@xyflow/react/dist/base.css";
+import Link from "next/link";
 import { FunctionComponent, useMemo } from "react";
 
 const paddingX = 35;
@@ -204,6 +203,9 @@ const RiskIdentification: FunctionComponent<Props> = (
       }
       title="Risk Identification"
     >
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-semibold">Risk Identification</h1>
+      </div>
       <Section
         description="The OWASP DevSecOps Pipeline is a reference architecture for
             integrating security into a DevOps Pipeline. It is a set of security

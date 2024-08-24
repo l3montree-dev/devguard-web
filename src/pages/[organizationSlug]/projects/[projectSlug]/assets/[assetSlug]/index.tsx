@@ -26,7 +26,6 @@ import {
 } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 
-import { DependenciesPieChart } from "@/components/overview/DependenciesPieChart";
 import FlawAggregationState from "@/components/overview/FlawAggregationState";
 import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
 import { VulnerableComponents } from "@/components/overview/VulnerableComponents";

@@ -61,7 +61,7 @@ export const useAssetMenu = () => {
       isActive: router.pathname.includes("[flawId]"),
     },
     {
-      title: "Dependency graph",
+      title: "Dependencies",
       href:
         "/" +
         orgSlug +

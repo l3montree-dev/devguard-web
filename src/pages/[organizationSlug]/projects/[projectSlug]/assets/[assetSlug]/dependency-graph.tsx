@@ -122,8 +122,11 @@ const DependencyGraphPage: FunctionComponent<{
           </Link>
         </span>
       }
-      title="Dependency Graph"
+      title="Dependencies"
     >
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-semibold">Dependencies</h1>
+      </div>
       <Section
         forceVertical
         title="Dependency Graph"
