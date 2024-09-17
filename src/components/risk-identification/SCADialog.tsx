@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import Section from "../common/Section";
 
 interface Props {
   open: boolean;
@@ -69,45 +70,42 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
             known vulnerabilities in your dependencies.
           </DialogDescription>
         </DialogHeader>
-        <div className="mb-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                Create a Personal Access Token
-              </CardTitle>
-              <CardDescription>
-                To use the FlawFind CLI, you need to create a Personal Access
-                Token. You can create such a token by clicking the button below.
-              </CardDescription>
-            </CardHeader>
+        <hr />
+        <div>
+          <Section
+            className="mb-0 mt-0 pb-0 pt-0"
+            description="To use the Devguard-Scanner, you need to create a Personal Access
+              Token. You can create such a token by clicking the button below."
+            title="Create a Personal Access Token"
+            forceVertical
+          >
             {pat && (
-              <CardContent>
-                <div className="flex flex-row items-center justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex flex-row gap-2">
-                      <CopyCode language="shell" codeString={pat.privKey} />
-                    </div>
-
-                    <span className=" block text-right text-sm text-destructive">
-                      Make sure to copy the token. You won&apos;t be able to see
-                      it ever again!
-                    </span>
+              <div className="flex flex-row items-center justify-between">
+                <div className="flex-1">
+                  <div className="mb-2 flex flex-row gap-2">
+                    <CopyCode language="shell" codeString={pat.privKey} />
                   </div>
+
+                  <span className=" block text-right text-sm text-destructive">
+                    Make sure to copy the token. You won&apos;t be able to see
+                    it ever again!
+                  </span>
                 </div>
-              </CardContent>
+              </div>
             )}
             {!pat && (
-              <CardFooter>
+              <div>
                 <Button
                   variant={"default"}
                   onClick={() => onCreatePat({ description: "SCA Analysis" })}
                 >
                   Create Personal Access Token
                 </Button>
-              </CardFooter>
+              </div>
             )}
-          </Card>
+          </Section>
         </div>
+        <hr />
         <Tab.Group>
           <Tab.List>
             <CustomTab>
@@ -230,7 +228,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Run DevGuard Software Composition Analysis
-      uses: l3montree-dev/flawfind@1.0.0
+      uses: l3montree-dev/Devguard-Scanner@1.0.0
       with:
         scan-type: "sca"
         scan-ref: "."

@@ -39,7 +39,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       <div className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-card" />
       <button
         onClick={handleCopy}
-        className="absolute right-1 top-1 z-10 rounded-lg bg-white/30 p-1 px-2 text-xs text-white transition-all hover:bg-white/40"
+        className="absolute right-1 top-1 z-10 rounded-lg bg-gray-700 p-1 px-2 text-xs text-white transition-all hover:bg-white/40"
       >
         Copy
       </button>

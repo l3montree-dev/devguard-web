@@ -25,10 +25,14 @@ interface Props {
   forceVertical?: boolean;
   Icon?: ReactNode;
   primaryHeadline?: boolean;
+  className?: string;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
-    <div id={props.id} className={classNames("mb-6 mt-4 pb-6")}>
+    <div
+      id={props.id}
+      className={classNames(props.className ?? "mb-6 mt-4 pb-6")}
+    >
       <div
         className={classNames(
           "flex",
