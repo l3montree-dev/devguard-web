@@ -180,9 +180,3 @@ Distributed under the AGPL-3.0-or-later License. See `LICENSE.txt` for more info
 ```bash
 docker run --rm -v $(pwd):/workspace gcr.io/kaniko-project/executor:latest --dockerfile=/workspace/Dockerfile --context=/workspace --tarPath=/workspace/image.tar --no-push
 ```
-
-
-go run ./cmd/devguard-scanner/main.go sca --assetName="rrree/projects/pro/assets/a" --apiUrl="http://127.0.0.1:8080" --path="../flawfix-web" --token="d4ff2f36b983b69dd36e441f58fcc0bc4f372ace1d12ecc040f1d860ea254f82"
-
-
-go run ./cmd/devguard-scanner/main.go container-scanning --assetName="rrree/projects/pro/assets/a" --apiUrl="http://127.0.0.1:8080" --path="../flawfix-web/image.tar" --token="d4ff2f36b983b69dd36e441f58fcc0bc4f372ace1d12ecc040f1d860ea254f82"

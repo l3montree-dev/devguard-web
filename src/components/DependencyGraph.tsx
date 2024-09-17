@@ -13,32 +13,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { AffectedPackage, DependencyTreeNode, FlawDTO } from "@/types/api/api";
+import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
   MiniMap,
   ReactFlow,
-  addEdge,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 
-import { DependencyGraphNode } from "./DependencyGraphNode";
 import { useRouter } from "next/router";
+import { DependencyGraphNode } from "./DependencyGraphNode";
 
 // or if you just want basic styles
-import "@xyflow/react/dist/base.css";
-import { riskToSeverity, severityToColor } from "./common/Severity";
-import { useTheme } from "next-themes";
 import { beautifyPurl } from "@/utils/common";
+import "@xyflow/react/dist/base.css";
+import { useTheme } from "next-themes";
+import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const nodeWidth = 300;
 const nodeHeight = 100;

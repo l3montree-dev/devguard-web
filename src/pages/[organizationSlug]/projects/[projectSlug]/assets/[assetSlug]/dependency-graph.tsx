@@ -301,7 +301,7 @@ const DependencyGraphPage: FunctionComponent<{
 
 export default DependencyGraphPage;
 
-const RISK_INHERITANCE_FACTOR = 0.33;
+const RISK_INHERITANCE_FACTOR = 1;
 const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<FlawDTO>,

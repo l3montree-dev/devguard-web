@@ -51,6 +51,8 @@ export interface OrganizationDTO extends AppModelDTO {
     targetLogin: string;
     targetAvatarUrl: string;
   }>;
+
+  isPublic: boolean;
 }
 
 export interface OrganizationDetailsDTO extends OrganizationDTO {
@@ -287,6 +289,8 @@ export interface AssetDTO {
   repositoryId?: string;
 
   reachableFromTheInternet: boolean;
+
+  isPublic: boolean;
 }
 
 export interface DependencyTreeNode {

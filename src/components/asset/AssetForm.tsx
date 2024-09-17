@@ -20,6 +20,7 @@ import { Switch } from "../ui/switch";
 import ListItem from "../common/ListItem";
 import { UseFormReturn } from "react-hook-form";
 import { AssetDTO } from "@/types/api/api";
+import Section from "../common/Section";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -170,12 +171,64 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
-const AssetForm: FunctionComponent<Props> = ({ form }) => {
+export const AssetVisibility: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    control={form.control}
+    name="isPublic"
+    render={({ field }) => (
+      <FormItem>
+        <ListItem
+          description={"Should this asset be made visible to the public?"}
+          Title="Public Asset"
+          Button={
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          }
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const AssetForm: FunctionComponent<
+  Props & { forceVerticalSections?: boolean }
+> = ({ form, forceVerticalSections }) => {
   return (
     <>
-      <AssetFormGeneral form={form} />
-      <AssetFormRequirements form={form} />
-      <AssetFormMisc form={form} />
+      <Section
+        forceVertical={forceVerticalSections}
+        title="General"
+        description="General settings"
+      >
+        <AssetFormGeneral form={form} />
+      </Section>
+      <hr />
+      <Section
+        forceVertical={forceVerticalSections}
+        title="Security Requirements"
+        description="
+Security requirements are specific criteria or conditions that an application, system, or organization must meet to ensure the protection of data, maintain integrity, confidentiality, and availability, and guard against threats and vulnerabilities. These requirements help to establish security policies, guide the development of secure systems, and ensure compliance with regulatory and industry standards."
+      >
+        <AssetFormRequirements form={form} />
+      </Section>
+      <hr />
+      <Section
+        forceVertical={forceVerticalSections}
+        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
+        title="Environmental information"
+      >
+        <AssetFormMisc form={form} />
+      </Section>
+      <hr />
+      <Section
+        forceVertical={forceVerticalSections}
+        description="Should this asset be made visible to the public? The asset can be accessed without any authentication."
+        title="Visibility"
+      >
+        <AssetVisibility form={form} />
+      </Section>
     </>
   );
 };

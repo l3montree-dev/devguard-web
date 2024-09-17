@@ -153,6 +153,12 @@ export const beautifyPurl = (purl: string) => {
   }
   const parts = purl.split("@");
   let first = parts[0];
+
+  if (parts.length > 2) {
+    // all other parts than the last
+    first = parts.slice(0, parts.length - 1).join("@");
+  }
+
   // remove everything before the first slash
   const slashIndex = first.indexOf("/");
   if (slashIndex > 0) {

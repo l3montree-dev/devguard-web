@@ -9,6 +9,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
 import {
@@ -19,6 +20,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Switch } from "./ui/switch";
+import ListItem from "./common/ListItem";
 
 interface Props {
   form:
@@ -48,7 +50,7 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
         </div>
       </div>
     </Section>
-
+    <hr />
     <Section
       description="Help us to improve DevGuard."
       title="Optional Information"
@@ -262,6 +264,36 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
           />
         </div>
       </div>
+    </Section>
+    <hr />
+    <Section
+      description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
+      title="Visibility"
+    >
+      <FormField
+        // @ts-expect-error
+        control={form.control}
+        name="isPublic"
+        render={({ field }) => (
+          <FormItem>
+            <ListItem
+              description={
+                "Setting this to true will make the organization visible to the public. It allows creating public and private projects and assets."
+              }
+              Title="Public Organization"
+              Button={
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              }
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </Section>
   </>
 );

@@ -451,6 +451,7 @@ export const getServerSideProps = middleware(
 
     const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
 
+    console.log(flaws);
     return {
       props: {
         asset,

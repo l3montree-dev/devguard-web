@@ -1,5 +1,5 @@
 import Page from "@/components/Page";
-import {
+import AssetForm, {
   AssetFormGeneral,
   AssetFormMisc,
   AssetFormRequirements,
@@ -232,22 +232,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <Section title="General" description="General settings">
-              <AssetFormGeneral form={form} />
-            </Section>
-            <Section
-              title="Security Requirements"
-              description="
-Security requirements are specific criteria or conditions that an application, system, or organization must meet to ensure the protection of data, maintain integrity, confidentiality, and availability, and guard against threats and vulnerabilities. These requirements help to establish security policies, guide the development of secure systems, and ensure compliance with regulatory and industry standards."
-            >
-              <AssetFormRequirements form={form} />
-            </Section>
-            <Section
-              description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
-              title="Environmental information"
-            >
-              <AssetFormMisc form={form} />
-            </Section>
+            <AssetForm form={form} />
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>

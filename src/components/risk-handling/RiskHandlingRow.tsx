@@ -70,8 +70,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           )}
         >
           <td colSpan={7}>
-            <div className="m-2 ml-12">
-              <table className="w-full table-fixed rounded border">
+            <div className="m-2 ml-12 overflow-hidden rounded border">
+              <table className="w-full table-fixed">
                 <thead
                   className={classNames(
                     "w-full text-left",

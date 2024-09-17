@@ -130,7 +130,16 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
               />
               Using GitLab CI/CD
             </CustomTab>
-            <CustomTab>Using FlawFind CLI</CustomTab>
+            <CustomTab>
+              <Image
+                src="/assets/docker.svg"
+                width={20}
+                className="mr-2 inline"
+                height={20}
+                alt="Docker Logo"
+              />
+              Using Docker
+            </CustomTab>
           </Tab.List>
           <Tab.Panels className={"mt-2"}>
             <Tab.Panel>
@@ -243,7 +252,7 @@ jobs:
             <Tab.Panel>
               <CopyCode
                 language="shell"
-                codeString={`flawfind sca \\
+                codeString={`docker run ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 devguard-scanner sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
              --apiUrl="${config.devGuardApiUrl}" \\
              --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
@@ -252,10 +261,12 @@ jobs:
             <Tab.Panel>
               <CopyCode
                 language="shell"
-                codeString={`flawfind sca \\
-             --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.devGuardApiUrl}" \\
-             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+                codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
+    devguard-scanner sca \\
+        --path="/app" \\
+        --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
+        --apiUrl="${config.devGuardApiUrl}" \\
+        --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
           </Tab.Panels>
