@@ -91,7 +91,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   {row.original.flaws?.map((flaw) => (
                     <tr
                       onClick={() =>
-                        router.push(router.asPath + "/../flaws/" + flaw.id)
+                        router.push(
+                          router.asPath.split("?")[0] + "/../flaws/" + flaw.id,
+                        )
                       }
                       className="border-b align-top             hover:bg-gray-50 dark:hover:bg-secondary"
                       key={flaw.id}

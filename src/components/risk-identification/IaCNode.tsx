@@ -15,15 +15,12 @@
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function IaC({ data }: { data: { enabled: boolean } }) {
+function IaC() {
   return (
     <Stage
       title="Infrastructure as Code"
       description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
-      sourceHandle
-      targetHandle
       comingSoon
-      data={data}
     />
   );
 }

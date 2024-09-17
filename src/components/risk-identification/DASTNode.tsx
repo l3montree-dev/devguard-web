@@ -15,14 +15,12 @@
 
 import Stage from "./Stage";
 
-function DAST({ data }: { data: { enabled: boolean } }) {
+function DAST() {
   return (
     <Stage
       title="Dynamic Application Security Testing"
       description="Find security vulnerabilities in running applications."
-      targetHandle
       comingSoon
-      data={data}
     />
   );
 }

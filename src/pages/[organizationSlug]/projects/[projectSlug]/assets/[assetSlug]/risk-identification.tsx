@@ -6,6 +6,7 @@ import IaC from "@/components/risk-identification/IaCNode";
 import SAST from "@/components/risk-identification/SASTNode";
 import SCA from "@/components/risk-identification/SCANode";
 import SecretScanning from "@/components/risk-identification/SecretScanningNode";
+import Stage from "@/components/risk-identification/Stage";
 import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -23,7 +24,7 @@ import { AssetMetricsDTO } from "@/types/api/api";
 import { Edge, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import Link from "next/link";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useRef, useState } from "react";
 
 const paddingX = 35;
 const paddingY = 55;
@@ -212,24 +213,14 @@ const RiskIdentification: FunctionComponent<Props> = (
         title="Risk Identification using the OWASP DevSecOps-Pipeline"
         forceVertical
       >
-        <div
-          className="overflow-hidden rounded-lg border bg-white dark:bg-black"
-          style={{
-            width: "100%",
-            height: dimensions.height / 2,
-          }}
-        >
-          <ReactFlow
-            disableKeyboardA11y
-            defaultViewport={{
-              zoom: 0.9,
-              x: 0,
-              y: 0,
-            }}
-            nodes={n}
-            edges={edges}
-            nodeTypes={nodeTypes}
-          />
+        <div className="grid grid-cols-3 gap-4">
+          <SecretScanning />
+          <SAST />
+
+          <SCA />
+          <IaC />
+          <ContainerScanning />
+          <DAST />
         </div>
       </Section>
     </Page>

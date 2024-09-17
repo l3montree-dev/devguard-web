@@ -15,14 +15,12 @@
 
 import Stage from "./Stage";
 
-function SecretScanning({ data }: { data: { enabled: boolean } }) {
+function SecretScanning() {
   return (
     <Stage
       title="Secret Scanning"
       description="Scan git repositories for finding potential credentials leakage."
-      sourceHandle
       comingSoon
-      data={data}
     />
   );
 }

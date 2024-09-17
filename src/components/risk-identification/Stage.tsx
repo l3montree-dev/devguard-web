@@ -27,35 +27,17 @@ import {
 function Stage({
   title,
   description,
-  sourceHandle,
-  targetHandle,
   onButtonClick,
-  data,
+
   comingSoon,
 }: {
   title: string;
   description: string;
-  sourceHandle?: boolean;
-  targetHandle?: boolean;
   comingSoon?: boolean;
   onButtonClick?: () => void;
-  data: { enabled: boolean };
 }) {
   return (
-    <Card
-      className={classNames(
-        "w-72",
-        comingSoon ? "" : "scale-105 ring ring-blue-600",
-      )}
-    >
-      {targetHandle && (
-        <Handle
-          className="rounded-full !border-2 border-white !bg-gray-400 p-1"
-          type="target"
-          id="left"
-          position={Position.Left}
-        />
-      )}
+    <Card>
       <CardHeader>
         <CardTitle className="text-base">
           <div className="flex flex-row items-center gap-2">{title}</div>
@@ -73,15 +55,6 @@ function Stage({
           {comingSoon ? "Coming soon" : "Open Instructions"}
         </Button>
       </CardFooter>
-
-      {sourceHandle && (
-        <Handle
-          className="rounded-full !border-2 border-white !bg-gray-400 p-1"
-          type="source"
-          id="right"
-          position={Position.Right}
-        />
-      )}
     </Card>
   );
 }
