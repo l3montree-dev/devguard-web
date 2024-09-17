@@ -142,7 +142,11 @@ a {
 }
 
 
-
+.mdx-editor {
+    [role="toolbar"] {
+        background-color: transparent
+    }
+}
 
 
 .mdx-editor-content {
