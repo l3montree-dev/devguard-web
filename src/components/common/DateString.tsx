@@ -12,4 +12,13 @@ const DateString: FunctionComponent<Props> = ({ date }) => {
   return dateString;
 };
 
+export const DateTimeString: FunctionComponent<Props> = ({ date }) => {
+  const [dateString, setDateString] = useState(date.toDateString());
+
+  useEffect(() => {
+    setDateString(date.toLocaleString());
+  }, [date]);
+  return dateString;
+};
+
 export default DateString;

@@ -16,14 +16,11 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
   const defaultClasses =
     "px-2 py-1 whitespace-nowrap rounded-full flex flex-row items-center gap-1 border font-semibold";
   switch (state) {
-    case "fixed":
+    case "open":
       return (
         <Badge
-          variant={"outline"}
-          className={classNames(
-            defaultClasses,
-            "border-green-400 bg-green-200 text-green-900 dark:bg-green-400/10 dark:text-green-500",
-          )}
+          variant={"default"}
+          className={classNames(defaultClasses, "bg-green-500 text-black")}
         >
           <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
           Fixed
@@ -33,10 +30,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
     case "accepted":
       return (
         <Badge
-          variant={"outline"}
+          variant={"default"}
           className={classNames(
             defaultClasses,
-            "border-gray-500 text-gray-500 dark:text-gray-300",
+            "bg-secondary text-secondary-foreground",
           )}
         >
           <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
@@ -47,10 +44,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
     case "falsePositive":
       return (
         <Badge
-          variant={"outline"}
+          variant={"default"}
           className={classNames(
             defaultClasses,
-            "border-gray-500 text-gray-500 dark:text-gray-300",
+            "bg-secondary text-secondary-foreground",
           )}
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />
@@ -62,10 +59,10 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
     default:
       return (
         <Badge
-          variant={"outline"}
+          variant={"default"}
           className={classNames(
             defaultClasses,
-            "border-gray-500 text-gray-500 dark:text-gray-300",
+            "bg-secondary text-secondary-foreground",
           )}
         >
           <BugAntIcon className="-ml-1 inline-block h-4 w-4" />

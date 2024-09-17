@@ -66,6 +66,8 @@ import { beautifyPurl } from "@/utils/common";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import DateString, { DateTimeString } from "@/components/common/DateString";
+import FormatDate from "@/components/risk-assessment/FormatDate";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -674,6 +676,10 @@ const Index: FunctionComponent<Props> = (props) => {
                     Show detailed risk assessment
                     <CaretDownIcon />
                   </CollapsibleTrigger>
+                  <small className="text-muted-foreground">
+                    Last calculated at:{" "}
+                    <FormatDate dateString={flaw.riskRecalculatedAt} />
+                  </small>
                   <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
                     <div className="w-full border-b pb-4">
                       <div className="flex w-full flex-row items-center justify-between">

@@ -3,13 +3,13 @@ import { Badge } from "../ui/badge";
 export const getClassNames = (severity: string) => {
   switch (severity) {
     case "CRITICAL":
-      return "text-red-500 border border-red-500";
+      return "text-white bg-red-600 border border-red-600";
     case "HIGH":
-      return "text-orange-500 border border-orange-500";
+      return "text-white border border-orange-500 bg-orange-500";
     case "MEDIUM":
-      return "border border-yellow-400 text-yellow-300";
+      return "text-black bg-yellow-500 border border-yellow-500";
     case "LOW":
-      return "text-green-400 border border-green-400";
+      return "text-black border bg-green-500 border-green-500";
     default:
       return "text-white bg-gray-500";
   }

@@ -41,8 +41,8 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
               key={item.componentName}
               className={classNames("flex items-center gap-4")}
             >
-              <div className="rounded-full bg-muted p-1">
-                <EcosystemImage size={28} packageName={item.componentName} />
+              <div className="rounded-full bg-muted p-2">
+                <EcosystemImage size={20} packageName={item.componentName} />
               </div>
               <div className="grid gap-1">
                 <p className="text-sm font-medium leading-none">

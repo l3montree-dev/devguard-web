@@ -107,6 +107,7 @@ export interface FlawDTO {
   rawRiskAssessment: number;
   ticketId: string | null;
   ticketUrl: string | null;
+  riskRecalculatedAt: string;
 }
 
 export interface Paged<T> {
