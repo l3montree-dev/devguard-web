@@ -21,6 +21,8 @@ import ListItem from "../common/ListItem";
 import { UseFormReturn } from "react-hook-form";
 import { AssetDTO } from "@/types/api/api";
 import Section from "../common/Section";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { classNames } from "@/utils/common";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -171,26 +173,43 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
-export const AssetVisibility: FunctionComponent<Props> = ({ form }) => (
-  <FormField
-    control={form.control}
-    name="isPublic"
-    render={({ field }) => (
-      <FormItem>
-        <ListItem
-          description={"Should this asset be made visible to the public?"}
-          Title="Public Asset"
-          Button={
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-          }
-        />
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
+export const AssetVisibility: FunctionComponent<Props> = ({ form }) => {
+  const project = useActiveProject()!;
+  return (
+    <>
+      <FormField
+        control={form.control}
+        name="isPublic"
+        render={({ field }) => (
+          <FormItem>
+            <div className={classNames(!project.isPublic && "opacity-50")}>
+              <ListItem
+                description={"Should this asset be made visible to the public?"}
+                Title="Public Asset"
+                Button={
+                  <FormControl>
+                    <Switch
+                      disabled={!project.isPublic}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                }
+              />
+              <FormMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+      {!project.isPublic && (
+        <small>
+          The project {project.name} is not public. You can not make the asset
+          public.
+        </small>
+      )}
+    </>
+  );
+};
 
 const AssetForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }

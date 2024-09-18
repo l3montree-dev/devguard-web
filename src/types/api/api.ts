@@ -81,6 +81,8 @@ export interface ProjectDTO {
   description: string;
   slug: string;
   id: string;
+
+  isPublic: boolean;
 }
 
 export interface EnvDTO {

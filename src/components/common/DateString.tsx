@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 
 interface Props {
   date: Date;
@@ -8,15 +8,6 @@ const DateString: FunctionComponent<Props> = ({ date }) => {
 
   useEffect(() => {
     setDateString(date.toLocaleDateString());
-  }, [date]);
-  return dateString;
-};
-
-export const DateTimeString: FunctionComponent<Props> = ({ date }) => {
-  const [dateString, setDateString] = useState(date.toDateString());
-
-  useEffect(() => {
-    setDateString(date.toLocaleString());
   }, [date]);
   return dateString;
 };

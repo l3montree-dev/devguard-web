@@ -24,6 +24,7 @@ export async function withProject(ctx: GetServerSidePropsContext) {
 
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
+
   // get the organization
   const r = await devGuardApiClient(
     "/organizations/" + organization + "/projects/" + projectSlug,

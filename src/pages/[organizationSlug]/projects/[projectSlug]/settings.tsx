@@ -11,22 +11,19 @@ import Link from "next/link";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../../../../services/devGuardApi";
-import { AssetDTO, ProjectDTO } from "../../../../types/api/api";
+import { browserApiClient } from "../../../../services/devGuardApi";
+import { ProjectDTO } from "../../../../types/api/api";
 
-import Section from "@/components/common/Section";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
 import { withProject } from "@/decorators/withProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { toast } from "sonner";
 import { useStore } from "@/zustand/globalStoreProvider";
+
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface Props {
   project: ProjectDTO;
@@ -44,6 +41,7 @@ const Index: FunctionComponent<Props> = () => {
   const form = useForm<ProjectDTO>({ defaultValues: project });
 
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
+    console.log(project);
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/projects/" + project!.slug + "/",
       {
@@ -110,12 +108,8 @@ const Index: FunctionComponent<Props> = () => {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <Section
-              title="General"
-              description="General Settings of the project"
-            >
-              <ProjectForm form={form} />
-            </Section>
+            <ProjectForm forceVerticalSections={false} form={form} />
+
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>

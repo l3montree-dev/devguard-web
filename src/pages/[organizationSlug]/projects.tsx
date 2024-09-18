@@ -68,6 +68,7 @@ import {
 import EmptyList from "@/components/common/EmptyList";
 import { Badge } from "@/components/ui/badge";
 import { withOrganization } from "@/decorators/withOrganization";
+import { ProjectForm } from "@/components/project/ProjectForm";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -83,7 +84,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
 
-  const form = useForm<CreateProjectReq>({
+  const form = useForm<ProjectDTO>({
     mode: "onBlur",
     resolver: zodResolver(formSchema),
   });
@@ -136,42 +137,13 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
               a single enitity. Something like: frontend and backend
             </DialogDescription>
           </DialogHeader>
+          <hr />
           <Form {...form}>
             <form
               className="space-y-8"
               onSubmit={form.handleSubmit(handleCreateProject)}
             >
-              <FormField
-                name={"name"}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormDescription>The name of the project.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name={"description"}
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      The description of the project.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+              <ProjectForm forceVerticalSections form={form} />
               <DialogFooter>
                 <Button type="submit">Create</Button>
               </DialogFooter>

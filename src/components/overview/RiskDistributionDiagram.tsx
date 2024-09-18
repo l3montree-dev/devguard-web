@@ -58,16 +58,18 @@ export function RiskDistributionDiagram({
 }: {
   data: RiskDistribution[];
 }) {
-  const chartConfig = uniq(data.map((item) => item.scannerId)).reduce(
-    (acc, scannerId, i) => ({
-      ...acc,
-      [scannerId]: {
-        label: beautifyScannerId(scannerId),
-        color: `hsl(var(--chart-${i + 1}))`,
-      },
-    }),
-    {} as any,
-  );
+  const chartConfig = uniq(data.map((item) => item.scannerId))
+    .sort()
+    .reduce(
+      (acc, scannerId, i) => ({
+        ...acc,
+        [scannerId]: {
+          label: beautifyScannerId(scannerId),
+          color: `hsl(var(--chart-${i + 1}))`,
+        },
+      }),
+      {} as any,
+    );
 
   const chartData = combineRanges(data);
 

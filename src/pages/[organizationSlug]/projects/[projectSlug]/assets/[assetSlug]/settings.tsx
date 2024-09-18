@@ -32,6 +32,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -81,6 +82,9 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           "/settings",
       );
     }
+    toast("Success", {
+      description: "Asset updated",
+    });
   };
 
   return (

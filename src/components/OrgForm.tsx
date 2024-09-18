@@ -278,7 +278,7 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
           <FormItem>
             <ListItem
               description={
-                "Setting this to true will make the organization visible to the public. It allows creating public and private projects and assets."
+                "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
               }
               Title="Public Organization"
               Button={
