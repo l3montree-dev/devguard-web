@@ -321,7 +321,7 @@ export interface RiskDistribution {
 }
 
 export interface RiskHistory {
-  assetId: string;
+  id: string;
   day: string;
   sumOpenRisk: number;
   averageOpenRisk: number;

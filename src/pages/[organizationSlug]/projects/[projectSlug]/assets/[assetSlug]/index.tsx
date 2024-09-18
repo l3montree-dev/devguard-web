@@ -220,6 +220,8 @@ export const getServerSideProps = middleware(
       ),
     ]);
 
+    console.log("riskHistory", riskHistory);
+
     return {
       props: {
         componentRisk,

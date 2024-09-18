@@ -130,30 +130,35 @@ const Index: FunctionComponent<Props> = ({
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-6">
-                {riskHistory.slice(0, 5).map((r) => (
-                  <div
-                    key={r.label}
-                    className={classNames("flex items-center gap-4")}
-                  >
-                    <div className="rounded-full bg-muted p-1">
-                      <Avatar>
-                        <AvatarFallback>{r.label[0]}</AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {beautifyPurl(r.label)}
-                      </p>
-                    </div>
-                    <div className="ml-auto font-medium">
-                      {" "}
-                      {r.history[r.history.length - 1].sumOpenRisk.toFixed(
-                        2,
-                      )}{" "}
-                      <small className="text-muted-foreground">Risk</small>
-                    </div>
-                  </div>
-                ))}
+                {riskHistory.slice(0, 5).map(
+                  (r) => (
+                    console.log("r", r),
+                    (
+                      <div
+                        key={r.label}
+                        className={classNames("flex items-center gap-4")}
+                      >
+                        <div className="rounded-full bg-muted p-1">
+                          <Avatar>
+                            <AvatarFallback>{r.label[0]}</AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="grid gap-1">
+                          <p className="text-sm font-medium leading-none">
+                            {beautifyPurl(r.label)}
+                          </p>
+                        </div>
+                        <div className="ml-auto font-medium">
+                          {" "}
+                          {r.history[r.history.length - 1].sumOpenRisk.toFixed(
+                            2,
+                          )}{" "}
+                          <small className="text-muted-foreground">Risk</small>
+                        </div>
+                      </div>
+                    )
+                  ),
+                )}
               </div>
               <div className="flex items-center gap-4"></div>
             </CardContent>
@@ -274,6 +279,25 @@ export const getServerSideProps = middleware(
       if (r.riskHistory.length === max) {
         return r;
       }
+      if (r.riskHistory.length === 0) {
+        r.riskHistory = [
+          {
+            day: new Date().toUTCString(),
+            id: r.asset.id,
+            sumClosedRisk: 0,
+            sumOpenRisk: 0,
+            maxClosedRisk: 0,
+            maxOpenRisk: 0,
+            averageClosedRisk: 0,
+            averageOpenRisk: 0,
+            openFlaws: 0,
+            fixedFlaws: 0,
+            minClosedRisk: 0,
+            minOpenRisk: 0,
+          },
+        ];
+        return r;
+      }
       // it is smaller - thus we need to prepend fake elements
       let firstDay = new Date(r.riskHistory[0].day);
       while (r.riskHistory.length < max) {
@@ -283,7 +307,7 @@ export const getServerSideProps = middleware(
         r.riskHistory = [
           {
             day: clone.toUTCString(),
-            assetId: r.asset.id,
+            id: r.asset.id,
             sumClosedRisk: 0,
             sumOpenRisk: 0,
             maxClosedRisk: 0,
