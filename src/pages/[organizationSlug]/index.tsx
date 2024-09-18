@@ -247,7 +247,6 @@ export const getServerSideProps = middleware(
         r.json(),
       ),
     ]);
-    console.log("riskHistory", riskHistory);
     const lengths = riskHistory.map((r) => r.riskHistory.length);
     const max = Math.max(...lengths);
 

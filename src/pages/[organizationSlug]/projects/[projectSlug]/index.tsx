@@ -130,35 +130,30 @@ const Index: FunctionComponent<Props> = ({
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-6">
-                {riskHistory.slice(0, 5).map(
-                  (r) => (
-                    console.log("r", r),
-                    (
-                      <div
-                        key={r.label}
-                        className={classNames("flex items-center gap-4")}
-                      >
-                        <div className="rounded-full bg-muted p-1">
-                          <Avatar>
-                            <AvatarFallback>{r.label[0]}</AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div className="grid gap-1">
-                          <p className="text-sm font-medium leading-none">
-                            {beautifyPurl(r.label)}
-                          </p>
-                        </div>
-                        <div className="ml-auto font-medium">
-                          {" "}
-                          {r.history[r.history.length - 1].sumOpenRisk.toFixed(
-                            2,
-                          )}{" "}
-                          <small className="text-muted-foreground">Risk</small>
-                        </div>
-                      </div>
-                    )
-                  ),
-                )}
+                {riskHistory.slice(0, 5).map((r) => (
+                  <div
+                    key={r.label}
+                    className={classNames("flex items-center gap-4")}
+                  >
+                    <div className="rounded-full bg-muted p-1">
+                      <Avatar>
+                        <AvatarFallback>{r.label[0]}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                    <div className="grid gap-1">
+                      <p className="text-sm font-medium leading-none">
+                        {beautifyPurl(r.label)}
+                      </p>
+                    </div>
+                    <div className="ml-auto font-medium">
+                      {" "}
+                      {r.history[r.history.length - 1].sumOpenRisk.toFixed(
+                        2,
+                      )}{" "}
+                      <small className="text-muted-foreground">Risk</small>
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="flex items-center gap-4"></div>
             </CardContent>
