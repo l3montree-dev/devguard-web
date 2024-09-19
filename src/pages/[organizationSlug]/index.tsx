@@ -123,9 +123,9 @@ const Home: FunctionComponent<Props> = ({
 
           <Card>
             <CardHeader>
-              <CardTitle>Vulnerable Assets</CardTitle>
+              <CardTitle>Vulnerable Projects</CardTitle>
               <CardDescription>
-                The most vulnerable assets in this project
+                The most vulnerable Projects in this organization
               </CardDescription>
             </CardHeader>
             <CardContent>
