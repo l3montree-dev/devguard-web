@@ -274,6 +274,25 @@ export const getServerSideProps = middleware(
       if (r.riskHistory.length === max) {
         return r;
       }
+      if (r.riskHistory.length === 0) {
+        r.riskHistory = [
+          {
+            day: new Date().toUTCString(),
+            id: r.asset.id,
+            sumClosedRisk: 0,
+            sumOpenRisk: 0,
+            maxClosedRisk: 0,
+            maxOpenRisk: 0,
+            averageClosedRisk: 0,
+            averageOpenRisk: 0,
+            openFlaws: 0,
+            fixedFlaws: 0,
+            minClosedRisk: 0,
+            minOpenRisk: 0,
+          },
+        ];
+        return r;
+      }
       // it is smaller - thus we need to prepend fake elements
       let firstDay = new Date(r.riskHistory[0].day);
       while (r.riskHistory.length < max) {
@@ -283,7 +302,7 @@ export const getServerSideProps = middleware(
         r.riskHistory = [
           {
             day: clone.toUTCString(),
-            assetId: r.asset.id,
+            id: r.asset.id,
             sumClosedRisk: 0,
             sumOpenRisk: 0,
             maxClosedRisk: 0,
