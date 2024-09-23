@@ -74,9 +74,9 @@ interface Props {
   projects: Array<ProjectDTO>;
 }
 
-const formSchema = z.object<ZodConvert<CreateProjectReq>>({
+const formSchema = z.object({
   name: z.string(),
-  description: z.string(),
+  description: z.string().optional(),
 });
 
 const Home: FunctionComponent<Props> = ({ projects }) => {
