@@ -250,7 +250,7 @@ jobs:
                 language="shell"
                 codeString={`docker run ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 devguard-scanner sca \\
              --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.devGuardApiUrl}" \\
+             --apiUrl="${config.publicDevGuardApiUrl}" \\
              --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
@@ -261,7 +261,7 @@ jobs:
     devguard-scanner sca \\
         --path="/app" \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-        --apiUrl="${config.devGuardApiUrl}" \\
+        --apiUrl="${config.publicDevGuardApiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>
