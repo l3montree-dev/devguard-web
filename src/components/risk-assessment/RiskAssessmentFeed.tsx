@@ -191,7 +191,7 @@ const evTypeBackground: { [key in FlawEventDTO["type"]]: string } = {
   fixed: "bg-green-600 text-white",
   detected: "bg-red-600 text-white",
   falsePositive: "bg-purple-600 text-white",
-  mitigate: "bg-green-600 text-white",
+  mitigate: "bg-green-600 text-black",
   markedForTransfer: "bg-blue-600 text-white",
   rawRiskAssessmentUpdated: "bg-secondary",
   reopened: "bg-red-600 text-white",
