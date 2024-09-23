@@ -889,8 +889,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                 router.asPath +
                                 "/../../dependency-graph?pkg=" +
                                 flaw.arbitraryJsonData.packageName +
-                                "@" +
-                                flaw.arbitraryJsonData.installedVersion +
                                 "&scanType=" +
                                 flaw.arbitraryJsonData.scanType
                               }
