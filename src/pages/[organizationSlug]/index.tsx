@@ -137,19 +137,21 @@ const Home: FunctionComponent<Props> = ({
                   >
                     <div className="rounded-full bg-muted p-1">
                       <Avatar>
-                        <AvatarFallback>{r.label[0]}</AvatarFallback>
+                        <AvatarFallback className="flex h-8 w-8 flex-row items-center justify-center">
+                          {r.label[0]}
+                        </AvatarFallback>
                       </Avatar>
                     </div>
                     <div className="grid gap-1">
                       <p className="text-sm font-medium leading-none">
-                        {beautifyPurl(r.label)}
+                        {r.label}
                       </p>
                     </div>
                     <div className="ml-auto font-medium">
                       {" "}
-                      {r.history[r.history.length - 1].sumOpenRisk.toFixed(
+                      {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
                         2,
-                      )}{" "}
+                      ) ?? "0.00"}{" "}
                       <small className="text-muted-foreground">Risk</small>
                     </div>
                   </div>
@@ -302,8 +304,8 @@ export const getServerSideProps = middleware(
 
     riskHistory.sort(
       (a, b) =>
-        b.riskHistory[b.riskHistory.length - 1].sumOpenRisk -
-        a.riskHistory[a.riskHistory.length - 1].sumOpenRisk,
+        (b.riskHistory[b.riskHistory.length - 1]?.sumOpenRisk ?? 0) -
+        (a.riskHistory[a.riskHistory.length - 1]?.sumOpenRisk ?? 0),
     );
 
     return {
