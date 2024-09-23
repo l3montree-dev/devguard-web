@@ -281,7 +281,7 @@ export interface DetailedFlawDTO extends FlawWithCVE {
 
 export interface AssetDTO {
   name: string;
-  description: string;
+  description?: string;
   slug: string;
   id: string;
 

@@ -41,6 +41,7 @@ import {
   RequirementsLevel,
 } from "../../../../types/api/api";
 import { withOrganization } from "@/decorators/withOrganization";
+import { addToInitialZustandState } from "@/zustand/initialState";
 
 interface Props {
   project: ProjectDTO & {
@@ -50,7 +51,7 @@ interface Props {
 
 const formSchema = z.object({
   name: z.string(),
-  description: z.string(),
+  description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
 
@@ -214,6 +215,9 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
+        initialZustandState: {
+          project,
+        },
         project,
       },
     };
