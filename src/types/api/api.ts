@@ -78,7 +78,7 @@ export interface PatWithPrivKey extends PersonalAccessTokenDTO {
 
 export interface ProjectDTO {
   name: string;
-  description: string;
+  description?: string;
   slug: string;
   id: string;
 

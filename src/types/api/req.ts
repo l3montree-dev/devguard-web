@@ -15,5 +15,5 @@ export interface CreateAssetReq {
 
 export interface CreateProjectReq {
   name: string;
-  description: string;
+  description?: string;
 }
