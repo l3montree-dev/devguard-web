@@ -233,7 +233,7 @@ jobs:
     - name: DevGuard SCA
       uses: docker://ghcr.io/l3montree-dev/devguard-scanner:main-ae590b31-1726823132
       with:
-        args: devguard-scanner sca --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
+        args: devguard-scanner sca --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://api.main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
