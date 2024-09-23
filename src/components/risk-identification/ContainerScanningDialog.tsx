@@ -274,7 +274,7 @@ jobs:
         - name: DevGuard Container-Scanning
         uses: docker://ghcr.io/l3montree-dev/devguard-scanner@sha256:55736b9dc029762131ea31b7d5ec7a108f07df114520fefa82df28132f554ab8
         with:
-            args: devguard-scanner container-scanning --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://main.devguard.org" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace/image.tar"
+            args: devguard-scanner container-scanning --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://api.main.devguard.org" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace/image.tar"
     # ----- END Container Scanning -----`}
                   ></CopyCode>
                 </div>
