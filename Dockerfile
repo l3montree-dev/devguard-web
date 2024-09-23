@@ -19,6 +19,7 @@ LABEL maintainer="Sebastian Kawelke <sebatian.kawelke@l3montree.com"
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 ARG VERSION
+ARG DEVGUARD_API_URL
 
 WORKDIR /usr/app/
 
@@ -27,6 +28,7 @@ EXPOSE 3000
 
 ENV NEXT_PUBLIC_ENVIRONMENT production
 ENV NEXT_PUBLIC_VERSION $VERSION
+ENV NEXT_PUBLIC_DEVGUARD_API_URL $DEVGUARD_API_URL
 
 COPY package-lock.json .
 COPY package.json .

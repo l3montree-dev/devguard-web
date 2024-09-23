@@ -12,15 +12,23 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { useState } from "react";
+import ContainerScanningDialog from "./ContainerScanningDialog";
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function ContainerScanning() {
+  const [open, setOpen] = useState(false);
   return (
-    <Stage
-      title="Container Scanning"
-      description="Find known security vulnerabilities in OCI images, like Docker Images."
-    />
+    <>
+      <Stage
+        title="Container Scanning"
+        description="Find known security vulnerabilities in OCI images, like Docker Images."
+        onButtonClick={() => setOpen(true)}
+      />
+
+      <ContainerScanningDialog open={open} setOpen={setOpen} />
+    </>
   );
 }
 
