@@ -98,7 +98,7 @@ jobs:
       id: build_image
       uses: docker://gcr.io/kaniko-project/executor:v1.9.2
       with:
-        args: --destination=${{ env.IMAGE_TAG }} --context=/github/workspace --build-arg "VERSION=${{ steps.ghd.outputs.describe }}" --dockerfile=/github/workspace/Dockerfile --no-push --tarPath /github/workspace/image.tar
+        args: --destination=${{ env.IMAGE_TAG }} --context=/github/workspace --build-arg "VERSION=${{ steps.ghd.outputs.describe }}" --build-arg "DEVGUARD_API_URL=main.devguard.org" --dockerfile=/github/workspace/Dockerfile --no-push --tarPath /github/workspace/image.tar
     - name: Setup crane
       uses: imjasonh/setup-crane@v0.1
     - name: Use crane to get the digest
