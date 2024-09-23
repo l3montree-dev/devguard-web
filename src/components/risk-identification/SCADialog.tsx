@@ -226,16 +226,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Run DevGuard Software Composition Analysis
-      uses: l3montree-dev/Devguard-Scanner@1.0.0
+      uses: actions/checkout@v4 # Check out the repository content to the runner
+    - name: Set up Git
+      run: |
+        git config --global --add safe.directory /github/workspace
+    - name: DevGuard SCA
+      uses: docker://ghcr.io/l3montree-dev/devguard-scanner:main-ae590b31-1726823132
       with:
-        scan-type: "sca"
-        scan-ref: "."
-        severity: "CRITICAL,HIGH"
-        assetName: "${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}"
-        apiUrl: "${config.devGuardApiUrl}"
-        token: "{{github.secrets.DEVGUARD_TOKEN}}"
+        args: devguard-scanner sca --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
