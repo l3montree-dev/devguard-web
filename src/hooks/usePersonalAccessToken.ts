@@ -1,8 +1,10 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { EventEmitter } from "events";
 
+const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
   existingPats?: PersonalAccessTokenDTO[],
 ) {
@@ -18,9 +20,21 @@ export default function usePersonalAccessToken(
     );
   };
 
+  useEffect(() => {
+    const pat = sessionStorage.getItem("pat");
+    if (pat) {
+      setPersonalAccessTokens((prev) => [...prev, JSON.parse(pat)]);
+    }
+    newPatEventEmitter.on("pat", (pat) => {
+      setPersonalAccessTokens((prev) => [...prev, pat]);
+    });
+  }, []);
+
   const handleCreatePat = async (data: { description: string }) => {
     const pat = await createPat(data);
-    setPersonalAccessTokens([...personalAccessTokens, pat]);
+    setPersonalAccessTokens((prev) => [...prev, pat]);
+    sessionStorage.setItem("pat", JSON.stringify(pat));
+    newPatEventEmitter.emit("pat", pat);
   };
 
   return {

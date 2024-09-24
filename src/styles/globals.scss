@@ -5,10 +5,10 @@
 
 @layer base {
   :root {
-    --background: 214 20% 100%;
+    --background: 214 20% 95%;
     --foreground: 226, 57%, 0%;
 
-    --card: 210 29% 97%;
+    --card: 210 29% 100%;
     --card-foreground: 226, 57%, 0%;
 
     --popover: 0 0% 100%;
@@ -17,10 +17,10 @@
     --primary: 43 95% 56%;
     --primary-foreground: 0 0% 2%;
 
-    --secondary: 226 30% 90%;
+    --secondary: 226 15% 85%;
     --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 90%;
+    --muted: 0 0% 95%;
     --muted-foreground: 0 0% 45%;
 
     --accent: 0 0% 96%;
@@ -200,3 +200,46 @@
     }
 }
 
+
+
+
+
+.animated-outline {
+    --border-angle: 0turn; // For animation.
+    --main-bg: conic-gradient(
+        from var(--border-angle),
+        hsl(var(--card)) 0%,
+        hsl(var(--card)) 5%,
+        hsl(var(--card)) 60%,
+        hsl(var(--card)) 95%
+      );
+    margin: -0.5px;
+    border: solid 2px transparent;
+    
+    --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, transparent, hsl(var(--primary)) 99%, transparent);
+    
+    background: 
+      // padding-box clip this background in to the overall element except the border.
+      
+      // border-box extends this background to the border space
+      var(--gradient-border) border-box, 
+      // Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background.
+      var(--main-bg) border-box;
+  
+    animation: bg-spin 3s linear infinite;
+    @keyframes bg-spin {
+      to {
+        --border-angle: 1turn;
+      }
+    }
+  
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+  
+  @property --border-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0turn;
+  }

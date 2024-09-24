@@ -296,15 +296,33 @@ jobs:
               ></CopyCode>
             </Tab.Panel>
             <Tab.Panel>
-              <CopyCode
-                language="shell"
-                codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
-    devguard-scanner sca \\
-        --path="/app" \\
+              <Steps>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Build the image using kaniko
+                  </h3>
+
+                  <CopyCode
+                    language="shell"
+                    codeString={`docker run --rm -v $(pwd):/workspace gcr.io/kaniko-project/executor:latest --dockerfile=/workspace/Dockerfile --context=/workspace --tarPath=/workspace/image.tar --no-push`}
+                  ></CopyCode>
+                </div>
+                <div>
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Scan the produced .tar file image using devguard
+                    container-scanning
+                  </h3>
+                  <CopyCode
+                    language="shell"
+                    codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
+    devguard-scanner container-scanning \\
+        --path="/app/image.tar" \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
         --apiUrl="${config.publicDevGuardApiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
-              ></CopyCode>
+                  ></CopyCode>
+                </div>
+              </Steps>
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>

@@ -15,16 +15,28 @@
 import { useState } from "react";
 import ContainerScanningDialog from "./ContainerScanningDialog";
 import Stage from "./Stage";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import FormatDate from "../risk-assessment/FormatDate";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function ContainerScanning() {
   const [open, setOpen] = useState(false);
+  const asset = useActiveAsset()!;
   return (
     <>
       <Stage
         title="Container Scanning"
         description="Find known security vulnerabilities in OCI images, like Docker Images."
         onButtonClick={() => setOpen(true)}
+        LastScan={
+          asset.lastContainerScan ? (
+            <small className="w-full text-right text-muted-foreground">
+              last component update{" "}
+              <FormatDate dateString={asset.lastContainerScan} />, continuously
+              monitoring risk changes.
+            </small>
+          ) : undefined
+        }
       />
 
       <ContainerScanningDialog open={open} setOpen={setOpen} />

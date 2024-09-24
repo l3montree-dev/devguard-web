@@ -17,17 +17,30 @@ import { useState } from "react";
 import SCADialog from "./SCADialog";
 import Stage from "./Stage";
 import { useRouter } from "next/router";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import FormatDate from "../risk-assessment/FormatDate";
 
 function SCA() {
   const router = useRouter();
   const openDialog = router.query.openDialog;
   const [open, setOpen] = useState(openDialog === "sca");
 
+  const asset = useActiveAsset()!;
+
   return (
     <>
       <Stage
         title="Software Composition Analysis"
         description="Find known vulnerabilities in third-party and open source dependencies."
+        LastScan={
+          asset.lastScaScan ? (
+            <small className="w-full text-right text-muted-foreground">
+              last component update{" "}
+              <FormatDate dateString={asset.lastScaScan} />, continuously
+              monitoring risk changes.
+            </small>
+          ) : undefined
+        }
         onButtonClick={() => setOpen(true)}
       />
       <SCADialog open={open} setOpen={setOpen} />
