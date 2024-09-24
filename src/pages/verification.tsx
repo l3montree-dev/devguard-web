@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
 import { ory } from "../services/ory";
 import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Verification: NextPage = () => {
   const [flow, setFlow] = useState<VerificationFlow>();
@@ -126,40 +127,20 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-col justify-center bg-gray-200 px-6 py-32 dark:bg-gray-950 max-sm:py-16 lg:px-8">
-        <div className="rounded-lg bg-white p-5 text-black dark:bg-gray-900 dark:text-white sm:mx-auto sm:w-full sm:max-w-lg">
-          <div className="">
-            <Image
-              className="mx-auto h-20 w-auto dark:hidden"
-              src="/logo_horizontal.svg"
-              alt="DevGuard by l3montree Logo"
-              width={300}
-              height={300}
-            />
-            <Image
-              className="mx-auto hidden h-20 w-auto dark:block"
-              src="/logo_inverse_horizontal.svg"
-              alt="DevGuard by l3montree Logo"
-              width={300}
-              height={300}
-            />
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
-              Verify your E-Mail
-            </h2>
-          </div>
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg">
-            <Flow onSubmit={onSubmit} flow={flow} />
-          </div>
-          <p className="mt-2 text-right text-sm">
-            <Link
-              href="/"
-              passHref
-              className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
-            >
-              Go back
-            </Link>
-          </p>
-        </div>
+      <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-32 max-sm:py-16 lg:px-8">
+        <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
+          <CardHeader>
+            <CardTitle>Verify your E-Mail</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
+              <Flow onSubmit={onSubmit} flow={flow} />
+            </div>
+            <div className="flex flex-row justify-end text-sm">
+              <Link href="/">Go back</Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );

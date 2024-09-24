@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { classNames } from "@/utils/common";
-import { Handle, Position } from "@xyflow/react";
+import { ReactNode } from "react";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -28,33 +28,43 @@ function Stage({
   title,
   description,
   onButtonClick,
-
   comingSoon,
+  LastScan,
 }: {
   title: string;
   description: string;
   comingSoon?: boolean;
   onButtonClick?: () => void;
+  LastScan?: ReactNode;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">
-          <div className="flex flex-row items-center gap-2">{title}</div>
-        </CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
+    <Card className="h-full">
+      <div
+        className={classNames(
+          Boolean(LastScan) && "animated-outline relative rounded-lg",
+        )}
+      >
+        <div className="rounded-lg bg-card">
+          <CardHeader>
+            <CardTitle className="text-base">
+              <div className="flex flex-row items-center gap-2">{title}</div>
+            </CardTitle>
+            <CardDescription>{description}</CardDescription>
+          </CardHeader>
 
-      <CardFooter className="flex w-full ">
-        <Button
-          className="flex-1"
-          disabled={comingSoon}
-          variant={comingSoon ? "outline" : "default"}
-          onClick={onButtonClick}
-        >
-          {comingSoon ? "Coming soon" : "Open Instructions"}
-        </Button>
-      </CardFooter>
+          <CardFooter className="flex flex-col gap-2">
+            <Button
+              className="w-full flex-1"
+              disabled={comingSoon}
+              variant={comingSoon ? "outline" : "default"}
+              onClick={onButtonClick}
+            >
+              {comingSoon ? "Coming soon" : "Open Instructions"}
+            </Button>
+            {Boolean(LastScan) && LastScan}
+          </CardFooter>
+        </div>
+      </div>
     </Card>
   );
 }
