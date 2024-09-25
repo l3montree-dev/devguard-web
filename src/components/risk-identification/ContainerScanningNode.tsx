@@ -31,9 +31,8 @@ function ContainerScanning() {
         LastScan={
           asset.lastContainerScan ? (
             <small className="w-full text-right text-muted-foreground">
-              last component update{" "}
-              <FormatDate dateString={asset.lastContainerScan} />, continuously
-              monitoring risk changes.
+              Continuously monitoring risk changes. Last component update{" "}
+              <FormatDate dateString={asset.lastScaScan} />.
             </small>
           ) : undefined
         }
