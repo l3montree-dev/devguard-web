@@ -218,9 +218,10 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
                     codeString={`# DevSecOps Workflow Definition
 # This workflow is triggered on every push to the repository
 name: DevSecOps Workflow
-on: 
-  push:
-  workflow_dispatch:
+on:
+    push:
+        branches:
+        - main # change to primary branch
 
 env:
     IMAGE_TAG: \${{ github.repository }}:\${{ github.sha }} # Setting the image tag to the repository name and the commit SHA

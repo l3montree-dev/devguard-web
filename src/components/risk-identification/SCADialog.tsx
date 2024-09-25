@@ -215,9 +215,10 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     codeString={`# DevSecOps Workflow Definition
 # This workflow is triggered on every push to the repository
 name: DevSecOps Workflow
-on: 
-  push:
-  workflow_dispatch:
+on:
+    push:
+        branches:
+        - main # change to primary branch
 
 jobs:
   # ----- BEGIN Software Composition Analysis Job -----
