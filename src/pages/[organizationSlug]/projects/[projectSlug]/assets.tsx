@@ -160,7 +160,37 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               <ListItem
                 key={asset.id}
                 Title={asset.name}
-                description={asset.description}
+                description={
+                  <div>
+                    {asset.description}{" "}
+                    <div className="mt-2 flex flex-row gap-2">
+                      {asset.lastSecretScan && (
+                        <Badge variant={"outline"}>Secret-Scanning</Badge>
+                      )}
+                      {asset.lastSastScan && (
+                        <Badge variant={"outline"}>
+                          Static-Application-Security-Testing
+                        </Badge>
+                      )}
+                      {asset.lastScaScan && (
+                        <Badge variant={"outline"}>
+                          Software Composition Analysis
+                        </Badge>
+                      )}
+                      {asset.lastIacScan && (
+                        <Badge variant={"outline"}>
+                          Infrastructure-as-Code-Scanning
+                        </Badge>
+                      )}
+                      {asset.lastContainerScan && (
+                        <Badge variant={"outline"}>Container-Scanning</Badge>
+                      )}
+                      {asset.lastDastScan && (
+                        <Badge variant={"outline"}>Dynamic-Analysis</Badge>
+                      )}
+                    </div>
+                  </div>
+                }
                 Button={
                   <Link
                     href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
