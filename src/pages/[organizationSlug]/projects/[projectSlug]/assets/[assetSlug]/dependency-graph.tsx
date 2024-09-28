@@ -77,6 +77,25 @@ const DependencyGraphPage: FunctionComponent<{
 
   const all = router.query.all === "1";
   const menu = useAssetMenu();
+
+  const addVersionAndScanTypeQueryParams = (link: string): string => {
+    const version = router.query.version as string | undefined;
+    const scanType = router.query.scanType as string | undefined;
+    if (version && scanType) {
+      return `${link}?version=${version}&scanType=${scanType}`;
+    }
+
+    if (version) {
+      return `${link}?version=${version}`;
+    }
+
+    if (scanType) {
+      return `${link}?scanType=${scanType}`;
+    }
+
+    return link;
+  };
+
   return (
     <Page
       Menu={menu}
@@ -175,10 +194,9 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={
-                    pathname +
-                    `/../sbom.json?scanType=${router.query.scanType ?? "sca"}`
-                  }
+                  href={addVersionAndScanTypeQueryParams(
+                    pathname + `/../sbom.json`,
+                  )}
                   className="!text-foreground hover:no-underline"
                 >
                   <DropdownMenuItem>JSON-Format</DropdownMenuItem>
@@ -187,10 +205,9 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={
-                    pathname +
-                    `/../sbom.xml?scanType=${router.query.scanType ?? "sca"}`
-                  }
+                  href={addVersionAndScanTypeQueryParams(
+                    pathname + `/../sbom.xml`,
+                  )}
                   className="!text-foreground hover:no-underline"
                 >
                   <DropdownMenuItem>XML-Format</DropdownMenuItem>
@@ -206,10 +223,9 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={
-                    pathname +
-                    `/../vex.json?scanType=${router.query.scanType ?? "sca"}`
-                  }
+                  href={addVersionAndScanTypeQueryParams(
+                    pathname + `/../vex.json`,
+                  )}
                   className="!text-foreground hover:no-underline"
                 >
                   <DropdownMenuItem>JSON-Format</DropdownMenuItem>
@@ -218,10 +234,9 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={
-                    pathname +
-                    `/../vex.xml?scanType=${router.query.scanType ?? "sca"}`
-                  }
+                  href={addVersionAndScanTypeQueryParams(
+                    pathname + `/../vex.xml`,
+                  )}
                   className="!text-foreground hover:no-underline"
                 >
                   <DropdownMenuItem>XML-Format</DropdownMenuItem>
