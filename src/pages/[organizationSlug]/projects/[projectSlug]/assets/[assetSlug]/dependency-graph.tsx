@@ -176,7 +176,8 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={
-                    pathname + `/../sbom.json?scanType=${router.query.scanType}`
+                    pathname +
+                    `/../sbom.json?scanType=${router.query.scanType ?? "sca"}`
                   }
                   className="!text-foreground hover:no-underline"
                 >
@@ -187,7 +188,39 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={
-                    pathname + `/../sbom.xml?scanType=${router.query.scanType}`
+                    pathname +
+                    `/../sbom.xml?scanType=${router.query.scanType ?? "sca"}`
+                  }
+                  className="!text-foreground hover:no-underline"
+                >
+                  <DropdownMenuItem>XML-Format</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant={"secondary"}>Download VeX</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <Link
+                  download
+                  target="_blank"
+                  prefetch={false}
+                  href={
+                    pathname +
+                    `/../vex.json?scanType=${router.query.scanType ?? "sca"}`
+                  }
+                  className="!text-foreground hover:no-underline"
+                >
+                  <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+                </Link>
+                <Link
+                  download
+                  target="_blank"
+                  prefetch={false}
+                  href={
+                    pathname +
+                    `/../vex.xml?scanType=${router.query.scanType ?? "sca"}`
                   }
                   className="!text-foreground hover:no-underline"
                 >

@@ -31,8 +31,13 @@ export const getServerSideProps: GetServerSideProps = middleware(
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {
       context.res.statusCode = sbom.status;
-      context.res.setHeader("Content-Type", "application/xml");
-      context.res.write(JSON.stringify(sbom));
+      context.res.setHeader("Content-Type", "application/json");
+      context.res.write(
+        JSON.stringify({
+          message: "Failed to fetch sbom",
+          error: sbom.statusText,
+        }),
+      );
       context.res.end();
       return {
         props: {},
