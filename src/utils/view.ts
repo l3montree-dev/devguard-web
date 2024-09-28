@@ -21,7 +21,7 @@ export const defaultScanner =
 export const findUser = (
   id: string,
   org: OrganizationDetailsDTO,
-  currentUser: Identity,
+  currentUser?: Identity,
 ) => {
   if (id === "system") {
     return {
