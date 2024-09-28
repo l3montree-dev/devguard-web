@@ -9,7 +9,7 @@ import {
 import { User } from "../types/auth";
 
 export interface InitialState {
-  session: Omit<Session, "identity"> & { identity: User };
+  session: (Omit<Session, "identity"> & { identity: User }) | null;
   organizations: OrganizationDTO[];
   organization: OrganizationDetailsDTO;
 }

@@ -23,17 +23,17 @@ export const getServerSideProps: GetServerSideProps = middleware(
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/sbom.json?scanType=" +
+        "/vex.json?scanType=" +
         context.query.scanType ?? "sca";
 
-    const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
-    if (!sbom.ok) {
-      context.res.statusCode = sbom.status;
+    const vex = await apiClient(uri + (version ? "?version=" + version : ""));
+    if (!vex.ok) {
+      context.res.statusCode = vex.status;
       context.res.setHeader("Content-Type", "application/json");
       context.res.write(
         JSON.stringify({
-          message: "Failed to fetch sbom",
-          error: sbom.statusText,
+          message: "Failed to fetch vex",
+          error: vex.statusText,
         }),
       );
       context.res.end();
@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
     context.res.setHeader("Content-Type", "application/json");
 
     await pipelineAsync(
-      sbom.body as unknown as NodeJS.ReadableStream,
+      vex.body as unknown as NodeJS.ReadableStream,
       context.res,
     );
 

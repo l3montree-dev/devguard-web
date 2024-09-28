@@ -1,9 +1,5 @@
 import Page from "@/components/Page";
-import AssetForm, {
-  AssetFormGeneral,
-  AssetFormMisc,
-  AssetFormRequirements,
-} from "@/components/asset/AssetForm";
+import AssetForm from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";

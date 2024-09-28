@@ -175,43 +175,7 @@ const Settings: FunctionComponent<{
   }, [flow?.ui.messages]);
 
   return (
-    <Page
-      Sidebar={
-        <SubnavSidebar
-          links={[
-            {
-              href: "#profile",
-              title: "Profile Management & Security Settings",
-            },
-            {
-              href: "#password",
-              title: "Change Password",
-            },
-            {
-              href: "#pat",
-              title: "Manage Personal Access Tokens",
-            },
-            {
-              href: "#oidc",
-              title: "Manage Social Sign In",
-            },
-            {
-              href: "#webauthn",
-              title: "Manage Hardware Tokens and Biometrics",
-            },
-            {
-              href: "#totp",
-              title: "Manage 2FA TOTP Authenticator App",
-            },
-            {
-              href: "#lookup_secret",
-              title: "Manage 2FA Backup Recovery Codes",
-            },
-          ]}
-        />
-      }
-      title="Profile Management and Security Settings"
-    >
+    <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
         <Section
           id="profile"
@@ -291,7 +255,7 @@ const Settings: FunctionComponent<{
                   }
                   Button={
                     <Button
-                      variant="destructive"
+                      variant="destructiveOutline"
                       onClick={() => onDeletePat(pat)}
                     >
                       Delete
@@ -407,7 +371,15 @@ const Settings: FunctionComponent<{
 
 // just guard the page with the session decorator
 export const getServerSideProps = middleware(
-  async (ctx) => {
+  async (ctx, { session }) => {
+    if (!session) {
+      return {
+        redirect: {
+          destination: `/login`,
+          permanent: false,
+        },
+      };
+    }
     // get the personal access tokens from the user
     const apiClient = getApiClientFromContext(ctx);
 

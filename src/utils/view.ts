@@ -29,7 +29,7 @@ export const findUser = (
       realName: "System",
     };
   }
-  if (currentUser.id === id) {
+  if (currentUser?.id === id) {
     return {
       displayName: "You",
       avatarUrl: currentUser.traits?.picture,

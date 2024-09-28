@@ -8,7 +8,7 @@ const Index = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = middleware(
-  async (ctx: GetServerSidePropsContext, { organizations }) => {
+  async (ctx: GetServerSidePropsContext, { organizations, session }) => {
     // check if we can redirect to the first organization
     if (organizations.length > 0) {
       return {
@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
           permanent: false,
         },
       };
-    } else {
+    } else if (session) {
       // redirect to the create organization page
       return {
         redirect: {
@@ -26,6 +26,12 @@ export const getServerSideProps: GetServerSideProps = middleware(
         },
       };
     }
+    return {
+      redirect: {
+        destination: `/login`,
+        permanent: false,
+      },
+    };
   },
   {
     organizations: withOrgs,

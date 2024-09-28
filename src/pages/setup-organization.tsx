@@ -29,7 +29,15 @@ export default function SetupOrg() {
 }
 
 export const getServerSideProps = middleware(
-  async () => {
+  async (_, { session }) => {
+    if (!session) {
+      return {
+        redirect: {
+          destination: `/login`,
+          permanent: false,
+        },
+      };
+    }
     return {
       props: {},
     };

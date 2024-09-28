@@ -26,7 +26,7 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useStore } from "../../zustand/globalStoreProvider";
-import { buttonVariants } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,9 +86,9 @@ export default function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          {user && (
+      {user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
             <Link
               className={classNames(
                 buttonVariants({ variant: "ghost", size: "icon" }),
@@ -104,37 +104,43 @@ export default function UserNav() {
                 </AvatarFallback>
               </Avatar>
             </Link>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-            <CogIcon className="mr-2 h-5 w-5 text-muted-foreground" />
-            User Settings
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-            <BuildingOffice2Icon className="mr-2 h-5 w-5 text-muted-foreground" />
-            Join Organization
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-            <PlusIcon className="mr-2 h-5 w-5 text-muted-foreground" />
-            Create Organization
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {orgs.length !== 0 && (
-            <>
-              {orgs.map((o) => (
-                <DropdownMenuItem
-                  key={o.id}
-                  onClick={handleActiveOrgChange(o.id)}
-                >
-                  {o.name}
-                </DropdownMenuItem>
-              ))}
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <Link className="hover:no-underline" href={"/user-settings"}>
+              <DropdownMenuItem className="text-foreground hover:no-underline">
+                <CogIcon className="mr-2 h-5 w-5 text-muted-foreground" />
+                User Settings
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+              <BuildingOffice2Icon className="mr-2 h-5 w-5 text-muted-foreground" />
+              Join Organization
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+              <PlusIcon className="mr-2 h-5 w-5 text-muted-foreground" />
+              Create Organization
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {orgs.length !== 0 && (
+              <>
+                {orgs.map((o) => (
+                  <DropdownMenuItem
+                    key={o.id}
+                    onClick={handleActiveOrgChange(o.id)}
+                  >
+                    {o.name}
+                  </DropdownMenuItem>
+                ))}
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <Link href="/login">
+          <Button variant="default">Login</Button>
+        </Link>
+      )}
     </div>
   );
 }

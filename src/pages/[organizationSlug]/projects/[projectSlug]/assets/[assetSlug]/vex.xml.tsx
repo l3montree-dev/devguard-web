@@ -13,8 +13,10 @@ export const getServerSideProps: GetServerSideProps = middleware(
   async (context, {}) => {
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
+
     // check for version query parameter
     const version = context.query.version as string | undefined;
+
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -23,17 +25,17 @@ export const getServerSideProps: GetServerSideProps = middleware(
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/sbom.json?scanType=" +
+        "/vex.xml?scanType=" +
         context.query.scanType ?? "sca";
 
-    const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
-    if (!sbom.ok) {
-      context.res.statusCode = sbom.status;
+    const vex = await apiClient(uri + (version ? "?version=" + version : ""));
+    if (!vex.ok) {
+      context.res.statusCode = vex.status;
       context.res.setHeader("Content-Type", "application/json");
       context.res.write(
         JSON.stringify({
-          message: "Failed to fetch sbom",
-          error: sbom.statusText,
+          message: "Failed to fetch vex",
+          error: vex.statusText,
         }),
       );
       context.res.end();
@@ -43,10 +45,10 @@ export const getServerSideProps: GetServerSideProps = middleware(
     }
     // pipe the response to the client
     context.res.statusCode = 200;
-    context.res.setHeader("Content-Type", "application/json");
+    context.res.setHeader("Content-Type", "application/xml");
 
     await pipelineAsync(
-      sbom.body as unknown as NodeJS.ReadableStream,
+      vex.body as unknown as NodeJS.ReadableStream,
       context.res,
     );
 

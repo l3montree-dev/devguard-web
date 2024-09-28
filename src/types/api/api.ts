@@ -293,8 +293,6 @@ export interface AssetDTO {
 
   reachableFromTheInternet: boolean;
 
-  isPublic: boolean;
-
   lastSecretScan: string;
   lastSastScan: string;
   lastScaScan: string;
