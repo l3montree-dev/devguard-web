@@ -16,5 +16,5 @@
 import { useStore } from "@/zustand/globalStoreProvider";
 
 export const useCurrentUser = () => {
-  return useStore((s) => s.session.identity);
+  return useStore((s) => s.session?.identity);
 };

@@ -15,8 +15,10 @@
 
 import { GetServerSidePropsContext } from "next";
 import { ory } from "../services/ory";
-import { User } from "../types/auth";
+
 import { HttpError } from "./middleware";
+import { User } from "@/types/auth";
+import { isAxiosError } from "axios";
 
 export async function withSession(ctx: GetServerSidePropsContext) {
   const orySessionCookie = ctx.req.cookies["ory_kratos_session"];
@@ -32,19 +34,17 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     );
 
     if (!session.data) {
-      console.error("no session data", session);
-      throw new HttpError({
-        redirect: {
-          destination: "/login?return_to=" + ctx.resolvedUrl,
-          permanent: false,
-        },
-      });
+      return null;
     }
 
     // call the initial endpoint with the latest information available
     return session.data as User;
   } catch (e: unknown) {
-    console.error("http error", e);
+    if (isAxiosError(e)) {
+      if (e.response?.status === 401) {
+        return null;
+      }
+    }
     throw new HttpError({
       redirect: {
         destination: "/login?return_to=" + ctx.resolvedUrl,

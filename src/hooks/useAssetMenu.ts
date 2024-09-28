@@ -20,6 +20,8 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
+import useSession from "./useSession";
+import { useCurrentUser } from "./useCurrentUser";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -27,8 +29,9 @@ export const useAssetMenu = () => {
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const assetSlug = router.query.assetSlug as string;
+  const loggedIn = useCurrentUser();
 
-  return [
+  const menu = [
     {
       title: "Overview",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
@@ -74,17 +77,23 @@ export const useAssetMenu = () => {
       Icon: ShareIcon,
       isActive: router.pathname.includes("dependency-graph"),
     },
-    {
-      title: "Settings",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/settings",
-      Icon: CogIcon,
-    },
   ];
+
+  if (loggedIn) {
+    return menu.concat([
+      {
+        title: "Settings",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/settings",
+        Icon: CogIcon,
+      },
+    ]);
+  }
+  return menu;
 };

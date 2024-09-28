@@ -19,12 +19,14 @@ import {
   ListBulletIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
+import useSession from "./useSession";
+import { useCurrentUser } from "./useCurrentUser";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
   const orgSlug = router.query.organizationSlug as string;
-
-  return [
+  const loggedIn = useCurrentUser();
+  const menu = [
     {
       title: "Overview",
       href: "/" + orgSlug,
@@ -35,10 +37,16 @@ export const useOrganizationMenu = () => {
       href: "/" + orgSlug + "/projects",
       Icon: ListBulletIcon,
     },
-    {
-      title: "Settings",
-      href: "/" + orgSlug + "/settings",
-      Icon: CogIcon,
-    },
   ];
+
+  if (loggedIn) {
+    return menu.concat([
+      {
+        title: "Settings",
+        href: "/" + orgSlug + "/settings",
+        Icon: CogIcon,
+      },
+    ]);
+  }
+  return menu;
 };

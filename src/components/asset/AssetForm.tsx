@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import { FunctionComponent } from "react";
 import {
   FormControl,
   FormDescription,
@@ -8,6 +8,10 @@ import {
   FormMessage,
 } from "../ui/form";
 
+import { AssetDTO } from "@/types/api/api";
+import { UseFormReturn } from "react-hook-form";
+import ListItem from "../common/ListItem";
+import Section from "../common/Section";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -17,12 +21,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
-import ListItem from "../common/ListItem";
-import { UseFormReturn } from "react-hook-form";
-import { AssetDTO } from "@/types/api/api";
-import Section from "../common/Section";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { classNames } from "@/utils/common";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -173,44 +171,6 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
-export const AssetVisibility: FunctionComponent<Props> = ({ form }) => {
-  const project = useActiveProject()!;
-  return (
-    <>
-      <FormField
-        control={form.control}
-        name="isPublic"
-        render={({ field }) => (
-          <FormItem>
-            <div className={classNames(!project.isPublic && "opacity-50")}>
-              <ListItem
-                description={"Should this asset be made visible to the public?"}
-                Title="Public Asset"
-                Button={
-                  <FormControl>
-                    <Switch
-                      disabled={!project.isPublic}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                }
-              />
-              <FormMessage />
-            </div>
-          </FormItem>
-        )}
-      />
-      {!project.isPublic && (
-        <small>
-          The project {project.name} is not public. You can not make the asset
-          public.
-        </small>
-      )}
-    </>
-  );
-};
-
 const AssetForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
 > = ({ form, forceVerticalSections }) => {
@@ -239,14 +199,6 @@ Security requirements are specific criteria or conditions that an application, s
         title="Environmental information"
       >
         <AssetFormMisc form={form} />
-      </Section>
-      <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        description="Should this asset be made visible to the public? The asset can be accessed without any authentication."
-        title="Visibility"
-      >
-        <AssetVisibility form={form} />
       </Section>
     </>
   );

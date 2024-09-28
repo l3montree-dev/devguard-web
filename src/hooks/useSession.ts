@@ -36,10 +36,11 @@ export default function useSession() {
         });
       })
       .catch(() => {
-        // Redirect to login page
-        return router.push("/login");
+        // User is not logged in
+        setSession(undefined);
+        setLogoutUrl(undefined);
       });
   }, [router]);
 
-  return { session, logoutUrl };
+  return { session, logoutUrl, loggedIn: !!session };
 }
