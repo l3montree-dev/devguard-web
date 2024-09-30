@@ -84,6 +84,18 @@ With DevGuard you can easily go through the vulnerability management process:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Demo
+
+We are using DevGuard to scan and manage the risks of DevGuard itself—essentially eating our own dogfood. The project can be found here:
+
+[DEMO](https://main.devguard.org/l3montree-cybersecurity/projects/devguard)
+
+We believe VEX information should be shared via a link due to its dynamic nature, as what is risk-free today may be affected by a CVE tomorrow. We've integrated the DevGuard risk scoring into the metrics, with detailed documentation on its calculation to follow soon. SBOM and VEX data are always up to date at these links: 
+
+|Project|SBOM|VeX|
+|---|---|---|
+|[Devguard Golang API](https://github.com/l3montree-dev/devguard)|[SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/sbom.json?scanType=container-scanning)|[VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/vex.json?scanType=container-scanning)|
+|[Devguard Web-Frontend](https://github.com/l3montree-dev/devguard-web)|[SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/sbom.json?scanType=container-scanning)|[VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/vex.json?scanType=container-scanning)|
 
 
 ### Built With
