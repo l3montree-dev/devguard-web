@@ -16,7 +16,7 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
   const defaultClasses =
     "px-2 py-1 whitespace-nowrap rounded-full flex flex-row items-center gap-1 border font-semibold";
   switch (state) {
-    case "open":
+    case "fixed":
       return (
         <Badge
           variant={"default"}
