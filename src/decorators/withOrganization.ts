@@ -40,7 +40,7 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
         },
       });
     }
-
+    console.log("ORGANIZATION", organization);
     return organization;
   } else {
     return null;

@@ -24,24 +24,24 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
 
+import { OrgForm } from "@/components/OrgForm";
+import { Badge } from "@/components/ui/badge";
+import { Form } from "@/components/ui/form";
+import { withOrganization } from "@/decorators/withOrganization";
+import { browserApiClient } from "@/services/devGuardApi";
+import { GitLabIntegrationDTO, OrganizationDetailsDTO } from "@/types/api/api";
+import { useStore } from "@/zustand/globalStoreProvider";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Badge } from "@/components/ui/badge";
-import { withOrganization } from "@/decorators/withOrganization";
-import { Form } from "@/components/ui/form";
-import { AssetFormGeneral } from "@/components/asset/AssetForm";
 import { useForm } from "react-hook-form";
-import { OrganizationDTO, OrganizationDetailsDTO } from "@/types/api/api";
-import OrgRegisterForm from "@/components/OrgRegister";
-import { OrgForm } from "@/components/OrgForm";
 import { toast } from "sonner";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useStore } from "@/zustand/globalStoreProvider";
+import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -77,6 +77,31 @@ const Home: FunctionComponent = () => {
       if (newOrg.slug !== activeOrg.slug) {
         router.push("/" + newOrg.slug + "/settings");
       }
+    }
+  };
+
+  const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
+    updateOrganization({
+      ...activeOrg,
+      gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/integrations/gitlab/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateOrganization({
+        ...activeOrg,
+        gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
+          (i) => i.id !== id,
+        ),
+      });
     }
   };
 
@@ -139,8 +164,50 @@ const Home: FunctionComponent = () => {
               }
             />
           ))}
+          {activeOrg.gitLabIntegrations.map((integration) => (
+            <ListItem
+              key={integration.id}
+              Title={
+                <>
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/gitlab.svg"
+                      alt="GitHub"
+                      width={20}
+                      height={20}
+                      className="mr-2 inline-block"
+                    />
+                    {integration.name}
+                  </div>
+                </>
+              }
+              description={
+                "DevGuard uses an Access-Token to access your repositories and interact with your code."
+              }
+              Button={
+                <AsyncButton
+                  variant={"destructiveOutline"}
+                  onClick={() => handleDelete(integration.id)}
+                >
+                  Delete
+                </AsyncButton>
+              }
+            />
+          ))}
+          <hr />
           <ListItem
-            Title="Add a GitHub App"
+            Title={
+              <div className="flex flex-row items-center">
+                <Image
+                  src="/assets/github.svg"
+                  alt="GitHub"
+                  width={20}
+                  height={20}
+                  className="mr-2 inline-block dark:invert"
+                />
+                Add a GitHub App
+              </div>
+            }
             description="DevGuard uses a GitHub App to access your repositories and interact with your code."
             Button={
               <GithubAppInstallationAlert
@@ -164,6 +231,29 @@ const Home: FunctionComponent = () => {
               >
                 <Button variant={"secondary"}>Install GitHub App</Button>
               </GithubAppInstallationAlert>
+            }
+          />
+          <ListItem
+            Title={
+              <div className="flex flex-row items-center">
+                <Image
+                  src="/assets/gitlab.svg"
+                  alt="GitHub"
+                  width={20}
+                  height={20}
+                  className="mr-2 inline-block"
+                />
+                Integrate with GitLab
+              </div>
+            }
+            description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Button={
+              <GitLabIntegrationDialog
+                onNewIntegration={handleNewGitLabIntegration}
+                Button={
+                  <Button variant={"secondary"}>Integrate with GitLab</Button>
+                }
+              ></GitLabIntegrationDialog>
             }
           />
         </Section>

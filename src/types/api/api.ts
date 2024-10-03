@@ -30,6 +30,13 @@ export interface AssetMetricsDTO {
   enabledScanners: string[];
 }
 
+export interface GitLabIntegrationDTO {
+  id: string;
+  obfuscatedToken: string;
+  url: string;
+  name: string;
+}
+
 export interface OrganizationDTO extends AppModelDTO {
   name: string;
   contactPhoneNumber?: string;
@@ -51,6 +58,8 @@ export interface OrganizationDTO extends AppModelDTO {
     targetLogin: string;
     targetAvatarUrl: string;
   }>;
+
+  gitLabIntegrations: Array<GitLabIntegrationDTO>;
 
   isPublic: boolean;
 }
