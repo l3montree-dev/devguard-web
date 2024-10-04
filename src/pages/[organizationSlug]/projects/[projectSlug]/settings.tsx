@@ -41,7 +41,6 @@ const Index: FunctionComponent<Props> = () => {
   const form = useForm<ProjectDTO>({ defaultValues: project });
 
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
-    console.log(project);
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/projects/" + project!.slug + "/",
       {

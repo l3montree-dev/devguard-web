@@ -10,11 +10,11 @@ export default async function handler(
   // just forward the request to devguard
   // include the session cookie
   // check the url
-  const url = new URL(req.url!, "http://localhost");
+  const url = new URL(req.url!, appConfig.devGuardApiUrl);
   url.pathname = url.pathname.replace("/api/devguard-tunnel", "");
 
   // get the path from the url
-  const resp = await fetch(appConfig.devGuardApiUrl + url.pathname, {
+  const resp = await fetch(url, {
     method: req.method,
     headers: {
       "Content-Type": "application/json",

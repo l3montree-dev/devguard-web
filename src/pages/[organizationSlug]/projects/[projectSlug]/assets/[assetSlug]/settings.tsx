@@ -26,14 +26,16 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Image from "next/image";
+import { debounce } from "lodash";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
 }
+
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -45,6 +47,9 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const [selectedRepo, setSelectedRepo] = useState<string | null>(
     asset.repositoryId ?? null,
   );
+
+  const [repos, setRepositories] = useState(repositories ?? []);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [editRepo, setEditRepo] = useState(!Boolean(asset.repositoryId));
 
@@ -82,6 +87,32 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
     toast("Success", {
       description: "Asset updated",
     });
+  };
+
+  const debouncedSearch = useCallback(
+    debounce(async (search: string) => {
+      setSearchLoading(true);
+      // fetch repositories from the server
+      const repos = await browserApiClient(
+        "/organizations/" +
+          activeOrg.slug +
+          "/integrations/repositories?search=" +
+          search,
+      );
+
+      const data = await repos.json();
+      setRepositories(convertRepos(data) ?? []);
+      setSearchLoading(false);
+    }, 500),
+    [activeOrg.slug],
+  );
+
+  const handleSearchRepos = async (value: string) => {
+    if (value === "") {
+      setRepositories(repositories ?? []);
+      return;
+    }
+    return debouncedSearch(value);
   };
 
   return (
@@ -150,10 +181,8 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                       <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
                     </span>
 
-                    {
-                      repositories.find((r) => r.value === asset.repositoryId)
-                        ?.label
-                    }
+                    {repositories.find((r) => r.value === asset.repositoryId)
+                      ?.label ?? "Unknown"}
                   </>
                 }
                 description={"This asset is connected to a GitHub repository "}
@@ -186,8 +215,10 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                 <div className="flex flex-row gap-2">
                   <div className="flex-1">
                     <Combobox
+                      onValueChange={handleSearchRepos}
                       placeholder="Search repository..."
-                      items={repositories}
+                      items={repos}
+                      loading={searchLoading}
                       onSelect={setSelectedRepo}
                       value={selectedRepo ?? undefined}
                       emptyMessage="No repositories found"
@@ -284,6 +315,9 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
 };
 export default Index;
 
+const convertRepos = (repos: Array<{ label: string; id: string }>) =>
+  repos.map((r) => ({ value: r.id, label: r.label }));
+
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
     // fetch the project
@@ -308,13 +342,9 @@ export const getServerSideProps = middleware(
 
     let repos: Array<{ value: string; label: string }> | null = null;
     if (repoResp.ok) {
-      repos = (await repoResp.json()).map(
-        (r: { label: string; id: string }) => ({
-          value: r.id,
-          label: r.label,
-        }),
-      );
+      repos = convertRepos(await repoResp.json());
     }
+
     // fetch a personal access token from the user
     const [asset] = await Promise.all([resp.json()]);
 
