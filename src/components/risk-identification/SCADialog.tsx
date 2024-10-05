@@ -20,17 +20,12 @@ import {
 } from "../ui/dialog";
 import Steps from "./Steps";
 
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { PatWithPrivKey } from "@/types/api/api";
-import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
 import Section from "../common/Section";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
 
 interface Props {
   open: boolean;
@@ -42,6 +37,8 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const activeOrg = useActiveOrg();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
 
+  const activeProject = useActiveProject();
+  const asset = useActiveAsset();
   const pat =
     personalAccessTokens.length > 0
       ? (personalAccessTokens[0] as PatWithPrivKey)
@@ -150,10 +147,10 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     For example, for the DevGuard project its following url:
                     https://github.com/l3montree-dev/devguard/settings
                   </small>
-                  <div className="relative aspect-video w-full max-w-4xl">
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
                     <Image
                       alt="Open the project settings in GitHub"
-                      className="object-contain"
+                      className="rounded-lg border object-contain"
                       src={"/assets/project-settings.png"}
                       fill
                     />
@@ -169,10 +166,10 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                     For example, for the DevGuard project its following url:
                     https://github.com/l3montree-dev/devguard/settings/secrets/actions
                   </small>
-                  <div className="relative aspect-video w-full max-w-4xl">
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
                     <Image
                       alt="Open the project settings in GitHub"
-                      className="object-contain"
+                      className="rounded-lg border object-contain"
                       src={"/assets/repo-secret.png"}
                       fill
                     />
@@ -232,9 +229,9 @@ jobs:
       run: |
         git config --global --add safe.directory /github/workspace
     - name: DevGuard SCA
-      uses: docker://ghcr.io/l3montree-dev/devguard-scanner:main-ae590b31-1726823132
+      uses: docker://ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag}
       with:
-        args: devguard-scanner sca --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://api.main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
+        args: devguard-scanner sca --assetName="${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}" --apiUrl="https://api.main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
@@ -247,18 +244,109 @@ jobs:
               </Steps>
             </Tab.Panel>
             <Tab.Panel>
-              <CopyCode
-                language="shell"
-                codeString={`docker run ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 devguard-scanner sca \\
-             --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.publicDevGuardApiUrl}" \\
-             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
-              ></CopyCode>
+              <Steps>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Open the CI/CD project settings in GitLab
+                  </h3>
+                  <small className="text-muted-foreground">
+                    It looks something like this:
+                    https://gitlab.com/l3montree/example-project/-/settings/ci_cd
+                  </small>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-contain"
+                      src={"/assets/gitlab-project-settings.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Scroll down to Variables section and click on
+                    &quot;Expand&quot;
+                    <br />
+                    Press the button {"<"}Add variable{">"}
+                  </h3>
+
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-contain"
+                      src={"/assets/gitlab-secret.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create a new variable
+                  </h3>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-contain"
+                      src={"/assets/gitlab-var-settings.png"}
+                      fill
+                    />
+                  </div>
+                  <Card className="mt-4">
+                    <CardContent className="pt-6">
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Key
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={`DEVGUARD_TOKEN`}
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Value
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create or insert the yaml snippet inside a .github/workflows
+                    file
+                  </h3>
+                  <CopyCode
+                    language="yaml"
+                    codeString={`# DevSecOps Workflow Definition
+stages:
+  - sca
+
+sca:
+  stage: sca
+  image: ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag}
+  script:
+    - echo "Running DevGuard SCA..."
+    - devguard-scanner sca --assetName="${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}" --apiUrl="https://api.main.devguard.org/" --token="$DEVGUARD_TOKEN" --path="$CI_PROJECT_DIR"
+  only:
+    - main
+`}
+                  ></CopyCode>
+                </div>
+                <div>
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Commit and push the changes to the repository.
+                  </h3>
+                </div>
+              </Steps>
             </Tab.Panel>
             <Tab.Panel>
               <CopyCode
                 language="shell"
-                codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
+                codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
     devguard-scanner sca \\
         --path="/app" \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\

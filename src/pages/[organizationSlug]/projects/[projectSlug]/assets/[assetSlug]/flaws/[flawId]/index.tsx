@@ -478,9 +478,13 @@ const Index: FunctionComponent<Props> = (props) => {
                             >
                               {status === "accepted"
                                 ? "Accept risk"
-                                : status === "mitigate"
+                                : status === "mitigate" &&
+                                    asset?.repositoryId?.startsWith("github:")
                                   ? "Create GitHub Ticket"
-                                  : "Mark risk as False Positive"}
+                                  : status === "mitigate" &&
+                                      asset?.repositoryId?.startsWith("gitlab:")
+                                    ? "Create GitLab Ticket"
+                                    : "Mark risk as False Positive"}
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -493,29 +497,72 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent>
-                                {flaw.ticketId === null && (
-                                  <DropdownMenuCheckboxItem
-                                    checked={status === "mitigate"}
-                                    onCheckedChange={() => {
-                                      setStatus("mitigate");
-                                    }}
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        Create GitHub Ticket
+                                {flaw.ticketId === null &&
+                                  asset?.repositoryId?.startsWith(
+                                    "github:",
+                                  ) && (
+                                    <DropdownMenuCheckboxItem
+                                      checked={status === "mitigate"}
+                                      onCheckedChange={() => {
+                                        setStatus("mitigate");
+                                      }}
+                                    >
+                                      <div className="flex flex-col">
+                                        <div className="flex">
+                                          <Image
+                                            alt="GitLab Logo"
+                                            width={15}
+                                            height={15}
+                                            className="mr-2 dark:invert"
+                                            src={"/assets/github.svg"}
+                                          />
+                                          Create GitHub Ticket
+                                        </div>
+                                        <small className="text-muted-foreground">
+                                          This asset is connected to a GitHub
+                                          Repository.
+                                          <br />
+                                          Automatically create a ticket in
+                                          GitHub with all the necessary
+                                          <br /> information and the comment you
+                                          provided.
+                                        </small>
                                       </div>
-                                      <small className="text-muted-foreground">
-                                        This asset is connected to a GitHub
-                                        Repository.
-                                        <br />
-                                        Automatically create a ticket in GitHub
-                                        with all the necessary
-                                        <br /> information and the comment you
-                                        provided.
-                                      </small>
-                                    </div>
-                                  </DropdownMenuCheckboxItem>
-                                )}
+                                    </DropdownMenuCheckboxItem>
+                                  )}
+                                {flaw.ticketId === null &&
+                                  asset?.repositoryId?.startsWith(
+                                    "gitlab:",
+                                  ) && (
+                                    <DropdownMenuCheckboxItem
+                                      checked={status === "mitigate"}
+                                      onCheckedChange={() => {
+                                        setStatus("mitigate");
+                                      }}
+                                    >
+                                      <div className="flex flex-col">
+                                        <div className="flex">
+                                          <Image
+                                            alt="GitLab Logo"
+                                            width={15}
+                                            height={15}
+                                            className="mr-2"
+                                            src={"/assets/gitlab.svg"}
+                                          />
+                                          Create GitLab Ticket
+                                        </div>
+                                        <small className="text-muted-foreground">
+                                          This asset is connected to a GitLab
+                                          Repository.
+                                          <br />
+                                          Automatically create a ticket in
+                                          GitLab with all the necessary
+                                          <br /> information and the comment you
+                                          provided.
+                                        </small>
+                                      </div>
+                                    </DropdownMenuCheckboxItem>
+                                  )}
                                 <DropdownMenuCheckboxItem
                                   checked={status === "accepted"}
                                   onCheckedChange={() => {

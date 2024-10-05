@@ -16,4 +16,5 @@ export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
   publicDevGuardApiUrl: process.env.NEXT_PUBLIC_DEVGUARD_API_URL,
   oryKratosUrl: process.env.ORY_KRATOS_URL,
+  devguardScannerTag: "main-7e94178b-1727680457",
 };
