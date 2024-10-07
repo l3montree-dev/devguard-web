@@ -31,21 +31,32 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   onSelect: (value: string) => void;
+  onValueChange?: (value: string) => Promise<void>; // should refetch the items
   items: Array<{
     value: string;
     label: string;
   }>;
   placeholder: string;
   emptyMessage: string;
+  loading?: boolean;
   value?: string;
 }
 
 export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
+  const { loading } = props;
+
+  const handleValueChange = (value: string) => {
+    if (props.onValueChange) {
+      props.onValueChange(value);
+    }
+    setValue(value);
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -54,7 +65,7 @@ export function Combobox(props: Props) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full min-w-[300px] justify-between"
+          className="-my-0.5 h-11 w-full min-w-[300px] justify-between"
         >
           <span className="flex-1 overflow-hidden overflow-ellipsis text-left">
             {value
@@ -65,9 +76,20 @@ export function Combobox(props: Props) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
-        <Command>
-          <CommandInput placeholder={props.placeholder} />
+        <Command shouldFilter={props.onValueChange === undefined}>
+          <CommandInput
+            onValueChange={handleValueChange}
+            placeholder={props.placeholder}
+          />
+
           <CommandList>
+            {loading && (
+              <CommandItem>
+                <div className="flex w-full flex-row items-center justify-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              </CommandItem>
+            )}
             <CommandEmpty>{props.emptyMessage}</CommandEmpty>
             <CommandGroup>
               {props.items.map((item) => (
@@ -87,6 +109,20 @@ export function Combobox(props: Props) {
                       value === item.value ? "opacity-100" : "opacity-0",
                     )}
                   />
+                  {item.value.startsWith("gitlab") ? (
+                    <img
+                      className="mr-2 inline-block h-4 w-4"
+                      src="/assets/gitlab.svg"
+                      alt="GitLab"
+                    />
+                  ) : item.value.startsWith("github") ? (
+                    <img
+                      className="mr-2 inline-block h-4 w-4"
+                      src="/assets/github.svg"
+                      alt="GitHub"
+                    />
+                  ) : null}
+
                   {item.label}
                 </CommandItem>
               ))}

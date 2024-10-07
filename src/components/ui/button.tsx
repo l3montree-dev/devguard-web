@@ -3,9 +3,10 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { useLoader } from "@/hooks/useLoader";
 
 const buttonVariants = cva(
-  "inline-flex items-center hover:no-underline justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center hover:no-underline justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:grayscale-[50%]",
   {
     variants: {
       variant: {
@@ -15,7 +16,7 @@ const buttonVariants = cva(
         destructiveOutline:
           "border-destructive border text-destructive hover:bg-destructive/10",
         outline:
-          "border border-input !text-secondary-foreground hover:no-underline bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input !text-foreground hover:no-underline bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary !text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -55,4 +56,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+const AsyncButton = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { onClick: () => Promise<any> }
+>(({ children, ...props }, ref) => {
+  const { Loader, isLoading, waitFor } = useLoader();
+
+  return (
+    <Button
+      disabled={isLoading}
+      ref={ref}
+      {...props}
+      onClick={waitFor(props.onClick)}
+    >
+      <Loader />
+      {children}
+    </Button>
+  );
+});
+
+AsyncButton.displayName = "AsyncButton";
+
+export { Button, buttonVariants, AsyncButton };
