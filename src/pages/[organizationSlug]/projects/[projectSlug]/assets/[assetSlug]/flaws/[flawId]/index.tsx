@@ -67,6 +67,7 @@ import { beautifyPurl } from "@/utils/common";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import { useLoader } from "@/hooks/useLoader";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -285,7 +286,9 @@ const Index: FunctionComponent<Props> = (props) => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
-  const [status, setStatus] = useState<FlawEventDTO["type"]>("accepted");
+  const { Loader, waitFor, isLoading } = useLoader();
+
+  const [status, setStatus] = useState<FlawEventDTO["type"]>("comment");
 
   const handleSubmit = async (data: {
     status?: FlawEventDTO["type"];
@@ -334,7 +337,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
     setFlaw((prev) => ({ ...prev, ...json }));
     setJustification("");
-    setStatus("accepted");
+    setStatus("comment");
   };
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
@@ -413,13 +416,23 @@ const Index: FunctionComponent<Props> = (props) => {
                 {flaw.ticketUrl && (
                   <Link href={flaw.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
-                      <Image
-                        src="/assets/github.svg"
-                        alt="GitHub Logo"
-                        className="-ml-1 mr-2 dark:invert"
-                        width={15}
-                        height={15}
-                      />
+                      {flaw.ticketUrl.startsWith("github:") ? (
+                        <Image
+                          src="/assets/github.svg"
+                          alt="GitHub Logo"
+                          className="-ml-1 mr-2 dark:invert"
+                          width={15}
+                          height={15}
+                        />
+                      ) : (
+                        <Image
+                          src="/assets/gitlab.svg"
+                          alt="GitLab Logo"
+                          className="-ml-1 mr-2"
+                          width={15}
+                          height={15}
+                        />
+                      )}
                       <span>{flaw.ticketUrl}</span>
                     </Badge>
                   </Link>
@@ -468,32 +481,40 @@ const Index: FunctionComponent<Props> = (props) => {
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-center">
                             <Button
-                              onClick={() => {
+                              onClick={waitFor(() =>
                                 handleSubmit({
                                   status,
                                   justification,
-                                });
-                              }}
-                              variant={"secondary"}
+                                }),
+                              )}
+                              disabled={isLoading}
+                              className="-mr-3"
+                              variant={"default"}
                             >
-                              {status === "accepted"
-                                ? "Accept risk"
-                                : status === "mitigate" &&
-                                    asset?.repositoryId?.startsWith("github:")
-                                  ? "Create GitHub Ticket"
+                              <Loader />
+                              {status === "comment"
+                                ? "Comment"
+                                : status === "accepted"
+                                  ? "Accept risk"
                                   : status === "mitigate" &&
-                                      asset?.repositoryId?.startsWith("gitlab:")
-                                    ? "Create GitLab Ticket"
-                                    : "Mark risk as False Positive"}
+                                      asset?.repositoryId?.startsWith("github:")
+                                    ? "Create GitHub Ticket"
+                                    : status === "mitigate" &&
+                                        asset?.repositoryId?.startsWith(
+                                          "gitlab:",
+                                        )
+                                      ? "Create GitLab Ticket"
+                                      : "Mark risk as False Positive"}
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   size={"icon"}
-                                  className="relative right-2"
-                                  variant={"secondary"}
+                                  disabled={isLoading}
+                                  className="relative z-10"
+                                  variant={"default"}
                                 >
-                                  <CaretDownIcon />
+                                  <CaretDownIcon className="text-black" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent>
@@ -597,17 +618,6 @@ const Index: FunctionComponent<Props> = (props) => {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
-                          <Button
-                            type="submit"
-                            onClick={() => {
-                              handleSubmit({
-                                status: "comment",
-                                justification,
-                              });
-                            }}
-                          >
-                            Comment
-                          </Button>
                         </div>
                       </form>
                     ) : (
@@ -634,12 +644,13 @@ const Index: FunctionComponent<Props> = (props) => {
                         </p>
                         <div className="flex flex-row justify-end">
                           <Button
-                            onClick={() => {
+                            onClick={waitFor(() =>
                               handleSubmit({
                                 status: "reopened",
                                 justification,
-                              });
-                            }}
+                              }),
+                            )}
+                            disabled={isLoading}
                             variant={"secondary"}
                             type="submit"
                           >

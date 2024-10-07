@@ -173,7 +173,7 @@ export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
 export interface MitigateFlawEventDTO extends BaseFlawEventDTO {
   type: "mitigate";
   arbitraryJsonData: {
-    url: string;
+    ticketUrl: string;
     ticketId: string;
   };
 }
