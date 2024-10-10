@@ -299,6 +299,7 @@ export interface AssetDTO {
   availabilityRequirement: RequirementsLevel;
 
   repositoryId?: string;
+  repositoryName?: string;
 
   reachableFromTheInternet: boolean;
 
