@@ -35,6 +35,7 @@ export default function usePersonalAccessToken(
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));
     newPatEventEmitter.emit("pat", pat);
+    return pat;
   };
 
   return {
