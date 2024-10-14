@@ -25,7 +25,16 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { PatWithPrivKey } from "@/types/api/api";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { SparklesIcon } from "@heroicons/react/24/solid";
+import { browserApiClient } from "@/services/devGuardApi";
 
 interface Props {
   open: boolean;
@@ -54,6 +63,23 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
       });
     }
   }, [open]);
+
+  const handleAutosetup = async () => {
+    // check if we already have a pat
+    let privKey = pat?.privKey;
+    if (!pat) {
+      // create a new one for autosetup
+      privKey = (await onCreatePat({ description: "SCA Analysis" })).privKey;
+    }
+
+    browserApiClient(
+      `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ devguardPrivateKey: privKey }),
+      },
+    );
+  };
 
   return (
     <Dialog open={open}>
@@ -244,6 +270,31 @@ jobs:
               </Steps>
             </Tab.Panel>
             <Tab.Panel>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex flex-row gap-2">
+                    <SparklesIcon className="w-5 text-muted-foreground" /> Use
+                    Auto-Setup
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    You can use the auto-setup feature to automatically add the
+                    DevGuard SCA job to the GitLab CI/CD pipeline for the
+                    project <span>{asset?.repositoryName}</span>, create a
+                    Merge-Request and add any missing configuration variables or
+                    webhooks.
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button onClick={handleAutosetup}>Use Auto-Setup</Button>
+                </CardFooter>
+              </Card>
+              <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
+                <div className="flex-1 border-t-2 border-dotted" />
+                <span className="px-5">OR</span>
+                <div className="flex-1 border-t-2 border-dotted" />
+              </div>
               <Steps>
                 <div className="mb-10">
                   <h3 className="mb-4 mt-2 font-semibold">
