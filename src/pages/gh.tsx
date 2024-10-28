@@ -14,14 +14,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { decodeObjectBase64 } from "@/services/encodeService";
 
 const gh = () => {
   return (
     <div className="flex min-h-screen flex-1 flex-row items-center justify-center">
-      <div className="w-96 rounded-lg border border-gray-800 bg-gray-900 p-8">
+      <div className="w-96 rounded-lg border bg-secondary p-8">
         <div className="mx-auto mb-5 flex flex-row justify-center">
           <Image
             className="hidden h-20 w-auto dark:block"
@@ -59,9 +59,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     state as string,
   );
 
-  const installation = await apiClient(
-    `/organizations/${stateObj.orgSlug}/integrations/finish-installation?installationId=${installationId}`,
-  );
+  // quick fix for https://github.com/l3montree-dev/devguard-web/issues/53
+  // retry 3 times
+  let installation: Response = new Response();
+  for (let i = 0; i < 3; i++) {
+    installation = await apiClient(
+      `/organizations/${stateObj?.orgSlug}/integrations/finish-installation?installationId=${installationId}`,
+    );
+
+    // wait 3 seconds
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    if (installation.ok) {
+      break;
+    }
+  }
 
   if (!installation.ok) {
     console.log("Installation failed", installation);
