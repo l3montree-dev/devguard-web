@@ -44,8 +44,13 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
   const form = useForm<AssetDTO>({ defaultValues: asset });
-  const [selectedRepo, setSelectedRepo] = useState<string | null>(
-    asset.repositoryId ?? null,
+  const [selectedRepo, setSelectedRepo] = useState<{
+    id: string;
+    name: string;
+  } | null>(
+    asset.repositoryId
+      ? { id: asset.repositoryId!, name: asset.repositoryName! }
+      : null,
   );
 
   const [repos, setRepositories] = useState(repositories ?? []);
@@ -66,6 +71,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         body: JSON.stringify(data),
       },
     );
+
     if (!resp.ok) {
       console.error("Could not update asset");
     }
@@ -181,8 +187,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                       <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
                     </span>
 
-                    {repositories.find((r) => r.value === asset.repositoryId)
-                      ?.label ?? "Unknown"}
+                    {asset.repositoryName}
                   </>
                 }
                 description={"This asset is connected to a GitHub repository "}
@@ -219,15 +224,24 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                       placeholder="Search repository..."
                       items={repos}
                       loading={searchLoading}
-                      onSelect={setSelectedRepo}
-                      value={selectedRepo ?? undefined}
+                      onSelect={(repoId: string) => {
+                        const repo = repos.find((r) => r.value === repoId);
+
+                        if (repo) {
+                          setSelectedRepo({ id: repo.value, name: repo.label });
+                        }
+                      }}
+                      value={selectedRepo?.id ?? undefined}
                       emptyMessage="No repositories found"
                     />
                   </div>
                   <Button
                     onClick={async () => {
                       if (selectedRepo) {
-                        await handleUpdate({ repositoryId: selectedRepo });
+                        await handleUpdate({
+                          repositoryId: selectedRepo.id,
+                          repositoryName: selectedRepo.name,
+                        });
                         setEditRepo(false);
                       }
                     }}
