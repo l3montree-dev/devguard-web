@@ -17,6 +17,7 @@ import { GetServerSideProps } from "next";
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { decodeObjectBase64 } from "@/services/encodeService";
+import { config } from "@/config";
 
 const gh = () => {
   return (
@@ -61,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // quick fix for https://github.com/l3montree-dev/devguard-web/issues/53
   // retry 3 times
-  let installation: Response = new Response();
+  let installation: Response | null = null;
   for (let i = 0; i < 3; i++) {
     installation = await apiClient(
       `/organizations/${stateObj?.orgSlug}/integrations/finish-installation?installationId=${installationId}`,
@@ -73,6 +74,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     if (installation.ok) {
       break;
     }
+  }
+
+  if (!installation) {
+    console.log("Installation failed");
+    return {
+      props: {
+        error: "Installation failed",
+      },
+    };
   }
 
   if (!installation.ok) {
