@@ -330,9 +330,12 @@ export interface ComponentRisk {
 }
 
 export interface RiskDistribution {
-  scannerId: string;
-  severity: string;
-  count: number;
+  id: string;
+  label: string;
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
 }
 
 export interface RiskHistory {

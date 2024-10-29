@@ -36,7 +36,7 @@ import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart
 
 interface Props {
   componentRisk: ComponentRisk;
-  riskDistribution: RiskDistribution[] | null;
+  riskDistribution: RiskDistribution | null;
   riskHistory: RiskHistory[];
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
@@ -122,7 +122,9 @@ const Index: FunctionComponent<Props> = ({
         />
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2">
-            <RiskDistributionDiagram data={riskDistribution ?? []} />
+            <RiskDistributionDiagram
+              data={riskDistribution ? [riskDistribution] : []}
+            />
           </div>
           <VulnerableComponents data={componentRisk} />
         </div>
