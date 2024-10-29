@@ -12,6 +12,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { RiskHistory } from "@/types/api/api";
+import { generateColor } from "@/utils/view";
 import { useMemo } from "react";
 import {
   Area,
@@ -69,7 +70,7 @@ export function RiskHistoryChart({
                 ...acc,
                 [d.label]: {
                   label: d.label,
-                  color: "hsl(var(--chart-" + i + "))",
+                  color: generateColor(d.label),
                 },
               }),
               {},
@@ -117,12 +118,12 @@ export function RiskHistoryChart({
                   >
                     <stop
                       offset="5%"
-                      stopColor={"hsl(var(--chart-" + (i + 1) + "))"}
+                      stopColor={generateColor(d.label)}
                       stopOpacity={0.8}
                     />
                     <stop
                       offset="95%"
-                      stopColor={"hsl(var(--chart-" + (i + 1) + "))"}
+                      stopColor={generateColor(d.label)}
                       stopOpacity={0.1}
                     />
                   </linearGradient>
@@ -133,7 +134,7 @@ export function RiskHistoryChart({
                   key={d.label}
                   dataKey={d.label}
                   type="monotone"
-                  stroke={"hsl(var(--chart-" + (i + 1) + "))"}
+                  stroke={generateColor(d.label)}
                   strokeWidth={2}
                   fill={"url(#fill-" + (i + 1) + ")"}
                   fillOpacity={0.4}

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/chart";
 import { RiskDistribution } from "@/types/api/api";
 import { uniq } from "lodash";
+import { generateColor } from "@/utils/view";
 
 //  { range: "0-2", scanner1: 186, scanner2: 80 },
 const combineRanges = (data: RiskDistribution[]) => {
@@ -57,7 +58,7 @@ export function RiskDistributionDiagram({
       ...acc,
       [el.id]: {
         label: el.label,
-        color: `hsl(var(--chart-${i + 1}))`,
+        color: generateColor(el.label),
       },
     }),
     {} as any,
