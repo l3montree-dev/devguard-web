@@ -19,12 +19,22 @@ import { FunctionComponent } from "react";
 import Page from "../../components/Page";
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
 
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import Link from "next/link";
+import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
+import FlawAggregationState from "@/components/overview/FlawAggregationState";
+import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
+import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
 import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { withOrganization } from "@/decorators/withOrganization";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import {
   AssetDTO,
   AverageFixingTime,
@@ -36,21 +46,9 @@ import {
   RiskDistribution,
   RiskHistory,
 } from "@/types/api/api";
-import { Project } from "@/types/common";
-import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import FlawAggregationState from "@/components/overview/FlawAggregationState";
-import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
-import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { classNames, beautifyPurl } from "@/utils/common";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { getApiClientFromContext } from "@/services/devGuardApi";
+import { classNames } from "@/utils/common";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Link from "next/link";
 
 interface Props {
   organization: OrganizationDTO & {
@@ -61,7 +59,12 @@ interface Props {
     >;
   };
   riskDistribution: RiskDistribution[] | null;
-  riskHistory: Array<{ history: RiskHistory[]; label: string }>;
+  riskHistory: Array<{
+    history: RiskHistory[];
+    label: string;
+    slug: string;
+    description: string;
+  }>;
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
   flawAggregationStateAndChange: FlawAggregationStateAndChange;
@@ -129,32 +132,43 @@ const Home: FunctionComponent<Props> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
                 {riskHistory.slice(0, 5).map((r) => (
-                  <div
-                    key={r.label}
-                    className={classNames("flex items-center gap-4")}
+                  <Link
+                    href={organization.slug + "/projects/" + r.slug}
+                    key={r.slug}
+                    className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
                   >
-                    <div className="rounded-full bg-muted p-1">
+                    <div
+                      key={r.label}
+                      className={classNames("flex items-center gap-4")}
+                    >
                       <Avatar>
-                        <AvatarFallback className="flex h-8 w-8 flex-row items-center justify-center">
-                          {r.label[0]}
-                        </AvatarFallback>
+                        <AvatarFallback>{r.label[0]}</AvatarFallback>
                       </Avatar>
+
+                      <div className="grid ">
+                        <p className="text-sm font-medium leading-none">
+                          {r.label}
+                        </p>
+                        <small className="line-clamp-1 text-ellipsis text-muted-foreground">
+                          {r.description}
+                        </small>
+                      </div>
+                      <div className="ml-auto font-medium">
+                        <Badge
+                          className="whitespace-nowrap"
+                          variant="secondary"
+                        >
+                          {" "}
+                          {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
+                            2,
+                          ) ?? "0.00"}{" "}
+                          Risk
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {r.label}
-                      </p>
-                    </div>
-                    <div className="ml-auto font-medium">
-                      {" "}
-                      {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
-                        2,
-                      ) ?? "0.00"}{" "}
-                      <small className="text-muted-foreground">Risk</small>
-                    </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
               <div className="flex items-center gap-4"></div>
@@ -315,6 +329,8 @@ export const getServerSideProps = middleware(
         riskHistory: riskHistory.map((r) => ({
           label: r.project.name,
           history: r.riskHistory,
+          slug: r.project.slug,
+          description: r.project.description,
         })),
         flawAggregationStateAndChange,
         avgLowFixingTime,

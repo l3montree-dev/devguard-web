@@ -8,10 +8,19 @@ import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart
 import FlawAggregationState from "@/components/overview/FlawAggregationState";
 import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
 import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withProject } from "@/decorators/withProject";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import { beautifyPurl, classNames } from "@/utils/common";
 import Link from "next/link";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
@@ -27,25 +36,19 @@ import {
   RiskDistribution,
   RiskHistory,
 } from "../../../../types/api/api";
-import EcosystemImage from "@/components/common/EcosystemImage";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { classNames, beautifyPurl, extractVersion } from "@/utils/common";
-import d from "react-syntax-highlighter/dist/esm/languages/hljs/d";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useRouter } from "next/router";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
   riskDistribution: RiskDistribution[] | null;
-  riskHistory: Array<{ history: RiskHistory[]; label: string }>;
+  riskHistory: Array<{
+    history: RiskHistory[];
+    label: string;
+    slug: string;
+    description: string;
+  }>;
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
   flawAggregationStateAndChange: FlawAggregationStateAndChange;
@@ -67,6 +70,7 @@ const Index: FunctionComponent<Props> = ({
 }) => {
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
+  const activeProject = useActiveProject();
 
   return (
     <Page
@@ -129,30 +133,49 @@ const Index: FunctionComponent<Props> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
                 {riskHistory.slice(0, 5).map((r) => (
-                  <div
-                    key={r.label}
-                    className={classNames("flex items-center gap-4")}
+                  <Link
+                    href={
+                      "/" +
+                      activeOrg.slug +
+                      "/projects/" +
+                      activeProject?.slug +
+                      "/assets/" +
+                      r.slug
+                    }
+                    key={r.slug}
+                    className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
                   >
-                    <div className="rounded-full bg-muted p-1">
+                    <div
+                      key={r.label}
+                      className={classNames("flex items-center gap-4")}
+                    >
                       <Avatar>
                         <AvatarFallback>{r.label[0]}</AvatarFallback>
                       </Avatar>
+
+                      <div className="grid">
+                        <p className="text-sm font-medium leading-none">
+                          {beautifyPurl(r.label)}
+                        </p>
+                        <small className="line-clamp-1 text-ellipsis text-muted-foreground">
+                          {r.description}
+                        </small>
+                      </div>
+                      <div className="ml-auto font-medium">
+                        <Badge
+                          className="whitespace-nowrap"
+                          variant="secondary"
+                        >
+                          {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
+                            2,
+                          ) ?? "0.00"}{" "}
+                          Risk
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {beautifyPurl(r.label)}
-                      </p>
-                    </div>
-                    <div className="ml-auto font-medium">
-                      {" "}
-                      {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
-                        2,
-                      ) ?? "0.00"}{" "}
-                      <small className="text-muted-foreground">Risk</small>
-                    </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
               <div className="flex items-center gap-4"></div>
@@ -314,6 +337,8 @@ export const getServerSideProps = middleware(
         riskHistory: riskHistory.map((r) => ({
           label: r.asset.name,
           history: r.riskHistory,
+          slug: r.asset.slug,
+          description: r.asset.description,
         })),
         flawAggregationStateAndChange,
         avgLowFixingTime,

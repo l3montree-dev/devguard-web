@@ -10,6 +10,7 @@ import {
 import { ComponentRisk } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import EcosystemImage from "../common/EcosystemImage";
+import { Badge } from "../ui/badge";
 
 export interface ChartConfig {
   [key: string]: {
@@ -35,16 +36,19 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
           {d.slice(0, 5).map((item, index) => (
             <div
               key={item.componentName}
-              className={classNames("flex items-center gap-4")}
+              className={classNames(
+                "flex items-center gap-2",
+                "-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all",
+              )}
             >
-              <div className="rounded-full bg-muted p-2">
+              <div className="rounded-full p-2">
                 <EcosystemImage size={20} packageName={item.componentName} />
               </div>
-              <div className="grid gap-1">
+              <div className="grid">
                 <p className="text-sm font-medium leading-none">
                   {beautifyPurl(item.componentName)}
                 </p>
@@ -53,9 +57,7 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
                 </p>
               </div>
               <div className="ml-auto font-medium">
-                {" "}
-                {item.risk.toFixed(2)}{" "}
-                <small className="text-muted-foreground">Risk</small>
+                <Badge variant={"secondary"}>{item.risk.toFixed(2)} Risk</Badge>
               </div>
             </div>
           ))}
