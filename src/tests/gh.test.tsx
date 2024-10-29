@@ -14,7 +14,7 @@
 
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { encodeObjectBase64 } from "@/services/encodeService";
-import { getServerSideProps } from "./gh";
+import { getServerSideProps } from "../pages/gh";
 
 jest.mock("@/services/devGuardApi");
 
