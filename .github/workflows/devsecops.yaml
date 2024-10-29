@@ -137,7 +137,7 @@ jobs:
       # Running Trivy to scan the Docker image for vulnerabilities
       uses: aquasecurity/trivy-action@master
       with:
-        input: /github/workspace/image.tar
+        input: ./image.tar
         severity: "CRITICAL,HIGH"
         format: "sarif"
         output: "trivy-results.sarif"
