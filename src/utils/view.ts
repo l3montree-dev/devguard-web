@@ -62,3 +62,20 @@ export const findUser = (
     avatarUrl: user?.avatarUrl,
   };
 };
+
+// A simple hash function to convert the project ID to a consistent integer
+export const hashCode = (str: string) => {
+  return Array.from(str).reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+};
+
+// Generate HSL color
+export const generateColor = (str: string) => {
+  const hash = hashCode(str);
+  const hue = Math.abs(hash) % 360; // Keeping hue between 0 and 359
+  const saturation = 60 + (hash % 40); // Randomize saturation between 60-100%
+  const lightness = 50; // Keep lightness consistent for a harmonious look
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};

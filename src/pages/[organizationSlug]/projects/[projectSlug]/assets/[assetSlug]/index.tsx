@@ -151,7 +151,7 @@ const Index: FunctionComponent<Props> = ({
           />
         </div>
         <RiskHistoryChart
-          data={[{ label: "Total Risk", history: riskHistory }]}
+          data={[{ label: asset.name, history: riskHistory }]}
         />
         {/* <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2"></div>
