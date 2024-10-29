@@ -24,33 +24,28 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { RiskDistribution } from "@/types/api/api";
-import { beautifyScannerId } from "@/utils/common";
 import { uniq } from "lodash";
+import { generateColor } from "@/utils/view";
 
 //  { range: "0-2", scanner1: 186, scanner2: 80 },
 const combineRanges = (data: RiskDistribution[]) => {
-  const uniqueRanges = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
-  const scanner = uniq(data.map((item) => item.scannerId));
-  return uniqueRanges.map((range) => {
-    const rangeData = data.filter((item) => item.severity === range);
-    const rangeDataScanner = scanner.map((scannerId) => {
-      const scannerData = rangeData.find(
-        (item) => item.scannerId === scannerId,
-      );
-      return {
-        scannerId,
-        count: scannerData ? scannerData.count : 0,
-      };
-    });
+  const low = data
+    .map((el) => ({ [el.id]: el.low }))
+    .reduce((acc, el) => ({ ...acc, ...el }), { range: "LOW" });
 
-    return rangeDataScanner.reduce((acc, item) => {
-      return {
-        ...acc,
-        range,
-        [item.scannerId]: item.count,
-      };
-    }, {});
-  });
+  const medium = data
+    .map((el) => ({ [el.id]: el.medium }))
+    .reduce((acc, el) => ({ ...acc, ...el }), { range: "MEDIUM" });
+
+  const high = data
+    .map((el) => ({ [el.id]: el.high }))
+    .reduce((acc, el) => ({ ...acc, ...el }), { range: "HIGH" });
+
+  const critical = data
+    .map((el) => ({ [el.id]: el.critical }))
+    .reduce((acc, el) => ({ ...acc, ...el }), { range: "CRITICAL" });
+
+  return [{ ...low }, medium, high, critical];
 };
 
 export function RiskDistributionDiagram({
@@ -58,18 +53,16 @@ export function RiskDistributionDiagram({
 }: {
   data: RiskDistribution[];
 }) {
-  const chartConfig = uniq(data.map((item) => item.scannerId))
-    .sort()
-    .reduce(
-      (acc, scannerId, i) => ({
-        ...acc,
-        [scannerId]: {
-          label: beautifyScannerId(scannerId),
-          color: `hsl(var(--chart-${i + 1}))`,
-        },
-      }),
-      {} as any,
-    );
+  const chartConfig = data.reduce(
+    (acc, el, i) => ({
+      ...acc,
+      [el.id]: {
+        label: el.label,
+        color: generateColor(el.label),
+      },
+    }),
+    {} as any,
+  );
 
   const chartData = combineRanges(data);
 
@@ -105,12 +98,12 @@ export function RiskDistributionDiagram({
                 content={<ChartTooltipContent className="bg-background" />}
               />
               <ChartLegend content={<ChartLegendContent />} />
-              {Object.keys(chartConfig).map((scannerId, i, arr) => (
+              {Object.keys(chartConfig).map((id, i, arr) => (
                 <Bar
-                  key={scannerId}
-                  dataKey={scannerId}
+                  key={id}
+                  dataKey={id}
                   radius={4}
-                  fill={chartConfig[scannerId].color}
+                  fill={chartConfig[id].color}
                 />
               ))}
             </BarChart>
