@@ -1,3 +1,4 @@
+import Autosetup from "@/components/Autosetup";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import ContainerScanning from "@/components/risk-identification/ContainerScanningNode";
@@ -6,7 +7,6 @@ import IaC from "@/components/risk-identification/IaCNode";
 import SAST from "@/components/risk-identification/SASTNode";
 import SCA from "@/components/risk-identification/SCANode";
 import SecretScanning from "@/components/risk-identification/SecretScanningNode";
-import Stage from "@/components/risk-identification/Stage";
 import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -18,124 +18,12 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import useDimensions from "@/hooks/useDimensions";
+import { useAutosetup } from "@/hooks/useAutosetup";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { AssetMetricsDTO } from "@/types/api/api";
-import { Edge, ReactFlow } from "@xyflow/react";
-import "@xyflow/react/dist/base.css";
+
 import Link from "next/link";
-import { FunctionComponent, useMemo, useRef, useState } from "react";
-
-const paddingX = 35;
-const paddingY = 55;
-
-const width = 325;
-const nodes = [
-  {
-    id: "node-1",
-    type: "secretScanning",
-    position: { x: paddingX, y: paddingY },
-    data: { enabled: false, scanner: "" },
-  },
-  {
-    id: "node-2",
-    type: "sca",
-    position: { x: paddingX + width, y: paddingY },
-    data: {
-      enabled: false,
-      scanner: "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
-    },
-  },
-  {
-    id: "node-3",
-    type: "sast",
-    position: { x: paddingX + width * 2, y: paddingY },
-    data: { enabled: false, scanner: "" },
-  },
-  {
-    id: "node-4",
-    type: "iac",
-    position: { x: paddingX + 3 * width, y: paddingY },
-    data: { enabled: false, scanner: "" },
-  },
-  {
-    id: "node-5",
-    type: "containerScanning",
-    position: { x: paddingX + 4 * width, y: paddingY },
-    data: {
-      enabled: false,
-      scanner:
-        "github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning",
-    },
-  },
-  {
-    id: "node-6",
-    type: "dast",
-    position: { x: paddingX + 5 * width, y: paddingY },
-    data: { enabled: false, scanner: "" },
-  },
-];
-const edges: Array<Edge<any>> = [
-  {
-    id: "edge-1",
-    source: "node-1",
-    target: "node-2",
-    sourceHandle: "right",
-    targetHandle: "left",
-    style: {
-      strokeWidth: "2",
-    },
-  },
-  {
-    id: "edge-2",
-    source: "node-2",
-    target: "node-3",
-    sourceHandle: "right",
-    targetHandle: "left",
-    style: {
-      strokeWidth: "2",
-    },
-  },
-  {
-    id: "edge-3",
-    source: "node-3",
-    target: "node-4",
-    sourceHandle: "right",
-    targetHandle: "left",
-    style: {
-      strokeWidth: "2",
-    },
-  },
-  {
-    id: "edge-4",
-    source: "node-4",
-    target: "node-5",
-    sourceHandle: "right",
-    targetHandle: "left",
-    style: {
-      strokeWidth: "2",
-    },
-  },
-  {
-    id: "edge-5",
-    source: "node-5",
-    target: "node-6",
-    sourceHandle: "right",
-    targetHandle: "left",
-    style: {
-      strokeWidth: "2",
-    },
-  },
-];
-
-const nodeTypes = {
-  secretScanning: SecretScanning,
-  sca: SCA,
-  sast: SAST,
-  iac: IaC,
-  containerScanning: ContainerScanning,
-  dast: DAST,
-};
+import { FunctionComponent } from "react";
 
 interface Props extends AssetMetricsDTO {}
 const RiskIdentification: FunctionComponent<Props> = (
@@ -146,16 +34,8 @@ const RiskIdentification: FunctionComponent<Props> = (
   const asset = useActiveAsset();
 
   const menu = useAssetMenu();
-  const dimensions = useDimensions();
 
-  const n = useMemo(() => {
-    return nodes.map((el) => {
-      if (props.enabledScanners.includes(el.data.scanner)) {
-        el.data.enabled = true;
-      }
-      return el;
-    });
-  }, [props.enabledScanners]);
+  const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
 
   return (
     <Page
@@ -213,6 +93,21 @@ const RiskIdentification: FunctionComponent<Props> = (
         title="Risk Identification using the OWASP DevSecOps-Pipeline"
         forceVertical
       >
+        {asset?.repositoryId?.startsWith("gitlab:") && (
+          <div className="mb-0">
+            <Autosetup
+              isLoading={isLoading}
+              handleAutosetup={handleAutosetup}
+              progress={progress}
+              Loader={Loader}
+            />
+            <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
+              <div className="flex-1 border-t-2 border-dotted" />
+              <span className="px-5">OR</span>
+              <div className="flex-1 border-t-2 border-dotted" />
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-3 gap-4">
           <SecretScanning />
           <SAST />

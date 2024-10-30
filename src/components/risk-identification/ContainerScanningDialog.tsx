@@ -20,7 +20,17 @@ import {
 } from "../ui/dialog";
 import Steps from "./Steps";
 
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useLoader } from "@/hooks/useLoader";
 import { PatWithPrivKey } from "@/types/api/api";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/solid";
+import { Loader2 } from "lucide-react";
+import Section from "../common/Section";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -30,7 +40,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import Section from "../common/Section";
+import { useAutosetup } from "@/hooks/useAutosetup";
+import Autosetup from "../Autosetup";
 
 interface Props {
   open: boolean;
@@ -43,12 +54,13 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
 
-  const pat =
-    personalAccessTokens.length > 0
-      ? (personalAccessTokens[0] as PatWithPrivKey)
-      : undefined;
+  const asset = useActiveAsset();
+  const activeProject = useActiveProject();
+  const { Loader, isLoading } = useLoader();
+
+  const { progress, pat, onCreatePat, handleAutosetup } =
+    useAutosetup("container-scanning");
 
   useEffect(() => {
     if (open) {
@@ -156,7 +168,7 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
                       alt="Open the project settings in GitHub"
-                      className="object-contain"
+                      className="rounded-lg border object-fill"
                       src={"/assets/project-settings.png"}
                       fill
                     />
@@ -175,7 +187,7 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
                   <div className="relative aspect-video w-full max-w-4xl">
                     <Image
                       alt="Open the project settings in GitHub"
-                      className="object-contain"
+                      className="rounded-lg border object-fill"
                       src={"/assets/repo-secret.png"}
                       fill
                     />
@@ -288,13 +300,109 @@ jobs:
               </Steps>
             </Tab.Panel>
             <Tab.Panel>
-              <CopyCode
-                language="shell"
-                codeString={`docker run ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 devguard-scanner sca \\
-             --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-             --apiUrl="${config.publicDevGuardApiUrl}" \\
-             --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
-              ></CopyCode>
+              <Autosetup
+                isLoading={isLoading}
+                handleAutosetup={handleAutosetup}
+                progress={progress}
+                Loader={Loader}
+              />
+              <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
+                <div className="flex-1 border-t-2 border-dotted" />
+                <span className="px-5">OR</span>
+                <div className="flex-1 border-t-2 border-dotted" />
+              </div>
+              <Steps>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Open the CI/CD project settings in GitLab
+                  </h3>
+                  <small className="text-muted-foreground">
+                    It looks something like this:
+                    https://gitlab.com/l3montree/example-project/-/settings/ci_cd
+                  </small>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-project-settings.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Scroll down to Variables section and click on
+                    &quot;Expand&quot;
+                    <br />
+                    Press the button {"<"}Add variable{">"}
+                  </h3>
+
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-secret.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create a new variable
+                  </h3>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-var-settings.png"}
+                      fill
+                    />
+                  </div>
+                  <Card className="mt-4">
+                    <CardContent className="pt-6">
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Key
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={`DEVGUARD_TOKEN`}
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Value
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create or insert the yaml snippet inside a .gitlab-ci.yaml
+                    file
+                  </h3>
+                  <CopyCode
+                    language="yaml"
+                    codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+include:
+- component: gitlab.com/l3montree/devguard/container-scanning@~latest
+    inputs:
+      asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+      token: "$DEVGUARD_TOKEN"
+`}
+                  ></CopyCode>
+                </div>
+                <div>
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Commit and push the changes to the repository.
+                  </h3>
+                </div>
+              </Steps>
             </Tab.Panel>
             <Tab.Panel>
               <Steps>

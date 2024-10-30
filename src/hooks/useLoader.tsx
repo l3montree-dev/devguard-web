@@ -7,18 +7,21 @@ export function useLoader() {
   return {
     waitFor<T>(fn: (() => Promise<T>) | Promise<T>): () => Promise<T> {
       return async () => {
-        console.log("LOADING");
-        setIsLoading(true);
-        let res: T;
-        if (typeof fn === "function") {
-          res = await fn();
+        try {
+          setIsLoading(true);
+          let res: T;
+          if (typeof fn === "function") {
+            res = await fn();
+            setIsLoading(false);
+          } else {
+            res = await fn;
+            setIsLoading(false);
+          }
+          return res;
+        } catch (e) {
           setIsLoading(false);
-        } else {
-          res = await fn;
-          setIsLoading(false);
+          throw e;
         }
-        console.log("DONE LOADING");
-        return res;
       };
     },
     isLoading,

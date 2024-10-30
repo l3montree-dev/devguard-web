@@ -38,7 +38,21 @@ export default async function handler(
     res.end();
     return;
   }
-  // pipe the response
-  // @ts-expect-error resp.body is a ReadableStream
-  Readable.fromWeb(resp.body).pipe(res);
+
+  res.flushHeaders();
+
+  // enables streaming support
+  // @ts-expect-error
+  const nodeStream = Readable.fromWeb(resp.body);
+
+  nodeStream.on("data", (chunk) => {
+    res.write(chunk); // Write chunk to the response
+    // @ts-expect-error
+    if (typeof res.flush === "function") {
+      // @ts-expect-error
+      res.flush(); // Flush each chunk if `flush` is available
+    }
+  });
+
+  nodeStream.on("end", () => res.end());
 }

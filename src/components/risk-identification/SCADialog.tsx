@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 
 import { config } from "@/config";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { Tab } from "@headlessui/react";
 import Image from "next/image";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
@@ -22,7 +21,13 @@ import Steps from "./Steps";
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { PatWithPrivKey } from "@/types/api/api";
+import { useAutosetup } from "@/hooks/useAutosetup";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/solid";
+import { Loader2 } from "lucide-react";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
 import {
@@ -33,8 +38,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { SparklesIcon } from "@heroicons/react/24/solid";
-import { browserApiClient } from "@/services/devGuardApi";
+import Autosetup from "../Autosetup";
 
 interface Props {
   open: boolean;
@@ -44,14 +48,12 @@ interface Props {
 const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
 
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
-  const pat =
-    personalAccessTokens.length > 0
-      ? (personalAccessTokens[0] as PatWithPrivKey)
-      : undefined;
+
+  const { handleAutosetup, isLoading, Loader, progress, onCreatePat, pat } =
+    useAutosetup("sca");
 
   useEffect(() => {
     if (open) {
@@ -63,23 +65,6 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
       });
     }
   }, [open]);
-
-  const handleAutosetup = async () => {
-    // check if we already have a pat
-    let privKey = pat?.privKey;
-    if (!pat) {
-      // create a new one for autosetup
-      privKey = (await onCreatePat({ description: "SCA Analysis" })).privKey;
-    }
-
-    browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup/`,
-      {
-        method: "POST",
-        body: JSON.stringify({ devguardPrivateKey: privKey }),
-      },
-    );
-  };
 
   return (
     <Dialog open={open}>
@@ -179,6 +164,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                       className="rounded-lg border object-contain"
                       src={"/assets/project-settings.png"}
                       fill
+                      objectFit="fill"
                     />
                   </div>
                 </div>
@@ -198,6 +184,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
                       className="rounded-lg border object-contain"
                       src={"/assets/repo-secret.png"}
                       fill
+                      objectFit="fill"
                     />
                   </div>
                 </div>
@@ -270,26 +257,12 @@ jobs:
               </Steps>
             </Tab.Panel>
             <Tab.Panel>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex flex-row gap-2">
-                    <SparklesIcon className="w-5 text-muted-foreground" /> Use
-                    Auto-Setup
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    You can use the auto-setup feature to automatically add the
-                    DevGuard SCA job to the GitLab CI/CD pipeline for the
-                    project <span>{asset?.repositoryName}</span>, create a
-                    Merge-Request and add any missing configuration variables or
-                    webhooks.
-                  </CardDescription>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleAutosetup}>Use Auto-Setup</Button>
-                </CardFooter>
-              </Card>
+              <Autosetup
+                isLoading={isLoading}
+                handleAutosetup={handleAutosetup}
+                progress={progress}
+                Loader={Loader}
+              />
               <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
                 <div className="flex-1 border-t-2 border-dotted" />
                 <span className="px-5">OR</span>
@@ -367,23 +340,17 @@ jobs:
                 </div>
                 <div className="mb-10">
                   <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .github/workflows
+                    Create or insert the yaml snippet inside a .gitlab-ci.yaml
                     file
                   </h3>
                   <CopyCode
                     language="yaml"
-                    codeString={`# DevSecOps Workflow Definition
-stages:
-  - sca
-
-sca:
-  stage: sca
-  image: ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag}
-  script:
-    - echo "Running DevGuard SCA..."
-    - devguard-scanner sca --assetName="${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}" --apiUrl="https://api.main.devguard.org/" --token="$DEVGUARD_TOKEN" --path="$CI_PROJECT_DIR"
-  only:
-    - main
+                    codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+include:
+- component: gitlab.com/l3montree/devguard/sca@~latest
+    inputs:
+      asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+      token: "$DEVGUARD_TOKEN"
 `}
                   ></CopyCode>
                 </div>
