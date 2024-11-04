@@ -288,8 +288,6 @@ const Index: FunctionComponent<Props> = (props) => {
   );
   const { Loader, waitFor, isLoading } = useLoader();
 
-  const [status, setStatus] = useState<FlawEventDTO["type"]>("comment");
-
   const handleSubmit = async (data: {
     status?: FlawEventDTO["type"];
     justification?: string;
@@ -337,7 +335,6 @@ const Index: FunctionComponent<Props> = (props) => {
 
     setFlaw((prev) => ({ ...prev, ...json }));
     setJustification("");
-    setStatus("comment");
   };
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
@@ -479,11 +476,83 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <div className="flex flex-row justify-end gap-1">
-                          <div className="flex flex-row items-center">
+                          <div className="flex flex-row items-center gap-2">
+                            {flaw.ticketId === null &&
+                              asset?.repositoryId?.startsWith("gitlab:") && (
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => {
+                                    handleSubmit({
+                                      status: "mitigate",
+                                      justification,
+                                    });
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <Image
+                                        alt="GitLab Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2"
+                                        src={"/assets/gitlab.svg"}
+                                      />
+                                      Create GitLab Ticket
+                                    </div>
+                                  </div>
+                                </Button>
+                              )}
+                            {flaw.ticketId === null &&
+                              asset?.repositoryId?.startsWith("github:") && (
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => {
+                                    handleSubmit({
+                                      status: "mitigate",
+                                      justification,
+                                    });
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <Image
+                                        alt="GitLab Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2 dark:invert"
+                                        src={"/assets/github.svg"}
+                                      />
+                                      Create GitHub Ticket
+                                    </div>
+                                  </div>
+                                </Button>
+                              )}
+                            <Button
+                              onClick={() =>
+                                handleSubmit({
+                                  status: "accepted",
+                                  justification,
+                                })
+                              }
+                              variant={"secondary"}
+                            >
+                              Accept risk
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                handleSubmit({
+                                  status: "falsePositive",
+                                  justification,
+                                })
+                              }
+                              variant={"secondary"}
+                            >
+                              Mark False Positive
+                            </Button>
                             <Button
                               onClick={waitFor(() =>
                                 handleSubmit({
-                                  status,
+                                  status: "comment",
                                   justification,
                                 }),
                               )}
@@ -491,132 +560,8 @@ const Index: FunctionComponent<Props> = (props) => {
                               className="-mr-3"
                               variant={"default"}
                             >
-                              <Loader />
-                              {status === "comment"
-                                ? "Comment"
-                                : status === "accepted"
-                                  ? "Accept risk"
-                                  : status === "mitigate" &&
-                                      asset?.repositoryId?.startsWith("github:")
-                                    ? "Create GitHub Ticket"
-                                    : status === "mitigate" &&
-                                        asset?.repositoryId?.startsWith(
-                                          "gitlab:",
-                                        )
-                                      ? "Create GitLab Ticket"
-                                      : "Mark risk as False Positive"}
+                              Comment
                             </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size={"icon"}
-                                  disabled={isLoading}
-                                  className="relative z-10"
-                                  variant={"default"}
-                                >
-                                  <CaretDownIcon className="text-black" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                {flaw.ticketId === null &&
-                                  asset?.repositoryId?.startsWith(
-                                    "github:",
-                                  ) && (
-                                    <DropdownMenuCheckboxItem
-                                      checked={status === "mitigate"}
-                                      onCheckedChange={() => {
-                                        setStatus("mitigate");
-                                      }}
-                                    >
-                                      <div className="flex flex-col">
-                                        <div className="flex">
-                                          <Image
-                                            alt="GitLab Logo"
-                                            width={15}
-                                            height={15}
-                                            className="mr-2 dark:invert"
-                                            src={"/assets/github.svg"}
-                                          />
-                                          Create GitHub Ticket
-                                        </div>
-                                        <small className="text-muted-foreground">
-                                          This asset is connected to a GitHub
-                                          Repository.
-                                          <br />
-                                          Automatically create a ticket in
-                                          GitHub with all the necessary
-                                          <br /> information and the comment you
-                                          provided.
-                                        </small>
-                                      </div>
-                                    </DropdownMenuCheckboxItem>
-                                  )}
-                                {flaw.ticketId === null &&
-                                  asset?.repositoryId?.startsWith(
-                                    "gitlab:",
-                                  ) && (
-                                    <DropdownMenuCheckboxItem
-                                      checked={status === "mitigate"}
-                                      onCheckedChange={() => {
-                                        setStatus("mitigate");
-                                      }}
-                                    >
-                                      <div className="flex flex-col">
-                                        <div className="flex">
-                                          <Image
-                                            alt="GitLab Logo"
-                                            width={15}
-                                            height={15}
-                                            className="mr-2"
-                                            src={"/assets/gitlab.svg"}
-                                          />
-                                          Create GitLab Ticket
-                                        </div>
-                                        <small className="text-muted-foreground">
-                                          This asset is connected to a GitLab
-                                          Repository.
-                                          <br />
-                                          Automatically create a ticket in
-                                          GitLab with all the necessary
-                                          <br /> information and the comment you
-                                          provided.
-                                        </small>
-                                      </div>
-                                    </DropdownMenuCheckboxItem>
-                                  )}
-                                <DropdownMenuCheckboxItem
-                                  checked={status === "accepted"}
-                                  onCheckedChange={() => {
-                                    setStatus("accepted");
-                                  }}
-                                >
-                                  <div className="flex flex-col">
-                                    Mark as accepted
-                                    <small className="text-muted-foreground">
-                                      Accepts the risk the flaw poses to the
-                                      organization.
-                                      <br /> Detecting this flaw again
-                                      won&apos;t have an impact on the pipeline
-                                      result.
-                                    </small>
-                                  </div>
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                  checked={status === "falsePositive"}
-                                  onCheckedChange={() => {
-                                    setStatus("falsePositive");
-                                  }}
-                                >
-                                  <div className="flex flex-col">
-                                    Mark as false positive
-                                    <small className="text-muted-foreground">
-                                      Mutes the flaw permanently as it is
-                                      identified as a non-issue.
-                                    </small>
-                                  </div>
-                                </DropdownMenuCheckboxItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
                           </div>
                         </div>
                       </form>

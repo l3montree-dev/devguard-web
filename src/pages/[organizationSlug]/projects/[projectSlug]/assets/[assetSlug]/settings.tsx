@@ -190,7 +190,13 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
                     {asset.repositoryName}
                   </>
                 }
-                description={"This asset is connected to a GitHub repository "}
+                description={
+                  "This asset is connected to a " +
+                  (asset.repositoryId?.startsWith("github:")
+                    ? "GitHub"
+                    : "GitLab") +
+                  " repository "
+                }
                 Button={
                   <>
                     <Button
