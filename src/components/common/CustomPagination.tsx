@@ -20,8 +20,8 @@ const CustomPagination: FunctionComponent<Props> = ({
     });
   };
   // check how many to the left and right of the current page
-  const renderFirstPage = page > 2;
-  const renderLastPage = page < pages - 1;
+  const renderFirstPage = page - 2 > 2;
+  const renderLastPage = page + 2 < pages;
 
   const renderPages = useMemo(() => {
     if (pages < 3) {
