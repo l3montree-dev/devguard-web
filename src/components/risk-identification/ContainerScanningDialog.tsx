@@ -227,68 +227,21 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
                   </h3>
                   <CopyCode
                     language="yaml"
-                    codeString={`# DevSecOps Workflow Definition
-# This workflow is triggered on every push to the repository
-name: DevSecOps Workflow
+                    codeString={`# ----- START Container Scanning -----
+name: Devguard Container Scanning Workflow
 on:
     push:
         branches:
         - main # change to primary branch
 
-env:
-    IMAGE_TAG: \${{ github.repository }}:\${{ github.sha }} # Setting the image tag to the repository name and the commit SHA
-
 jobs:
-    # ----- BEGIN Container-Scanning Job -----
-    # This job scans the container images for known vulnerabilities
-
-
-    # Build the image using Kaniko
-    build-image:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v4
-        - name: Build Docker image with Kaniko
-        # Building the Docker image using Kaniko
-        id: build_image
-        uses: docker://gcr.io/kaniko-project/executor:v1.23.0
+    container-scanning:
+        uses: l3montree-dev/devguard-action/.github/workflows/container-scanning.yml@main
         with:
-            args: --destination=\${{ env.IMAGE_TAG }} --context=/github/workspace --dockerfile=/github/workspace/Dockerfile --no-push --tarPath /github/workspace/image.tar
-        - name: Setup crane
-        uses: imjasonh/setup-crane@v0.1
-        - name: Use crane to get the digest
-        run: crane digest --tarball=image.tar > digest.txt
-        - name: Upload artifact
-        # Uploading the built Docker image as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-            name: docker-image
-            path: image.tar
-        - name: Upload digest
-        # Uploading the built Docker image digest as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-            name: digest
-            path: digest.txt
-
-    # Image scanning job to detect vulnerabilities in the built oci image
-    image-scanning:
-        needs: build-image
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v4
-        - uses: actions/download-artifact@v4
-        with:
-            name: docker-image
-            path: .
-        - name: Set up Git
-        run: |
-            git config --global --add safe.directory /github/workspace
-        - name: DevGuard Container-Scanning
-        uses: docker://ghcr.io/l3montree-dev/devguard-scanner@sha256:55736b9dc029762131ea31b7d5ec7a108f07df114520fefa82df28132f554ab8
-        with:
-            args: devguard-scanner container-scanning --assetName="l3montree-cybersecurity/projects/devguard/assets/devguard-web" --apiUrl="https://api.main.devguard.org" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace/image.tar"
-    # ----- END Container Scanning -----`}
+            asset-name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+        secrets:
+            devguard-token: \${{ secrets.DEVGUARD_TOKEN }}
+# ----- END Container Scanning -----`}
                   ></CopyCode>
                 </div>
                 <div>
