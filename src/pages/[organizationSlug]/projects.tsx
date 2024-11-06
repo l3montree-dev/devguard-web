@@ -113,7 +113,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
     <Page
       Title={
         <Link
-          href={`/${activeOrg.slug}`}
+          href={`/${activeOrg.slug}/projects`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
           {activeOrg.name}{" "}
@@ -179,7 +179,11 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                       <Link
                         className={buttonVariants({ variant: "outline" })}
                         href={
-                          "/" + activeOrg.slug + "/projects/" + project.slug
+                          "/" +
+                          activeOrg.slug +
+                          "/projects/" +
+                          project.slug +
+                          "/assets"
                         }
                       >
                         View project

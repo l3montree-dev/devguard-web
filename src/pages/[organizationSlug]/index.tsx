@@ -90,7 +90,7 @@ const Home: FunctionComponent<Props> = ({
     <Page
       Title={
         <Link
-          href={`/${organization.slug}`}
+          href={`/${organization.slug}/projects`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
           {organization.name}{" "}

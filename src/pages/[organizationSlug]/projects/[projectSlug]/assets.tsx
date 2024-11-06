@@ -110,7 +110,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
         Title={
           <span className="flex flex-row gap-2">
             <Link
-              href={`/${activeOrg.slug}`}
+              href={`/${activeOrg.slug}/projects`}
               className="flex flex-row items-center gap-1 !text-white hover:no-underline"
             >
               {activeOrg.name}{" "}
@@ -124,7 +124,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             <span className="opacity-75">/</span>
             <Link
               className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-              href={`/${activeOrg.slug}/projects/${project.slug}`}
+              href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
             >
               {project.name}
               <Badge
@@ -193,7 +193,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
                 }
                 Button={
                   <Link
-                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
+                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
                     className={buttonVariants({ variant: "outline" })}
                   >
                     View Asset
