@@ -42,6 +42,13 @@ import {
 } from "../../../../types/api/api";
 import { withOrganization } from "@/decorators/withOrganization";
 import { addToInitialZustandState } from "@/zustand/initialState";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   project: ProjectDTO & {
@@ -157,49 +164,67 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             title="Assets"
           >
             {project.assets.map((asset) => (
-              <ListItem
+              <Link
                 key={asset.id}
-                Title={asset.name}
-                description={
-                  <div>
-                    {asset.description}{" "}
-                    <div className="mt-2 flex flex-row gap-2">
-                      {asset.lastSecretScan && (
-                        <Badge variant={"outline"}>Secret-Scanning</Badge>
-                      )}
-                      {asset.lastSastScan && (
-                        <Badge variant={"outline"}>
-                          Static-Application-Security-Testing
-                        </Badge>
-                      )}
-                      {asset.lastScaScan && (
-                        <Badge variant={"outline"}>
-                          Software Composition Analysis
-                        </Badge>
-                      )}
-                      {asset.lastIacScan && (
-                        <Badge variant={"outline"}>
-                          Infrastructure-as-Code-Scanning
-                        </Badge>
-                      )}
-                      {asset.lastContainerScan && (
-                        <Badge variant={"outline"}>Container-Scanning</Badge>
-                      )}
-                      {asset.lastDastScan && (
-                        <Badge variant={"outline"}>Dynamic-Analysis</Badge>
-                      )}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
+                className="flex flex-col gap-2 hover:no-underline "
+              >
+                <ListItem
+                  key={asset.id}
+                  Title={asset.name}
+                  description={
+                    <div>
+                      {asset.description}{" "}
+                      <div className="mt-2 flex flex-row gap-2">
+                        {asset.lastSecretScan && (
+                          <Badge variant={"outline"}>Secret-Scanning</Badge>
+                        )}
+                        {asset.lastSastScan && (
+                          <Badge variant={"outline"}>
+                            Static-Application-Security-Testing
+                          </Badge>
+                        )}
+                        {asset.lastScaScan && (
+                          <Badge variant={"outline"}>
+                            Software Composition Analysis
+                          </Badge>
+                        )}
+                        {asset.lastIacScan && (
+                          <Badge variant={"outline"}>
+                            Infrastructure-as-Code-Scanning
+                          </Badge>
+                        )}
+                        {asset.lastContainerScan && (
+                          <Badge variant={"outline"}>Container-Scanning</Badge>
+                        )}
+                        {asset.lastDastScan && (
+                          <Badge variant={"outline"}>Dynamic-Analysis</Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                }
-                Button={
-                  <Link
-                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
-                    className={buttonVariants({ variant: "outline" })}
-                  >
-                    View Asset
-                  </Link>
-                }
-              />
+                  }
+                  Button={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon",
+                        })}
+                      >
+                        <EllipsisVerticalIcon className="h-5 w-5" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <Link
+                          className="!text-foreground hover:no-underline"
+                          href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                />
+              </Link>
             ))}
           </Section>
         )}

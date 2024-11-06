@@ -169,25 +169,15 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           >
             <div className="flex flex-col gap-2">
               {projects.map((project) => (
-                <ListItem
+                <Link
                   key={project.id}
-                  Title={project.name}
-                  description={project.description}
-                  Button={
-                    <>
-                      {" "}
-                      <Link
-                        className={buttonVariants({ variant: "outline" })}
-                        href={
-                          "/" +
-                          activeOrg.slug +
-                          "/projects/" +
-                          project.slug +
-                          "/assets"
-                        }
-                      >
-                        View project
-                      </Link>
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+                  className="flex flex-col gap-2 hover:no-underline"
+                >
+                  <ListItem
+                    Title={project.name}
+                    description={project.description}
+                    Button={
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           className={buttonVariants({
@@ -198,12 +188,17 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                           <EllipsisVerticalIcon className="h-5 w-5" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <Link
+                            className="!text-foreground hover:no-underline"
+                            href={`/${activeOrg.slug}/settings`}
+                          >
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </>
-                  }
-                />
+                    }
+                  />
+                </Link>
               ))}
             </div>
           </Section>
