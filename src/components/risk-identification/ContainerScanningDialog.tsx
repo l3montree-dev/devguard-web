@@ -55,8 +55,6 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
   const router = useRouter();
   const activeOrg = useActiveOrg();
 
-  const asset = useActiveAsset();
-  const activeProject = useActiveProject();
   const { Loader, isLoading } = useLoader();
 
   const { progress, pat, onCreatePat, handleAutosetup } =

@@ -6,15 +6,13 @@ on:
   push:
     branches:
     - main
-    - update/devsecops-pipeline
     tags:
     - '*'
  
 jobs:
   devguard-scanner:
-    uses: l3montree-dev/devguard-action/.github/workflows/devguard-workflow.yml@main
+    uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
     with:
         asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
-        scan-type: "full"
     secrets:
-        devguard-token: ${{ secrets.DEVGUARD_TOKEN }}   
+        devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
