@@ -227,24 +227,19 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
 name: DevSecOps Workflow
 on:
     push:
-        branches:
-        - main # change to primary branch
 
 jobs:
   # ----- BEGIN Software Composition Analysis Job -----
   # Software Composition Analysis (SCA) to find vulnerabilities in project dependencies
-  sca:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4 # Check out the repository content to the runner
-    - name: Set up Git
-      run: |
-        git config --global --add safe.directory /github/workspace
-    - name: DevGuard SCA
-      uses: docker://ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag}
-      with:
-        args: devguard-scanner sca --assetName="${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}" --apiUrl="https://api.main.devguard.org/" --token="\${{ secrets.DEVGUARD_TOKEN }}" --path="/github/workspace"
+  call-software-compsition-analysis:
+    uses: ./.github/workflows/software-composition-analysis.yml
+    with:
+      asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
+      api-url: "https://api.main.devguard.org/"
+      sca-path: "/github/workspace"
+    secrets:
+      devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
+
   # ----- END Software Composition Analysis Job -----`}
                   ></CopyCode>
                 </div>
