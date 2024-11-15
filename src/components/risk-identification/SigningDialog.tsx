@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 
 import { config } from "@/config";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { Tab } from "@headlessui/react";
 import Image from "next/image";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
@@ -20,40 +19,19 @@ import {
 } from "../ui/dialog";
 import Steps from "./Steps";
 
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveProject } from "@/hooks/useActiveProject";
+import { useAutosetup } from "@/hooks/useAutosetup";
 import { useLoader } from "@/hooks/useLoader";
-import { PatWithPrivKey } from "@/types/api/api";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/solid";
-import { Loader2 } from "lucide-react";
+import Autosetup from "../Autosetup";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { useAutosetup } from "@/hooks/useAutosetup";
-import Autosetup from "../Autosetup";
-import GitlabTokenInstructions from "./GitlabTokenInstructions";
-import GithubTokenInstructions from "./GithubTokenInstructions";
+import { Card, CardContent } from "../ui/card";
 
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const ContainerScanningDialog: FunctionComponent<Props> = ({
-  open,
-  setOpen,
-}) => {
+const SigningDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
 
@@ -77,12 +55,12 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
         <DialogHeader>
-          <DialogTitle>Container-Scanning</DialogTitle>
+          <DialogTitle>Image Signing</DialogTitle>
           <DialogDescription>
-            Container-Scanning is a security testing method that identifies
-            known vulnerabilities in OCI images, like Docker Images. DevGuard
-            provides a CLI tool to scan your project for known vulnerabilities
-            in your Docker Images.
+            Sign your container images to ensure their integrity and
+            authenticity. You can verify the image&apos;s signature using
+            kyverno. DevGuard builds upon the cosign project to provide a secure
+            and easy-to-use signing experience.
           </DialogDescription>
         </DialogHeader>
         <hr />
@@ -157,7 +135,69 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
           <Tab.Panels className={"mt-2"}>
             <Tab.Panel>
               <Steps>
-                <GithubTokenInstructions pat={pat?.privKey} />
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Open the project settings in GitHub
+                  </h3>
+                  <small className="text-muted-foreground">
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings
+                  </small>
+                  <div className="relative aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/project-settings.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Navigate to Secrets and Variables and choose actions
+                    <br />
+                    Press the button {"<"}New repository secret{">"}
+                  </h3>
+                  <small className="text-muted-foreground">
+                    For example, for the DevGuard project its following url:
+                    https://github.com/l3montree-dev/devguard/settings/secrets/actions
+                  </small>
+                  <div className="relative aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/repo-secret.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create a new secret
+                  </h3>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Name
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={`DEVGUARD_TOKEN`}
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Secret
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
                 <div className="mb-10">
                   <h3 className="mb-4 mt-2 font-semibold">
                     Create or insert the yaml snippet inside a .github/workflows
@@ -165,19 +205,19 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
                   </h3>
                   <CopyCode
                     language="yaml"
-                    codeString={`# ----- START Container Scanning -----
+                    codeString={`# ----- START Container Image Signing -----
 name: Devguard Container Scanning Workflow
 on:
     push:
 
 jobs:
-    container-scanning:
-        uses: l3montree-dev/devguard-action/.github/workflows/container-scanning.yml@main
+    container-image-signing:
+        uses: l3montree-dev/devguard-action/.github/workflows/sign.yml@main
         with:
             asset-name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
         secrets:
             devguard-token: \${{ secrets.DEVGUARD_TOKEN }}
-# ----- END Container Scanning -----`}
+# ----- END Container Image Signing -----`}
                   ></CopyCode>
                 </div>
                 <div>
@@ -201,7 +241,75 @@ jobs:
                 <div className="flex-1 border-t-2 border-dotted" />
               </div>
               <Steps>
-                <GitlabTokenInstructions pat={pat?.privKey} />
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Open the CI/CD project settings in GitLab
+                  </h3>
+                  <small className="text-muted-foreground">
+                    It looks something like this:
+                    https://gitlab.com/l3montree/example-project/-/settings/ci_cd
+                  </small>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-project-settings.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Scroll down to Variables section and click on
+                    &quot;Expand&quot;
+                    <br />
+                    Press the button {"<"}Add variable{">"}
+                  </h3>
+
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-secret.png"}
+                      fill
+                    />
+                  </div>
+                </div>
+                <div className="mb-10">
+                  <h3 className="mb-4 mt-2 font-semibold">
+                    Create a new variable
+                  </h3>
+                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
+                    <Image
+                      alt="Open the project settings in GitHub"
+                      className="rounded-lg border object-fill"
+                      src={"/assets/gitlab-var-settings.png"}
+                      fill
+                    />
+                  </div>
+                  <Card className="mt-4">
+                    <CardContent className="pt-6">
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Key
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={`DEVGUARD_TOKEN`}
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <span className="mb-2 block text-sm font-semibold">
+                          Value
+                        </span>
+                        <CopyCode
+                          language="shell"
+                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
                 <div className="mb-10">
                   <h3 className="mb-4 mt-2 font-semibold">
                     Create or insert the yaml snippet inside a .gitlab-ci.yml
@@ -211,7 +319,7 @@ jobs:
                     language="yaml"
                     codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
-- component: gitlab.com/l3montree/devguard/container-scanning@~latest
+- component: gitlab.com/l3montree/devguard/sign@~latest
     inputs:
       asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
       token: "$DEVGUARD_TOKEN"
@@ -227,29 +335,17 @@ include:
             </Tab.Panel>
             <Tab.Panel>
               <Steps>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Build the image using kaniko
-                  </h3>
-
-                  <CopyCode
-                    language="shell"
-                    codeString={`docker run --rm -v $(pwd):/workspace gcr.io/kaniko-project/executor:latest --dockerfile=/workspace/Dockerfile --context=/workspace --tarPath=/workspace/image.tar --no-push`}
-                  ></CopyCode>
-                </div>
                 <div>
                   <h3 className="mb-4 mt-2 font-semibold">
-                    Scan the produced .tar file image using devguard
-                    container-scanning
+                    Sign the image using the DevGuard-Scanner
                   </h3>
                   <CopyCode
                     language="shell"
                     codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
-    devguard-scanner container-scanning \\
-        --path="/app/image.tar" \\
+    devguard-scanner sign \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
         --apiUrl="${config.publicDevGuardApiUrl}" \\
-        --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
+        --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}" <IMAGE_NAME>:<TAG>`}
                   ></CopyCode>
                 </div>
               </Steps>
@@ -266,4 +362,4 @@ include:
   );
 };
 
-export default ContainerScanningDialog;
+export default SigningDialog;

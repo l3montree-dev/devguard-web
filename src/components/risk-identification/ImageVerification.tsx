@@ -12,35 +12,26 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { useState } from "react";
-import ContainerScanningDialog from "./ContainerScanningDialog";
-import Stage from "./Stage";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import FormatDate from "../risk-assessment/FormatDate";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import VerificationDialog from "./ImageVerificationDialog";
+import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function ContainerScanning() {
+function ImageVerificationNode() {
   const [open, setOpen] = useState(false);
-  const asset = useActiveAsset()!;
+
   return (
     <>
       <Stage
-        title="Container Scanning"
-        description="Find known security vulnerabilities in OCI images, like Docker Images."
+        title="Image Verification"
+        description="Ensure the integrity and authenticity of your container images."
         onButtonClick={() => setOpen(true)}
-        LastScan={
-          asset.lastContainerScan ? (
-            <small className="w-full text-right text-muted-foreground">
-              Continuously monitoring risk changes. Last component update{" "}
-              <FormatDate dateString={asset.lastContainerScan} />.
-            </small>
-          ) : undefined
-        }
       />
-
-      <ContainerScanningDialog open={open} setOpen={setOpen} />
+      <VerificationDialog open={open} setOpen={setOpen} />
     </>
   );
 }
 
-export default ContainerScanning;
+export default ImageVerificationNode;

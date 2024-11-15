@@ -22,6 +22,7 @@ import {
 import { useRouter } from "next/router";
 import useSession from "./useSession";
 import { useCurrentUser } from "./useCurrentUser";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -38,7 +39,7 @@ export const useAssetMenu = () => {
       Icon: ChartBarSquareIcon,
     },
     {
-      title: "Risk identification",
+      title: "Security Control Center",
       href:
         "/" +
         orgSlug +
@@ -46,8 +47,8 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/risk-identification",
-      Icon: DocumentMagnifyingGlassIcon,
+        "/security-control-center",
+      Icon: ShieldCheckIcon,
     },
     {
       title: "Risk handling",

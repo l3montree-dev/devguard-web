@@ -12,35 +12,32 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { useState } from "react";
-import ContainerScanningDialog from "./ContainerScanningDialog";
-import Stage from "./Stage";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import FormatDate from "../risk-assessment/FormatDate";
+import { useState } from "react";
+import SigningDialog from "./SigningDialog";
+import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-function ContainerScanning() {
+function SigningNode() {
   const [open, setOpen] = useState(false);
   const asset = useActiveAsset()!;
   return (
     <>
       <Stage
-        title="Container Scanning"
-        description="Find known security vulnerabilities in OCI images, like Docker Images."
+        title="Image Signing"
+        description="Ensure the integrity and authenticity of your container images."
         onButtonClick={() => setOpen(true)}
         LastScan={
-          asset.lastContainerScan ? (
+          asset.signingPubKey ? (
             <small className="w-full text-right text-muted-foreground">
-              Continuously monitoring risk changes. Last component update{" "}
-              <FormatDate dateString={asset.lastContainerScan} />.
+              Images are getting signed.{" "}
             </small>
           ) : undefined
         }
       />
-
-      <ContainerScanningDialog open={open} setOpen={setOpen} />
+      <SigningDialog open={open} setOpen={setOpen} />
     </>
   );
 }
 
-export default ContainerScanning;
+export default SigningNode;
