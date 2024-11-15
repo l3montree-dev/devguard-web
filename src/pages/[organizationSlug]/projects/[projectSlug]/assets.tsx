@@ -23,7 +23,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { toast } from "sonner";
 import z from "zod";
@@ -40,15 +48,6 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
-import { withOrganization } from "@/decorators/withOrganization";
-import { addToInitialZustandState } from "@/zustand/initialState";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   project: ProjectDTO & {
@@ -216,7 +215,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
                       <DropdownMenuContent>
                         <Link
                           className="!text-foreground hover:no-underline"
-                          href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                          href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
                         >
                           <DropdownMenuItem>Edit</DropdownMenuItem>
                         </Link>
