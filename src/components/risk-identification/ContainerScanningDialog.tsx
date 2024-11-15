@@ -332,7 +332,7 @@ jobs:
                 </div>
                 <div className="mb-10">
                   <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .gitlab-ci.yaml
+                    Create or insert the yaml snippet inside a .gitlab-ci.yml
                     file
                   </h3>
                   <CopyCode
