@@ -348,9 +348,9 @@ jobs:
                     codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
 - component: gitlab.com/l3montree/devguard/sca@~latest
-    inputs:
-      asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
-      token: "$DEVGUARD_TOKEN"
+  inputs:
+    asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+    token: "$DEVGUARD_TOKEN"
 `}
                   ></CopyCode>
                 </div>
