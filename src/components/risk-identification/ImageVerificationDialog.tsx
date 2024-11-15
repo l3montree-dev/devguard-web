@@ -47,6 +47,8 @@ const VerificationDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   }, [open]);
 
   const downloadPublicKey = () => {
+    if (!asset.signingPubKey) return;
+
     const element = document.createElement("a");
     const file = new Blob([asset.signingPubKey], {
       type: "text/plain",
@@ -56,6 +58,42 @@ const VerificationDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
     document.body.appendChild(element);
     element.click();
   };
+
+  if (!asset.signingPubKey) {
+    return (
+      <Dialog open={open}>
+        <DialogContent setOpen={setOpen}>
+          <DialogHeader>
+            <DialogTitle>Image Verification</DialogTitle>
+            <DialogDescription>
+              Ensure the integrity and authenticity of your container images.
+              You can either verify the images using the cosign CLI or integrate
+              Kyverno into your operations.
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <div className="flex flex-col gap-4">
+            <h3 className="font-semibold">
+              You never signed an image using devguard
+            </h3>
+            <p>
+              Start by closing this dialog and open the image signing dialog.
+              This contains instructions how to use devguard to sign oci images.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              autoFocus
+              variant="secondary"
+              onClick={() => setOpen(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open}>

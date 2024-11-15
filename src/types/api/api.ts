@@ -310,7 +310,7 @@ export interface AssetDTO {
   lastContainerScan: string;
   lastDastScan: string;
 
-  signingPubKey: string;
+  signingPubKey?: string;
 }
 
 export interface DependencyTreeNode {
