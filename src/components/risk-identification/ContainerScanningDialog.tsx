@@ -229,8 +229,6 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
 name: Devguard Container Scanning Workflow
 on:
     push:
-        branches:
-        - main # change to primary branch
 
 jobs:
     container-scanning:
