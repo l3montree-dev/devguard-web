@@ -112,11 +112,6 @@ export default function UserNav() {
                 User Settings
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-              <BuildingOffice2Icon className="mr-2 h-5 w-5 text-muted-foreground" />
-              Join Organization
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
               <PlusIcon className="mr-2 h-5 w-5 text-muted-foreground" />
               Create Organization
