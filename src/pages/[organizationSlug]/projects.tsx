@@ -14,7 +14,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
@@ -33,6 +32,7 @@ import {
 import { ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
+import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import {
   Dialog,
@@ -42,33 +42,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { ZodConvert } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import ListItem from "@/components/common/ListItem";
 
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
+import EmptyList from "@/components/common/EmptyList";
+import { ProjectForm } from "@/components/project/ProjectForm";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import EmptyList from "@/components/common/EmptyList";
-import { Badge } from "@/components/ui/badge";
 import { withOrganization } from "@/decorators/withOrganization";
-import { ProjectForm } from "@/components/project/ProjectForm";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -113,7 +103,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
     <Page
       Title={
         <Link
-          href={`/${activeOrg.slug}`}
+          href={`/${activeOrg.slug}/projects`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
           {activeOrg.name}{" "}
@@ -169,21 +159,15 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           >
             <div className="flex flex-col gap-2">
               {projects.map((project) => (
-                <ListItem
+                <Link
                   key={project.id}
-                  Title={project.name}
-                  description={project.description}
-                  Button={
-                    <>
-                      {" "}
-                      <Link
-                        className={buttonVariants({ variant: "outline" })}
-                        href={
-                          "/" + activeOrg.slug + "/projects/" + project.slug
-                        }
-                      >
-                        View project
-                      </Link>
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+                  className="flex flex-col gap-2 hover:no-underline"
+                >
+                  <ListItem
+                    Title={project.name}
+                    description={project.description}
+                    Button={
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           className={buttonVariants({
@@ -194,12 +178,17 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                           <EllipsisVerticalIcon className="h-5 w-5" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <Link
+                            className="!text-foreground hover:no-underline"
+                            href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                          >
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </>
-                  }
-                />
+                    }
+                  />
+                </Link>
               ))}
             </div>
           </Section>

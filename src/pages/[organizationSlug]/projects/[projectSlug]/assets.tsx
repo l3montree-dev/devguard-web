@@ -23,7 +23,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { toast } from "sonner";
 import z from "zod";
@@ -40,8 +48,6 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
-import { withOrganization } from "@/decorators/withOrganization";
-import { addToInitialZustandState } from "@/zustand/initialState";
 
 interface Props {
   project: ProjectDTO & {
@@ -110,7 +116,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
         Title={
           <span className="flex flex-row gap-2">
             <Link
-              href={`/${activeOrg.slug}`}
+              href={`/${activeOrg.slug}/projects`}
               className="flex flex-row items-center gap-1 !text-white hover:no-underline"
             >
               {activeOrg.name}{" "}
@@ -124,7 +130,7 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             <span className="opacity-75">/</span>
             <Link
               className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-              href={`/${activeOrg.slug}/projects/${project.slug}`}
+              href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
             >
               {project.name}
               <Badge
@@ -157,49 +163,67 @@ const Index: FunctionComponent<Props> = ({ project }) => {
             title="Assets"
           >
             {project.assets.map((asset) => (
-              <ListItem
+              <Link
                 key={asset.id}
-                Title={asset.name}
-                description={
-                  <div>
-                    {asset.description}{" "}
-                    <div className="mt-2 flex flex-row gap-2">
-                      {asset.lastSecretScan && (
-                        <Badge variant={"outline"}>Secret-Scanning</Badge>
-                      )}
-                      {asset.lastSastScan && (
-                        <Badge variant={"outline"}>
-                          Static-Application-Security-Testing
-                        </Badge>
-                      )}
-                      {asset.lastScaScan && (
-                        <Badge variant={"outline"}>
-                          Software Composition Analysis
-                        </Badge>
-                      )}
-                      {asset.lastIacScan && (
-                        <Badge variant={"outline"}>
-                          Infrastructure-as-Code-Scanning
-                        </Badge>
-                      )}
-                      {asset.lastContainerScan && (
-                        <Badge variant={"outline"}>Container-Scanning</Badge>
-                      )}
-                      {asset.lastDastScan && (
-                        <Badge variant={"outline"}>Dynamic-Analysis</Badge>
-                      )}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
+                className="flex flex-col gap-2 hover:no-underline "
+              >
+                <ListItem
+                  key={asset.id}
+                  Title={asset.name}
+                  description={
+                    <div>
+                      {asset.description}{" "}
+                      <div className="mt-2 flex flex-row gap-2">
+                        {asset.lastSecretScan && (
+                          <Badge variant={"outline"}>Secret-Scanning</Badge>
+                        )}
+                        {asset.lastSastScan && (
+                          <Badge variant={"outline"}>
+                            Static-Application-Security-Testing
+                          </Badge>
+                        )}
+                        {asset.lastScaScan && (
+                          <Badge variant={"outline"}>
+                            Software Composition Analysis
+                          </Badge>
+                        )}
+                        {asset.lastIacScan && (
+                          <Badge variant={"outline"}>
+                            Infrastructure-as-Code-Scanning
+                          </Badge>
+                        )}
+                        {asset.lastContainerScan && (
+                          <Badge variant={"outline"}>Container-Scanning</Badge>
+                        )}
+                        {asset.lastDastScan && (
+                          <Badge variant={"outline"}>Dynamic-Analysis</Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                }
-                Button={
-                  <Link
-                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}`}
-                    className={buttonVariants({ variant: "outline" })}
-                  >
-                    View Asset
-                  </Link>
-                }
-              />
+                  }
+                  Button={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon",
+                        })}
+                      >
+                        <EllipsisVerticalIcon className="h-5 w-5" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <Link
+                          className="!text-foreground hover:no-underline"
+                          href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                />
+              </Link>
             ))}
           </Section>
         )}

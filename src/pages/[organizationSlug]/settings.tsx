@@ -109,7 +109,7 @@ const Home: FunctionComponent = () => {
     <Page
       Title={
         <Link
-          href={`/${activeOrg.slug}`}
+          href={`/${activeOrg.slug}/projects`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
           {activeOrg.name}{" "}
