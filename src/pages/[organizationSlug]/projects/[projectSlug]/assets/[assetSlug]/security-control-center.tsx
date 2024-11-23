@@ -8,6 +8,7 @@ import GitCommitVerification from "@/components/risk-identification/GitCommitVer
 import IaC from "@/components/risk-identification/IaCNode";
 import ImageVerification from "@/components/risk-identification/ImageVerification";
 import VerificationDialog from "@/components/risk-identification/ImageVerificationDialog";
+import InTotoProvenance from "@/components/risk-identification/InTotoProvenance";
 import SAST from "@/components/risk-identification/SASTNode";
 import SCA from "@/components/risk-identification/SCANode";
 import SecretScanning from "@/components/risk-identification/SecretScanningNode";
@@ -123,24 +124,39 @@ const RiskIdentification: FunctionComponent<Props> = (
                 width={30}
                 height={30}
               />
+              <Image
+                className="mr-2 inline-block"
+                src={"/assets/intoto.png"}
+                alt="InToto logo"
+                width={30}
+                height={30}
+              />
             </h3>
             <div className="mb-10 grid grid-cols-3 gap-4">
               <SecureCodingGuidelines />
               <GitCommitSigning />
+              <InTotoProvenance />
             </div>
             <h3 id="continous-integration" className="text-xl font-semibold">
               Continous Integration{" "}
               <Image
                 className="mr-1 inline-block"
                 src={"/assets/gitlab.svg"}
-                alt="Git logo"
+                alt="GitLab logo"
                 width={30}
                 height={30}
               />{" "}
               <Image
                 className="mr-2 inline-block dark:invert"
                 src={"/assets/github.svg"}
-                alt="Git logo"
+                alt="GitHub logo"
+                width={30}
+                height={30}
+              />
+              <Image
+                className="mr-2 inline-block"
+                src={"/assets/intoto.png"}
+                alt="InToto logo"
                 width={30}
                 height={30}
               />
@@ -160,14 +176,21 @@ const RiskIdentification: FunctionComponent<Props> = (
               <Image
                 className="mr-2 inline-block"
                 src={"/assets/kubernetes.svg"}
-                alt="Git logo"
+                alt="Kubernetes logo"
                 width={30}
                 height={30}
               />
               <Image
                 className="mr-2 inline-block"
                 src={"/assets/helm.svg"}
-                alt="Git logo"
+                alt="Helm logo"
+                width={30}
+                height={30}
+              />
+              <Image
+                className="mr-2 inline-block"
+                src={"/assets/intoto.png"}
+                alt="InToto logo"
                 width={30}
                 height={30}
               />
