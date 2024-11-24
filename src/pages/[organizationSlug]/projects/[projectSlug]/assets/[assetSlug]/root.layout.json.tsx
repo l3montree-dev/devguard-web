@@ -14,7 +14,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
     // check for version query parameter
-    const version = context.query.version as string | undefined;
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -23,17 +22,16 @@ export const getServerSideProps: GetServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/vex.json?scanType=" +
-      (context.query.scanType ? context.query.scanType : "sca");
+      "/in-toto/root.layout.json";
 
-    const vex = await apiClient(uri + (version ? "?version=" + version : ""));
-    if (!vex.ok) {
-      context.res.statusCode = vex.status;
+    const rootLayout = await apiClient(uri);
+    if (!rootLayout.ok) {
+      context.res.statusCode = rootLayout.status;
       context.res.setHeader("Content-Type", "application/json");
       context.res.write(
         JSON.stringify({
-          message: "Failed to fetch vex",
-          error: vex.statusText,
+          message: "Failed to fetch root.layout",
+          error: rootLayout.statusText,
         }),
       );
       context.res.end();
@@ -46,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
     context.res.setHeader("Content-Type", "application/json");
 
     await pipelineAsync(
-      vex.body as unknown as NodeJS.ReadableStream,
+      rootLayout.body as unknown as NodeJS.ReadableStream,
       context.res,
     );
 

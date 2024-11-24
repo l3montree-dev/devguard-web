@@ -54,9 +54,9 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
         <DialogHeader>
-          <DialogTitle>InToto Provenance</DialogTitle>
+          <DialogTitle>In-Toto Provenance</DialogTitle>
           <DialogDescription>
-            InToto is a framework to secure the software supply chain. It
+            In-Toto is a framework to secure the software supply chain. It
             ensures that the software was built and delivered securely. We start
             at the developers machine. It will create a post-commit hook, which
             records all file hashes of the project. This information is send to
@@ -119,7 +119,7 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
               codeString={`devguard-scanner intoto setup \\
     --assetName=${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug} \\
     --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} \\
-    --apiUrl=${config.publicDevGuardApiUrl}\\
+    --apiUrl=${config.publicDevGuardApiUrl} \\
     --step=post-commit`}
             ></CopyCode>
           </div>
