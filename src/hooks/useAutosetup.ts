@@ -50,11 +50,6 @@ export function useAutosetup(scanType: "full" | "sca" | "container-scanning") {
       message:
         "Project variables (DEVGUARD_TOKEN, DEVGUARD_ASSET_NAME) are created",
     },
-    sshKey: {
-      status: "notStarted",
-      message:
-        "A temporary SSH Key is created and added to the project. This is necessary to clone the repository, create a new branch and commit the changes.",
-    },
     pipeline: {
       status: "notStarted",
       message:
@@ -64,11 +59,6 @@ export function useAutosetup(scanType: "full" | "sca" | "container-scanning") {
       url: undefined,
       status: "notStarted",
       message: "A merge request is created",
-    },
-    deleteSSHKey: {
-      status: "notStarted",
-      message:
-        "The temporary SSH Key is deleted (This will be done even if anything above fails)",
     },
   });
 
