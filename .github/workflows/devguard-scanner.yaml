@@ -11,4 +11,4 @@ jobs:
     with:
         asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
     secrets:
-        devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
+        devguard-token: ${{ secrets.DEVGUARD_TOKEN }} 
