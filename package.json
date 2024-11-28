@@ -19,7 +19,7 @@
     "@hookform/resolvers": "^3.6.0",
     "@mdxeditor/editor": "^1.14.3",
     "@ory/client": "^1.15.12",
-    "@ory/integrations": "^1.2.1",
+    "@ory/integrations": "git+https://github.com/l3montree-dev/integrations.git#cad56746374fadcba6ba3ce9387e06b494c9f100",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-collapsible": "^1.1.0",

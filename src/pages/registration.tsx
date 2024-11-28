@@ -67,7 +67,6 @@ const Registration: NextPage = () => {
       return;
     }
 
-    "".sta;
     // Otherwise we initialize it
     ory
       .createBrowserRegistrationFlow({
@@ -209,14 +208,6 @@ const Registration: NextPage = () => {
                   <div className="mb-4 border-b-2 pb-4">
                     <Flow
                       only="passkey"
-                      onSubmit={onSubmit}
-                      flow={flow as LoginFlow}
-                    />
-                  </div>
-                  <div className="mb-4 border-b-2 pb-4">
-                    <Flow
-                      only="webauthn"
-                      hideGlobalMessages
                       onSubmit={onSubmit}
                       flow={flow as LoginFlow}
                     />
