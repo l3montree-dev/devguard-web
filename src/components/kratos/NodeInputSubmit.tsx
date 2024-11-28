@@ -15,9 +15,8 @@
 
 import { getNodeLabel } from "@ory/integrations/ui";
 
-import { NodeInputProps } from "./helpers";
-import { UiNodeGroupEnum } from "@ory/client";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import { UiNodeGroupEnum } from "@ory/client";
 import Image from "next/image";
 import DateString from "../common/DateString";
 import { Button } from "../ui/button";
@@ -28,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { NodeInputProps } from "./helpers";
 
 export function NodeInputSubmit<T>({
   node,
@@ -100,10 +100,12 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  const text = getNodeLabel(node);
   return (
     <div className="flex flex-row justify-end">
       <Button
         className="capitalize"
+        variant={text.toLowerCase() === "back" ? "secondary" : "default"}
         name={attributes.name}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}

@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { NodeInputProps } from "./helpers";
+import { NodeInputProps, useOnload } from "./helpers";
 
 export function NodeInputHidden<T>({ attributes }: NodeInputProps) {
   // Render a hidden input field
+  useOnload(attributes as any);
   return (
     <input
       type={attributes.type}

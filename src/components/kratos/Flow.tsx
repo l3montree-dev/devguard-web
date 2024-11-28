@@ -47,7 +47,8 @@ export type Methods =
   | "totp"
   | "webauthn"
   | "link"
-  | "lookup_secret";
+  | "lookup_secret"
+  | "passkey";
 
 export type Props<T> = {
   // The flow
@@ -135,6 +136,7 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
 
   // Handles form submission
   handleSubmit = (event: FormEvent<HTMLFormElement> | MouseEvent) => {
+    console.log("SUBMIT CALLED", event);
     // Prevent all native handlers
     event.stopPropagation();
     event.preventDefault();
@@ -204,8 +206,14 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       <form
         action={flow.ui.action}
         method={flow.ui.method}
+        className="flex flex-col gap-4"
         onSubmit={this.handleSubmit}
       >
+        {!hideGlobalMessages && Boolean(flow.ui.messages) ? (
+          <div>
+            <Messages messages={flow.ui.messages} />
+          </div>
+        ) : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
           return (
@@ -232,11 +240,6 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
             />
           );
         })}
-        {!hideGlobalMessages ? (
-          <div className="mt-6">
-            <Messages messages={flow.ui.messages} />
-          </div>
-        ) : null}
       </form>
     );
   }

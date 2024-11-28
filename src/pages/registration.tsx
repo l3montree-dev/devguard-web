@@ -21,9 +21,13 @@ import {
   UpdateRegistrationFlowBody,
 } from "@ory/client";
 
+import { Flow } from "@/components/kratos/Flow";
+import { filterNodesByGroups } from "@ory/integrations/ui";
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   HTMLAttributeReferrerPolicy,
@@ -32,14 +36,6 @@ import {
   useState,
 } from "react";
 import { handleFlowError, ory } from "../services/ory";
-import { Flow } from "@/components/kratos/Flow";
-import Link from "next/link";
-import Image from "next/image";
-import { filterNodesByGroups } from "@ory/integrations/ui";
-import { Tab } from "@headlessui/react";
-import CustomTab from "@/components/common/CustomTab";
-import Carriage from "@/components/common/Carriage";
-import Callout from "@/components/common/Callout";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -71,6 +67,7 @@ const Registration: NextPage = () => {
       return;
     }
 
+    "".sta;
     // Otherwise we initialize it
     ory
       .createBrowserRegistrationFlow({
@@ -162,45 +159,11 @@ const Registration: NextPage = () => {
     };
   }, [flow?.ui.nodes]);
 
-  const passwordlessFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter(
-            (n) =>
-              n.group === UiNodeGroupEnum.Webauthn ||
-              n.group === UiNodeGroupEnum.Default,
-          ) ?? [],
-      },
-    };
-  }, [flow]);
-
-  const passwordFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter(
-            (n) =>
-              n.group === UiNodeGroupEnum.Default ||
-              n.group === UiNodeGroupEnum.Password,
-          ) ?? [],
-      },
-    };
-  }, [flow]);
-
-  const oidcFlow = useMemo(() => {
-    return {
-      ...flow,
-      ui: {
-        ...flow?.ui,
-        nodes:
-          flow?.ui.nodes?.filter((n) => n.group === UiNodeGroupEnum.Oidc) ?? [],
-      },
-    };
+  const hasSignupWithPasskey = useMemo(() => {
+    return (
+      (flow?.ui.nodes.filter((n) => n.group === UiNodeGroupEnum.Passkey)
+        .length ?? 0) > 0
+    );
   }, [flow]);
 
   return (
@@ -240,41 +203,46 @@ const Registration: NextPage = () => {
               </h2>
             </div>
 
-            <div className="mt-10 sm:mx-auto">
-              <Tab.Group>
-                <CustomTab>Passwordless</CustomTab>
-                <CustomTab>Legacy Password Sign Up</CustomTab>
-                <Tab.Panels className={"mt-6"}>
-                  <Tab.Panel>
-                    <div className="mb-6 border-b ">
-                      <Flow onSubmit={onSubmit} flow={oidcFlow as LoginFlow} />
-                    </div>
+            <div className="mb-4 mt-10 border-b-2 pb-4 sm:mx-auto">
+              {hasSignupWithPasskey && (
+                <div className={"mb-4"}>
+                  <div className="mb-4 border-b-2 pb-4">
                     <Flow
+                      only="passkey"
                       onSubmit={onSubmit}
-                      flow={passwordlessFlow as LoginFlow}
+                      flow={flow as LoginFlow}
                     />
-                  </Tab.Panel>
-                  <Tab.Panel>
-                    <div className="mb-6 mt-4">
-                      <Callout intent="warning">
-                        <div className="flex flex-row gap-4">
-                          <p className="flex-1">
-                            Passwords are insecure by design. We recommend using
-                            passwordless authentication methods.{" "}
-                            <div className="mr-2 inline-block w-10">
-                              <Carriage />
-                            </div>
-                          </p>
-                        </div>
-                      </Callout>
-                    </div>
+                  </div>
+                  <div className="mb-4 border-b-2 pb-4">
                     <Flow
+                      only="webauthn"
+                      hideGlobalMessages
                       onSubmit={onSubmit}
-                      flow={passwordFlow as LoginFlow}
+                      flow={flow as LoginFlow}
                     />
-                  </Tab.Panel>
-                </Tab.Panels>
-              </Tab.Group>
+                  </div>
+                  <Flow
+                    hideGlobalMessages
+                    only="password"
+                    onSubmit={onSubmit}
+                    flow={flow as LoginFlow}
+                  />
+                </div>
+              )}
+              <Flow
+                hideGlobalMessages
+                only="profile"
+                onSubmit={onSubmit}
+                flow={flow as LoginFlow}
+              />
+            </div>
+            <div>
+              <Flow
+                only="oidc"
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                flow={flow as LoginFlow}
+              />
             </div>
             <p className="mt-10 text-left text-sm">
               Already have an Account?{" "}

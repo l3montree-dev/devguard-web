@@ -26,7 +26,7 @@ export const NodeImage = ({ node, attributes }: Props) => {
       data-testid={`node/image/${attributes.id}`}
       src={attributes.src}
       alt={node.meta.label?.text}
-      className="h-56"
+      className="h-56 w-56"
     />
   );
 };

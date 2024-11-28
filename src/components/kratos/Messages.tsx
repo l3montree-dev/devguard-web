@@ -27,7 +27,10 @@ const messageType2Intent = {
 };
 export const Message = ({ message }: MessageProps) => {
   return (
-    <p className="text-sm" data-testid={`ui/message/${message.id}`}>
+    <p
+      className="text-sm text-muted-foreground"
+      data-testid={`ui/message/${message.id}`}
+    >
       {message.text}
     </p>
   );
@@ -44,14 +47,10 @@ export const Messages = ({ messages }: MessagesProps) => {
   }
 
   return (
-    <Callout
-      intent={
-        messageType2Intent[messages[0].type] as "danger" | "success" | "info"
-      }
-    >
+    <>
       {messages.map((message) => (
         <Message key={message.id} message={message} />
       ))}
-    </Callout>
+    </>
   );
 };

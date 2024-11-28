@@ -25,6 +25,7 @@ import { Flow } from "../components/kratos/Flow";
 import { ory } from "../services/ory";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Verification: NextPage = () => {
   const [flow, setFlow] = useState<VerificationFlow>();
@@ -127,7 +128,7 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-32 max-sm:py-16 lg:px-8">
+      <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">
         <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
           <CardHeader>
             <CardTitle>Verify your E-Mail</CardTitle>
@@ -136,8 +137,10 @@ const Verification: NextPage = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-lg">
               <Flow onSubmit={onSubmit} flow={flow} />
             </div>
-            <div className="flex flex-row justify-end text-sm">
-              <Link href="/">Go back</Link>
+            <div className="mt-4 flex flex-row justify-end text-sm">
+              <Link href="/">
+                <Button variant={"secondary"}>Go back</Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

@@ -15,7 +15,7 @@
 
 import { getNodeLabel } from "@ory/integrations/ui";
 
-import { NodeInputProps } from "./helpers";
+import { callWebauthnFunction, NodeInputProps } from "./helpers";
 import { Button } from "../ui/button";
 
 export function NodeInputButton<T>({
@@ -35,8 +35,7 @@ export function NodeInputButton<T>({
     if (attributes.onclick) {
       e.stopPropagation();
       e.preventDefault();
-      const run = new Function(attributes.onclick);
-      run();
+      callWebauthnFunction(attributes.onclick);
       return;
     }
 
@@ -50,7 +49,7 @@ export function NodeInputButton<T>({
         onClick={(e) => {
           onClick(e);
         }}
-        className="mt-2 capitalize"
+        className="capitalize"
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
