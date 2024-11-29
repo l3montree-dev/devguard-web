@@ -122,7 +122,7 @@ const AppSidebar = () => {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size={"lg"}
-              className="data-[state=open]:text-sidebar-accent-foreground flex flex-row items-center justify-between rounded-lg data-[state=open]:bg-accent"
+              className="flex flex-row items-center justify-between rounded-lg data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex flex-row items-center gap-2">
                 <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
@@ -220,7 +220,7 @@ const AppSidebar = () => {
                             <span>Settings</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuItem>
-                        <SidebarGroup className="border-sidebar-border rounded-lg border dark:border-0 dark:bg-card">
+                        <SidebarGroup className="rounded-lg border border-sidebar-border dark:border-0 dark:bg-card">
                           {item.assets?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton asChild>
