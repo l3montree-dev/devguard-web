@@ -10,5 +10,6 @@ jobs:
     uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
     with:
         asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
+        build-args: "--context=. --dockerfile=Dockerfile --build-arg=NEXT_PUBLIC_DEVGUARD_API_URL=https://api.main.devguard.org"
     secrets:
         devguard-token: ${{ secrets.DEVGUARD_TOKEN }} 
