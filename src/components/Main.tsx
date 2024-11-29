@@ -20,6 +20,7 @@ import React, { FunctionComponent, useEffect } from "react";
 import UserNav from "./navigation/UserNav";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import AppSidebar from "./AppSidebar";
+import { useStore } from "@/zustand/globalStoreProvider";
 
 interface Props {
   title: string;
@@ -49,6 +50,8 @@ const Main: FunctionComponent<Props> = ({
     setSidebarOpen(localStorage.getItem("sidebar") === "true");
   }, []);
 
+  const contentTree = useStore((s) => s.contentTree);
+
   return (
     <SidebarProvider
       open={isSidebarOpen}
@@ -57,7 +60,7 @@ const Main: FunctionComponent<Props> = ({
         localStorage.setItem("sidebar", String(!isSidebarOpen));
       }}
     >
-      <AppSidebar />
+      {contentTree && <AppSidebar />}
       <main className="flex-1 font-body">
         <header
           className={classNames(

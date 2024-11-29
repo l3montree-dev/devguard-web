@@ -32,17 +32,17 @@ import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Page from "../components/Page";
-import SubnavSidebar from "../components/SubnavSidebar";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 
+import { withContentTree } from "@/decorators/withContentTree";
+import { withOrganization } from "@/decorators/withOrganization";
+import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
 import { getApiClientFromContext } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withOrganization } from "@/decorators/withOrganization";
 
 interface Props {
   flow?: SettingsFlow;
