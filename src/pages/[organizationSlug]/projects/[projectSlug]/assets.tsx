@@ -48,6 +48,7 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   project: ProjectDTO & {
@@ -280,6 +281,7 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    contentTree: withContentTree,
   },
 );
 

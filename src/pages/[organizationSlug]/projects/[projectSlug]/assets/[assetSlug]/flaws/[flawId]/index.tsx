@@ -68,6 +68,7 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { useLoader } from "@/hooks/useLoader";
+import { withContentTree } from "@/decorators/withContentTree";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -944,6 +945,7 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     asset: withAsset,
     project: withProject,
+    contentTree: withContentTree,
   },
 );
 

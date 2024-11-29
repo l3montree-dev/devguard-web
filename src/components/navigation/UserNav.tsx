@@ -44,25 +44,11 @@ export default function UserNav() {
   const router = useRouter();
 
   const { setTheme } = useTheme();
-  const updateOrganization = useStore((s) => s.updateOrganization);
 
   const user = useStore((s) => s.session?.identity);
   const orgs = useStore((s) => s.organizations);
 
   const activeOrg = useOrg() ?? orgs[0];
-
-  const handleActiveOrgChange = (id: string) => () => {
-    // redirect to the new slug
-    const org = orgs.find((o) => o.id === id);
-    if (org) {
-      router.push(`/${org.slug}`);
-      updateOrganization(org as OrganizationDetailsDTO);
-    }
-  };
-
-  const handleNavigateToSetupOrg = () => {
-    router.push(`/setup-organization`);
-  };
 
   return (
     <div className="flex flex-row justify-between gap-1">
@@ -112,23 +98,6 @@ export default function UserNav() {
                 User Settings
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-              <PlusIcon className="mr-2 h-5 w-5 text-muted-foreground" />
-              Create Organization
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {orgs.length !== 0 && (
-              <>
-                {orgs.map((o) => (
-                  <DropdownMenuItem
-                    key={o.id}
-                    onClick={handleActiveOrgChange(o.id)}
-                  >
-                    {o.name}
-                  </DropdownMenuItem>
-                ))}
-              </>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (

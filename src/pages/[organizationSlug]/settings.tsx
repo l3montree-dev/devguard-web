@@ -42,6 +42,7 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
+import { withContentTree } from "@/decorators/withContentTree";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -285,5 +286,6 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    contentTree: withContentTree,
   },
 );

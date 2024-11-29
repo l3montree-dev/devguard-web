@@ -44,6 +44,15 @@
 
     --blue: 204 86% 53%;
     --green: 168 100% 41%;
+
+    --sidebar-background: 214 20% 95%;
+    --sidebar-foreground: 226, 57%, 0%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 226 15% 85%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 210 18% 84%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
   
   .dark {
@@ -85,6 +94,15 @@
 
     --blue: 204 86% 53%;
     --green: 168 100% 41%;
+
+    --sidebar-background: 213 31% 7%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 22% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 215 22% 15%;
+    --sidebar-ring: 215 22% 15%;
 
     .mdx-editor {
         [class*="_placeholder"] {

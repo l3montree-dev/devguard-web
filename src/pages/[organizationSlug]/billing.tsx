@@ -14,6 +14,7 @@ import { middleware } from "@/decorators/middleware";
 import { withOrgs } from "@/decorators/withOrgs";
 import Link from "next/link";
 import { withOrganization } from "@/decorators/withOrganization";
+import { withContentTree } from "@/decorators/withContentTree";
 
 export default function Billing({
   productsData,
@@ -140,5 +141,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    contentTree: withContentTree,
   },
 );

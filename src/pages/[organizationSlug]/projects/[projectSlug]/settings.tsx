@@ -24,6 +24,7 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   project: ProjectDTO;
@@ -130,6 +131,7 @@ export const getServerSideProps = middleware(
     organizations: withOrgs,
     organization: withOrganization,
     project: withProject,
+    contentTree: withContentTree,
   },
 );
 

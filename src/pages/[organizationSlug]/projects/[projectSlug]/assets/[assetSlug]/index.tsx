@@ -33,6 +33,7 @@ import Link from "next/link";
 import { FunctionComponent } from "react";
 
 import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -241,5 +242,6 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    contentTree: withContentTree,
   },
 );

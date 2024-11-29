@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Image from "next/image";
 import { debounce } from "lodash";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -381,5 +382,6 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    contentTree: withContentTree,
   },
 );

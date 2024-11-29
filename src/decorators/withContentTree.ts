@@ -13,12 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { OrganizationDetailsDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
-import { HttpError } from "./middleware";
 
-export async function withOrganization(ctx: GetServerSidePropsContext) {
+export async function withContentTree(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient
   const devGuardApiClient = getApiClientFromContext(ctx);
   // check if there is a slug in the query
@@ -26,23 +24,13 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
 
   if (organizationSlug) {
     // get the organization
-    const org = await devGuardApiClient("/organizations/" + organizationSlug);
+    const contentTree = await devGuardApiClient(
+      "/organizations/" + organizationSlug + "/content-tree",
+    );
 
-    // parse the organization
-    const organization: OrganizationDetailsDTO = await org.json();
+    const contentTreeData = await contentTree.json();
 
-    if (!org.ok) {
-      console.log("LOGIN REDIRECT", org);
-      // it must be an 500
-      throw new HttpError({
-        redirect: {
-          destination: "/login",
-          permanent: false,
-        },
-      });
-    }
-
-    return organization;
+    return contentTreeData;
   } else {
     return null;
   }

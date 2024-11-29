@@ -49,6 +49,7 @@ import {
 import { classNames } from "@/utils/common";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   organization: OrganizationDTO & {
@@ -344,5 +345,6 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    contentTree: withContentTree,
   },
 );

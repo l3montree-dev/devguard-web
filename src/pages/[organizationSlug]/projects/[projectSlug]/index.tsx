@@ -37,6 +37,7 @@ import {
   RiskHistory,
 } from "../../../../types/api/api";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   project: ProjectDTO & {
@@ -353,5 +354,6 @@ export const getServerSideProps = middleware(
     organizations: withOrgs,
     organization: withOrganization,
     project: withProject,
+    contentTree: withContentTree,
   },
 );

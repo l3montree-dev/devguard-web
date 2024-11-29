@@ -36,6 +36,7 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   asset: AssetDTO;
@@ -464,5 +465,6 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    contentTree: withContentTree,
   },
 );

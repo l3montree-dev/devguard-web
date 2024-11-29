@@ -74,7 +74,7 @@ export const hashCode = (str: string) => {
 export const generateColor = (str: string) => {
   const hash = hashCode(str);
   const hue = Math.abs(hash) % 360; // Keeping hue between 0 and 359
-  const saturation = 60 + (hash % 40); // Randomize saturation between 60-100%
+  const saturation = 70; // Randomize saturation between 60-100%
   const lightness = 50; // Keep lightness consistent for a harmonious look
 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;

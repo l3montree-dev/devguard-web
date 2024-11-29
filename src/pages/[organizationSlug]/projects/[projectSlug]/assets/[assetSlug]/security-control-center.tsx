@@ -17,6 +17,7 @@ import SigningNode from "@/components/risk-identification/SigningNode";
 import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
@@ -237,5 +238,6 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    contentTree: withContentTree,
   },
 );

@@ -59,6 +59,7 @@ import {
 import { withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -221,5 +222,6 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
+    contentTree: withContentTree,
   },
 );
