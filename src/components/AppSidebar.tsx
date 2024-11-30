@@ -183,6 +183,9 @@ const AppSidebar = () => {
                 <Collapsible
                   key={item.title}
                   asChild
+                  defaultOpen={router.asPath.startsWith(
+                    "/" + activeOrg.slug + "/projects/" + item.slug,
+                  )}
                   className="group/collapsible truncate "
                 >
                   <SidebarMenuItem>
@@ -196,6 +199,10 @@ const AppSidebar = () => {
                       <SidebarMenuSub>
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
+                            isActive={
+                              router.asPath ===
+                              "/" + activeOrg.slug + "/projects/" + item.slug
+                            }
                             className="text-sm !text-foreground hover:no-underline"
                             href={
                               "/" + activeOrg.slug + "/projects/" + item.slug
@@ -207,6 +214,14 @@ const AppSidebar = () => {
                         </SidebarMenuSubItem>
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
+                            isActive={
+                              router.asPath ===
+                              "/" +
+                                activeOrg.slug +
+                                "/projects/" +
+                                item.slug +
+                                "/settings"
+                            }
                             className="text-sm !text-foreground hover:no-underline"
                             href={
                               "/" +
@@ -223,7 +238,10 @@ const AppSidebar = () => {
 
                         {item.assets?.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
+                            <SidebarMenuSubButton
+                              isActive={router.asPath.includes(subItem.slug)}
+                              asChild
+                            >
                               <Link
                                 className="text-sm !text-foreground hover:no-underline"
                                 href={
