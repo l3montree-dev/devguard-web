@@ -40,6 +40,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { withContentTree } from "@/decorators/withContentTree";
 import EmptyOverview from "@/components/common/EmptyOverview";
 import { useRouter } from "next/router";
+import { padRiskHistory } from "@/utils/server";
 
 interface Props {
   project: ProjectDTO & {
@@ -338,52 +339,13 @@ export const getServerSideProps = middleware(
 	}
     */
 
-    const lengths = riskHistory.map((r) => r.riskHistory.length);
-    const max = Math.max(...lengths);
-
-    // check if some array needs to be padded
-    riskHistory.forEach((r) => {
-      if (r.riskHistory.length === max) {
-        return r;
-      }
-
-      // it is smaller - thus we need to prepend fake elements
-      let firstDay = new Date(r.riskHistory[0].day);
-      while (r.riskHistory.length < max) {
-        // decrement firstDay by 1 day
-        const clone = new Date(firstDay);
-        clone.setTime(clone.getTime() - 24 * 60 * 60 * 60);
-        r.riskHistory = [
-          {
-            day: clone.toUTCString(),
-            id: r.asset.id,
-            sumClosedRisk: 0,
-            sumOpenRisk: 0,
-            maxClosedRisk: 0,
-            maxOpenRisk: 0,
-            averageClosedRisk: 0,
-            averageOpenRisk: 0,
-            openFlaws: 0,
-            fixedFlaws: 0,
-            minClosedRisk: 0,
-            minOpenRisk: 0,
-          },
-          ...r.riskHistory,
-        ];
-      }
-    });
-
-    riskHistory.sort(
-      (a, b) =>
-        b.riskHistory[b.riskHistory.length - 1]?.sumOpenRisk -
-        a.riskHistory[a.riskHistory.length - 1]?.sumOpenRisk,
-    );
+    const paddedRiskHistory = padRiskHistory(riskHistory);
 
     return {
       props: {
         project,
         riskDistribution,
-        riskHistory: riskHistory.map((r) => ({
+        riskHistory: paddedRiskHistory.map((r) => ({
           label: r.asset.name,
           history: r.riskHistory,
           slug: r.asset.slug,
