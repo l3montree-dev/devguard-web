@@ -230,7 +230,14 @@ const AppSidebar = () => {
                           {item.assets?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
-                                isActive={router.asPath.includes(subItem.slug)}
+                                isActive={router.asPath.startsWith(
+                                  "/" +
+                                    activeOrg.slug +
+                                    "/projects/" +
+                                    item.slug +
+                                    "/assets/" +
+                                    subItem.slug,
+                                )}
                                 asChild
                               >
                                 <Link
