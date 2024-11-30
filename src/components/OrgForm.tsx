@@ -41,7 +41,7 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Organization name</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
