@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { useOrg } from "@/hooks/useOrg";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
@@ -22,15 +23,7 @@ import {
   CogIcon,
   LifebuoyIcon,
 } from "@heroicons/react/24/outline";
-import {
-  Calendar,
-  ChevronRight,
-  Home,
-  Inbox,
-  PlusIcon,
-  Search,
-  Settings,
-} from "lucide-react";
+import { ChevronRight, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -62,37 +55,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
 } from "./ui/sidebar";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
 
 const AppSidebar = () => {
   const orgs = useStore((s) => s.organizations);
@@ -114,6 +77,8 @@ const AppSidebar = () => {
   const handleNavigateToSetupOrg = () => {
     router.push(`/setup-organization`);
   };
+
+  const items = useOrganizationMenu();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -175,6 +140,31 @@ const AppSidebar = () => {
         </DropdownMenu>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Organization</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    isActive={router.asPath === item.href}
+                    asChild
+                  >
+                    <Link
+                      className="!text-foreground hover:no-underline"
+                      href={item.href}
+                    >
+                      <div className="flex flex-row items-center gap-1">
+                        <item.Icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarGroupContent>

@@ -19,7 +19,7 @@ import {
   ListBulletIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import useSession from "./useSession";
+
 import { useCurrentUser } from "./useCurrentUser";
 
 export const useOrganizationMenu = () => {
