@@ -24,7 +24,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { RiskDistribution } from "@/types/api/api";
-import { uniq } from "lodash";
 import { generateColor } from "@/utils/view";
 
 //  { range: "0-2", scanner1: 186, scanner2: 80 },
@@ -45,7 +44,7 @@ const combineRanges = (data: RiskDistribution[]) => {
     .map((el) => ({ [el.id]: el.critical }))
     .reduce((acc, el) => ({ ...acc, ...el }), { range: "CRITICAL" });
 
-  return [{ ...low }, medium, high, critical];
+  return [low, medium, high, critical];
 };
 
 export function RiskDistributionDiagram({
@@ -64,15 +63,16 @@ export function RiskDistributionDiagram({
     {} as any,
   );
 
+  const amountOfElements = Object.keys(chartConfig).length;
   const chartData = combineRanges(data);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Open Flaws</CardTitle>
+        <CardTitle>Open Vulnerabilities</CardTitle>
         <CardDescription>
-          Showing the distribution of flaws based on the risk range and the scan
-          type.
+          Showing the distribution of vulnerabilities based on the risk range
+          and the scan type.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +97,11 @@ export function RiskDistributionDiagram({
                 cursor={false}
                 content={<ChartTooltipContent className="bg-background" />}
               />
-              <ChartLegend content={<ChartLegendContent />} />
+              {amountOfElements < 6 && (
+                <ChartLegend
+                  content={<ChartLegendContent verticalAlign={"middle"} />}
+                />
+              )}
               {Object.keys(chartConfig).map((id, i, arr) => (
                 <Bar
                   key={id}

@@ -26,7 +26,7 @@ export default function FlawAggregationState({
   const stats = {
     total: {
       id: 1,
-      name: "Total Flaws",
+      name: "Total Vulnerabilities",
       stat: data.now.fixed + data.now.open,
       icon: WrenchIcon,
       percentage: 0,
@@ -37,7 +37,7 @@ export default function FlawAggregationState({
     },
     handled: {
       id: 2,
-      name: "Handled Flaws",
+      name: "Handled Vulnerabilities",
       stat: data.now.fixed,
       icon: CheckCircleIcon,
       percentage: (data.now.fixed / (data.now.fixed + data.now.open)) * 100,
@@ -46,7 +46,7 @@ export default function FlawAggregationState({
     },
     open: {
       id: 3,
-      name: "Open Flaws",
+      name: "Open Vulnerabilities",
       stat: data.now.open,
       percentage: (data.now.open / (data.now.fixed + data.now.open)) * 100,
       icon: BugAntIcon,
@@ -69,7 +69,9 @@ export default function FlawAggregationState({
       </Card>
       <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Flaws</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Total Vulnerabilities
+          </CardTitle>
           <WrenchIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -81,7 +83,9 @@ export default function FlawAggregationState({
       </Card>
       <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Handled Flaws</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Handled Vulnerabilities
+          </CardTitle>
           <CheckCircleIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -94,7 +98,9 @@ export default function FlawAggregationState({
       </Card>
       <Card className="flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Open Flaws</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            Open Vulnerabilities
+          </CardTitle>
           <BugAntIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>

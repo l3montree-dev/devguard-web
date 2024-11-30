@@ -113,7 +113,7 @@ const Home: FunctionComponent<Props> = ({
       <div className="mt-4 grid gap-4">
         <FlawAggregationState
           description="The total risk this project poses to the organization"
-          title="Project Risk"
+          title="Organization Risk"
           totalRisk={riskHistory
             .map((r) => r.history[r.history.length - 1])
             .filter((r) => !!r)
@@ -179,22 +179,22 @@ const Home: FunctionComponent<Props> = ({
         <div className="grid grid-cols-4 gap-4">
           <AverageFixingTimeChart
             title="Low severity"
-            description="Average fixing time for low severity flaws"
+            description="Average fixing time for low severity vulnerabilities"
             avgFixingTime={avgLowFixingTime}
           />
           <AverageFixingTimeChart
             title="Medium severity"
-            description="Average fixing time for medium severity flaws"
+            description="Average fixing time for medium severity vulnerabilities"
             avgFixingTime={avgMediumFixingTime}
           />
           <AverageFixingTimeChart
             title="High severity"
-            description="Average fixing time for high severity flaws"
+            description="Average fixing time for high severity vulnerabilities"
             avgFixingTime={avgHighFixingTime}
           />
           <AverageFixingTimeChart
             title="Critical severity"
-            description="Average fixing time for critical severity flaws"
+            description="Average fixing time for critical severity vulnerabilities"
             avgFixingTime={avgCriticalFixingTime}
           />
         </div>

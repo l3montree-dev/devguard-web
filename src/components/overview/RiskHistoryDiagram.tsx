@@ -56,6 +56,8 @@ export function RiskHistoryChart({
     return res;
   }, [data]);
 
+  const amountOfElements = data.length;
+
   return (
     <Card>
       <CardHeader>
@@ -79,7 +81,9 @@ export function RiskHistoryChart({
             )}
           >
             <AreaChart accessibilityLayer data={reduced}>
-              <ChartLegend content={<ChartLegendContent />} />
+              {amountOfElements < 6 && (
+                <ChartLegend content={<ChartLegendContent />} />
+              )}
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="day"
@@ -140,7 +144,7 @@ export function RiskHistoryChart({
                   stroke={generateColor(d.label)}
                   strokeWidth={2}
                   fill={"url(#fill-" + (i + 1) + ")"}
-                  fillOpacity={0.4}
+                  fillOpacity={0.2}
                   dot={false}
                 />
               ))}
