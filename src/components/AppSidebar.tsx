@@ -14,23 +14,25 @@
 import { useOrg } from "@/hooks/useOrg";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
-
 import {
-  BriefcaseIcon,
   BuildingOffice2Icon,
   BuildingOfficeIcon,
+  ChartBarSquareIcon,
   ChevronUpDownIcon,
+  CogIcon,
+  LifebuoyIcon,
 } from "@heroicons/react/24/outline";
 import {
   Calendar,
   ChevronRight,
   Home,
   Inbox,
-  PanelLeftIcon,
   PlusIcon,
   Search,
   Settings,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   Collapsible,
@@ -62,8 +64,6 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import { generateColor } from "@/utils/view";
-import Link from "next/link";
 
 // Menu items.
 const items = [
@@ -101,7 +101,7 @@ const AppSidebar = () => {
   const activeOrg = useOrg() ?? orgs[0];
   const updateOrganization = useStore((s) => s.updateOrganization);
   const contentTree = useStore((s) => s.contentTree);
-  const { toggleSidebar } = useSidebar();
+
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.id === id);
@@ -183,33 +183,31 @@ const AppSidebar = () => {
                 <Collapsible
                   key={item.title}
                   asChild
-                  className="group/collapsible truncate dark:text-muted-foreground"
+                  className="group/collapsible truncate "
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton tooltip={item.title}>
-                        <div className="relative -left-1 rounded-lg bg-secondary p-1">
-                          <BriefcaseIcon className="z-1 relative h-5 w-5 text-foreground" />
-                        </div>
                         <span>{item.title}</span>
                         <ChevronRight className="ml-auto h-4 w-4  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        <SidebarMenuItem>
+                        <SidebarMenuSubItem>
                           <SidebarMenuSubButton
-                            className="text-sm hover:no-underline dark:!text-muted-foreground"
+                            className="text-sm !text-foreground hover:no-underline"
                             href={
                               "/" + activeOrg.slug + "/projects/" + item.slug
                             }
                           >
+                            <ChartBarSquareIcon className="h-5 w-5 opacity-75" />
                             <span>Overview</span>
                           </SidebarMenuSubButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
                           <SidebarMenuSubButton
-                            className="text-sm hover:no-underline dark:!text-muted-foreground"
+                            className="text-sm !text-foreground hover:no-underline"
                             href={
                               "/" +
                               activeOrg.slug +
@@ -218,30 +216,37 @@ const AppSidebar = () => {
                               "/settings"
                             }
                           >
+                            <CogIcon className="h-5 w-5 opacity-75" />
                             <span>Settings</span>
                           </SidebarMenuSubButton>
-                        </SidebarMenuItem>
-                        <SidebarGroup className="rounded-lg border border-sidebar-border dark:border-0 dark:bg-card">
-                          {item.assets?.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
-                                <Link
-                                  className="text-sm hover:no-underline dark:!text-muted-foreground"
-                                  href={
-                                    "/" +
-                                    activeOrg.slug +
-                                    "/projects/" +
-                                    item.slug +
-                                    "/assets/" +
-                                    subItem.slug
-                                  }
-                                >
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarGroup>
+                        </SidebarMenuSubItem>
+
+                        {item.assets?.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <Link
+                                className="text-sm !text-foreground hover:no-underline"
+                                href={
+                                  "/" +
+                                  activeOrg.slug +
+                                  "/projects/" +
+                                  item.slug +
+                                  "/assets/" +
+                                  subItem.slug
+                                }
+                              >
+                                <Image
+                                  alt="git"
+                                  width={20}
+                                  height={20}
+                                  className="opacity-100 "
+                                  src={"/assets/git.svg"}
+                                />
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
@@ -251,13 +256,24 @@ const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenuButton
-          onClick={toggleSidebar}
-          className="dark:text-muted-foreground"
-        >
-          <PanelLeftIcon className="h-5 w-5" />
-          <span>Collapse Sidebar</span>
+      <SidebarFooter className="text-xs">
+        <SidebarMenuButton asChild>
+          <Link
+            className="!text-foreground hover:no-underline"
+            href="/user-settings"
+          >
+            <CogIcon className="h-5 w-5" />
+            User Settings
+          </Link>
+        </SidebarMenuButton>
+        <SidebarMenuButton asChild>
+          <Link
+            className="!text-foreground hover:no-underline"
+            href="https://github.com/l3montree-dev/devguard-web"
+          >
+            <LifebuoyIcon className="h-5 w-5" />
+            <span>Support</span>
+          </Link>
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

@@ -45,26 +45,15 @@ const Main: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
 
-  const [isSidebarOpen, setSidebarOpen] = React.useState(true);
-  useEffect(() => {
-    setSidebarOpen(localStorage.getItem("sidebar") === "true");
-  }, []);
-
   const contentTree = useStore((s) => s.contentTree);
 
   return (
-    <SidebarProvider
-      open={isSidebarOpen}
-      onOpenChange={() => {
-        setSidebarOpen(!isSidebarOpen);
-        localStorage.setItem("sidebar", String(!isSidebarOpen));
-      }}
-    >
+    <SidebarProvider open={true}>
       {contentTree && <AppSidebar />}
       <main className="flex-1 font-body">
         <header
           className={classNames(
-            "relative ml-1 flex items-center justify-between rounded-bl-xl border-b border-l  bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
+            "relative  flex items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
             Boolean(Menu) ? "pb-3" : "pb-5",
           )}
         >
