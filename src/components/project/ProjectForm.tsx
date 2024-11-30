@@ -15,6 +15,7 @@ import Section from "../common/Section";
 import ListItem from "../common/ListItem";
 import { Switch } from "../ui/switch";
 import { classNames } from "@/utils/common";
+import DangerZone from "../common/DangerZone";
 
 interface Props {
   form: UseFormReturn<ProjectDTO, any, undefined>;
@@ -63,43 +64,47 @@ export const ProjectForm: FunctionComponent<Props> = ({
         />
       </Section>
       <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
-        title="Visibility"
-      >
-        <FormField
-          control={form.control}
-          name="isPublic"
-          render={({ field }) => (
-            <FormItem>
-              <div className={classNames(!org.isPublic && "opacity-50")}>
-                <ListItem
-                  description={
-                    "Setting this to true will make the project visible to the public. It allows creating public and private assets."
-                  }
-                  Title="Public Project"
-                  Button={
-                    <FormControl>
-                      <Switch
-                        disabled={!org.isPublic}
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  }
-                />
-                <FormMessage />
-              </div>
-            </FormItem>
+      <DangerZone>
+        <Section
+          className="pb-0"
+          forceVertical={forceVerticalSections}
+          description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
+          title="Visibility"
+        >
+          <FormField
+            control={form.control}
+            name="isPublic"
+            render={({ field }) => (
+              <FormItem>
+                <div className={classNames(!org.isPublic && "opacity-50")}>
+                  <ListItem
+                    description={
+                      "Setting this to true will make the project visible to the public. It allows creating public and private assets."
+                    }
+                    Title="Public Project"
+                    Button={
+                      <FormControl>
+                        <Switch
+                          disabled={!org.isPublic}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+          {!org.isPublic && (
+            <small>
+              The organization is not public. You can not make the project
+              public.
+            </small>
           )}
-        />
-        {!org.isPublic && (
-          <small>
-            The organization is not public. You can not make the project public.
-          </small>
-        )}
-      </Section>
+        </Section>
+      </DangerZone>
     </>
   );
 };
