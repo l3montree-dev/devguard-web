@@ -167,9 +167,10 @@ const Index: FunctionComponent<Props> = ({ project }) => {
               <Link
                 key={asset.id}
                 href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
-                className="flex flex-col gap-2 hover:no-underline "
+                className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem
+                  reactOnHover
                   key={asset.id}
                   Title={asset.name}
                   description={

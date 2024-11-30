@@ -166,6 +166,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                   className="flex flex-col gap-2 hover:no-underline"
                 >
                   <ListItem
+                    reactOnHover
                     Title={project.name}
                     description={project.description}
                     Button={
