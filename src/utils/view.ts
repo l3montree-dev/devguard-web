@@ -73,9 +73,13 @@ export const hashCode = (str: string) => {
 // Generate HSL color
 export const generateColor = (str: string) => {
   const hash = hashCode(str);
-  const hue = Math.abs(hash) % 360; // Keeping hue between 0 and 359
-  const saturation = 70; // Randomize saturation between 60-100%
-  const lightness = 50; // Keep lightness consistent for a harmonious look
+
+  // Narrow hue range to avoid overly vivid colors, focus on pleasing palettes
+  const hue = (Math.abs(hash) % 300) + 30; // E.g., avoid pure red (0) or magenta (360)
+
+  // Moderate saturation and lightness for a professional look
+  const saturation = 50 + (Math.abs(hash) % 20); // Range: 50% - 70%
+  const lightness = 40 + (Math.abs(hash) % 20); // Range: 40% - 60%
 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
