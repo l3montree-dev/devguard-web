@@ -122,23 +122,24 @@ const AppSidebar = () => {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size={"lg"}
-              className="flex flex-row items-center justify-between rounded-lg data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="rounded-lg data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex flex-row items-center gap-2">
-                <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
-                  <BuildingOffice2Icon className="h-6 w-6" />
+              <div className="flex w-full flex-row items-center justify-between gap-1">
+                <div className="flex flex-row items-center gap-1 overflow-hidden text-ellipsis">
+                  <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
+                    <BuildingOffice2Icon className="h-6 w-6" />
+                  </div>
+                  <div className="flex flex-col gap-0">
+                    <span className="line-clamp-1 inline-block max-w-[155px] truncate text-ellipsis text-left text-sm font-semibold">
+                      {activeOrg?.name}
+                    </span>
+                    <span className="truncate text-left text-xs">
+                      Organization
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-1 flex-col gap-0">
-                  <span className="leading-1 line-clamp-1 truncate text-left text-sm font-semibold">
-                    {activeOrg?.name}
-                  </span>
-                  <span className="truncate text-left text-xs">
-                    Organization
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-row items-center justify-center">
-                <ChevronUpDownIcon className="h-6 w-6" />
+
+                <ChevronUpDownIcon className="block h-7 w-7 p-1" />
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
