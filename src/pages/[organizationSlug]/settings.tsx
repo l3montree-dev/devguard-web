@@ -260,6 +260,7 @@ const Home: FunctionComponent = () => {
         </Section>
       </div>
       <hr />
+
       <div className="pb-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>

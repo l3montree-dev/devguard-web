@@ -88,7 +88,7 @@ const Home: FunctionComponent<Props> = ({
 }) => {
   const orgMenu = useOrganizationMenu();
 
-  if (riskHistory.length == 0) {
+  if (riskHistory.length === 0) {
     return (
       <Page
         Title={

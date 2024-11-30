@@ -21,6 +21,7 @@ import {
 } from "./ui/select";
 import { Switch } from "./ui/switch";
 import ListItem from "./common/ListItem";
+import DangerZone from "./common/DangerZone";
 
 interface Props {
   form:
@@ -266,34 +267,37 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
       </div>
     </Section>
     <hr />
-    <Section
-      description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
-      title="Visibility"
-    >
-      <FormField
-        // @ts-expect-error
-        control={form.control}
-        name="isPublic"
-        render={({ field }) => (
-          <FormItem>
-            <ListItem
-              description={
-                "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
-              }
-              Title="Public Organization"
-              Button={
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              }
-            />
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </Section>
+    <DangerZone>
+      <Section
+        description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
+        title="Visibility"
+        className="pb-0"
+      >
+        <FormField
+          // @ts-expect-error
+          control={form.control}
+          name="isPublic"
+          render={({ field }) => (
+            <FormItem>
+              <ListItem
+                description={
+                  "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
+                }
+                Title="Public Organization"
+                Button={
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                }
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </Section>
+    </DangerZone>
   </>
 );

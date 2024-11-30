@@ -253,7 +253,7 @@ const Settings: FunctionComponent<{
                   }
                   Button={
                     <Button
-                      variant="destructiveOutline"
+                      variant="secondary"
                       onClick={() => onDeletePat(pat)}
                     >
                       Delete
@@ -286,15 +286,15 @@ const Settings: FunctionComponent<{
           </SettingsCard>
         </Section>
         <Section
-          id="webauthn"
+          id="passkey"
           title="Manage Hardware Tokens and Biometrics"
           description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
         >
-          <SettingsCard only="webauthn" flow={flow}>
+          <SettingsCard only="passkey" flow={flow}>
             <Flow
               hideGlobalMessages
               onSubmit={onSubmit}
-              only="webauthn"
+              only="passkey"
               flow={flow}
             />
           </SettingsCard>
