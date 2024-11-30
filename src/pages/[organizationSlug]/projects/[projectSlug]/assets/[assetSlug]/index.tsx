@@ -34,6 +34,8 @@ import { FunctionComponent } from "react";
 
 import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
 import { withContentTree } from "@/decorators/withContentTree";
+import EmptyOverview from "@/components/common/EmptyOverview";
+import { useRouter } from "next/router";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -62,6 +64,70 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
+
+  const router = useRouter();
+  if (riskHistory.length === 0) {
+    return (
+      <Page
+        Menu={assetMenu}
+        title="Overview"
+        description="Overview of the asset"
+        Title={
+          <span className="flex flex-row gap-2">
+            <Link
+              href={`/${activeOrg.slug}/projects`}
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            >
+              {activeOrg.name}{" "}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Organization
+              </Badge>
+            </Link>
+            <span className="opacity-75">/</span>
+            <Link
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+              href={`/${activeOrg.slug}/projects/${project?.slug}/assets`}
+            >
+              {project?.name}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Project
+              </Badge>
+            </Link>
+            <span className="opacity-75">/</span>
+            <Link
+              className="flex items-center gap-1 text-white hover:no-underline"
+              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-handling`}
+            >
+              {asset?.name}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Asset
+              </Badge>
+            </Link>
+          </span>
+        }
+      >
+        <EmptyOverview
+          title="No data available"
+          description="There is no data available for this asset. Please run a scan to get data."
+          onClick={() =>
+            router.push(
+              `/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
+            )
+          }
+          buttonTitle="Run a scan"
+        />
+      </Page>
+    );
+  }
 
   return (
     <Page

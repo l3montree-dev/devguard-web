@@ -35,8 +35,6 @@ import Page from "../components/Page";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
@@ -395,7 +393,6 @@ export const getServerSideProps = middleware(
   {
     session: withSession,
     organizations: withOrgs,
-    organization: withOrganization,
   },
 );
 

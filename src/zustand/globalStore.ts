@@ -12,7 +12,7 @@ export interface InitialState {
   session: (Omit<Session, "identity"> & { identity: User }) | null;
   organizations: OrganizationDTO[];
   organization: OrganizationDetailsDTO;
-  contentTree: Array<{
+  contentTree?: Array<{
     id: string;
     title: string;
     slug: string;

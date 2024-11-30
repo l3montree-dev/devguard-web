@@ -38,6 +38,8 @@ import {
 } from "../../../../types/api/api";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { withContentTree } from "@/decorators/withContentTree";
+import EmptyOverview from "@/components/common/EmptyOverview";
+import { useRouter } from "next/router";
 
 interface Props {
   project: ProjectDTO & {
@@ -71,8 +73,55 @@ const Index: FunctionComponent<Props> = ({
 }) => {
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
+  const router = useRouter();
   const activeProject = useActiveProject();
 
+  if (riskHistory.length === 0) {
+    return (
+      <Page
+        title={project.name}
+        Menu={projectMenu}
+        Title={
+          <span className="flex flex-row gap-2">
+            <Link
+              href={`/${activeOrg.slug}/projects`}
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            >
+              {activeOrg.name}{" "}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Organization
+              </Badge>
+            </Link>
+            <span className="opacity-75">/</span>
+            <Link
+              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+              href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+            >
+              {project.name}
+              <Badge
+                className="font-body font-normal !text-white"
+                variant="outline"
+              >
+                Project
+              </Badge>
+            </Link>
+          </span>
+        }
+      >
+        <EmptyOverview
+          title={"No data available for this project"}
+          description="Create an asset and start scanning it to see the data here."
+          buttonTitle="Create new asset"
+          onClick={() => {
+            router.push(`/${activeOrg.slug}/projects/${project.slug}/assets`);
+          }}
+        />
+      </Page>
+    );
+  }
   return (
     <Page
       title={project.name}
@@ -107,7 +156,6 @@ const Index: FunctionComponent<Props> = ({
         </span>
       }
     >
-      {" "}
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Overview</h1>
       </div>

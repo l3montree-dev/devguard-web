@@ -165,104 +165,106 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {contentTree.map((item) => (
-                <Collapsible
-                  key={item.title}
-                  asChild
-                  defaultOpen={router.asPath.startsWith(
-                    "/" + activeOrg.slug + "/projects/" + item.slug,
-                  )}
-                  className="group/collapsible truncate "
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={item.title}>
-                        <span>{item.title}</span>
-                        <ChevronRight className="ml-auto h-4 w-4  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            isActive={
-                              router.asPath ===
-                              "/" + activeOrg.slug + "/projects/" + item.slug
-                            }
-                            className="text-sm !text-foreground hover:no-underline"
-                            href={
-                              "/" + activeOrg.slug + "/projects/" + item.slug
-                            }
-                          >
-                            <ChartBarSquareIcon className="h-5 w-5 opacity-75" />
-                            <span>Overview</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            isActive={
-                              router.asPath ===
-                              "/" +
+        {contentTree && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {contentTree.map((item) => (
+                  <Collapsible
+                    key={item.title}
+                    asChild
+                    defaultOpen={router.asPath.startsWith(
+                      "/" + activeOrg.slug + "/projects/" + item.slug,
+                    )}
+                    className="group/collapsible truncate "
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={item.title}>
+                          <span>{item.title}</span>
+                          <ChevronRight className="ml-auto h-4 w-4  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={
+                                router.asPath ===
+                                "/" + activeOrg.slug + "/projects/" + item.slug
+                              }
+                              className="text-sm !text-foreground hover:no-underline"
+                              href={
+                                "/" + activeOrg.slug + "/projects/" + item.slug
+                              }
+                            >
+                              <ChartBarSquareIcon className="h-5 w-5 opacity-75" />
+                              <span>Overview</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={
+                                router.asPath ===
+                                "/" +
+                                  activeOrg.slug +
+                                  "/projects/" +
+                                  item.slug +
+                                  "/settings"
+                              }
+                              className="text-sm !text-foreground hover:no-underline"
+                              href={
+                                "/" +
                                 activeOrg.slug +
                                 "/projects/" +
                                 item.slug +
                                 "/settings"
-                            }
-                            className="text-sm !text-foreground hover:no-underline"
-                            href={
-                              "/" +
-                              activeOrg.slug +
-                              "/projects/" +
-                              item.slug +
-                              "/settings"
-                            }
-                          >
-                            <CogIcon className="h-5 w-5 opacity-75" />
-                            <span>Settings</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-
-                        {item.assets?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              isActive={router.asPath.includes(subItem.slug)}
-                              asChild
+                              }
                             >
-                              <Link
-                                className="text-sm !text-foreground hover:no-underline"
-                                href={
-                                  "/" +
-                                  activeOrg.slug +
-                                  "/projects/" +
-                                  item.slug +
-                                  "/assets/" +
-                                  subItem.slug
-                                }
-                              >
-                                <Image
-                                  alt="git"
-                                  width={20}
-                                  height={20}
-                                  className="opacity-100 "
-                                  src={"/assets/git.svg"}
-                                />
-                                <span>{subItem.title}</span>
-                              </Link>
+                              <CogIcon className="h-5 w-5 opacity-75" />
+                              <span>Settings</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+
+                          {item.assets?.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton
+                                isActive={router.asPath.includes(subItem.slug)}
+                                asChild
+                              >
+                                <Link
+                                  className="text-sm !text-foreground hover:no-underline"
+                                  href={
+                                    "/" +
+                                    activeOrg.slug +
+                                    "/projects/" +
+                                    item.slug +
+                                    "/assets/" +
+                                    subItem.slug
+                                  }
+                                >
+                                  <Image
+                                    alt="git"
+                                    width={20}
+                                    height={20}
+                                    className="opacity-100 "
+                                    src={"/assets/git.svg"}
+                                  />
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter className="text-xs">
         <SidebarMenuButton asChild>

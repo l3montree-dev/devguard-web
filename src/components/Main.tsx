@@ -45,11 +45,9 @@ const Main: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
 
-  const contentTree = useStore((s) => s.contentTree);
-
   return (
     <SidebarProvider open={true}>
-      {contentTree && <AppSidebar />}
+      <AppSidebar />
       <main className="flex-1 font-body">
         <header
           className={classNames(

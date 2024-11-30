@@ -50,6 +50,7 @@ import { classNames } from "@/utils/common";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { withContentTree } from "@/decorators/withContentTree";
+import EmptyOverview from "@/components/common/EmptyOverview";
 
 interface Props {
   organization: OrganizationDTO & {
@@ -87,6 +88,37 @@ const Home: FunctionComponent<Props> = ({
 }) => {
   const orgMenu = useOrganizationMenu();
 
+  if (riskHistory.length == 0) {
+    return (
+      <Page
+        Title={
+          <Link
+            href={`/${organization.slug}/projects`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+          >
+            {organization.name}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Organization
+            </Badge>
+          </Link>
+        }
+        title={organization.name ?? "Loading..."}
+        Menu={orgMenu}
+      >
+        <EmptyOverview
+          title="No Data Available"
+          description="There is no data available for this organization. Please add a project to get started."
+          buttonTitle="Add Project"
+          onClick={() => {
+            window.location.href = `/${organization.slug}/projects/`;
+          }}
+        />
+      </Page>
+    );
+  }
   return (
     <Page
       Title={
