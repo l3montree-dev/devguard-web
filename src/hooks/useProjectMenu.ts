@@ -17,9 +17,12 @@ import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
+  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
+import { title } from "process";
+import { Icon } from "lucide-react";
 
 export const useProjectMenu = () => {
   const router = useRouter();
@@ -33,6 +36,11 @@ export const useProjectMenu = () => {
       title: "Overview",
       href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ChartBarSquareIcon,
+    },
+    {
+      title: "Compliance",
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
+      Icon: ScaleIcon,
     },
     {
       title: "Assets",

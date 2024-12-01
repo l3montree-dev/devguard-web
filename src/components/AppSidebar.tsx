@@ -22,6 +22,7 @@ import {
   ChevronUpDownIcon,
   CogIcon,
   LifebuoyIcon,
+  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronRight, PlusIcon } from "lucide-react";
 import Image from "next/image";
@@ -201,6 +202,29 @@ const AppSidebar = () => {
                             >
                               <ChartBarSquareIcon className="h-5 w-5 opacity-75" />
                               <span>Overview</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={
+                                router.asPath ===
+                                "/" +
+                                  activeOrg.slug +
+                                  "/projects/" +
+                                  item.slug +
+                                  "/compliance"
+                              }
+                              className="text-sm !text-foreground hover:no-underline"
+                              href={
+                                "/" +
+                                activeOrg.slug +
+                                "/projects/" +
+                                item.slug +
+                                "/compliance"
+                              }
+                            >
+                              <ScaleIcon className="h-5 w-5 opacity-75" />
+                              <span>Compliance</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>

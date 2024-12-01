@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FlawByPackage } from "@/types/api/api";
+import { FlawByPackage, FlawWithCVE } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
@@ -28,6 +28,53 @@ interface Props {
   index: number;
   arrLength: number;
 }
+
+const FlawWithCveTableRow = ({
+  onClick,
+  flaw,
+}: {
+  onClick: () => void;
+  flaw: FlawWithCVE;
+}) => {
+  return (
+    <tr
+      onClick={onClick}
+      className="border-b align-top hover:bg-gray-50 dark:hover:bg-secondary"
+      key={flaw.id}
+    >
+      <td className="p-4">
+        <div className="flex flex-row">
+          <FlawState state={flaw.state} />
+        </div>
+      </td>
+      <td className="p-4">
+        <Badge variant={"secondary"}>
+          {flaw.scanner.replace(defaultScanner, "")}
+        </Badge>
+      </td>
+      <td className="p-4">{flaw.cveId}</td>
+      <td className="p-4">{flaw.rawRiskAssessment.toFixed(1)}</td>
+      <td className="p-4">
+        {flaw.arbitraryJsonData?.fixedVersion ? (
+          <span>
+            <Badge variant={"secondary"}>
+              {flaw.arbitraryJsonData.fixedVersion}
+            </Badge>
+          </span>
+        ) : (
+          <span className="text-muted-foreground">
+            {flaw.component.componentType === "application"
+              ? "No image security-update available"
+              : "No fix available"}
+          </span>
+        )}
+      </td>
+      <td className="p-4" colSpan={2}>
+        <div className="line-clamp-3">{flaw.cve?.description} </div>
+      </td>
+    </tr>
+  );
+};
 
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
@@ -89,50 +136,15 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 </thead>
                 <tbody>
                   {row.original.flaws?.map((flaw) => (
-                    <tr
+                    <FlawWithCveTableRow
+                      flaw={flaw}
+                      key={flaw.id}
                       onClick={() =>
                         router.push(
                           router.asPath.split("?")[0] + "/../flaws/" + flaw.id,
                         )
                       }
-                      className="border-b align-top             hover:bg-gray-50 dark:hover:bg-secondary"
-                      key={flaw.id}
-                    >
-                      <td className="p-4">
-                        <div className="flex flex-row">
-                          <FlawState state={flaw.state} />
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <Badge variant={"secondary"}>
-                          {flaw.scanner.replace(defaultScanner, "")}
-                        </Badge>
-                      </td>
-                      <td className="p-4">{flaw.cveId}</td>
-                      <td className="p-4">
-                        {flaw.rawRiskAssessment.toFixed(1)}
-                      </td>
-                      <td className="p-4">
-                        {flaw.arbitraryJsonData?.fixedVersion ? (
-                          <span>
-                            <Badge variant={"secondary"}>
-                              {flaw.arbitraryJsonData.fixedVersion}
-                            </Badge>
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            {flaw.component.componentType === "application"
-                              ? "No image security-update available"
-                              : "No fix available"}
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4" colSpan={2}>
-                        <div className="line-clamp-3">
-                          {flaw.cve?.description} 
-                        </div>
-                      </td>
-                    </tr>
+                    />
                   ))}
                 </tbody>
               </table>

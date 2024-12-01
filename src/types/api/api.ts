@@ -119,6 +119,7 @@ export interface FlawDTO {
   ticketId: string | null;
   ticketUrl: string | null;
   riskRecalculatedAt: string;
+  assetId: string;
 }
 
 export interface Paged<T> {

@@ -39,7 +39,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
-  asset: AssetDTO;
   flaws: Paged<FlawByPackage>;
 }
 
@@ -432,29 +431,25 @@ export const getServerSideProps = middleware(
     // if they are there, append them to the uri
     const page = (context.query.page as string) ?? "1";
     const pageSize = (context.query.pageSize as string) ?? "25";
-    const [resp, flawResp] = await Promise.all([
-      apiClient(uri),
-      apiClient(
-        uri +
-          "flaws/?" +
-          new URLSearchParams({
-            page,
-            pageSize,
-            ...(context.query.search
-              ? { search: context.query.search as string }
-              : {}),
-            ...filterQuery,
-          }),
-      ),
-    ]);
+    const flawResp = await apiClient(
+      uri +
+        "flaws/?" +
+        new URLSearchParams({
+          page,
+          pageSize,
+          ...(context.query.search
+            ? { search: context.query.search as string }
+            : {}),
+          ...filterQuery,
+        }),
+    );
 
     // fetch a personal access token from the user
 
-    const [asset, flaws] = await Promise.all([resp.json(), flawResp.json()]);
+    const flaws = await flawResp.json();
 
     return {
       props: {
-        asset,
         flaws,
       },
     };

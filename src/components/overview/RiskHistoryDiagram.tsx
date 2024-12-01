@@ -30,7 +30,6 @@ export function RiskHistoryChart({
 }: {
   data: Array<{ label: string; history: RiskHistory[] }>;
 }) {
-  console.log(data);
   const reduced = useMemo(() => {
     if (data.length === 0) {
       return [];
