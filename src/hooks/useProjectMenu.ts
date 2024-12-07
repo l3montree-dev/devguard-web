@@ -18,6 +18,7 @@ import {
   CogIcon,
   ListBulletIcon,
   ScaleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
@@ -42,6 +43,7 @@ export const useProjectMenu = () => {
       href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
       Icon: ScaleIcon,
     },
+
     {
       title: "Assets",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets",
@@ -50,6 +52,11 @@ export const useProjectMenu = () => {
   ];
   if (loggedIn) {
     return menu.concat([
+      {
+        title: "Members",
+        href: "/" + orgSlug + "/projects/" + projectSlug + "/members",
+        Icon: UsersIcon,
+      },
       {
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",

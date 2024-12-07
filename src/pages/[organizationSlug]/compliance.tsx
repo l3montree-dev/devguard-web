@@ -72,8 +72,8 @@ export default function Compliance({
         title="Accepted Vulnerabilities"
         description="Vulnerabilities that have been accepted across the whole organization"
       >
-        <div className="rounded-lg border">
-          <table className="w-full  text-sm">
+        <div className="overflow-hidden rounded-lg border">
+          <table className="w-full text-sm">
             <thead
               className={classNames("w-full text-left", "border-b bg-card")}
             >

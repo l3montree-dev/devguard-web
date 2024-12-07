@@ -18,6 +18,7 @@ import {
   CogIcon,
   ListBulletIcon,
   ScaleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
@@ -47,6 +48,11 @@ export const useOrganizationMenu = () => {
 
   if (loggedIn) {
     return menu.concat([
+      {
+        title: "Members",
+        href: "/" + orgSlug + "/members",
+        Icon: UsersIcon,
+      },
       {
         title: "Settings",
         href: "/" + orgSlug + "/settings",

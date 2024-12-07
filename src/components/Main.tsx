@@ -16,7 +16,7 @@ import { classNames } from "@/utils/common";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import UserNav from "./navigation/UserNav";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import AppSidebar from "./AppSidebar";
@@ -44,9 +44,25 @@ const Main: FunctionComponent<Props> = ({
   fullscreen,
 }) => {
   const router = useRouter();
+  const [sidebarDefaultOpen, setDefaultOpen] = useState(true);
+
+  useEffect(() => {
+    // check local storage
+    const open = localStorage.getItem("sidebarOpen");
+    if (open !== null) {
+      setDefaultOpen(open === "true");
+    }
+  }, []);
 
   return (
-    <SidebarProvider open={true}>
+    <SidebarProvider
+      onOpenChange={(o) => {
+        localStorage.setItem("sidebarOpen", o.toString());
+        setDefaultOpen(o);
+      }}
+      open={sidebarDefaultOpen}
+      defaultOpen={sidebarDefaultOpen}
+    >
       <AppSidebar />
       <main className="flex-1 font-body">
         <header

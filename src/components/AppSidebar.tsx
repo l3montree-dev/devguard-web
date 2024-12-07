@@ -23,8 +23,9 @@ import {
   CogIcon,
   LifebuoyIcon,
   ScaleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
-import { ChevronRight, PlusIcon } from "lucide-react";
+import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -56,7 +57,10 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "./ui/sidebar";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useEffect } from "react";
 
 const AppSidebar = () => {
   const orgs = useStore((s) => s.organizations);
@@ -64,8 +68,10 @@ const AppSidebar = () => {
   const router = useRouter();
   const activeOrg = useOrg() ?? orgs[0];
   const updateOrganization = useStore((s) => s.updateOrganization);
+  const currentUser = useCurrentUser();
   const contentTree = useStore((s) => s.contentTree);
 
+  const sidebar = useSidebar();
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.id === id);
@@ -83,19 +89,19 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="pb-[46px] pt-3.5">
+      <SidebarHeader className="border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-black">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size={"lg"}
-              className="rounded-lg data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="rounded-lg text-white data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex w-full flex-row items-center justify-between gap-1">
-                <div className="flex flex-row items-center gap-1 overflow-hidden text-ellipsis">
+                <div className="flex flex-row items-center gap-1 text-ellipsis">
                   <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
                     <BuildingOffice2Icon className="h-6 w-6" />
                   </div>
-                  <div className="flex flex-col gap-0">
+                  <div className="flex flex-col gap-0 ">
                     <span className="line-clamp-1 inline-block max-w-[155px] truncate text-ellipsis text-left text-sm font-semibold">
                       {activeOrg?.name}
                     </span>
@@ -152,11 +158,11 @@ const AppSidebar = () => {
                     asChild
                   >
                     <Link
-                      className="!text-foreground hover:no-underline"
+                      className="truncate !text-foreground hover:no-underline"
                       href={item.href}
                     >
                       <div className="flex flex-row items-center gap-1">
-                        <item.Icon className="h-5 w-5" />
+                        <item.Icon className="mr-2 h-5 w-5" />
                         <span>{item.title}</span>
                       </div>
                     </Link>
@@ -166,7 +172,7 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {contentTree && (
+        {contentTree && Boolean(currentUser) && (
           <SidebarGroup>
             <SidebarGroupLabel>Projects</SidebarGroupLabel>
             <SidebarGroupContent>
@@ -182,9 +188,29 @@ const AppSidebar = () => {
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title}>
-                          <span>{item.title}</span>
-                          <ChevronRight className="ml-auto h-4 w-4  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        <SidebarMenuButton
+                          onClick={(e) => {
+                            if (!sidebar.open) {
+                              router.push(
+                                "/" + activeOrg.slug + "/projects/" + item.slug,
+                              );
+                            }
+                          }}
+                          tooltip={item.title}
+                        >
+                          <div className="flex w-full flex-row items-center justify-between ">
+                            <div
+                              style={{
+                                width: 28,
+                                height: 28,
+                              }}
+                              className="relative right-1 mr-1 aspect-square rounded-lg border p-1 text-center"
+                            >
+                              {item.title[0]}
+                            </div>
+                            <span className="trunace">{item.title}</span>
+                            <ChevronRight className="ml-auto h-4 w-4  transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </div>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -225,6 +251,29 @@ const AppSidebar = () => {
                             >
                               <ScaleIcon className="h-5 w-5 opacity-75" />
                               <span>Compliance</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              isActive={
+                                router.asPath ===
+                                "/" +
+                                  activeOrg.slug +
+                                  "/projects/" +
+                                  item.slug +
+                                  "/members"
+                              }
+                              className="text-sm !text-foreground hover:no-underline"
+                              href={
+                                "/" +
+                                activeOrg.slug +
+                                "/projects/" +
+                                item.slug +
+                                "/members"
+                              }
+                            >
+                              <UsersIcon className="h-5 w-5 opacity-75" />
+                              <span>Members</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
@@ -300,21 +349,25 @@ const AppSidebar = () => {
       <SidebarFooter className="text-xs">
         <SidebarMenuButton asChild>
           <Link
-            className="!text-foreground hover:no-underline"
+            className="truncate !text-foreground hover:no-underline"
             href="/user-settings"
           >
-            <CogIcon className="h-5 w-5" />
+            <CogIcon className="mr-1 h-5 w-5" />
             User Settings
           </Link>
         </SidebarMenuButton>
         <SidebarMenuButton asChild>
           <Link
-            className="!text-foreground hover:no-underline"
+            className="truncate !text-foreground hover:no-underline"
             href="https://github.com/l3montree-dev/devguard-web"
           >
-            <LifebuoyIcon className="h-5 w-5" />
+            <LifebuoyIcon className="mr-1 h-5 w-5" />
             <span>Support</span>
           </Link>
+        </SidebarMenuButton>
+        <SidebarMenuButton className="truncate" onClick={sidebar.toggleSidebar}>
+          <SidebarIcon className="mr-1 h-5 w-5" />
+          Collapse Sidebar
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>

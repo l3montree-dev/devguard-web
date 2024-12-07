@@ -69,6 +69,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     id: string;
     name: string;
     avatarUrl?: string;
+    role?: "owner" | "member" | "admin";
   }>;
 }
 
