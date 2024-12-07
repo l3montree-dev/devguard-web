@@ -261,29 +261,6 @@ const AppSidebar = () => {
                                   activeOrg.slug +
                                   "/projects/" +
                                   item.slug +
-                                  "/members"
-                              }
-                              className="text-sm !text-foreground hover:no-underline"
-                              href={
-                                "/" +
-                                activeOrg.slug +
-                                "/projects/" +
-                                item.slug +
-                                "/members"
-                              }
-                            >
-                              <UsersIcon className="h-5 w-5 opacity-75" />
-                              <span>Members</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              isActive={
-                                router.asPath ===
-                                "/" +
-                                  activeOrg.slug +
-                                  "/projects/" +
-                                  item.slug +
                                   "/settings"
                               }
                               className="text-sm !text-foreground hover:no-underline"

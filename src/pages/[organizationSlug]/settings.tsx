@@ -43,6 +43,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
+import MembersTable from "@/components/MembersTable";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -260,7 +261,13 @@ const Home: FunctionComponent = () => {
         </Section>
       </div>
       <hr />
-
+      <Section
+        title="Member"
+        description="Manage the members of your organization"
+      >
+        <MembersTable members={activeOrg.members} />
+      </Section>
+      <hr />
       <div className="pb-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>

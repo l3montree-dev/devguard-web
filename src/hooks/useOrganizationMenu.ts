@@ -49,11 +49,6 @@ export const useOrganizationMenu = () => {
   if (loggedIn) {
     return menu.concat([
       {
-        title: "Members",
-        href: "/" + orgSlug + "/members",
-        Icon: UsersIcon,
-      },
-      {
         title: "Settings",
         href: "/" + orgSlug + "/settings",
         Icon: CogIcon,

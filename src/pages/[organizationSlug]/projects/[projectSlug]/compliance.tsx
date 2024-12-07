@@ -33,6 +33,9 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { withProject } from "@/decorators/withProject";
+import { useProjectMenu } from "@/hooks/useProjectMenu";
 
 export default function Compliance({
   flaws,
@@ -41,7 +44,8 @@ export default function Compliance({
 }) {
   const activeOrg = useActiveOrg();
   const router = useRouter();
-  const orgMenu = useOrganizationMenu();
+  const projectMenu = useProjectMenu();
+  const project = useActiveProject()!;
 
   const contentTree = useStore((s) => s.contentTree);
   const assetMap = useMemo(
@@ -52,20 +56,35 @@ export default function Compliance({
     <Page
       title="Compliance"
       Title={
-        <Link
-          href={`/${activeOrg.slug}/projects`}
-          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-        >
-          {activeOrg.name}{" "}
-          <Badge
-            className="font-body font-normal !text-white"
-            variant="outline"
+        <span className="flex flex-row gap-2">
+          <Link
+            href={`/${activeOrg.slug}/projects`}
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
           >
-            Organization
-          </Badge>
-        </Link>
+            {activeOrg.name}{" "}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Organization
+            </Badge>
+          </Link>
+          <span className="opacity-75">/</span>
+          <Link
+            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
+            href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+          >
+            {project.name}
+            <Badge
+              className="font-body font-normal !text-white"
+              variant="outline"
+            >
+              Project
+            </Badge>
+          </Link>
+        </span>
       }
-      Menu={orgMenu}
+      Menu={projectMenu}
     >
       <Section
         forceVertical
@@ -185,5 +204,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
     organizations: withOrgs,
     organization: withOrganization,
     contentTree: withContentTree,
+    project: withProject,
   },
 );

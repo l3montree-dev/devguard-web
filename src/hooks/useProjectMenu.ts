@@ -53,11 +53,6 @@ export const useProjectMenu = () => {
   if (loggedIn) {
     return menu.concat([
       {
-        title: "Members",
-        href: "/" + orgSlug + "/projects/" + projectSlug + "/members",
-        Icon: UsersIcon,
-      },
-      {
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
         Icon: CogIcon,
