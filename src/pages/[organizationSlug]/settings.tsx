@@ -15,7 +15,7 @@
 
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import Page from "../../components/Page";
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
@@ -44,12 +44,14 @@ import { toast } from "sonner";
 import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
 import MembersTable from "@/components/MembersTable";
+import MemberDialog from "@/components/MemberForm";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const orgMenu = useOrganizationMenu();
   const updateOrganization = useStore((s) => s.updateOrganization);
   const router = useRouter();
+  const [memberDialogOpen, setMemberDialogOpen] = useState(false);
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
@@ -266,6 +268,13 @@ const Home: FunctionComponent = () => {
         description="Manage the members of your organization"
       >
         <MembersTable members={activeOrg.members} />
+        <MemberDialog
+          isOpen={memberDialogOpen}
+          onOpenChange={setMemberDialogOpen}
+        />
+        <div className="flex flex-row justify-end">
+          <Button onClick={() => setMemberDialogOpen(true)}>Add Member</Button>
+        </div>
       </Section>
       <hr />
       <div className="pb-6">

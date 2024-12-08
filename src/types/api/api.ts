@@ -14,6 +14,9 @@
 
 import { Modify } from "../common";
 
+export interface InviteRequest {
+  email: string;
+}
 export enum RequirementsLevel {
   Low = "low",
   Medium = "medium",

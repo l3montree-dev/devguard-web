@@ -16,6 +16,14 @@ import { classNames } from "@/utils/common";
 import React, { FunctionComponent } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { Button, buttonVariants } from "./ui/button";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   members: Array<{
@@ -34,6 +42,7 @@ const MembersTable: FunctionComponent<Props> = ({ members }) => {
             <th className="p-4">Avatar</th>
             <th className="p-4">Name</th>
             <th className="p-4">Role</th>
+            <th className="p-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -63,6 +72,22 @@ const MembersTable: FunctionComponent<Props> = ({ members }) => {
                   <td className="p-4">{m.name}</td>
                   <td className="p-4 capitalize">
                     <Badge variant={"outline"}>{m.role}</Badge>
+                  </td>
+                  <td className="p-4 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon",
+                        })}
+                      >
+                        <EllipsisVerticalIcon className="h-5 w-5" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               );

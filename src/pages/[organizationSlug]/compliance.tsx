@@ -82,6 +82,7 @@ export default function Compliance({
                 <th className="p-4">Risk</th>
                 <th className="p-4">Asset</th>
                 <th className="p-4">Accepted at</th>
+                <th className="p-4">Automatically reopened for revalidation</th>
                 <th className="p-4">Justification</th>
               </tr>
             </thead>
@@ -90,6 +91,12 @@ export default function Compliance({
                 const acceptedEvent = flaw.events.findLast(
                   (e) => e.type === "accepted",
                 );
+
+                const revalidationDate = acceptedEvent
+                  ? new Date(acceptedEvent.createdAt).setDate(
+                      new Date(acceptedEvent.createdAt).getDate() + 4 * 30,
+                    )
+                  : null;
                 return (
                   <tr
                     className={classNames(
@@ -121,6 +128,11 @@ export default function Compliance({
                     <td className="p-4">
                       {acceptedEvent && (
                         <DateString date={new Date(acceptedEvent.createdAt)} />
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {revalidationDate && (
+                        <DateString date={new Date(revalidationDate)} />
                       )}
                     </td>
                     <td className="p-4">{acceptedEvent?.justification}</td>
