@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { OrganizationDetailsDTO } from "@/types/api/api";
@@ -23,7 +24,6 @@ import {
   CogIcon,
   LifebuoyIcon,
   ScaleIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
@@ -59,8 +59,6 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useEffect } from "react";
 
 const AppSidebar = () => {
   const orgs = useStore((s) => s.organizations);
@@ -89,7 +87,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-black">
+      <SidebarHeader className="border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
