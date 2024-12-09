@@ -68,6 +68,7 @@ const Main: FunctionComponent<Props> = ({
             Boolean(Menu) ? "pb-3" : "pb-5",
           )}
         >
+          <div className="absolute -left-1 bottom-0 top-0 z-10 w-2 bg-blue-950 dark:bg-[#02040a]" />
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
               <Image

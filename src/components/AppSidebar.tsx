@@ -87,7 +87,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
+      <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton

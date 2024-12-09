@@ -70,16 +70,34 @@ export const hashCode = (str: string) => {
   }, 0);
 };
 
+const colors1 = [
+  "#fbbd25",
+  "#ff9b37",
+  "#ff7755",
+  "#ff5578",
+  "#ff409d",
+  "#e044c0",
+  "#a154dc",
+  "#2563eb",
+];
+
+const colors = [
+  "#fbbd25",
+  "#ffca5b",
+  "#ffd785",
+  "#ffe4ae",
+  "#fff1d6",
+  "#ffffff",
+  "#dfddfc",
+  "#bcbdf9",
+  "#979ef5",
+  "#6c7ff0",
+  "#2563eb",
+];
+
 // Generate HSL color
 export const generateColor = (str: string) => {
   const hash = hashCode(str);
 
-  // Narrow hue range to avoid overly vivid colors, focus on pleasing palettes
-  const hue = (Math.abs(hash) % 300) + 30; // E.g., avoid pure red (0) or magenta (360)
-
-  // Moderate saturation and lightness for a professional look
-  const saturation = 50 + (Math.abs(hash) % 20); // Range: 50% - 70%
-  const lightness = 40 + (Math.abs(hash) % 20); // Range: 40% - 60%
-
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  return colors1[hash % colors1.length];
 };
