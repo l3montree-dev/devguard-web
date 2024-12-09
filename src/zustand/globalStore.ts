@@ -54,12 +54,15 @@ export interface InitialState {
   organizations: OrganizationDTO[];
   organization: OrganizationDetailsDTO;
   contentTree?: Array<ContentTreeElement>;
+
+  isSidebarOpen: boolean;
 }
 
 export interface GlobalStoreActions {
   updateOrganization: (organization: OrganizationDetailsDTO) => void;
   updateAsset: (asset: AssetDTO) => void;
   updateProject: (project: ProjectDTO) => void;
+  setSidebarOpen: (open: boolean) => void;
 }
 
 export interface GlobalStore extends InitialState, GlobalStoreActions {
@@ -88,6 +91,11 @@ export const createGlobalStore = (
       },
       updateAsset: (asset: AssetDTO) => {
         set({ asset });
+      },
+      setSidebarOpen: (open: boolean) => {
+        set({
+          isSidebarOpen: open,
+        });
       },
       ...state,
     };
