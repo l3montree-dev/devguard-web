@@ -7,7 +7,7 @@ const CustomTab: FunctionComponent<PropsWithChildren<{}>> = (props) => {
       {({ selected }) => (
         <div
           className={classNames(
-            "mr-2 inline-block cursor-pointer rounded-lg px-2 py-2 text-sm transition-all",
+            "mr-2 inline-block  cursor-pointer rounded-lg px-2 py-2 text-sm transition-all",
             selected ? "bg-secondary" : "hover:bg-secondary",
           )}
         >
