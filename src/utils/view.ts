@@ -70,17 +70,6 @@ export const hashCode = (str: string) => {
   }, 0);
 };
 
-const colors1 = [
-  "#fbbd25",
-  "#ff9b37",
-  "#ff7755",
-  "#ff5578",
-  "#ff409d",
-  "#e044c0",
-  "#a154dc",
-  "#2563eb",
-];
-
 const colors = [
   "#fbbd25",
   "#ffca5b",
@@ -95,9 +84,20 @@ const colors = [
   "#2563eb",
 ];
 
+const colors1 = [
+  "#fbbd25",
+  "#ff9b37",
+  "#ff7755",
+  "#ff5578",
+  "#ff409d",
+  "#e044c0",
+  "#a154dc",
+  "#2563eb",
+];
+
 // Generate HSL color
 export const generateColor = (str: string) => {
-  const hash = hashCode(str);
+  const hash = Math.abs(hashCode(str));
 
   return colors1[hash % colors1.length];
 };

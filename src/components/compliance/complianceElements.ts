@@ -21,7 +21,7 @@ export const bsiComplianceControls = {
       maxEvidence: 1,
       currentEvidence: 1,
       howDevguardHelps:
-        "Just by using DevGuard, you are defining roles and responsibilities for the software development process. There is a dedicated person - the owner of each asset - who is responsible for information security",
+        "Just by using DevGuard, you are compliant with the security part of this control. There is a dedicated person - the owner of each asset - who is responsible for information security. Nevertheless it is necessary to defined the other roles and responsibilities as well. This needs to be done outside of devguard.",
     },
     {
       control: "CON.8.A2 - Auswahl eines Vorgehensmodells",
