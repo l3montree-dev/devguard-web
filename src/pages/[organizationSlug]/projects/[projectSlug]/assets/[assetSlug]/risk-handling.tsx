@@ -279,7 +279,7 @@ const Index: FunctionComponent<Props> = (props) => {
             buttonTitle="Start identifying risks"
             onClick={() =>
               router.push(
-                `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-identification`,
+                `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
               )
             }
           />
