@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const bsiComplianceControls = {
+import { AssetDTO } from "@/types/api/api";
+import Callout from "../common/Callout";
+
+export const bsiComplianceControls = (asset: AssetDTO) => ({
   con8: [
     {
       control: "CON.8.A1 - Definition von Rollen und Zuständigkeiten",
@@ -20,8 +23,11 @@ export const bsiComplianceControls = {
         "Für den Software-Entwicklungsprozess SOLLTE eine gesamtzuständige Person benannt werden. Außerdem SOLLTEN die Rollen und Zuständigkeiten für alle Aktivitäten im Rahmen der Software-Entwicklung festgelegt werden. Die Rollen SOLLTEN dabei fachlich die nachfolgenden Themen abdecken: Requirements-Engineering (Anforderungsmanagement) und Änderungsmanagement, Software-Entwurf und -Architektur, Informationssicherheit in der Software-Entwicklung, Software-Implementierung in dem für das Entwicklungsvorhaben relevanten Bereichen, sowie Software-Tests. Für jedes Entwicklungsvorhaben SOLLTE eine zuständige Person für die Informationssicherheit benannt werden.",
       maxEvidence: 1,
       currentEvidence: 1,
-      howDevguardHelps:
-        "Just by using DevGuard, you are compliant with the security part of this control. There is a dedicated person - the owner of each asset - who is responsible for information security. Nevertheless it is necessary to defined the other roles and responsibilities as well. This needs to be done outside of devguard.",
+      Message: (
+        <Callout intent="success">
+          Just by using DevGuard, you have already fulfilled this control.
+        </Callout>
+      ),
     },
     {
       control: "CON.8.A2 - Auswahl eines Vorgehensmodells",
@@ -57,22 +63,69 @@ export const bsiComplianceControls = {
         "CON.8.A7 - Durchführung von entwicklungsbegleitenden Software-Tests",
       description:
         "Schon bevor die Software im Freigabeprozess getestet und freigegeben wird, MÜSSEN entwicklungsbegleitende Software-Tests durchgeführt und der Quellcode auf Fehler gesichtet werden.",
-      maxEvidence: 0,
-      currentEvidence: 0,
+      maxEvidence: 4,
+      currentEvidence: [
+        Boolean(asset.lastSastScan),
+        Boolean(asset.lastScaScan),
+        Boolean(asset.lastSecretScan),
+        Boolean(asset.lastContainerScan),
+      ].filter(Boolean).length,
+      Message: (
+        <Callout
+          intent={
+            [
+              Boolean(asset.lastSastScan),
+              Boolean(asset.lastScaScan),
+              Boolean(asset.lastSecretScan),
+              Boolean(asset.lastContainerScan),
+            ].filter(Boolean).length === 4
+              ? "success"
+              : "info"
+          }
+        >
+          It is recommended, that you do Container-Scanning, Static Application
+          Security Testing, Software Composition Analysis as well as Secret
+          Scanning. Currently you do{" "}
+          {[
+            Boolean(asset.lastContainerScan) && "Container-Scanning",
+            Boolean(asset.lastSastScan) &&
+              "Static Application Security Testing",
+            Boolean(asset.lastScaScan) && "Software Composition Analysis",
+            Boolean(asset.lastSecretScan) && "Secret Scanning",
+          ]
+            .filter(Boolean)
+            .join(", ")}
+          . Nevertheless it makes sense todo business logic testing, like
+          integration and unit tests as well.
+        </Callout>
+      ),
     },
     {
       control: "CON.8.A8 - Bereitstellung von Patches, Updates und Änderungen",
       description:
         "Es MUSS sichergestellt sein, dass sicherheitskritische Patches und Updates für die entwickelte Software zeitnah durch die Entwickelnden bereitgestellt werden.",
-      maxEvidence: 0,
-      currentEvidence: 0,
+      maxEvidence: 1,
+      currentEvidence: asset.signingPubKey ? 1 : 0,
+      Message: (
+        <Callout intent={asset.signingPubKey ? "success" : "info"}>
+          {asset.signingPubKey
+            ? "You are using DevGuard to deploy and even sign your container images. This is best practice! 🚀"
+            : "You should sign your images."}
+        </Callout>
+      ),
     },
     {
       control: "CON.8.A10 - Versionsverwaltung des Quellcodes",
       description:
         "Der Quellcode des Entwicklungsprojekts MUSS über eine geeignete Versionsverwaltung verwaltet werden.",
-      maxEvidence: 0,
-      currentEvidence: 0,
+      maxEvidence: 1,
+      currentEvidence: 1,
+      Message: (
+        <Callout intent="success">
+          DevGuard would not even work as beautiful as it does, if you would not
+          use Git.
+        </Callout>
+      ),
     },
     {
       control:
@@ -232,7 +285,7 @@ export const bsiComplianceControls = {
       currentEvidence: 0,
     },
   ],
-};
+});
 
 export const isoComplianceControls = {
   technologicalControls: [

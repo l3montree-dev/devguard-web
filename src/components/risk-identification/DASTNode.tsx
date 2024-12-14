@@ -18,6 +18,7 @@ import Stage from "./Stage";
 function DAST() {
   return (
     <Stage
+      id="dast"
       title="Dynamic Application Security Testing"
       description="Find security vulnerabilities in running applications."
       comingSoon

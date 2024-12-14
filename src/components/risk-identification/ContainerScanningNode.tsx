@@ -25,6 +25,7 @@ function ContainerScanning() {
   return (
     <>
       <Stage
+        id="container-scanning"
         title="Container Scanning"
         description="Find known security vulnerabilities in OCI images, like Docker Images."
         onButtonClick={() => setOpen(true)}

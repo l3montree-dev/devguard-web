@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 214 20% 95%;
+    --background: 214 20% 98%;
     --foreground: 226, 57%, 0%;
 
     --card: 210 29% 100%;
@@ -262,3 +262,9 @@
     inherits: true;
     initial-value: 0turn;
   }
+
+.hide-handles {
+    .react-flow__handle {
+        opacity: 0;
+    }
+}

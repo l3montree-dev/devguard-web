@@ -18,6 +18,7 @@ import Stage from "./Stage";
 function SAST() {
   return (
     <Stage
+      id="sast"
       title="Static Application Security Testing"
       description="Find security vulnerabilities in produced source code."
       comingSoon

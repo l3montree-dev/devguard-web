@@ -21,6 +21,7 @@ function SecretScanning() {
       title="Secret Scanning"
       description="Scan git repositories for finding potential credentials leakage."
       comingSoon
+      id="secret-scanning"
     />
   );
 }

@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
@@ -98,52 +99,7 @@ const DependencyGraphPage: FunctionComponent<{
   };
 
   return (
-    <Page
-      Menu={menu}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}/assets`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex items-center gap-1 text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-handling`}
-          >
-            {asset?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Asset
-            </Badge>
-          </Link>
-        </span>
-      }
-      title="Dependencies"
-    >
+    <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
       <Section
         primaryHeadline
         forceVertical

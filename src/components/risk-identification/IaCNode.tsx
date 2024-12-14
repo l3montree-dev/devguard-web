@@ -18,6 +18,7 @@ import Stage from "./Stage";
 function IaC() {
   return (
     <Stage
+      id="iac"
       title="Infrastructure as Code"
       description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
       comingSoon

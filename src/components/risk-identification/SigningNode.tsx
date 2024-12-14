@@ -24,6 +24,7 @@ function SigningNode() {
   return (
     <>
       <Stage
+        id="signing"
         title="Image Signing"
         description="Ensure the integrity and authenticity of your container images."
         onButtonClick={() => setOpen(true)}

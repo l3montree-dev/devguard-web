@@ -1,13 +1,14 @@
 import Page from "@/components/Page";
 import AssetForm from "@/components/asset/AssetForm";
+import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
@@ -23,15 +24,14 @@ import {
 } from "@/services/devGuardApi";
 import { AssetDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { debounce } from "lodash";
 import { GetServerSidePropsContext } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Image from "next/image";
-import { debounce } from "lodash";
-import { withContentTree } from "@/decorators/withContentTree";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -127,48 +127,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       Menu={assetMenu}
       title="Asset Settings"
       description="Update the settings of this asset"
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}/assets`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex items-center gap-1 text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-handling`}
-          >
-            {asset?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Asset
-            </Badge>
-          </Link>
-        </span>
-      }
+      Title={<AssetTitle />}
     >
       <div>
         <div className="flex flex-row justify-between">

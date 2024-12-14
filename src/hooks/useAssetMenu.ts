@@ -16,6 +16,7 @@ import {
   ChartBarSquareIcon,
   CogIcon,
   DocumentMagnifyingGlassIcon,
+  ScaleIcon,
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
@@ -49,6 +50,7 @@ export const useAssetMenu = () => {
         assetSlug +
         "/security-control-center",
       Icon: ShieldCheckIcon,
+      isActive: router.pathname.includes("security-control-center"),
     },
     {
       title: "Risk handling",
@@ -77,6 +79,19 @@ export const useAssetMenu = () => {
         "/dependency-graph",
       Icon: ShareIcon,
       isActive: router.pathname.includes("dependency-graph"),
+    },
+    {
+      title: "Compliance",
+      href:
+        "/" +
+        orgSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/compliance",
+      Icon: ScaleIcon,
+      isActive: router.pathname.includes("compliance"),
     },
   ];
 

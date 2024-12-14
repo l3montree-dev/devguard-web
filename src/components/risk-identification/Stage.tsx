@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { useRouter } from "next/router";
 
 function Stage({
   title,
@@ -30,15 +31,21 @@ function Stage({
   onButtonClick,
   comingSoon,
   LastScan,
+  id,
 }: {
   title: string;
   description: string;
   comingSoon?: boolean;
   onButtonClick?: () => void;
   LastScan?: ReactNode;
+  id: string;
 }) {
+  const router = useRouter();
+  const { query } = router;
+
+  const highlight = query?.highlight === id;
   return (
-    <Card className="h-full">
+    <Card className={classNames("h-full", highlight && "border-primary")}>
       <div
         className={classNames(
           Boolean(LastScan) && "animated-outline relative rounded-lg",

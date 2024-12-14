@@ -21,6 +21,7 @@ function SecureCodingGuidelines() {
       title="Secure Coding Guidelines"
       description="Produce secure code by following secure coding guidelines."
       comingSoon
+      id="secure-coding-guidelines"
     />
   );
 }

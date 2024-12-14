@@ -245,6 +245,7 @@ const DependencyGraph: FunctionComponent<{
       defaultEdgeOptions={{
         selectable: false,
       }}
+      onlyRenderVisibleElements={true}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       viewport={viewPort}

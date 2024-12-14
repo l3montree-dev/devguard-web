@@ -1,20 +1,19 @@
 import Autosetup from "@/components/Autosetup";
+import AssetTitle from "@/components/common/AssetTitle";
+import SDLC from "@/components/common/SDLC";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import ContainerScanning from "@/components/risk-identification/ContainerScanningNode";
 import DAST from "@/components/risk-identification/DASTNode";
-import GitCommitSigning from "@/components/risk-identification/GitCommitSigning";
 import GitCommitVerification from "@/components/risk-identification/GitCommitVerification";
 import IaC from "@/components/risk-identification/IaCNode";
 import ImageVerification from "@/components/risk-identification/ImageVerification";
-import VerificationDialog from "@/components/risk-identification/ImageVerificationDialog";
 import InTotoProvenance from "@/components/risk-identification/InTotoProvenance";
 import SAST from "@/components/risk-identification/SASTNode";
 import SCA from "@/components/risk-identification/SCANode";
 import SecretScanning from "@/components/risk-identification/SecretScanningNode";
 import SecureCodingGuidelines from "@/components/risk-identification/SecureCodingGuidelines";
 import SigningNode from "@/components/risk-identification/SigningNode";
-import { Badge } from "@/components/ui/badge";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withContentTree } from "@/decorators/withContentTree";
@@ -23,23 +22,17 @@ import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useAutosetup } from "@/hooks/useAutosetup";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { AssetMetricsDTO } from "@/types/api/api";
 import Image from "next/image";
-
-import Link from "next/link";
 import { FunctionComponent } from "react";
 
 interface Props extends AssetMetricsDTO {}
 const RiskIdentification: FunctionComponent<Props> = (
   props: AssetMetricsDTO,
 ) => {
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
   const asset = useActiveAsset();
 
   const menu = useAssetMenu();
@@ -47,52 +40,7 @@ const RiskIdentification: FunctionComponent<Props> = (
   const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
 
   return (
-    <Page
-      Menu={menu}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}/assets`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex items-center gap-1 text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-handling`}
-          >
-            {asset?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Asset
-            </Badge>
-          </Link>
-        </span>
-      }
-      title="Security Control Center"
-    >
+    <Page Menu={menu} Title={<AssetTitle />} title="Security Control Center">
       <div className="flex flex-row">
         <div className="flex-1">
           <Section
@@ -135,7 +83,6 @@ const RiskIdentification: FunctionComponent<Props> = (
             </h3>
             <div className="mb-10 grid grid-cols-3 gap-4">
               <SecureCodingGuidelines />
-              <GitCommitSigning />
               <InTotoProvenance />
             </div>
             <h3 id="continous-integration" className="text-xl font-semibold">
@@ -163,7 +110,6 @@ const RiskIdentification: FunctionComponent<Props> = (
               />
             </h3>
             <div className="mb-10 grid grid-cols-3 gap-4">
-              <GitCommitVerification />
               <SecretScanning />
               <SAST />
               <SCA />

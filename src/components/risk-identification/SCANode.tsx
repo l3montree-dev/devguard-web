@@ -30,6 +30,7 @@ function SCA() {
   return (
     <>
       <Stage
+        id="sca"
         title="Software Composition Analysis"
         description="Find known vulnerabilities in third-party and open source dependencies."
         LastScan={

@@ -22,6 +22,7 @@ function InTotoProvenance() {
   return (
     <>
       <Stage
+        id="in-toto-provenance"
         title="In-Toto Provenance"
         description="Prove the integrity of the software supply chain. Creates a post-commit hook that records the file hashes of the project."
         onButtonClick={() => setOpen(true)}

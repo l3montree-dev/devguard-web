@@ -37,6 +37,7 @@ import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withContentTree } from "@/decorators/withContentTree";
+import AssetTitle from "@/components/common/AssetTitle";
 
 interface Props {
   flaws: Paged<FlawByPackage>;
@@ -224,52 +225,7 @@ const Index: FunctionComponent<Props> = (props) => {
   );
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Risk Handling"}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}/assets`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex items-center gap-1 text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/risk-handling`}
-          >
-            {asset?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Asset
-            </Badge>
-          </Link>
-        </span>
-      }
-    >
+    <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       {
         /**  the query will contain organizationSlug, projectSlug and assetSlug - thus 3 is empty  */
         table.getRowCount() === 0 && Object.keys(router.query).length === 3 ? (
