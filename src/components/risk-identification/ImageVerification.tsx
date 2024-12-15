@@ -25,6 +25,7 @@ function ImageVerificationNode() {
   return (
     <>
       <Stage
+        id="image-verification"
         title="Image Verification"
         description="Ensure the integrity and authenticity of your container images."
         onButtonClick={() => setOpen(true)}

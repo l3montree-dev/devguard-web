@@ -18,6 +18,7 @@ import Stage from "./Stage";
 function GitCommitVerification() {
   return (
     <Stage
+      id="git-commit-verification"
       title="Git Commit Verification"
       description="Verify the authenticity of the author of git commits."
       comingSoon

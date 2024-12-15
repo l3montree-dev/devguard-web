@@ -18,6 +18,7 @@ import Stage from "./Stage";
 function GitCommitSigning() {
   return (
     <Stage
+      id="git-commit-signing"
       title="Git Commit Signing"
       description="Sign git commits to ensure the authenticity of the author."
       comingSoon
