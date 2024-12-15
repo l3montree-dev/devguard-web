@@ -64,7 +64,7 @@ const Main: FunctionComponent<Props> = ({
       <main className="flex-1 font-body">
         <header
           className={classNames(
-            "relative  flex items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
+            "relative flex min-h-[109px] items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
             Boolean(Menu) ? "pb-3" : "pb-5",
           )}
         >
