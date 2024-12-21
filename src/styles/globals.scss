@@ -268,3 +268,15 @@
         opacity: 0;
     }
 }
+
+[data-state="open"] {
+
+    > button > div > div .caret, > div > h3 .caret {
+        transition: all 0.2s ease;
+        transform: rotate(180deg);
+    }
+}
+
+.caret {
+    transition: all 0.2s ease;
+}

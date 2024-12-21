@@ -30,7 +30,10 @@ interface AppModelDTO {
 }
 
 export interface AssetMetricsDTO {
-  enabledScanners: string[];
+  enabledImageSigning: boolean;
+  verifiedSupplyChainsPercentage: number;
+  enabledContainerScanning: boolean;
+  enabledSCA: boolean;
 }
 
 export interface GitLabIntegrationDTO {

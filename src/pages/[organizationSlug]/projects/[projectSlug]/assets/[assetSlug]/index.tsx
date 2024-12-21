@@ -14,6 +14,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import {
+  AssetMetricsDTO,
   AverageFixingTime,
   ComponentRisk,
   DependencyCountByScanType,
@@ -36,16 +37,20 @@ import EmptyOverview from "@/components/common/EmptyOverview";
 import SDLC from "@/components/common/SDLC";
 import Section from "@/components/common/Section";
 import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
+import ThreatsMitigationsCollapsibles from "@/components/ssdlc/ThreatsMitigations";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Collapsible } from "@/components/ui/collapsible";
 import { withContentTree } from "@/decorators/withContentTree";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import ThreatsMitigationsCollapsibles from "@/components/ssdlc/ThreatsMitigations";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { BoltIcon } from "lucide-react";
-import { title } from "process";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -58,7 +63,17 @@ interface Props {
   avgMediumFixingTime: AverageFixingTime;
   avgHighFixingTime: AverageFixingTime;
   avgCriticalFixingTime: AverageFixingTime;
+  metrics: AssetMetricsDTO;
 }
+
+const metrics2CurrentEvidence = (metrics: AssetMetricsDTO) => {
+  return (
+    Number(metrics.enabledContainerScanning) +
+    Number(metrics.enabledImageSigning) * 2 +
+    Number(metrics.enabledSCA) +
+    Number(Boolean(metrics.verifiedSupplyChainsPercentage > 0)) * 8
+  );
+};
 
 const Index: FunctionComponent<Props> = ({
   componentRisk,
@@ -69,6 +84,7 @@ const Index: FunctionComponent<Props> = ({
   avgMediumFixingTime,
   avgHighFixingTime,
   avgCriticalFixingTime,
+  metrics,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -112,7 +128,7 @@ const Index: FunctionComponent<Props> = ({
         Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific asset poses to your organization."
         title="Overview"
       >
-        <SDLC />
+        <SDLC metrics={metrics} />
         <p className="mt-2 text-sm text-muted-foreground">
           This diagram displays the current state of your software development
           lifecycle. It shows which threats are mitigated already as well as
@@ -138,26 +154,33 @@ const Index: FunctionComponent<Props> = ({
         </p>
         <div>
           <Card className="flex-1">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Details for your SSDLC
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Collapsible>
-                <CollapsibleControlTrigger maxEvidence={24} currentEvidence={0}>
-                  <div className="w-full text-left font-bold">
-                    Threats and mitigations
-                  </div>
-                </CollapsibleControlTrigger>
-                <CollapsibleContent className="py-2">
+            <Collapsible>
+              <CardHeader>
+                <CardTitle className="-mb-3">
+                  <CollapsibleControlTrigger
+                    maxEvidence={15}
+                    currentEvidence={metrics2CurrentEvidence(metrics)}
+                  >
+                    <div className="w-full text-left">
+                      Threats and mitigations
+                    </div>
+                  </CollapsibleControlTrigger>
+                </CardTitle>
+                <CardDescription>
+                  Details of your secure software development lifecycle
+                </CardDescription>
+              </CardHeader>
+
+              <CollapsibleContent className="py-2">
+                <CardContent>
                   <ThreatsMitigationsCollapsibles
+                    metrics={metrics}
                     router={router}
                     asset={asset}
                   />
-                </CollapsibleContent>
-              </Collapsible>
-            </CardContent>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
           </Card>
         </div>
         <div className="mt-2 grid gap-4">
@@ -224,6 +247,7 @@ export const getServerSideProps = middleware(
     last3Month.setMonth(last3Month.getMonth() - 3);
 
     const apiClient = getApiClientFromContext(context);
+
     const url =
       "/organizations/" +
       organizationSlug +
@@ -241,6 +265,7 @@ export const getServerSideProps = middleware(
       avgMediumFixingTime,
       avgHighFixingTime,
       avgCriticalFixingTime,
+      metrics,
     ] = await Promise.all([
       apiClient(url + "/component-risk").then((r) => r.json()),
       apiClient(url + "/risk-distribution").then((r) => r.json()),
@@ -268,6 +293,15 @@ export const getServerSideProps = middleware(
       apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
         r.json(),
       ),
+      apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/metrics",
+      ).then((r) => r.json()),
     ]);
 
     return {
@@ -280,6 +314,7 @@ export const getServerSideProps = middleware(
         avgMediumFixingTime,
         avgHighFixingTime,
         avgCriticalFixingTime,
+        metrics,
       },
     };
   },

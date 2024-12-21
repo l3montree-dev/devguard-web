@@ -118,6 +118,15 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                   <FormControl>
                     <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
                   </FormControl>
+                  <FormDescription>
+                    DevGuard uses this token to <strong>create issues</strong>{" "}
+                    in your repository. Thus the token needs to have{" "}
+                    <strong>at least reporter access</strong>.<br />
+                    There are features in DevGuard, that require higher access
+                    levels. For example, DevGuard can automatically create merge
+                    requests for you. In this case, the token needs to have{" "}
+                    <strong>developer access</strong>.
+                  </FormDescription>
                 </FormItem>
               )}
             />

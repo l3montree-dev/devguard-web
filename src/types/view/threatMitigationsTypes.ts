@@ -5,8 +5,15 @@ interface Threat {
   Message: JSX.Element;
 }
 
-export interface ThreatMitigationTopic {
-  title: string; //e.g. "Producer Threats"
-  description: JSX.Element;
-  threats?: Threat[];
-}
+export type ThreatMitigationTopic =
+  | {
+      title: string; //e.g. "Producer Threats"
+      description: JSX.Element;
+      threats: Threat[];
+    }
+  | {
+      title: string; //e.g. "Producer Threats"
+      description: JSX.Element;
+      currentEvidence: number;
+      maxEvidence: number;
+    };

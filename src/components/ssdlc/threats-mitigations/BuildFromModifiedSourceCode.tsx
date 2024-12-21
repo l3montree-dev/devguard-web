@@ -2,12 +2,18 @@ import { Button } from "@/components/ui/button";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
+import { AssetMetricsDTO } from "../../../types/api/api";
 
 export const buildFromModifiedSource = (
   router: NextRouter,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(D) Build from modified source code",
+    currentEvidence: Number(
+      Boolean(metrics.verifiedSupplyChainsPercentage > 0),
+    ),
+    maxEvidence: 1,
     description: (
       <>
         <p>

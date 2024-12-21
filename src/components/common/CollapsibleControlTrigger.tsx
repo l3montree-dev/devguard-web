@@ -28,7 +28,7 @@ const CollapsibleControlTrigger: FunctionComponent<Props> = ({
   currentEvidence,
 }) => {
   return (
-    <BaseCollapsibleTrigger className="w-full  py-2">
+    <BaseCollapsibleTrigger className="w-full py-2">
       <div className="grid w-full grid-cols-12 flex-row justify-between">
         <div className="col-span-10">{children}</div>
         <div className="col-span-1 flex flex-row justify-end gap-2">
@@ -40,7 +40,7 @@ const CollapsibleControlTrigger: FunctionComponent<Props> = ({
           )}
         </div>
         <div className="col-span-1 flex flex-row justify-end text-right">
-          <CaretDownIcon width={24} height={24} />
+          <CaretDownIcon className="caret" width={24} height={24} />
         </div>
       </div>
     </BaseCollapsibleTrigger>

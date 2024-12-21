@@ -2,12 +2,18 @@ import { Button } from "@/components/ui/button";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
+import { AssetMetricsDTO } from "../../../types/api/api";
 
 export const compromiseDuringSourceCodeUpload = (
   router: NextRouter,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(B) Compromise during source code upload",
+    currentEvidence: Number(
+      Boolean(metrics.verifiedSupplyChainsPercentage > 0),
+    ),
+    maxEvidence: 1,
     description: (
       <>
         <p>

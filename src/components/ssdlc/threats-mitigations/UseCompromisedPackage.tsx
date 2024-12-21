@@ -2,12 +2,18 @@ import { Button } from "@/components/ui/button";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
+import { AssetMetricsDTO } from "../../../types/api/api";
 
 export const useCompromisedPackage = (
   router: NextRouter,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(I) Use compromised package",
+    maxEvidence: 2,
+    currentEvidence:
+      Number(Boolean(metrics.verifiedSupplyChainsPercentage > 0)) +
+      Number(metrics.enabledImageSigning),
     description: (
       <>
         <p>

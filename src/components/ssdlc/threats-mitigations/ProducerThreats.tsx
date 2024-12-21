@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { AssetDTO } from "@/types/api/api";
+import { AssetDTO, AssetMetricsDTO } from "@/types/api/api";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
@@ -7,6 +7,7 @@ import { NextRouter } from "next/router";
 export const producerThreats = (
   router: NextRouter,
   asset: AssetDTO,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(A) Producer Threats",
@@ -65,7 +66,9 @@ export const producerThreats = (
       {
         threat: "Submit Unauthorized Change",
         maxEvidence: 1,
-        currentEvidence: 0,
+        currentEvidence: Number(
+          Boolean(metrics.verifiedSupplyChainsPercentage > 0),
+        ),
         Message: (
           <>
             <p>

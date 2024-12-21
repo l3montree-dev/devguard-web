@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
+import { AssetMetricsDTO } from "../../../types/api/api";
 
 export const useCompromisedDependency = (
   router: NextRouter,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(E) Use compromised dependency",
@@ -19,7 +21,7 @@ export const useCompromisedDependency = (
       {
         threat: "Use a dependency with known vulnerabilities",
         maxEvidence: 2,
-        currentEvidence: 2,
+        currentEvidence: Number(Boolean(metrics.enabledSCA)),
         Message: (
           <>
             <p className="mb-2">
@@ -74,7 +76,7 @@ export const useCompromisedDependency = (
       {
         threat: "Use a container image with known vulnerabilities",
         maxEvidence: 2,
-        currentEvidence: 2,
+        currentEvidence: Number(Boolean(metrics.enabledContainerScanning)),
         Message: (
           <>
             <p className="mb-2">

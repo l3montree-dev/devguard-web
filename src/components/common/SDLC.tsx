@@ -1,13 +1,25 @@
 import { classNames } from "@/utils/common";
 import { Handle, Position, ReactFlow } from "@xyflow/react";
+import { FunctionComponent } from "react";
+import { AssetMetricsDTO } from "../../types/api/api";
 
-const initialNodes = [
+enum WarnState {
+  AWESOME = "AWESOME",
+  WARN = "WARN",
+  ERROR = "ERROR",
+}
+
+const getInitialNodes = (metrics: AssetMetricsDTO) => [
   {
     id: "producer-warn",
     type: "warn",
     position: { x: 40, y: -60 },
     data: {
       label: "A",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0
+          ? WarnState.WARN
+          : WarnState.ERROR,
     },
   },
   {
@@ -16,6 +28,10 @@ const initialNodes = [
     position: { x: 160, y: -60 },
     data: {
       label: "B",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0
+          ? WarnState.AWESOME
+          : WarnState.ERROR,
     },
   },
   {
@@ -24,6 +40,10 @@ const initialNodes = [
     position: { x: 280, y: -60 },
     data: {
       label: "C",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0
+          ? WarnState.AWESOME
+          : WarnState.ERROR,
     },
   },
   {
@@ -32,6 +52,10 @@ const initialNodes = [
     position: { x: 400, y: -60 },
     data: {
       label: "D",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0
+          ? WarnState.AWESOME
+          : WarnState.ERROR,
     },
   },
   {
@@ -41,6 +65,12 @@ const initialNodes = [
     data: {
       label: "E",
       arrowRight: true,
+      warnState:
+        metrics.enabledContainerScanning && metrics.enabledSCA
+          ? WarnState.AWESOME
+          : metrics.enabledContainerScanning || metrics.enabledSCA
+            ? WarnState.WARN
+            : WarnState.ERROR,
     },
   },
   {
@@ -49,6 +79,7 @@ const initialNodes = [
     position: { x: 520, y: -60 },
     data: {
       label: "F",
+      warnState: WarnState.ERROR,
     },
   },
   {
@@ -57,6 +88,10 @@ const initialNodes = [
     position: { x: 640, y: -60 },
     data: {
       label: "G",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0
+          ? WarnState.AWESOME
+          : WarnState.ERROR,
     },
   },
   {
@@ -65,6 +100,14 @@ const initialNodes = [
     position: { x: 760, y: -60 },
     data: {
       label: "H",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0 &&
+        metrics.enabledImageSigning
+          ? WarnState.AWESOME
+          : metrics.verifiedSupplyChainsPercentage > 0 ||
+              metrics.enabledImageSigning
+            ? WarnState.WARN
+            : WarnState.ERROR,
     },
   },
   {
@@ -73,6 +116,14 @@ const initialNodes = [
     position: { x: 880, y: -60 },
     data: {
       label: "I",
+      warnState:
+        metrics.verifiedSupplyChainsPercentage > 0 &&
+        metrics.enabledImageSigning
+          ? WarnState.AWESOME
+          : metrics.verifiedSupplyChainsPercentage > 0 ||
+              metrics.enabledImageSigning
+            ? WarnState.WARN
+            : WarnState.ERROR,
     },
   },
   {
@@ -81,6 +132,7 @@ const initialNodes = [
     position: { x: 1000, y: -60 },
     data: {
       label: "J",
+      warnState: WarnState.ERROR,
     },
   },
   {
@@ -153,18 +205,50 @@ const initialEdges = [
   },
 ];
 
-const NodeWarn = ({ data }: any) => {
+const NodeWarn = ({
+  data,
+}: {
+  data: { label: string; warnState: WarnState; arrowRight: boolean };
+}) => {
+  const getColor = (warnState: WarnState | undefined) => {
+    switch (warnState) {
+      case WarnState.AWESOME:
+        return "bg-green-600";
+      case WarnState.WARN:
+        return "bg-yellow-600";
+      case WarnState.ERROR:
+        return "bg-red-600";
+      default:
+        return "bg-gray-600";
+    }
+  };
+
   return (
     <div className="w-20">
       <div className="flex flex-row justify-center">
-        <div className="aspect-square h-7 w-7 rounded-full bg-red-600 text-center text-lg font-medium text-white">
+        <div
+          className={classNames(
+            "aspect-square h-7 w-7 rounded-full  text-center text-lg font-medium text-white",
+            getColor(data.warnState),
+          )}
+        >
           {data.label}
         </div>
         {data.arrowRight && (
-          <div className="bg-red absolute top-1/2 w-[30px] translate-x-full border-t border-dotted bg-red-600" />
+          <div
+            className={classNames(
+              getColor(data.warnState),
+              "bg-red absolute top-1/2 w-[30px] translate-x-full border-t border-dotted",
+            )}
+          />
         )}
         {!data.arrowRight && (
-          <div className="bg-red absolute bottom-0 h-[35px] translate-y-full border-l border-dotted bg-red-600" />
+          <div
+            className={classNames(
+              getColor(data.warnState),
+              "bg-red absolute bottom-0 h-[35px] translate-y-full border-l border-dotted",
+            )}
+          />
         )}
       </div>
     </div>
@@ -176,7 +260,7 @@ const Node = ({ data }: any) => {
     <div className={classNames("w-40 rounded border bg-card p-4 leading-3")}>
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
-      <span className="inline-block w-full text-center font-medium">
+      <span className="inline-block w-full text-left font-medium">
         {data.label}
       </span>
       <span className="mt-3 inline-block text-xs text-muted-foreground">
@@ -192,7 +276,7 @@ const BuildNode = ({ data }: any) => {
       <Handle type="target" position={Position.Left} />
       <Handle type="target" position={Position.Bottom} id="bottom" />
       <Handle type="source" position={Position.Right} />
-      <span className="inline-block w-full text-center font-medium">
+      <span className="inline-block w-full text-left font-medium">
         {data.label}
       </span>
       <span className="mt-3 inline-block text-xs text-muted-foreground">
@@ -207,7 +291,7 @@ const DependenciesNode = ({ data }: any) => {
     <div className="w-40 rounded-lg border border-dashed border-muted-foreground p-4 leading-3">
       <Handle type="target" position={Position.Right} />
       <Handle type="source" position={Position.Top} />
-      <span className="inline-block w-full text-center font-medium">
+      <span className="inline-block w-full text-left font-medium">
         {data.label}
       </span>
 
@@ -224,7 +308,7 @@ const DistributionNode = ({ data }: any) => {
       <Handle type="target" position={Position.Left} />
       <Handle type="source" position={Position.Right} />
       <Handle type="source" id="bottom" position={Position.Bottom} />
-      <span className="inline-block w-full text-center font-medium">
+      <span className="inline-block w-full text-left font-medium">
         {data.label}
       </span>
       <span className="mt-3 inline-block text-xs text-muted-foreground">
@@ -243,7 +327,7 @@ const PlainNode = ({ data }: any) => {
       {data.hasSourceHandle && (
         <Handle type="source" position={Position.Right} />
       )}
-      <span className="inline-block w-full text-center font-medium">
+      <span className="inline-block w-full text-left font-medium">
         {data.label}
       </span>
       <span className="mt-3 inline-block text-xs leading-tight text-muted-foreground">
@@ -253,7 +337,7 @@ const PlainNode = ({ data }: any) => {
   );
 };
 
-const SDLC = () => {
+const SDLC: FunctionComponent<{ metrics: AssetMetricsDTO }> = ({ metrics }) => {
   return (
     <div className="hide-handles pointer-events-none h-[360px] w-full">
       <ReactFlow
@@ -261,7 +345,7 @@ const SDLC = () => {
         draggable={false}
         zoomOnScroll={false}
         fitView
-        viewport={{ zoom: 1, x: 0, y: 80 }}
+        viewport={{ zoom: 1.086, x: 0, y: 80 }}
         nodesConnectable={false}
         zoomOnPinch={false}
         edgesReconnectable={false}
@@ -273,7 +357,7 @@ const SDLC = () => {
           distribution: DistributionNode,
           plain: PlainNode,
         }}
-        nodes={initialNodes}
+        nodes={getInitialNodes(metrics)}
         edges={initialEdges}
       />
     </div>

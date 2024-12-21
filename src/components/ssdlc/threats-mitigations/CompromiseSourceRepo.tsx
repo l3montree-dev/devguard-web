@@ -2,12 +2,18 @@ import { Button } from "@/components/ui/button";
 import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
+import { AssetMetricsDTO } from "../../../types/api/api";
 
 export const compromiseSourceRepo = (
   router: NextRouter,
+  metrics: AssetMetricsDTO,
 ): ThreatMitigationTopic => {
   return {
     title: "(C) Compromise source repository",
+    currentEvidence: Number(
+      Boolean(metrics.verifiedSupplyChainsPercentage > 0),
+    ),
+    maxEvidence: 1,
     description: (
       <>
         <p>
