@@ -14,7 +14,6 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import {
-  AssetDTO,
   AverageFixingTime,
   ComponentRisk,
   DependencyCountByScanType,
@@ -33,20 +32,20 @@ import { FunctionComponent } from "react";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import CollapsibleControlTrigger from "@/components/common/CollapsibleControlTrigger";
-import CustomTab from "@/components/common/CustomTab";
 import EmptyOverview from "@/components/common/EmptyOverview";
 import SDLC from "@/components/common/SDLC";
 import Section from "@/components/common/Section";
 import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import { Button } from "@/components/ui/button";
 import { Collapsible } from "@/components/ui/collapsible";
 import { withContentTree } from "@/decorators/withContentTree";
-import { Tab } from "@headlessui/react";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
-import { NextRouter, useRouter } from "next/router";
-import CollapsibleThreatsMitigations from "@/components/ssdlc/ThreatsMitigations";
+import { useRouter } from "next/router";
+import ThreatsMitigationsCollapsibles from "@/components/ssdlc/ThreatsMitigations";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { BoltIcon } from "lucide-react";
+import { title } from "process";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -137,20 +136,31 @@ const Index: FunctionComponent<Props> = ({
           </Link>
           .
         </p>
-        <Section forceVertical title="Threats and mitigations">
-          <Collapsible>
-            <CollapsibleControlTrigger maxEvidence={24} currentEvidence={0}>
-              <div className="w-full text-left">
-                Details for all threats and mitigations
-              </div>
-            </CollapsibleControlTrigger>
-            <CollapsibleContent className="py-2">
-              <CollapsibleThreatsMitigations router={router} asset={asset} />
-            </CollapsibleContent>
-          </Collapsible>
-        </Section>
-
-        <div className="mt-4 grid gap-4">
+        <div>
+          <Card className="flex-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Details for your SSDLC
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Collapsible>
+                <CollapsibleControlTrigger maxEvidence={24} currentEvidence={0}>
+                  <div className="w-full text-left font-bold">
+                    Threats and mitigations
+                  </div>
+                </CollapsibleControlTrigger>
+                <CollapsibleContent className="py-2">
+                  <ThreatsMitigationsCollapsibles
+                    router={router}
+                    asset={asset}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="mt-2 grid gap-4">
           <FlawAggregationState
             title="Asset Risk"
             description="The total risk this asset poses to the organization"

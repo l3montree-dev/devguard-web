@@ -17,7 +17,7 @@ interface Props {
   asset: AssetDTO;
 }
 
-export default function CollapsibleThreatsMitigations({
+export default function ThreatsMitigationsCollapsibles({
   router,
   asset,
 }: Props) {
