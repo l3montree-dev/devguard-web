@@ -38,7 +38,7 @@ export default function ThreatCollapsible({ threatMitigationTopic }: Props) {
             {threatMitigationTopic.threats
               ? threatMitigationTopic.threats.map((threat, i) => (
                   <Collapsible
-                    className="rounded-lg border px-2 py-0"
+                    className="rounded-lg border bg-sidebar px-2 py-0"
                     key={threat.threat}
                   >
                     <CollapsibleControlTrigger

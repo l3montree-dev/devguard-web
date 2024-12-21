@@ -19,7 +19,7 @@ export const useCompromisedDependency = (
       {
         threat: "Use a dependency with known vulnerabilities",
         maxEvidence: 2,
-        currentEvidence: 1,
+        currentEvidence: 2,
         Message: (
           <>
             <p className="mb-2">
@@ -74,7 +74,7 @@ export const useCompromisedDependency = (
       {
         threat: "Use a container image with known vulnerabilities",
         maxEvidence: 2,
-        currentEvidence: 1,
+        currentEvidence: 2,
         Message: (
           <>
             <p className="mb-2">
