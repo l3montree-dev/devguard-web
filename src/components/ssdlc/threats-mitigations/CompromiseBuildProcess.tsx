@@ -3,25 +3,19 @@ import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
 
-export const compromiseDuringSourceCodeUpload = (
+export const compromiseBuildProcess = (
   router: NextRouter,
 ): ThreatMitigationTopic => {
   return {
-    title: "(B) Compromise during source code upload",
+    title: "(F) Compromise build process",
     description: (
       <>
         <p>
-          <strong>Example</strong>: An attacker who has gained access to the
-          software developers network can manipulate the source code during the
-          upload process by conducting a man-in-the-middle (MITM) attack.
+          An adversary introduces an unauthorized change to a build output
+          through tampering of the build process; or introduces false
+          information into the provenance.
         </p>
-        <p className="mt-2">
-          To mitigate this risk, Git supports secure upload methods using SSH or
-          HTTPS. Additionally, the upload process can be further protected by
-          leveraging In-Toto file hash recording, ensuring the integrity and
-          authenticity of the source code.
-        </p>
-
+        <p className="mt-2"></p>
         <div className="mt-4">
           <Link
             href={

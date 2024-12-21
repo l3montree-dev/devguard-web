@@ -3,25 +3,18 @@ import { ThreatMitigationTopic } from "@/types/view/threatMitigationsTypes";
 import Link from "next/link";
 import { NextRouter } from "next/router";
 
-export const compromiseDuringSourceCodeUpload = (
+export const deployCompromisedNoncompliantSoftware = (
   router: NextRouter,
 ): ThreatMitigationTopic => {
   return {
-    title: "(B) Compromise during source code upload",
+    title: "(J) Deploy compromised or noncompliant software",
     description: (
       <>
         <p>
-          <strong>Example</strong>: An attacker who has gained access to the
-          software developers network can manipulate the source code during the
-          upload process by conducting a man-in-the-middle (MITM) attack.
+          A compromised or noncompliant software package (or container) is
+          deployed to the (production) operational environment.
         </p>
-        <p className="mt-2">
-          To mitigate this risk, Git supports secure upload methods using SSH or
-          HTTPS. Additionally, the upload process can be further protected by
-          leveraging In-Toto file hash recording, ensuring the integrity and
-          authenticity of the source code.
-        </p>
-
+        <p className="mt-2"></p>
         <div className="mt-4">
           <Link
             href={
