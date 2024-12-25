@@ -20,14 +20,12 @@ import { Button } from "../ui/button";
 interface Props {
   title: string;
   description: string;
-  onClick: () => void;
-  buttonTitle: string;
+  Button: JSX.Element;
 }
 const EmptyList: FunctionComponent<Props> = ({
   title,
   description,
-  buttonTitle,
-  onClick,
+  Button,
 }) => {
   return (
     <div className="relative">
@@ -47,9 +45,7 @@ const EmptyList: FunctionComponent<Props> = ({
         <div className="flex flex-row justify-center">
           <p className="mt-2 w-2/3 text-muted-foreground">{description}</p>
         </div>
-        <div className="mt-6">
-          <Button onClick={onClick}>{buttonTitle}</Button>
-        </div>
+        <div className="mt-6">{Button}</div>
       </div>
     </div>
   );

@@ -147,8 +147,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           <EmptyList
             title="Here you will see all your projects"
             description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-            buttonTitle="Create your first Project"
-            onClick={() => setOpen(true)}
+            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
           />
         ) : (
           <Section

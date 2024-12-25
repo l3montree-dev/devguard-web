@@ -25,6 +25,7 @@ import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { withContentTree } from "@/decorators/withContentTree";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
 
 interface Props {
   project: ProjectDTO;
@@ -72,35 +73,7 @@ const Index: FunctionComponent<Props> = () => {
     <Page
       title={project?.name || ""}
       Menu={projectMenu}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project!.slug}/assets`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-        </span>
-      }
+      Title={<ProjectTitle />}
     >
       <div>
         <div className="flex flex-row justify-between">

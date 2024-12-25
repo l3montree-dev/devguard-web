@@ -99,6 +99,9 @@ export interface ProjectDTO {
   id: string;
 
   isPublic: boolean;
+
+  parentId: string | null;
+  parent: ProjectDTO | null;
 }
 
 export interface EnvDTO {

@@ -37,8 +37,7 @@ import { TrendingUp } from "lucide-react";
 interface Props {
   title: string;
   description: string;
-  onClick: () => void;
-  buttonTitle: string;
+  Button: JSX.Element;
 }
 
 const chartData = () => [
@@ -100,8 +99,7 @@ function ExampleBar() {
 const EmptyOverview: FunctionComponent<Props> = ({
   title,
   description,
-  buttonTitle,
-  onClick,
+  Button,
 }) => {
   return (
     <div className="relative">
@@ -127,9 +125,7 @@ const EmptyOverview: FunctionComponent<Props> = ({
             <div className="relative flex flex-row justify-center">
               <p className="mt-2 w-full text-muted-foreground">{description}</p>
             </div>
-            <div className="relative mt-6">
-              <Button onClick={onClick}>{buttonTitle}</Button>
-            </div>
+            <div className="relative mt-6">{Button}</div>
           </div>
         </div>
       </div>

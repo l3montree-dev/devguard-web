@@ -36,6 +36,7 @@ import { useMemo } from "react";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { withProject } from "@/decorators/withProject";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
 
 export default function Compliance({
   flaws,
@@ -53,39 +54,7 @@ export default function Compliance({
     [contentTree],
   );
   return (
-    <Page
-      title="Compliance"
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
-          >
-            {project.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-        </span>
-      }
-      Menu={projectMenu}
-    >
+    <Page title="Compliance" Title={<ProjectTitle />} Menu={projectMenu}>
       <Section
         forceVertical
         title="Accepted Vulnerabilities"

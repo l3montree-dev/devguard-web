@@ -38,6 +38,7 @@ import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withContentTree } from "@/decorators/withContentTree";
 import AssetTitle from "@/components/common/AssetTitle";
+import { buttonVariants } from "../../../../../../components/ui/button";
 
 interface Props {
   flaws: Paged<FlawByPackage>;
@@ -232,11 +233,15 @@ const Index: FunctionComponent<Props> = (props) => {
           <EmptyList
             title="You do not have any identified risks for this asset."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
-            buttonTitle="Start identifying risks"
-            onClick={() =>
-              router.push(
-                `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
-              )
+            Button={
+              <Link
+                className={buttonVariants({
+                  variant: "default",
+                })}
+                href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`}
+              >
+                Start identifying risks
+              </Link>
             }
           />
         ) : (
