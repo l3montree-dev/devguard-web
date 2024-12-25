@@ -26,6 +26,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { withContentTree } from "@/decorators/withContentTree";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
+import Section from "../../../../components/common/Section";
+import { Input } from "../../../../components/ui/input";
+import CopyCode from "../../../../components/common/CopyCode";
+import CopyInput from "../../../../components/common/CopyInput";
+import { Label } from "../../../../components/ui/label";
 
 interface Props {
   project: ProjectDTO;
@@ -79,10 +84,15 @@ const Index: FunctionComponent<Props> = () => {
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold">Project Settings</h1>
         </div>
+
+        <Section title="Information">
+          <Label>Project ID</Label>
+          <CopyInput value={project?.id ?? ""} />
+        </Section>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm forceVerticalSections={false} form={form} />
-
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>
