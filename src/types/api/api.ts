@@ -103,7 +103,7 @@ export interface ProjectDTO {
   parentId: string | null;
   parent: ProjectDTO | null;
 
-  type: "default" | "kubernetesNamespace";
+  type: "default" | "kubernetesNamespace" | "kubernetesCluster";
 }
 
 export interface EnvDTO {

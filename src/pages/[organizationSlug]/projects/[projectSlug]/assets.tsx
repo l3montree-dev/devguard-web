@@ -192,12 +192,18 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
             Button={
               <div className="flex flex-row gap-2">
                 <Button
+                  disabled={project.type !== "default"}
                   variant={"secondary"}
                   onClick={() => setShowProjectModal(true)}
                 >
                   New subproject
                 </Button>
-                <Button onClick={() => setShowModal(true)}>New Asset</Button>
+                <Button
+                  disabled={project.type !== "default"}
+                  onClick={() => setShowModal(true)}
+                >
+                  New Asset
+                </Button>
               </div>
             }
             primaryHeadline
@@ -269,6 +275,18 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
                     <div>
                       {asset.description}{" "}
                       <div className="mt-2 flex flex-row gap-2">
+                        {project.type === "kubernetesNamespace" && (
+                          <Badge variant={"outline"}>
+                            <Image
+                              alt="Kubernetes logo"
+                              src="/assets/kubernetes.svg"
+                              className="-ml-1.5 mr-2"
+                              width={16}
+                              height={16}
+                            />
+                            Kubernetes Workload
+                          </Badge>
+                        )}
                         {asset.lastSecretScan && (
                           <Badge variant={"outline"}>Secret-Scanning</Badge>
                         )}
