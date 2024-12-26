@@ -23,7 +23,7 @@ import Page from "../../../../../../components/Page";
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { beautifyPurl } from "../../../../../../utils/common";
+import { beautifyPurl, classNames } from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -235,9 +235,12 @@ const Index: FunctionComponent<Props> = (props) => {
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
             Button={
               <Link
-                className={buttonVariants({
-                  variant: "default",
-                })}
+                className={classNames(
+                  buttonVariants({
+                    variant: "default",
+                  }),
+                  "!text-primary-foreground",
+                )}
                 href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`}
               >
                 Start identifying risks

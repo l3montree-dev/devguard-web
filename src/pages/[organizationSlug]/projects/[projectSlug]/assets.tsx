@@ -52,6 +52,11 @@ import { withContentTree } from "@/decorators/withContentTree";
 import { ProjectForm } from "../../../../components/project/ProjectForm";
 import { withProject } from "../../../../decorators/withProject";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
+import Steps from "../../../../components/risk-identification/Steps";
+import CopyCode from "../../../../components/common/CopyCode";
+import PatSection from "../../../../components/risk-identification/PatSection";
+import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
+import { config } from "../../../../config";
 
 interface Props {
   project: ProjectDTO & {
@@ -91,7 +96,10 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
     },
   });
 
+  const { pat, onCreatePat } = usePersonalAccessToken();
+
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showK8sModal, setShowK8sModal] = useState(false);
 
   const projectMenu = useProjectMenu();
 
@@ -145,7 +153,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {project.assets.length === 0 ? (
+        {project.assets.length === 0 && subprojects.length === 0 ? (
           <EmptyList
             title="Your Assets will show up here!"
             description="You can understand assets as a software project. An asset is a
@@ -153,7 +161,10 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
                 files, ..."
             Button={
               <div className="flex flex-row justify-center gap-2">
-                <Button variant="secondary">
+                <Button
+                  onClick={() => setShowK8sModal(true)}
+                  variant="secondary"
+                >
                   <Image
                     alt="Kubernetes logo"
                     src="/assets/kubernetes.svg"
@@ -207,6 +218,18 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
                     <div className="flex flex-row gap-2">
                       {subproject.description}
                       <Badge variant={"outline"}>Subproject</Badge>
+                      {subproject.type === "kubernetesNamespace" && (
+                        <Badge variant={"outline"}>
+                          <Image
+                            alt="Kubernetes logo"
+                            src="/assets/kubernetes.svg"
+                            className="-ml-1.5 mr-2"
+                            width={16}
+                            height={16}
+                          />
+                          Kubernetes Namespace
+                        </Badge>
+                      )}
                     </div>
                   }
                   Button={
@@ -299,6 +322,46 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
           </Section>
         )}
       </Page>
+      <Dialog open={showK8sModal}>
+        <DialogContent setOpen={setShowK8sModal}>
+          <DialogHeader>
+            <DialogTitle className="flex flex-row items-center">
+              <Image
+                alt="Kubernetes logo"
+                src="/assets/kubernetes.svg"
+                className="mr-2"
+                width={24}
+                height={24}
+              />
+              Connect a Kubernetes Cluster
+            </DialogTitle>
+            <DialogDescription>
+              Connect a Kubernetes cluster to DevGuard to automatically index
+              your assets.
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Steps>
+            <div className="mb-10">
+              <PatSection onCreatePat={onCreatePat} pat={pat} />
+            </div>
+            <Section
+              className="mt-0"
+              forceVertical
+              title="Install the DevGuard Kubernetes Operator"
+              description="The DevGuard Kubernetes Operator is a small piece of software
+                that runs inside your Kubernetes cluster and indexes your
+                assets. It watches for new deployments and namespaces."
+            >
+              <CopyCode
+                codeString={`go run main.go --projectName=${activeOrg.slug + "/projects/" + project.slug} --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} --apiUrl=${config.publicDevGuardApiUrl}`}
+                language="shell"
+              />
+            </Section>
+          </Steps>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showProjectModal}>
         <DialogContent setOpen={setShowProjectModal}>
           <DialogHeader>

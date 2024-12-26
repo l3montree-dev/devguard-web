@@ -102,6 +102,8 @@ export interface ProjectDTO {
 
   parentId: string | null;
   parent: ProjectDTO | null;
+
+  type: "default" | "kubernetesNamespace";
 }
 
 export interface EnvDTO {

@@ -42,5 +42,9 @@ export default function usePersonalAccessToken(
     personalAccessTokens,
     onDeletePat: handleDeletePat,
     onCreatePat: handleCreatePat,
+    pat:
+      personalAccessTokens.length > 0
+        ? (personalAccessTokens[0] as PatWithPrivKey)
+        : undefined,
   };
 }
