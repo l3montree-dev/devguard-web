@@ -4,7 +4,7 @@ import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
 import ListItem from "../../../../components/common/ListItem";
-
+import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
@@ -153,6 +153,16 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
                 files, ..."
             Button={
               <div className="flex flex-row justify-center gap-2">
+                <Button variant="secondary">
+                  <Image
+                    alt="Kubernetes logo"
+                    src="/assets/kubernetes.svg"
+                    className="mr-2"
+                    width={24}
+                    height={24}
+                  />
+                  Use a Kubernetes Operator to index your assets
+                </Button>
                 <Button
                   variant={"secondary"}
                   onClick={() => setShowProjectModal(true)}
