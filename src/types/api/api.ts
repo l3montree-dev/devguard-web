@@ -104,6 +104,9 @@ export interface ProjectDTO {
   parent: ProjectDTO | null;
 
   type: "default" | "kubernetesNamespace" | "kubernetesCluster";
+
+  repositoryId?: string;
+  repositoryName?: string;
 }
 
 export interface EnvDTO {
