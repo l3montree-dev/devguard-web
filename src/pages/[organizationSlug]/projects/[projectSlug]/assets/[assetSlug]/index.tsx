@@ -51,6 +51,7 @@ import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Button } from "../../../../../../components/ui/button";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -103,12 +104,18 @@ const Index: FunctionComponent<Props> = ({
         <EmptyOverview
           title="No data available"
           description="There is no data available for this asset. Please run a scan to get data."
-          onClick={() =>
-            router.push(
-              `/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
-            )
+          Button={
+            <Button
+              onClick={() =>
+                router.push(
+                  `/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
+                )
+              }
+              className="btn btn-primary"
+            >
+              Run a scan
+            </Button>
           }
-          buttonTitle="Run a scan"
         />
       </Page>
     );

@@ -13,16 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent } from "react";
+import { FunctionComponent } from "react";
 import SkeletonListItem from "./SkeletonListItem";
-import { Button } from "../ui/button";
 
 interface Props {
   title: string;
   description: string;
-  Button: JSX.Element;
+  Button?: JSX.Element;
 }
-const EmptyList: FunctionComponent<Props> = ({
+const EmptyParty: FunctionComponent<Props> = ({
   title,
   description,
   Button,
@@ -45,10 +44,10 @@ const EmptyList: FunctionComponent<Props> = ({
         <div className="flex flex-row justify-center">
           <p className="mt-2 w-2/3 text-muted-foreground">{description}</p>
         </div>
-        <div className="mt-6">{Button}</div>
+        {Boolean(Button) && <div className="mt-6">{Button}</div>}
       </div>
     </div>
   );
 };
 
-export default EmptyList;
+export default EmptyParty;

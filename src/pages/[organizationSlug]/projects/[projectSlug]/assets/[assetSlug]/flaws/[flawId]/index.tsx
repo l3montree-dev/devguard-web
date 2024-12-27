@@ -69,6 +69,8 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { useLoader } from "@/hooks/useLoader";
 import { withContentTree } from "@/decorators/withContentTree";
+import { getRepositoryId } from "../../../../../../../../utils/view";
+import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -347,59 +349,7 @@ const Index: FunctionComponent<Props> = (props) => {
   return (
     <Page
       Menu={assetMenu}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project?.slug}`}
-          >
-            {project?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex items-center gap-1 text-white hover:no-underline"
-            href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}`}
-          >
-            {asset?.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Asset
-            </Badge>
-          </Link>
-
-          <span className="opacity-75">/</span>
-          <span className="flex flex-row items-center gap-1">
-            {flaw.cve?.cve ?? "Flaw Details"}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Flaw
-            </Badge>
-          </span>
-        </span>
-      }
+      Title={<AssetTitle />}
       title={flaw.cve?.cve ?? "Flaw Details"}
     >
       <div className="flex flex-row gap-4">
@@ -479,7 +429,9 @@ const Index: FunctionComponent<Props> = (props) => {
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-center gap-2">
                             {flaw.ticketId === null &&
-                              asset?.repositoryId?.startsWith("gitlab:") && (
+                              getRepositoryId(asset, project)?.startsWith(
+                                "gitlab:",
+                              ) && (
                                 <Button
                                   variant={"secondary"}
                                   onClick={() => {
@@ -504,7 +456,9 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </Button>
                               )}
                             {flaw.ticketId === null &&
-                              asset?.repositoryId?.startsWith("github:") && (
+                              getRepositoryId(asset, project)?.startsWith(
+                                "github:",
+                              ) && (
                                 <Button
                                   variant={"secondary"}
                                   onClick={() => {

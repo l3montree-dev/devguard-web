@@ -52,6 +52,7 @@ import Link from "next/link";
 import { withContentTree } from "@/decorators/withContentTree";
 import EmptyOverview from "@/components/common/EmptyOverview";
 import { padRiskHistory } from "@/utils/server";
+import { Button } from "../../components/ui/button";
 
 interface Props {
   organization: OrganizationDTO & {
@@ -112,10 +113,15 @@ const Home: FunctionComponent<Props> = ({
         <EmptyOverview
           title="No Data Available"
           description="There is no data available for this organization. Please add a project to get started."
-          buttonTitle="Add Project"
-          onClick={() => {
-            window.location.href = `/${organization.slug}/projects/`;
-          }}
+          Button={
+            <Button
+              onClick={() => {
+                window.location.href = `/${organization.slug}/projects/`;
+              }}
+            >
+              Add Project
+            </Button>
+          }
         />
       </Page>
     );

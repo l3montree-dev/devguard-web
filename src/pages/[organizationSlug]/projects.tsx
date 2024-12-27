@@ -60,6 +60,7 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { withContentTree } from "@/decorators/withContentTree";
+import { ProjectBadge } from "../../components/common/ProjectTitle";
 
 interface Props {
   projects: Array<ProjectDTO>;
@@ -147,8 +148,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           <EmptyList
             title="Here you will see all your projects"
             description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-            buttonTitle="Create your first Project"
-            onClick={() => setOpen(true)}
+            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
           />
         ) : (
           <Section
@@ -168,7 +168,14 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                   <ListItem
                     reactOnHover
                     Title={project.name}
-                    description={project.description}
+                    description={
+                      <span>
+                        {project.description}
+                        {project.type !== "default" && (
+                          <ProjectBadge type={project.type} />
+                        )}
+                      </span>
+                    }
                     Button={
                       <DropdownMenu>
                         <DropdownMenuTrigger

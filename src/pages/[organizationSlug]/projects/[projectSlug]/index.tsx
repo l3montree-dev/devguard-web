@@ -41,6 +41,8 @@ import { withContentTree } from "@/decorators/withContentTree";
 import EmptyOverview from "@/components/common/EmptyOverview";
 import { useRouter } from "next/router";
 import { padRiskHistory } from "@/utils/server";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
+import { Button } from "../../../../components/ui/button";
 
 interface Props {
   project: ProjectDTO & {
@@ -52,6 +54,7 @@ interface Props {
     label: string;
     slug: string;
     description: string;
+    type: "project" | "asset";
   }>;
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
@@ -79,84 +82,29 @@ const Index: FunctionComponent<Props> = ({
 
   if (riskHistory.length === 0) {
     return (
-      <Page
-        title={project.name}
-        Menu={projectMenu}
-        Title={
-          <span className="flex flex-row gap-2">
-            <Link
-              href={`/${activeOrg.slug}/projects`}
-              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            >
-              {activeOrg.name}{" "}
-              <Badge
-                className="font-body font-normal !text-white"
-                variant="outline"
-              >
-                Organization
-              </Badge>
-            </Link>
-            <span className="opacity-75">/</span>
-            <Link
-              className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-              href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
-            >
-              {project.name}
-              <Badge
-                className="font-body font-normal !text-white"
-                variant="outline"
-              >
-                Project
-              </Badge>
-            </Link>
-          </span>
-        }
-      >
+      <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
         <EmptyOverview
           title={"No data available for this project"}
+          Button={
+            <Button
+              onClick={() => {
+                router.push(
+                  `/${activeOrg.slug}/projects/${project.slug}/assets`,
+                );
+              }}
+            >
+              Create new asset
+            </Button>
+          }
           description="Create an asset and start scanning it to see the data here."
-          buttonTitle="Create new asset"
-          onClick={() => {
-            router.push(`/${activeOrg.slug}/projects/${project.slug}/assets`);
-          }}
         />
       </Page>
     );
   }
+
+  console.log(riskDistribution);
   return (
-    <Page
-      title={project.name}
-      Menu={projectMenu}
-      Title={
-        <span className="flex flex-row gap-2">
-          <Link
-            href={`/${activeOrg.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {activeOrg.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-          <span className="opacity-75">/</span>
-          <Link
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-            href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
-          >
-            {project.name}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Project
-            </Badge>
-          </Link>
-        </span>
-      }
-    >
+    <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Overview</h1>
       </div>
@@ -187,12 +135,14 @@ const Index: FunctionComponent<Props> = ({
                 {riskHistory.slice(0, 5).map((r) => (
                   <Link
                     href={
-                      "/" +
-                      activeOrg.slug +
-                      "/projects/" +
-                      activeProject?.slug +
-                      "/assets/" +
-                      r.slug
+                      r.type === "project"
+                        ? "/" + activeOrg.slug + "/projects/" + r.slug
+                        : "/" +
+                          activeOrg.slug +
+                          "/projects/" +
+                          activeProject?.slug +
+                          "/assets/" +
+                          r.slug
                     }
                     key={r.slug}
                     className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
@@ -303,7 +253,13 @@ export const getServerSideProps = middleware(
       ).then(
         (r) =>
           r.json() as Promise<
-            Array<{ riskHistory: RiskHistory[]; asset: AssetDTO }>
+            Array<
+              | { riskHistory: RiskHistory[]; asset: AssetDTO }
+              | {
+                  riskHistory: [];
+                  project: ProjectDTO;
+                }
+            >
           >,
       ),
       apiClient(
@@ -346,10 +302,12 @@ export const getServerSideProps = middleware(
         project,
         riskDistribution,
         riskHistory: paddedRiskHistory.map((r) => ({
-          label: r.asset.name,
+          label: "asset" in r ? r.asset.name : r.project.name,
           history: r.riskHistory,
-          slug: r.asset.slug,
-          description: r.asset.description,
+          type: "asset" in r ? "asset" : "project",
+          slug: "asset" in r ? r.asset.slug : r.project.slug,
+          description:
+            "asset" in r ? r.asset.description : r.project.description,
         })),
         flawAggregationStateAndChange,
         avgLowFixingTime,

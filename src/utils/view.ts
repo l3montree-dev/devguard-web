@@ -12,8 +12,42 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { OrganizationDetailsDTO } from "@/types/api/api";
+import { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
 import { Identity } from "@ory/client";
+
+export const getParentRepositoryIdAndName = (
+  project?: ProjectDTO,
+): {
+  parentRepositoryId: string | undefined;
+  parentRepositoryName: string | undefined;
+} => {
+  if (!project) {
+    return {
+      parentRepositoryId: undefined,
+      parentRepositoryName: undefined,
+    };
+  }
+
+  if (project.repositoryId && project.repositoryName) {
+    return {
+      parentRepositoryId: project.repositoryId,
+      parentRepositoryName: project.repositoryName,
+    };
+  } else if (project.parent) {
+    return getParentRepositoryIdAndName(project.parent);
+  }
+  return {
+    parentRepositoryId: undefined,
+    parentRepositoryName: undefined,
+  };
+};
+
+export const getRepositoryId = (asset?: AssetDTO, project?: ProjectDTO) => {
+  if (asset && asset.repositoryId) {
+    return asset.repositoryId;
+  }
+  return getParentRepositoryIdAndName(project).parentRepositoryId;
+};
 
 export const defaultScanner =
   "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
@@ -99,5 +133,5 @@ const colors1 = [
 export const generateColor = (str: string) => {
   const hash = Math.abs(hashCode(str));
 
-  return colors1[hash % colors1.length];
+  return colors[hash % colors.length];
 };
