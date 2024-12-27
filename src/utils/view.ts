@@ -133,5 +133,5 @@ const colors1 = [
 export const generateColor = (str: string) => {
   const hash = Math.abs(hashCode(str));
 
-  return colors1[hash % colors1.length];
+  return colors[hash % colors.length];
 };

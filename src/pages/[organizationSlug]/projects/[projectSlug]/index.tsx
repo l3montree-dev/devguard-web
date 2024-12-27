@@ -54,6 +54,7 @@ interface Props {
     label: string;
     slug: string;
     description: string;
+    type: "project" | "asset";
   }>;
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByScanType: DependencyCountByScanType;
@@ -100,6 +101,8 @@ const Index: FunctionComponent<Props> = ({
       </Page>
     );
   }
+
+  console.log(riskDistribution);
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
       <div className="flex flex-row justify-between">
@@ -132,12 +135,14 @@ const Index: FunctionComponent<Props> = ({
                 {riskHistory.slice(0, 5).map((r) => (
                   <Link
                     href={
-                      "/" +
-                      activeOrg.slug +
-                      "/projects/" +
-                      activeProject?.slug +
-                      "/assets/" +
-                      r.slug
+                      r.type === "project"
+                        ? "/" + activeOrg.slug + "/projects/" + r.slug
+                        : "/" +
+                          activeOrg.slug +
+                          "/projects/" +
+                          activeProject?.slug +
+                          "/assets/" +
+                          r.slug
                     }
                     key={r.slug}
                     className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
@@ -248,7 +253,13 @@ export const getServerSideProps = middleware(
       ).then(
         (r) =>
           r.json() as Promise<
-            Array<{ riskHistory: RiskHistory[]; asset: AssetDTO }>
+            Array<
+              | { riskHistory: RiskHistory[]; asset: AssetDTO }
+              | {
+                  riskHistory: [];
+                  project: ProjectDTO;
+                }
+            >
           >,
       ),
       apiClient(
@@ -291,10 +302,12 @@ export const getServerSideProps = middleware(
         project,
         riskDistribution,
         riskHistory: paddedRiskHistory.map((r) => ({
-          label: r.asset.name,
+          label: "asset" in r ? r.asset.name : r.project.name,
           history: r.riskHistory,
-          slug: r.asset.slug,
-          description: r.asset.description,
+          type: "asset" in r ? "asset" : "project",
+          slug: "asset" in r ? r.asset.slug : r.project.slug,
+          description:
+            "asset" in r ? r.asset.description : r.project.description,
         })),
         flawAggregationStateAndChange,
         avgLowFixingTime,
