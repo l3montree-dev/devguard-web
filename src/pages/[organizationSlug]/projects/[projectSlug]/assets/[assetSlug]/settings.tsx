@@ -27,6 +27,7 @@ import { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
+import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -81,6 +82,9 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
 
+  const { parentRepositoryId, parentRepositoryName } =
+    getParentRepositoryIdAndName(project);
+
   return (
     <Page
       Menu={assetMenu}
@@ -93,6 +97,8 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           <h1 className="text-2xl font-semibold">Asset Settings</h1>
         </div>
         <ConnectToRepoSection
+          parentRepositoryId={parentRepositoryId}
+          parentRepositoryName={parentRepositoryName}
           repositoryName={asset.repositoryName}
           repositoryId={asset.repositoryId}
           repositories={repos}
