@@ -122,11 +122,15 @@ To get a local copy up and running follow these simple example steps.
    ```sh
    git clone https://github.com/l3montree-dev/devguard-web.git
    ```
-2. Install NPM packages
+2. Copy .env.example to .env
+   ```sh
+   cp .env.example .env
+   ```
+3. Install NPM packages
    ```sh
    npm install
    ```
-3. Start the development server
+4. Start the development server
    ```sh
    npm run dev
    ```
