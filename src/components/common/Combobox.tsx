@@ -117,7 +117,7 @@ export function Combobox(props: Props) {
                     />
                   ) : item.value.startsWith("github") ? (
                     <img
-                      className="mr-2 inline-block h-4 w-4"
+                      className="mr-2 inline-block h-4 w-4 dark:invert"
                       src="/assets/github.svg"
                       alt="GitHub"
                     />
