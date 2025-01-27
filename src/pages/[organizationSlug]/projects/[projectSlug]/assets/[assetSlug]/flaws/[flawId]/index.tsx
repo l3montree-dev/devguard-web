@@ -63,7 +63,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 import EcosystemImage from "@/components/common/EcosystemImage";
 import FormatDate from "@/components/risk-assessment/FormatDate";
-import { beautifyPurl } from "@/utils/common";
+import { beautifyPurl, extractVersion } from "@/utils/common";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
@@ -719,16 +719,14 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {flaw.arbitraryJsonData?.componentDepth === 1
+                            {flaw.componentDepth === 1
                               ? "Direct"
                               : "Transitive"}
                           </Badge>
                         </div>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {componentDepthMessages(
-                          flaw.arbitraryJsonData?.componentDepth ?? 0,
-                        )}
+                        {componentDepthMessages(flaw.componentDepth ?? 0)}
                       </p>
                     </div>
                     <div className="w-full border-b pb-4">
@@ -794,7 +792,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              {flaw.arbitraryJsonData !== null && (
+              {flaw.componentPurl !== null && (
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
                     Affected component
@@ -804,30 +802,17 @@ const Index: FunctionComponent<Props> = (props) => {
                       <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm">
                           <span className="flex flex-row gap-2">
-                            <EcosystemImage
-                              packageName={flaw.arbitraryJsonData.packageName}
-                            />{" "}
-                            {beautifyPurl(flaw.arbitraryJsonData.packageName)}
+                            <EcosystemImage packageName={flaw.componentPurl} />{" "}
+                            {beautifyPurl(flaw.componentPurl)}
                           </span>
                         </p>
                         <div className="mt-4 text-sm">
-                          <div className="flex flex-row justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              Introduced in:{" "}
-                            </span>
-                            <Badge variant={"outline"}>
-                              {Boolean(flaw.arbitraryJsonData.introducedVersion)
-                                ? flaw.arbitraryJsonData.introducedVersion
-                                : "first version"}
-                            </Badge>
-                          </div>
                           <div className="mt-1 flex flex-row justify-between">
                             <span className="text-xs text-muted-foreground">
                               Installed version:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {flaw.arbitraryJsonData.installedVersion ??
-                                "unknown"}
+                              {extractVersion(flaw.componentPurl) ?? "unknown"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -835,8 +820,8 @@ const Index: FunctionComponent<Props> = (props) => {
                               Fixed in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {Boolean(flaw.arbitraryJsonData.fixedVersion)
-                                ? flaw.arbitraryJsonData.fixedVersion
+                              {Boolean(flaw.componentFixedVersion)
+                                ? flaw.componentFixedVersion
                                 : "no patch available"}
                             </Badge>
                           </div>
@@ -846,9 +831,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               href={
                                 router.asPath +
                                 "/../../dependency-graph?pkg=" +
-                                flaw.arbitraryJsonData.packageName +
-                                "&scanType=" +
-                                flaw.arbitraryJsonData.scanType
+                                flaw.componentPurl +
+                                "&scanner=" +
+                                flaw.scanner
                               }
                             >
                               Show in dependency graph

@@ -17,7 +17,6 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -80,19 +79,19 @@ const DependencyGraphPage: FunctionComponent<{
   const all = router.query.all === "1";
   const menu = useAssetMenu();
 
-  const addVersionAndScanTypeQueryParams = (link: string): string => {
+  const addVersionAndscannerQueryParams = (link: string): string => {
     const version = router.query.version as string | undefined;
-    const scanType = router.query.scanType as string | undefined;
-    if (version && scanType) {
-      return `${link}?version=${version}&scanType=${scanType}`;
+    const scanner = router.query.scanner as string | undefined;
+    if (version && scanner) {
+      return `${link}?version=${version}&scanner=${scanner}`;
     }
 
     if (version) {
       return `${link}?version=${version}`;
     }
 
-    if (scanType) {
-      return `${link}?scanType=${scanType}`;
+    if (scanner) {
+      return `${link}?scanner=${scanner}`;
     }
 
     return link;
@@ -110,7 +109,7 @@ const DependencyGraphPage: FunctionComponent<{
           <div className="flex flex-row gap-4">
             <Tabs
               defaultValue={
-                (router.query.scanType as string | undefined) ?? "sca"
+                (router.query.scanner as string | undefined) ?? "sca"
               }
             >
               <TabsList>
@@ -119,7 +118,7 @@ const DependencyGraphPage: FunctionComponent<{
                     router.push({
                       query: {
                         ...router.query,
-                        scanType: "sca",
+                        scanner: "sca",
                       },
                     })
                   }
@@ -132,7 +131,7 @@ const DependencyGraphPage: FunctionComponent<{
                     router.push({
                       query: {
                         ...router.query,
-                        scanType: "container-scanning",
+                        scanner: "container-scanning",
                       },
                     })
                   }
@@ -151,7 +150,7 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={addVersionAndScanTypeQueryParams(
+                  href={addVersionAndscannerQueryParams(
                     pathname + `/../sbom.json`,
                   )}
                   className="!text-foreground hover:no-underline"
@@ -162,7 +161,7 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={addVersionAndScanTypeQueryParams(
+                  href={addVersionAndscannerQueryParams(
                     pathname + `/../sbom.xml`,
                   )}
                   className="!text-foreground hover:no-underline"
@@ -180,7 +179,7 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={addVersionAndScanTypeQueryParams(
+                  href={addVersionAndscannerQueryParams(
                     pathname + `/../vex.json`,
                   )}
                   className="!text-foreground hover:no-underline"
@@ -191,7 +190,7 @@ const DependencyGraphPage: FunctionComponent<{
                   download
                   target="_blank"
                   prefetch={false}
-                  href={addVersionAndScanTypeQueryParams(
+                  href={addVersionAndscannerQueryParams(
                     pathname + `/../vex.xml`,
                   )}
                   className="!text-foreground hover:no-underline"
@@ -391,7 +390,7 @@ export const getServerSideProps = middleware(
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
             version: version,
-            scanType: context.query.scanType ?? "sca",
+            scanner: context.query.scanner,
           }),
       ),
       apiClient(
@@ -399,7 +398,7 @@ export const getServerSideProps = middleware(
           "affected-components?" +
           toSearchParams({
             version: version,
-            scanType: context.query.scanType ?? "sca",
+            scanner: context.query.scanner,
           }),
       ),
       apiClient(uri + "versions"),

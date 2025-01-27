@@ -25,8 +25,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/vex.xml?scanType=" +
-      (context.query.scanType ? context.query.scanType : "sca");
+      "/vex.xml?scanner=" +
+      (context.query.scanner ? context.query.scanner : "sca");
 
     const vex = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!vex.ok) {

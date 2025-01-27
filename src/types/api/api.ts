@@ -118,7 +118,19 @@ export interface EnvDTO {
   lastReportTime: string;
 }
 
-export interface FlawDTO {
+export interface ScaFlawDTO extends BaseFlawDTO {
+  componentFixedVersion: string | null;
+  componentDepth: number;
+  componentPurl: string;
+}
+
+export interface NonScaFlawDTO extends BaseFlawDTO {
+  componentFixedVersion: null;
+  componentDepth: null;
+  componentPurl: null;
+}
+
+export interface BaseFlawDTO {
   message: string | null;
   ruleId: string;
   level: string | null;
@@ -126,7 +138,7 @@ export interface FlawDTO {
   createdAt: string;
   updatedAt: string;
   cveId: string | null;
-  componentPurl: string | null;
+
   scanner: string;
   state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
@@ -136,6 +148,8 @@ export interface FlawDTO {
   riskRecalculatedAt: string;
   assetId: string;
 }
+
+export type FlawDTO = ScaFlawDTO | NonScaFlawDTO;
 
 export interface Paged<T> {
   data: T[];
@@ -268,7 +282,7 @@ export interface Exploit {
   subscribers_count: number;
   stargazers_count: number;
 }
-export interface FlawWithCVE extends FlawDTO {
+export interface FlawWithCVE extends ScaFlawDTO {
   cve:
     | (Modify<
         CVE,
@@ -285,19 +299,6 @@ export interface FlawWithCVE extends FlawDTO {
         exploits: Array<Exploit>;
       })
     | null;
-  arbitraryJsonData: null | {
-    introducedVersion: string;
-    fixedVersion: string;
-    packageName: string;
-    installedVersion: string;
-    cveId: string;
-    scanType: string;
-    componentDepth: number;
-  };
-  component: {
-    componentType: "application" | "library";
-    purlOrCpe: string;
-  };
 }
 
 export interface DetailedFlawDTO extends FlawWithCVE {
@@ -377,8 +378,8 @@ export interface FlawCountByScanner {
   [scannerId: string]: number;
 }
 
-export interface DependencyCountByScanType {
-  [scanType: string]: number;
+export interface DependencyCountByscanner {
+  [scanner: string]: number;
 }
 
 export interface FlawAggregationStateAndChange {

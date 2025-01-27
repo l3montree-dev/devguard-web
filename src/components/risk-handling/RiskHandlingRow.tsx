@@ -55,18 +55,12 @@ const FlawWithCveTableRow = ({
       <td className="p-4">{flaw.cveId}</td>
       <td className="p-4">{flaw.rawRiskAssessment.toFixed(1)}</td>
       <td className="p-4">
-        {flaw.arbitraryJsonData?.fixedVersion ? (
+        {flaw.componentFixedVersion ? (
           <span>
-            <Badge variant={"secondary"}>
-              {flaw.arbitraryJsonData.fixedVersion}
-            </Badge>
+            <Badge variant={"secondary"}>{flaw.componentFixedVersion}</Badge>
           </span>
         ) : (
-          <span className="text-muted-foreground">
-            {flaw.component.componentType === "application"
-              ? "No image security-update available"
-              : "No fix available"}
-          </span>
+          <span className="text-muted-foreground">No fix available</span>
         )}
       </td>
       <td className="p-4" colSpan={2}>

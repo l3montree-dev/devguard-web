@@ -29,7 +29,7 @@ import { getApiClientFromContext } from "../../../../services/devGuardApi";
 import {
   AssetDTO,
   AverageFixingTime,
-  DependencyCountByScanType,
+  DependencyCountByscanner,
   FlawAggregationStateAndChange,
   FlawCountByScanner,
   ProjectDTO,
@@ -57,7 +57,7 @@ interface Props {
     type: "project" | "asset";
   }>;
   flawCountByScanner: FlawCountByScanner;
-  dependencyCountByScanType: DependencyCountByScanType;
+  dependencyCountByscanner: DependencyCountByscanner;
   flawAggregationStateAndChange: FlawAggregationStateAndChange;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
@@ -207,7 +207,7 @@ const Index: FunctionComponent<Props> = ({
         <RiskHistoryChart data={riskHistory} />
         {/* <div className="grid grid-cols-3 gap-4">
       <div className="col-span-2"></div>
-      <DependenciesPieChart data={dependencyCountByScanType} />
+      <DependenciesPieChart data={dependencyCountByscanner} />
     </div> */}
       </div>
     </Page>

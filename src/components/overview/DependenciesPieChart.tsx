@@ -16,12 +16,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DependencyCountByScanType } from "@/types/api/api";
+import { DependencyCountByscanner } from "@/types/api/api";
 
 export function DependenciesPieChart({
   data,
 }: {
-  data: DependencyCountByScanType;
+  data: DependencyCountByscanner;
 }) {
   const chartConfig = Object.keys(data).reduce((acc, key, i) => {
     return {
@@ -52,13 +52,13 @@ export function DependenciesPieChart({
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={Object.entries(data).map(([scanType, count]) => ({
-                scanType,
+              data={Object.entries(data).map(([scanner, count]) => ({
+                scanner,
                 count,
-                fill: chartConfig[scanType].color,
+                fill: chartConfig[scanner].color,
               }))}
               dataKey="count"
-              nameKey="scanType"
+              nameKey="scanner"
               innerRadius={60}
               outerRadius={80}
               strokeWidth={5}

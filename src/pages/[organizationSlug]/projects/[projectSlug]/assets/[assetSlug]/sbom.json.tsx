@@ -23,8 +23,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/sbom.json?scanType=" +
-      (context.query.scanType ? context.query.scanType : "sca");
+      "/sbom.json?scanner=" +
+      (context.query.scanner ? context.query.scanner : "sca");
 
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {

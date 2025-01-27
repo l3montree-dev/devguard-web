@@ -22,7 +22,7 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveProject } from "./useActiveProject";
 
 // limitations under the License.
-export function useAutosetup(scanType: "full" | "sca" | "container-scanning") {
+export function useAutosetup(scanner: "full" | "sca" | "container-scanning") {
   const { waitFor, isLoading, Loader } = useLoader();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const activeOrg = useActiveOrg();
@@ -79,7 +79,7 @@ export function useAutosetup(scanType: "full" | "sca" | "container-scanning") {
       });
 
       const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup?scanType=${scanType}`,
+        `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup?scanner=${scanner}`,
         {
           method: "POST",
           body: JSON.stringify({

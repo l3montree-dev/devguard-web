@@ -23,7 +23,11 @@ import Page from "../../../../../../components/Page";
 import { withOrgs } from "../../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../../decorators/withSession";
 import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
-import { beautifyPurl, classNames } from "../../../../../../utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+} from "../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -50,20 +54,15 @@ const columnHelper = createColumnHelper<FlawByPackage>();
 const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
   // order the flaws by fixedVersion
   const orderedFlaws = flaws.sort((a, b) => {
-    if (
-      a.arbitraryJsonData?.fixedVersion &&
-      b.arbitraryJsonData?.fixedVersion
-    ) {
-      return a.arbitraryJsonData.fixedVersion.localeCompare(
-        b.arbitraryJsonData.fixedVersion,
-      );
+    if (a.componentFixedVersion && b.componentFixedVersion) {
+      return a.componentFixedVersion.localeCompare(b.componentFixedVersion);
     }
     return 0;
   });
 
   // remove all without fixed version
   const filteredFlaws = orderedFlaws.filter(
-    (f) => f.arbitraryJsonData?.fixedVersion,
+    (f) => f.componentFixedVersion !== null,
   );
 
   if (filteredFlaws.length === 0) {
@@ -77,7 +76,7 @@ const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
 
   return {
     version:
-      filteredFlaws[filteredFlaws.length - 1].arbitraryJsonData?.fixedVersion,
+      filteredFlaws[filteredFlaws.length - 1].componentFixedVersion ?? "",
     riskReduction: totalRisk,
   };
 };
@@ -141,7 +140,7 @@ const columnsDef = [
     cell: ({ row }: any) => (
       <span>
         <Badge variant={"secondary"}>
-          {row.original.flaws[0].arbitraryJsonData["installedVersion"]}
+          {extractVersion((row.original.flaws[0] as FlawWithCVE).componentPurl)}
         </Badge>
       </span>
     ),
@@ -155,13 +154,6 @@ const columnsDef = [
         row.original.flaws,
       );
       if (versionAndReduction === null) {
-        if (row.original.flaws[0].component.componentType === "application") {
-          return (
-            <span className="text-muted-foreground">
-              No image security-update available
-            </span>
-          );
-        }
         return <span className="text-muted-foreground">No fix available</span>;
       }
       return (

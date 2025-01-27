@@ -17,7 +17,7 @@ import {
   AssetMetricsDTO,
   AverageFixingTime,
   ComponentRisk,
-  DependencyCountByScanType,
+  DependencyCountByscanner,
   FlawAggregationStateAndChange,
   FlawCountByScanner,
   RiskDistribution,
@@ -58,7 +58,7 @@ interface Props {
   riskDistribution: RiskDistribution | null;
   riskHistory: RiskHistory[];
   flawCountByScanner: FlawCountByScanner;
-  dependencyCountByScanType: DependencyCountByScanType;
+  dependencyCountByscanner: DependencyCountByscanner;
   flawAggregationStateAndChange: FlawAggregationStateAndChange;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
@@ -232,7 +232,7 @@ const Index: FunctionComponent<Props> = ({
           />
           {/* <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2"></div>
-          <DependenciesPieChart data={dependencyCountByScanType} />
+          <DependenciesPieChart data={dependencyCountByscanner} />
         </div> */}
         </div>
       </Section>
