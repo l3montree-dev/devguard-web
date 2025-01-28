@@ -288,25 +288,56 @@ export const bsiComplianceControls = (asset: AssetDTO) => ({
 });
 
 export const isoComplianceControls = {
-  technologicalControls: [
+  technologicalControlsDevGuardSupport: [
     {
-      control: "User end point devices",
+      control: "Management of technical vulnerabilities",
       description:
-        "Information stored on, processed by or accessible via user end point devices shall be protected.",
+        "Information about technical vulnerabilities of information systems in use shall be obtained, the organization’s exposure to such vulnerabilities shall be evaluated and appropriate measures shall be taken.",
+      currentEvidence: 0,
       maxEvidence: 0,
+    },
+    {
+      control: "Configuration management",
+      description:
+        "Configurations, including security configurations, of hardware, software, services and networks shall be established, documented, implemented, monitored and reviewed.",
+      currentEvidence: 0,
+      maxEvidence: 0,
+    },
+    {
+      control: "Secure development life cycle",
+      description:
+        "Rules for the secure development of software and systems shall be established and applied.",
+      maxEvidence: 4,
       currentEvidence: 0,
     },
+    {
+      control: "Application security requirements",
+      description:
+        "Information security requirements shall be identified, specified and approved when developing or acquiring applications.",
+      maxEvidence: 1,
+      currentEvidence: 1,
+    },
+    {
+      control: "Secure coding",
+      description:
+        "Secure coding principles shall be applied to software development.",
+      maxEvidence: 2,
+      currentEvidence: 0,
+    },
+    {
+      control: "Security testing in development and acceptance",
+      description:
+        "Security testing processes shall be defined and implemented in the development life cycle.",
+      maxEvidence: 10,
+      currentEvidence: 0,
+    },
+  ],
+
+  technologicalControlsDevGuardInsertion: [
     {
       control: "Privileged access rights",
       description:
         "The allocation and use of privileged access rights shall be restricted and managed.",
-      maxEvidence: 0,
-      currentEvidence: 0,
-    },
-    {
-      control: "Information access restriction",
-      description:
-        "Access to information and other associated assets shall be restricted in accordance with the established topic-specific policy on access control.",
       maxEvidence: 0,
       currentEvidence: 0,
     },
@@ -325,6 +356,37 @@ export const isoComplianceControls = {
       currentEvidence: 0,
     },
     {
+      control: "Information access restriction",
+      description:
+        "Access to information and other associated assets shall be restricted in accordance with the established topic-specific policy on access control.",
+      maxEvidence: 0,
+      currentEvidence: 0,
+    },
+    {
+      control: "Secure system architecture and engineering principles",
+      description:
+        "Principles for engineering secure systems shall be established, documented, maintained and applied to any information system development activities.",
+      maxEvidence: 0,
+      currentEvidence: 0,
+    },
+    {
+      control: "Separation of development, test and production environments",
+      description:
+        "Development, testing and production environments shall be separated and secured.",
+      maxEvidence: 1,
+      currentEvidence: 0,
+    },
+  ],
+
+  technologicalControls: [
+    {
+      control: "User end point devices",
+      description:
+        "Information stored on, processed by or accessible via user end point devices shall be protected.",
+      maxEvidence: 0,
+      currentEvidence: 0,
+    },
+    {
       control: "Capacity management",
       description:
         "The use of resources shall be monitored and adjusted in line with current and expected capacity requirements.",
@@ -335,20 +397,6 @@ export const isoComplianceControls = {
       control: "Protection against malware",
       description:
         "Protection against malware shall be implemented and supported by appropriate user awareness.",
-      currentEvidence: 0,
-      maxEvidence: 0,
-    },
-    {
-      control: "Management of technical vulnerabilities",
-      description:
-        "Information about technical vulnerabilities of information systems in use shall be obtained, the organization’s exposure to such vulnerabilities shall be evaluated and appropriate measures shall be taken.",
-      currentEvidence: 0,
-      maxEvidence: 0,
-    },
-    {
-      control: "Configuration management",
-      description:
-        "Configurations, including security configurations, of hardware, software, services and networks shall be established, documented, implemented, monitored and reviewed.",
       currentEvidence: 0,
       maxEvidence: 0,
     },
@@ -458,52 +506,10 @@ export const isoComplianceControls = {
       currentEvidence: 0,
     },
     {
-      control: "Secure development life cycle",
-      description:
-        "Rules for the secure development of software and systems shall be established and applied.",
-      maxEvidence: 4,
-      currentEvidence: 0,
-    },
-    {
-      control: "Application security requirements",
-      description:
-        "Information security requirements shall be identified, specified and approved when developing or acquiring applications.",
-      maxEvidence: 1,
-      currentEvidence: 1,
-    },
-    {
-      control: "Secure system architecture and engineering principles",
-      description:
-        "Principles for engineering secure systems shall be established, documented, maintained and applied to any information system development activities.",
-      maxEvidence: 0,
-      currentEvidence: 0,
-    },
-    {
-      control: "Secure coding",
-      description:
-        "Secure coding principles shall be applied to software development.",
-      maxEvidence: 2,
-      currentEvidence: 0,
-    },
-    {
-      control: "Security testing in development and acceptance",
-      description:
-        "Security testing processes shall be defined and implemented in the development life cycle.",
-      maxEvidence: 10,
-      currentEvidence: 0,
-    },
-    {
       control: "Outsourced development",
       description:
         "The organization shall direct, monitor and review the activities related to outsourced system development.",
       maxEvidence: 0,
-      currentEvidence: 0,
-    },
-    {
-      control: "Separation of development, test and production environments",
-      description:
-        "Development, testing and production environments shall be separated and secured.",
-      maxEvidence: 1,
       currentEvidence: 0,
     },
     {

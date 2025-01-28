@@ -157,11 +157,77 @@ const Compliance = ({ flaws }: { flaws: Paged<DetailedFlawDTO> }) => {
                   collects to demonstrate that your company fulfills the
                   requirements of that control.
                 </p>
+
+                <p>
+                  DevGuard helps you to implement the following controls from
+                  the ISO 27001:
+                </p>
+
+                <div className="grid grid-cols-12 font-bold">
+                  <div className="col-span-10">Control name</div>
+                  <div>Evidence</div>
+                </div>
+                {isoComplianceControls.technologicalControlsDevGuardSupport.map(
+                  (el) => (
+                    <Collapsible key={el.control} title={el.control}>
+                      <CollapsibleControlTrigger
+                        maxEvidence={el.maxEvidence}
+                        currentEvidence={el.currentEvidence}
+                      >
+                        <div className="grid w-full grid-cols-12 flex-row justify-between">
+                          <div className="col-span-11 text-left">
+                            {el.control}
+                          </div>
+                        </div>
+                      </CollapsibleControlTrigger>
+                      <div className="border-b">
+                        <CollapsibleContent className=" py-2 text-sm text-muted-foreground">
+                          <div>{el.description}</div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  ),
+                )}
+
+                <p>
+                  DevGuard inserts the following controls from the ISO 27001
+                </p>
+
+                <div className="grid grid-cols-12 font-bold">
+                  <div className="col-span-10">Control name</div>
+                  <div>Evidence</div>
+                </div>
+                {isoComplianceControls.technologicalControlsDevGuardInsertion.map(
+                  (el) => (
+                    <Collapsible key={el.control} title={el.control}>
+                      <CollapsibleControlTrigger
+                        maxEvidence={el.maxEvidence}
+                        currentEvidence={el.currentEvidence}
+                      >
+                        <div className="grid w-full grid-cols-12 flex-row justify-between">
+                          <div className="col-span-11 text-left">
+                            {el.control}
+                          </div>
+                        </div>
+                      </CollapsibleControlTrigger>
+                      <div className="border-b">
+                        <CollapsibleContent className=" py-2 text-sm text-muted-foreground">
+                          <div>{el.description}</div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  ),
+                )}
+
                 <div className="grid grid-cols-12 font-bold">
                   <div className="col-span-10">Control name</div>
                   <div>Evidence</div>
                 </div>
 
+                <p>
+                  DevGuard does NOT supports the following controls from the ISO
+                  27001:
+                </p>
                 {isoComplianceControls.technologicalControls.map((el) => (
                   <Collapsible key={el.control} title={el.control}>
                     <CollapsibleControlTrigger
