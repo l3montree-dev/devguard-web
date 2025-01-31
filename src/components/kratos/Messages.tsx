@@ -27,10 +27,7 @@ const messageType2Intent = {
 };
 export const Message = ({ message }: MessageProps) => {
   return (
-    <p
-      className="text-sm text-muted-foreground"
-      data-testid={`ui/message/${message.id}`}
-    >
+    <p className="text-sm" data-testid={`ui/message/${message.id}`}>
       {message.text}
     </p>
   );
