@@ -109,7 +109,8 @@ const DependencyGraphPage: FunctionComponent<{
           <div className="flex flex-row gap-4">
             <Tabs
               defaultValue={
-                (router.query.scanner as string | undefined) ?? "sca"
+                (router.query.scanner as string | undefined) ??
+                "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca"
               }
             >
               <TabsList>
