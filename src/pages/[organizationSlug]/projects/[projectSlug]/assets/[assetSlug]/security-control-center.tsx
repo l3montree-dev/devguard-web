@@ -247,7 +247,7 @@ jobs:
   devguard-scanner:
     uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
     with:
-        asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
+        asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
     secrets:
         devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
                           />
