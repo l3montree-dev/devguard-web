@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 import { Form, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
+import InlineCopy from "./common/InlineCopy";
 
 interface Props {
   isOpen: boolean;
@@ -55,7 +56,13 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
             Invite a new member to your organization by entering their email
-            address. An invitation will be sent.
+            address.
+            <div className="mt-2">
+              <Callout intent="warning">
+                Currently DevGuard does not send any E-Mails. Please copy the
+                link and forward it manually.
+              </Callout>
+            </div>
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -71,7 +78,7 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
                   <Callout intent="info">
                     <p>
                       Accept the invitation by visiting this link:{" "}
-                      {invitationCode}
+                      <InlineCopy content={invitationCode!} />
                     </p>
                   </Callout>
                 )}

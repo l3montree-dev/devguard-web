@@ -38,7 +38,7 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     }
 
     // call the initial endpoint with the latest information available
-    return session.data as User;
+    return session.data as { identity: User };
   } catch (e: unknown) {
     if (isAxiosError(e)) {
       if (e.response?.status === 401) {

@@ -13,17 +13,18 @@
 // limitations under the License.
 
 import { classNames } from "@/utils/common";
-import React, { FunctionComponent } from "react";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { FunctionComponent } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
+import { buttonVariants } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { Button, buttonVariants } from "./ui/button";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   members: Array<{
@@ -32,8 +33,14 @@ interface Props {
     avatarUrl?: string;
     role?: string;
   }>;
+  onRemoveMember: (id: string) => void;
+  onChangeMemberRole: (id: string, role: "admin" | "member") => void;
 }
-const MembersTable: FunctionComponent<Props> = ({ members }) => {
+const MembersTable: FunctionComponent<Props> = ({
+  members,
+  onRemoveMember,
+  onChangeMemberRole,
+}) => {
   return (
     <div className="overflow-hidden rounded-lg border">
       <table className="w-full text-sm">
@@ -84,8 +91,20 @@ const MembersTable: FunctionComponent<Props> = ({ members }) => {
                         <EllipsisVerticalIcon className="h-5 w-5" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onChangeMemberRole(m.id, "admin")}
+                        >
+                          Make admin
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onChangeMemberRole(m.id, "member")}
+                        >
+                          Make member
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onRemoveMember(m.id)}>
+                          Remove
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>

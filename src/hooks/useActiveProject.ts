@@ -17,6 +17,6 @@ import { useStore } from "@/zustand/globalStoreProvider";
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export function useActiveProject() {
   return useStore((s) => {
-    return s.project;
+    return s.project!;
   });
 }

@@ -109,8 +109,7 @@ const Recovery: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Recover your account - Ory NextJS Integration Example</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
+        <title>Recover your account</title>
       </Head>
       <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">
         <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">

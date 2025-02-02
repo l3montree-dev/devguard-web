@@ -107,6 +107,13 @@ export interface ProjectDTO {
 
   repositoryId?: string;
   repositoryName?: string;
+
+  members: Array<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    role?: "member" | "admin";
+  }>;
 }
 
 export interface EnvDTO {

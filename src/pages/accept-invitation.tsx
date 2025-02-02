@@ -2,16 +2,67 @@ import { middleware } from "@/decorators/middleware";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
-import React from "react";
+import Head from "next/head";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { useCurrentUser } from "../hooks/useCurrentUser";
+import { Button } from "../components/ui/button";
+import { LogoutLink } from "../hooks/logoutLink";
 
 const AcceptInvitation = () => {
-  return <div></div>;
+  const user = useCurrentUser();
+
+  const handleLogout = LogoutLink();
+
+  return (
+    <>
+      <Head>
+        <title>Invitation Failed</title>
+        <meta name="description" content="Invitation failed" />
+      </Head>
+      <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">
+        <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
+          <CardHeader>
+            <CardTitle>Invitation failed</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Make sure, that you are logged in with the correct Account. The
+                invitation code is bound to a specific E-Mail Address.
+              </p>
+              <div className="mt-2">
+                <p className="text-sm text-muted-foreground">
+                  Currently logged in as:
+                </p>
+                {user && (
+                  <div>
+                    <span className="mt-2 block rounded-lg border bg-card p-1 px-2 text-sm">
+                      {user ? user.traits.email : "Not logged in"}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 flex flex-row justify-end">
+                <Button onClick={handleLogout}>Logout</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
 };
 
 export default AcceptInvitation;
 
 export const getServerSideProps: GetServerSideProps = middleware(
-  async (context) => {
+  async (context, { session }) => {
     // make a request to accept that invitation
     const apiClient = getApiClientFromContext(context);
     const code = context.query.code as string;
@@ -31,7 +82,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
 
     if (!resp.ok) {
       return {
-        notFound: true,
+        props: {},
       };
     }
 
