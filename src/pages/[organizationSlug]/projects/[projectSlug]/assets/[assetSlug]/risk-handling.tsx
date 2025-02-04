@@ -7,6 +7,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
+
 import {
   AssetDTO,
   AssetVersionDTO,
@@ -48,11 +49,27 @@ import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withContentTree } from "@/decorators/withContentTree";
 import AssetTitle from "@/components/common/AssetTitle";
-import { buttonVariants } from "../../../../../../components/ui/button";
+import { Button, buttonVariants } from "../../../../../../components/ui/button";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+} from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenuCheckboxItem,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 
 interface Props {
-  assetVersions: AssetVersionDTO[];
+  branches: string[];
+  tags: string[];
   flaws: Paged<FlawByPackage>;
 }
 
@@ -201,8 +218,6 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  console.log("assetVersions", props.assetVersions);
-
   const handleSearch = useMemo(
     () =>
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,7 +278,8 @@ const Index: FunctionComponent<Props> = (props) => {
         />
       ) : (
         <div>
-          <div>Test</div>
+          <BranchTagSelector branches={props.branches} tags={props.tags} />
+
           <Section
             forceVertical
             primaryHeadline
@@ -401,6 +417,22 @@ export const getServerSideProps = middleware(
     const assetVersionResp = await apiClient(uri + "asset-versions");
     const assetVersions = await assetVersionResp.json();
 
+    console.log("assetVersions", assetVersions.length);
+
+    let branches: string[] = [];
+    let tags: string[] = [];
+
+    assetVersions.map((av: AssetVersionDTO) => {
+      console.log("av", av.type);
+      if (av.type === "branch") {
+        branches.push(av.name);
+      } else if (av.type === "tag") {
+        tags.push(av.name);
+      } else {
+        throw new Error("Unknown asset version type " + av.Type);
+      }
+    });
+
     const filterQuery = Object.fromEntries(
       Object.entries(context.query).filter(
         ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
@@ -441,7 +473,8 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        assetVersions,
+        branches,
+        tags,
         flaws,
       },
     };

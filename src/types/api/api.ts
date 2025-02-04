@@ -315,6 +315,8 @@ export interface AssetVersionDTO {
   updatedAt: string;
   version: string;
 
+  type: "branch" | "tag";
+
   repositoryId?: string;
   repositoryName?: string;
 
