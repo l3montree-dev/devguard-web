@@ -305,11 +305,35 @@ export interface DetailedFlawDTO extends FlawWithCVE {
   events: FlawEventDTO[];
 }
 
+export interface AssetVersionDTO {
+  id: string;
+  name: string;
+  slug: string;
+
+  assetId: string;
+  createdAt: string;
+  updatedAt: string;
+  version: string;
+
+  repositoryId?: string;
+  repositoryName?: string;
+
+  lastSecretScan: string;
+  lastSastScan: string;
+  lastScaScan: string;
+  lastIacScan: string;
+  lastContainerScan: string;
+  lastDastScan: string;
+
+  signingPubKey?: string;
+}
 export interface AssetDTO {
   name: string;
   description?: string;
   slug: string;
   id: string;
+
+  assetVersions: AssetVersionDTO[];
 
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
