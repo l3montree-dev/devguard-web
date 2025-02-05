@@ -335,8 +335,6 @@ export interface AssetDTO {
   slug: string;
   id: string;
 
-  assetVersions: AssetVersionDTO[];
-
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;

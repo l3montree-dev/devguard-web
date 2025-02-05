@@ -69,8 +69,8 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { useLoader } from "@/hooks/useLoader";
 import { withContentTree } from "@/decorators/withContentTree";
-import { getRepositoryId } from "../../../../../../../../utils/view";
-import AssetTitle from "../../../../../../../../components/common/AssetTitle";
+import { getRepositoryId } from "@/utils/view";
+import AssetTitle from "@/components/common/AssetTitle";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -856,8 +856,15 @@ const Index: FunctionComponent<Props> = (props) => {
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
     // fetch the project
-    const { organizationSlug, projectSlug, assetSlug, flawId } =
-      context.params!;
+    const {
+      organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+      flawId,
+    } = context.params!;
+
+    console.log("assetVersion", assetVersionSlug);
 
     const apiClient = getApiClientFromContext(context);
     const uri =
@@ -867,6 +874,8 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
+      "/asset-version/" +
+      assetVersionSlug +
       "/flaws/" +
       flawId;
 

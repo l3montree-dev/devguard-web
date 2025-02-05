@@ -51,7 +51,9 @@ import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Button } from "../../../../../../components/ui/button";
+import { Button } from "../../../../../../../../components/ui/button";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -91,6 +93,10 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
+
+  const assetVersion = useActiveAssetVersion();
+
+  console.log("assetVersion", assetVersion);
 
   const router = useRouter();
   if (riskHistory.length === 0) {
@@ -245,7 +251,8 @@ const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+      context.params!;
 
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -262,6 +269,8 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
+      "/asset-version/" +
+      assetVersionSlug +
       "/stats";
     const [
       componentRisk,
@@ -331,6 +340,7 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    assetVersion: withAssetVersion,
     contentTree: withContentTree,
   },
 );

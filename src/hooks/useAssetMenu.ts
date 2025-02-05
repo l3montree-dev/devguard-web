@@ -24,6 +24,7 @@ import { useRouter } from "next/router";
 import useSession from "./useSession";
 import { useCurrentUser } from "./useCurrentUser";
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
+import { useActiveAssetVersion } from "./useActiveAssetVersion";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -31,12 +32,25 @@ export const useAssetMenu = () => {
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const assetSlug = router.query.assetSlug as string;
+  const assetVersionSlug = router.query.assetVersionSlug as string;
   const loggedIn = useCurrentUser();
+
+  const assV = useActiveAssetVersion();
+
+  console.log("assV", assV);
 
   const menu = [
     {
       title: "Overview",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
+      href:
+        "/" +
+        orgSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/asset-version/" +
+        assetVersionSlug,
       Icon: ChartBarSquareIcon,
     },
     {
@@ -61,6 +75,8 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
+        "/asset-version/" +
+        assetVersionSlug +
         "/risk-handling",
       Icon: WrenchScrewdriverIcon,
       isActive:
@@ -76,6 +92,8 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
+        "/asset-version/" +
+        assetVersionSlug +
         "/dependency-graph",
       Icon: ShareIcon,
       isActive: router.pathname.includes("dependency-graph"),
@@ -89,6 +107,8 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
+        "/asset-version/" +
+        assetVersionSlug +
         "/compliance",
       Icon: ScaleIcon,
       isActive: router.pathname.includes("compliance"),

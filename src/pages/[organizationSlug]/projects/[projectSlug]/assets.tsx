@@ -264,7 +264,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
             {project.assets.map((asset) => (
               <Link
                 key={asset.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/asset-version/main/risk-handling`}
                 className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem

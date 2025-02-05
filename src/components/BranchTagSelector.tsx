@@ -8,6 +8,7 @@ import {
 import { Button } from "./ui/button";
 import React, { useState } from "react";
 import { Input } from "./ui/input";
+import { useRouter } from "next/router";
 
 export function BranchTagSelector({
   branches,
@@ -19,6 +20,8 @@ export function BranchTagSelector({
   const [selected, setSelected] = useState("main");
   const [filter, setFilter] = useState("");
   const [view, setView] = useState("branches");
+
+  const router = useRouter();
 
   const items = view === "branches" ? branches : tags;
   const filteredItems = items.filter((item) => item.includes(filter));
@@ -54,7 +57,18 @@ export function BranchTagSelector({
         <DropdownMenuSeparator />
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
-            <DropdownMenuItem key={item} onClick={() => setSelected(item)}>
+            <DropdownMenuItem
+              key={item}
+              onClick={() => {
+                setSelected(item);
+
+                let cleanPath = router.asPath.split("?")[0];
+
+                cleanPath = cleanPath.split("/asset-version")[0];
+
+                router.push(`${cleanPath}/asset-version/${item}/risk-handling`);
+              }}
+            >
               {item}
             </DropdownMenuItem>
           ))

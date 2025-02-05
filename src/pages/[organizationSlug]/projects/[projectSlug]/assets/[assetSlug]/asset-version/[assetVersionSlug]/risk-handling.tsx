@@ -25,16 +25,16 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useMemo, useState } from "react";
-import Page from "../../../../../../components/Page";
+import Page from "../../../../../../../../components/Page";
 
-import { withOrgs } from "../../../../../../decorators/withOrgs";
-import { withSession } from "../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
+import { withOrgs } from "../../../../../../../../decorators/withOrgs";
+import { withSession } from "../../../../../../../../decorators/withSession";
+import { getApiClientFromContext } from "../../../../../../../../services/devGuardApi";
 import {
   beautifyPurl,
   classNames,
   extractVersion,
-} from "../../../../../../utils/common";
+} from "../../../../../../../../utils/common";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -49,8 +49,11 @@ import { Loader2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withContentTree } from "@/decorators/withContentTree";
 import AssetTitle from "@/components/common/AssetTitle";
-import { Button, buttonVariants } from "../../../../../../components/ui/button";
-import EmptyParty from "../../../../../../components/common/EmptyParty";
+import {
+  Button,
+  buttonVariants,
+} from "../../../../../../../../components/ui/button";
+import EmptyParty from "../../../../../../../../components/common/EmptyParty";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -66,10 +69,13 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface Props {
   branches: string[];
   tags: string[];
+  exists: boolean;
   flaws: Paged<FlawByPackage>;
 }
 
@@ -218,6 +224,8 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
+  const assetVersion = useActiveAssetVersion();
+
   const handleSearch = useMemo(
     () =>
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,24 +249,26 @@ const Index: FunctionComponent<Props> = (props) => {
       }, 500),
     [router],
   );
-
-  const activeScan = Boolean(asset?.lastContainerScan ?? asset?.lastScaScan);
-
-  console.log("activeScan", activeScan);
-  console.log("table", table.getRowCount());
-  console.log("router.query", router.query);
-
+  let activeScan = false;
+  if (props.exists) {
+    activeScan = Boolean(asset?.lastContainerScan ?? asset?.lastScaScan);
+  }
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
-      {activeScan &&
-      table.getRowCount() === 0 &&
-      Object.keys(router.query).length === 3 ? (
+      {!props.exists ? (
+        <EmptyParty
+          title="No identified risks"
+          description="No identified risks for this asset."
+        />
+      ) : activeScan &&
+        table.getRowCount() === 0 &&
+        Object.keys(router.query).length === 4 ? (
         <EmptyParty
           title="No identified risks"
           description="No identified risks for this asset."
         />
       ) : /**  the query will contain organizationSlug, projectSlug and assetSlug - thus 3 is empty  */
-      table.getRowCount() === 0 && Object.keys(router.query).length === 3 ? (
+      table.getRowCount() === 0 && Object.keys(router.query).length === 4 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
@@ -399,10 +409,6 @@ export const getServerSideProps = middleware(
     let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
 
-    if (assetVersionSlug === "" || assetVersionSlug === undefined) {
-      assetVersionSlug = "default";
-    }
-
     const apiClient = getApiClientFromContext(context);
 
     const uri =
@@ -417,21 +423,55 @@ export const getServerSideProps = middleware(
     const assetVersionResp = await apiClient(uri + "asset-versions");
     const assetVersions = await assetVersionResp.json();
 
-    console.log("assetVersions", assetVersions.length);
-
     let branches: string[] = [];
     let tags: string[] = [];
 
-    assetVersions.map((av: AssetVersionDTO) => {
-      console.log("av", av.type);
-      if (av.type === "branch") {
-        branches.push(av.name);
-      } else if (av.type === "tag") {
-        tags.push(av.name);
+    let exists = false;
+
+    if (assetVersions.length !== 0) {
+      assetVersions.map((av: AssetVersionDTO) => {
+        if (av.type === "branch") {
+          branches.push(av.name);
+        } else if (av.type === "tag") {
+          tags.push(av.name);
+        } else {
+          throw new Error("Unknown asset version type " + av.type);
+        }
+      });
+      const assetVersionSlugString = assetVersionSlug as string;
+      if (
+        branches.includes(assetVersionSlugString) ||
+        tags.includes(assetVersionSlugString)
+      ) {
+        exists = true;
       } else {
-        throw new Error("Unknown asset version type " + av.Type);
+        if (branches.includes("main")) {
+          assetVersionSlug = "main";
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/main/risk-handling`,
+              permanent: false,
+            },
+          };
+        } else if (branches.length > 0) {
+          assetVersionSlug = branches[0];
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/${branches[0]}/risk-handling`,
+              permanent: false,
+            },
+          };
+        } else if (tags.length > 0) {
+          assetVersionSlug = tags[0];
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/${tags[0]}/risk-handling`,
+              permanent: false,
+            },
+          };
+        }
       }
-    });
+    }
 
     const filterQuery = Object.fromEntries(
       Object.entries(context.query).filter(
@@ -453,7 +493,7 @@ export const getServerSideProps = middleware(
     const pageSize = (context.query.pageSize as string) ?? "25";
     const flawResp = await apiClient(
       uri +
-        "assetVersionSlug/" +
+        "asset-version/" +
         assetVersionSlug +
         "/" +
         "flaws/?" +
@@ -475,6 +515,7 @@ export const getServerSideProps = middleware(
       props: {
         branches,
         tags,
+        exists,
         flaws,
       },
     };
@@ -485,6 +526,7 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    assetVersion: withAssetVersion,
     contentTree: withContentTree,
   },
 );

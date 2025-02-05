@@ -368,7 +368,8 @@ export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
 export const getServerSideProps = middleware(
   async (context, { asset }) => {
     // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+      context.params!;
 
     const apiClient = getApiClientFromContext(context);
     const uri =
@@ -378,10 +379,21 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
+      "/asset-version/" +
+      assetVersionSlug +
       "/";
 
     // check for version query parameter
     const version = context.query.version as string | undefined;
+
+    console.log("version", version);
+    console.log("scanner", context.query.scanner);
+
+    //TODO: Fix this
+    const scanner = context.query.scanner;
+    if (!scanner) {
+      context.query.scanner = "sca";
+    }
 
     const [resp, flawResp, versionsResp] = await Promise.all([
       apiClient(
