@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { AssetDTO } from "@/types/api/api";
+import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { HttpError } from "./middleware";
 
@@ -24,15 +24,17 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
   const assetSlug = ctx.params?.assetSlug;
-  // get the organization
-  const r = await devGuardApiClient(
+
+  const url =
     "/organizations/" +
-      organization +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug,
-  );
+    organization +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug;
+
+  // get the organization
+  const r = await devGuardApiClient(url);
 
   if (!r.ok) {
     throw new HttpError({
@@ -45,5 +47,27 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   }
   // parse the organization
   const asset: AssetDTO = await r.json();
+
+  const assetVersionResp = await devGuardApiClient(url + "/asset-versions");
+  if (!assetVersionResp.ok) {
+    console.error("Failed to fetch asset versions", assetVersionResp);
+  }
+
+  const assetVersions = await assetVersionResp.json();
+
+  let branches: string[] = [];
+  let tags: string[] = [];
+
+  for (const assetVersion of assetVersions) {
+    if (assetVersion.type === "branch") {
+      branches.push(assetVersion.slug);
+    } else {
+      tags.push(assetVersion.slug);
+    }
+  }
+
+  asset.branches = branches;
+  asset.tags = tags;
+
   return asset;
 }

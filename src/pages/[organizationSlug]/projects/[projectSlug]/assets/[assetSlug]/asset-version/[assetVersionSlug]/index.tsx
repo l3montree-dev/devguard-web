@@ -54,6 +54,7 @@ import { useRouter } from "next/router";
 import { Button } from "../../../../../../../../components/ui/button";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -94,9 +95,10 @@ const Index: FunctionComponent<Props> = ({
   const project = useActiveProject();
   const asset = useActiveAsset()!;
 
-  const assetVersion = useActiveAssetVersion();
+  const branches = asset?.branches ?? [];
+  const tags = asset?.tags ?? [];
 
-  console.log("assetVersion", assetVersion);
+  const assetVersion = useActiveAssetVersion();
 
   const router = useRouter();
   if (riskHistory.length === 0) {
@@ -134,6 +136,7 @@ const Index: FunctionComponent<Props> = ({
       description="Overview of the asset"
       Title={<AssetTitle />}
     >
+      <BranchTagSelector branches={branches} tags={tags} />
       <Section
         primaryHeadline
         forceVertical

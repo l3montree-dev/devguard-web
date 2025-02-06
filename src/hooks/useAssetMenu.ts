@@ -32,12 +32,13 @@ export const useAssetMenu = () => {
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const assetSlug = router.query.assetSlug as string;
-  const assetVersionSlug = router.query.assetVersionSlug as string;
+  let assetVersionSlug = router.query.assetVersionSlug as string;
   const loggedIn = useCurrentUser();
 
-  const assV = useActiveAssetVersion();
-
-  console.log("assV", assV);
+  //TODO: Fix this
+  if (assetVersionSlug === "" || assetVersionSlug === undefined) {
+    assetVersionSlug = "main";
+  }
 
   const menu = [
     {

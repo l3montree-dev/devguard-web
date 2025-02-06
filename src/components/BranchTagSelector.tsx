@@ -17,11 +17,13 @@ export function BranchTagSelector({
   branches: string[];
   tags: string[];
 }) {
-  const [selected, setSelected] = useState("main");
+  const router = useRouter();
+
+  const [selected, setSelected] = useState(
+    router.query.assetVersionSlug as string,
+  );
   const [filter, setFilter] = useState("");
   const [view, setView] = useState("branches");
-
-  const router = useRouter();
 
   const items = view === "branches" ? branches : tags;
   const filteredItems = items.filter((item) => item.includes(filter));
@@ -60,13 +62,15 @@ export function BranchTagSelector({
             <DropdownMenuItem
               key={item}
               onClick={() => {
+                router.push(
+                  {
+                    query: { ...router.query, assetVersionSlug: item },
+                  },
+                  undefined,
+                  { shallow: false },
+                );
+
                 setSelected(item);
-
-                let cleanPath = router.asPath.split("?")[0];
-
-                cleanPath = cleanPath.split("/asset-version")[0];
-
-                router.push(`${cleanPath}/asset-version/${item}/risk-handling`);
               }}
             >
               {item}

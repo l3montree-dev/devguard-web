@@ -307,6 +307,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
     let json: any;
     if (data.status === "mitigate") {
+      console.log("mitigate");
       const resp = await browserApiClient(
         "/api/v1/organizations/" + router.asPath + "/mitigate",
         {
@@ -322,6 +323,7 @@ const Index: FunctionComponent<Props> = (props) => {
       );
       json = await resp.json();
     } else {
+      console.log("comment");
       const resp = await browserApiClient(
         "/api/v1/organizations/" + router.asPath,
         {
@@ -864,8 +866,6 @@ export const getServerSideProps = middleware(
       flawId,
     } = context.params!;
 
-    console.log("assetVersion", assetVersionSlug);
-
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -880,6 +880,8 @@ export const getServerSideProps = middleware(
       flawId;
 
     const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
+
+    console.log(resp);
 
     return {
       props: {

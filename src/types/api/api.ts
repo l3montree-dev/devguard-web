@@ -177,6 +177,7 @@ interface BaseFlawEventDTO {
   flawId: string;
   justification: string;
   flawName: string | null;
+  assetVersion: string;
 }
 
 export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
@@ -335,6 +336,9 @@ export interface AssetDTO {
   slug: string;
   id: string;
 
+  branches: string[];
+  tags: string[];
+
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;
@@ -352,6 +356,8 @@ export interface AssetDTO {
   lastDastScan: string;
 
   signingPubKey?: string;
+
+  centralFlawManagement: boolean;
 }
 
 export interface DependencyTreeNode {

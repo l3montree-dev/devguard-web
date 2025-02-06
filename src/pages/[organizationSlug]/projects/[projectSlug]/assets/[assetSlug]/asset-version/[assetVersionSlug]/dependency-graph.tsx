@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
@@ -68,6 +69,8 @@ const DependencyGraphPage: FunctionComponent<{
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
+  const branches = asset?.branches ?? [];
+  const tags = asset?.tags ?? [];
   const dimensions = useDimensions();
 
   const router = useRouter();
@@ -99,6 +102,7 @@ const DependencyGraphPage: FunctionComponent<{
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
+      <BranchTagSelector branches={branches} tags={tags} />s
       <Section
         primaryHeadline
         forceVertical
@@ -385,9 +389,6 @@ export const getServerSideProps = middleware(
 
     // check for version query parameter
     const version = context.query.version as string | undefined;
-
-    console.log("version", version);
-    console.log("scanner", context.query.scanner);
 
     //TODO: Fix this
     const scanner = context.query.scanner;

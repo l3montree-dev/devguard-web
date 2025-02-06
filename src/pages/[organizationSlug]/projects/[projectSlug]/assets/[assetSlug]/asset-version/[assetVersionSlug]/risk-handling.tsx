@@ -73,8 +73,6 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface Props {
-  branches: string[];
-  tags: string[];
   exists: boolean;
   flaws: Paged<FlawByPackage>;
 }
@@ -201,6 +199,7 @@ const columnsDef = [
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
+  console.log("props", props.flaws);
   const { sortingState, handleSort } = useFilter();
 
   const table = useReactTable({
@@ -223,6 +222,9 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
+
+  const branches = asset?.branches ?? [];
+  const tags = asset?.tags ?? [];
 
   const assetVersion = useActiveAssetVersion();
 
@@ -288,7 +290,7 @@ const Index: FunctionComponent<Props> = (props) => {
         />
       ) : (
         <div>
-          <BranchTagSelector branches={props.branches} tags={props.tags} />
+          <BranchTagSelector branches={branches} tags={tags} />
 
           <Section
             forceVertical
@@ -513,8 +515,6 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        branches,
-        tags,
         exists,
         flaws,
       },

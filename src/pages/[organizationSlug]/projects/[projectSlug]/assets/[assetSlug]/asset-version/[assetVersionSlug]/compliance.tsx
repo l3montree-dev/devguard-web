@@ -37,13 +37,17 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import { DetailedFlawDTO, Paged } from "@/types/api/api";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 
 const Compliance = ({ flaws }: { flaws: Paged<DetailedFlawDTO> }) => {
   const menu = useAssetMenu();
   const asset = useActiveAsset()!;
+  const branches = asset.branches;
+  const tags = asset.tags;
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
       <div>
+        <BranchTagSelector branches={branches} tags={tags} />
         <Section
           forceVertical
           primaryHeadline
@@ -212,7 +216,9 @@ export const getServerSideProps = middleware(
       "/projects/" +
       context.params?.projectSlug +
       "/assets/" +
-      context.params?.assetSlug;
+      context.params?.assetSlug +
+      "/asset-version/" +
+      context.query.assetVersionSlug;
 
     const filterQuery = Object.fromEntries(
       Object.entries(context.query).filter(

@@ -37,6 +37,7 @@ import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import FormatDate from "./FormatDate";
 import { classNames } from "@/utils/common";
+import { useRouter } from "next/router";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -208,6 +209,11 @@ export default function RiskAssessmentFeed({
   const org = useActiveOrg();
   const currentUser = useCurrentUser();
 
+  const router = useRouter();
+  const assetVersion = router.query.assetVersion;
+
+  console.log("assetVersion", assetVersion);
+
   return (
     <div>
       <ul
@@ -259,10 +265,22 @@ export default function RiskAssessmentFeed({
                       </Avatar>
                     )}
                     <div className="w-full overflow-hidden rounded border">
-                      <p className="bg-card px-2 py-2 font-medium">
-                        {findUser(event.userId, org, currentUser).displayName}{" "}
-                        {eventTypeMessages(event, index, flawName, events)}
-                      </p>
+                      <div className="flex w-full justify-between">
+                        <p className="bg-card px-2 py-2 font-medium">
+                          {findUser(event.userId, org, currentUser).displayName}{" "}
+                          {eventTypeMessages(event, index, flawName, events)}
+                        </p>
+
+                        <p>
+                          {event.assetVersion !== assetVersion ? (
+                            <span className="text-s text-muted-foreground">
+                              {event.assetVersion}
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                        </p>
+                      </div>
 
                       {Boolean(msg) && (
                         <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">

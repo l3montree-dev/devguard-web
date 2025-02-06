@@ -169,7 +169,6 @@ export const beautifyPurl = (purl: string) => {
 };
 
 export const extractVersion = (purl: string) => {
-  console.log("purl", purl);
   if (!purl.includes("@")) {
     return "";
   }
