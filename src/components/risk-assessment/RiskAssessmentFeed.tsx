@@ -38,6 +38,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import FormatDate from "./FormatDate";
 import { classNames } from "@/utils/common";
 import { useRouter } from "next/router";
+import { Badge } from "../ui/badge";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -209,11 +211,8 @@ export default function RiskAssessmentFeed({
   const org = useActiveOrg();
   const currentUser = useCurrentUser();
 
-  const router = useRouter();
-  const assetVersion = router.query.assetVersion;
-
-  console.log("assetVersion", assetVersion);
-
+  const activeAssetVersion = useActiveAssetVersion();
+  
   return (
     <div>
       <ul
@@ -226,7 +225,7 @@ export default function RiskAssessmentFeed({
           const msg = eventMessages(event, index, events);
           return (
             <li
-              className="relative flex flex-row items-start gap-4"
+              className={classNames(event.assetVersion !== activeAssetVersion?.name && "opacity-75 hover:opacity-100", "transition-all relative flex flex-row items-start gap-4")}
               key={event.id}
             >
               <div
@@ -271,15 +270,15 @@ export default function RiskAssessmentFeed({
                           {eventTypeMessages(event, index, flawName, events)}
                         </p>
 
-                        <p>
-                          {event.assetVersion !== assetVersion ? (
-                            <span className="text-s text-muted-foreground">
-                              {event.assetVersion}
-                            </span>
-                          ) : (
-                            ""
+  
+                          {event.assetVersion !== activeAssetVersion?.name && (
+                            <div className="absolute right-2 top-2">
+                            <Badge variant={"outline"}>
+                               {event.assetVersion}
+                            </Badge>
+                            </div>
                           )}
-                        </p>
+                
                       </div>
 
                       {Boolean(msg) && (

@@ -447,7 +447,7 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        initialZustandState: {
+        initialZustand: {
           project,
         },
         subprojects,

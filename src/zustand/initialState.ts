@@ -15,22 +15,20 @@
 import { GlobalStore } from "./globalStore";
 
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-export const addToInitialZustandState = (
-  resp: any,
-  obj: Partial<GlobalStore>,
-) => {
+export const addToInitialZustand = (resp: any, obj: Partial<GlobalStore>) => {
   // check if the response contains the props
+  console.log("addToInitialZustand", resp, obj);
   if ("props" in resp) {
     // check if the page does already define an initial zustand state
-    if (resp.props.initialZustandState) {
+    if (resp.props.initialZustand) {
       // merge the initial zustand state with the session data
-      resp.props.initialZustandState = {
-        ...resp.props.initialZustandState,
+      resp.props.initialZustand = {
+        ...resp.props.initialZustand,
         ...obj,
       };
     } else {
       // at least provide the session data
-      resp.props.initialZustandState = {
+      resp.props.initialZustand = {
         ...obj,
       };
     }

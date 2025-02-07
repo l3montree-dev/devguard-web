@@ -48,12 +48,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -61,16 +55,18 @@ import {
 import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
+import AssetTitle from "@/components/common/AssetTitle";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import FormatDate from "@/components/risk-assessment/FormatDate";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { withContentTree } from "@/decorators/withContentTree";
+import { useLoader } from "@/hooks/useLoader";
 import { beautifyPurl, extractVersion } from "@/utils/common";
+import { getRepositoryId } from "@/utils/view";
+import { useStore } from "@/zustand/globalStoreProvider";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import { useLoader } from "@/hooks/useLoader";
-import { withContentTree } from "@/decorators/withContentTree";
-import { getRepositoryId } from "@/utils/view";
-import AssetTitle from "@/components/common/AssetTitle";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -290,6 +286,10 @@ const Index: FunctionComponent<Props> = (props) => {
     undefined,
   );
   const { Loader, waitFor, isLoading } = useLoader();
+
+  const assetVersion = useStore((s) => s.assetVersion);
+
+  console.log("assetVersion", assetVersion);
 
   const handleSubmit = async (data: {
     status?: FlawEventDTO["type"];
@@ -856,7 +856,7 @@ const Index: FunctionComponent<Props> = (props) => {
 };
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { assetVersion }) => {
     // fetch the project
     const {
       organizationSlug,
@@ -896,6 +896,7 @@ export const getServerSideProps = middleware(
     asset: withAsset,
     project: withProject,
     contentTree: withContentTree,
+    assetVersion: withAssetVersion,
   },
 );
 
