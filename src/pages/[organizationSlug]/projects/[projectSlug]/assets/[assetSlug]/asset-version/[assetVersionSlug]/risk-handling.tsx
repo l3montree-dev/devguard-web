@@ -199,7 +199,6 @@ const columnsDef = [
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
-  console.log("props", props.flaws);
   const { sortingState, handleSort } = useFilter();
 
   const table = useReactTable({

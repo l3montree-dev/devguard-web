@@ -31,7 +31,6 @@ export const StoreProvider: FunctionComponent<
   }>
 > = ({ children, initialZustand }) => {
   const storeRef = useRef<ReturnType<typeof createGlobalStore>>();
-  console.log("StoreProvider", initialZustand);
   if (!storeRef.current) {
     storeRef.current = createGlobalStore(initialZustand);
   } else {
@@ -44,7 +43,6 @@ export const StoreProvider: FunctionComponent<
     });
   }
 
-  console.log("Merged state", storeRef.current.getState());
   return (
     <StoreContext.Provider value={storeRef.current}>
       {children}

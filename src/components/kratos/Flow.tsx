@@ -136,7 +136,6 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
 
   // Handles form submission
   handleSubmit = (event: FormEvent<HTMLFormElement> | MouseEvent) => {
-    console.log("SUBMIT CALLED", event);
     // Prevent all native handlers
     event.stopPropagation();
     event.preventDefault();

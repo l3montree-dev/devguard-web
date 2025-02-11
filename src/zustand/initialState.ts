@@ -17,7 +17,7 @@ import { GlobalStore } from "./globalStore";
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const addToInitialZustand = (resp: any, obj: Partial<GlobalStore>) => {
   // check if the response contains the props
-  console.log("addToInitialZustand", resp, obj);
+
   if ("props" in resp) {
     // check if the page does already define an initial zustand state
     if (resp.props.initialZustand) {
