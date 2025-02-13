@@ -19,7 +19,13 @@ import CopyCode from "@/components/common/CopyCode";
 import DateString from "@/components/common/DateString";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
@@ -28,7 +34,12 @@ import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, ReactNode, useEffect, useState } from "react";
+import React, {
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Page from "../components/Page";
@@ -38,7 +49,10 @@ import { Flow, Methods } from "../components/kratos/Flow";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
-import { getApiClientFromContext } from "../services/devGuardApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 
@@ -172,6 +186,20 @@ const Settings: FunctionComponent<{
     }
   }, [flow?.ui.messages]);
 
+  const handleRevokePat = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const privkey = formData.get("privkey") as string;
+    browserApiClient("/pats/revoke-by-private-key", {
+      method: "POST",
+      body: JSON.stringify({ privkey }),
+    }).then(() => {
+      toast("Token revoked", {
+        description: "Your token was successfully revoked",
+      });
+    });
+  };
+
   return (
     <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
@@ -225,10 +253,25 @@ const Settings: FunctionComponent<{
           title="Manage Personal Access Tokens"
           description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to DevGuard"
         >
+          <Card className="bg-background">
+            <CardHeader>
+              <CardTitle>Revoke access token by private key</CardTitle>
+            </CardHeader>
+            <form onSubmit={handleRevokePat}>
+              <CardContent>
+                <Input name="privkey" placeholder="Paste private key here" />
+              </CardContent>
+              <CardFooter className="flex justify-end">
+                <Button type="submit" variant="destructiveOutline">
+                  Revoke
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
           <div className="mb-6 flex flex-col gap-4">
             {personalAccessTokens.map((pat) =>
               "privKey" in pat ? (
-                <>
+                <React.Fragment key={pat.fingerprint}>
                   <Card>
                     <CardContent className="pt-6">
                       <CopyCode
@@ -241,7 +284,7 @@ const Settings: FunctionComponent<{
                       </span>
                     </CardContent>
                   </Card>
-                </>
+                </React.Fragment>
               ) : (
                 <ListItem
                   key={pat.id}
@@ -249,6 +292,13 @@ const Settings: FunctionComponent<{
                   description={
                     <>
                       Created at: <DateString date={new Date(pat.createdAt)} />
+                      <br />
+                      Last used:{" "}
+                      {pat.lastUsedAt ? (
+                        <DateString date={new Date(pat.lastUsedAt)} />
+                      ) : (
+                        "Never"
+                      )}
                     </>
                   }
                   Button={

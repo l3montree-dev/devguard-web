@@ -86,6 +86,7 @@ export interface PersonalAccessTokenDTO {
   id: string;
   pubKey: string;
   fingerprint: string;
+  lastUsedAt: string | null;
 }
 
 export interface PatWithPrivKey extends PersonalAccessTokenDTO {

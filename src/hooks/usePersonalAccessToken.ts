@@ -3,6 +3,7 @@ import { createPat } from "@/services/patService";
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { useEffect, useState } from "react";
 import { EventEmitter } from "events";
+import { uniqBy } from "lodash";
 
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
@@ -23,10 +24,12 @@ export default function usePersonalAccessToken(
   useEffect(() => {
     const pat = sessionStorage.getItem("pat");
     if (pat) {
-      setPersonalAccessTokens((prev) => [...prev, JSON.parse(pat)]);
+      setPersonalAccessTokens((prev) =>
+        uniqBy([...prev, JSON.parse(pat)], "fingerprint"),
+      );
     }
     newPatEventEmitter.on("pat", (pat) => {
-      setPersonalAccessTokens((prev) => [...prev, pat]);
+      setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
     });
   }, []);
 
