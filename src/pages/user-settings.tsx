@@ -255,11 +255,11 @@ const Settings: FunctionComponent<{
         >
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle>Revoke access token by private key</CardTitle>
+              <CardTitle>Revoke access token</CardTitle>
             </CardHeader>
             <form onSubmit={handleRevokePat}>
               <CardContent>
-                <Input name="privkey" placeholder="Paste private key here" />
+                <Input name="privkey" placeholder="Paste token here" />
               </CardContent>
               <CardFooter className="flex justify-end">
                 <Button type="submit" variant="destructiveOutline">
