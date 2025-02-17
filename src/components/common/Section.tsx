@@ -17,10 +17,11 @@ import { classNames } from "@/utils/common";
 import React, { FunctionComponent, ReactNode } from "react";
 
 interface Props {
-  title: string;
+  title?: string;
   description?: ReactNode;
   children: React.ReactNode;
   id?: string;
+  Title?: ReactNode;
   Button?: ReactNode;
   forceVertical?: boolean;
   Icon?: ReactNode;
@@ -54,7 +55,7 @@ const Section: FunctionComponent<Props> = (props) => {
               )}
             >
               {props.Icon}
-              {props.title}
+              {props.title ?? props.Title}
             </h2>
             {props.description !== undefined && (
               <p className="mt-1 text-sm leading-6 text-muted-foreground">

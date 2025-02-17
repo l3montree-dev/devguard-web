@@ -28,6 +28,8 @@ function SigningNode() {
         title="Image Signing"
         description="Ensure the integrity and authenticity of your container images."
         onButtonClick={() => setOpen(true)}
+        buttonTitle="Add image signing"
+        buttonVariant="secondary"
         LastScan={
           asset.signingPubKey ? (
             <small className="w-full text-right text-muted-foreground">

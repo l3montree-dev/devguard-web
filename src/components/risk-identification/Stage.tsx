@@ -29,14 +29,18 @@ function Stage({
   title,
   description,
   onButtonClick,
-  comingSoon,
+  buttonVariant,
+  disableButton,
+  buttonTitle,
   LastScan,
   id,
 }: {
   title: string;
   description: string;
-  comingSoon?: boolean;
+  buttonVariant: "default" | "outline" | "secondary";
   onButtonClick?: () => void;
+  buttonTitle: string;
+  disableButton?: boolean;
   LastScan?: ReactNode;
   id: string;
 }) {
@@ -60,14 +64,15 @@ function Stage({
           </CardHeader>
 
           <CardFooter className="flex flex-col gap-2">
-            <Button
-              className="w-full flex-1"
-              disabled={comingSoon}
-              variant={comingSoon ? "outline" : "default"}
-              onClick={onButtonClick}
-            >
-              {comingSoon ? "Coming soon" : "Open Instructions"}
-            </Button>
+            <div className="flex w-full flex-row justify-end">
+              <Button
+                disabled={disableButton}
+                variant={buttonVariant}
+                onClick={onButtonClick}
+              >
+                {buttonTitle}
+              </Button>
+            </div>
             {Boolean(LastScan) && LastScan}
           </CardFooter>
         </div>

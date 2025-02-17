@@ -9,7 +9,6 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
 
 import {
-  AssetDTO,
   AssetVersionDTO,
   FlawByPackage,
   FlawWithCVE,
@@ -36,6 +35,8 @@ import {
   extractVersion,
 } from "../../../../../../../../utils/common";
 
+import { BranchTagSelector } from "@/components/BranchTagSelector";
+import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
@@ -43,34 +44,15 @@ import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { withContentTree } from "@/decorators/withContentTree";
-import AssetTitle from "@/components/common/AssetTitle";
-import {
-  Button,
-  buttonVariants,
-} from "../../../../../../../../components/ui/button";
 import EmptyParty from "../../../../../../../../components/common/EmptyParty";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-} from "@radix-ui/react-dropdown-menu";
-import {
-  DropdownMenuCheckboxItem,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-} from "@/components/ui/dropdown-menu";
-import { BranchTagSelector } from "@/components/BranchTagSelector";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { buttonVariants } from "../../../../../../../../components/ui/button";
 
 interface Props {
   exists: boolean;
@@ -222,10 +204,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
-  const branches = asset?.branches ?? [];
-  const tags = asset?.tags ?? [];
-
-  const assetVersion = useActiveAssetVersion();
+  const { branches, tags } = useAssetBranchesAndTags();
 
   const handleSearch = useMemo(
     () =>

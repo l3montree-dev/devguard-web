@@ -62,12 +62,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
       name="centralFlawManagement"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Central Flaw Management</FormLabel>
           <ListItem
             description={
               "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
             }
-            Title=""
+            Title="Central Flaw Management"
             Button={
               <FormControl>
                 <Switch

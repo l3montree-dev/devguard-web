@@ -53,7 +53,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "../../../../../../../../components/ui/button";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 
 interface Props {
@@ -94,13 +97,10 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
-
-  const branches = asset?.branches ?? [];
-  const tags = asset?.tags ?? [];
-
-  const assetVersion = useActiveAssetVersion();
+  const { branches, tags } = useAssetBranchesAndTags();
 
   const router = useRouter();
+
   if (riskHistory.length === 0) {
     return (
       <Page
@@ -186,7 +186,6 @@ const Index: FunctionComponent<Props> = ({
                   Details of your secure software development lifecycle
                 </CardDescription>
               </CardHeader>
-
               <CollapsibleContent className="py-2">
                 <CardContent>
                   <ThreatsMitigationsCollapsibles

@@ -15,16 +15,15 @@
 import {
   ChartBarSquareIcon,
   CogIcon,
-  DocumentMagnifyingGlassIcon,
   ScaleIcon,
   ShareIcon,
+  ShieldCheckIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import useSession from "./useSession";
-import { useCurrentUser } from "./useCurrentUser";
-import { ShieldCheckIcon } from "@heroicons/react/24/outline";
+import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
+import { useCurrentUser } from "./useCurrentUser";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -35,11 +34,30 @@ export const useAssetMenu = () => {
 
   const loggedIn = useCurrentUser();
   const assetVersion = useActiveAssetVersion();
+  const activeAsset = useActiveAsset();
 
   //TODO: Fix this
   const assetVersionSlug = assetVersion?.slug ?? "main";
-  const menu = [
+  let menu = [
     {
+      title: "Security Control Center",
+      href:
+        "/" +
+        orgSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/",
+      Icon: ShieldCheckIcon,
+      isActive:
+        router.pathname ===
+        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]",
+    },
+  ];
+
+  if ((activeAsset?.refs.length ?? 0) > 0) {
+    menu.unshift({
       title: "Overview",
       href:
         "/" +
@@ -51,68 +69,61 @@ export const useAssetMenu = () => {
         "/refs/" +
         assetVersionSlug,
       Icon: ChartBarSquareIcon,
-    },
-    {
-      title: "Security Control Center",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/security-control-center",
-      Icon: ShieldCheckIcon,
-      isActive: router.pathname.includes("security-control-center"),
-    },
-    {
-      title: "Risk handling",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/risk-handling",
-      Icon: WrenchScrewdriverIcon,
       isActive:
-        router.pathname.includes("[flawId]") ||
-        router.pathname.includes("risk-handling"),
-    },
-    {
-      title: "Dependencies",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/dependency-graph",
-      Icon: ShareIcon,
-      isActive: router.pathname.includes("dependency-graph"),
-    },
-    {
-      title: "Compliance",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/compliance",
-      Icon: ScaleIcon,
-      isActive: router.pathname.includes("compliance"),
-    },
-  ];
+        router.pathname ===
+        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]",
+    });
+
+    menu = menu.concat([
+      {
+        title: "Risk handling",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/risk-handling",
+        Icon: WrenchScrewdriverIcon,
+        isActive:
+          router.pathname.includes("[flawId]") ||
+          router.pathname.includes("risk-handling"),
+      },
+      {
+        title: "Dependencies",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/dependency-graph",
+        Icon: ShareIcon,
+        isActive: router.pathname.includes("dependency-graph"),
+      },
+      {
+        title: "Compliance",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/compliance",
+        Icon: ScaleIcon,
+        isActive: router.pathname.includes("compliance"),
+      },
+    ]);
+  }
 
   if (loggedIn) {
     return menu.concat([
@@ -127,6 +138,9 @@ export const useAssetMenu = () => {
           assetSlug +
           "/settings",
         Icon: CogIcon,
+        isActive:
+          router.pathname ===
+          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/settings",
       },
     ]);
   }

@@ -38,12 +38,12 @@ import { DetailedFlawDTO, Paged } from "@/types/api/api";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
+import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 
 const Compliance = ({ flaws }: { flaws: Paged<DetailedFlawDTO> }) => {
   const menu = useAssetMenu();
   const asset = useActiveAsset()!;
-  const branches = asset.branches;
-  const tags = asset.tags;
+  const { branches, tags } = useAssetBranchesAndTags();
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
       <div>

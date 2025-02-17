@@ -41,7 +41,6 @@ export const merriweather = Merriweather({
 
 // @ts-ignore
 export default function App({ Component, pageProps }) {
-  console.log("APP CALLED");
   return (
     <ThemeProvider
       attribute="class"

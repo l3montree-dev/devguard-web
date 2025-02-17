@@ -47,27 +47,5 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   }
   // parse the organization
   const asset: AssetDTO = await r.json();
-
-  const assetVersionResp = await devGuardApiClient(url + "/refs");
-  if (!assetVersionResp.ok) {
-    console.error("Failed to fetch asset versions", assetVersionResp);
-  }
-
-  const assetVersions = await assetVersionResp.json();
-
-  let branches: string[] = [];
-  let tags: string[] = [];
-
-  for (const assetVersion of assetVersions) {
-    if (assetVersion.type === "branch") {
-      branches.push(assetVersion.slug);
-    } else {
-      tags.push(assetVersion.slug);
-    }
-  }
-
-  asset.branches = branches;
-  asset.tags = tags;
-
   return asset;
 }

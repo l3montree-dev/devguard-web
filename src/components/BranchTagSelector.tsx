@@ -1,5 +1,6 @@
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -69,9 +70,9 @@ export function BranchTagSelector({
         <DropdownMenuSeparator />
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
-            <DropdownMenuItem
+            <DropdownMenuCheckboxItem
+              checked={selected === item}
               key={item}
-              className="px-1"
               onClick={() => {
                 router.push(
                   {
@@ -85,7 +86,7 @@ export function BranchTagSelector({
               }}
             >
               {item}
-            </DropdownMenuItem>
+            </DropdownMenuCheckboxItem>
           ))
         ) : (
           <DropdownMenuItem disabled>No items found</DropdownMenuItem>

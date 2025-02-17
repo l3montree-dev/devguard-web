@@ -344,8 +344,7 @@ export interface AssetDTO {
   slug: string;
   id: string;
 
-  branches: string[];
-  tags: string[];
+  refs: AssetVersionDTO[];
 
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;

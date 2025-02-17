@@ -293,12 +293,7 @@ export const getServerSideProps = middleware(
 		}
 	}
     */
-
-    console.log("riskHistory", riskHistory);
-
     const paddedRiskHistory = padRiskHistory(riskHistory);
-
-    console.log("paddedRiskHistory", paddedRiskHistory);
 
     return {
       props: {

@@ -60,17 +60,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
+import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
   versions: string[];
   flaws: Array<FlawDTO>;
 }> = ({ graph, flaws, versions }) => {
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
-  const asset = useActiveAsset();
-  const branches = asset?.branches ?? [];
-  const tags = asset?.tags ?? [];
+  const { branches, tags } = useAssetBranchesAndTags();
+
   const dimensions = useDimensions();
 
   const router = useRouter();
