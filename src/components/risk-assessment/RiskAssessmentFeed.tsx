@@ -212,7 +212,7 @@ export default function RiskAssessmentFeed({
   const currentUser = useCurrentUser();
 
   const activeAssetVersion = useActiveAssetVersion();
-  
+
   return (
     <div>
       <ul
@@ -225,7 +225,11 @@ export default function RiskAssessmentFeed({
           const msg = eventMessages(event, index, events);
           return (
             <li
-              className={classNames(event.assetVersion !== activeAssetVersion?.name && "opacity-75 hover:opacity-100", "transition-all relative flex flex-row items-start gap-4")}
+              className={classNames(
+                event.assetVersion !== activeAssetVersion?.name &&
+                  "opacity-75 hover:opacity-100",
+                "relative flex flex-row items-start gap-4 transition-all",
+              )}
               key={event.id}
             >
               <div
@@ -270,15 +274,13 @@ export default function RiskAssessmentFeed({
                           {eventTypeMessages(event, index, flawName, events)}
                         </p>
 
-  
-                          {event.assetVersion !== activeAssetVersion?.name && (
-                            <div className="absolute right-2 top-2">
+                        {event.assetVersion !== activeAssetVersion?.name && (
+                          <div className="absolute right-2 top-2">
                             <Badge variant={"outline"}>
-                               {event.assetVersion}
+                              {event.assetVersion}
                             </Badge>
-                            </div>
-                          )}
-                
+                          </div>
+                        )}
                       </div>
 
                       {Boolean(msg) && (
