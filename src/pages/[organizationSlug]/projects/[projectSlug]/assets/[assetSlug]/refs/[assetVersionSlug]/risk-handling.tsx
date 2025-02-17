@@ -7,7 +7,13 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useFilter from "@/hooks/useFilter";
-import { AssetDTO, FlawByPackage, FlawWithCVE, Paged } from "@/types/api/api";
+
+import {
+  AssetVersionDTO,
+  FlawByPackage,
+  FlawWithCVE,
+  Paged,
+} from "@/types/api/api";
 import {
   createColumnHelper,
   flexRender,
@@ -18,17 +24,19 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useMemo, useState } from "react";
-import Page from "../../../../../../components/Page";
+import Page from "../../../../../../../../components/Page";
 
-import { withOrgs } from "../../../../../../decorators/withOrgs";
-import { withSession } from "../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../services/devGuardApi";
+import { withOrgs } from "../../../../../../../../decorators/withOrgs";
+import { withSession } from "../../../../../../../../decorators/withSession";
+import { getApiClientFromContext } from "../../../../../../../../services/devGuardApi";
 import {
   beautifyPurl,
   classNames,
   extractVersion,
-} from "../../../../../../utils/common";
+} from "../../../../../../../../utils/common";
 
+import { BranchTagSelector } from "@/components/BranchTagSelector";
+import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
@@ -36,16 +44,18 @@ import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { withContentTree } from "@/decorators/withContentTree";
-import AssetTitle from "@/components/common/AssetTitle";
-import { buttonVariants } from "../../../../../../components/ui/button";
-import EmptyParty from "../../../../../../components/common/EmptyParty";
+import EmptyParty from "../../../../../../../../components/common/EmptyParty";
+import { buttonVariants } from "../../../../../../../../components/ui/button";
 
 interface Props {
+  exists: boolean;
   flaws: Paged<FlawByPackage>;
 }
 
@@ -194,6 +204,8 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
+  const { branches, tags } = useAssetBranchesAndTags();
+
   const handleSearch = useMemo(
     () =>
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,20 +229,26 @@ const Index: FunctionComponent<Props> = (props) => {
       }, 500),
     [router],
   );
-
-  const activeScan = Boolean(asset?.lastContainerScan ?? asset?.lastScaScan);
-
+  let activeScan = false;
+  if (props.exists) {
+    activeScan = Boolean(asset?.lastContainerScan ?? asset?.lastScaScan);
+  }
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
-      {activeScan &&
-      table.getRowCount() === 0 &&
-      Object.keys(router.query).length === 3 ? (
+      {!props.exists ? (
+        <EmptyParty
+          title="No identified risks"
+          description="No identified risks for this asset."
+        />
+      ) : activeScan &&
+        table.getRowCount() === 0 &&
+        Object.keys(router.query).length === 4 ? (
         <EmptyParty
           title="No identified risks"
           description="No identified risks for this asset."
         />
       ) : /**  the query will contain organizationSlug, projectSlug and assetSlug - thus 3 is empty  */
-      table.getRowCount() === 0 && Object.keys(router.query).length === 3 ? (
+      table.getRowCount() === 0 && Object.keys(router.query).length === 4 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
@@ -249,111 +267,115 @@ const Index: FunctionComponent<Props> = (props) => {
           }
         />
       ) : (
-        <Section
-          forceVertical
-          primaryHeadline
-          title="Identified Risks"
-          description="This table shows all the identified risks for this asset."
-        >
-          <div className="relative flex flex-row gap-2">
-            <Tabs
-              defaultValue={
-                (router.query.state as string | undefined)
-                  ? (router.query.state as string)
-                  : "open"
-              }
-            >
-              <TabsList>
-                <TabsTrigger
-                  onClick={() =>
-                    router.push({
-                      query: {
-                        ...router.query,
-                        state: "open",
-                      },
-                    })
-                  }
-                  value="open"
-                >
-                  Open
-                </TabsTrigger>
-                <TabsTrigger
-                  onClick={() =>
-                    router.push({
-                      query: {
-                        ...router.query,
-                        state: "closed",
-                      },
-                    })
-                  }
-                  value="closed"
-                >
-                  Closed
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <Input
-              onChange={handleSearch}
-              defaultValue={router.query.search as string}
-              placeholder="Search for cve, package name or message..."
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-              {isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              )}
-            </div>
-          </div>
-          <div className="overflow-hidden rounded-lg border shadow-sm">
-            <div className="overflow-auto">
-              <table className="w-full table-fixed overflow-x-auto text-sm">
-                <thead className="border-b bg-card text-foreground">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      <th className="w-6" />
-                      {headerGroup.headers.map((header) => (
-                        <th
-                          className="w-40 cursor-pointer break-normal p-4 text-left"
-                          onClick={
-                            header.column.columnDef.enableSorting
-                              ? header.column.getToggleSortingHandler()
-                              : undefined
-                          }
-                          key={header.id}
-                        >
-                          <div className="flex flex-row items-center gap-2">
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
+        <div>
+          <BranchTagSelector branches={branches} tags={tags} />
 
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody className="text-sm text-foreground">
-                  {table.getRowModel().rows.map((row, i, arr) => (
-                    <RiskHandlingRow
-                      row={row}
-                      index={i}
-                      arrLength={arr.length}
-                      key={row.original.packageName}
-                    />
-                  ))}
-                </tbody>
-              </table>
+          <Section
+            forceVertical
+            primaryHeadline
+            title="Identified Risks"
+            description="This table shows all the identified risks for this asset."
+          >
+            <div className="relative flex flex-row gap-2">
+              <Tabs
+                defaultValue={
+                  (router.query.state as string | undefined)
+                    ? (router.query.state as string)
+                    : "open"
+                }
+              >
+                <TabsList>
+                  <TabsTrigger
+                    onClick={() =>
+                      router.push({
+                        query: {
+                          ...router.query,
+                          state: "open",
+                        },
+                      })
+                    }
+                    value="open"
+                  >
+                    Open
+                  </TabsTrigger>
+                  <TabsTrigger
+                    onClick={() =>
+                      router.push({
+                        query: {
+                          ...router.query,
+                          state: "closed",
+                        },
+                      })
+                    }
+                    value="closed"
+                  >
+                    Closed
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <Input
+                onChange={handleSearch}
+                defaultValue={router.query.search as string}
+                placeholder="Search for cve, package name or message..."
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+                {isLoading && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
             </div>
-          </div>
-          <div className="mt-4">
-            <CustomPagination {...props.flaws} />
-          </div>
-        </Section>
+            <div className="overflow-hidden rounded-lg border shadow-sm">
+              <div className="overflow-auto">
+                <table className="w-full table-fixed overflow-x-auto text-sm">
+                  <thead className="border-b bg-card text-foreground">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id}>
+                        <th className="w-6" />
+                        {headerGroup.headers.map((header) => (
+                          <th
+                            className="w-40 cursor-pointer break-normal p-4 text-left"
+                            onClick={
+                              header.column.columnDef.enableSorting
+                                ? header.column.getToggleSortingHandler()
+                                : undefined
+                            }
+                            key={header.id}
+                          >
+                            <div className="flex flex-row items-center gap-2">
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+
+                              <SortingCaret
+                                sortDirection={header.column.getIsSorted()}
+                              />
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody className="text-sm text-foreground">
+                    {table.getRowModel().rows.map((row, i, arr) => (
+                      <RiskHandlingRow
+                        row={row}
+                        index={i}
+                        arrLength={arr.length}
+                        key={row.original.packageName}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="mt-4">
+              <CustomPagination {...props.flaws} />
+            </div>
+          </Section>
+        </div>
       )}
     </Page>
   );
@@ -364,7 +386,8 @@ export default Index;
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
     // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+    let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+      context.params!;
 
     const apiClient = getApiClientFromContext(context);
 
@@ -376,6 +399,59 @@ export const getServerSideProps = middleware(
       "/assets/" +
       assetSlug +
       "/";
+
+    const assetVersionResp = await apiClient(uri + "refs");
+    const assetVersions = await assetVersionResp.json();
+
+    let branches: string[] = [];
+    let tags: string[] = [];
+
+    let exists = false;
+
+    if (assetVersions.length !== 0) {
+      assetVersions.map((av: AssetVersionDTO) => {
+        if (av.type === "branch") {
+          branches.push(av.name);
+        } else if (av.type === "tag") {
+          tags.push(av.name);
+        } else {
+          throw new Error("Unknown asset version type " + av.type);
+        }
+      });
+      const assetVersionSlugString = assetVersionSlug as string;
+      if (
+        branches.includes(assetVersionSlugString) ||
+        tags.includes(assetVersionSlugString)
+      ) {
+        exists = true;
+      } else {
+        if (branches.includes("main")) {
+          assetVersionSlug = "main";
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/main/risk-handling`,
+              permanent: false,
+            },
+          };
+        } else if (branches.length > 0) {
+          assetVersionSlug = branches[0];
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${branches[0]}/risk-handling`,
+              permanent: false,
+            },
+          };
+        } else if (tags.length > 0) {
+          assetVersionSlug = tags[0];
+          return {
+            redirect: {
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${tags[0]}/risk-handling`,
+              permanent: false,
+            },
+          };
+        }
+      }
+    }
 
     const filterQuery = Object.fromEntries(
       Object.entries(context.query).filter(
@@ -397,6 +473,9 @@ export const getServerSideProps = middleware(
     const pageSize = (context.query.pageSize as string) ?? "25";
     const flawResp = await apiClient(
       uri +
+        "refs/" +
+        assetVersionSlug +
+        "/" +
         "flaws/?" +
         new URLSearchParams({
           page,
@@ -414,6 +493,7 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
+        exists,
         flaws,
       },
     };
@@ -424,6 +504,7 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
+    assetVersion: withAssetVersion,
     contentTree: withContentTree,
   },
 );

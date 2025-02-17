@@ -21,7 +21,8 @@ function IaC() {
       id="iac"
       title="Infrastructure as Code"
       description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
-      comingSoon
+      buttonTitle="Coming soon"
+      buttonVariant="outline"
     />
   );
 }

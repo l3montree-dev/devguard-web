@@ -13,28 +13,30 @@
 // You should have received a copy of the GNU Affero General Public License
 
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
+import { AssetVersionDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { HttpError } from "./middleware";
 
-export async function withAsset(ctx: GetServerSidePropsContext) {
+export async function withAssetVersion(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient
   const devGuardApiClient = getApiClientFromContext(ctx);
 
   const organization = ctx.params?.organizationSlug;
   const projectSlug = ctx.params?.projectSlug;
   const assetSlug = ctx.params?.assetSlug;
-
-  const url =
-    "/organizations/" +
-    organization +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug;
+  const assetVersionSlug = ctx.params?.assetVersionSlug;
 
   // get the organization
-  const r = await devGuardApiClient(url);
+  const r = await devGuardApiClient(
+    "/organizations/" +
+      organization +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/refs/" +
+      assetVersionSlug,
+  );
 
   if (!r.ok) {
     throw new HttpError({
@@ -46,6 +48,6 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
     });
   }
   // parse the organization
-  const asset: AssetDTO = await r.json();
-  return asset;
+  const assetVersion: AssetVersionDTO = await r.json();
+  return assetVersion;
 }

@@ -43,7 +43,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       </Head>
 
       <div>
-        <div className={classNames(props.Sidebar ? "lg:pr-72" : "")}>
+        <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
           <Main
             fullscreen={props.fullscreen}
             Menu={props.Menu}
@@ -55,7 +55,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </Main>
         </div>
         {!!props.Sidebar && (
-          <aside className="bottom-0 right-0 top-0 hidden w-72 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
+          <aside className="bottom-0 right-0 top-0 hidden w-80 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
             {props.Sidebar}
           </aside>
         )}

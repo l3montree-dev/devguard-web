@@ -21,7 +21,8 @@ function DAST() {
       id="dast"
       title="Dynamic Application Security Testing"
       description="Find security vulnerabilities in running applications."
-      comingSoon
+      buttonTitle="Coming soon"
+      buttonVariant="outline"
     />
   );
 }

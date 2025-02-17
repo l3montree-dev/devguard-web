@@ -37,6 +37,9 @@ import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import FormatDate from "./FormatDate";
 import { classNames } from "@/utils/common";
+import { useRouter } from "next/router";
+import { Badge } from "../ui/badge";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -208,6 +211,8 @@ export default function RiskAssessmentFeed({
   const org = useActiveOrg();
   const currentUser = useCurrentUser();
 
+  const activeAssetVersion = useActiveAssetVersion();
+
   return (
     <div>
       <ul
@@ -220,7 +225,11 @@ export default function RiskAssessmentFeed({
           const msg = eventMessages(event, index, events);
           return (
             <li
-              className="relative flex flex-row items-start gap-4"
+              className={classNames(
+                event.assetVersion !== activeAssetVersion?.name &&
+                  "opacity-75 hover:opacity-100",
+                "relative flex flex-row items-start gap-4 transition-all",
+              )}
               key={event.id}
             >
               <div
@@ -259,10 +268,20 @@ export default function RiskAssessmentFeed({
                       </Avatar>
                     )}
                     <div className="w-full overflow-hidden rounded border">
-                      <p className="bg-card px-2 py-2 font-medium">
-                        {findUser(event.userId, org, currentUser).displayName}{" "}
-                        {eventTypeMessages(event, index, flawName, events)}
-                      </p>
+                      <div className="flex w-full justify-between">
+                        <p className="bg-card px-2 py-2 font-medium">
+                          {findUser(event.userId, org, currentUser).displayName}{" "}
+                          {eventTypeMessages(event, index, flawName, events)}
+                        </p>
+
+                        {event.assetVersion !== activeAssetVersion?.name && (
+                          <div className="absolute right-2 top-2">
+                            <Badge variant={"outline"}>
+                              {event.assetVersion}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
 
                       {Boolean(msg) && (
                         <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">

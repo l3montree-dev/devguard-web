@@ -1,328 +1,337 @@
+import Autosetup from "@/components/Autosetup";
+import AssetTitle from "@/components/common/AssetTitle";
+import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-
-import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
-
+import ContainerScanning from "@/components/risk-identification/ContainerScanningNode";
+import DAST from "@/components/risk-identification/DASTNode";
+import IaC from "@/components/risk-identification/IaCNode";
+import ImageVerification from "@/components/risk-identification/ImageVerification";
+import InTotoProvenance from "@/components/risk-identification/InTotoProvenance";
+import SAST from "@/components/risk-identification/SASTNode";
+import SCA from "@/components/risk-identification/SCANode";
+import SecretScanning from "@/components/risk-identification/SecretScanningNode";
+import SecureCodingGuidelines from "@/components/risk-identification/SecureCodingGuidelines";
+import SigningNode from "@/components/risk-identification/SigningNode";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import {
-  AssetMetricsDTO,
-  AverageFixingTime,
-  ComponentRisk,
-  DependencyCountByscanner,
-  FlawAggregationStateAndChange,
-  FlawCountByScanner,
-  RiskDistribution,
-  RiskHistory,
-} from "@/types/api/api";
-import "@xyflow/react/dist/style.css";
-import { GetServerSidePropsContext } from "next";
+import { useAutosetup } from "@/hooks/useAutosetup";
+import { AssetMetricsDTO, PatWithPrivKey } from "@/types/api/api";
+import { Tab } from "@headlessui/react";
 
-import FlawAggregationState from "@/components/overview/FlawAggregationState";
-import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
-import { VulnerableComponents } from "@/components/overview/VulnerableComponents";
-import { FunctionComponent } from "react";
-
-import AssetTitle from "@/components/common/AssetTitle";
-import CollapsibleControlTrigger from "@/components/common/CollapsibleControlTrigger";
-import EmptyOverview from "@/components/common/EmptyOverview";
-import SDLC from "@/components/common/SDLC";
-import Section from "@/components/common/Section";
-import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import ThreatsMitigationsCollapsibles from "@/components/ssdlc/ThreatsMitigations";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Collapsible } from "@/components/ui/collapsible";
-import { withContentTree } from "@/decorators/withContentTree";
-import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { FunctionComponent, useState } from "react";
+import CopyCode from "../../../../../../components/common/CopyCode";
+import CustomTab from "../../../../../../components/common/CustomTab";
+import Stage from "../../../../../../components/risk-identification/Stage";
+import Steps from "../../../../../../components/risk-identification/Steps";
 import { Button } from "../../../../../../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "../../../../../../components/ui/dialog";
+import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
+import { useActiveProject } from "../../../../../../hooks/useActiveProject";
+import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
-interface Props {
-  componentRisk: ComponentRisk;
-  riskDistribution: RiskDistribution | null;
-  riskHistory: RiskHistory[];
-  flawCountByScanner: FlawCountByScanner;
-  dependencyCountByscanner: DependencyCountByscanner;
-  flawAggregationStateAndChange: FlawAggregationStateAndChange;
-  avgLowFixingTime: AverageFixingTime;
-  avgMediumFixingTime: AverageFixingTime;
-  avgHighFixingTime: AverageFixingTime;
-  avgCriticalFixingTime: AverageFixingTime;
-  metrics: AssetMetricsDTO;
-}
+interface Props extends AssetMetricsDTO {}
 
-const metrics2CurrentEvidence = (metrics: AssetMetricsDTO) => {
-  return (
-    Number(metrics.enabledContainerScanning) +
-    Number(metrics.enabledImageSigning) * 2 +
-    Number(metrics.enabledSCA) +
-    Number(Boolean(metrics.verifiedSupplyChainsPercentage > 0)) * 8
-  );
-};
+const SecurityControlCenter: FunctionComponent<Props> = () => {
+  const asset = useActiveAsset();
 
-const Index: FunctionComponent<Props> = ({
-  componentRisk,
-  riskDistribution,
-  riskHistory,
-  flawAggregationStateAndChange,
-  avgLowFixingTime,
-  avgMediumFixingTime,
-  avgHighFixingTime,
-  avgCriticalFixingTime,
-  metrics,
-}) => {
-  const activeOrg = useActiveOrg();
-  const assetMenu = useAssetMenu();
+  const menu = useAssetMenu();
+
   const project = useActiveProject();
-  const asset = useActiveAsset()!;
+  const org = useActiveOrg();
+  const [fullIntegrationOpen, setFullIntegrationOpen] = useState(false);
+  const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
+  const pat = (
+    personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
+  ) as PatWithPrivKey | null;
 
-  const router = useRouter();
-  if (riskHistory.length === 0) {
-    return (
-      <Page
-        Menu={assetMenu}
-        title="Overview"
-        description="Overview of the asset"
-        Title={<AssetTitle />}
-      >
-        <EmptyOverview
-          title="No data available"
-          description="There is no data available for this asset. Please run a scan to get data."
-          Button={
-            <Button
-              onClick={() =>
-                router.push(
-                  `/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
-                )
-              }
-              className="btn btn-primary"
-            >
-              Run a scan
-            </Button>
-          }
-        />
-      </Page>
-    );
-  }
+  const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
 
   return (
-    <Page
-      Menu={assetMenu}
-      title="Overview"
-      description="Overview of the asset"
-      Title={<AssetTitle />}
-    >
-      <Section
-        primaryHeadline
-        forceVertical
-        description="
-        Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific asset poses to your organization."
-        title="Overview"
-      >
-        <SDLC metrics={metrics} />
-        <p className="mt-2 text-sm text-muted-foreground">
-          This diagram displays the current state of your software development
-          lifecycle. It shows which threats are mitigated already as well as
-          which threats are still open. The threat model is heavily based on the
-          proposed threat model by{" "}
-          <Link href="https://slsa.dev/spec/v1.0/threats" target="_blank">
-            <Image
-              src="/assets/slsa.svg"
-              alt="SLSA Logo"
-              className="inline dark:hidden"
-              width={60}
-              height={20}
-            />
-            <Image
-              src="/assets/slsa_dark.svg"
-              alt="SLSA Logo"
-              className="hidden dark:inline-block"
-              width={60}
-              height={20}
-            />
-          </Link>
-          .
-        </p>
-        <div>
-          <Card className="flex-1">
-            <Collapsible>
-              <CardHeader>
-                <CardTitle className="-mb-3">
-                  <CollapsibleControlTrigger
-                    maxEvidence={15}
-                    currentEvidence={metrics2CurrentEvidence(metrics)}
-                  >
-                    <div className="w-full text-left">
-                      Threats and mitigations
-                    </div>
-                  </CollapsibleControlTrigger>
-                </CardTitle>
-                <CardDescription>
-                  Details of your secure software development lifecycle
-                </CardDescription>
-              </CardHeader>
-
-              <CollapsibleContent className="py-2">
-                <CardContent>
-                  <ThreatsMitigationsCollapsibles
-                    metrics={metrics}
-                    router={router}
-                    asset={asset}
+    <>
+      <Page Menu={menu} Title={<AssetTitle />} title="Security Control Center">
+        <div className="flex flex-row">
+          <div className="flex-1">
+            <Section
+              primaryHeadline
+              description="The Security Control Center provides you with a set of tools to secure your project. The tools are designed to be used in a DevOps environment and are integrated into your CI/CD pipeline. The Workflow is based on proven security practices and is designed to be easy to use."
+              title="Security Control Center for DevSecOps"
+              forceVertical
+            >
+              {asset?.repositoryId?.startsWith("gitlab:") && (
+                <div className="mb-0">
+                  <Autosetup
+                    isLoading={isLoading}
+                    handleAutosetup={handleAutosetup}
+                    progress={progress}
+                    Loader={Loader}
                   />
-                </CardContent>
-              </CollapsibleContent>
-            </Collapsible>
-          </Card>
-        </div>
-        <div className="mt-2 grid gap-4">
-          <FlawAggregationState
-            title="Asset Risk"
-            description="The total risk this asset poses to the organization"
-            totalRisk={riskHistory[riskHistory.length - 1]?.sumOpenRisk ?? 0}
-            data={flawAggregationStateAndChange}
-          />
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <RiskDistributionDiagram
-                data={riskDistribution ? [riskDistribution] : []}
-              />
-            </div>
-            <VulnerableComponents data={componentRisk} />
+                  <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
+                    <div className="flex-1 border-t-2 border-dotted" />
+                    <span className="px-5">OR</span>
+                    <div className="flex-1 border-t-2 border-dotted" />
+                  </div>
+                </div>
+              )}
+
+              <h3 className="text-xl font-semibold">
+                Development{" "}
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/git.svg"}
+                  alt="Git logo"
+                  width={30}
+                  height={30}
+                />
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/intoto.png"}
+                  alt="InToto logo"
+                  width={30}
+                  height={30}
+                />
+              </h3>
+              <div className="mb-10 grid grid-cols-3 gap-4">
+                <SecureCodingGuidelines />
+                <InTotoProvenance />
+              </div>
+              <h3 className="text-xl font-semibold">
+                Integrating DevGuard into your CI/CD-Pipeline{" "}
+                <Image
+                  className="mr-1 inline-block"
+                  src={"/assets/gitlab.svg"}
+                  alt="GitLab logo"
+                  width={30}
+                  height={30}
+                />{" "}
+                <Image
+                  className="mr-2 inline-block dark:invert"
+                  src={"/assets/github.svg"}
+                  alt="GitHub logo"
+                  width={30}
+                  height={30}
+                />
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/intoto.png"}
+                  alt="InToto logo"
+                  width={30}
+                  height={30}
+                />
+              </h3>
+              <div className="mb-10">
+                <div className="mb-4">
+                  <Stage
+                    id="devsecops-pipeline"
+                    title="DevSecOps-Pipeline"
+                    description="Integrate the whole DevSecOps-Pipeline with a single CI/CD-Component. This includes Security-Scans, Artifact Signing and Build-Provenance generation"
+                    buttonTitle="Integrate the CI/CD-Pipeline for automated Security-Scans"
+                    buttonVariant="default"
+                    onButtonClick={() => setFullIntegrationOpen(true)}
+                  />
+                </div>
+                <div className="flex w-full flex-row items-center py-2">
+                  <div className="flex-1 border-t" />
+                  <span className="mx-10 inline-block text-center text-sm text-muted-foreground">
+                    OR integrate each step manually (improved flexibility)
+                  </span>
+                  <div className="flex-1 border-t" />
+                </div>
+                <div className="grid grid-cols-3 gap-4 opacity-50 transition-all hover:opacity-100">
+                  <SecretScanning />
+                  <SAST />
+                  <SCA />
+                  <IaC />
+                  <ContainerScanning />
+                  <DAST />
+                  <SigningNode />
+                </div>
+              </div>
+
+              <h3 id="operations" className="text-xl font-semibold">
+                Operations{" "}
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/kubernetes.svg"}
+                  alt="Kubernetes logo"
+                  width={30}
+                  height={30}
+                />
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/helm.svg"}
+                  alt="Helm logo"
+                  width={30}
+                  height={30}
+                />
+                <Image
+                  className="mr-2 inline-block"
+                  src={"/assets/intoto.png"}
+                  alt="InToto logo"
+                  width={30}
+                  height={30}
+                />
+              </h3>
+              <div className="grid grid-cols-3 gap-4">
+                <ImageVerification />
+              </div>
+            </Section>
           </div>
-          <div className="grid grid-cols-4 gap-4">
-            <AverageFixingTimeChart
-              title="Low severity"
-              description="Average fixing time for low severity flaws"
-              avgFixingTime={avgLowFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="Medium severity"
-              description="Average fixing time for medium severity flaws"
-              avgFixingTime={avgMediumFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="High severity"
-              description="Average fixing time for high severity flaws"
-              avgFixingTime={avgHighFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="Critical severity"
-              description="Average fixing time for critical severity flaws"
-              avgFixingTime={avgCriticalFixingTime}
-            />
-          </div>
-          <RiskHistoryChart
-            data={[{ label: asset.name, history: riskHistory }]}
-          />
-          {/* <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2"></div>
-          <DependenciesPieChart data={dependencyCountByscanner} />
-        </div> */}
         </div>
-      </Section>
-    </Page>
+      </Page>
+      <Dialog open={fullIntegrationOpen} onOpenChange={setFullIntegrationOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Full DevSecOps Integration</DialogTitle>
+            <DialogDescription>
+              Integrate the whole DevSecOps-Pipeline with a single
+              CI/CD-Component. This includes Security-Scans, Artifact Signing
+              and Build-Provenance generation
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Steps>
+            <Section
+              className="mb-10 mt-0 pb-0 pt-0"
+              description="To use the Devguard-Scanner, you need to create a Personal Access
+Token. You can create such a token by clicking the button below."
+              title="Create a Personal Access Token"
+              forceVertical
+            >
+              {pat && (
+                <div className="flex flex-row items-center justify-between">
+                  <div className="flex-1">
+                    <div className="mb-2 flex flex-row gap-2">
+                      <CopyCode language="shell" codeString={pat?.privKey} />
+                    </div>
+
+                    <span className=" block text-right text-sm text-destructive">
+                      Make sure to copy the token. You won&apos;t be able to see
+                      it ever again!
+                    </span>
+                  </div>
+                </div>
+              )}
+              {!pat && (
+                <div>
+                  <Button
+                    variant={"default"}
+                    onClick={() => onCreatePat({ description: "SCA Analysis" })}
+                  >
+                    Create Personal Access Token
+                  </Button>
+                </div>
+              )}
+            </Section>
+            <Section
+              forceVertical
+              className="mb-10"
+              title="Store the Token in your CI/CD Variables"
+            >
+              <p className="text-sm text-muted-foreground">
+                To use the DevGuard-Scanner in your CI/CD pipeline, you need to
+                store the token in your CI/CD variables. The token is used to
+                authenticate the scanner with the DevGuard API:{" "}
+                <Link
+                  target="_blank"
+                  href="https://docs.gitlab.com/ee/ci/variables/"
+                >
+                  GitLab Documentation
+                </Link>
+                {", "}
+                <Link href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables">
+                  GitHub Documentation
+                </Link>
+              </p>
+            </Section>
+            <Section
+              className="mt-0"
+              forceVertical
+              title="Integrate the DevGuard-Scanner"
+            >
+              <Tab.Group>
+                <Tab.List>
+                  <CustomTab>
+                    {" "}
+                    <Image
+                      className="mr-1 inline-block"
+                      src={"/assets/gitlab.svg"}
+                      alt="GitLab logo"
+                      width={20}
+                      height={20}
+                    />{" "}
+                    GitLab
+                  </CustomTab>
+                  <CustomTab>
+                    <Image
+                      className="mr-2 inline-block dark:invert"
+                      src={"/assets/github.svg"}
+                      alt="GitHub logo"
+                      width={20}
+                      height={20}
+                    />{" "}
+                    GitHub
+                  </CustomTab>
+                </Tab.List>
+                <Tab.Panel className={"my-3"}>
+                  <CopyCode
+                    language="yaml"
+                    codeString={`# .gitlab-ci.yml
+
+include:
+- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
+inputs:
+asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
+token: "$DEVGUARD_TOKEN"`}
+                  />
+                </Tab.Panel>
+                <Tab.Panel className={"my-3"}>
+                  <CopyCode
+                    language="yaml"
+                    codeString={`# .github/workflows/devguard.yml
+name: DevGuard Workflow
+
+on:
+push:
+
+jobs:
+devguard-scanner:
+uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
+with:
+asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
+secrets:
+devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
+                  />
+                </Tab.Panel>
+              </Tab.Group>
+            </Section>
+          </Steps>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
-export default Index;
 
-const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
+export default SecurityControlCenter;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
-
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    const last3Month = new Date();
-    last3Month.setMonth(last3Month.getMonth() - 3);
-
-    const apiClient = getApiClientFromContext(context);
-
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/stats";
-    const [
-      componentRisk,
-      riskDistribution,
-      riskHistory,
-      flawAggregationStateAndChange,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-      metrics,
-    ] = await Promise.all([
-      apiClient(url + "/component-risk").then((r) => r.json()),
-      apiClient(url + "/risk-distribution").then((r) => r.json()),
-      apiClient(
-        url +
-          "/risk-history?start=" +
-          extractDateOnly(last3Month) +
-          "&end=" +
-          extractDateOnly(new Date()),
-      ).then((r) => r.json()),
-      apiClient(
-        url +
-          "/flaw-aggregation-state-and-change?compareTo=" +
-          lastMonth.toISOString().split("T")[0],
-      ).then((r) => r.json()),
-      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
-        r.json(),
-      ),
-      apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/metrics",
-      ).then((r) => r.json()),
-    ]);
-
+  async (context) => {
     return {
-      props: {
-        componentRisk,
-        riskDistribution,
-        riskHistory,
-        flawAggregationStateAndChange,
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
-        metrics,
-      },
+      props: {},
     };
   },
   {

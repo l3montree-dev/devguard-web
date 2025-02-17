@@ -20,7 +20,8 @@ function SecureCodingGuidelines() {
     <Stage
       title="Secure Coding Guidelines"
       description="Produce secure code by following secure coding guidelines."
-      comingSoon
+      buttonTitle="Coming soon"
+      buttonVariant="outline"
       id="secure-coding-guidelines"
     />
   );

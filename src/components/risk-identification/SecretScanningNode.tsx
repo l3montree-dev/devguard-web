@@ -20,7 +20,8 @@ function SecretScanning() {
     <Stage
       title="Secret Scanning"
       description="Scan git repositories for finding potential credentials leakage."
-      comingSoon
+      buttonTitle="Coming soon"
+      buttonVariant="outline"
       id="secret-scanning"
     />
   );

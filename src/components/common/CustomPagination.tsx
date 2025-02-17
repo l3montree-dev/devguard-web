@@ -56,7 +56,7 @@ const CustomPagination: FunctionComponent<Props> = ({
         {renderPages.map((pageNumber) => (
           <Button
             className="flex h-9 w-9 items-center justify-center whitespace-nowrap"
-            variant={page === pageNumber ? "default" : "outline"}
+            variant={page === pageNumber ? "secondary" : "outline"}
             key={pageNumber}
             onClick={() => navigateToPage(pageNumber)}
           >

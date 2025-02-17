@@ -67,6 +67,7 @@ const DropdownMenuContent = React.forwardRef<
         className,
       )}
       {...props}
+      align={props.align ?? "start"}
     />
   </DropdownMenuPrimitive.Portal>
 ));

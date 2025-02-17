@@ -27,18 +27,18 @@ export const StoreContext = createContext<StoreApi<GlobalStore> | null>(null);
 
 export const StoreProvider: FunctionComponent<
   PropsWithChildren<{
-    initialZustandState: any;
+    initialZustand: any;
   }>
-> = ({ children, initialZustandState }) => {
+> = ({ children, initialZustand }) => {
   const storeRef = useRef<ReturnType<typeof createGlobalStore>>();
   if (!storeRef.current) {
-    storeRef.current = createGlobalStore(initialZustandState);
+    storeRef.current = createGlobalStore(initialZustand);
   } else {
     // merge the initial zustand state with the current state
     storeRef.current.setState((state) => {
       return {
         ...state,
-        ...initialZustandState,
+        ...initialZustand,
       };
     });
   }
@@ -52,6 +52,7 @@ export const StoreProvider: FunctionComponent<
 
 export function useStore(): GlobalStore;
 export function useStore<T>(selector: (s: GlobalStore) => T): T;
+
 export function useStore<T>(
   selector: (s: GlobalStore) => T = (s) => s as T,
 ): T {

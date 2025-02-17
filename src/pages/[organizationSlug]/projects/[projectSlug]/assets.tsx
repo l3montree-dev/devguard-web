@@ -87,6 +87,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
+
+      centralFlawManagement: true,
     },
   });
 
@@ -264,7 +266,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
             {project.assets.map((asset) => (
               <Link
                 key={asset.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/risk-handling`}
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
                 className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem
@@ -445,7 +447,7 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        initialZustandState: {
+        initialZustand: {
           project,
         },
         subprojects,

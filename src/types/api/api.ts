@@ -185,6 +185,7 @@ interface BaseFlawEventDTO {
   flawId: string;
   justification: string;
   flawName: string | null;
+  assetVersion: string;
 }
 
 export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
@@ -313,11 +314,37 @@ export interface DetailedFlawDTO extends FlawWithCVE {
   events: FlawEventDTO[];
 }
 
+export interface AssetVersionDTO {
+  id: string;
+  name: string;
+  slug: string;
+
+  assetId: string;
+  createdAt: string;
+  updatedAt: string;
+  version: string;
+
+  type: "branch" | "tag";
+
+  repositoryId?: string;
+  repositoryName?: string;
+
+  lastSecretScan: string;
+  lastSastScan: string;
+  lastScaScan: string;
+  lastIacScan: string;
+  lastContainerScan: string;
+  lastDastScan: string;
+
+  signingPubKey?: string;
+}
 export interface AssetDTO {
   name: string;
   description?: string;
   slug: string;
   id: string;
+
+  refs: AssetVersionDTO[];
 
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
@@ -336,6 +363,8 @@ export interface AssetDTO {
   lastDastScan: string;
 
   signingPubKey?: string;
+
+  centralFlawManagement: boolean;
 }
 
 export interface DependencyTreeNode {

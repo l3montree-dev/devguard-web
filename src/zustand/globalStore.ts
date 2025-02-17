@@ -2,6 +2,7 @@ import { Session } from "@ory/client";
 import { createStore } from "zustand";
 import {
   AssetDTO,
+  AssetVersionDTO,
   OrganizationDetailsDTO,
   OrganizationDTO,
   ProjectDTO,
@@ -61,6 +62,7 @@ export interface InitialState {
 export interface GlobalStoreActions {
   updateOrganization: (organization: OrganizationDetailsDTO) => void;
   updateAsset: (asset: AssetDTO) => void;
+  updateAssetVersions: (assetVersion: AssetVersionDTO) => void;
   updateProject: (project: ProjectDTO) => void;
   setSidebarOpen: (open: boolean) => void;
 }
@@ -68,6 +70,7 @@ export interface GlobalStoreActions {
 export interface GlobalStore extends InitialState, GlobalStoreActions {
   project?: ProjectDTO;
   asset?: AssetDTO;
+  assetVersion?: AssetVersionDTO;
 }
 export const createGlobalStore = (
   preloadedState: Partial<GlobalStore> & {
@@ -91,6 +94,9 @@ export const createGlobalStore = (
       },
       updateAsset: (asset: AssetDTO) => {
         set({ asset });
+      },
+      updateAssetVersions: (assetVersion: AssetVersionDTO) => {
+        set({ assetVersion });
       },
       setSidebarOpen: (open: boolean) => {
         set({

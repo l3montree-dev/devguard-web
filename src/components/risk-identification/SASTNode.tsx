@@ -21,7 +21,8 @@ function SAST() {
       id="sast"
       title="Static Application Security Testing"
       description="Find security vulnerabilities in produced source code."
-      comingSoon
+      buttonTitle="Coming soon"
+      buttonVariant="outline"
     />
   );
 }

@@ -49,7 +49,7 @@ export default function App({ Component, pageProps }) {
       disableTransitionOnChange
     >
       <TooltipProvider>
-        <StoreProvider initialZustandState={pageProps.initialZustandState}>
+        <StoreProvider initialZustand={pageProps.initialZustand}>
           <div className="font-body">
             <Component {...pageProps} />
           </div>

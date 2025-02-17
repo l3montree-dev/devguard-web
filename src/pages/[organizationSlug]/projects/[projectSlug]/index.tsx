@@ -102,7 +102,6 @@ const Index: FunctionComponent<Props> = ({
     );
   }
 
-  console.log(riskDistribution);
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
       <div className="flex flex-row justify-between">
@@ -294,7 +293,6 @@ export const getServerSideProps = middleware(
 		}
 	}
     */
-
     const paddedRiskHistory = padRiskHistory(riskHistory);
 
     return {

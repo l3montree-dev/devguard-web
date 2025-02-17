@@ -33,6 +33,8 @@ function SCA() {
         id="sca"
         title="Software Composition Analysis"
         description="Find known vulnerabilities in third-party and open source dependencies."
+        buttonTitle="Add Dependency Analysis"
+        buttonVariant="secondary"
         LastScan={
           asset.lastScaScan ? (
             <small className="w-full text-right text-muted-foreground">

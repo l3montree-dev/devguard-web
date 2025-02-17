@@ -28,6 +28,8 @@ function ImageVerificationNode() {
         id="image-verification"
         title="Image Verification"
         description="Ensure the integrity and authenticity of your container images."
+        buttonTitle="Add image verification"
+        buttonVariant="secondary"
         onButtonClick={() => setOpen(true)}
       />
       <VerificationDialog open={open} setOpen={setOpen} />

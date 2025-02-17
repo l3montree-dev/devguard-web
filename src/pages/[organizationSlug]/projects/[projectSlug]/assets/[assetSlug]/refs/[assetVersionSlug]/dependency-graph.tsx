@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
@@ -59,15 +60,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
+import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
   versions: string[];
   flaws: Array<FlawDTO>;
 }> = ({ graph, flaws, versions }) => {
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
-  const asset = useActiveAsset();
+  const { branches, tags } = useAssetBranchesAndTags();
+
   const dimensions = useDimensions();
 
   const router = useRouter();
@@ -99,6 +100,7 @@ const DependencyGraphPage: FunctionComponent<{
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
+      <BranchTagSelector branches={branches} tags={tags} />
       <Section
         primaryHeadline
         forceVertical
@@ -371,7 +373,8 @@ export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
 export const getServerSideProps = middleware(
   async (context, { asset }) => {
     // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+      context.params!;
 
     const apiClient = getApiClientFromContext(context);
     const uri =
@@ -381,10 +384,18 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
+      "/refs/" +
+      assetVersionSlug +
       "/";
 
     // check for version query parameter
     const version = context.query.version as string | undefined;
+
+    //TODO: Fix this
+    const scanner = context.query.scanner;
+    if (!scanner) {
+      context.query.scanner = "sca";
+    }
 
     const [resp, flawResp, versionsResp] = await Promise.all([
       apiClient(

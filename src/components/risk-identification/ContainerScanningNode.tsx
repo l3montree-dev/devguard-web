@@ -28,6 +28,8 @@ function ContainerScanning() {
         id="container-scanning"
         title="Container Scanning"
         description="Find known security vulnerabilities in OCI images, like Docker Images."
+        buttonTitle="Add container scanning"
+        buttonVariant="secondary"
         onButtonClick={() => setOpen(true)}
         LastScan={
           asset.lastContainerScan ? (

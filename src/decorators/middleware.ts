@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { addToInitialZustandState } from "@/zustand/initialState";
+import { addToInitialZustand as addToInitialZustand } from "@/zustand/initialState";
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
@@ -54,7 +54,7 @@ export const middleware = <Additional extends Record<string, any>>(
       );
 
       const resp = await handler(ctx, params as any);
-      addToInitialZustandState(resp, params as any);
+      addToInitialZustand(resp, params as any);
       return resp;
     } catch (e) {
       // if a middleware function throws an error,
