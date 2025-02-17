@@ -48,7 +48,7 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   // parse the organization
   const asset: AssetDTO = await r.json();
 
-  const assetVersionResp = await devGuardApiClient(url + "/asset-versions");
+  const assetVersionResp = await devGuardApiClient(url + "/refs");
   if (!assetVersionResp.ok) {
     console.error("Failed to fetch asset versions", assetVersionResp);
   }

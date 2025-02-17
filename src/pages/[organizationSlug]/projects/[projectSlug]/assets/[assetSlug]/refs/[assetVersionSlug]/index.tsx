@@ -272,7 +272,7 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/asset-version/" +
+      "/refs/" +
       assetVersionSlug +
       "/stats";
     const [

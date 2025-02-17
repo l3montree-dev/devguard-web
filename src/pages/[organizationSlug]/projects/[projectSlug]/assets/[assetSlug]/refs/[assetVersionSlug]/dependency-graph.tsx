@@ -102,7 +102,7 @@ const DependencyGraphPage: FunctionComponent<{
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
-      <BranchTagSelector branches={branches} tags={tags} />s
+      <BranchTagSelector branches={branches} tags={tags} />
       <Section
         primaryHeadline
         forceVertical
@@ -386,7 +386,7 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/asset-version/" +
+      "/refs/" +
       assetVersionSlug +
       "/";
 

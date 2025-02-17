@@ -34,7 +34,7 @@ export async function withAssetVersion(ctx: GetServerSidePropsContext) {
       projectSlug +
       "/assets/" +
       assetSlug +
-      "/asset-version/" +
+      "/refs/" +
       assetVersionSlug,
   );
 

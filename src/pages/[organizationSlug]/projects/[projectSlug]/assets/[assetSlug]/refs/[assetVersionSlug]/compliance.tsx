@@ -217,7 +217,7 @@ export const getServerSideProps = middleware(
       context.params?.projectSlug +
       "/assets/" +
       context.params?.assetSlug +
-      "/asset-version/" +
+      "/refs/" +
       context.query.assetVersionSlug;
 
     const filterQuery = Object.fromEntries(

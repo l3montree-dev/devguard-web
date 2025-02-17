@@ -421,7 +421,7 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const assetVersionResp = await apiClient(uri + "asset-versions");
+    const assetVersionResp = await apiClient(uri + "refs");
     const assetVersions = await assetVersionResp.json();
 
     let branches: string[] = [];
@@ -450,7 +450,7 @@ export const getServerSideProps = middleware(
           assetVersionSlug = "main";
           return {
             redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/main/risk-handling`,
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/main/risk-handling`,
               permanent: false,
             },
           };
@@ -458,7 +458,7 @@ export const getServerSideProps = middleware(
           assetVersionSlug = branches[0];
           return {
             redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/${branches[0]}/risk-handling`,
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${branches[0]}/risk-handling`,
               permanent: false,
             },
           };
@@ -466,7 +466,7 @@ export const getServerSideProps = middleware(
           assetVersionSlug = tags[0];
           return {
             redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/asset-version/${tags[0]}/risk-handling`,
+              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${tags[0]}/risk-handling`,
               permanent: false,
             },
           };
@@ -494,7 +494,7 @@ export const getServerSideProps = middleware(
     const pageSize = (context.query.pageSize as string) ?? "25";
     const flawResp = await apiClient(
       uri +
-        "asset-version/" +
+        "refs/" +
         assetVersionSlug +
         "/" +
         "flaws/?" +

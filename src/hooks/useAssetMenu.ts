@@ -32,7 +32,7 @@ export const useAssetMenu = () => {
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const assetSlug = router.query.assetSlug as string;
-  
+
   const loggedIn = useCurrentUser();
   const assetVersion = useActiveAssetVersion();
 
@@ -48,7 +48,7 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/asset-version/" +
+        "/refs/" +
         assetVersionSlug,
       Icon: ChartBarSquareIcon,
     },
@@ -74,7 +74,7 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/asset-version/" +
+        "/refs/" +
         assetVersionSlug +
         "/risk-handling",
       Icon: WrenchScrewdriverIcon,
@@ -91,7 +91,7 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/asset-version/" +
+        "/refs/" +
         assetVersionSlug +
         "/dependency-graph",
       Icon: ShareIcon,
@@ -106,7 +106,7 @@ export const useAssetMenu = () => {
         projectSlug +
         "/assets/" +
         assetSlug +
-        "/asset-version/" +
+        "/refs/" +
         assetVersionSlug +
         "/compliance",
       Icon: ScaleIcon,
