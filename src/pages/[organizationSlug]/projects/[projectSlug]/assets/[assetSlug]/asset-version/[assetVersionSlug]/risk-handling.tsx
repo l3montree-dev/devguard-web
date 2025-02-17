@@ -116,7 +116,7 @@ const columnsDef = [
       id: "packageName",
       cell: (row) => (
         <span className="flex flex-row gap-2">
-          <span className="flex h-5 w-5 flex-row items-center justify-center rounded-full bg-muted">
+          <span className="flex h-5 w-5 flex-row items-center justify-center">
             <EcosystemImage packageName={row.getValue()} />
           </span>
           {beautifyPurl(row.getValue())}

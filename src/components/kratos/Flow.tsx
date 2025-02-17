@@ -19,6 +19,7 @@ import {
   RegistrationFlow,
   SettingsFlow,
   UiNode,
+  UiText,
   UpdateLoginFlowBody,
   UpdateRecoveryFlowBody,
   UpdateRegistrationFlowBody,
@@ -31,6 +32,7 @@ import { Component, FormEvent, MouseEvent } from "react";
 
 import { Messages } from "./Messages";
 import { Node } from "./Node";
+import Callout from "../common/Callout";
 
 export type Values = Partial<
   | UpdateLoginFlowBody
@@ -201,6 +203,26 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       return null;
     }
 
+    const typeToIntent = (
+      messages?: UiText[],
+    ): "info" | "success" | "danger" => {
+      // If there are no messages, its info
+      if (!messages) {
+        return "info";
+      }
+
+      // If there are messages, we need to find the most severe one
+      return messages.reduce<"info" | "success" | "danger">((acc, message) => {
+        if (message.type === "error") {
+          return "danger";
+        }
+        if (message.type === "success") {
+          return "success";
+        }
+        return acc;
+      }, "info");
+    };
+
     return (
       <form
         action={flow.ui.action}
@@ -209,9 +231,9 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
         onSubmit={this.handleSubmit}
       >
         {!hideGlobalMessages && Boolean(flow.ui.messages) ? (
-          <div>
+          <Callout intent={typeToIntent(flow.ui.messages)}>
             <Messages messages={flow.ui.messages} />
-          </div>
+          </Callout>
         ) : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;

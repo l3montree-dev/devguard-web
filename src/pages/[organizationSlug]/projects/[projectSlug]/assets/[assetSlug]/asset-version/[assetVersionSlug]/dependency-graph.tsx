@@ -113,7 +113,8 @@ const DependencyGraphPage: FunctionComponent<{
           <div className="flex flex-row gap-4">
             <Tabs
               defaultValue={
-                (router.query.scanner as string | undefined) ?? "sca"
+                (router.query.scanner as string | undefined) ??
+                "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca"
               }
             >
               <TabsList>
@@ -122,11 +123,12 @@ const DependencyGraphPage: FunctionComponent<{
                     router.push({
                       query: {
                         ...router.query,
-                        scanner: "sca",
+                        scanner:
+                          "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
                       },
                     })
                   }
-                  value="sca"
+                  value="github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca"
                 >
                   Application
                 </TabsTrigger>
@@ -135,11 +137,12 @@ const DependencyGraphPage: FunctionComponent<{
                     router.push({
                       query: {
                         ...router.query,
-                        scanner: "container-scanning",
+                        scanner:
+                          "github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning",
                       },
                     })
                   }
-                  value="container-scanning"
+                  value="github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning"
                 >
                   Container Image
                 </TabsTrigger>
@@ -403,7 +406,9 @@ export const getServerSideProps = middleware(
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
             version: version,
-            scanner: context.query.scanner,
+            scanner:
+              context.query.scanner ??
+              "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
           }),
       ),
       apiClient(
@@ -411,7 +416,9 @@ export const getServerSideProps = middleware(
           "affected-components?" +
           toSearchParams({
             version: version,
-            scanner: context.query.scanner,
+            scanner:
+              context.query.scanner ??
+              "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
           }),
       ),
       apiClient(uri + "versions"),

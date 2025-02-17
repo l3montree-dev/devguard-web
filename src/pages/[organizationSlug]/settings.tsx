@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
 import MembersTable from "@/components/MembersTable";
-import MemberDialog from "@/components/MemberForm";
+import MemberDialog from "@/components/MemberDialog";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -89,6 +89,48 @@ const Home: FunctionComponent = () => {
       ...activeOrg,
       gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
     });
+  };
+
+  const handleChangeMemberRole = async (
+    id: string,
+    role: "admin" | "member",
+  ) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/members/" + id,
+      {
+        method: "PUT",
+        body: JSON.stringify({ role }),
+      },
+    );
+
+    if (resp.ok) {
+      updateOrganization({
+        ...activeOrg,
+        members: activeOrg.members.map((m) =>
+          m.id === id ? { ...m, role } : m,
+        ),
+      });
+    } else {
+      toast.error("Failed to update member role");
+    }
+  };
+
+  const handleRemoveMember = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/members/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateOrganization({
+        ...activeOrg,
+        members: activeOrg.members.filter((m) => m.id !== id),
+      });
+    } else {
+      toast.error("Failed to remove member");
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -267,7 +309,11 @@ const Home: FunctionComponent = () => {
         title="Member"
         description="Manage the members of your organization"
       >
-        <MembersTable members={activeOrg.members} />
+        <MembersTable
+          onChangeMemberRole={handleChangeMemberRole}
+          onRemoveMember={handleRemoveMember}
+          members={activeOrg.members}
+        />
         <MemberDialog
           isOpen={memberDialogOpen}
           onOpenChange={setMemberDialogOpen}

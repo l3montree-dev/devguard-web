@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import Page from "../../../../components/Page";
 
 import { middleware } from "@/decorators/middleware";
@@ -32,6 +32,9 @@ import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
 import { convertRepos } from "../../../../hooks/useRepositorySearch";
 import ConnectToRepoSection from "../../../../components/ConnectToRepoSection";
+import MemberDialog from "../../../../components/MemberDialog";
+import MembersTable from "../../../../components/MembersTable";
+import ProjectMemberDialog from "../../../../components/ProjectMemberDialog";
 
 interface Props {
   project: ProjectDTO;
@@ -42,6 +45,61 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const updateProject = useStore((s) => s.updateProject);
+  const [memberDialogOpen, setMemberDialogOpen] = useState(false);
+
+  const handleChangeMemberRole = async (
+    id: string,
+    role: "admin" | "member",
+  ) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project?.slug +
+        "/members/" +
+        id,
+      {
+        method: "PUT",
+        body: JSON.stringify({ role }),
+      },
+    );
+
+    if (resp.ok) {
+      updateProject({
+        ...project!,
+        members: project!.members.map((member) =>
+          member.id === id ? { ...member, role } : member,
+        ),
+      });
+      toast.success("Role successfully changed");
+    } else {
+      toast.error("Failed to update member role");
+    }
+  };
+
+  const handleRemoveMember = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project?.slug +
+        "/members/" +
+        id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateProject({
+        ...project!,
+        members: project!.members.filter((member) => member.id !== id),
+      });
+      toast.success("Member deleted");
+    } else {
+      toast.error("Failed to remove member");
+    }
+  };
 
   const projectMenu = useProjectMenu();
 
@@ -97,6 +155,28 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
           repositoryId={project?.repositoryId}
           repositoryName={project?.repositoryName}
         />
+        <hr />
+        <Section
+          title="Member"
+          description="Manage the members of your organization"
+        >
+          <MembersTable
+            onChangeMemberRole={handleChangeMemberRole}
+            onRemoveMember={handleRemoveMember}
+            members={project.members}
+          />
+          <ProjectMemberDialog
+            isOpen={memberDialogOpen}
+            onOpenChange={setMemberDialogOpen}
+          />
+
+          <div className="flex flex-row justify-end">
+            <Button onClick={() => setMemberDialogOpen(true)}>
+              Add Member
+            </Button>
+          </div>
+        </Section>
+        <hr />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm forceVerticalSections={false} form={form} />

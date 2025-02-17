@@ -17,6 +17,8 @@ import React from "react";
 import Image from "next/image";
 import { getEcosystem } from "@/utils/common";
 
+const invertSvgOnDark = (ecosystem: string) => ["apk"].includes(ecosystem);
+
 const EcosystemImage = ({
   packageName,
   size,
@@ -28,6 +30,8 @@ const EcosystemImage = ({
     [
       "golang",
       "npm",
+      "apk",
+      "pypi",
       "Maven",
       "crates.io",
       "Packagist",
@@ -39,8 +43,11 @@ const EcosystemImage = ({
     return (
       <Image
         alt={"Logo von " + getEcosystem(packageName)}
-        width={size ?? 15}
-        height={size ?? 15}
+        width={size ?? 20}
+        height={size ?? 20}
+        className={
+          invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : ""
+        }
         src={
           "/logos/" +
           getEcosystem(packageName).toLowerCase() +

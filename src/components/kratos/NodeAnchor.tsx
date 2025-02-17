@@ -14,6 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { UiNode, UiNodeAnchorAttributes } from "@ory/client";
+import { Button } from "../ui/button";
 
 interface Props {
   node: UiNode;
@@ -22,15 +23,17 @@ interface Props {
 
 export const NodeAnchor = ({ node, attributes }: Props) => {
   return (
-    <button
-      data-testid={`node/anchor/${attributes.id}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        window.location.href = attributes.href;
-      }}
-    >
-      {attributes.title.text}
-    </button>
+    <div className="flex flex-row justify-end">
+      <Button
+        data-testid={`node/anchor/${attributes.id}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          window.location.href = attributes.href;
+        }}
+      >
+        {attributes.title.text}
+      </Button>
+    </div>
   );
 };

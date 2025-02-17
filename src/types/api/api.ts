@@ -86,6 +86,7 @@ export interface PersonalAccessTokenDTO {
   id: string;
   pubKey: string;
   fingerprint: string;
+  lastUsedAt: string | null;
 }
 
 export interface PatWithPrivKey extends PersonalAccessTokenDTO {
@@ -107,6 +108,13 @@ export interface ProjectDTO {
 
   repositoryId?: string;
   repositoryName?: string;
+
+  members: Array<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    role?: "member" | "admin";
+  }>;
 }
 
 export interface EnvDTO {

@@ -22,8 +22,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
-import { ory, handleFlowError } from "../services/ory";
-import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { handleFlowError, ory } from "../services/ory";
+import { Button } from "../components/ui/button";
 
 const Recovery: NextPage = () => {
   const [flow, setFlow] = useState<RecoveryFlow>();
@@ -103,43 +109,25 @@ const Recovery: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Recover your account - Ory NextJS Integration Example</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
+        <title>Recover your account</title>
       </Head>
-      <div className="flex min-h-screen flex-1 flex-col justify-center bg-gray-200 px-6 py-32 dark:bg-gray-950 max-sm:py-16 lg:px-8">
-        <div className="rounded-lg p-5 dark:bg-gray-900 sm:mx-auto sm:w-full sm:max-w-lg">
-          <div>
-            <Image
-              className="mx-auto hidden h-20 w-auto dark:block"
-              src="/logo_inverse_horizontal.svg"
-              alt="DevGuard by l3montree Logo"
-              width={300}
-              height={300}
-            />
-            <Image
-              className="mx-auto h-20 w-auto dark:hidden"
-              src="/logo_horizontal.svg"
-              alt="DevGuard by l3montree Logo"
-              width={300}
-              height={300}
-            />
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
-              Recover your account
-            </h2>
-          </div>
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg">
-            <Flow onSubmit={onSubmit} flow={flow} />
-          </div>
-          <p className="mt-2 text-right text-sm">
-            <Link
-              href="/"
-              passHref
-              className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
-            >
-              Go back
-            </Link>
-          </p>
-        </div>
+      <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">
+        <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
+          <CardHeader>
+            <CardTitle>Recover your account</CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
+              <Flow onSubmit={onSubmit} flow={flow} />
+            </div>
+            <div className="mt-4 flex flex-row justify-end text-sm">
+              <Link href="/">
+                <Button variant={"secondary"}>Go back</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
