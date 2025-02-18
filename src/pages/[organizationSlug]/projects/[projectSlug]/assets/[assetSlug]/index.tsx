@@ -295,8 +295,8 @@ Token. You can create such a token by clicking the button below."
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
 inputs:
-asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
-token: "$DEVGUARD_TOKEN"`}
+    asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
+    token: "$DEVGUARD_TOKEN"`}
                   />
                 </Tab.Panel>
                 <Tab.Panel className={"my-3"}>
@@ -306,15 +306,15 @@ token: "$DEVGUARD_TOKEN"`}
 name: DevGuard Workflow
 
 on:
-push:
+    push:
 
 jobs:
-devguard-scanner:
-uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
-with:
-asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
-secrets:
-devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
+    devguard-scanner:
+        uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
+        with:
+            asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
+        secrets:
+            devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
                   />
                 </Tab.Panel>
               </Tab.Group>
