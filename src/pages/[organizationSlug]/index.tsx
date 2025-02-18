@@ -163,7 +163,6 @@ const Home: FunctionComponent<Props> = ({
           <div className="col-span-2">
             <RiskDistributionDiagram data={riskDistribution ?? []} />
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle>Vulnerable Projects</CardTitle>

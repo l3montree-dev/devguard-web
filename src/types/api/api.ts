@@ -386,7 +386,8 @@ export interface ComponentRisk {
 }
 
 export interface RiskDistribution {
-  id: string;
+  assetId: string;
+  assetVersionName: string;
   label: string;
   low: number;
   medium: number;

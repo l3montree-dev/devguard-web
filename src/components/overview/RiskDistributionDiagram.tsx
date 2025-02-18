@@ -29,19 +29,19 @@ import { generateColor } from "@/utils/view";
 //  { range: "0-2", scanner1: 186, scanner2: 80 },
 const combineRanges = (data: RiskDistribution[]) => {
   const low = data
-    .map((el) => ({ [el.id]: el.low }))
+    .map((el) => ({ [el.assetId]: el.low }))
     .reduce((acc, el) => ({ ...acc, ...el }), { range: "LOW" });
 
   const medium = data
-    .map((el) => ({ [el.id]: el.medium }))
+    .map((el) => ({ [el.assetId]: el.medium }))
     .reduce((acc, el) => ({ ...acc, ...el }), { range: "MEDIUM" });
 
   const high = data
-    .map((el) => ({ [el.id]: el.high }))
+    .map((el) => ({ [el.assetId]: el.high }))
     .reduce((acc, el) => ({ ...acc, ...el }), { range: "HIGH" });
 
   const critical = data
-    .map((el) => ({ [el.id]: el.critical }))
+    .map((el) => ({ [el.assetId]: el.critical }))
     .reduce((acc, el) => ({ ...acc, ...el }), { range: "CRITICAL" });
 
   return [low, medium, high, critical];
@@ -55,7 +55,7 @@ export function RiskDistributionDiagram({
   const chartConfig = data.reduce(
     (acc, el, i) => ({
       ...acc,
-      [el.id]: {
+      [el.assetId]: {
         label: el.label,
         color: generateColor(el.label),
       },
