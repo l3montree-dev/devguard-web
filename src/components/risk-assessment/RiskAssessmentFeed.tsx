@@ -40,6 +40,7 @@ import { classNames } from "@/utils/common";
 import { useRouter } from "next/router";
 import { Badge } from "../ui/badge";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { GitBranchIcon } from "lucide-react";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -213,6 +214,7 @@ export default function RiskAssessmentFeed({
 
   const activeAssetVersion = useActiveAssetVersion();
 
+  console.log(events);
   return (
     <div>
       <ul
@@ -268,15 +270,16 @@ export default function RiskAssessmentFeed({
                       </Avatar>
                     )}
                     <div className="w-full overflow-hidden rounded border">
-                      <div className="flex w-full justify-between">
-                        <p className="bg-card px-2 py-2 font-medium">
+                      <div className="w-full">
+                        <p className="w-full bg-card px-2 py-2 font-medium">
                           {findUser(event.userId, org, currentUser).displayName}{" "}
                           {eventTypeMessages(event, index, flawName, events)}
                         </p>
 
-                        {event.assetVersion !== activeAssetVersion?.name && (
+                        {event.assetVersion === activeAssetVersion?.name && (
                           <div className="absolute right-2 top-2">
                             <Badge variant={"outline"}>
+                              <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                               {event.assetVersion}
                             </Badge>
                           </div>
