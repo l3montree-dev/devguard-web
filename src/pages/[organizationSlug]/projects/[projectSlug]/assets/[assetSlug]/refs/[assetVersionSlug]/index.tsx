@@ -318,6 +318,8 @@ export const getServerSideProps = middleware(
           projectSlug +
           "/assets/" +
           assetSlug +
+          "/refs/" +
+          assetVersionSlug +
           "/metrics",
       ).then((r) => r.json()),
     ]);
