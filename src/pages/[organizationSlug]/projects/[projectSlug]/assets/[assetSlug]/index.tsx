@@ -44,12 +44,41 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
-import React from "react";
-import Dropzone from "react-dropzone";
+import Dropzone, { DropzoneOptions } from "react-dropzone";
 import { useDropzone } from "react-dropzone";
 import { string } from "zod";
+import React, { useCallback } from "react";
+import { json } from "stream/consumers";
+import * as fs from "fs";
 
 interface Props extends AssetMetricsDTO {}
+
+function DropzoneComponent() {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+
+      const test: any = JSON.parse(this.any);
+      console.log(test.bomFormat);
+      reader.onabort = () => console.log("file reading was aborted");
+      reader.onerror = () => console.log("file reading has failed");
+      reader.onload = () => {
+        // Do whatever you want with the file contents
+        const binaryStr = reader.result;
+        console.log(binaryStr);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }, []);
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      <p>test test 2</p>
+    </div>
+  );
+}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
   const asset = useActiveAsset();
@@ -69,7 +98,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
 
   useDropzone({
     accept: {
-      sbom: [".json"],
+      "application/json": [".json"],
     },
   });
 
@@ -221,18 +250,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
             onOpenChange={setSbomIntegrationOpen}
           >
             <DialogContent>
-              <Dropzone accept={{ sbom: [".json"] }}>
-                {({ getRootProps, getInputProps }) => (
-                  <section>
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      <p>
-                        Drag 'n' drop some files here, or click to select files
-                      </p>
-                    </div>
-                  </section>
-                )}
-              </Dropzone>
+              <DropzoneComponent />
             </DialogContent>
           </Dialog>
         </div>
@@ -374,6 +392,7 @@ export default SecurityControlCenter;
 
 export const getServerSideProps = middleware(
   async (context) => {
+    console.log("SERVER SIDE");
     return {
       props: {},
     };
