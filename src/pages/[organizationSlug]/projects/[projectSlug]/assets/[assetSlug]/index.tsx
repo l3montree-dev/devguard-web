@@ -44,6 +44,11 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
+import React from "react";
+import Dropzone from "react-dropzone";
+import { useDropzone } from "react-dropzone";
+import { string } from "zod";
+
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
@@ -61,6 +66,12 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   ) as PatWithPrivKey | null;
 
   const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
+
+  useDropzone({
+    accept: {
+      sbom: [".json"],
+    },
+  });
 
   return (
     <>
@@ -209,7 +220,20 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
             open={sbomIntegrationOpen}
             onOpenChange={setSbomIntegrationOpen}
           >
-            <DialogContent>add dragable area</DialogContent>
+            <DialogContent>
+              <Dropzone accept={{ sbom: [".json"] }}>
+                {({ getRootProps, getInputProps }) => (
+                  <section>
+                    <div {...getRootProps()}>
+                      <input {...getInputProps()} />
+                      <p>
+                        Drag 'n' drop some files here, or click to select files
+                      </p>
+                    </div>
+                  </section>
+                )}
+              </Dropzone>
+            </DialogContent>
           </Dialog>
         </div>
       </Page>
