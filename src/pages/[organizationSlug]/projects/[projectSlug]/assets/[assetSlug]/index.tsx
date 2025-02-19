@@ -54,6 +54,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   const project = useActiveProject();
   const org = useActiveOrg();
   const [fullIntegrationOpen, setFullIntegrationOpen] = useState(false);
+  const [sbomIntegrationOpen, setSbomIntegrationOpen] = useState(false);
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const pat = (
     personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
@@ -89,6 +90,17 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               )}
 
               <h3 className="text-xl font-semibold">
+                <div className="mb-4">
+                  <Stage
+                    id="devsecops-pipeline"
+                    title="DevSecOps-Pipeline"
+                    description=" "
+                    buttonTitle="SBOM check"
+                    buttonVariant="default"
+                    onButtonClick={() => setSbomIntegrationOpen(true)}
+                  />
+                </div>
+                <SecretScanning />
                 Development{" "}
                 <Image
                   className="mr-2 inline-block"
@@ -191,6 +203,14 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               </div>
             </Section>
           </div>
+        </div>
+        <div>
+          <Dialog
+            open={sbomIntegrationOpen}
+            onOpenChange={setSbomIntegrationOpen}
+          >
+            <DialogContent>add dragable area</DialogContent>
+          </Dialog>
         </div>
       </Page>
       <Dialog open={fullIntegrationOpen} onOpenChange={setFullIntegrationOpen}>
