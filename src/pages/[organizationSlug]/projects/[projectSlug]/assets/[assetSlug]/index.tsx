@@ -50,10 +50,34 @@ import { string } from "zod";
 import React, { useCallback } from "react";
 import { json } from "stream/consumers";
 import * as fs from "fs";
+import { browserApiClient } from "@/services/devGuardApi";
+import { toast } from "sonner";
 
 interface Props extends AssetMetricsDTO {}
 
+const file = new File([JSON.stringify({ ping: true })], "ping.json", {
+  type: "application/json",
+});
+
+const handleSBOM = async (text: string) => {
+  const resp = await browserApiClient(
+    "/organizations/" +
+      "l3montree/projects/devguard/assets/devguard/sbom-manual-scan/",
+    {
+      method: "POST",
+      body: JSON.stringify(text),
+    },
+  );
+
+  if (resp.ok) {
+    console.log("Nice");
+  } else {
+    toast.error("Failed to update member role");
+  }
+};
+
 function DropzoneComponent() {
+  let myEl;
   const onDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
@@ -63,20 +87,28 @@ function DropzoneComponent() {
         const binaryStr = reader.result;
         console.log(binaryStr);
       };
-      //console.log(file.text().then());
+
       reader.readAsText(file);
+      //console.log(file.text().then());
       const text = reader.result;
-      const test = JSON.stringify(text);
-      console.log(test);
+      myEl = JSON.stringify(text) as string;
+      //console.log(test);
+      //console.log(acceptedFiles);
+      //acceptedFiles.toString();
       //JSON.parse(text as string);
+      //acceptedfile ist aufjedenfall die ganze datei mit ihrem inhalt, die muss also mit .text geparsed
     });
   }, []);
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { "application/json": ["./json"] },
+  });
 
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
       <p>click me</p>
+      <Button onClick={() => handleSBOM(myEl)}> Hey</Button>
     </div>
   );
 }
