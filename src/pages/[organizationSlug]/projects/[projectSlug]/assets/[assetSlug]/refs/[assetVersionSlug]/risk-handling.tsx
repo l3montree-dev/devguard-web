@@ -260,7 +260,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 }),
                 "!text-primary-foreground",
               )}
-              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`}
+              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/`}
             >
               Start identifying risks
             </Link>
