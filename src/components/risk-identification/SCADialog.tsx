@@ -212,7 +212,7 @@ jobs:
                     language="yaml"
                     codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
-- component: gitlab.com/l3montree/devguard/sca@~latest
+- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/software-composition-analysis.yml"
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"

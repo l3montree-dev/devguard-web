@@ -211,10 +211,10 @@ jobs:
                     language="yaml"
                     codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
-- component: gitlab.com/l3montree/devguard/container-scanning@~latest
-    inputs:
-      asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
-      token: "$DEVGUARD_TOKEN"
+- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/container-scanning.yml"
+  inputs:
+    asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+    token: "$DEVGUARD_TOKEN"
 `}
                   ></CopyCode>
                 </div>

@@ -294,7 +294,7 @@ Token. You can create such a token by clicking the button below."
 
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
-inputs:
+  inputs:
     asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
     token: "$DEVGUARD_TOKEN"`}
                   />
