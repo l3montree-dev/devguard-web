@@ -63,7 +63,12 @@ function DropzoneComponent() {
         const binaryStr = reader.result;
         console.log(binaryStr);
       };
+      //console.log(file.text().then());
       reader.readAsText(file);
+      const text = reader.result;
+      const test = JSON.stringify(text);
+      console.log(test);
+      //JSON.parse(text as string);
     });
   }, []);
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
