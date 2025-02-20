@@ -39,8 +39,8 @@ import {
   CardTitle,
 } from "../ui/card";
 import Autosetup from "../Autosetup";
-import GitlabTokenInstructions from "./GitlabTokenInstructions";
-import GithubTokenInstructions from "./GithubTokenInstructions";
+import GitlapInstructionsSteps from "./GitlabInstructionsSteps";
+import GithubInstructionsSteps from "./GithubInstructionsSteps";
 
 interface Props {
   open: boolean;
@@ -151,16 +151,9 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           </Tab.List>
           <Tab.Panels className={"mt-2"}>
             <Tab.Panel>
-              <Steps>
-                <GithubTokenInstructions pat={pat?.privKey} />
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .github/workflows
-                    file
-                  </h3>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# DevSecOps Workflow Definition
+              <GithubInstructionsSteps
+                pat={pat}
+                codeString={`# DevSecOps Workflow Definition
 # This workflow is triggered on every push to the repository
 name: DevSecOps Workflow
 on:
@@ -179,52 +172,23 @@ jobs:
       devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
 
   # ----- END Software Composition Analysis Job -----`}
-                  ></CopyCode>
-                </div>
-                <div>
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Commit and push the changes to the repository.
-                    <br /> You can also trigger the workflow manually
-                  </h3>
-                </div>
-              </Steps>
+              />
             </Tab.Panel>
             <Tab.Panel>
-              <Autosetup
+              <GitlapInstructionsSteps
                 isLoading={isLoading}
                 handleAutosetup={handleAutosetup}
                 progress={progress}
                 Loader={Loader}
-              />
-              <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
-                <div className="flex-1 border-t-2 border-dotted" />
-                <span className="px-5">OR</span>
-                <div className="flex-1 border-t-2 border-dotted" />
-              </div>
-              <Steps>
-                <GitlabTokenInstructions pat={pat?.privKey} />
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .gitlab-ci.yml
-                    file
-                  </h3>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+                pat={pat}
+                codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/software-composition-analysis.yml"
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
 `}
-                  ></CopyCode>
-                </div>
-                <div>
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Commit and push the changes to the repository.
-                  </h3>
-                </div>
-              </Steps>
+              />
             </Tab.Panel>
             <Tab.Panel>
               <CopyCode

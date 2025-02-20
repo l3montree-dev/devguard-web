@@ -26,6 +26,9 @@ import Section from "../common/Section";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 
+import GitlapInstructionsSteps from "./GitlabInstructionsSteps";
+import GithubInstructionsSteps from "./GithubInstructionsSteps";
+
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -134,78 +137,9 @@ const SigningDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           </Tab.List>
           <Tab.Panels className={"mt-2"}>
             <Tab.Panel>
-              <Steps>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Open the project settings in GitHub
-                  </h3>
-                  <small className="text-muted-foreground">
-                    For example, for the DevGuard project its following url:
-                    https://github.com/l3montree-dev/devguard/settings
-                  </small>
-                  <div className="relative aspect-video w-full max-w-4xl">
-                    <Image
-                      alt="Open the project settings in GitHub"
-                      className="rounded-lg border object-fill"
-                      src={"/assets/project-settings.png"}
-                      fill
-                    />
-                  </div>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Navigate to Secrets and Variables and choose actions
-                    <br />
-                    Press the button {"<"}New repository secret{">"}
-                  </h3>
-                  <small className="text-muted-foreground">
-                    For example, for the DevGuard project its following url:
-                    https://github.com/l3montree-dev/devguard/settings/secrets/actions
-                  </small>
-                  <div className="relative aspect-video w-full max-w-4xl">
-                    <Image
-                      alt="Open the project settings in GitHub"
-                      className="rounded-lg border object-fill"
-                      src={"/assets/repo-secret.png"}
-                      fill
-                    />
-                  </div>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create a new secret
-                  </h3>
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="mb-4">
-                        <span className="mb-2 block text-sm font-semibold">
-                          Name
-                        </span>
-                        <CopyCode
-                          language="shell"
-                          codeString={`DEVGUARD_TOKEN`}
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <span className="mb-2 block text-sm font-semibold">
-                          Secret
-                        </span>
-                        <CopyCode
-                          language="shell"
-                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .github/workflows
-                    file
-                  </h3>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# ----- START Container Image Signing -----
+              <GithubInstructionsSteps
+                pat={pat}
+                codeString={`# ----- START Container Image Signing -----
 name: Devguard Container Scanning Workflow
 on:
     push:
@@ -217,121 +151,24 @@ jobs:
             asset-name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
         secrets:
             devguard-token: \${{ secrets.DEVGUARD_TOKEN }}
-# ----- END Container Image Signing -----`}
-                  ></CopyCode>
-                </div>
-                <div>
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Commit and push the changes to the repository.
-                    <br /> You can also trigger the workflow manually
-                  </h3>
-                </div>
-              </Steps>
+# ----- END Container Image Signing ——`}
+              />
             </Tab.Panel>
             <Tab.Panel>
-              <Autosetup
+              <GitlapInstructionsSteps
                 isLoading={isLoading}
                 handleAutosetup={handleAutosetup}
                 progress={progress}
                 Loader={Loader}
-              />
-              <div className="my-8 flex flex-row items-center text-center text-muted-foreground">
-                <div className="flex-1 border-t-2 border-dotted" />
-                <span className="px-5">OR</span>
-                <div className="flex-1 border-t-2 border-dotted" />
-              </div>
-              <Steps>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Open the CI/CD project settings in GitLab
-                  </h3>
-                  <small className="text-muted-foreground">
-                    It looks something like this:
-                    https://gitlab.com/l3montree/example-project/-/settings/ci_cd
-                  </small>
-                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
-                    <Image
-                      alt="Open the project settings in GitHub"
-                      className="rounded-lg border object-fill"
-                      src={"/assets/gitlab-project-settings.png"}
-                      fill
-                    />
-                  </div>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Scroll down to Variables section and click on
-                    &quot;Expand&quot;
-                    <br />
-                    Press the button {"<"}Add variable{">"}
-                  </h3>
-
-                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
-                    <Image
-                      alt="Open the project settings in GitHub"
-                      className="rounded-lg border object-fill"
-                      src={"/assets/gitlab-secret.png"}
-                      fill
-                    />
-                  </div>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create a new variable
-                  </h3>
-                  <div className="relative mt-2 aspect-video w-full max-w-4xl">
-                    <Image
-                      alt="Open the project settings in GitHub"
-                      className="rounded-lg border object-fill"
-                      src={"/assets/gitlab-var-settings.png"}
-                      fill
-                    />
-                  </div>
-                  <Card className="mt-4">
-                    <CardContent className="pt-6">
-                      <div className="mb-4">
-                        <span className="mb-2 block text-sm font-semibold">
-                          Key
-                        </span>
-                        <CopyCode
-                          language="shell"
-                          codeString={`DEVGUARD_TOKEN`}
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <span className="mb-2 block text-sm font-semibold">
-                          Value
-                        </span>
-                        <CopyCode
-                          language="shell"
-                          codeString={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="mb-10">
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Create or insert the yaml snippet inside a .gitlab-ci.yml
-                    file
-                  </h3>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+                pat={pat}
+                codeString={`# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/sign.yml"
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
 `}
-                  ></CopyCode>
-                </div>
-                <div>
-                  <h3 className="mb-4 mt-2 font-semibold">
-                    Commit and push the changes to the repository.
-                  </h3>
-                </div>
-              </Steps>
+              />
             </Tab.Panel>
             <Tab.Panel>
               <Steps>
