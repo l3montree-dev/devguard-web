@@ -60,7 +60,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const pat = (
     personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
-  ) as PatWithPrivKey | null;
+  ) as PatWithPrivKey | undefined;
 
   const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
 
