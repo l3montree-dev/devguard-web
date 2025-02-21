@@ -12,7 +12,8 @@ export default function SBOM() {
 export const getServerSideProps: GetServerSideProps = middleware(
   async (context, {}) => {
     // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+      context.params!;
     // check for version query parameter
     const version = context.query.version as string | undefined;
     const apiClient = getApiClientFromContext(context);
@@ -23,6 +24,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       projectSlug +
       "/assets/" +
       assetSlug +
+      "/refs/" +
+      assetVersionSlug +
       "/vex.json?scanner=" +
       (context.query.scanner ? context.query.scanner : "sca");
 
