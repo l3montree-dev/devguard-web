@@ -39,8 +39,9 @@ import {
   CardTitle,
 } from "../ui/card";
 import Autosetup from "../Autosetup";
-import GitlapInstructionsSteps from "./GitlabInstructionsSteps";
+import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 import GithubInstructionsSteps from "./GithubInstructionsSteps";
+import { useStore } from "@/zustand/globalStoreProvider";
 
 interface Props {
   open: boolean;
@@ -53,6 +54,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
 
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
+  const apiUrl = useStore((s) => s.apiUrl);
 
   const { handleAutosetup, isLoading, Loader, progress, onCreatePat, pat } =
     useAutosetup("sca");
@@ -175,7 +177,7 @@ jobs:
               />
             </Tab.Panel>
             <Tab.Panel>
-              <GitlapInstructionsSteps
+              <GitlabInstructionsSteps
                 isLoading={isLoading}
                 handleAutosetup={handleAutosetup}
                 progress={progress}
@@ -187,7 +189,9 @@ include:
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
+    api-url: ${apiUrl}
 `}
+                apiUrl={apiUrl}
               />
             </Tab.Panel>
             <Tab.Panel>
@@ -197,7 +201,7 @@ include:
     devguard-scanner sca \\
         --path="/app" \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-        --apiUrl="${config.publicDevGuardApiUrl}" \\
+        --api-url="${apiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>

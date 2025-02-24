@@ -56,6 +56,7 @@ export interface InitialState {
   organization: OrganizationDetailsDTO;
   contentTree?: Array<ContentTreeElement>;
 
+  apiUrl: string;
   isSidebarOpen: boolean;
 }
 

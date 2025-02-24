@@ -6,6 +6,7 @@ import Steps from "./Steps";
 import GitlabTokenInstructions from "./GitlabTokenInstructions";
 import Autosetup from "../Autosetup";
 import { FunctionComponent } from "react";
+import GitlabWebhookInstructions from "./GitlabWebhookInstructions";
 
 interface Props {
   isLoading: boolean;
@@ -21,15 +22,17 @@ interface Props {
 
   pat?: PatWithPrivKey;
   codeString: string;
+  apiUrl: string;
 }
 
-const GitlapInstructionsSteps: FunctionComponent<Props> = ({
+const GitlabInstructionsSteps: FunctionComponent<Props> = ({
   isLoading,
   handleAutosetup,
   progress,
   Loader,
   pat,
   codeString,
+  apiUrl,
 }) => {
   return (
     <>
@@ -48,6 +51,7 @@ const GitlapInstructionsSteps: FunctionComponent<Props> = ({
 
       <Steps>
         <GitlabTokenInstructions pat={pat?.privKey} />
+        <GitlabWebhookInstructions apiUrl={apiUrl} />
         <div className="mb-10">
           <h3 className="mb-4 mt-2 font-semibold">
             Create or insert the yaml snippet inside a .gitlab-ci.yml file
@@ -64,4 +68,4 @@ const GitlapInstructionsSteps: FunctionComponent<Props> = ({
   );
 };
 
-export default GitlapInstructionsSteps;
+export default GitlabInstructionsSteps;

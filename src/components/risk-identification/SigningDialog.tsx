@@ -26,8 +26,10 @@ import Section from "../common/Section";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 
-import GitlapInstructionsSteps from "./GitlabInstructionsSteps";
+import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 import GithubInstructionsSteps from "./GithubInstructionsSteps";
+
+import { useStore } from "@/zustand/globalStoreProvider";
 
 interface Props {
   open: boolean;
@@ -37,6 +39,8 @@ interface Props {
 const SigningDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const router = useRouter();
   const activeOrg = useActiveOrg();
+
+  const apiUrl = useStore((s) => s.apiUrl);
 
   const { Loader, isLoading } = useLoader();
 
@@ -155,7 +159,7 @@ jobs:
               />
             </Tab.Panel>
             <Tab.Panel>
-              <GitlapInstructionsSteps
+              <GitlabInstructionsSteps
                 isLoading={isLoading}
                 handleAutosetup={handleAutosetup}
                 progress={progress}
@@ -167,7 +171,9 @@ include:
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
+    api-url: ${apiUrl}
 `}
+                apiUrl={apiUrl}
               />
             </Tab.Panel>
             <Tab.Panel>
@@ -181,7 +187,7 @@ include:
                     codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
     devguard-scanner sign \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-        --apiUrl="${config.publicDevGuardApiUrl}" \\
+        --api-url="${apiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}" <IMAGE_NAME>:<TAG>`}
                   ></CopyCode>
                 </div>
