@@ -27,7 +27,7 @@ import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
 import Link from "next/link";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 import CopyCode from "../../../../../../components/common/CopyCode";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
@@ -44,73 +44,10 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
-import Dropzone, { DropzoneOptions } from "react-dropzone";
-import { useDropzone } from "react-dropzone";
-import { string } from "zod";
-import React, { useCallback } from "react";
-import { json } from "stream/consumers";
-import * as fs from "fs";
-import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import React from "react";
+import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog";
 
 interface Props extends AssetMetricsDTO {}
-
-const file = new File([JSON.stringify({ ping: true })], "ping.json", {
-  type: "application/json",
-});
-
-const handleSBOM = async (text: string) => {
-  const resp = await browserApiClient(
-    "/organizations/" +
-      "l3montree/projects/devguard/assets/devguard/sbom-manual-scan/",
-    {
-      method: "POST",
-      body: JSON.stringify(text),
-    },
-  );
-
-  if (resp.ok) {
-    console.log("Nice");
-  } else {
-    toast.error("Failed to update member role");
-  }
-};
-
-function DropzoneComponent() {
-  const [fileContent, setFileContent] = useState<string>("");
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onabort = () => console.log("file reading was aborted");
-      reader.onerror = () => console.log("file reading has failed");
-      reader.onload = () => {
-        const text = reader.result as string;
-        const sbomparse = JSON.parse(text);
-        setFileContent(text);
-        //console.log(text);
-
-        if (sbomparse.bomFormat && sbomparse.specVersion === "1.6") {
-          console.log("yay it works");
-        }
-      };
-      reader.readAsText(file);
-    });
-  }, []);
-
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: { "application/json": [".json"] },
-  });
-
-  return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      <p>click me</p>
-      <Button onClick={() => handleSBOM(fileContent)}> Hey</Button>
-    </div>
-  );
-}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
   const asset = useActiveAsset();
@@ -276,7 +213,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
             onOpenChange={setSbomIntegrationOpen}
           >
             <DialogContent>
-              <DropzoneComponent />
+              <UploadSbomDialog />
             </DialogContent>
           </Dialog>
         </div>
