@@ -4,7 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "../ui/button";
 
 export default function UploadSbomDialog() {
-  const fileContent = useRef<File>();
+  const fileContent = useRef<any>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -31,20 +31,18 @@ export default function UploadSbomDialog() {
   });
 
   const uploadSBOM = async () => {
-    if (!fileContent.current) {
-      console.log("file Content doesn't exists");
-      return;
-    }
     const formdata = new FormData();
     formdata.append("sbom", fileContent.current);
+    console.log("i just appended the content of " + fileContent.current);
+    console.log(formdata.get("sbom"));
     const resp = await browserApiClient(
       "/organizations/" +
         "l3montree/projects/devguard/assets/devguard/sbom-manual-scan/",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        //body: formdata,
-        body: fileContent.current,
+        headers: { "Content-Type": "multipart/form-data" },
+        body: formdata.get("sbom"),
+        //body: fileContent.current,
       },
     );
     if (resp.ok) {
