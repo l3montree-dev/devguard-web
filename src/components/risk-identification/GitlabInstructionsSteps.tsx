@@ -6,7 +6,7 @@ import Steps from "./Steps";
 import GitlabTokenInstructions from "./GitlabTokenInstructions";
 import Autosetup from "../Autosetup";
 import { FunctionComponent } from "react";
-import GitlabWebhookInstructions from "./GitlabWebhookInstructions";
+import Link from "next/link";
 
 interface Props {
   isLoading: boolean;
@@ -36,6 +36,17 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
 }) => {
   return (
     <>
+      <div className="mb-8">
+        See the documentation to integrate your project on Gitlab with Devguard.
+        <Link
+          href="https://devguard.org/getting-started/setup-gitlab-integration"
+          target="_blank"
+          className="mt-4"
+        >
+          {" "}
+           Set-up GitLab Integration
+        </Link>
+      </div>
       <Autosetup
         isLoading={isLoading}
         handleAutosetup={handleAutosetup}
@@ -51,7 +62,7 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
 
       <Steps>
         <GitlabTokenInstructions pat={pat?.privKey} />
-        <GitlabWebhookInstructions apiUrl={apiUrl} />
+
         <div className="mb-10">
           <h3 className="mb-4 mt-2 font-semibold">
             Create or insert the yaml snippet inside a .gitlab-ci.yml file
