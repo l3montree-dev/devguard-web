@@ -5,8 +5,15 @@ import {
 import React, { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "../ui/button";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 export default function UploadSbomDialog() {
+  const org = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
+
   const fileContent = useRef<any>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -19,12 +26,11 @@ export default function UploadSbomDialog() {
         const readerContent = reader.result as string;
         const sbomParsed = JSON.parse(readerContent);
         console.log(sbomParsed);
-        console.log("this is the actual file)" + file);
         if (
           sbomParsed.bomFormat === "CycloneDX" &&
           sbomParsed.specVersion === "1.6"
         ) {
-          console.log("yay it works");
+          console.log("checks have worked!");
           fileContent.current = file;
         } else console.log("this is not correct");
       };
@@ -40,16 +46,10 @@ export default function UploadSbomDialog() {
 
   const uploadSBOM = async () => {
     const formdata = new FormData();
-    console.log("this should be the actual file" + fileContent.current);
     formdata.append("file", fileContent.current);
-    console.log("the data is" + formdata);
-    console.log("i just appended the content of " + fileContent.current);
-    console.log(
-      "this is the actual data of the key value file " + formdata.get("file"),
-    );
     const resp = await multipartBrowserApiClient(
-      "/organizations/" +
-        "l3montree/projects/devguard/assets/devguard/sbom-manual-scan/",
+      `/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/sbom-manual-scan`,
+
       {
         method: "POST",
         body: formdata,
@@ -57,9 +57,9 @@ export default function UploadSbomDialog() {
       },
     );
     if (resp.ok) {
-      console.log("Nice");
+      console.log("SBOM has successfully been send!");
     } else {
-      console.error("uploading the data doesnt work");
+      console.error("uploading has failed");
     }
   };
 
