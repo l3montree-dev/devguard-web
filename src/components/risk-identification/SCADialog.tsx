@@ -189,7 +189,7 @@ include:
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
-    api-url: ${apiUrl}
+    api_url: ${apiUrl}
 `}
                 apiUrl={apiUrl}
               />
@@ -201,7 +201,7 @@ include:
     devguard-scanner sca \\
         --path="/app" \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-        --api-url="${apiUrl}" \\
+        --apiUrl="${apiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}"`}
               ></CopyCode>
             </Tab.Panel>

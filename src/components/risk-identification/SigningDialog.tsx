@@ -171,7 +171,7 @@ include:
   inputs:
     asset_name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
     token: "$DEVGUARD_TOKEN"
-    api-url: ${apiUrl}
+    api_url: ${apiUrl}
 `}
                 apiUrl={apiUrl}
               />
@@ -187,7 +187,7 @@ include:
                     codeString={`docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner@sha256:4aa67e829322df7c57213130cbe0bed19eed83d1d19988d5a00310fa1e524ed8 \\
     devguard-scanner sign \\
         --assetName="${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}" \\
-        --api-url="${apiUrl}" \\
+        --apiUrl="${apiUrl}" \\
         --token="${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"}" <IMAGE_NAME>:<TAG>`}
                   ></CopyCode>
                 </div>
