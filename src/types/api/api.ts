@@ -324,6 +324,8 @@ export interface AssetVersionDTO {
   updatedAt: string;
   version: string;
 
+  defaultBranch: boolean;
+
   type: "branch" | "tag";
 
   repositoryId?: string;

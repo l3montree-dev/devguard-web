@@ -44,13 +44,15 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
-import GitlapInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
+import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
-
+import { useStore } from "@/zustand/globalStoreProvider";
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
   const asset = useActiveAsset();
+
+  const apiUrl = useStore((s) => s.apiUrl);
 
   const menu = useAssetMenu();
 
@@ -295,7 +297,7 @@ jobs:
                 />
               </Tab.Panel>
               <Tab.Panel>
-                <GitlapInstructionsSteps
+                <GitlabInstructionsSteps
                   isLoading={isLoading}
                   handleAutosetup={handleAutosetup}
                   progress={progress}
@@ -307,7 +309,10 @@ include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
   inputs:
     asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
-    token: "$DEVGUARD_TOKEN"`}
+    token: "$DEVGUARD_TOKEN"
+    api-url: ${apiUrl}
+    `}
+                  apiUrl={apiUrl}
                 />
               </Tab.Panel>
             </Tab.Panels>

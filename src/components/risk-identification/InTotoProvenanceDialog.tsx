@@ -89,7 +89,7 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
               codeString={`devguard-scanner intoto setup \\
     --assetName=${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug} \\
     --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} \\
-    --apiUrl=${config.publicDevGuardApiUrl} \\
+    --apiUrl=${config.devguardApiUrlPublicInternet} \\
     --step=post-commit`}
             ></CopyCode>
           </div>
