@@ -77,7 +77,6 @@ export const multipartBrowserApiClient = (
   return fetch("/api/devguard-tunnel" + prefix + input, {
     ...init,
     headers: {
-      // "Content-Type": "application/json",
       ...init?.headers,
     },
     credentials: "include",

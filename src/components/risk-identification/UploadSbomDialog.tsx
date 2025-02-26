@@ -21,22 +21,26 @@ export default function UploadSbomDialog() {
       reader.onabort = () => console.log("file reading was aborted");
       reader.onerror = () => console.log("file reading has failed");
       reader.onload = () => {
-        const readerContent = reader.result as string;
-        let sbomParsed; //is this good code practice? probably not :c
         try {
+          const readerContent = reader.result as string;
+          let sbomParsed; //is this good code practice? probably not :c
           sbomParsed = JSON.parse(readerContent);
+          console.log(sbomParsed);
+          if (
+            sbomParsed.bomFormat === "CycloneDX" &&
+            sbomParsed.specVersion === "1.6"
+          ) {
+            fileContent.current = file;
+          } else
+            toast.error(
+              "SBOM does not follow CycloneDX format or Version is <1.6",
+            );
         } catch (e) {
           toast.error(
             "JSON format is not recognized, make sure it is the proper format",
           );
           return;
         }
-        if (
-          sbomParsed.bomFormat === "CycloneDX" &&
-          sbomParsed.specVersion === "1.6"
-        ) {
-          fileContent.current = file;
-        } else toast.error("SBOM does not follow CycloneDX format");
       };
 
       reader.readAsText(file);
@@ -63,7 +67,7 @@ export default function UploadSbomDialog() {
     if (resp.ok) {
       toast.success("SBOM has successfully been send!");
     } else {
-      toast.error("SBOM has not been send successfully to backend!");
+      toast.error("SBOM has not been send successfully");
     }
   };
 

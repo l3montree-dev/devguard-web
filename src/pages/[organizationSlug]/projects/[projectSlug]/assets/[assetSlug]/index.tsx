@@ -51,7 +51,6 @@ interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
   const asset = useActiveAsset();
-
   const menu = useAssetMenu();
 
   const project = useActiveProject();
@@ -95,10 +94,10 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               <h3 className="text-xl font-semibold">
                 <div className="mb-4">
                   <Stage
-                    id="devsecops-pipeline"
-                    title="DevSecOps-Pipeline"
+                    id="Manual-SBOM-Scan"
+                    title="Manual SBOM Scan"
                     description=" "
-                    buttonTitle="SBOM check"
+                    buttonTitle="Scan"
                     buttonVariant="default"
                     onButtonClick={() => setSbomIntegrationOpen(true)}
                   />
@@ -355,7 +354,6 @@ export default SecurityControlCenter;
 
 export const getServerSideProps = middleware(
   async (context) => {
-    console.log("SERVER SIDE");
     return {
       props: {},
     };
