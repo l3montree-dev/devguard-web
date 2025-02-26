@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { toast } from "sonner";
 
 export default function UploadSbomDialog() {
   const org = useActiveOrg();
@@ -24,15 +25,22 @@ export default function UploadSbomDialog() {
       reader.onerror = () => console.log("file reading has failed");
       reader.onload = () => {
         const readerContent = reader.result as string;
-        const sbomParsed = JSON.parse(readerContent);
+        let sbomParsed; //is this good code practice? probably not :c
+        try {
+          sbomParsed = JSON.parse(readerContent);
+        } catch (e) {
+          toast.error(
+            "JSON format is not recognized, make sure it is the proper format",
+          );
+          return;
+        }
         console.log(sbomParsed);
         if (
           sbomParsed.bomFormat === "CycloneDX" &&
           sbomParsed.specVersion === "1.6"
         ) {
-          console.log("checks have worked!");
           fileContent.current = file;
-        } else console.log("this is not correct");
+        } else toast.error("SBOM does not follow CycloneDX format"); //;
       };
 
       reader.readAsText(file);
