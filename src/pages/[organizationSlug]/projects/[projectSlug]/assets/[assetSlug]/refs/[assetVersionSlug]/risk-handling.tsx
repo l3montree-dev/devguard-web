@@ -378,7 +378,7 @@ const Index: FunctionComponent<Props> = (props) => {
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { asset }) => {
     // fetch the project
     let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
@@ -394,16 +394,13 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const assetVersionResp = await apiClient(uri + "refs");
-    const assetVersions = await assetVersionResp.json();
-
     let branches: string[] = [];
     let tags: string[] = [];
 
     let exists = false;
 
-    if (assetVersions.length !== 0) {
-      assetVersions.map((av: AssetVersionDTO) => {
+    if (asset.refs.length !== 0) {
+      asset.refs.map((av: AssetVersionDTO) => {
         if (av.type === "branch") {
           branches.push(av.name);
         } else if (av.type === "tag") {

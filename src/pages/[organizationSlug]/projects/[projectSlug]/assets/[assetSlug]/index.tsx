@@ -310,7 +310,7 @@ include:
   inputs:
     asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
     token: "$DEVGUARD_TOKEN"
-    api-url: ${apiUrl}
+    api_url: ${apiUrl}
     `}
                   apiUrl={apiUrl}
                 />
