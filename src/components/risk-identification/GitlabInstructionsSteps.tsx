@@ -6,7 +6,7 @@ import Steps from "./Steps";
 import GitlabTokenInstructions from "./GitlabTokenInstructions";
 import Autosetup from "../Autosetup";
 import { FunctionComponent } from "react";
-import GitlabWebhookInstructions from "./GitlabWebhookInstructions";
+import Link from "next/link";
 
 interface Props {
   isLoading: boolean;
@@ -36,6 +36,27 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
 }) => {
   return (
     <>
+      <div className="mb-8">
+        <div>
+          To integrate Devguard&apos;s CI/CD pipeline with your GitLab project,
+          follow the steps below. Once completed, you will see the results in
+          the Devguard Dashboard.
+        </div>
+        <div className="mt-4">
+          To manage and create issues in your GitLab project, you need to
+          generate a Token on GitLab, add it to Devguard, and configure a
+          webhook for your GitLab project. Refer to the documentation for
+          detailed instructions on setting up the GitLab integration.
+          <Link
+            href="https://devguard.org/getting-started/setup-gitlab-integration"
+            target="_blank"
+            className="mt-4"
+          >
+            Set Up GitLab Integration
+          </Link>
+        </div>
+      </div>
+
       <Autosetup
         isLoading={isLoading}
         handleAutosetup={handleAutosetup}
@@ -51,7 +72,7 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
 
       <Steps>
         <GitlabTokenInstructions pat={pat?.privKey} />
-        <GitlabWebhookInstructions apiUrl={apiUrl} />
+
         <div className="mb-10">
           <h3 className="mb-4 mt-2 font-semibold">
             Create or insert the yaml snippet inside a .gitlab-ci.yml file
