@@ -29,7 +29,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  console.log(req.body);
   // just forward the request to devguard
   // include the session cookie
   // check the url

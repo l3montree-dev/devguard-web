@@ -11,7 +11,6 @@ export default function UploadSbomDialog() {
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
-
   const fileContent = useRef<any>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -23,7 +22,7 @@ export default function UploadSbomDialog() {
       reader.onload = () => {
         try {
           const readerContent = reader.result as string;
-          let sbomParsed; //is this good code practice? probably not :c
+          let sbomParsed;
           sbomParsed = JSON.parse(readerContent);
           console.log(sbomParsed);
           if (
@@ -61,7 +60,7 @@ export default function UploadSbomDialog() {
       {
         method: "POST",
         body: formdata,
-        headers: { "X-Scanner": "SBOM-DATA" },
+        headers: { "X-Scanner": "SBOM-File-Upload" },
       },
     );
     if (resp.ok) {
