@@ -1,7 +1,4 @@
-import {
-  browserApiClient,
-  multipartBrowserApiClient,
-} from "@/services/devGuardApi";
+import { multipartBrowserApiClient } from "@/services/devGuardApi";
 import React, { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "../ui/button";
@@ -34,13 +31,12 @@ export default function UploadSbomDialog() {
           );
           return;
         }
-        console.log(sbomParsed);
         if (
           sbomParsed.bomFormat === "CycloneDX" &&
           sbomParsed.specVersion === "1.6"
         ) {
           fileContent.current = file;
-        } else toast.error("SBOM does not follow CycloneDX format"); //;
+        } else toast.error("SBOM does not follow CycloneDX format");
       };
 
       reader.readAsText(file);
@@ -56,18 +52,18 @@ export default function UploadSbomDialog() {
     const formdata = new FormData();
     formdata.append("file", fileContent.current);
     const resp = await multipartBrowserApiClient(
-      `/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/sbom-manual-scan`,
+      `/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/sbom-file`,
 
       {
         method: "POST",
         body: formdata,
-        headers: { "X-Scanner": "test" },
+        headers: { "X-Scanner": "SBOM-DATA" },
       },
     );
     if (resp.ok) {
-      console.log("SBOM has successfully been send!");
+      toast.success("SBOM has successfully been send!");
     } else {
-      console.error("uploading has failed");
+      toast.error("SBOM has not been send successfully to backend!");
     }
   };
 
