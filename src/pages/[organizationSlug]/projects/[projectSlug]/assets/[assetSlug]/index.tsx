@@ -96,7 +96,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
                   <Stage
                     id="Manual-SBOM-Scan"
                     title="Manual SBOM Scan"
-                    description=" "
+                    description="Manually scan uploaded CycloneDX JSON files for component and vulnerability analysis."
                     buttonTitle="Scan"
                     buttonVariant="default"
                     onButtonClick={() => setSbomIntegrationOpen(true)}

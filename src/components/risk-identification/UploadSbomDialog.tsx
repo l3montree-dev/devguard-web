@@ -12,6 +12,7 @@ export default function UploadSbomDialog() {
   const project = useActiveProject();
   const asset = useActiveAsset();
   const fileContent = useRef<any>();
+  const [occupied, setOccupied] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     console.log(acceptedFiles);
@@ -30,6 +31,7 @@ export default function UploadSbomDialog() {
             sbomParsed.specVersion === "1.6"
           ) {
             fileContent.current = file;
+            setOccupied(true);
           } else
             toast.error(
               "SBOM does not follow CycloneDX format or Version is <1.6",
@@ -38,6 +40,7 @@ export default function UploadSbomDialog() {
           toast.error(
             "JSON format is not recognized, make sure it is the proper format",
           );
+          setOccupied(false);
           return;
         }
       };
@@ -76,9 +79,12 @@ export default function UploadSbomDialog() {
         {...getRootProps()}
         className="mb-10 h-20 cursor-pointer rounded border border-dashed"
       >
+        <p>{"test " + occupied}</p>
         <input {...getInputProps()} />
       </div>
-      <Button onClick={() => uploadSBOM()}>Upload</Button>
+      <div className="flex justify-self-center">
+        <Button onClick={() => uploadSBOM()}>Upload</Button>
+      </div>
     </div>
   );
 }
