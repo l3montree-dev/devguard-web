@@ -87,7 +87,7 @@ export default function UploadSbomDialog() {
         <p>{fileName}</p>
       </div>
       <div className="flex justify-self-center">
-        <Button onClick={() => uploadSBOM()} disabled={occupied === false}>
+        <Button onClick={() => uploadSBOM()} disabled={!fileName}>
           Upload
         </Button>
       </div>
