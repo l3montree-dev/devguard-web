@@ -13,9 +13,9 @@ export default function UploadSbomDialog() {
   const asset = useActiveAsset();
   const fileContent = useRef<any>();
   const [occupied, setOccupied] = useState(false);
+  const [fileName, setFileName] = useState<string>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onabort = () => console.log("file reading was aborted");
@@ -25,13 +25,13 @@ export default function UploadSbomDialog() {
           const readerContent = reader.result as string;
           let sbomParsed;
           sbomParsed = JSON.parse(readerContent);
-          console.log(sbomParsed);
           if (
             sbomParsed.bomFormat === "CycloneDX" &&
             sbomParsed.specVersion === "1.6"
           ) {
             fileContent.current = file;
             setOccupied(true);
+            setFileName(file.name);
           } else
             toast.error(
               "SBOM does not follow CycloneDX format or Version is <1.6",
@@ -40,7 +40,6 @@ export default function UploadSbomDialog() {
           toast.error(
             "JSON format is not recognized, make sure it is the proper format",
           );
-          setOccupied(false);
           return;
         }
       };
@@ -77,13 +76,15 @@ export default function UploadSbomDialog() {
     <div>
       <div
         {...getRootProps()}
-        className="mb-10 h-20 cursor-pointer rounded border border-dashed"
+        className="mb-10 flex h-20 cursor-pointer items-center justify-center rounded border border-dashed"
       >
-        <p>{"test " + occupied}</p>
         <input {...getInputProps()} />
+        <p>{fileName}</p>
       </div>
       <div className="flex justify-self-center">
-        <Button onClick={() => uploadSBOM()}>Upload</Button>
+        <Button onClick={() => uploadSBOM()} disabled={occupied === false}>
+          Upload
+        </Button>
       </div>
     </div>
   );
