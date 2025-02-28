@@ -108,7 +108,6 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
                     onButtonClick={() => setSbomIntegrationOpen(true)}
                   />
                 </div>
-
                 Development{" "}
                 <Image
                   className="mr-2 inline-block"
