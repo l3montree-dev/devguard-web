@@ -14,7 +14,6 @@ export default function UploadSbomDialog() {
   const project = useActiveProject();
   const asset = useActiveAsset();
   const fileContent = useRef<any>();
-  const [occupied, setOccupied] = useState(false);
   const [fileName, setFileName] = useState<string>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
