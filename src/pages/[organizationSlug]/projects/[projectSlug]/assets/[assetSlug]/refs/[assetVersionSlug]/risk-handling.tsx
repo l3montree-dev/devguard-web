@@ -229,26 +229,10 @@ const Index: FunctionComponent<Props> = (props) => {
       }, 500),
     [router],
   );
-  let activeScan = false;
-  if (props.exists) {
-    activeScan = Boolean(asset?.lastContainerScan ?? asset?.lastScaScan);
-  }
+
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       {!props.exists ? (
-        <EmptyParty
-          title="No identified risks"
-          description="No identified risks for this asset."
-        />
-      ) : activeScan &&
-        table.getRowCount() === 0 &&
-        Object.keys(router.query).length === 4 ? (
-        <EmptyParty
-          title="No identified risks"
-          description="No identified risks for this asset."
-        />
-      ) : /**  the query will contain organizationSlug, projectSlug and assetSlug - thus 3 is empty  */
-      table.getRowCount() === 0 && Object.keys(router.query).length === 4 ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
@@ -260,12 +244,22 @@ const Index: FunctionComponent<Props> = (props) => {
                 }),
                 "!text-primary-foreground",
               )}
-              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`}
+              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/`}
             >
               Start identifying risks
             </Link>
           }
         />
+      ) : table.getRowCount() === 0 &&
+        Object.keys(router.query).length === 4 ? (
+        <>
+          <BranchTagSelector branches={branches} tags={tags} />
+
+          <EmptyParty
+            title="No identified risks"
+            description="No identified risks for this asset."
+          />
+        </>
       ) : (
         <div>
           <BranchTagSelector branches={branches} tags={tags} />
@@ -384,7 +378,7 @@ const Index: FunctionComponent<Props> = (props) => {
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { asset }) => {
     // fetch the project
     let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
@@ -400,16 +394,13 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const assetVersionResp = await apiClient(uri + "refs");
-    const assetVersions = await assetVersionResp.json();
-
     let branches: string[] = [];
     let tags: string[] = [];
 
     let exists = false;
 
-    if (assetVersions.length !== 0) {
-      assetVersions.map((av: AssetVersionDTO) => {
+    if (asset.refs.length !== 0) {
+      asset.refs.map((av: AssetVersionDTO) => {
         if (av.type === "branch") {
           branches.push(av.name);
         } else if (av.type === "tag") {

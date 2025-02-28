@@ -47,10 +47,16 @@ import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessTok
 import React from "react";
 import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog";
 
+import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
+import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
+import { useStore } from "@/zustand/globalStoreProvider";
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
   const asset = useActiveAsset();
+
+  const apiUrl = useStore((s) => s.apiUrl);
+
   const menu = useAssetMenu();
 
   const project = useActiveProject();
@@ -60,7 +66,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const pat = (
     personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
-  ) as PatWithPrivKey | null;
+  ) as PatWithPrivKey | undefined;
 
   const { isLoading, handleAutosetup, progress, Loader } = useAutosetup("full");
 
@@ -228,7 +234,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
             </DialogDescription>
           </DialogHeader>
           <hr />
-          <Steps>
+          <div>
             <Section
               className="mb-10 mt-0 pb-0 pt-0"
               description="To use the Devguard-Scanner, you need to create a Personal Access
@@ -261,72 +267,46 @@ Token. You can create such a token by clicking the button below."
                 </div>
               )}
             </Section>
-            <Section
-              forceVertical
-              className="mb-10"
-              title="Store the Token in your CI/CD Variables"
-            >
-              <p className="text-sm text-muted-foreground">
-                To use the DevGuard-Scanner in your CI/CD pipeline, you need to
-                store the token in your CI/CD variables. The token is used to
-                authenticate the scanner with the DevGuard API:{" "}
-                <Link
-                  target="_blank"
-                  href="https://docs.gitlab.com/ee/ci/variables/"
-                >
-                  GitLab Documentation
-                </Link>
-                {", "}
-                <Link href="https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables">
-                  GitHub Documentation
-                </Link>
-              </p>
-            </Section>
-            <Section
-              className="mt-0"
-              forceVertical
-              title="Integrate the DevGuard-Scanner"
-            >
-              <Tab.Group>
-                <Tab.List>
-                  <CustomTab>
-                    {" "}
-                    <Image
-                      className="mr-1 inline-block"
-                      src={"/assets/gitlab.svg"}
-                      alt="GitLab logo"
-                      width={20}
-                      height={20}
-                    />{" "}
-                    GitLab
-                  </CustomTab>
-                  <CustomTab>
-                    <Image
-                      className="mr-2 inline-block dark:invert"
-                      src={"/assets/github.svg"}
-                      alt="GitHub logo"
-                      width={20}
-                      height={20}
-                    />{" "}
-                    GitHub
-                  </CustomTab>
-                </Tab.List>
-                <Tab.Panel className={"my-3"}>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# .gitlab-ci.yml
-
-include:
-- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
-inputs:
-    asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
-    token: "$DEVGUARD_TOKEN"`}
-                  />
-                </Tab.Panel>
-                <Tab.Panel className={"my-3"}>
-                  <CopyCode
-                    language="yaml"
-                    codeString={`# .github/workflows/devguard.yml
+          </div>
+          <hr />
+          <Tab.Group>
+            <Tab.List>
+              <CustomTab>
+                <Image
+                  src="/assets/github.svg"
+                  width={20}
+                  className="mr-2 inline dark:invert"
+                  height={20}
+                  alt="GitHub"
+                />
+                Using GitHub Actions
+              </CustomTab>
+              <CustomTab>
+                <Image
+                  src="/assets/gitlab.svg"
+                  width={20}
+                  className="mr-2 inline"
+                  height={20}
+                  alt="GitLab"
+                />
+                Using GitLab CI/CD
+              </CustomTab>
+              {/*               <CustomTab>
+                <Image
+                  src="/assets/docker.svg"
+                  width={20}
+                  className="mr-2 inline"
+                  height={20}
+                  alt="Docker Logo"
+                />
+                Using Docker
+              </CustomTab> */}
+            </Tab.List>
+            <Tab.Panels className={"mt-2"}>
+              <Tab.Panel>
+                <GithubInstructionsSteps
+                  pat={pat}
+                  codeString={`# .github/workflows/devguard.yml
 name: DevGuard Workflow
 
 on:
@@ -339,11 +319,29 @@ jobs:
             asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
         secrets:
             devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
-                  />
-                </Tab.Panel>
-              </Tab.Group>
-            </Section>
-          </Steps>
+                />
+              </Tab.Panel>
+              <Tab.Panel>
+                <GitlabInstructionsSteps
+                  isLoading={isLoading}
+                  handleAutosetup={handleAutosetup}
+                  progress={progress}
+                  Loader={Loader}
+                  pat={pat}
+                  codeString={`# .gitlab-ci.yml
+
+include:
+- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/full.yml"
+  inputs:
+    asset_name: ${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}
+    token: "$DEVGUARD_TOKEN"
+    api_url: ${apiUrl}
+    `}
+                  apiUrl={apiUrl}
+                />
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
         </DialogContent>
       </Dialog>
     </>

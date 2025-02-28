@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { config } from "@/config";
 import { addToInitialZustand as addToInitialZustand } from "@/zustand/initialState";
 import {
   GetServerSidePropsContext,
@@ -35,6 +36,10 @@ export type DecoratedGetServerSideProps<AdditionalData, Props = {}> = (
   additionalData: AdditionalData,
 ) => GetServerSidePropsResult<Props> | Promise<GetServerSidePropsResult<Props>>;
 
+const defaultParams = {
+  apiUrl: config.devguardApiUrlPublicInternet,
+};
+
 export const middleware = <Additional extends Record<string, any>>(
   handler: DecoratedGetServerSideProps<Additional, any>,
   decorators: {
@@ -54,7 +59,7 @@ export const middleware = <Additional extends Record<string, any>>(
       );
 
       const resp = await handler(ctx, params as any);
-      addToInitialZustand(resp, params as any);
+      addToInitialZustand(resp, { ...(params as any), ...defaultParams });
       return resp;
     } catch (e) {
       // if a middleware function throws an error,

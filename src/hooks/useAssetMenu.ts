@@ -24,6 +24,20 @@ import { useRouter } from "next/router";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
+import { AssetDTO } from "@/types/api/api";
+
+export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
+  // if we know the default branch - get that one
+  const defaultVersion = asset.refs.find((ref) => ref.defaultBranch);
+  if (defaultVersion) {
+    return defaultVersion.slug;
+  }
+  // if we don't know the default branch - get the first one
+  if (asset.refs.length > 0) {
+    return asset.refs[0].slug;
+  }
+  return "";
+};
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
@@ -36,8 +50,8 @@ export const useAssetMenu = () => {
   const assetVersion = useActiveAssetVersion();
   const activeAsset = useActiveAsset();
 
-  //TODO: Fix this
-  const assetVersionSlug = assetVersion?.slug ?? "main";
+  const assetVersionSlug =
+    assetVersion?.slug ?? getDefaultAssetVersionSlug(activeAsset!);
   let menu = [
     {
       title: "Security Control Center",
