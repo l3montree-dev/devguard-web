@@ -31,7 +31,6 @@ export default function UploadSbomDialog() {
             sbomParsed.specVersion === "1.6"
           ) {
             fileContent.current = file;
-            setOccupied(true);
             setFileName(file.name);
           } else
             toast.error(
