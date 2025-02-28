@@ -6,8 +6,10 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "sonner";
+import { useRouter } from "next/router";
 
 export default function UploadSbomDialog() {
+  const router = useRouter();
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -70,6 +72,9 @@ export default function UploadSbomDialog() {
     } else {
       toast.error("SBOM has not been send successfully");
     }
+    router.push(
+      `/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/main/risk-handling/`,
+    );
   };
 
   return (
