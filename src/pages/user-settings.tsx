@@ -306,7 +306,7 @@ const Settings: FunctionComponent<{
                     <ConfirmTokenDeletion
                       Button={
                         <Button
-                          variant="destructive"
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90" //variant destructive doesnt apply here for some reason
                           onClick={() => onDeletePat(pat)}
                         >
                           Yes
