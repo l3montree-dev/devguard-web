@@ -101,11 +101,18 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                   <FormLabel>GitLab URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="https://gitlab.com"
+                      placeholder={"https://gitlab.com/"}
                       autoComplete="url"
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>
+                    Ensure that you provide only the{" "}
+                    <strong>base URL of your GitLab instance </strong> (e.g.,
+                    https://gitlab.example.com) without any repository paths.
+                    Including the full URL with the repository path may result
+                    in an error.{" "}
+                  </FormDescription>
                 </FormItem>
               )}
             />
