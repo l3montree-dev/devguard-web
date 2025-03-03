@@ -54,6 +54,10 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       onNewIntegration(integration);
       setOpen(false);
     }
+    var formatedUrl = form.getValues("url") + "asd";
+    console.log(formatedUrl);
+    form.setValue("url", `${formatedUrl}`); //updated url
+    console.log(form.getValues("url"));
   };
   return (
     <Dialog onOpenChange={setOpen} open={open}>
