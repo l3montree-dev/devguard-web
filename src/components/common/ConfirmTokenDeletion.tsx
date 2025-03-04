@@ -35,9 +35,7 @@ const ConfirmTokenDeletion: FunctionComponent<PropsWithChildren<Props>> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction className="" asChild>
-            {Button}
-          </AlertDialogAction>
+          {Button}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
