@@ -306,7 +306,7 @@ const Settings: FunctionComponent<{
                     <ConfirmTokenDeletion
                       Button={
                         <Button
-                          className="destructive"
+                          variant="destructive"
                           onClick={() => onDeletePat(pat)}
                         >
                           Yes
