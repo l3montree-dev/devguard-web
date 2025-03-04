@@ -118,6 +118,8 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                     <Input
                       placeholder={"https://gitlab.com/"}
                       autoComplete="url"
+                      type="url"
+                      required
                       {...field}
                     />
                   </FormControl>
