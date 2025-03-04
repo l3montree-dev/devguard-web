@@ -54,9 +54,12 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       onNewIntegration(integration);
       setOpen(false);
     }
-    var formatedUrl = form.getValues("url") + "asd";
-    console.log(formatedUrl);
-    form.setValue("url", `${formatedUrl}`); //updated url
+
+    var regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
+    var regexUrl = form.getValues("url");
+    var formatedUrl = regexUrl.split(regex);
+    //console.log("sind hier kommas?" + formatedUrl[1]); //keine kommas
+    form.setValue("url", `${formatedUrl[1]}`); //updated url
     console.log(form.getValues("url"));
   };
   return (
