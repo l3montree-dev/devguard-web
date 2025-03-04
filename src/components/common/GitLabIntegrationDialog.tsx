@@ -15,7 +15,7 @@ import {
   FormItem,
   FormLabel,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -23,6 +23,13 @@ import { useLoader } from "@/hooks/useLoader";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { GitLabIntegrationDTO } from "@/types/api/api";
 import { toast } from "sonner";
+
+export function urlToBaseURL(url: string): string {
+  const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
+  const formatedUrl = url.split(regex);
+
+  return formatedUrl[1];
+}
 
 interface Props {
   Button: ReactNode;
@@ -46,7 +53,10 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       "/organizations/" + activeOrg.slug + "/integrations/gitlab/test-and-save",
       {
         method: "POST",
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          ...params,
+          url: urlToBaseURL(params.url),
+        }),
       },
     );
     if (res.ok) {
@@ -59,6 +69,7 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       );
     }
   };
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
@@ -75,10 +86,6 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
-              const regexUrl = form.getValues("url");
-              const formatedUrl = regexUrl.split(regex);
-              form.setValue("url", `${formatedUrl[1]}`); //updated url
               waitFor(form.handleSubmit(handleSubmit))();
             }}
           >
