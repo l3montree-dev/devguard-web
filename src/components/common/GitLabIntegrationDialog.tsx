@@ -48,19 +48,11 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
         body: JSON.stringify(params),
       },
     );
-
     if (res.ok) {
       const integration = await res.json();
       onNewIntegration(integration);
       setOpen(false);
     }
-
-    var regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
-    var regexUrl = form.getValues("url");
-    var formatedUrl = regexUrl.split(regex);
-    //console.log("sind hier kommas?" + formatedUrl[1]); //keine kommas
-    form.setValue("url", `${formatedUrl[1]}`); //updated url
-    console.log(form.getValues("url"));
   };
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -78,6 +70,13 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
+
+              var regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
+              var regexUrl = form.getValues("url");
+              var formatedUrl = regexUrl.split(regex);
+              form.setValue("url", `${formatedUrl[1]}`); //updated url
+              console.log(form.getValues("url"));
+
               waitFor(form.handleSubmit(handleSubmit))();
             }}
           >
