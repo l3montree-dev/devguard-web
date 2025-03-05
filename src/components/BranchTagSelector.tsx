@@ -23,14 +23,14 @@ export function BranchTagSelector({
   tags: AssetVersionDTO[];
 }) {
   const router = useRouter();
-
+  const [view, setView] = useState("branches");
+  const items = view === "branches" ? branches : tags;
   const [selected, setSelected] = useState(
-    router.query.assetVersionSlug as string,
+    items.find((i) => i.slug === (router.query.assetVersionSlug as string))
+      ?.name,
   );
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState("branches");
 
-  const items = view === "branches" ? branches : tags;
   const filteredItems = items.filter((item) => item.name.includes(filter));
 
   return (
