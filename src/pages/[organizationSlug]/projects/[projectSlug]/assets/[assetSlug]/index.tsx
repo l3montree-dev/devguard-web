@@ -27,7 +27,7 @@ import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
 import Link from "next/link";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 import CopyCode from "../../../../../../components/common/CopyCode";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
@@ -44,6 +44,9 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
+import React from "react";
+import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog";
+
 import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
 import { useStore } from "@/zustand/globalStoreProvider";
@@ -59,6 +62,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   const project = useActiveProject();
   const org = useActiveOrg();
   const [fullIntegrationOpen, setFullIntegrationOpen] = useState(false);
+  const [sbomIntegrationOpen, setSbomIntegrationOpen] = useState(false);
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const pat = (
     personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
@@ -94,6 +98,16 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               )}
 
               <h3 className="text-xl font-semibold">
+                <div className="mb-4">
+                  <Stage
+                    id="Manual-SBOM-Scan"
+                    title="Manual SBOM Scan"
+                    description="Manually scan uploaded CycloneDX JSON files for component and vulnerability analysis."
+                    buttonTitle="Scan"
+                    buttonVariant="default"
+                    onButtonClick={() => setSbomIntegrationOpen(true)}
+                  />
+                </div>
                 Development{" "}
                 <Image
                   className="mr-2 inline-block"
@@ -196,6 +210,16 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               </div>
             </Section>
           </div>
+        </div>
+        <div>
+          <Dialog
+            open={sbomIntegrationOpen}
+            onOpenChange={setSbomIntegrationOpen}
+          >
+            <DialogContent>
+              <UploadSbomDialog />
+            </DialogContent>
+          </Dialog>
         </div>
       </Page>
       <Dialog open={fullIntegrationOpen} onOpenChange={setFullIntegrationOpen}>

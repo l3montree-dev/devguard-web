@@ -68,3 +68,17 @@ export const browserApiClient = (
     credentials: "include",
   });
 };
+
+export const multipartBrowserApiClient = (
+  input: string,
+  init?: RequestInit,
+  prefix = "/api/v1",
+) => {
+  return fetch("/api/devguard-tunnel" + prefix + input, {
+    ...init,
+    headers: {
+      ...init?.headers,
+    },
+    credentials: "include",
+  });
+};
