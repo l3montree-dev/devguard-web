@@ -22,6 +22,7 @@ import {
 } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { controlOrMeta } from "@mdxeditor/editor";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -197,6 +198,29 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
+const SliderForm: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    name="sliderInput"
+    control={form.control}
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>{form.getValues("sliderInput")}</FormLabel>
+        <FormControl>
+          <Slider
+            min={0}
+            max={10}
+            defaultValue={[8]}
+            step={0.1}
+            onValueChange={field.onChange}
+          />
+        </FormControl>
+        <FormDescription>The name of the asset.</FormDescription>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
 const AssetForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
 > = ({ form, forceVerticalSections }) => {
@@ -224,7 +248,8 @@ Security requirements are specific criteria or conditions that an application, s
         description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
         title="Environmental information"
       >
-        <Slider defaultValue={[8]} max={10.0} step={0.1} />
+        <SliderForm form={form}></SliderForm>
+
         <AssetFormMisc form={form} />
       </Section>
     </>
