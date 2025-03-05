@@ -15,13 +15,21 @@ import {
   FormItem,
   FormLabel,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useLoader } from "@/hooks/useLoader";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { GitLabIntegrationDTO } from "@/types/api/api";
+import { toast } from "sonner";
+
+export function urlToBaseURL(url: string): string {
+  const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
+  const formatedUrl = url.split(regex);
+
+  return formatedUrl[1];
+}
 
 interface Props {
   Button: ReactNode;
@@ -45,16 +53,23 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       "/organizations/" + activeOrg.slug + "/integrations/gitlab/test-and-save",
       {
         method: "POST",
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          ...params,
+          url: urlToBaseURL(params.url),
+        }),
       },
     );
-
     if (res.ok) {
       const integration = await res.json();
       onNewIntegration(integration);
       setOpen(false);
+    } else {
+      toast.error(
+        "Your Gitlab token seems to be wrong, check if the token has at least reporter access or is pasted correctly",
+      );
     }
   };
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
@@ -101,11 +116,20 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                   <FormLabel>GitLab URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="https://gitlab.com"
+                      placeholder={"https://gitlab.com/"}
                       autoComplete="url"
+                      type="url"
+                      required
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>
+                    Ensure that you provide only the{" "}
+                    <strong>base URL of your GitLab instance </strong> (e.g.,
+                    https://gitlab.example.com) without any repository paths.
+                    Including the full URL with the repository path may result
+                    in an error.{" "}
+                  </FormDescription>
                 </FormItem>
               )}
             />

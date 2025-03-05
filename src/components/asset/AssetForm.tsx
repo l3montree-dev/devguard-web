@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
+import { Slider } from "@/components/ui/slider";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -223,6 +224,7 @@ Security requirements are specific criteria or conditions that an application, s
         description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
         title="Environmental information"
       >
+        <Slider defaultValue={[8]} max={10.0} step={0.1} />
         <AssetFormMisc form={form} />
       </Section>
     </>
