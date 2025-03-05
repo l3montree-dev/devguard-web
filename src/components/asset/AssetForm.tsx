@@ -210,7 +210,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
             min={0}
             max={10}
             defaultValue={[8]}
-            step={0.1}
+            step={0.5}
             onValueChange={field.onChange}
           />
         </FormControl>
