@@ -24,7 +24,7 @@ import { useRouter } from "next/router";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
-import { AssetDTO } from "@/types/api/api";
+import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   // if we know the default branch - get that one
@@ -39,6 +39,25 @@ export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   return "";
 };
 
+export const getAssetVersionSlug = (
+  asset: AssetDTO,
+  assetVersion?: AssetVersionDTO,
+): string => {
+  if (!assetVersion) {
+    return getDefaultAssetVersionSlug(asset);
+  }
+
+  // if the assetVersion is defined, we should use that slug - since the user
+  // already navigated to that version - therefore it is set.
+  // BUT make sure, that the assetVersion corresponds to the asset
+  if (assetVersion.assetId === asset.id) {
+    return assetVersion.slug;
+  }
+
+  // get the default asset version slug
+  return getDefaultAssetVersionSlug(asset);
+};
+
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
   const router = useRouter();
@@ -50,8 +69,8 @@ export const useAssetMenu = () => {
   const assetVersion = useActiveAssetVersion();
   const activeAsset = useActiveAsset();
 
-  const assetVersionSlug =
-    assetVersion?.slug ?? getDefaultAssetVersionSlug(activeAsset!);
+  const assetVersionSlug = getAssetVersionSlug(activeAsset!, assetVersion);
+
   let menu = [
     {
       title: "Security Control Center",
