@@ -66,7 +66,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <ListItem
             description={
-              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
+              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the set."
             }
             Title="Central Flaw Management"
             Button={
@@ -200,7 +200,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
 
 const SliderForm: FunctionComponent<Props> = ({ form }) => (
   <FormField
-    name="sliderInput"
+    name="cvssScore"
     control={form.control}
     render={({ field }) => (
       <FormItem>
@@ -214,7 +214,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
             onValueChange={field.onChange}
           />
         </FormControl>
-        <FormDescription>The name of the asset.</FormDescription>
+        <FormDescription>Chose a score.</FormDescription>
         <FormMessage />
       </FormItem>
     )}

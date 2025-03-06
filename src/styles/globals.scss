@@ -281,17 +281,8 @@
     transition: all 0.2s ease;
 }
 
-
-
-span h1 {
-    
-    background-color: red;
-}
-
-.Lars {
-    background-color: blue;
-}
-
-#test{
-    background-color: green;
+.slider-gradient {  
+    background: rgb(216,186,26);
+    background: linear-gradient(90deg, rgba(216,186,26,1) 35%, rgba(216,104,26,1) 100%);
+      
 }

@@ -87,7 +87,6 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-
       centralFlawManagement: true,
     },
   });
@@ -422,7 +421,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
               <AssetForm forceVerticalSections form={form} />
               <DialogFooter>
                 <Button type="submit" variant="default">
-                  Create
+                  Create asd123
                 </Button>
               </DialogFooter>
             </form>
