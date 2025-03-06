@@ -182,10 +182,11 @@ interface BaseFlawEventDTO {
   userId: string;
   createdAt: string;
   id: string;
-  flawId: string;
+  vulnId: string;
   justification: string;
   flawName: string | null;
-  assetVersion: string;
+  assetVersionName: string;
+  assetVersionSlug: string;
 }
 
 export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
@@ -367,6 +368,8 @@ export interface AssetDTO {
   signingPubKey?: string;
 
   centralFlawManagement: boolean;
+
+  slider: number;
 }
 
 export interface DependencyTreeNode {

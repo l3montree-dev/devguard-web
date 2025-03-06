@@ -30,7 +30,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, ReactNode, useState } from "react";
+import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
@@ -274,6 +274,9 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
+  useEffect(() => {
+    setFlaw(props.flaw);
+  }, [props.flaw]);
   const cve = flaw.cve;
 
   const activeOrg = useActiveOrg();
@@ -876,6 +879,17 @@ export const getServerSideProps = middleware(
       flawId;
 
     const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
+
+    //fetch events for the flaw in all asset versions
+    const eventsUri = uri + "/events";
+    const events: FlawEventDTO[] = await (await apiClient(eventsUri)).json();
+
+    //filter events with type detected
+    const ev = events.filter((event) => {
+      return event.type !== "detected" || event.vulnId === resp.id;
+    });
+
+    resp.events = ev;
 
     return {
       props: {
