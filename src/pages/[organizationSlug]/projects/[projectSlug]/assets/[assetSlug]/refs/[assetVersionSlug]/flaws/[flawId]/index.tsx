@@ -337,7 +337,11 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     }
 
-    setFlaw((prev) => ({ ...prev, ...json }));
+    setFlaw((prev) => ({
+      ...prev,
+      ...json,
+      events: prev.events.concat(json.events.slice(-1)),
+    }));
     setJustification("");
   };
 
