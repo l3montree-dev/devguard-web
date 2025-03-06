@@ -204,13 +204,13 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
     control={form.control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel>{form.getValues("sliderInput")}</FormLabel>
+        <FormLabel>{form.getValues("cvssScore")}</FormLabel>
         <FormControl>
           <Slider
             min={0}
             max={10}
-            defaultValue={[8]}
             step={0.5}
+            defaultValue={[8]}
             onValueChange={field.onChange}
           />
         </FormControl>
@@ -248,9 +248,8 @@ Security requirements are specific criteria or conditions that an application, s
         description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
         title="Environmental information"
       >
-        <SliderForm form={form}></SliderForm>
-
         <AssetFormMisc form={form} />
+        <SliderForm form={form}></SliderForm>
       </Section>
     </>
   );

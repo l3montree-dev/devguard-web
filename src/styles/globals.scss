@@ -286,3 +286,14 @@
     background: linear-gradient(90deg, rgba(216,186,26,1) 35%, rgba(216,104,26,1) 100%);
       
 }
+
+.tick-slider-value {
+    position: absolute;
+    top: 0;
+
+    font-weight: bold;
+
+    color: var(--blue);
+
+    border-radius: var(--slider-handle-border-radius);
+}

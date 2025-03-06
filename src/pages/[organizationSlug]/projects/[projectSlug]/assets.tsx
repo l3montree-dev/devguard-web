@@ -57,6 +57,7 @@ import CopyCode from "../../../../components/common/CopyCode";
 import PatSection from "../../../../components/risk-identification/PatSection";
 import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
 import { config } from "../../../../config";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 
 interface Props {
   project: ProjectDTO & {
@@ -70,6 +71,7 @@ const formSchema = z.object({
   description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
+  cvssScore: z.number(),
 
   confidentialityRequirement: z.string(),
   integrityRequirement: z.string(),
@@ -87,6 +89,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
+      cvssScore: 8,
       centralFlawManagement: true,
     },
   });
