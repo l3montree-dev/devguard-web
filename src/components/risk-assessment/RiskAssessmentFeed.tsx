@@ -276,14 +276,12 @@ export default function RiskAssessmentFeed({
                           {eventTypeMessages(event, index, flawName, events)}
                         </p>
 
-                        {event.assetVersion === activeAssetVersion?.name && (
-                          <div className="absolute right-2 top-2">
-                            <Badge variant={"outline"}>
-                              <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                              {event.assetVersion}
-                            </Badge>
-                          </div>
-                        )}
+                        <div className="absolute right-2 top-2">
+                          <Badge variant={"outline"}>
+                            <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                            {event.assetVersion}
+                          </Badge>
+                        </div>
                       </div>
 
                       {Boolean(msg) && (
