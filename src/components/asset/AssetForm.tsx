@@ -23,8 +23,7 @@ import {
 import { Switch } from "../ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { controlOrMeta } from "@mdxeditor/editor";
-import SliderWithStickyLabelDemo from "../ui/sliderwithstickylabeldemo";
-
+import SliderWithStickyLabelDemo from "../ui/slider copy";
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
 }
@@ -205,33 +204,32 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
     control={form.control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel>{form.getValues("cvssScore")}</FormLabel>
+        <FormLabel>CVSS Score</FormLabel>
         <FormControl>
           <Slider
             min={0}
             max={10}
             step={0.5}
             defaultValue={[8]}
+            value={form.getValues("cvssScore")}
             onValueChange={field.onChange}
           />
         </FormControl>
         <FormDescription>
-          CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted Score
-          given by experts{" "}
+          Calculates Risk including multiple factors.
         </FormDescription>
         <FormMessage />
       </FormItem>
     )}
   />
 );
-
 const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
   <FormField
     name="riskValueScore"
     control={form.control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel>{form.getValues("riskValueScore")}</FormLabel>
+        <FormLabel>CVSS-BTE</FormLabel>
         <FormControl>
           <Slider
             min={0}
@@ -243,7 +241,8 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
           />
         </FormControl>
         <FormDescription>
-          Calculates Risk including multiple factors.
+          CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted Score
+          given by experts{" "}
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -282,6 +281,7 @@ Security requirements are specific criteria or conditions that an application, s
         <SliderForm form={form}></SliderForm>
         <RiskSliderForm form={form}></RiskSliderForm>
       </Section>
+      <></>
     </>
   );
 };
