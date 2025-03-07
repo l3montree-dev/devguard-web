@@ -278,9 +278,11 @@ Security requirements are specific criteria or conditions that an application, s
         title="Environmental information"
       >
         <AssetFormMisc form={form} />
-        <SliderForm form={form}></SliderForm>
-        <RiskSliderForm form={form}></RiskSliderForm>
       </Section>
+      <hr />
+      <SliderForm form={form}></SliderForm>
+      <RiskSliderForm form={form}></RiskSliderForm>
+
       <></>
     </>
   );
