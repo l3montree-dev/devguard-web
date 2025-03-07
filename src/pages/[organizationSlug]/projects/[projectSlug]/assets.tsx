@@ -71,7 +71,8 @@ const formSchema = z.object({
   description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
-  cvssScore: z.number(),
+  cvssScore: z.number().array(),
+  riskValueScore: z.number().array(),
 
   confidentialityRequirement: z.string(),
   integrityRequirement: z.string(),
@@ -89,7 +90,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      cvssScore: 8,
+      cvssScore: [8],
+      riskValueScore: [8],
       centralFlawManagement: true,
     },
   });
@@ -424,7 +426,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
               <AssetForm forceVerticalSections form={form} />
               <DialogFooter>
                 <Button type="submit" variant="default">
-                  Create asd123
+                  Create
                 </Button>
               </DialogFooter>
             </form>

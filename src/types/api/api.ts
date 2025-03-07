@@ -367,8 +367,8 @@ export interface AssetDTO {
   signingPubKey?: string;
 
   centralFlawManagement: boolean;
-  cvssScore: number;
-  riskValueScore: number;
+  cvssScore: number[];
+  riskValueScore: number[];
   sliderInput: string;
 }
 

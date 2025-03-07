@@ -214,7 +214,35 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
             onValueChange={field.onChange}
           />
         </FormControl>
-        <FormDescription>Chose a score.</FormDescription>
+        <FormDescription>
+          CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted Score
+          given by experts{" "}
+        </FormDescription>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    name="riskValueScore"
+    control={form.control}
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>{form.getValues("riskValueScore")}</FormLabel>
+        <FormControl>
+          <Slider
+            min={0}
+            max={10}
+            step={0.5}
+            defaultValue={[8]}
+            onValueChange={field.onChange}
+          />
+        </FormControl>
+        <FormDescription>
+          Calculates Risk including multiple factors.
+        </FormDescription>
         <FormMessage />
       </FormItem>
     )}
@@ -250,6 +278,7 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <AssetFormMisc form={form} />
         <SliderForm form={form}></SliderForm>
+        <RiskSliderForm form={form}></RiskSliderForm>
       </Section>
     </>
   );
