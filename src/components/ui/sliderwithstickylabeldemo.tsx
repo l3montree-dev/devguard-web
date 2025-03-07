@@ -5,13 +5,13 @@ import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
-export default function SliderWithStickyLabelDemo() {
-  const [progress, setProgress] = React.useState([8]);
+const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
 
-  return (
-    <div className="relative flex w-full max-w-sm flex-col items-center">
-      <SliderPrimitive.Root
-        defaultValue={progress}
+>(({ className, ...props }, ref) => (
+  <SliderPrimitive.Root
+        defaultValue={[8]}
         max={10}
         step={1}
         onValueChange={setProgress}
@@ -28,6 +28,5 @@ export default function SliderWithStickyLabelDemo() {
           </Badge>
         </SliderPrimitive.Thumb>
       </SliderPrimitive.Root>
-    </div>
-  );
-}
+));
+};
