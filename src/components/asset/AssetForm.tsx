@@ -238,6 +238,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
             max={10}
             step={0.5}
             defaultValue={[8]}
+            value={form.getValues("riskValueScore")}
             onValueChange={field.onChange}
           />
         </FormControl>
