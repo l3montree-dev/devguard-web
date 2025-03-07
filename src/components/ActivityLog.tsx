@@ -214,7 +214,7 @@ export const ActivityLogElement: FunctionComponent<ActivityLogProps> = ({
   return (
     <li className="relative flex flex-row items-start gap-4" key={event.id}>
       <Link
-        href={`/organizations/${org}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.flawId}`}
+        href={`/organizations/${org}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.vulnId}`}
       ></Link>
 
       <div className="h-7 w-7 rounded-full border-2 border-background bg-secondary p-1 text-muted-foreground">
@@ -261,7 +261,7 @@ export const ActivityLogElement: FunctionComponent<ActivityLogProps> = ({
 
                 <div>
                   <Link
-                    href={`/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.flawId}`}
+                    href={`/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/flaws/${event.vulnId}`}
                   >
                     <Button size="sm">to Flaw</Button>
                   </Link>
