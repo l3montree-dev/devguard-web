@@ -882,11 +882,12 @@ export const getServerSideProps = middleware(
       "/flaws/" +
       flawId;
 
-    const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
-
-    //fetch events for the flaw in all asset versions
-    const eventsUri = uri + "/events";
-    const events: FlawEventDTO[] = await (await apiClient(eventsUri)).json();
+    const [resp, events]: [DetailedFlawDTO, FlawEventDTO[]] = await Promise.all(
+      [
+        apiClient(uri).then((r) => r.json()),
+        apiClient(uri + "/events").then((r) => r.json()),
+      ],
+    );
 
     //filter events with type detected
     const ev = events.filter((event) => {

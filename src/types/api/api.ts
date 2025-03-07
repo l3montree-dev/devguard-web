@@ -368,8 +368,6 @@ export interface AssetDTO {
   signingPubKey?: string;
 
   centralFlawManagement: boolean;
-
-  slider: number;
 }
 
 export interface DependencyTreeNode {
