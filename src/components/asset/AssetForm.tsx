@@ -23,6 +23,7 @@ import {
 import { Switch } from "../ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { controlOrMeta } from "@mdxeditor/editor";
+import SliderWithStickyLabelDemo from "../ui/sliderwithstickylabeldemo";
 
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
@@ -277,6 +278,7 @@ Security requirements are specific criteria or conditions that an application, s
         title="Environmental information"
       >
         <AssetFormMisc form={form} />
+        <SliderWithStickyLabelDemo></SliderWithStickyLabelDemo>
         <SliderForm form={form}></SliderForm>
         <RiskSliderForm form={form}></RiskSliderForm>
       </Section>
