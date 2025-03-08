@@ -42,9 +42,19 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
+import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog";
+
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
 import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import { useStore } from "@/zustand/globalStoreProvider";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../../../../../components/ui/card";
+import { classNames } from "../../../../../../utils/common";
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
@@ -57,6 +67,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
   const project = useActiveProject();
   const org = useActiveOrg();
   const [fullIntegrationOpen, setFullIntegrationOpen] = useState(false);
+  const [sbomIntegrationOpen, setSbomIntegrationOpen] = useState(false);
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const pat = (
     personalAccessTokens.length > 0 ? personalAccessTokens[0] : null
@@ -91,27 +102,73 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
                 </div>
               )}
 
-              <h3 className="text-xl font-semibold">
-                Development{" "}
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/git.svg"}
-                  alt="Git logo"
-                  width={30}
-                  height={30}
-                />
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/intoto.png"}
-                  alt="InToto logo"
-                  width={30}
-                  height={30}
-                />
-              </h3>
-              <div className="mb-10 grid grid-cols-3 gap-4">
-                <SecureCodingGuidelines />
-                <InTotoProvenance />
+              <div>
+                <h3 className="mb-4 text-xl font-semibold">
+                  Development{" "}
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/git.svg"}
+                    alt="Git logo"
+                    width={30}
+                    height={30}
+                  />
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/intoto.png"}
+                    alt="InToto logo"
+                    width={30}
+                    height={30}
+                  />
+                </h3>
+                <div className="mb-10 grid grid-cols-3 gap-4">
+                  <Card className={classNames("h-full")}>
+                    <div>
+                      <div className="rounded-lg bg-card">
+                        <CardHeader>
+                          <CardTitle className="text-base">
+                            <div className="flex flex-row items-center justify-between gap-2">
+                              SBOM Upload
+                              <Image
+                                className="mr-2 dark:hidden"
+                                src={"/assets/cyclonedx-logo-black.svg"}
+                                alt="CycloneDX logo"
+                                width={100}
+                                height={30}
+                              />
+                              <Image
+                                className="mr-2 hidden dark:inline-block"
+                                src={"/assets/cyclonedx-logo-white.svg"}
+                                alt="CycloneDX logo"
+                                width={100}
+                                height={30}
+                              />
+                            </div>
+                          </CardTitle>
+                          <CardDescription>
+                            Upload an SBOM and check for vulnerabilities. You
+                            will be able to see the results in the
+                            Risk-Identification section.
+                          </CardDescription>
+                        </CardHeader>
+
+                        <CardFooter className="flex flex-col gap-2">
+                          <div className="flex w-full flex-row justify-end">
+                            <Button
+                              variant={"secondary"}
+                              onClick={() => setSbomIntegrationOpen(true)}
+                            >
+                              Upload SBOM
+                            </Button>
+                          </div>
+                        </CardFooter>
+                      </div>
+                    </div>
+                  </Card>
+                  <SecureCodingGuidelines />
+                  <InTotoProvenance />
+                </div>
               </div>
+
               <h3 className="text-xl font-semibold">
                 Integrating DevGuard into your CI/CD-Pipeline{" "}
                 <Image
@@ -194,6 +251,16 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               </div>
             </Section>
           </div>
+        </div>
+        <div>
+          <Dialog
+            open={sbomIntegrationOpen}
+            onOpenChange={setSbomIntegrationOpen}
+          >
+            <DialogContent>
+              <UploadSbomDialog />
+            </DialogContent>
+          </Dialog>
         </div>
       </Page>
       <Dialog open={fullIntegrationOpen} onOpenChange={setFullIntegrationOpen}>

@@ -1,3 +1,9 @@
+import { AssetVersionDTO } from "@/types/api/api";
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import { GitBranchIcon } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -6,14 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import React, { useState } from "react";
 import { Input } from "./ui/input";
-import { useRouter } from "next/router";
-import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import { GitBranchIcon } from "lucide-react";
-import { CaretDownIcon } from "@radix-ui/react-icons";
-import { AssetVersionDTO } from "@/types/api/api";
 
 export function BranchTagSelector({
   branches,
