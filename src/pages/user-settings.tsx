@@ -55,6 +55,7 @@ import {
 } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
+import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
 
 interface Props {
   flow?: SettingsFlow;
@@ -302,12 +303,18 @@ const Settings: FunctionComponent<{
                     </>
                   }
                   Button={
-                    <Button
-                      variant="secondary"
-                      onClick={() => onDeletePat(pat)}
+                    <ConfirmTokenDeletion
+                      Button={
+                        <Button
+                          variant="destructive"
+                          onClick={() => onDeletePat(pat)}
+                        >
+                          Yes
+                        </Button>
+                      }
                     >
-                      Delete
-                    </Button>
+                      <Button>Delete</Button>
+                    </ConfirmTokenDeletion>
                   }
                 />
               ),

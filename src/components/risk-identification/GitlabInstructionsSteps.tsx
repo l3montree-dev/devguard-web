@@ -22,7 +22,6 @@ interface Props {
 
   pat?: PatWithPrivKey;
   codeString: string;
-  apiUrl: string;
 }
 
 const GitlabInstructionsSteps: FunctionComponent<Props> = ({
@@ -32,7 +31,6 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
   Loader,
   pat,
   codeString,
-  apiUrl,
 }) => {
   return (
     <>

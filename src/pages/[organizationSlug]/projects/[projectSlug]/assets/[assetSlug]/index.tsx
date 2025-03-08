@@ -26,37 +26,33 @@ import { AssetMetricsDTO, PatWithPrivKey } from "@/types/api/api";
 import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
-import Link from "next/link";
-import { FunctionComponent, useRef, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import CopyCode from "../../../../../../components/common/CopyCode";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
-import Steps from "../../../../../../components/risk-identification/Steps";
 import { Button } from "../../../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "../../../../../../components/ui/dialog";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 import usePersonalAccessToken from "../../../../../../hooks/usePersonalAccessToken";
 
-import React from "react";
 import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog";
 
-import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
+import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import { useStore } from "@/zustand/globalStoreProvider";
-import { title } from "process";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "../../../../../../components/ui/card";
 import { classNames } from "../../../../../../utils/common";
 interface Props extends AssetMetricsDTO {}
@@ -361,6 +357,7 @@ jobs:
         uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
         with:
             asset-name: "${org.slug + "/projects/" + project?.slug + "/assets/" + asset?.slug}"
+            api-url: ${apiUrl}
         secrets:
             devguard-token: \$\{\{ secrets.DEVGUARD_TOKEN }} `}
                 />
@@ -381,7 +378,6 @@ include:
     token: "$DEVGUARD_TOKEN"
     api_url: ${apiUrl}
     `}
-                  apiUrl={apiUrl}
                 />
               </Tab.Panel>
             </Tab.Panels>

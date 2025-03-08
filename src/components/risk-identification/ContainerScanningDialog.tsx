@@ -191,7 +191,6 @@ include:
     token: "$DEVGUARD_TOKEN"
     api_url: ${apiUrl}
 `}
-                apiUrl={apiUrl}
               />
             </Tab.Panel>
             <Tab.Panel>

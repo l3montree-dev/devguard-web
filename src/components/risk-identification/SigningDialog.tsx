@@ -153,6 +153,7 @@ jobs:
         uses: l3montree-dev/devguard-action/.github/workflows/sign.yml@main
         with:
             asset-name: ${activeOrg?.slug}/projects/${router.query.projectSlug}/assets/${router.query.assetSlug}
+            api-url: ${apiUrl}
         secrets:
             devguard-token: \${{ secrets.DEVGUARD_TOKEN }}
 # ----- END Container Image Signing ——`}
@@ -173,7 +174,6 @@ include:
     token: "$DEVGUARD_TOKEN"
     api_url: ${apiUrl}
 `}
-                apiUrl={apiUrl}
               />
             </Tab.Panel>
             <Tab.Panel>

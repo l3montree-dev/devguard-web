@@ -402,9 +402,9 @@ export const getServerSideProps = middleware(
     if (asset.refs.length !== 0) {
       asset.refs.map((av: AssetVersionDTO) => {
         if (av.type === "branch") {
-          branches.push(av.name);
+          branches.push(av.slug);
         } else if (av.type === "tag") {
-          tags.push(av.name);
+          tags.push(av.slug);
         } else {
           throw new Error("Unknown asset version type " + av.type);
         }

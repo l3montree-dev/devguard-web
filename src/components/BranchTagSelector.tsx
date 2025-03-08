@@ -1,3 +1,4 @@
+import { AssetVersionDTO } from "@/types/api/api";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
 import { useRouter } from "next/router";
@@ -17,19 +18,19 @@ export function BranchTagSelector({
   branches,
   tags,
 }: {
-  branches: string[];
-  tags: string[];
+  branches: AssetVersionDTO[];
+  tags: AssetVersionDTO[];
 }) {
   const router = useRouter();
-
+  const [view, setView] = useState("branches");
+  const items = view === "branches" ? branches : tags;
   const [selected, setSelected] = useState(
-    router.query.assetVersionSlug as string,
+    items.find((i) => i.slug === (router.query.assetVersionSlug as string))
+      ?.name,
   );
   const [filter, setFilter] = useState("");
-  const [view, setView] = useState("branches");
 
-  const items = view === "branches" ? branches : tags;
-  const filteredItems = items.filter((item) => item.includes(filter));
+  const filteredItems = items.filter((item) => item.name.includes(filter));
 
   return (
     <DropdownMenu>
@@ -70,21 +71,21 @@ export function BranchTagSelector({
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
             <DropdownMenuCheckboxItem
-              checked={selected === item}
-              key={item}
+              checked={selected === item.name}
+              key={item.slug}
               onClick={() => {
                 router.push(
                   {
-                    query: { ...router.query, assetVersionSlug: item },
+                    query: { ...router.query, assetVersionSlug: item.slug },
                   },
                   undefined,
                   { shallow: false },
                 );
 
-                setSelected(item);
+                setSelected(item.name);
               }}
             >
-              {item}
+              {item.name}
             </DropdownMenuCheckboxItem>
           ))
         ) : (

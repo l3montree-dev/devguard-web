@@ -30,7 +30,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, ReactNode, useState } from "react";
+import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
@@ -274,6 +274,9 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
+  useEffect(() => {
+    setFlaw(props.flaw);
+  }, [props.flaw]);
   const cve = flaw.cve;
 
   const activeOrg = useActiveOrg();
@@ -334,7 +337,11 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     }
 
-    setFlaw((prev) => ({ ...prev, ...json }));
+    setFlaw((prev) => ({
+      ...prev,
+      ...json,
+      events: prev.events.concat(json.events.slice(-1)),
+    }));
     setJustification("");
   };
 
@@ -875,7 +882,19 @@ export const getServerSideProps = middleware(
       "/flaws/" +
       flawId;
 
-    const resp: DetailedFlawDTO = await (await apiClient(uri)).json();
+    const [resp, events]: [DetailedFlawDTO, FlawEventDTO[]] = await Promise.all(
+      [
+        apiClient(uri).then((r) => r.json()),
+        apiClient(uri + "/events").then((r) => r.json()),
+      ],
+    );
+
+    //filter events with type detected
+    const ev = events.filter((event) => {
+      return event.type !== "detected" || event.vulnId === resp.id;
+    });
+
+    resp.events = ev;
 
     return {
       props: {

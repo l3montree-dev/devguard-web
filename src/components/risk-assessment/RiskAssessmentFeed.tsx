@@ -41,6 +41,9 @@ import { useRouter } from "next/router";
 import { Badge } from "../ui/badge";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { GitBranchIcon } from "lucide-react";
+import Link from "next/link";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
@@ -210,11 +213,11 @@ export default function RiskAssessmentFeed({
   flawName: string;
 }) {
   const org = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
   const currentUser = useCurrentUser();
 
   const activeAssetVersion = useActiveAssetVersion();
-
-  console.log(events);
   return (
     <div>
       <ul
@@ -228,7 +231,7 @@ export default function RiskAssessmentFeed({
           return (
             <li
               className={classNames(
-                event.assetVersion !== activeAssetVersion?.name &&
+                event.assetVersionName !== activeAssetVersion?.name &&
                   "opacity-75 hover:opacity-100",
                 "relative flex flex-row items-start gap-4 transition-all",
               )}
@@ -276,14 +279,16 @@ export default function RiskAssessmentFeed({
                           {eventTypeMessages(event, index, flawName, events)}
                         </p>
 
-                        {event.assetVersion === activeAssetVersion?.name && (
-                          <div className="absolute right-2 top-2">
+                        <div className="absolute right-2 top-2">
+                          <Link
+                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionSlug}/flaws/${event.vulnId}`}
+                          >
                             <Badge variant={"outline"}>
                               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                              {event.assetVersion}
+                              {event.assetVersionName}
                             </Badge>
-                          </div>
-                        )}
+                          </Link>
+                        </div>
                       </div>
 
                       {Boolean(msg) && (

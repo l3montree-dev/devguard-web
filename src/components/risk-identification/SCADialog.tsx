@@ -17,31 +17,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import Steps from "./Steps";
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAutosetup } from "@/hooks/useAutosetup";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/solid";
-import { Loader2 } from "lucide-react";
+import { useStore } from "@/zustand/globalStoreProvider";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import Autosetup from "../Autosetup";
-import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 import GithubInstructionsSteps from "./GithubInstructionsSteps";
-import { useStore } from "@/zustand/globalStoreProvider";
+import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 
 interface Props {
   open: boolean;
@@ -168,7 +152,7 @@ jobs:
     uses: ./.github/workflows/software-composition-analysis.yml
     with:
       asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
-      api-url: "https://api.main.devguard.org/"
+      api-url: ${apiUrl}
       sca-path: "/github/workspace"
     secrets:
       devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
@@ -191,7 +175,6 @@ include:
     token: "$DEVGUARD_TOKEN"
     api_url: ${apiUrl}
 `}
-                apiUrl={apiUrl}
               />
             </Tab.Panel>
             <Tab.Panel>
