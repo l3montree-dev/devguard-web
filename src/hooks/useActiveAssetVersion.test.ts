@@ -7,7 +7,6 @@ import { useActiveAsset } from "./useActiveAsset";
 import { renderHook } from "@testing-library/react";
 
 jest.mock("@/zustand/globalStoreProvider");
-jest.mock("./useActiveAsset");
 
 describe("useActiveAssetVersion", () => {
   it("should return the active asset version if it matches the active asset", () => {
@@ -53,6 +52,7 @@ describe("useActiveAssetVersion", () => {
   });
 });
 
+jest.mock("./useActiveAsset");
 describe("useAssetBranchesAndTags", () => {
   it("should return branches and tags of the active asset", () => {
     const mockActiveAsset = {
@@ -66,8 +66,11 @@ describe("useAssetBranchesAndTags", () => {
 
     const { result } = renderHook(() => useAssetBranchesAndTags());
 
-    expect(result.current.branches).toEqual(["main", "develop"]);
-    expect(result.current.tags).toEqual(["v1.0"]);
+    expect(result.current.branches).toEqual([
+      { type: "branch", name: "main" },
+      { type: "branch", name: "develop" },
+    ]);
+    expect(result.current.tags).toEqual([{ type: "tag", name: "v1.0" }]);
   });
 
   it("should return empty arrays if there is no active asset", () => {

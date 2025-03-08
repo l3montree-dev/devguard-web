@@ -6,6 +6,18 @@ on:
   push:
  
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: "Install Dependencies"
+      run: |
+        npm install
+    - name: "Run Tests"
+      run: |
+        npm test
+        
   devguard-scanner:
     uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
     with:

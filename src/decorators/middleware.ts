@@ -37,7 +37,8 @@ export type DecoratedGetServerSideProps<AdditionalData, Props = {}> = (
 ) => GetServerSidePropsResult<Props> | Promise<GetServerSidePropsResult<Props>>;
 
 const defaultParams = {
-  apiUrl: config.devguardApiUrlPublicInternet,
+  apiUrl:
+    config.devguardApiUrlPublicInternet ?? "https://api.main.devguard.org",
 };
 
 export const middleware = <Additional extends Record<string, any>>(
