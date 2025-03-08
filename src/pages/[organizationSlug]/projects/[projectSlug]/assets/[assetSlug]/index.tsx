@@ -50,6 +50,15 @@ import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog"
 import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { title } from "process";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "../../../../../../components/ui/card";
+import { classNames } from "../../../../../../utils/common";
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {
@@ -97,37 +106,73 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
                 </div>
               )}
 
-              <h3 className="text-xl font-semibold">
-                <div className="mb-4">
-                  <Stage
-                    id="Manual-SBOM-Scan"
-                    title="Manual SBOM Scan"
-                    description="Manually scan uploaded CycloneDX JSON files for component and vulnerability analysis."
-                    buttonTitle="Scan"
-                    buttonVariant="default"
-                    onButtonClick={() => setSbomIntegrationOpen(true)}
+              <div>
+                <h3 className="mb-4 text-xl font-semibold">
+                  Development{" "}
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/git.svg"}
+                    alt="Git logo"
+                    width={30}
+                    height={30}
                   />
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/intoto.png"}
+                    alt="InToto logo"
+                    width={30}
+                    height={30}
+                  />
+                </h3>
+                <div className="mb-10 grid grid-cols-3 gap-4">
+                  <Card className={classNames("h-full")}>
+                    <div>
+                      <div className="rounded-lg bg-card">
+                        <CardHeader>
+                          <CardTitle className="text-base">
+                            <div className="flex flex-row items-center justify-between gap-2">
+                              SBOM Upload
+                              <Image
+                                className="mr-2 dark:hidden"
+                                src={"/assets/cyclonedx-logo-black.svg"}
+                                alt="CycloneDX logo"
+                                width={100}
+                                height={30}
+                              />
+                              <Image
+                                className="mr-2 hidden dark:inline-block"
+                                src={"/assets/cyclonedx-logo-white.svg"}
+                                alt="CycloneDX logo"
+                                width={100}
+                                height={30}
+                              />
+                            </div>
+                          </CardTitle>
+                          <CardDescription>
+                            Upload an SBOM and check for vulnerabilities. You
+                            will be able to see the results in the
+                            Risk-Identification section.
+                          </CardDescription>
+                        </CardHeader>
+
+                        <CardFooter className="flex flex-col gap-2">
+                          <div className="flex w-full flex-row justify-end">
+                            <Button
+                              variant={"secondary"}
+                              onClick={() => setSbomIntegrationOpen(true)}
+                            >
+                              Upload SBOM
+                            </Button>
+                          </div>
+                        </CardFooter>
+                      </div>
+                    </div>
+                  </Card>
+                  <SecureCodingGuidelines />
+                  <InTotoProvenance />
                 </div>
-                Development{" "}
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/git.svg"}
-                  alt="Git logo"
-                  width={30}
-                  height={30}
-                />
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/intoto.png"}
-                  alt="InToto logo"
-                  width={30}
-                  height={30}
-                />
-              </h3>
-              <div className="mb-10 grid grid-cols-3 gap-4">
-                <SecureCodingGuidelines />
-                <InTotoProvenance />
               </div>
+
               <h3 className="text-xl font-semibold">
                 Integrating DevGuard into your CI/CD-Pipeline{" "}
                 <Image

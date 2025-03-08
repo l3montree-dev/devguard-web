@@ -19,7 +19,7 @@ function SecureCodingGuidelines() {
   return (
     <Stage
       title="Secure Coding Guidelines"
-      description="Produce secure code by following secure coding guidelines."
+      description="Produce secure code by following secure coding guidelines. Provides Templates to help developers write secure code."
       buttonTitle="Coming soon"
       buttonVariant="outline"
       id="secure-coding-guidelines"

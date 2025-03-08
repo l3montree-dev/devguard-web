@@ -7,6 +7,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
+import { BranchTagSelector } from "../BranchTagSelector";
 
 export default function UploadSbomDialog() {
   const router = useRouter();
@@ -79,12 +80,18 @@ export default function UploadSbomDialog() {
     <div>
       <div
         {...getRootProps()}
-        className="mb-10 flex h-20 cursor-pointer items-center justify-center rounded border border-dashed"
+        className="mb-5 mt-5 flex h-20 cursor-pointer items-center justify-center rounded border border-dashed"
       >
         <input {...getInputProps()} />
-        <p>{fileName}</p>
+        {fileName ? (
+          <p>{fileName}</p>
+        ) : (
+          <p className="text-muted-foreground">
+            Drag and drop some files here, or click to select files
+          </p>
+        )}
       </div>
-      <div className="flex justify-self-center">
+      <div className="flex flex-row justify-end">
         <Button onClick={() => uploadSBOM()} disabled={!fileName}>
           Upload
         </Button>
