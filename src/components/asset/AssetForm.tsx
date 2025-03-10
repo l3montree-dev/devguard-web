@@ -22,8 +22,7 @@ import {
 } from "../ui/select";
 import { Switch } from "../ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { controlOrMeta } from "@mdxeditor/editor";
-import SliderWithStickyLabelDemo from "../ui/slider copy";
+
 interface Props {
   form: UseFormReturn<AssetDTO, any, undefined>;
 }
@@ -200,7 +199,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
 
 const SliderForm: FunctionComponent<Props> = ({ form }) => (
   <FormField
-    name="cvssScore"
+    name="cvssAutomaticTicketThreshold"
     control={form.control}
     render={({ field }) => (
       <FormItem>
@@ -211,7 +210,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
             max={10}
             step={0.5}
             defaultValue={[8]}
-            value={form.getValues("cvssScore")}
+            value={form.getValues("cvssAutomaticTicketThreshold")}
             onValueChange={field.onChange}
           />
         </FormControl>
@@ -225,24 +224,24 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => (
 );
 const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
   <FormField
-    name="riskValueScore"
+    name="riskAutomaticTicketThreshold"
     control={form.control}
     render={({ field }) => (
       <FormItem>
-        <FormLabel>CVSS-BTE</FormLabel>
+        <FormLabel>(form.getValues(riskAutomaticTicketThreshold))</FormLabel>
         <FormControl>
           <Slider
             min={0}
             max={10}
             step={0.5}
             defaultValue={[8]}
-            value={form.getValues("riskValueScore")}
+            value={form.getValues("riskAutomaticTicketThreshold")}
             onValueChange={field.onChange}
           />
         </FormControl>
         <FormDescription>
           CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted Score
-          given by experts{" "}
+          given by experts
         </FormDescription>
         <FormMessage />
       </FormItem>

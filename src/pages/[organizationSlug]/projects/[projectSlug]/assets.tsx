@@ -71,8 +71,8 @@ const formSchema = z.object({
   description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
-  cvssScore: z.number().array(),
-  riskValueScore: z.number().array(),
+  cvssAutomaticTicketThreshold: z.number().array(),
+  riskAutomaticTicketThreshold: z.number().array(),
 
   confidentialityRequirement: z.string(),
   integrityRequirement: z.string(),
@@ -90,8 +90,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      cvssScore: [8],
-      riskValueScore: [8],
+      cvssAutomaticTicketThreshold: [8],
+      riskAutomaticTicketThreshold: [8],
       centralFlawManagement: true,
     },
   });
@@ -127,6 +127,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
   };
 
   const handleCreateAsset = async (data: AssetDTO) => {
+    const modifiedData = {
+      ...data,
+      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold[0],
+      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold[0],
+    };
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -135,7 +140,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
         "/assets",
       {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(modifiedData),
       },
     );
     if (resp.ok) {

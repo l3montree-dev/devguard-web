@@ -367,9 +367,8 @@ export interface AssetDTO {
   signingPubKey?: string;
 
   centralFlawManagement: boolean;
-  cvssScore: number[];
-  riskValueScore: number[];
-  sliderInput: string;
+  cvssAutomaticTicketThreshold: number[];
+  riskAutomaticTicketThreshold: number[];
 }
 
 export interface DependencyTreeNode {
