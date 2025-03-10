@@ -129,20 +129,6 @@ const eventMessages = (
         event.arbitraryJsonData.ticketUrl +
         ")"
       );
-    case "rawRiskAssessmentUpdated":
-      if (events === undefined) {
-        return "";
-      }
-      // get the last risk calculation report.
-      const beforeThisEvent = events.slice(0, index);
-      const lastRiskEvent = beforeThisEvent.findLast(
-        (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
-      ) as DetectedFlawEventDTO | RiskAssessmentUpdatedFlawEventDTO | undefined;
-      if (!lastRiskEvent) return "";
-      return diffReports(
-        lastRiskEvent?.arbitraryJsonData,
-        event.arbitraryJsonData,
-      );
   }
   return event.justification;
 };
@@ -177,15 +163,13 @@ const eventTypeMessages = (
       if (events === undefined) {
         return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
       }
-      // get the last risk calculation report.
-      const beforeThisEvent = events.slice(0, index);
-      const lastRiskEvent = beforeThisEvent.findLast(
-        (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
-      );
+      const oldRisk = event.arbitraryJsonData.oldRisk;
+      if (!oldRisk && oldRisk !== 0) {
+        return "updated the risk assessment to " + event.arbitraryJsonData.risk;
+      }
       return (
         "updated the risk assessment from " +
-        ((lastRiskEvent as RiskAssessmentUpdatedFlawEventDTO)?.arbitraryJsonData
-          .risk ?? 0) +
+        oldRisk +
         " to " +
         event.arbitraryJsonData.risk
       );
@@ -218,6 +202,7 @@ export default function RiskAssessmentFeed({
   const currentUser = useCurrentUser();
 
   const activeAssetVersion = useActiveAssetVersion();
+
   return (
     <div>
       <ul

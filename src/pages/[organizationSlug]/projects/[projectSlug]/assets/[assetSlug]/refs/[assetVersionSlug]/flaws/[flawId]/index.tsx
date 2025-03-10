@@ -891,7 +891,11 @@ export const getServerSideProps = middleware(
 
     //filter events with type detected
     const ev = events.filter((event) => {
-      return event.type !== "detected" || event.vulnId === resp.id;
+      return (
+        (event.type !== "detected" &&
+          event.type !== "rawRiskAssessmentUpdated") ||
+        event.vulnId === resp.id
+      );
     });
 
     resp.events = ev;
