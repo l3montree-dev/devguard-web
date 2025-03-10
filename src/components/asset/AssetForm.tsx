@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
+//import { Slider } from "@radix-ui/react-slider";
 import { Slider } from "@/components/ui/slider";
 
 interface Props {
@@ -196,58 +197,65 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
     )}
   />
 );
-
-const SliderForm: FunctionComponent<Props> = ({ form }) => (
-  <FormField
-    name="cvssAutomaticTicketThreshold"
-    control={form.control}
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>CVSS Score</FormLabel>
-        <FormControl>
-          <Slider
-            min={0}
-            max={10}
-            step={0.5}
-            defaultValue={[8]}
-            value={form.getValues("cvssAutomaticTicketThreshold")}
-            onValueChange={field.onChange}
-          />
-        </FormControl>
-        <FormDescription>
-          Calculates Risk including multiple factors.
-        </FormDescription>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-const RiskSliderForm: FunctionComponent<Props> = ({ form }) => (
-  <FormField
-    name="riskAutomaticTicketThreshold"
-    control={form.control}
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>(form.getValues(riskAutomaticTicketThreshold))</FormLabel>
-        <FormControl>
-          <Slider
-            min={0}
-            max={10}
-            step={0.5}
-            defaultValue={[8]}
-            value={form.getValues("riskAutomaticTicketThreshold")}
-            onValueChange={field.onChange}
-          />
-        </FormControl>
-        <FormDescription>
-          CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted Score
-          given by experts
-        </FormDescription>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
+const SliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.getValues("cvssAutomaticTicketThreshold");
+  return (
+    <FormField
+      name="cvssAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>CVSS Score</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              defaultValue={[8]}
+              value={value ? [value] : []}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            Calculates Risk including multiple factors.
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.getValues("riskAutomaticTicketThreshold");
+  return (
+    <FormField
+      name="riskAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>
+            {form.getValues("riskAutomaticTicketThreshold")}
+          </FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              defaultValue={[8]}
+              value={value ? [value] : []}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
 
 const AssetForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
@@ -281,7 +289,6 @@ Security requirements are specific criteria or conditions that an application, s
       <hr />
       <SliderForm form={form}></SliderForm>
       <RiskSliderForm form={form}></RiskSliderForm>
-
       <></>
     </>
   );

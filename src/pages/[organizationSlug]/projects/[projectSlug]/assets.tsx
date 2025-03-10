@@ -90,8 +90,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      cvssAutomaticTicketThreshold: [8],
-      riskAutomaticTicketThreshold: [8],
+      cvssAutomaticTicketThreshold: 8,
+      riskAutomaticTicketThreshold: 8,
       centralFlawManagement: true,
     },
   });
@@ -129,8 +129,12 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
   const handleCreateAsset = async (data: AssetDTO) => {
     const modifiedData = {
       ...data,
-      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold[0],
-      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold[0],
+      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
+        ? data.cvssAutomaticTicketThreshold
+        : 8,
+      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
+        ? data.riskAutomaticTicketThreshold
+        : 8,
     };
     const resp = await browserApiClient(
       "/organizations/" +
