@@ -164,7 +164,7 @@ const eventTypeMessages = (
         return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
       }
       const oldRisk = event.arbitraryJsonData.oldRisk;
-      if (oldRisk === undefined) {
+      if (!oldRisk && oldRisk !== 0) {
         return "updated the risk assessment to " + event.arbitraryJsonData.risk;
       }
       return (
