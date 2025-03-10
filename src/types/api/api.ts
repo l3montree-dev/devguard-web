@@ -176,6 +176,7 @@ export interface RiskCalculationReport {
   integrityRequirement: string;
   availabilityRequirement: string;
   risk: number;
+  oldRisk: number;
 }
 
 interface BaseFlawEventDTO {
