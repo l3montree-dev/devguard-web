@@ -55,11 +55,11 @@ export type Methods =
 export type Props<T> = {
   // The flow
   flow?:
-    | LoginFlow
-    | RegistrationFlow
-    | SettingsFlow
-    | VerificationFlow
-    | RecoveryFlow;
+  | LoginFlow
+  | RegistrationFlow
+  | SettingsFlow
+  | VerificationFlow
+  | RecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
   // Is triggered on submission
@@ -237,28 +237,55 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
         ) : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
+          const isPasswordField =
+            isUiNodeInputAttributes(node.attributes) &&
+            node.attributes.type === "password";
+
           return (
-            <Node
-              key={`${id}-${k}`}
-              disabled={isLoading}
-              node={node}
-              value={values[id]}
-              dispatchSubmit={this.handleSubmit}
-              setValue={(value) =>
-                new Promise((resolve) => {
-                  this.setState(
-                    (state) => ({
+            <div key={`${id}-${k}`} className="relative flex items-center">
+              <Node
+                disabled={isLoading}
+                node={{
+                  ...node,
+                  attributes: isPasswordField
+                    ? { ...node.attributes, type: values[id] ? "text" : "password" }
+                    : node.attributes,
+                }}
+                value={values[id]}
+                dispatchSubmit={this.handleSubmit}
+                setValue={(value) =>
+                  new Promise((resolve) => {
+                    this.setState(
+                      (state) => ({
+                        ...state,
+                        values: {
+                          ...state.values,
+                          [getNodeId(node)]: value,
+                        },
+                      }),
+                      resolve,
+                    );
+                  })
+                }
+              />
+              {isPasswordField && (
+                <button
+                  type="button"
+                  className="absolute right-2 px-2 py-1 text-sm bg-gray-200 rounded"
+                  onClick={() =>
+                    this.setState((state) => ({
                       ...state,
                       values: {
                         ...state.values,
-                        [getNodeId(node)]: value,
+                        [id]: values[id] ? "" : "show",
                       },
-                    }),
-                    resolve,
-                  );
-                })
-              }
-            />
+                    }))
+                  }
+                >
+                  {values[id] ? "🙈" : "👁️"}
+                </button>
+              )}
+            </div>
           );
         })}
       </form>
