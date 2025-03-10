@@ -292,8 +292,15 @@ Security requirements are specific criteria or conditions that an application, s
         <AssetFormMisc form={form} />
       </Section>
       <hr />
-      <SliderForm form={form}></SliderForm>
-      <RiskSliderForm form={form}></RiskSliderForm>
+      <Section
+        forceVertical={forceVerticalSections}
+        description="Choose a range between 0-10.
+        "
+        title="Reporting range"
+      >
+        <SliderForm form={form}></SliderForm>
+        <RiskSliderForm form={form}></RiskSliderForm>
+      </Section>
       <></>
     </>
   );
