@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 
-import AssetForm from "@/components/asset/AssetForm";
+import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -58,6 +58,7 @@ import PatSection from "../../../../components/risk-identification/PatSection";
 import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
 import { config } from "../../../../config";
 import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
+import { Modify } from "@/types/common";
 
 interface Props {
   project: ProjectDTO & {
@@ -84,14 +85,14 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const form = useForm<AssetDTO>({
+  const form = useForm<AssetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      cvssAutomaticTicketThreshold: 8,
-      riskAutomaticTicketThreshold: 8,
+      cvssAutomaticTicketThreshold: [8],
+      riskAutomaticTicketThreshold: [8],
       centralFlawManagement: true,
     },
   });
@@ -126,14 +127,15 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
     }
   };
 
-  const handleCreateAsset = async (data: AssetDTO) => {
-    const modifiedData = {
+  const handleCreateAsset = async (data: AssetFormValues) => {
+    const modifiedData: AssetDTO = {
       ...data,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
-        ? data.cvssAutomaticTicketThreshold
+        ? data.cvssAutomaticTicketThreshold[0]
         : 8,
+
       riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
-        ? data.riskAutomaticTicketThreshold
+        ? data.riskAutomaticTicketThreshold[0]
         : 8,
     };
     const resp = await browserApiClient(

@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useRef } from "react";
 import {
   FormControl,
   FormDescription,
@@ -23,11 +23,19 @@ import {
 import { Switch } from "../ui/switch";
 //import { Slider } from "@radix-ui/react-slider";
 import { Slider } from "@/components/ui/slider";
+import { Modify } from "@/types/common";
 
 interface Props {
-  form: UseFormReturn<AssetDTO, any, undefined>;
+  form: UseFormReturn<AssetFormValues, any, undefined>;
 }
 
+export type AssetFormValues = Modify<
+  AssetDTO,
+  {
+    cvssAutomaticTicketThreshold: number[];
+    riskAutomaticTicketThreshold: number[];
+  }
+>;
 export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
   <>
     <FormField
@@ -198,21 +206,20 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 const SliderForm: FunctionComponent<Props> = ({ form }) => {
-  const value = form.getValues("cvssAutomaticTicketThreshold");
+  const value = form.watch("cvssAutomaticTicketThreshold");
   return (
     <FormField
       name="cvssAutomaticTicketThreshold"
       control={form.control}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>CVSS Score</FormLabel>
+          <FormLabel>{value[0]}</FormLabel>
           <FormControl>
             <Slider
               min={0}
               max={10}
               step={0.5}
-              defaultValue={[8]}
-              value={value ? [value] : []}
+              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -226,23 +233,21 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
   );
 };
 const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
-  const value = form.getValues("riskAutomaticTicketThreshold");
+  const value = form.watch("riskAutomaticTicketThreshold");
+
   return (
     <FormField
       name="riskAutomaticTicketThreshold"
       control={form.control}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>
-            {form.getValues("riskAutomaticTicketThreshold")}
-          </FormLabel>
+          <FormLabel>{value[0]}</FormLabel>
           <FormControl>
             <Slider
               min={0}
               max={10}
               step={0.5}
-              defaultValue={[8]}
-              value={value ? [value] : []}
+              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
