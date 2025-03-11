@@ -77,10 +77,7 @@ export function Combobox(props: Props) {
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command shouldFilter={props.onValueChange === undefined}>
-          <CommandInput
-            onValueChange={handleValueChange}
-            placeholder={props.placeholder}
-          />
+          <CommandInput />
 
           <CommandList>
             {loading && (
@@ -122,7 +119,6 @@ export function Combobox(props: Props) {
                       alt="GitHub"
                     />
                   ) : null}
-
                   {item.label}
                 </CommandItem>
               ))}
@@ -133,3 +129,4 @@ export function Combobox(props: Props) {
     </Popover>
   );
 }
+// {item.label} is responsible for rendering the text rendering is in CommandItem in
