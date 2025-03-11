@@ -120,7 +120,13 @@ export function Combobox(props: Props) {
                     />
                   ) : null}
                   {value === item.value ? (
-                    <div className="bg-green-600"> {item.label}</div>
+                    <div
+                      className={cn(
+                        "relative flex cursor-default select-none items-center truncate rounded-sm bg-accent px-2 py-1.5 text-sm text-accent-foreground  outline-none",
+                      )}
+                    >
+                      {item.label}
+                    </div>
                   ) : (
                     item.label
                   )}
