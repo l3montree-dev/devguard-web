@@ -33,7 +33,11 @@ export default function usePersonalAccessToken(
     });
   }, []);
 
-  const handleCreatePat = async (data: { description: string }) => {
+  const handleCreatePat = async (data: {
+    description: string;
+    forScanning: boolean;
+    forManagement: boolean;
+  }) => {
     const pat = await createPat(data);
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));

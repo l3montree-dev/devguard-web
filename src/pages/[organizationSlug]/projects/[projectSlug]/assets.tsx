@@ -363,7 +363,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
           <hr />
           <Steps>
             <div className="mb-10">
-              <PatSection onCreatePat={onCreatePat} pat={pat} />
+              <PatSection onCreatePat={onCreatePat} pat={pat} description="" />
             </div>
             <Section
               className="mt-0"

@@ -68,7 +68,13 @@ export function useAutosetup(scanner: "full" | "sca" | "container-scanning") {
       let privKey = pat?.privKey;
       if (!pat) {
         // create a new one for autosetup
-        privKey = (await onCreatePat({ description: "SCA Analysis" })).privKey;
+        privKey = (
+          await onCreatePat({
+            description: "SCA Analysis",
+            forScanning: true,
+            forManagement: false,
+          })
+        ).privKey;
       }
       // set the progress to pending
       setProgress((prev) => {

@@ -56,6 +56,7 @@ import {
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   flow?: SettingsFlow;
@@ -91,7 +92,11 @@ const Settings: FunctionComponent<{
   const router = useRouter();
   const { flow: flowId, return_to: returnTo } = router.query;
 
-  const { register, handleSubmit, reset } = useForm<{ description: string }>();
+  const { register, handleSubmit, reset } = useForm<{
+    description: string;
+    forScanning: boolean;
+    forManagement: boolean;
+  }>();
 
   const { personalAccessTokens, onDeletePat, onCreatePat } =
     usePersonalAccessToken(pats);
@@ -170,7 +175,11 @@ const Settings: FunctionComponent<{
           }),
       );
 
-  const handleCreatePat = async (data: { description: string }) => {
+  const handleCreatePat = async (data: {
+    description: string;
+    forScanning: boolean;
+    forManagement: boolean;
+  }) => {
     await onCreatePat(data);
     reset();
   };
@@ -320,9 +329,25 @@ const Settings: FunctionComponent<{
               ),
             )}
           </div>
+
           <form onSubmit={handleSubmit(handleCreatePat)}>
             <Label htmlFor="description">Description</Label>
             <Input {...register("description")} />
+
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <Label htmlFor="forScanning" className="flex-1">
+                For Scanning
+              </Label>
+              <Switch {...register("forScanning")} />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <Label htmlFor="forManagement" className="flex-1">
+                For Management
+              </Label>
+              <Switch {...register("forManagement")} />
+            </div>
+
             <div className="mt-6 flex flex-row justify-end">
               <Button type="submit">Create</Button>
             </div>
