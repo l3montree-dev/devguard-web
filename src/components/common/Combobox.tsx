@@ -100,12 +100,6 @@ export function Combobox(props: Props) {
                     setOpen(false);
                   }}
                 >
-                  <CheckIcon
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === item.value ? "opacity-100" : "opacity-0",
-                    )}
-                  />
                   {item.value.startsWith("gitlab") ? (
                     <img
                       className="mr-2 inline-block h-4 w-4"
