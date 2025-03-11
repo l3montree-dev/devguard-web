@@ -32,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
+import { classNames } from "@/utils/common";
 
 interface Props {
   onSelect: (value: string) => void;
@@ -49,8 +50,8 @@ interface Props {
 export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
+  const [active, setActive] = React.useState(props.value ?? "");
   const { loading } = props;
-  const [active, setActive] = React.useState(false);
 
   const handleValueChange = (value: string) => {
     if (props.onValueChange) {
@@ -97,9 +98,12 @@ export function Combobox(props: Props) {
                   keywords={[item.label]}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
+                    setActive(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
                     setOpen(false);
-                    setActive(true);
+
+                    console.log("1");
+                    console.log(value);
                   }}
                 >
                   {item.value.startsWith("gitlab") ? (
@@ -115,7 +119,11 @@ export function Combobox(props: Props) {
                       alt="GitHub"
                     />
                   ) : null}
-                  {item.label} {active ? "yup" : ""}
+                  {value === item.value ? (
+                    <div className="bg-green-600"> {item.label}</div>
+                  ) : (
+                    item.label
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>
