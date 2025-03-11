@@ -50,6 +50,7 @@ export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
   const { loading } = props;
+  const [active, setActive] = React.useState(false);
 
   const handleValueChange = (value: string) => {
     if (props.onValueChange) {
@@ -98,6 +99,7 @@ export function Combobox(props: Props) {
                     setValue(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
                     setOpen(false);
+                    setActive(true);
                   }}
                 >
                   {item.value.startsWith("gitlab") ? (
@@ -113,7 +115,7 @@ export function Combobox(props: Props) {
                       alt="GitHub"
                     />
                   ) : null}
-                  {item.label}
+                  {item.label} {active ? "yup" : ""}
                 </CommandItem>
               ))}
             </CommandGroup>
