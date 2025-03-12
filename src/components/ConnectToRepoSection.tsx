@@ -148,7 +148,6 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                   loading={searchLoading}
                   onSelect={(repoId: string) => {
                     const repo = repos.find((r) => r.value === repoId);
-
                     if (repo) {
                       setSelectedRepo({ id: repo.value, name: repo.label });
                     }

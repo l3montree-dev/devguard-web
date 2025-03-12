@@ -50,15 +50,7 @@ interface Props {
 export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
-  const [active, setActive] = React.useState(props.value ?? "");
   const { loading } = props;
-
-  const handleValueChange = (value: string) => {
-    if (props.onValueChange) {
-      props.onValueChange(value);
-    }
-    setValue(value);
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -80,7 +72,6 @@ export function Combobox(props: Props) {
       <PopoverContent className="w-[300px] p-0">
         <Command shouldFilter={props.onValueChange === undefined}>
           <CommandInput />
-
           <CommandList>
             {loading && (
               <CommandItem>
@@ -96,9 +87,9 @@ export function Combobox(props: Props) {
                   key={item.value}
                   value={item.value}
                   keywords={[item.label]}
+                  className={value === item.value ? "bg-accent" : ""}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
-                    setActive(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
                     setOpen(false);
                   }}
