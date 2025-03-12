@@ -5,6 +5,7 @@ import ListItem from "../common/ListItem";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
+import Link from "next/link";
 
 const PatSection = ({
   description,
@@ -39,6 +40,13 @@ const PatSection = ({
               Make sure to copy the token. You won&apos;t be able to see it ever
               again!
             </span>
+            <Link
+              href="/user-settings#pat"
+              target="_blank"
+              className="mt-4 text-sm"
+            >
+              <span>to create a new token or manage your existing ones</span>
+            </Link>
           </div>
         </div>
       ) : (
@@ -65,6 +73,14 @@ const PatSection = ({
               }
             />
           </div>
+
+          <Link
+            href="/user-settings#pat"
+            target="_blank"
+            className="mt-4 text-sm"
+          >
+            <span>manage your existing tokens</span>
+          </Link>
           <div>
             <Button
               variant="default"
