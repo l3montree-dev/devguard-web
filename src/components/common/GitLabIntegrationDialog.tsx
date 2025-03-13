@@ -35,7 +35,7 @@ interface Props {
   Button: ReactNode;
   onNewIntegration: (integration: GitLabIntegrationDTO) => void;
 }
-const GitLabIntegrationDialog: FunctionComponent<Props> = ({
+export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
   onNewIntegration,
   Button: Trigger,
 }) => {
@@ -172,5 +172,3 @@ const GitLabIntegrationDialog: FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-export default GitLabIntegrationDialog;

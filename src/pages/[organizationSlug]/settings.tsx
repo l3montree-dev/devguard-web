@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import { withContentTree } from "@/decorators/withContentTree";
 import MembersTable from "@/components/MembersTable";
 import MemberDialog from "@/components/MemberDialog";
-import GitLabIntegrationDialog from "@/components/common/GitLabIntegrationDialog";
+import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
