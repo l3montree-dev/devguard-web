@@ -35,7 +35,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <FormLabel>Name</FormLabel>
           <FormControl>
-            <Input {...field} />
+            <Input required={true} {...field} />
           </FormControl>
           <FormDescription>The name of the asset.</FormDescription>
           <FormMessage />
