@@ -41,7 +41,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input required={true} {...field} />
               </FormControl>
               <FormDescription>The name of the project.</FormDescription>
               <FormMessage />
