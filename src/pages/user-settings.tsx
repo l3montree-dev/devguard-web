@@ -81,7 +81,6 @@ function SettingsCard({
 
   return children;
 }
-
 const Settings: FunctionComponent<{
   personalAccessTokens: Array<PersonalAccessTokenDTO>;
 }> = ({ personalAccessTokens: pats }) => {
