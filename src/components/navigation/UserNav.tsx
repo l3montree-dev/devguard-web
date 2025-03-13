@@ -15,11 +15,13 @@
 
 import { useOrg } from "@/hooks/useOrg";
 import { classNames } from "@/utils/common";
+
 import {
   BuildingOffice2Icon,
   CogIcon,
   MoonIcon,
   SunIcon,
+  ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { PlusIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "next-themes";
@@ -37,6 +39,8 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { OrganizationDetailsDTO } from "@/types/api/api";
+import { Arrow } from "@radix-ui/react-dropdown-menu";
+import { LogoutLink } from "@/hooks/logoutLink";
 
 interface Props {}
 
@@ -49,6 +53,7 @@ export default function UserNav() {
   const orgs = useStore((s) => s.organizations);
 
   const activeOrg = useOrg() ?? orgs[0];
+  const handleLogout = LogoutLink();
 
   return (
     <div className="flex flex-row justify-between gap-1">
@@ -96,6 +101,13 @@ export default function UserNav() {
               <DropdownMenuItem className="text-foreground hover:no-underline">
                 <CogIcon className="mr-2 h-5 w-5 text-muted-foreground" />
                 User Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-foreground hover:no-underline"
+                onClick={handleLogout}
+              >
+                <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground"></ArrowRightStartOnRectangleIcon>
+                Logout
               </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>
