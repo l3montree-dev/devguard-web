@@ -54,8 +54,9 @@ import {
   getApiClientFromContext,
 } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
-import { PersonalAccessTokenDTO } from "../types/api/api";
+import { PatWithPrivKey, PersonalAccessTokenDTO } from "../types/api/api";
 import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   flow?: SettingsFlow;
@@ -90,9 +91,13 @@ const Settings: FunctionComponent<{
   const router = useRouter();
   const { flow: flowId, return_to: returnTo } = router.query;
 
-  const { register, handleSubmit, reset } = useForm<{ description: string }>();
+  const { register, handleSubmit, reset } = useForm<{
+    description: string;
+    forScanning: boolean;
+    forManagement: boolean;
+  }>();
 
-  const { personalAccessTokens, onDeletePat, onCreatePat } =
+  const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
     usePersonalAccessToken(pats);
 
   useEffect(() => {
@@ -169,7 +174,11 @@ const Settings: FunctionComponent<{
           }),
       );
 
-  const handleCreatePat = async (data: { description: string }) => {
+  const handleCreatePat = async (data: {
+    description: string;
+    forScanning: boolean;
+    forManagement: boolean;
+  }) => {
     await onCreatePat(data);
     reset();
   };
@@ -248,6 +257,7 @@ const Settings: FunctionComponent<{
             />
           </SettingsCard>
         </Section>
+
         <Section
           id="pat"
           title="Manage Personal Access Tokens"
@@ -255,42 +265,75 @@ const Settings: FunctionComponent<{
         >
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle>Revoke access token</CardTitle>
+              <CardTitle>Create Personal Access Token </CardTitle>
             </CardHeader>
-            <form onSubmit={handleRevokePat}>
+            <form onSubmit={handleSubmit(handleCreatePat)}>
               <CardContent>
-                <Input name="privkey" placeholder="Paste token here" />
+                <Label htmlFor="description">Description</Label>
+                <Input {...register("description")} />
+
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <Label htmlFor="forScanning" className="flex-1">
+                    For Scanning
+                    <span className="block text-sm text-gray-500">
+                      Use this token to scan your repositories.
+                    </span>
+                  </Label>
+                  <Switch {...register("forScanning")} />
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2">
+                  <Label htmlFor="forManagement" className="flex-1">
+                    For Management
+                    <span className="block text-sm text-gray-500">
+                      Use this token to manage your repositories.
+                    </span>
+                  </Label>
+                  <Switch {...register("forManagement")} />
+                </div>
               </CardContent>
               <CardFooter className="flex justify-end">
-                <Button type="submit" variant="destructiveOutline">
-                  Revoke
-                </Button>
+                <div className="mt-6 flex flex-row justify-end">
+                  <Button type="submit">Create</Button>
+                </div>
               </CardFooter>
             </form>
           </Card>
+          {personalAccessTokens.map((pat) =>
+            "privKey" in pat ? (
+              <React.Fragment key={pat.fingerprint}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{pat.description} </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <CopyCode
+                      codeString={pat.privKey}
+                      language="shell"
+                    ></CopyCode>
+                    <span className="mt-2 block text-sm text-destructive">
+                      Make sure to copy the token. You won&apos;t be able to see
+                      it ever again
+                    </span>
+                  </CardContent>
+                </Card>
+              </React.Fragment>
+            ) : null,
+          )}
+
           <div className="mb-6 flex flex-col gap-4">
             {personalAccessTokens.map((pat) =>
               "privKey" in pat ? (
-                <React.Fragment key={pat.fingerprint}>
-                  <Card>
-                    <CardContent className="pt-6">
-                      <CopyCode
-                        codeString={pat.privKey}
-                        language="shell"
-                      ></CopyCode>
-                      <span className="mt-2 block text-sm text-destructive">
-                        Make sure to copy the token. You won&apos;t be able to
-                        see it ever again
-                      </span>
-                    </CardContent>
-                  </Card>
-                </React.Fragment>
+                <></>
               ) : (
                 <ListItem
                   key={pat.id}
                   Title={pat.description}
                   description={
                     <>
+                      Rights: {pat.forScanning ? "Scanning" : ""}{" "}
+                      {pat.forManagement ? "Management" : ""}
+                      <br />
                       Created at: <DateString date={new Date(pat.createdAt)} />
                       <br />
                       Last used:{" "}
@@ -319,14 +362,23 @@ const Settings: FunctionComponent<{
               ),
             )}
           </div>
-          <form onSubmit={handleSubmit(handleCreatePat)}>
-            <Label htmlFor="description">Description</Label>
-            <Input {...register("description")} />
-            <div className="mt-6 flex flex-row justify-end">
-              <Button type="submit">Create</Button>
-            </div>
-          </form>
+          <Card className="bg-background">
+            <CardHeader>
+              <CardTitle>Revoke access token</CardTitle>
+            </CardHeader>
+            <form onSubmit={handleRevokePat}>
+              <CardContent>
+                <Input name="privkey" placeholder="Paste token here" />
+              </CardContent>
+              <CardFooter className="flex justify-end">
+                <Button type="submit" variant="destructiveOutline">
+                  Revoke
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
         </Section>
+
         <Section
           id="oidc"
           title="Manage Social Sign In"
