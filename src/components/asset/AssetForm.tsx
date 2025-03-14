@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useRef } from "react";
 import {
   FormControl,
   FormDescription,
@@ -21,11 +21,27 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Modify } from "@/types/common";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import React from "react";
 
 interface Props {
-  form: UseFormReturn<AssetDTO, any, undefined>;
+  form: UseFormReturn<AssetFormValues, any, undefined>;
 }
 
+export type AssetFormValues = Modify<
+  AssetDTO,
+  {
+    cvssAutomaticTicketThreshold: number[];
+    riskAutomaticTicketThreshold: number[];
+    enableTicketRange: boolean;
+  }
+>;
 export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
   <>
     <FormField
@@ -64,7 +80,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <ListItem
             description={
-              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
+              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the set."
             }
             Title="Central Flaw Management"
             Button={
@@ -196,6 +212,90 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
+export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    control={form.control}
+    name="enableTicketRange"
+    render={({ field }) => (
+      <FormItem>
+        <ListItem
+          description={
+            "Enables automatic ticket creation for vulnerabilities exceeding the defined CVSS-BTE and Risk Value thresholds."
+          }
+          Title="Reporting range"
+          Button={
+            <FormControl>
+              <Switch
+                defaultChecked={true}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+          }
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const SliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.watch("cvssAutomaticTicketThreshold");
+  return (
+    <FormField
+      name="cvssAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{value[0]}</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              value={value}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            Calculates Risk including multiple factors.
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.watch("riskAutomaticTicketThreshold");
+
+  return (
+    <FormField
+      name="riskAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{value[0]}</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              value={value}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
 const AssetForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
 > = ({ form, forceVerticalSections }) => {
@@ -225,6 +325,28 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <AssetFormMisc form={form} />
       </Section>
+      <hr />
+      <Section
+        forceVertical={forceVerticalSections}
+        description="CVSS-BTE is the latest Scoring System standard.
+        It combines multiple metrics into one, your defined range will automatically create tickets that 
+        "
+        title="Reporting range"
+      >
+        <EnableTicketRange form={form}></EnableTicketRange>
+
+        {form.watch("enableTicketRange") ? (
+          <React.Fragment>
+            <SliderForm form={form}></SliderForm>
+            <RiskSliderForm form={form}></RiskSliderForm>
+            {/* https://stackoverflow.com/questions/48886726/why-do-i-get-the-error-expressions-must-have-one-parent-element-how-do-i-fix   */}
+          </React.Fragment>
+        ) : null}
+
+        {/* <SliderForm form={form}></SliderForm>
+        <RiskSliderForm form={form}></RiskSliderForm> */}
+      </Section>
+      <></>
     </>
   );
 };

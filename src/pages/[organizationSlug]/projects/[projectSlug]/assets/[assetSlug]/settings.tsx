@@ -1,5 +1,5 @@
 import Page from "@/components/Page";
-import AssetForm from "@/components/asset/AssetForm";
+import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -33,6 +33,13 @@ interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
 }
 
+const firstOrUndefined = (el?: number[]): number | undefined => {
+  if (!el) {
+    return undefined;
+  }
+
+  return el[0];
+};
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -40,9 +47,19 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const asset = useActiveAsset()!;
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
-  const form = useForm<AssetDTO>({ defaultValues: asset });
+  const form = useForm<AssetFormValues>({
+    defaultValues: {
+      ...asset,
+      cvssAutomaticTicketThreshold: asset.cvssAutomaticTicketThreshold
+        ? [asset.cvssAutomaticTicketThreshold]
+        : [8],
+      riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
+        ? [asset.riskAutomaticTicketThreshold]
+        : [8],
+    },
+  });
 
-  const handleUpdate = async (data: Partial<AssetDTO>) => {
+  const handleUpdate = async (data: Partial<AssetFormValues>) => {
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -52,7 +69,15 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         asset.slug,
       {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          cvssAutomaticTicketThreshold: firstOrUndefined(
+            data.cvssAutomaticTicketThreshold,
+          ),
+          riskAutomaticTicketThreshold: firstOrUndefined(
+            data.riskAutomaticTicketThreshold,
+          ),
+        }),
       },
     );
 
