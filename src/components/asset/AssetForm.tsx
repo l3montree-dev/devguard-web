@@ -24,6 +24,11 @@ import { Switch } from "../ui/switch";
 //import { Slider } from "@radix-ui/react-slider";
 import { Slider } from "@/components/ui/slider";
 import { Modify } from "@/types/common";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, undefined>;
@@ -34,6 +39,7 @@ export type AssetFormValues = Modify<
   {
     cvssAutomaticTicketThreshold: number[];
     riskAutomaticTicketThreshold: number[];
+    enableTicketRange: boolean;
   }
 >;
 export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
@@ -205,6 +211,34 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
     )}
   />
 );
+
+export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    control={form.control}
+    name="enableTicketRange"
+    render={({ field }) => (
+      <FormItem>
+        <ListItem
+          description={
+            "Is the asset publicly availabe. Does it have a static IP-Address assigned to it or a domain name?"
+          }
+          Title="Enable Reprting range"
+          Button={
+            <FormControl>
+              <Switch
+                defaultChecked={true}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
+          }
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
 const SliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("cvssAutomaticTicketThreshold");
   return (
@@ -294,12 +328,21 @@ Security requirements are specific criteria or conditions that an application, s
       <hr />
       <Section
         forceVertical={forceVerticalSections}
-        description="Choose a range between 0-10.
+        description="CVSS-BTE is the latest Scoring System standard.
+        It combines multiple metrics into one, your defined range will automatically create tickets that 
         "
         title="Reporting range"
       >
+        <HoverCard>
+          <HoverCardTrigger>Hover</HoverCardTrigger>
+          <HoverCardContent>
+            The React Framework – created and maintained by @vercel
+          </HoverCardContent>
+        </HoverCard>
+
         <SliderForm form={form}></SliderForm>
         <RiskSliderForm form={form}></RiskSliderForm>
+        <EnableTicketRange form={form}></EnableTicketRange>
       </Section>
       <></>
     </>
