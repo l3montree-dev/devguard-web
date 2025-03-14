@@ -31,6 +31,7 @@ import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
 import { VulnerableComponents } from "@/components/overview/VulnerableComponents";
 import { FunctionComponent } from "react";
 
+import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CollapsibleControlTrigger from "@/components/common/CollapsibleControlTrigger";
 import EmptyOverview from "@/components/common/EmptyOverview";
@@ -46,18 +47,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Collapsible } from "@/components/ui/collapsible";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "../../../../../../../../components/ui/button";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "@/hooks/useActiveAssetVersion";
-import { BranchTagSelector } from "@/components/BranchTagSelector";
 
 interface Props {
   componentRisk: ComponentRisk;

@@ -447,3 +447,67 @@ export interface FlawByPackage {
 export interface AverageFixingTime {
   averageFixingTimeSeconds: number;
 }
+
+export interface ComponentPaged {
+  id: string;
+  semverStart: string;
+  semverEnd: any;
+  component: Component;
+  componentPurl: string;
+  assetVersionId: string;
+  scannerId: string;
+}
+
+export interface Component {
+  purl: string;
+  dependsOn: any;
+  componentType: string;
+  version: string;
+  license: string;
+  project: Project;
+  projectId: string;
+}
+
+export interface Project {
+  id: string;
+  starsCount: number;
+  forksCount: number;
+  openIssuesCount: number;
+  homepage: string;
+  license: string;
+  description: string;
+  scoreCard: ScoreCard;
+  updatedAt: string;
+}
+
+export interface ScoreCard {
+  checks: Check[];
+  date: string;
+  metadata: any[];
+  overallScore: number;
+  repository: Repository;
+  scorecard: Scorecard;
+}
+
+export interface Check {
+  details: string[];
+  documentation: Documentation;
+  name: string;
+  reason: string;
+  score: number;
+}
+
+export interface Documentation {
+  shortDescription: string;
+  url: string;
+}
+
+export interface Repository {
+  commit: string;
+  name: string;
+}
+
+export interface Scorecard {
+  commit: string;
+  version: string;
+}
