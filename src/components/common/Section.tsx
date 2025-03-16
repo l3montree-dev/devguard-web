@@ -47,7 +47,7 @@ const Section: FunctionComponent<Props> = (props) => {
               : "w-96",
           )}
         >
-          <div>
+          <div className="flex-1">
             <h2
               className={classNames(
                 "flex flex-row items-center gap-2 font-semibold leading-7 text-foreground",

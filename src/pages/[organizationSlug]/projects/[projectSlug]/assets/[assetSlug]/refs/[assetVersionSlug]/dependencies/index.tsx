@@ -14,7 +14,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -39,6 +39,7 @@ import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   components: Paged<ComponentPaged>;
+  licenses: Record<string, number>;
 }
 
 const columnHelper = createColumnHelper<ComponentPaged>();
@@ -95,7 +96,22 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   }),
 ];
 
-const Index: FunctionComponent<Props> = ({ components }) => {
+const osiLicenseColors: Record<string, string> = {
+  MIT: "bg-green-500",
+  "Apache-2.0": "bg-blue-500",
+  "GPL-3.0": "bg-red-500",
+  "GPL-2.0": "bg-orange-500",
+  "BSD-2-Clause": "bg-yellow-500",
+  "BSD-3-Clause": "bg-yellow-500",
+  "LGPL-3.0": "bg-purple-500",
+  "AGPL-3.0": "bg-pink-500",
+  "EPL-2.0": "bg-indigo-500",
+  "MPL-2.0": "bg-teal-500",
+  unknown: "bg-gray-500",
+  "CC0-1.0": "bg-gray-600",
+};
+
+const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
@@ -108,6 +124,14 @@ const Index: FunctionComponent<Props> = ({ components }) => {
     data: components.data,
     columnsDef,
   });
+
+  const licenseToPercentMapEntries = useMemo(() => {
+    const total = Object.values(licenses).reduce((acc, curr) => acc + curr, 0);
+
+    return Object.entries(licenses)
+      .map(([license, count]) => [license, (count / total) * 100])
+      .sort(([aLicense, a], [bLicense, b]) => (b as number) - (a as number));
+  }, [licenses]);
 
   return (
     <Page
@@ -122,6 +146,39 @@ const Index: FunctionComponent<Props> = ({ components }) => {
         forceVertical
         description="Dependencies of the asset"
         title="Dependencies"
+        Button={
+          <span className="w-72">
+            <span className="flex w-72 flex-row overflow-hidden rounded-full">
+              {licenseToPercentMapEntries.map(([license, percent], i, arr) => (
+                <span
+                  key={license}
+                  className={classNames(
+                    "h-2",
+                    osiLicenseColors[license] ?? "",
+                    i === arr.length - 1 ? "" : "border-r",
+                  )}
+                  style={{ width: percent + "%" }}
+                />
+              ))}
+            </span>
+            <span className="mt-2 flex flex-row flex-wrap gap-2">
+              {licenseToPercentMapEntries.map(([license, percent]) => (
+                <span className="whitespace-nowrap text-xs" key={license}>
+                  <span
+                    className={classNames(
+                      "mr-1 inline-block h-2 w-2 rounded-full text-xs",
+                      osiLicenseColors[license],
+                    )}
+                  />
+                  {license}{" "}
+                  <span className="text-muted-foreground">
+                    {Math.round(percent as number)}%
+                  </span>
+                </span>
+              ))}
+            </span>
+          </span>
+        }
       >
         {" "}
         <div className="overflow-hidden rounded-lg border shadow-sm">
@@ -189,15 +246,18 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/components?" +
-      buildFilterSearchParams(context).toString();
-    const [components] = await Promise.all([
-      apiClient(url).then((r) => r.json()),
+      "/components";
+
+    const params = buildFilterSearchParams(context).toString();
+    const [components, licenses] = await Promise.all([
+      apiClient(url + "?" + params.toString()).then((r) => r.json()),
+      apiClient(url + "/licenses?" + params.toString()).then((r) => r.json()),
     ]);
 
     return {
       props: {
         components,
+        licenses,
       },
     };
   },
