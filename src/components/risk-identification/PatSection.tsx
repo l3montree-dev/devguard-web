@@ -16,12 +16,12 @@ const PatSection = ({
   pat?: PatWithPrivKey;
   onCreatePat: (data: {
     description: string;
-    forScanning: boolean;
-    forManagement: boolean;
+    scanAsset: boolean;
+    manageAsset: boolean;
   }) => void;
 }) => {
-  const [forScanning, setForScanning] = useState(false);
-  const [forManagement, setForManagement] = useState(false);
+  const [scanAsset, setScanAsset] = useState(false);
+  const [manageAsset, setManageAsset] = useState(false);
 
   return (
     <Section
@@ -54,21 +54,18 @@ const PatSection = ({
           <div>
             <ListItem
               description="Use this token to scan your repositories"
-              Title="For Scanning"
+              Title="scan Asset"
               Button={
-                <Switch
-                  checked={forScanning}
-                  onCheckedChange={setForScanning}
-                />
+                <Switch checked={scanAsset} onCheckedChange={setScanAsset} />
               }
             />
             <ListItem
               description="Use this token to manage your repositories"
-              Title="For Management"
+              Title="manage Asset"
               Button={
                 <Switch
-                  checked={forManagement}
-                  onCheckedChange={setForManagement}
+                  checked={manageAsset}
+                  onCheckedChange={setManageAsset}
                 />
               }
             />
@@ -87,8 +84,8 @@ const PatSection = ({
               onClick={() =>
                 onCreatePat({
                   description,
-                  forScanning,
-                  forManagement,
+                  scanAsset,
+                  manageAsset,
                 })
               }
             >

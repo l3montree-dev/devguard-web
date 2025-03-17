@@ -35,8 +35,8 @@ export default function usePersonalAccessToken(
 
   const handleCreatePat = async (data: {
     description: string;
-    forScanning: boolean;
-    forManagement: boolean;
+    scanAsset: boolean;
+    manageAsset: boolean;
   }) => {
     const pat = await createPat(data);
     setPersonalAccessTokens((prev) => [...prev, pat]);

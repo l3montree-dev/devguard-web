@@ -94,8 +94,8 @@ const Settings: FunctionComponent<{
 
   const { register, handleSubmit, reset } = useForm<{
     description: string;
-    forScanning: boolean;
-    forManagement: boolean;
+    scanAsset: boolean;
+    manageAsset: boolean;
   }>();
 
   const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
@@ -177,8 +177,8 @@ const Settings: FunctionComponent<{
 
   const handleCreatePat = async (data: {
     description: string;
-    forScanning: boolean;
-    forManagement: boolean;
+    scanAsset: boolean;
+    manageAsset: boolean;
   }) => {
     await onCreatePat(data);
     reset();
@@ -274,23 +274,23 @@ const Settings: FunctionComponent<{
                 <Input {...register("description")} />
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <Label htmlFor="forScanning" className="flex-1">
-                    For Scanning
+                  <Label htmlFor="scanAsset" className="flex-1">
+                    scan Asset
                     <span className="block text-sm text-gray-500">
                       Use this token to scan your repositories.
                     </span>
                   </Label>
-                  <Switch {...register("forScanning")} />
+                  <Switch {...register("scanAsset")} />
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <Label htmlFor="forManagement" className="flex-1">
-                    For Management
+                  <Label htmlFor="manageAsset" className="flex-1">
+                    manage Asset
                     <span className="block text-sm text-gray-500">
                       Use this token to manage your repositories.
                     </span>
                   </Label>
-                  <Switch {...register("forManagement")} />
+                  <Switch {...register("manageAsset")} />
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end">
@@ -332,8 +332,8 @@ const Settings: FunctionComponent<{
                   Title={pat.description}
                   description={
                     <>
-                      Rights: {pat.forScanning ? "Scanning" : ""}{" "}
-                      {pat.forManagement ? "Management" : ""}
+                      Rights: {pat.scanAsset ? "Scanning" : ""}{" "}
+                      {pat.manageAsset ? "Management" : ""}
                       <br />
                       Created at: <DateString date={new Date(pat.createdAt)} />
                       <br />
