@@ -23,11 +23,7 @@ import {
 import { Switch } from "../ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Modify } from "@/types/common";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+
 import React from "react";
 
 interface Props {
