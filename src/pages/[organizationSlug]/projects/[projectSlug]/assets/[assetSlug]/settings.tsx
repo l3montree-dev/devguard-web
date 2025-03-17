@@ -1,5 +1,8 @@
 import Page from "@/components/Page";
-import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
+import AssetForm, {
+  AssetFormValues,
+  EnableTicketRange,
+} from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -47,15 +50,21 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const asset = useActiveAsset()!;
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
+
   const form = useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
+
       cvssAutomaticTicketThreshold: asset.cvssAutomaticTicketThreshold
         ? [asset.cvssAutomaticTicketThreshold]
-        : [8],
+        : [],
       riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
         ? [asset.riskAutomaticTicketThreshold]
-        : [8],
+        : [],
+      enableTicketRange: Boolean(
+        asset.riskAutomaticTicketThreshold ||
+          asset.cvssAutomaticTicketThreshold,
+      ),
     },
   });
 
@@ -77,6 +86,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           riskAutomaticTicketThreshold: firstOrUndefined(
             data.riskAutomaticTicketThreshold,
           ),
+          enableTicketRange: asset.enableTicketRange,
         }),
       },
     );

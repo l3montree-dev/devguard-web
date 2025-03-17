@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 
-import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
+import AssetForm, {
+  AssetFormValues,
+  EnableTicketRange,
+} from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -72,6 +75,7 @@ const formSchema = z.object({
   description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
+  enableTicketRange: z.boolean().optional(),
   cvssAutomaticTicketThreshold: z.number().array(),
   riskAutomaticTicketThreshold: z.number().array(),
 
@@ -91,8 +95,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      cvssAutomaticTicketThreshold: [8],
-      riskAutomaticTicketThreshold: [8],
+      cvssAutomaticTicketThreshold: [], //here are the values, when enabled I enable reproting range
+      riskAutomaticTicketThreshold: [],
       centralFlawManagement: true,
     },
   });
@@ -132,11 +136,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       ...data,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
-        : 8,
+        : null,
 
       riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
         ? data.riskAutomaticTicketThreshold[0]
-        : 8,
+        : null,
     };
     const resp = await browserApiClient(
       "/organizations/" +

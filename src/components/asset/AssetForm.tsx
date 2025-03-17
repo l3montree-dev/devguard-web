@@ -221,7 +221,16 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
           Title="Reporting range"
           Button={
             <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
+              <Switch
+                checked={field.value}
+                onCheckedChange={(v) => {
+                  // update enableTicketRange
+                  // update cvssTicketThreshold and riskTicketThreshold to 8
+                  form.setValue("enableTicketRange", v);
+                  form.setValue("cvssAutomaticTicketThreshold", [8]);
+                  form.setValue("riskAutomaticTicketThreshold", [8]);
+                }}
+              />
             </FormControl>
           }
         />
@@ -239,7 +248,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
       control={form.control}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{value[0]}</FormLabel>
+          <FormLabel>CVSS Score</FormLabel>
           <FormControl>
             <Slider
               min={0}
@@ -267,7 +276,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
       control={form.control}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{value[0]}</FormLabel>
+          <FormLabel>Risk Value</FormLabel>
           <FormControl>
             <Slider
               min={0}
@@ -288,7 +297,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const AssetForm: FunctionComponent<
+const AssetSettingsForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
 > = ({ form, forceVerticalSections }) => {
   return (
@@ -338,9 +347,10 @@ Security requirements are specific criteria or conditions that an application, s
         {/* <SliderForm form={form}></SliderForm>
         <RiskSliderForm form={form}></RiskSliderForm> */}
       </Section>
+
       <></>
     </>
   );
 };
 
-export default AssetForm;
+export default AssetSettingsForm;

@@ -366,6 +366,7 @@ export interface AssetDTO {
 
   signingPubKey?: string;
 
+  enableTicketRange: boolean;
   centralFlawManagement: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
