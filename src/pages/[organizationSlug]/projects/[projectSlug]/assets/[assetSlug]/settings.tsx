@@ -40,7 +40,6 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
     return undefined;
   }
-
   return el[0];
 };
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
@@ -86,7 +85,6 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           riskAutomaticTicketThreshold: firstOrUndefined(
             data.riskAutomaticTicketThreshold,
           ),
-          enableTicketRange: asset.enableTicketRange,
         }),
       },
     );

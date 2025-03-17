@@ -136,11 +136,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
       ...data,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
-        : null,
+        : 2,
 
       riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
         ? data.riskAutomaticTicketThreshold[0]
-        : null,
+        : 2,
     };
     const resp = await browserApiClient(
       "/organizations/" +
