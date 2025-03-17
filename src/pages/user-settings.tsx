@@ -332,8 +332,7 @@ const Settings: FunctionComponent<{
                   Title={pat.description}
                   description={
                     <>
-                      Rights: {pat.scanAsset ? "Scanning" : ""}{" "}
-                      {pat.manageAsset ? "Management" : ""}
+                      Scopes: {pat.scopes}
                       <br />
                       Created at: <DateString date={new Date(pat.createdAt)} />
                       <br />

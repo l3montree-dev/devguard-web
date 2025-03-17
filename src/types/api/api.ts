@@ -84,6 +84,8 @@ export interface PersonalAccessTokenDTO {
   scanAsset: boolean;
   manageAsset: boolean;
 
+  scopes: string;
+
   userId: string;
   createdAt: string;
   id: string;

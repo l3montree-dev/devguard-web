@@ -38,7 +38,18 @@ export default function usePersonalAccessToken(
     scanAsset: boolean;
     manageAsset: boolean;
   }) => {
-    const pat = await createPat(data);
+    let scopes = "";
+    if (data.scanAsset) {
+      scopes += "scanAsset";
+    }
+    if (data.manageAsset) {
+      if (scopes) {
+        scopes += " ";
+      }
+      scopes += "manageAsset";
+    }
+
+    const pat = await createPat({ ...data, scopes });
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));
     newPatEventEmitter.emit("pat", pat);
