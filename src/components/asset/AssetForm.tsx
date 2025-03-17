@@ -225,11 +225,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
           Title="Reporting range"
           Button={
             <FormControl>
-              <Switch
-                defaultChecked={true}
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
             </FormControl>
           }
         />
@@ -335,13 +331,13 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <EnableTicketRange form={form}></EnableTicketRange>
 
-        {form.watch("enableTicketRange") ? (
+        {form.watch("enableTicketRange") && (
           <React.Fragment>
             <SliderForm form={form}></SliderForm>
             <RiskSliderForm form={form}></RiskSliderForm>
             {/* https://stackoverflow.com/questions/48886726/why-do-i-get-the-error-expressions-must-have-one-parent-element-how-do-i-fix   */}
           </React.Fragment>
-        ) : null}
+        )}
 
         {/* <SliderForm form={form}></SliderForm>
         <RiskSliderForm form={form}></RiskSliderForm> */}

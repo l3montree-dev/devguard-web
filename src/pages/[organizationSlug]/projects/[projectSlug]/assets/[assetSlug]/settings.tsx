@@ -56,6 +56,10 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
         ? [asset.riskAutomaticTicketThreshold]
         : [8],
+      enableTicketRange: Boolean(
+        asset.riskAutomaticTicketThreshold ||
+          asset.cvssAutomaticTicketThreshold,
+      ),
     },
   });
 
