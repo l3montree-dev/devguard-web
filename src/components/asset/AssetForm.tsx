@@ -224,8 +224,6 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
               <Switch
                 checked={field.value}
                 onCheckedChange={(v) => {
-                  // update enableTicketRange
-                  // update cvssTicketThreshold and riskTicketThreshold to 8
                   form.setValue("enableTicketRange", v);
                   form.setValue("cvssAutomaticTicketThreshold", [8]);
                   form.setValue("riskAutomaticTicketThreshold", [8]);
@@ -340,12 +338,8 @@ Security requirements are specific criteria or conditions that an application, s
           <React.Fragment>
             <SliderForm form={form}></SliderForm>
             <RiskSliderForm form={form}></RiskSliderForm>
-            {/* https://stackoverflow.com/questions/48886726/why-do-i-get-the-error-expressions-must-have-one-parent-element-how-do-i-fix   */}
           </React.Fragment>
         )}
-
-        {/* <SliderForm form={form}></SliderForm>
-        <RiskSliderForm form={form}></RiskSliderForm> */}
       </Section>
 
       <></>

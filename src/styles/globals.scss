@@ -281,19 +281,3 @@
     transition: all 0.2s ease;
 }
 
-.slider-gradient {  
-    background: rgb(216,186,26);
-    background: linear-gradient(90deg, rgb(26, 216, 48) 35%, rgba(216,104,26,1) 100%);
-      
-}
-
-.tick-slider-value {
-    position: absolute;
-    top: 0;
-
-    font-weight: bold;
-
-    color: var(--blue);
-
-    border-radius: var(--slider-handle-border-radius);
-}
