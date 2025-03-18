@@ -22,7 +22,6 @@ export default function useTable<T>({
     data: data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSort,
-
     manualSorting: true,
     state: {
       sorting: sortingState,

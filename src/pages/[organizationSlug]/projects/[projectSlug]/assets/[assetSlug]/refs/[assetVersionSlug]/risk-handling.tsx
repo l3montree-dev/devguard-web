@@ -139,7 +139,7 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
   {
     ...columnHelper.accessor("flawCount", {
       header: "Flaw Count",
-      id: "flaw_count",
+      id: "dependency_vuln_count",
       enableSorting: true,
       cell: (row) => row.getValue(),
     }),

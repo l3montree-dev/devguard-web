@@ -6,9 +6,7 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
@@ -18,6 +16,7 @@ import { FunctionComponent, useMemo } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
+import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
@@ -27,15 +26,15 @@ import useTable from "@/hooks/useTable";
 import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
+import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
 import {
   ColumnDef,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { useRouter } from "next/router";
-import CustomPagination from "@/components/common/CustomPagination";
+import { GitBranch } from "lucide-react";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
+import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -47,41 +46,41 @@ const columnHelper = createColumnHelper<ComponentPaged>();
 const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   columnHelper.accessor("componentPurl", {
     header: "Package",
-    id: "componentPurl",
+    id: "component_purl",
     cell: (row) => (
-      <span className="flex flex-row gap-2">
-        <span className="flex h-5 w-5 flex-row items-center justify-center">
-          <EcosystemImage packageName={row.getValue()} />
-        </span>
+      <span className="flex flex-row items-start gap-2">
+        <EcosystemImage packageName={row.getValue()} />
         {beautifyPurl(row.getValue())}
       </span>
     ),
   }),
   columnHelper.accessor("component.version", {
     header: "Version",
-    id: "component.version",
-    cell: (row) => <Badge variant={"secondary"}>{row.getValue()}</Badge>,
+    id: "Component.version",
+    cell: (row) =>
+      row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
-  columnHelper.accessor("component.project.id", {
+  columnHelper.accessor("component.project.projectKey", {
     header: "Repository",
-    id: "component.project.id",
-    cell: (row) => (
-      <div>
-        <div className="mb-2">{row.getValue()}</div>
-        <Badge variant={"outline"} className="mr-1">
-          <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-          {row.row.original.component.project.starsCount}
-        </Badge>
-        <Badge variant={"outline"}>
-          <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-          {row.row.original.component.project.forksCount}
-        </Badge>
-      </div>
-    ),
+    id: "Component__ComponentProject.project_key",
+    cell: (row) =>
+      row.row.original.component.project && (
+        <div>
+          <div className="mb-2">{row.getValue()}</div>
+          <Badge variant={"outline"} className="mr-1">
+            <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
+            {row.row.original.component.project?.starsCount}
+          </Badge>
+          <Badge variant={"outline"}>
+            <GitBranch className="mr-1 h-4 w-4 text-muted-foreground" />
+            {row.row.original.component.project?.forksCount}
+          </Badge>
+        </div>
+      ),
   }),
-  columnHelper.accessor("component.project.license", {
+  columnHelper.accessor("component.license", {
     header: "License",
-    id: "component.project.license",
+    id: "Component.license",
     cell: (row) => (
       <Badge variant={"outline"}>
         <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
@@ -89,9 +88,9 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
       </Badge>
     ),
   }),
-  columnHelper.accessor("component.project.scoreCard.overallScore", {
+  columnHelper.accessor("component.project.scoreCardScore", {
     header: "Scorecard Score",
-    id: "component.project.scoreCard.overallScore",
+    id: "Component__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => <div>{row.getValue()}</div>,
   }),
 ];
@@ -114,11 +113,7 @@ const osiLicenseColors: Record<string, string> = {
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
-  const project = useActiveProject();
-  const asset = useActiveAsset()!;
   const { branches, tags } = useAssetBranchesAndTags();
-
-  const router = useRouter();
 
   const { table } = useTable({
     data: components.data,
@@ -130,7 +125,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
 
     return Object.entries(licenses)
       .map(([license, count]) => [license, (count / total) * 100])
-      .sort(([aLicense, a], [bLicense, b]) => (b as number) - (a as number));
+      .sort(([_aLicense, a], [_bLicense, b]) => (b as number) - (a as number));
   }, [licenses]);
 
   return (
@@ -180,7 +175,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           </span>
         }
       >
-        {" "}
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">
@@ -191,10 +185,18 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                       className="cursor-pointer break-normal p-4 text-left"
                       key={header.id}
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      <div
+                        className="flex flex-row gap-2"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        <SortingCaret
+                          sortDirection={header.column.getIsSorted()}
+                        />
+                      </div>
                     </th>
                   ))}
                 </tr>

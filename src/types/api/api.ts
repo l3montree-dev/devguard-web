@@ -464,12 +464,12 @@ export interface Component {
   componentType: string;
   version: string;
   license: string;
-  project: Project;
+  project?: Project;
   projectId: string;
 }
 
 export interface Project {
-  id: string;
+  projectKey: string;
   starsCount: number;
   forksCount: number;
   openIssuesCount: number;
@@ -478,6 +478,7 @@ export interface Project {
   description: string;
   scoreCard: ScoreCard;
   updatedAt: string;
+  scoreCardScore?: number;
 }
 
 export interface ScoreCard {
