@@ -1,4 +1,4 @@
-import { FunctionComponent, useRef } from "react";
+import { FunctionComponent } from "react";
 import {
   FormControl,
   FormDescription,
@@ -76,7 +76,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <ListItem
             description={
-              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the set."
+              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
             }
             Title="Central Flaw Management"
             Button={
