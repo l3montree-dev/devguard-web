@@ -136,9 +136,9 @@ export const useAssetMenu = () => {
           assetSlug +
           "/refs/" +
           assetVersionSlug +
-          "/dependency-graph",
+          "/dependencies",
         Icon: ShareIcon,
-        isActive: router.pathname.includes("dependency-graph"),
+        isActive: router.pathname.includes("dependencies"),
       },
       {
         title: "Compliance",
