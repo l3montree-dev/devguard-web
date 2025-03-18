@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 
-import AssetForm from "@/components/asset/AssetForm";
+import AssetForm, {
+  AssetFormValues,
+  EnableTicketRange,
+} from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -57,6 +60,8 @@ import CopyCode from "../../../../components/common/CopyCode";
 import PatSection from "../../../../components/risk-identification/PatSection";
 import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
 import { config } from "../../../../config";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
+import { Modify } from "@/types/common";
 
 interface Props {
   project: ProjectDTO & {
@@ -70,6 +75,9 @@ const formSchema = z.object({
   description: z.string().optional(),
 
   reachableFromTheInternet: z.boolean().optional(),
+  enableTicketRange: z.boolean().optional(),
+  cvssAutomaticTicketThreshold: z.number().array(),
+  riskAutomaticTicketThreshold: z.number().array(),
 
   confidentialityRequirement: z.string(),
   integrityRequirement: z.string(),
@@ -81,13 +89,14 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const form = useForm<AssetDTO>({
+  const form = useForm<AssetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-
+      cvssAutomaticTicketThreshold: [], //here are the values, when enabled I enable reproting range
+      riskAutomaticTicketThreshold: [],
       centralFlawManagement: true,
     },
   });
@@ -122,7 +131,17 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
     }
   };
 
-  const handleCreateAsset = async (data: AssetDTO) => {
+  const handleCreateAsset = async (data: AssetFormValues) => {
+    const modifiedData: AssetDTO = {
+      ...data,
+      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
+        ? data.cvssAutomaticTicketThreshold[0]
+        : 2,
+
+      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
+        ? data.riskAutomaticTicketThreshold[0]
+        : 2,
+    };
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -131,7 +150,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
         "/assets",
       {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(modifiedData),
       },
     );
     if (resp.ok) {

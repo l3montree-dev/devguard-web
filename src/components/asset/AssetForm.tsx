@@ -21,11 +21,23 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Modify } from "@/types/common";
+
+import React from "react";
 
 interface Props {
-  form: UseFormReturn<AssetDTO, any, undefined>;
+  form: UseFormReturn<AssetFormValues, any, undefined>;
 }
 
+export type AssetFormValues = Modify<
+  AssetDTO,
+  {
+    cvssAutomaticTicketThreshold: number[];
+    riskAutomaticTicketThreshold: number[];
+    enableTicketRange: boolean;
+  }
+>;
 export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
   <>
     <FormField
@@ -196,7 +208,94 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
   />
 );
 
-const AssetForm: FunctionComponent<
+export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
+  <FormField
+    control={form.control}
+    name="enableTicketRange"
+    render={({ field }) => (
+      <FormItem>
+        <ListItem
+          description={
+            "Enables automatic ticket creation for vulnerabilities exceeding the defined CVSS-BTE and Risk Value thresholds."
+          }
+          Title="Reporting range"
+          Button={
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={(v) => {
+                  form.setValue("enableTicketRange", v);
+                  form.setValue("cvssAutomaticTicketThreshold", [8]);
+                  form.setValue("riskAutomaticTicketThreshold", [8]);
+                }}
+              />
+            </FormControl>
+          }
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
+const SliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.watch("cvssAutomaticTicketThreshold");
+  return (
+    <FormField
+      name="cvssAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>CVSS Score</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              value={value}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            Calculates Risk including multiple factors.
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.watch("riskAutomaticTicketThreshold");
+
+  return (
+    <FormField
+      name="riskAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Risk Value</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              value={value}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+const AssetSettingsForm: FunctionComponent<
   Props & { forceVerticalSections?: boolean }
 > = ({ form, forceVerticalSections }) => {
   return (
@@ -225,8 +324,27 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <AssetFormMisc form={form} />
       </Section>
+      <hr />
+      <Section
+        forceVertical={forceVerticalSections}
+        description="CVSS-BTE is the latest Scoring System standard.
+        It combines multiple metrics into one, your defined range will automatically create tickets that 
+        "
+        title="Reporting range"
+      >
+        <EnableTicketRange form={form}></EnableTicketRange>
+
+        {form.watch("enableTicketRange") && (
+          <React.Fragment>
+            <SliderForm form={form}></SliderForm>
+            <RiskSliderForm form={form}></RiskSliderForm>
+          </React.Fragment>
+        )}
+      </Section>
+
+      <></>
     </>
   );
 };
 
-export default AssetForm;
+export default AssetSettingsForm;
