@@ -72,7 +72,9 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
       row.row.original.component.project && (
         <div>
           <div className="mb-2">
-            <a href={`${row.getValue()}`}>{row.getValue()}</a>
+            <a href={`//${row.getValue()}`} target="_blank">
+              {row.getValue()}
+            </a>
           </div>
           <Badge variant={"outline"} className="mr-1">
             <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
