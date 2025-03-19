@@ -162,7 +162,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   <span
                     className={classNames(
                       "mr-1 inline-block h-2 w-2 rounded-full text-xs",
-                      osiLicenseColors[license],
+                      osiLicenseColors[license]
+                        ? osiLicenseColors[license]
+                        : "bg-gray-600",
                     )}
                   />
                   {license}{" "}
