@@ -26,15 +26,20 @@ import useTable from "@/hooks/useTable";
 import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
-import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationCircleIcon,
+  ScaleIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
 import {
   ColumnDef,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GitBranch } from "lucide-react";
+import { GitBranch, Scale } from "lucide-react";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -81,13 +86,22 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   columnHelper.accessor("component.license", {
     header: "License",
     id: "Component.license",
-    cell: (row) => (
-      <Badge variant={"outline"}>
-        <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-        {row.getValue()}
-      </Badge>
-    ),
+    cell: (row) =>
+      row.getValue() === "MIT" ? (
+        <Badge variant={"outline"}>
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {row.getValue()}
+        </Badge>
+      ) : (
+        <Badge variant={"outline"}>
+          <ExclamationTriangleIcon
+            className={"mr-1 h-4 w-4 text-muted-foreground"}
+          />
+          {row.getValue()}
+        </Badge>
+      ),
   }),
+
   columnHelper.accessor("component.project.scoreCardScore", {
     header: "Scorecard Score",
     id: "Component__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
@@ -204,6 +218,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
+            ^{" "}
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
