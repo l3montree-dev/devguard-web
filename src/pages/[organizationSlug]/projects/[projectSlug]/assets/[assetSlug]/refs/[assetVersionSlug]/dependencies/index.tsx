@@ -35,6 +35,7 @@ import {
 import { GitBranch } from "lucide-react";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -66,7 +67,11 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     cell: (row) =>
       row.row.original.component.project && (
         <div>
-          <div className="mb-2">{row.getValue()}</div>
+          <div className="mb-2">
+            <a href={`//${row.getValue()}`} target="_blank">
+              {row.getValue()}
+            </a>
+          </div>
           <Badge variant={"outline"} className="mr-1">
             <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
             {row.row.original.component.project?.starsCount}
@@ -81,13 +86,22 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   columnHelper.accessor("component.license", {
     header: "License",
     id: "Component.license",
-    cell: (row) => (
-      <Badge variant={"outline"}>
-        <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-        {row.getValue()}
-      </Badge>
-    ),
+    cell: (row) =>
+      row.getValue() === "unknown" ? (
+        <Badge variant={"outline"}>
+          <ExclamationTriangleIcon
+            className={"mr-1 h-4 w-4 text-muted-foreground"}
+          />
+          {row.getValue()}
+        </Badge>
+      ) : (
+        <Badge variant={"outline"}>
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {row.getValue()}
+        </Badge>
+      ),
   }),
+
   columnHelper.accessor("component.project.scoreCardScore", {
     header: "Scorecard Score",
     id: "Component__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
@@ -162,7 +176,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   <span
                     className={classNames(
                       "mr-1 inline-block h-2 w-2 rounded-full text-xs",
-                      osiLicenseColors[license],
+                      osiLicenseColors[license]
+                        ? osiLicenseColors[license]
+                        : "bg-gray-600",
                     )}
                   />
                   {license}{" "}
@@ -202,6 +218,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
+
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
