@@ -21,7 +21,10 @@ import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
@@ -35,6 +38,11 @@ import {
 import { GitBranch } from "lucide-react";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
+import router from "next/router";
+import { buttonVariants } from "../../../../../../../../../components/ui/button";
+import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+import Link from "next/link";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -44,9 +52,9 @@ interface Props {
 const columnHelper = createColumnHelper<ComponentPaged>();
 
 const columnsDef: ColumnDef<ComponentPaged, any>[] = [
-  columnHelper.accessor("componentPurl", {
+  columnHelper.accessor("dependencyPurl", {
     header: "Package",
-    id: "component_purl",
+    id: "dependency_purl",
     cell: (row) => (
       <span className="flex flex-row items-start gap-2">
         <EcosystemImage packageName={row.getValue()} />
@@ -54,33 +62,33 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
       </span>
     ),
   }),
-  columnHelper.accessor("component.version", {
+  columnHelper.accessor("dependency.version", {
     header: "Version",
-    id: "Component.version",
+    id: "Dependency.version",
     cell: (row) =>
       row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
-  columnHelper.accessor("component.project.projectKey", {
+  columnHelper.accessor("dependency.project.projectKey", {
     header: "Repository",
-    id: "Component__ComponentProject.project_key",
+    id: "Dependency__ComponentProject.project_key",
     cell: (row) =>
-      row.row.original.component.project && (
+      row.row.original.dependency?.project && (
         <div>
           <div className="mb-2">{row.getValue()}</div>
           <Badge variant={"outline"} className="mr-1">
             <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-            {row.row.original.component.project?.starsCount}
+            {row.row.original.dependency.project?.starsCount}
           </Badge>
           <Badge variant={"outline"}>
             <GitBranch className="mr-1 h-4 w-4 text-muted-foreground" />
-            {row.row.original.component.project?.forksCount}
+            {row.row.original.dependency.project?.forksCount}
           </Badge>
         </div>
       ),
   }),
-  columnHelper.accessor("component.license", {
+  columnHelper.accessor("dependency.license", {
     header: "License",
-    id: "Component.license",
+    id: "Dependency.license",
     cell: (row) => (
       <Badge variant={"outline"}>
         <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
@@ -88,9 +96,9 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
       </Badge>
     ),
   }),
-  columnHelper.accessor("component.project.scoreCardScore", {
+  columnHelper.accessor("dependency.project.scoreCardScore", {
     header: "Scorecard Score",
-    id: "Component__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
+    id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => <div>{row.getValue()}</div>,
   }),
 ];
@@ -111,7 +119,6 @@ const osiLicenseColors: Record<string, string> = {
 };
 
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
-  const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -119,6 +126,10 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     data: components.data,
     columnsDef,
   });
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
 
   const licenseToPercentMapEntries = useMemo(() => {
     const total = Object.values(licenses).reduce((acc, curr) => acc + curr, 0);
@@ -135,15 +146,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       description="Overview of the asset"
       Title={<AssetTitle />}
     >
-      <BranchTagSelector branches={branches} tags={tags} />
-      <Section
-        primaryHeadline
-        forceVertical
-        description="Dependencies of the asset"
-        title="Dependencies"
-        Button={
-          <span className="w-72">
-            <span className="flex w-72 flex-row overflow-hidden rounded-full">
+      <div className="mb-10 flex flex-row items-start justify-between">
+        <BranchTagSelector branches={branches} tags={tags} />
+
+        <div>
+          <span className="text-xs text-muted-foreground">Licenses</span>
+          <span>
+            <span className="flex flex-row overflow-hidden rounded-full">
               {licenseToPercentMapEntries.map(([license, percent], i, arr) => (
                 <span
                   key={license}
@@ -173,7 +182,28 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               ))}
             </span>
           </span>
+        </div>
+      </div>
+
+      <Section
+        primaryHeadline
+        forceVertical
+        Button={
+          <Link
+            className={classNames(buttonVariants({ variant: "secondary" }))}
+            href={
+              `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.name}/dependencies/graph?` +
+              new URLSearchParams({
+                scanner:
+                  "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
+              }).toString()
+            }
+          >
+            Open Dependency Graph
+          </Link>
         }
+        description="Dependencies of the asset"
+        title="Dependencies"
       >
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -273,3 +303,6 @@ export const getServerSideProps = middleware(
     contentTree: withContentTree,
   },
 );
+function useAssetVersion() {
+  throw new Error("Function not implemented.");
+}

@@ -453,10 +453,8 @@ export interface AverageFixingTime {
 
 export interface ComponentPaged {
   id: string;
-  semverStart: string;
-  semverEnd: any;
-  component: Component;
-  componentPurl: string;
+  dependency: Component;
+  dependencyPurl: string;
   assetVersionId: string;
   scannerId: string;
 }
