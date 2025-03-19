@@ -26,17 +26,13 @@ import useTable from "@/hooks/useTable";
 import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
-import {
-  ExclamationCircleIcon,
-  ScaleIcon,
-  StarIcon,
-} from "@heroicons/react/24/outline";
+import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
 import {
   ColumnDef,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GitBranch, Scale } from "lucide-react";
+import { GitBranch } from "lucide-react";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
