@@ -87,16 +87,16 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     header: "License",
     id: "Component.license",
     cell: (row) =>
-      row.getValue() === "MIT" ? (
-        <Badge variant={"outline"}>
-          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {row.getValue()}
-        </Badge>
-      ) : (
+      row.getValue() === "unknown" ? (
         <Badge variant={"outline"}>
           <ExclamationTriangleIcon
             className={"mr-1 h-4 w-4 text-muted-foreground"}
           />
+          {row.getValue()}
+        </Badge>
+      ) : (
+        <Badge variant={"outline"}>
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
           {row.getValue()}
         </Badge>
       ),
@@ -218,7 +218,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
-            ^{" "}
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
