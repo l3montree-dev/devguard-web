@@ -71,7 +71,9 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     cell: (row) =>
       row.row.original.component.project && (
         <div>
-          <div className="mb-2">{row.getValue()}</div>
+          <div className="mb-2">
+            <a href={`${row.getValue()}`}>{row.getValue()}</a>
+          </div>
           <Badge variant={"outline"} className="mr-1">
             <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
             {row.row.original.component.project?.starsCount}
@@ -218,6 +220,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
+
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
