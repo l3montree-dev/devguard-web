@@ -33,8 +33,23 @@ export default function usePersonalAccessToken(
     });
   }, []);
 
-  const handleCreatePat = async (data: { description: string }) => {
-    const pat = await createPat(data);
+  const handleCreatePat = async (data: {
+    description: string;
+    scanAsset: boolean;
+    manageAsset: boolean;
+  }) => {
+    let scopes = "";
+    if (data.scanAsset) {
+      scopes += "scanAsset";
+    }
+    if (data.manageAsset) {
+      if (scopes) {
+        scopes += " ";
+      }
+      scopes += "manageAsset";
+    }
+
+    const pat = await createPat({ ...data, scopes });
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));
     newPatEventEmitter.emit("pat", pat);

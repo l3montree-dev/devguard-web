@@ -81,6 +81,11 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
 
 export interface PersonalAccessTokenDTO {
   description: string;
+  scanAsset: boolean;
+  manageAsset: boolean;
+
+  scopes: string;
+
   userId: string;
   createdAt: string;
   id: string;

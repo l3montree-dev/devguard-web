@@ -4,6 +4,7 @@ import { generateKeyPair } from "./keyService";
 
 const createPat = async (data: {
   description: string;
+  scopes: string;
 }): Promise<PatWithPrivKey> => {
   // generate public private key pair
   const { privateKey, publicKey } = await generateKeyPair();

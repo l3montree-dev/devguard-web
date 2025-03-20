@@ -68,7 +68,7 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
         </DialogHeader>
         <hr />
         <div>
-          <PatSection pat={pat} onCreatePat={onCreatePat} />
+          <PatSection pat={pat} onCreatePat={onCreatePat} description="" />
         </div>
         <hr />
 
