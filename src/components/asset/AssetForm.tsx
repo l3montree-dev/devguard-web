@@ -252,7 +252,6 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
-              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -280,7 +279,36 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
-              value={value}
+              onValueChange={field.onChange}
+            />
+          </FormControl>
+          <FormDescription>
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+const TestSliderForm: FunctionComponent<Props> = ({ form }) => {
+  const value = form.watch("riskAutomaticTicketThreshold");
+
+  return (
+    <FormField
+      name="riskAutomaticTicketThreshold"
+      control={form.control}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Risk Value</FormLabel>
+          <FormControl>
+            <Slider
+              min={0}
+              max={10}
+              step={0.5}
+              value={[]}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -341,7 +369,7 @@ Security requirements are specific criteria or conditions that an application, s
           </React.Fragment>
         )}
       </Section>
-
+      <TestSliderForm form={form}></TestSliderForm>
       <></>
     </>
   );

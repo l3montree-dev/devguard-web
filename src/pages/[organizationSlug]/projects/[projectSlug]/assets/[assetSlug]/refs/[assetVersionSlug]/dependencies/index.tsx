@@ -29,20 +29,23 @@ import useTable from "@/hooks/useTable";
 import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
-import { ScaleIcon, StarIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationTriangleIcon,
+  ScaleIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
 import {
   ColumnDef,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
 import { GitBranch } from "lucide-react";
-import { Badge } from "../../../../../../../../../components/ui/badge";
-import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
-import router from "next/router";
-import { buttonVariants } from "../../../../../../../../../components/ui/button";
-import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
-import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import Link from "next/link";
+import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
+import { Badge } from "../../../../../../../../../components/ui/badge";
+import { buttonVariants } from "../../../../../../../../../components/ui/button";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -74,7 +77,11 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     cell: (row) =>
       row.row.original.dependency?.project && (
         <div>
-          <div className="mb-2">{row.getValue()}</div>
+          <div className="mb-2">
+            <a href={`//${row.getValue()}`} target="_blank">
+              {row.getValue()}
+            </a>
+          </div>
           <Badge variant={"outline"} className="mr-1">
             <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
             {row.row.original.dependency.project?.starsCount}
@@ -88,14 +95,23 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   }),
   columnHelper.accessor("dependency.license", {
     header: "License",
-    id: "Dependency.license",
-    cell: (row) => (
-      <Badge variant={"outline"}>
-        <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-        {row.getValue()}
-      </Badge>
-    ),
+    id: "Component.license",
+    cell: (row) =>
+      row.getValue() === "unknown" ? (
+        <Badge variant={"outline"}>
+          <ExclamationTriangleIcon
+            className={"mr-1 h-4 w-4 text-muted-foreground"}
+          />
+          {row.getValue()}
+        </Badge>
+      ) : (
+        <Badge variant={"outline"}>
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {row.getValue()}
+        </Badge>
+      ),
   }),
+
   columnHelper.accessor("dependency.project.scoreCardScore", {
     header: "Scorecard Score",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
@@ -171,7 +187,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   <span
                     className={classNames(
                       "mr-1 inline-block h-2 w-2 rounded-full text-xs",
-                      osiLicenseColors[license],
+                      osiLicenseColors[license]
+                        ? osiLicenseColors[license]
+                        : "bg-gray-600",
                     )}
                   />
                   {license}{" "}
@@ -232,6 +250,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
+
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
