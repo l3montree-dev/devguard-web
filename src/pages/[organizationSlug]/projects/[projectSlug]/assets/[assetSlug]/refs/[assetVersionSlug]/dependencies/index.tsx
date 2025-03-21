@@ -30,6 +30,7 @@ import { ComponentPaged, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
 import {
+  CalendarDateRangeIcon,
   ExclamationTriangleIcon,
   ScaleIcon,
   StarIcon,
@@ -46,6 +47,7 @@ import { Badge } from "../../../../../../../../../components/ui/badge";
 import { buttonVariants } from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
+import DateString from "../../../../../../../../../components/common/DateString";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -113,9 +115,19 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   }),
 
   columnHelper.accessor("dependency.project.scoreCardScore", {
-    header: "Scorecard Score",
+    header: "OpenSSF Scorecard Score",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => <div>{row.getValue()}</div>,
+  }),
+  columnHelper.accessor("dependency.published", {
+    header: "Published",
+    id: "Dependency.published",
+    cell: (row) => (
+      <div className="flex flex-row items-center gap-2">
+        <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
+        <DateString date={new Date(row.getValue())} />
+      </div>
+    ),
   }),
 ];
 

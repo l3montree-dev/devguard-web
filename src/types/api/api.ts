@@ -464,9 +464,10 @@ export interface Component {
   dependsOn: any;
   componentType: string;
   version: string;
-  license: string;
+  license?: string;
   project?: Project;
   projectId: string;
+  published?: string;
 }
 
 export interface Project {
