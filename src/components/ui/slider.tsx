@@ -24,7 +24,7 @@ const Slider = React.forwardRef<
         className="absolute -top-4 left-1/2 -translate-x-1/2  -translate-y-1/2 whitespace-nowrap text-left"
         variant="default"
       >
-        {props.value}
+        {props.value === [0] ? props.value : 0}
       </Badge>
     </SliderPrimitive.Thumb>
   </SliderPrimitive.Root>
@@ -32,3 +32,5 @@ const Slider = React.forwardRef<
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider };
+
+//the badge is not the problem then
