@@ -3,6 +3,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { Badge } from "@/components/ui/badge";
 
 import { cn } from "@/lib/utils";
+import { prop } from "@mdxeditor/editor";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -24,7 +25,7 @@ const Slider = React.forwardRef<
         className="absolute -top-4 left-1/2 -translate-x-1/2  -translate-y-1/2 whitespace-nowrap text-left"
         variant="default"
       >
-        {props.value}
+        {props.accessKey}
       </Badge>
     </SliderPrimitive.Thumb>
   </SliderPrimitive.Root>

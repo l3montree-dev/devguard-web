@@ -252,6 +252,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
+              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -308,7 +309,6 @@ const TestSliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
-              value={[]}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -369,7 +369,6 @@ Security requirements are specific criteria or conditions that an application, s
           </React.Fragment>
         )}
       </Section>
-      <TestSliderForm form={form}></TestSliderForm>
       <></>
     </>
   );
