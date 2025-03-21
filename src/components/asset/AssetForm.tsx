@@ -252,6 +252,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
+              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
@@ -279,6 +280,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
               min={0}
               max={10}
               step={0.5}
+              value={value}
               onValueChange={field.onChange}
             />
           </FormControl>
