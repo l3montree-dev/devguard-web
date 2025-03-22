@@ -73,6 +73,24 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     cell: (row) =>
       row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
+  columnHelper.accessor("dependency.license", {
+    header: "License",
+    id: "Component.license",
+    cell: (row) =>
+      row.getValue() === "unknown" ? (
+        <Badge variant={"outline"}>
+          <ExclamationTriangleIcon
+            className={"mr-1 h-4 w-4 text-muted-foreground"}
+          />
+          {row.getValue()}
+        </Badge>
+      ) : (
+        <Badge variant={"outline"}>
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {row.getValue()}
+        </Badge>
+      ),
+  }),
   columnHelper.accessor("dependency.project.projectKey", {
     header: "Repository",
     id: "Dependency__ComponentProject.project_key",
@@ -95,24 +113,6 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
         </div>
       ),
   }),
-  columnHelper.accessor("dependency.license", {
-    header: "License",
-    id: "Component.license",
-    cell: (row) =>
-      row.getValue() === "unknown" ? (
-        <Badge variant={"outline"}>
-          <ExclamationTriangleIcon
-            className={"mr-1 h-4 w-4 text-muted-foreground"}
-          />
-          {row.getValue()}
-        </Badge>
-      ) : (
-        <Badge variant={"outline"}>
-          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {row.getValue()}
-        </Badge>
-      ),
-  }),
 
   columnHelper.accessor("dependency.project.scoreCardScore", {
     header: "OpenSSF Scorecard Score",
@@ -122,12 +122,13 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   columnHelper.accessor("dependency.published", {
     header: "Published",
     id: "Dependency.published",
-    cell: (row) => (
-      <div className="flex flex-row items-center gap-2">
-        <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
-        <DateString date={new Date(row.getValue())} />
-      </div>
-    ),
+    cell: (row) =>
+      row.getValue() && (
+        <div className="flex flex-row items-center gap-2">
+          <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
+          <DateString date={new Date(row.getValue())} />
+        </div>
+      ),
   }),
 ];
 
