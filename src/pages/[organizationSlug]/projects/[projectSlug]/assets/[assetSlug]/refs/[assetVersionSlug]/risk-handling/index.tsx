@@ -22,16 +22,12 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
-import Page from "../../../../../../../../components/Page";
+import Page from "@/components/Page";
 
-import { withOrgs } from "../../../../../../../../decorators/withOrgs";
-import { withSession } from "../../../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../../../services/devGuardApi";
-import {
-  beautifyPurl,
-  classNames,
-  extractVersion,
-} from "../../../../../../../../utils/common";
+import { withOrgs } from "@/decorators/withOrgs";
+import { withSession } from "@/decorators/withSession";
+import { getApiClientFromContext } from "@/services/devGuardApi";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -48,13 +44,10 @@ import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { Loader2 } from "lucide-react";
-import EmptyParty from "../../../../../../../../components/common/EmptyParty";
-import { buttonVariants } from "../../../../../../../../components/ui/button";
-import useTable from "../../../../../../../../hooks/useTable";
-import {
-  buildFilterQuery,
-  buildFilterSearchParams,
-} from "../../../../../../../../utils/url";
+import EmptyParty from "@/components/common/EmptyParty";
+import { buttonVariants } from "@/components/ui/button";
+import useTable from "@/hooks/useTable";
+import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 
 interface Props {
   exists: boolean;
