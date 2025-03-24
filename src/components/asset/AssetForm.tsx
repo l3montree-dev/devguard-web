@@ -240,6 +240,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
 
 const SliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("cvssAutomaticTicketThreshold");
+  console.log("cvss " + value);
   return (
     <FormField
       name="cvssAutomaticTicketThreshold"
@@ -267,6 +268,7 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
 };
 const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("riskAutomaticTicketThreshold");
+  console.log("risk " + value);
 
   return (
     <FormField
@@ -370,6 +372,7 @@ Security requirements are specific criteria or conditions that an application, s
           </React.Fragment>
         )}
       </Section>
+      <TestSliderForm form={form}></TestSliderForm>
       <></>
     </>
   );

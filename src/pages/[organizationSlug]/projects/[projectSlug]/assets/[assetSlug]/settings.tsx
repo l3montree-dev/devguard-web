@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
 import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
+import { ZodUndefinedDef } from "zod";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -42,6 +43,16 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   }
   return el[0];
 };
+
+const isNumber = (v: any): v is number => {
+  if (v === null || v === undefined) {
+    return false;
+  }
+
+  // checks for NaN
+  return typeof v === "number" && v === v;
+};
+
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -54,15 +65,15 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
     defaultValues: {
       ...asset,
 
-      cvssAutomaticTicketThreshold: asset.cvssAutomaticTicketThreshold
+      cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],
       riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
         ? [asset.riskAutomaticTicketThreshold]
         : [],
       enableTicketRange: Boolean(
-        asset.riskAutomaticTicketThreshold !== undefined ||
-          asset.cvssAutomaticTicketThreshold !== undefined,
+        isNumber(asset.riskAutomaticTicketThreshold) ||
+          isNumber(asset.cvssAutomaticTicketThreshold),
       ),
     },
   });
