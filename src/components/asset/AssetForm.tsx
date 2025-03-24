@@ -240,7 +240,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
 
 const SliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("cvssAutomaticTicketThreshold");
-  console.log("cvss " + value);
+
   return (
     <FormField
       name="cvssAutomaticTicketThreshold"
@@ -268,7 +268,6 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
 };
 const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("riskAutomaticTicketThreshold");
-  console.log("risk " + value);
 
   return (
     <FormField
@@ -283,35 +282,6 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
               max={10}
               step={0.5}
               value={value}
-              onValueChange={field.onChange}
-            />
-          </FormControl>
-          <FormDescription>
-            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
-            Score given by experts
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-};
-
-const TestSliderForm: FunctionComponent<Props> = ({ form }) => {
-  const value = form.watch("riskAutomaticTicketThreshold");
-
-  return (
-    <FormField
-      name="riskAutomaticTicketThreshold"
-      control={form.control}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Risk Value</FormLabel>
-          <FormControl>
-            <Slider
-              min={0}
-              max={10}
-              step={0.5}
               onValueChange={field.onChange}
             />
           </FormControl>
