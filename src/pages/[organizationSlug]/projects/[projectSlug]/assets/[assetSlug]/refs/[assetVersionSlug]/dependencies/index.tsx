@@ -176,8 +176,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       Title={<AssetTitle />}
     >
       <div className="mb-10 flex flex-row items-start justify-between">
-        <BranchTagSelector branches={branches} tags={tags} />
-
+        <div className="m-5">
+          <BranchTagSelector branches={branches} tags={tags} />
+        </div>
         <div>
           <span className="text-xs text-muted-foreground">Licenses</span>
           <span>
