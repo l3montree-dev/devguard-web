@@ -44,7 +44,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
-const isNumber = (v: any): v is number => {
+export const isNumber = (v: any): v is number => {
   if (v === null || v === undefined) {
     return false;
   }
