@@ -68,7 +68,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],
-      riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
+      riskAutomaticTicketThreshold: isNumber(asset.riskAutomaticTicketThreshold)
         ? [asset.riskAutomaticTicketThreshold]
         : [],
       enableTicketRange: Boolean(

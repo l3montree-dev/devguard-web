@@ -372,7 +372,6 @@ Security requirements are specific criteria or conditions that an application, s
           </React.Fragment>
         )}
       </Section>
-      <TestSliderForm form={form}></TestSliderForm>
       <></>
     </>
   );
