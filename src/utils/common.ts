@@ -151,6 +151,15 @@ export const getEcosystem = (packageName?: string) => {
   return packageName;
 };
 
+export const isNumber = (v: any): v is number => {
+  if (v === null || v === undefined) {
+    return false;
+  }
+
+  // checks for NaN
+  return typeof v === "number" && v === v;
+};
+
 export const beautifyPurl = (purl: string) => {
   if (!purl) {
     return "";

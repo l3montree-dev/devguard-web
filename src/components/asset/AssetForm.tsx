@@ -240,6 +240,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
 
 const SliderForm: FunctionComponent<Props> = ({ form }) => {
   const value = form.watch("cvssAutomaticTicketThreshold");
+
   return (
     <FormField
       name="cvssAutomaticTicketThreshold"
@@ -341,7 +342,6 @@ Security requirements are specific criteria or conditions that an application, s
           </React.Fragment>
         )}
       </Section>
-
       <></>
     </>
   );
