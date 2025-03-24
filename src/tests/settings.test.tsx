@@ -9,9 +9,6 @@ describe("input test, to check if it always return true, when a number is given"
       expect(actual).toBe(true);
     }
   });
-});
-
-describe("input test, to check if it always returns false, when everything but a number is given", () => {
   it("should only return false if its not a number", () => {
     const table2 = [NaN, null, "string", undefined];
     for (const index of table2) {
