@@ -1,4 +1,4 @@
-import { isNumber } from "./common";
+import { isNumber } from "@/utils/common";
 
 describe("input test, to check if it always return true, when a number is given", () => {
   it("should only return true if its a number ", () => {
