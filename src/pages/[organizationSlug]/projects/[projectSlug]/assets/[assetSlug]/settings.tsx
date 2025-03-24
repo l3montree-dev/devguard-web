@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
 import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
 import { ZodUndefinedDef } from "zod";
+import { isNumber } from "@/utils/common";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
@@ -42,15 +43,6 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
     return undefined;
   }
   return el[0];
-};
-
-export const isNumber = (v: any): v is number => {
-  if (v === null || v === undefined) {
-    return false;
-  }
-
-  // checks for NaN
-  return typeof v === "number" && v === v;
 };
 
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
