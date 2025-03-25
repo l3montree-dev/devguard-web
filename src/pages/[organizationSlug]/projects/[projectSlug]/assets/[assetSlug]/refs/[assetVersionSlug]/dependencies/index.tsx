@@ -176,9 +176,8 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       Title={<AssetTitle />}
     >
       <div className="mb-10 flex flex-row items-start justify-between">
-        <div className="m-5">
-          <BranchTagSelector branches={branches} tags={tags} />
-        </div>
+        <BranchTagSelector branches={branches} tags={tags} />
+
         <div>
           <span className="text-xs text-muted-foreground">Licenses</span>
           <span>
@@ -264,12 +263,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
-
+            {/* this is the part responsible for dependencies */}
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
+                  onClick={() => console.log(row.original)}
                   className={classNames(
-                    "relative cursor-pointer bg-background align-top transition-all",
+                    "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                   )}
