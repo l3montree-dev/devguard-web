@@ -179,7 +179,6 @@ const Settings: FunctionComponent<{
     scanAsset: boolean;
     manageAsset: boolean;
   }) => {
-    console.log(data);
     await onCreatePat(data);
     reset();
   };
