@@ -6,7 +6,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import useFilter from "@/hooks/useFilter";
 
 import {
   AssetVersionDTO,
@@ -15,25 +14,20 @@ import {
   Paged,
 } from "@/types/api/api";
 import {
+  ColumnDef,
   createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, useMemo, useState } from "react";
-import Page from "../../../../../../../../components/Page";
+import { FunctionComponent } from "react";
+import Page from "@/components/Page";
 
-import { withOrgs } from "../../../../../../../../decorators/withOrgs";
-import { withSession } from "../../../../../../../../decorators/withSession";
-import { getApiClientFromContext } from "../../../../../../../../services/devGuardApi";
-import {
-  beautifyPurl,
-  classNames,
-  extractVersion,
-} from "../../../../../../../../utils/common";
+import { withOrgs } from "@/decorators/withOrgs";
+import { withSession } from "@/decorators/withSession";
+import { getApiClientFromContext } from "@/services/devGuardApi";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -49,10 +43,11 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
-import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import EmptyParty from "../../../../../../../../components/common/EmptyParty";
-import { buttonVariants } from "../../../../../../../../components/ui/button";
+import EmptyParty from "@/components/common/EmptyParty";
+import { buttonVariants } from "@/components/ui/button";
+import useTable from "@/hooks/useTable";
+import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 
 interface Props {
   exists: boolean;
@@ -91,7 +86,7 @@ const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
   };
 };
 
-const columnsDef = [
+const columnsDef: ColumnDef<FlawByPackage, any>[] = [
   {
     ...columnHelper.accessor("packageName", {
       header: "Package",
@@ -106,7 +101,6 @@ const columnsDef = [
       ),
     }),
   },
-
   {
     ...columnHelper.accessor("maxRisk", {
       header: "Max Risk",
@@ -138,7 +132,7 @@ const columnsDef = [
   {
     ...columnHelper.accessor("flawCount", {
       header: "Flaw Count",
-      id: "flaw_count",
+      id: "dependency_vuln_count",
       enableSorting: true,
       cell: (row) => row.getValue(),
     }),
@@ -181,54 +175,18 @@ const columnsDef = [
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
-  const { sortingState, handleSort } = useFilter();
-
-  const table = useReactTable({
-    columns: columnsDef,
-    data: props.flaws.data,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: handleSort,
-
-    manualSorting: true,
-    state: {
-      sorting: sortingState,
-    },
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+  const router = useRouter();
+  const { table, isLoading, handleSearch } = useTable({
+    columnsDef,
+    data: props.flaws.data,
+  });
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
   const { branches, tags } = useAssetBranchesAndTags();
-
-  const handleSearch = useMemo(
-    () =>
-      debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-        setIsLoading(true);
-        // remove all sorting query params
-        const params = router.query;
-        if (e.target.value === "") {
-          delete params["search"];
-          router.push({
-            query: params,
-          });
-        } else if (e.target.value.length >= 3) {
-          router.push({
-            query: {
-              ...params,
-              search: e.target.value,
-            },
-          });
-        }
-        setIsLoading(false);
-      }, 500),
-    [router],
-  );
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -444,11 +402,7 @@ export const getServerSideProps = middleware(
       }
     }
 
-    const filterQuery = Object.fromEntries(
-      Object.entries(context.query).filter(
-        ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
-      ),
-    );
+    const filterQuery = buildFilterQuery(context);
 
     // translate the state query param to a filter query
     const state = context.query.state;
@@ -460,22 +414,13 @@ export const getServerSideProps = middleware(
 
     // check for page and page size query params
     // if they are there, append them to the uri
-    const page = (context.query.page as string) ?? "1";
-    const pageSize = (context.query.pageSize as string) ?? "25";
     const flawResp = await apiClient(
       uri +
         "refs/" +
         assetVersionSlug +
         "/" +
         "flaws/?" +
-        new URLSearchParams({
-          page,
-          pageSize,
-          ...(context.query.search
-            ? { search: context.query.search as string }
-            : {}),
-          ...filterQuery,
-        }),
+        buildFilterSearchParams(context).toString(),
     );
 
     // fetch a personal access token from the user

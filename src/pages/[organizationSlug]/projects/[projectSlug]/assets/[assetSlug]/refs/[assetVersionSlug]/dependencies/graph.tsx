@@ -42,9 +42,6 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
@@ -60,7 +57,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
-import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
+import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
@@ -206,50 +203,6 @@ const DependencyGraphPage: FunctionComponent<{
             </DropdownMenu>
           </div>
           <div className="flex flex-row items-center gap-4">
-            <div className="flex flex-row items-center gap-4">
-              <label
-                htmlFor={"version-select"}
-                className="block whitespace-nowrap text-sm"
-              >
-                Version
-              </label>
-              <Select
-                onValueChange={(value) => {
-                  router.push(
-                    {
-                      query: {
-                        ...router.query,
-                        version: value,
-                      },
-                    },
-                    undefined,
-                    { scroll: false },
-                  );
-                }}
-              >
-                <SelectTrigger className="bg-background">
-                  <SelectValue
-                    defaultValue={router.query.version ?? "latest"}
-                    placeholder={router.query.version ?? "latest"}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem className="text-sm" value={"latest"}>
-                    latest
-                  </SelectItem>
-                  {versions.map((version) => (
-                    <SelectItem
-                      className="text-sm"
-                      key={version}
-                      value={version}
-                    >
-                      {version}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {graph.root.risk !== 0 && (
               <div className="flex flex-row items-center gap-4 whitespace-nowrap text-sm">
                 <label htmlFor="allDependencies">

@@ -373,7 +373,10 @@ export interface AssetDTO {
 
   signingPubKey?: string;
 
+  enableTicketRange: boolean;
   centralFlawManagement: boolean;
+  cvssAutomaticTicketThreshold: number | null;
+  riskAutomaticTicketThreshold: number | null;
 }
 
 export interface DependencyTreeNode {
@@ -451,4 +454,68 @@ export interface FlawByPackage {
 
 export interface AverageFixingTime {
   averageFixingTimeSeconds: number;
+}
+
+export interface ComponentPaged {
+  id: string;
+  dependency: Component;
+  dependencyPurl: string;
+  assetVersionId: string;
+  scannerId: string;
+}
+
+export interface Component {
+  purl: string;
+  dependsOn: any;
+  componentType: string;
+  version: string;
+  license?: string;
+  project?: Project;
+  projectId: string;
+  published?: string;
+}
+
+export interface Project {
+  projectKey: string;
+  starsCount: number;
+  forksCount: number;
+  openIssuesCount: number;
+  homepage: string;
+  license: string;
+  description: string;
+  scoreCard: ScoreCard;
+  updatedAt: string;
+  scoreCardScore?: number;
+}
+
+export interface ScoreCard {
+  checks: Check[];
+  date: string;
+  metadata: any[];
+  overallScore: number;
+  repository: Repository;
+  scorecard: Scorecard;
+}
+
+export interface Check {
+  details: string[];
+  documentation: Documentation;
+  name: string;
+  reason: string;
+  score: number;
+}
+
+export interface Documentation {
+  shortDescription: string;
+  url: string;
+}
+
+export interface Repository {
+  commit: string;
+  name: string;
+}
+
+export interface Scorecard {
+  commit: string;
+  version: string;
 }

@@ -15,7 +15,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { getEcosystem } from "@/utils/common";
+import { classNames, getEcosystem } from "@/utils/common";
 
 const invertSvgOnDark = (ecosystem: string) => ["apk"].includes(ecosystem);
 
@@ -45,9 +45,10 @@ const EcosystemImage = ({
         alt={"Logo von " + getEcosystem(packageName)}
         width={size ?? 20}
         height={size ?? 20}
-        className={
-          invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : ""
-        }
+        className={classNames(
+          "inline-block",
+          invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
+        )}
         src={
           "/logos/" +
           getEcosystem(packageName).toLowerCase() +

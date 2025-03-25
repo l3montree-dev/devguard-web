@@ -137,7 +137,11 @@ export function cvssToColor(value: number) {
   return `rgb(${colorStops[colorStops.length - 1].color.join(", ")})`;
 }
 
-export const getEcosystem = (packageName: string) => {
+export const getEcosystem = (packageName?: string) => {
+  if (!packageName) {
+    return "";
+  }
+
   if (packageName.startsWith("pkg:")) {
     packageName = packageName.split(":")[1].split("/")[0];
   } else if (packageName.includes("/")) {
@@ -145,6 +149,15 @@ export const getEcosystem = (packageName: string) => {
   }
 
   return packageName;
+};
+
+export const isNumber = (v: any): v is number => {
+  if (v === null || v === undefined) {
+    return false;
+  }
+
+  // checks for NaN
+  return typeof v === "number" && v === v;
 };
 
 export const beautifyPurl = (purl: string) => {

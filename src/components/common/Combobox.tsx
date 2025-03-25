@@ -32,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
+import { classNames } from "@/utils/common";
 
 interface Props {
   onSelect: (value: string) => void;
@@ -50,13 +51,6 @@ export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
   const { loading } = props;
-
-  const handleValueChange = (value: string) => {
-    if (props.onValueChange) {
-      props.onValueChange(value);
-    }
-    setValue(value);
-  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -77,11 +71,7 @@ export function Combobox(props: Props) {
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command shouldFilter={props.onValueChange === undefined}>
-          <CommandInput
-            onValueChange={handleValueChange}
-            placeholder={props.placeholder}
-          />
-
+          <CommandInput />
           <CommandList>
             {loading && (
               <CommandItem>
@@ -97,18 +87,13 @@ export function Combobox(props: Props) {
                   key={item.value}
                   value={item.value}
                   keywords={[item.label]}
+                  className={value === item.value ? "bg-accent" : ""}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
                     setOpen(false);
                   }}
                 >
-                  <CheckIcon
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === item.value ? "opacity-100" : "opacity-0",
-                    )}
-                  />
                   {item.value.startsWith("gitlab") ? (
                     <img
                       className="mr-2 inline-block h-4 w-4"
@@ -122,7 +107,6 @@ export function Combobox(props: Props) {
                       alt="GitHub"
                     />
                   ) : null}
-
                   {item.label}
                 </CommandItem>
               ))}
@@ -133,3 +117,4 @@ export function Combobox(props: Props) {
     </Popover>
   );
 }
+// {item.label} is responsible for rendering the text rendering is in CommandItem in

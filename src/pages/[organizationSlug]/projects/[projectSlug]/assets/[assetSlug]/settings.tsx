@@ -1,5 +1,8 @@
 import Page from "@/components/Page";
-import AssetForm from "@/components/asset/AssetForm";
+import AssetForm, {
+  AssetFormValues,
+  EnableTicketRange,
+} from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -28,10 +31,19 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
 import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
+import { ZodUndefinedDef } from "zod";
+import { isNumber } from "@/utils/common";
 
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
 }
+
+const firstOrUndefined = (el?: number[]): number | undefined => {
+  if (!el) {
+    return undefined;
+  }
+  return el[0];
+};
 
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const activeOrg = useActiveOrg();
@@ -40,9 +52,25 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const asset = useActiveAsset()!;
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
-  const form = useForm<AssetDTO>({ defaultValues: asset });
 
-  const handleUpdate = async (data: Partial<AssetDTO>) => {
+  const form = useForm<AssetFormValues>({
+    defaultValues: {
+      ...asset,
+
+      cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
+        ? [asset.cvssAutomaticTicketThreshold]
+        : [],
+      riskAutomaticTicketThreshold: isNumber(asset.riskAutomaticTicketThreshold)
+        ? [asset.riskAutomaticTicketThreshold]
+        : [],
+      enableTicketRange: Boolean(
+        isNumber(asset.riskAutomaticTicketThreshold) ||
+          isNumber(asset.cvssAutomaticTicketThreshold),
+      ),
+    },
+  });
+
+  const handleUpdate = async (data: Partial<AssetFormValues>) => {
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -52,7 +80,15 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         asset.slug,
       {
         method: "PATCH",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          cvssAutomaticTicketThreshold: firstOrUndefined(
+            data.cvssAutomaticTicketThreshold,
+          ),
+          riskAutomaticTicketThreshold: firstOrUndefined(
+            data.riskAutomaticTicketThreshold,
+          ),
+        }),
       },
     );
 
