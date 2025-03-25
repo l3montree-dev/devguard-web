@@ -92,7 +92,7 @@ const Settings: FunctionComponent<{
   const router = useRouter();
   const { flow: flowId, return_to: returnTo } = router.query;
 
-  const { register, handleSubmit, reset } = useForm<{
+  const { register, handleSubmit, reset, setValue, watch } = useForm<{
     description: string;
     scanAsset: boolean;
     manageAsset: boolean;
@@ -180,6 +180,7 @@ const Settings: FunctionComponent<{
     scanAsset: boolean;
     manageAsset: boolean;
   }) => {
+    console.log(data);
     await onCreatePat(data);
     reset();
   };
@@ -280,7 +281,10 @@ const Settings: FunctionComponent<{
                       Use this token to scan your repositories.
                     </span>
                   </Label>
-                  <Switch {...register("scanAsset")} />
+                  <Switch
+                    onCheckedChange={(e) => setValue("scanAsset", e)}
+                    checked={watch("scanAsset")}
+                  />
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
@@ -290,7 +294,10 @@ const Settings: FunctionComponent<{
                       Use this token to manage your repositories.
                     </span>
                   </Label>
-                  <Switch {...register("manageAsset")} />
+                  <Switch
+                    onCheckedChange={(e) => setValue("manageAsset", e)}
+                    checked={watch("manageAsset")}
+                  />
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end">
