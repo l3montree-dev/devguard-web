@@ -12,7 +12,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -44,10 +44,23 @@ import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { buttonVariants } from "../../../../../../../../../components/ui/button";
+import {
+  Button,
+  buttonVariants,
+} from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 import DateString from "../../../../../../../../../components/common/DateString";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
+import { Label } from "@radix-ui/react-label";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -145,6 +158,39 @@ const osiLicenseColors: Record<string, string> = {
   "MPL-2.0": "bg-teal-500",
   unknown: "bg-gray-500",
   "CC0-1.0": "bg-gray-600",
+};
+
+const DependencyDialog: FunctionComponent<Props> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit Profile</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Name
+            </Label>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="username" className="text-right">
+              Username
+            </Label>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="submit">Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
@@ -263,11 +309,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 </tr>
               ))}
             </thead>
-            {/* this is the part responsible for dependencies */}
+
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
-                  onClick={() => console.log(row.original)}
+                  onClick={() => openDialog}
                   className={classNames(
                     "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
