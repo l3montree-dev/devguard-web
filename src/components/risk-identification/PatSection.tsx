@@ -14,15 +14,8 @@ const PatSection = ({
 }: {
   description: string;
   pat?: PatWithPrivKey;
-  onCreatePat: (data: {
-    description: string;
-    scanAsset: boolean;
-    manageAsset: boolean;
-  }) => void;
+  onCreatePat: (data: { description: string; scopes: string }) => void;
 }) => {
-  const [scanAsset, setScanAsset] = useState(false);
-  const [manageAsset, setManageAsset] = useState(false);
-
   return (
     <Section
       className="mb-0 mt-0 pb-0 pt-0"
@@ -45,53 +38,32 @@ const PatSection = ({
               target="_blank"
               className="mt-4 text-sm"
             >
-              <span>to create a new token or manage your existing ones</span>
+              <span>Create a new token or manage your existing ones</span>
             </Link>
           </div>
         </div>
       ) : (
         <>
           <div>
-            <ListItem
-              description="Use this token to scan your repositories"
-              Title="scan Asset"
-              Button={
-                <Switch checked={scanAsset} onCheckedChange={setScanAsset} />
-              }
-            />
-            <ListItem
-              description="Use this token to manage your repositories"
-              Title="manage Asset"
-              Button={
-                <Switch
-                  checked={manageAsset}
-                  onCheckedChange={setManageAsset}
-                />
-              }
-            />
-          </div>
-
-          <Link
-            href="/user-settings#pat"
-            target="_blank"
-            className="mt-4 text-sm"
-          >
-            <span>manage your existing tokens</span>
-          </Link>
-          <div>
             <Button
               variant="default"
               onClick={() =>
                 onCreatePat({
                   description,
-                  scanAsset,
-                  manageAsset,
+                  scopes: "scan",
                 })
               }
             >
               Create Personal Access Token
             </Button>
           </div>
+          <Link
+            href="/user-settings#pat"
+            target="_blank"
+            className=" flex justify-end text-sm"
+          >
+            <span>Manage your tokens</span>
+          </Link>
         </>
       )}
     </Section>

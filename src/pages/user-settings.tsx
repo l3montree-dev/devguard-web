@@ -93,8 +93,8 @@ const Settings: FunctionComponent<{
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<{
     description: string;
-    scanAsset: boolean;
-    manageAsset: boolean;
+    scan: boolean;
+    manage: boolean;
   }>();
 
   const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
@@ -176,10 +176,24 @@ const Settings: FunctionComponent<{
 
   const handleCreatePat = async (data: {
     description: string;
-    scanAsset: boolean;
-    manageAsset: boolean;
+    scan: boolean;
+    manage: boolean;
   }) => {
-    await onCreatePat(data);
+    let scopes = "";
+    if (data.scan) {
+      scopes += "scan";
+    }
+    if (data.manage) {
+      if (scopes) {
+        scopes += " ";
+      }
+      scopes += "manage";
+    }
+
+    await onCreatePat({
+      description: data.description,
+      scopes,
+    });
     reset();
   };
 
@@ -208,6 +222,8 @@ const Settings: FunctionComponent<{
       });
     });
   };
+
+  console.log(watch("scan"));
 
   return (
     <Page title="Profile Management and Security Settings">
@@ -272,29 +288,37 @@ const Settings: FunctionComponent<{
                 <Label htmlFor="description">Description</Label>
                 <Input {...register("description")} />
 
+                <div className="mt-4">
+                  <span>Select scopes</span>
+                  <span className="block text-sm text-gray-500">
+                    Scopes set the permissions of the token. You can choose
+                    multiple scopes.
+                  </span>
+                </div>
+
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <Label htmlFor="scanAsset" className="flex-1">
-                    scan Asset
+                  <Label htmlFor="scan" className="flex-1">
+                    scan
                     <span className="block text-sm text-gray-500">
                       Use this token to scan your repositories.
                     </span>
                   </Label>
                   <Switch
-                    onCheckedChange={(e) => setValue("scanAsset", e)}
-                    checked={watch("scanAsset")}
+                    onCheckedChange={(e) => setValue("scan", e)}
+                    checked={Boolean(watch("scan"))}
                   />
                 </div>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <Label htmlFor="manageAsset" className="flex-1">
-                    manage Asset
+                  <Label htmlFor="manage" className="flex-1">
+                    manage
                     <span className="block text-sm text-gray-500">
                       Use this token to manage your repositories.
                     </span>
                   </Label>
                   <Switch
-                    onCheckedChange={(e) => setValue("manageAsset", e)}
-                    checked={watch("manageAsset")}
+                    onCheckedChange={(e) => setValue("manage", e)}
+                    checked={Boolean(watch("manage"))}
                   />
                 </div>
               </CardContent>

@@ -382,7 +382,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
           <hr />
           <Steps>
             <div className="mb-10">
-              <PatSection onCreatePat={onCreatePat} pat={pat} description="" />
+              <PatSection
+                onCreatePat={onCreatePat}
+                pat={pat}
+                description={`Kubernetes Cluster Token generated am ${new Date().toLocaleString()}`}
+              />
             </div>
             <Section
               className="mt-0"

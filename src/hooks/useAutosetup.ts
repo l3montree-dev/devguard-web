@@ -71,8 +71,7 @@ export function useAutosetup(scanner: "full" | "sca" | "container-scanning") {
         privKey = (
           await onCreatePat({
             description: "SCA Analysis",
-            scanAsset: true,
-            manageAsset: false,
+            scopes: "scan",
           })
         ).privKey;
       }

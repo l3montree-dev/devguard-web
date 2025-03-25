@@ -68,7 +68,11 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
         </DialogHeader>
         <hr />
         <div>
-          <PatSection pat={pat} onCreatePat={onCreatePat} description="" />
+          <PatSection
+            pat={pat}
+            onCreatePat={onCreatePat}
+            description={`In-Toto Provenance Token generated am ${new Date().toLocaleString()}`}
+          />
         </div>
         <hr />
 

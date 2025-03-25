@@ -94,7 +94,7 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
           <PatSection
             onCreatePat={onCreatePat}
             pat={pat}
-            description="SCA Analysis"
+            description={`Container-Scanning Token generated am ${new Date().toLocaleString()}`}
           />
         </div>
         <hr />
