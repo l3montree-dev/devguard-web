@@ -403,7 +403,7 @@ export const getServerSideProps = middleware(
     }
 
     const filterQuery = buildFilterQuery(context);
-    const query = buildFilterSearchParams(context)
+    const query = buildFilterSearchParams(context);
     // translate the state query param to a filter query
     const state = context.query.state;
     if (!Boolean(state) || state === "open") {
@@ -413,18 +413,13 @@ export const getServerSideProps = middleware(
     }
 
     Object.entries(filterQuery).forEach(([key, value]) => {
-      query.append(key, value as string)
-    })
+      query.append(key, value as string);
+    });
 
     // check for page and page size query params
     // if they are there, append them to the uri
     const flawResp = await apiClient(
-      uri +
-        "refs/" +
-        assetVersionSlug +
-        "/" +
-        "flaws/?" +
-        query.toString()
+      uri + "refs/" + assetVersionSlug + "/" + "flaws/?" + query.toString(),
     );
 
     // fetch a personal access token from the user
