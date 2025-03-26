@@ -15,6 +15,7 @@ import DependencyGraph from "@/components/DependencyGraph";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { browserApiClient } from "@/services/devGuardApi";
 
 interface Props {
   open: boolean;
@@ -34,6 +35,25 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const router = useRouter();
   const organization = useActiveOrg();
   const project = useActiveProject();
+
+  const handleGraphFetch = async (data: Props) => {
+    const resp = await(
+      await browserApiClient(
+        "/organizations/" +
+          organization.slug +
+          "/projects/" +
+          project.slug +
+          "/assets/" +
+          asset?.slug +
+          "/refs/main/" +
+          "?scanner=SBOM-File-Upload" + "&purl=pkg%3Anpm%2Feslint-module-utils%402.11.1",
+        {
+          method: "POST",
+          body: JSON.stringify({url: data.data.purl}), //honestly this part right now I am just assuming, not sure what the is expected in body 
+        },
+      ),
+    ).json();
+  };
 
   return (
     <Dialog open={open}>
