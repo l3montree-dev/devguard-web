@@ -19,6 +19,7 @@ import { PatWithPrivKey } from "@/types/api/api";
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  data: any;
 }
 // hier müssen ins interface dann noch die anderen daten von row.row.* rein, die kann ich dann bei onClick denke ich mal auch mitgeben in useref maybe?
 

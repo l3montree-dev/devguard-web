@@ -10,7 +10,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useRef, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -164,17 +164,19 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
   const [open, setOpen] = useState(false);
+  const [dataArray, setDataArray] = useState([]);
 
   const { table } = useTable({
     data: components.data,
     columnsDef,
   });
 
-  function order66() {
+  function dataPassthrough(data: any) {
     setOpen(true);
     {
-      row.row.original.dependency.project?.starsCount;
+      console.log(data);
     }
+    setDataArray(data);
   }
 
   const activeOrg = useActiveOrg();
@@ -290,7 +292,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
                   onClick={() =>
-                    console.log(
+                    dataPassthrough(
                       row.original.dependency.project?.scoreCard.checks,
                     )
                   }
@@ -316,7 +318,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         </div>
         <CustomPagination {...components} />
       </Section>
-      <DependencyDialog open={open} setOpen={setOpen}></DependencyDialog>
+      <DependencyDialog
+        open={open}
+        setOpen={setOpen}
+        data={dataArray}
+      ></DependencyDialog>
     </Page>
   );
 };
