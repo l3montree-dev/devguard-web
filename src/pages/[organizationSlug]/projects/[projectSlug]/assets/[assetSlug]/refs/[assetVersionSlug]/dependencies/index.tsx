@@ -61,6 +61,7 @@ import {
 } from "@/components/ui/dialog";
 import { DialogContent } from "@radix-ui/react-dialog";
 import { Label } from "@radix-ui/react-label";
+import DependencyDialog from "./dependencyDialog";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -160,42 +161,10 @@ const osiLicenseColors: Record<string, string> = {
   "CC0-1.0": "bg-gray-600",
 };
 
-const DependencyDialog: FunctionComponent<Props> = () => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const [open, setOpen] = useState(false);
 
   const { table } = useTable({
     data: components.data,
@@ -313,7 +282,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
-                  onClick={() => openDialog}
+                  onClick={() => setOpen(true)}
                   className={classNames(
                     "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
@@ -336,6 +305,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         </div>
         <CustomPagination {...components} />
       </Section>
+      <DependencyDialog open={open} setOpen={setOpen}></DependencyDialog>
     </Page>
   );
 };
