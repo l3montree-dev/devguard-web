@@ -33,7 +33,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
       <DialogContent setOpen={setOpen}>
         <DialogHeader>
           <DialogTitle>In-Toto Provenance</DialogTitle>
-          <DialogDescription>{data}</DialogDescription>
+          <DialogDescription>{data.asdf}</DialogDescription>
         </DialogHeader>
         <hr />
 

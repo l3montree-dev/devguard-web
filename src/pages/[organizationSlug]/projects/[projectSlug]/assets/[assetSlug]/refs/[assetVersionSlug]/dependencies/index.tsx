@@ -67,6 +67,12 @@ interface Props {
   licenses: Record<string, number>;
 }
 
+interface Dictionary {
+  url: string;
+  test: string;
+  asdf: string;
+}
+
 const columnHelper = createColumnHelper<ComponentPaged>();
 
 const columnsDef: ColumnDef<ComponentPaged, any>[] = [
@@ -164,7 +170,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
   const [open, setOpen] = useState(false);
-  const [dataArray, setDataArray] = useState([]);
+  const [datasets, setDatasets] = useState<Record<string, Dictionary>>({});
 
   const { table } = useTable({
     data: components.data,
@@ -174,7 +180,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   function dataPassthrough(data: any) {
     console.log(data);
     setOpen(true);
-    setDataArray(data);
+    setDatasets({ key: data });
   }
 
   const activeOrg = useActiveOrg();
@@ -292,7 +298,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   onClick={() =>
                     dataPassthrough(
                       row.original.dependency.project?.scoreCard.checks[0]
-                        .documentation.url,
+                        .documentation,
                     )
                   }
                   className={classNames(
@@ -320,7 +326,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       <DependencyDialog
         open={open}
         setOpen={setOpen}
-        data={dataArray}
+        data={datasets}
       ></DependencyDialog>
     </Page>
   );
