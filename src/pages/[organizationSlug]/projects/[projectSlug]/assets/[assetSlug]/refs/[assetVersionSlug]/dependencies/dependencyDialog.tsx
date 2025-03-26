@@ -37,22 +37,24 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const project = useActiveProject();
 
   const handleGraphFetch = async (data: Props) => {
-    const resp = await(
-      await browserApiClient(
-        "/organizations/" +
-          organization.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset?.slug +
-          "/refs/main/" +
-          "?scanner=SBOM-File-Upload" + "&purl=pkg%3Anpm%2Feslint-module-utils%402.11.1",
-        {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        organization.slug +
+        "/projects/" +
+        project.slug +
+        "/assets/" +
+        asset?.slug +
+        "/refs/main/" +
+        "?scanner=SBOM-File-Upload" +
+        "&purl=pkg%3Anpm%2Feslint-module-utils%402.11.1",
+      {
+        method: "POST",
+        body: JSON.stringify({
           method: "POST",
-          body: JSON.stringify({url: data.data.purl}), //honestly this part right now I am just assuming, not sure what the is expected in body 
-        },
-      ),
-    ).json();
+          body: JSON.stringify({ purl: data.data.purl }),
+        }),
+      },
+    );
   };
 
   return (
