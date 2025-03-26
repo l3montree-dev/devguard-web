@@ -178,14 +178,17 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   });
 
   function dataPassthrough(data: any) {
-    console.log(data);
+    console.log(
+      "here is the raw data " + data[0].documentation.shortDescription,
+    );
+
     setOpen(true);
     console.log(data.documentation);
     setDatasets({
       data: data,
 
       url: data,
-      shortDescription: data.documentation.shortDescription,
+      shortDescription: data[0].documentation.shortDescription,
     });
   }
 
@@ -303,7 +306,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 <tr
                   onClick={() =>
                     dataPassthrough(
-                      row.original.dependency.project?.scoreCard.checks[0],
+                      row.original.dependency.project?.scoreCard.checks,
                     )
                   }
                   className={classNames(
