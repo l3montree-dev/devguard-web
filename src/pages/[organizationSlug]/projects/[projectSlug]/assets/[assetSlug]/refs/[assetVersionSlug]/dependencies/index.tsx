@@ -178,17 +178,19 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   });
 
   function dataPassthrough(data: any) {
-    console.log(
-      "here is the raw data " + data[0].documentation.shortDescription,
-    );
-
+    console.log(data.dependency.project?.scoreCard.checks[1]);
+    console.log(data);
     setOpen(true);
-    console.log(data.documentation);
-    setDatasets({
-      data: data,
 
-      url: data,
-      shortDescription: data[0].documentation.shortDescription,
+    setDatasets({
+      details: data.dependency.project?.scoreCard.checks[0],
+      documentation: data.dependency.project?.scoreCard.checks[0],
+      name: data.dependency.project?.scoreCard.checks[0].name,
+      reason: data.dependency.project?.scoreCard.checks[0].reason,
+      score: data.dependency.project?.scoreCard.checks[0].name,
+      url: data.dependency.project?.scoreCard.checks[0].url,
+      shortDescription:
+        data.dependency.project?.scoreCard.checks[0].shortDescription,
     });
   }
 
@@ -304,11 +306,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
-                  onClick={() =>
-                    dataPassthrough(
-                      row.original.dependency.project?.scoreCard.checks,
-                    )
-                  }
+                  onClick={() => dataPassthrough(row.original)}
                   className={classNames(
                     "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
