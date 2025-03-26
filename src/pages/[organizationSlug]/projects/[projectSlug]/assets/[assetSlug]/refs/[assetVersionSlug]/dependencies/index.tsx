@@ -70,7 +70,7 @@ interface Props {
 interface Dictionary {
   url: string;
   test: string;
-  asdf: string;
+  shortDescription: string;
 }
 
 const columnHelper = createColumnHelper<ComponentPaged>();
@@ -180,7 +180,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   function dataPassthrough(data: any) {
     console.log(data);
     setOpen(true);
-    setDatasets({ key: data });
+    console.log(data.documentation);
+    setDatasets({
+      data: data,
+
+      url: data,
+      shortDescription: data.documentation.shortDescription,
+    });
   }
 
   const activeOrg = useActiveOrg();
@@ -297,8 +303,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 <tr
                   onClick={() =>
                     dataPassthrough(
-                      row.original.dependency.project?.scoreCard.checks[0]
-                        .documentation,
+                      row.original.dependency.project?.scoreCard.checks[0],
                     )
                   }
                   className={classNames(
