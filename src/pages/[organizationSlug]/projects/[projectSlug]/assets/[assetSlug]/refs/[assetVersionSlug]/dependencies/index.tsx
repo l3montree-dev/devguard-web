@@ -169,6 +169,14 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     data: components.data,
     columnsDef,
   });
+
+  function order66() {
+    setOpen(true);
+    {
+      row.row.original.dependency.project?.starsCount;
+    }
+  }
+
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -281,7 +289,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
-                  onClick={() => setOpen(true)}
+                  onClick={() =>
+                    console.log(
+                      row.original.dependency.project?.scoreCard.checks,
+                    )
+                  }
                   className={classNames(
                     "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",

@@ -20,6 +20,7 @@ interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
+// hier müssen ins interface dann noch die anderen daten von row.row.* rein, die kann ich dann bei onClick denke ich mal auch mitgeben in useref maybe?
 
 const DependencyDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   return (
