@@ -205,3 +205,8 @@ a {
 .react-flow__attribution {
     @apply text-xs text-gray-400 dark:bg-black
 }
+
+
+.grid-cols-25 {
+    grid-template-columns: repeat(25, minmax(0, 1fr));
+}
