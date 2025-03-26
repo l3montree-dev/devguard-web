@@ -172,10 +172,8 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   });
 
   function dataPassthrough(data: any) {
+    console.log(data);
     setOpen(true);
-    {
-      console.log(data);
-    }
     setDataArray(data);
   }
 
@@ -293,7 +291,8 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                 <tr
                   onClick={() =>
                     dataPassthrough(
-                      row.original.dependency.project?.scoreCard.checks,
+                      row.original.dependency.project?.scoreCard.checks[0]
+                        .documentation.url,
                     )
                   }
                   className={classNames(
