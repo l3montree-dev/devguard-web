@@ -68,8 +68,11 @@ interface Props {
 }
 
 interface Dictionary {
+  details: string[];
+  name: string;
+  reason: string;
+  score: number;
   url: string;
-  test: string;
   shortDescription: string;
 }
 
@@ -178,19 +181,21 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   });
 
   function dataPassthrough(data: any) {
-    console.log(data.dependency.project?.scoreCard.checks[1]);
     console.log(data);
+
     setOpen(true);
 
     setDatasets({
-      details: data.dependency.project?.scoreCard.checks[0],
-      documentation: data.dependency.project?.scoreCard.checks[0],
+      purl: data.dependency.purl,
+      // purl2: data.dependencyPurl,
+      details: data.dependency.project?.scoreCard.checks[0].details,
       name: data.dependency.project?.scoreCard.checks[0].name,
       reason: data.dependency.project?.scoreCard.checks[0].reason,
-      score: data.dependency.project?.scoreCard.checks[0].name,
-      url: data.dependency.project?.scoreCard.checks[0].url,
+      score: data.dependency.project?.scoreCard.checks[0].score,
+      url: data.dependency.project?.scoreCard.checks[0].documentation.url,
       shortDescription:
-        data.dependency.project?.scoreCard.checks[0].shortDescription,
+        data.dependency.project?.scoreCard.checks[0].documentation
+          .shortDescription,
     });
   }
 
