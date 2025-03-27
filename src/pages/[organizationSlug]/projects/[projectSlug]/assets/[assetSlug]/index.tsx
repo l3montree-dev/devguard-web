@@ -279,7 +279,7 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
             <PatSection
               onCreatePat={onCreatePat}
               pat={pat}
-              description={`CI/CD-Pipeline Token generated am ${new Date().toLocaleString()}`}
+              description={`CI/CD-Pipeline Token generated at ${new Date().toLocaleString()}`}
             />
           </div>
           <hr />

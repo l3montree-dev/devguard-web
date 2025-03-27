@@ -385,7 +385,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
               <PatSection
                 onCreatePat={onCreatePat}
                 pat={pat}
-                description={`Kubernetes Cluster Token generated am ${new Date().toLocaleString()}`}
+                description={`Kubernetes Cluster Token generated at ${new Date().toLocaleString()}`}
               />
             </div>
             <Section

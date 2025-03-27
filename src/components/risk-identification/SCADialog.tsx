@@ -72,7 +72,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           <PatSection
             onCreatePat={onCreatePat}
             pat={pat}
-            description={`Software Composition Analysis Token generated am ${new Date().toLocaleString()}`}
+            description={`Software Composition Analysis Token generated ${new Date().toLocaleString()}`}
           />
         </div>
         <hr />

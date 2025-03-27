@@ -70,7 +70,7 @@ export function useAutosetup(scanner: "full" | "sca" | "container-scanning") {
         // create a new one for autosetup
         privKey = (
           await onCreatePat({
-            description: "SCA Analysis",
+            description: "DevGuard Autosetup (used inside GitLab Pipeline)",
             scopes: "scan",
           })
         ).privKey;

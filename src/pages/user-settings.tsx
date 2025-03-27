@@ -223,8 +223,6 @@ const Settings: FunctionComponent<{
     });
   };
 
-  console.log(watch("scan"));
-
   return (
     <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
@@ -352,10 +350,9 @@ const Settings: FunctionComponent<{
           )}
 
           <div className="mb-6 flex flex-col gap-4">
-            {personalAccessTokens.map((pat) =>
-              "privKey" in pat ? (
-                <></>
-              ) : (
+            {personalAccessTokens
+              .filter((p) => "privKey" in p)
+              .map((pat) => (
                 <ListItem
                   key={pat.id}
                   Title={pat.description}
@@ -388,8 +385,7 @@ const Settings: FunctionComponent<{
                     </ConfirmTokenDeletion>
                   }
                 />
-              ),
-            )}
+              ))}
           </div>
           <Card className="bg-background">
             <CardHeader>

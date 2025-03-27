@@ -76,7 +76,7 @@ const SigningDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
           <PatSection
             onCreatePat={onCreatePat}
             pat={pat}
-            description={`Image Signing Token generated am ${new Date().toLocaleString()}`}
+            description={`Image Signing Token generated ${new Date().toLocaleString()}`}
           />
         </div>
         <hr />
