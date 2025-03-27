@@ -16,6 +16,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   open: boolean;
@@ -36,20 +37,11 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const organization = useActiveOrg();
   const project = useActiveProject();
 
-  const uri = data.purl;
-  console.log("here is the encoded url : " + `${encodeURIComponent(uri)}`);
-  console.log(
-    `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload/purl=${encodeURIComponent(uri)}`,
-  );
-
-  const handleGraphFetch = async (data: any) => {
+  const handleGraphFetch = async (data: string) => {
     const resp = await browserApiClient(
-      `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload/purl=${encodeURIComponent(data)}`,
+      `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload&purl=${encodeURIComponent(data)}`,
       {
-        method: "POST",
-        body: JSON.stringify({
-          purl: data,
-        }),
+        method: "GET",
       },
     );
   };
@@ -64,9 +56,8 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <DialogTitle>score {data.score}</DialogTitle>
           <DialogTitle>shortDescription {data.shortDescription}</DialogTitle>
           <DialogTitle>dependencyPurl {data.purl}</DialogTitle>
-          <button onClick={handleGraphFetch(data.purl)}></button>
-          {/* <DialogTitle>dependencyPurl {data.purl2}</DialogTitle> */}
         </DialogHeader>
+        <Button onClick={() => handleGraphFetch(data.purl)}></Button>
         <hr />
         {/* <DependencyGraph
           width={100}
