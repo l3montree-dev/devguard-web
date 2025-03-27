@@ -36,22 +36,19 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const organization = useActiveOrg();
   const project = useActiveProject();
 
-  const handleGraphFetch = async (data: Props) => {
+  const uri = data.purl;
+  console.log("here is the encoded url : " + `${encodeURIComponent(uri)}`);
+  console.log(
+    `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload/purl=${encodeURIComponent(uri)}`,
+  );
+
+  const handleGraphFetch = async (data: any) => {
     const resp = await browserApiClient(
-      "/organizations/" +
-        organization.slug +
-        "/projects/" +
-        project.slug +
-        "/assets/" +
-        asset?.slug +
-        "/refs/main/" +
-        "?scanner=SBOM-File-Upload" +
-        "&purl=pkg%3Anpm%2Feslint-module-utils%402.11.1",
+      `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload/purl=${encodeURIComponent(data)}`,
       {
         method: "POST",
         body: JSON.stringify({
-          method: "POST",
-          body: JSON.stringify({ purl: data.data.purl }),
+          purl: data,
         }),
       },
     );
@@ -67,6 +64,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <DialogTitle>score {data.score}</DialogTitle>
           <DialogTitle>shortDescription {data.shortDescription}</DialogTitle>
           <DialogTitle>dependencyPurl {data.purl}</DialogTitle>
+          <button onClick={handleGraphFetch(data.purl)}></button>
           {/* <DialogTitle>dependencyPurl {data.purl2}</DialogTitle> */}
         </DialogHeader>
         <hr />
