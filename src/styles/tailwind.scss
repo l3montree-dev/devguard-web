@@ -205,3 +205,8 @@ a {
 .react-flow__attribution {
     @apply text-xs text-gray-400 dark:bg-black
 }
+
+.popover-content-width-same-as-its-trigger {
+    width: var(--radix-popover-trigger-width);
+    max-height: var(--radix-popover-content-available-height);
+}

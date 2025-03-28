@@ -47,7 +47,7 @@ const GithubAppInstallationAlert: FunctionComponent<
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction asChild>{Button}</AlertDialogAction>
+          {Button}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -64,7 +64,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             Button={
               <>
                 <Button
-                  variant={"destructiveOutline"}
+                  variant={"destructive"}
                   onClick={async () => {
                     await onUpdate({ repositoryId: "" });
                     setEditRepo(true);
@@ -116,7 +116,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             Button={
               <>
                 <Button
-                  variant={"destructiveOutline"}
+                  variant={"destructive"}
                   onClick={async () => {
                     await onUpdate({ repositoryId: "" });
                     setEditRepo(true);
