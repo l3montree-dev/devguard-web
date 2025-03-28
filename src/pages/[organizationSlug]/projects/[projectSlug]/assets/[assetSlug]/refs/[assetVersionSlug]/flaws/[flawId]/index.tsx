@@ -369,7 +369,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 {flaw.ticketUrl && (
                   <Link href={flaw.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
-                      {flaw.ticketUrl.startsWith("github:") ? (
+                      {flaw.ticketId?.startsWith("github:") ? (
                         <Image
                           src="/assets/github.svg"
                           alt="GitHub Logo"
