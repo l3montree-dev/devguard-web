@@ -53,7 +53,7 @@
     "funnel-graph-js": "^1.4.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.396.0",
-    "next": "14.2.13",
+    "next": "^14.2.13",
     "next-themes": "^0.3.0",
     "postcss": "8.4.31",
     "react": "18.2.0",
