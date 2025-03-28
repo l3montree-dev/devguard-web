@@ -16,7 +16,7 @@ import { TriangleAlert } from "lucide-react";
 interface Props {
   title: string;
   description: string;
-  onConfirm?: () => void;
+  onConfirm: () => void;
 }
 const Alert: FunctionComponent<PropsWithChildren<Props>> = ({
   children,

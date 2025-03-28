@@ -69,6 +69,28 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
     },
   });
 
+  const handleDeleteAsset = async () => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project!.slug + // can never be null
+        "/assets/" +
+        asset.slug,
+      {
+        method: "DELETE",
+      },
+    );
+    if (resp.ok) {
+      toast("Asset deleted", {
+        description: "The asset has been deleted",
+      });
+      router.push("/" + activeOrg.slug + "/projects/" + project!.slug);
+    } else {
+      toast.error("Could not delete asset");
+    }
+  };
+
   const handleUpdate = async (data: Partial<AssetFormValues>) => {
     const resp = await browserApiClient(
       "/organizations/" +
@@ -166,29 +188,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
               <Alert
                 title="Are you sure to delete this asset?"
                 description="This action cannot be undone. All data associated with this asset will be deleted."
-                onConfirm={async () => {
-                  const resp = await browserApiClient(
-                    "/organizations/" +
-                      activeOrg.slug +
-                      "/projects/" +
-                      project!.slug + // can never be null
-                      "/assets/" +
-                      asset.slug,
-                    {
-                      method: "DELETE",
-                    },
-                  );
-                  if (resp.ok) {
-                    toast("Asset deleted", {
-                      description: "The asset has been deleted",
-                    });
-                    router.push(
-                      "/" + activeOrg.slug + "/projects/" + project!.slug,
-                    );
-                  } else {
-                    toast.error("Could not delete asset");
-                  }
-                }}
+                onConfirm={handleDeleteAsset}
               >
                 <Button variant={"destructive"}>Delete</Button>
               </Alert>
