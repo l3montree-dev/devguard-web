@@ -22,30 +22,34 @@ import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "../../../../../../../../components/ui/card";
-import Image from "next/image";
 import { classNames } from "../../../../../../../../utils/common";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../../../../../../../components/ui/tooltip";
 
-import {
-  CrossIcon,
-  InfoIcon,
-  ShieldCheckIcon,
-  ShieldCloseIcon,
-} from "lucide-react";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { ShieldCloseIcon, TrendingUp } from "lucide-react";
 import { Badge } from "../../../../../../../../components/ui/badge";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../../../../../../../../components/ui/chart";
+import { LabelList, Pie, PieChart } from "recharts";
+import {
+  osiLicenseColors,
+  osiLicenseHexColors,
+} from "../../../../../../../../utils/view";
 
 interface PolicyEvaluation {
   result: boolean | null;
@@ -59,6 +63,7 @@ interface Props {
   compliance: Record<string, Array<PolicyEvaluation>>;
   riskDistribution: Record<string, number>;
   cvssDistribution: Record<string, number>;
+  licenses: Record<string, number>;
 }
 
 const selectedCompliance = "iso27001";
@@ -82,6 +87,7 @@ const Index: FunctionComponent<Props> = ({
   compliance,
   riskDistribution,
   cvssDistribution,
+  licenses,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -90,6 +96,30 @@ const Index: FunctionComponent<Props> = ({
   const { branches, tags } = useAssetBranchesAndTags();
 
   const router = useRouter();
+
+  const chartConfig = useMemo(() => {
+    return Object.entries(licenses).reduce((acc, [key, value]) => {
+      return {
+        ...acc,
+        [key]: {
+          label: key,
+          color: osiLicenseColors[key] ?? "hsl(var(--chart-1))",
+        },
+      };
+    }, {} satisfies ChartConfig);
+  }, [licenses]);
+
+  const chartData = useMemo(() => {
+    return Object.entries(licenses)
+      .map(([key, value]) => ({
+        license: key,
+        amount: value,
+        fill: osiLicenseHexColors[key] ?? osiLicenseHexColors["unknown"],
+      }))
+      .sort((a, b) => {
+        return b.amount - a.amount;
+      });
+  }, [licenses]);
 
   const controlsPassing = useMemo(
     () =>
@@ -105,6 +135,14 @@ const Index: FunctionComponent<Props> = ({
         return acc + (policy.result === false ? 1 : 0);
       }, 0),
     [compliance],
+  );
+
+  const totalDependencies = useMemo(
+    () =>
+      Object.values(licenses).reduce((acc, value) => {
+        return acc + value;
+      }, 0),
+    [licenses],
   );
 
   return (
@@ -278,6 +316,49 @@ const Index: FunctionComponent<Props> = ({
               </div>
             </CardContent>
           </Card>
+          <Card className="col-span-4 row-span-2 flex flex-col">
+            <CardHeader className="items-center pb-0">
+              <CardTitle>Licenses</CardTitle>
+              <CardDescription>
+                Displays the distribution of dependency licenses
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-row justify-center pb-0">
+              <div className="flex flex-row items-center">
+                <ChartContainer
+                  config={chartConfig}
+                  className="aspect-square max-h-[250px] w-[250px]"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent />}
+                    />
+                    <Pie data={chartData} dataKey="amount" nameKey="license" />
+                  </PieChart>
+                </ChartContainer>
+                <div>
+                  {chartData.map((entry, index) => (
+                    <div
+                      key={`cell-${index}`}
+                      className="flex flex-row items-center gap-2"
+                    >
+                      <div
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor: entry.fill,
+                        }}
+                      ></div>
+                      <span className="text-sm text-muted-foreground">
+                        {entry.license}{" "}
+                        {((entry.amount / totalDependencies) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           <Card className="col-span-2">
             <CardHeader className="pb-2">
               <CardTitle>Medium Severity</CardTitle>
@@ -360,11 +441,13 @@ export const getServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/";
-    const [compliance, riskDistribution, cvssDistribution] = await Promise.all([
-      apiClient(url + "compliance").then((r) => r.json()),
-      apiClient(url + "stats/risk-distribution").then((r) => r.json()),
-      apiClient(url + "stats/cvss-distribution").then((r) => r.json()),
-    ]);
+    const [compliance, riskDistribution, cvssDistribution, licenses] =
+      await Promise.all([
+        apiClient(url + "compliance").then((r) => r.json()),
+        apiClient(url + "stats/risk-distribution").then((r) => r.json()),
+        apiClient(url + "stats/cvss-distribution").then((r) => r.json()),
+        apiClient(url + "components/licenses").then((r) => r.json()),
+      ]);
 
     // group by compliance framework
     const complianceByFramework: Record<string, Array<PolicyEvaluation>> = {};
@@ -384,6 +467,7 @@ export const getServerSideProps = middleware(
         compliance: complianceByFramework,
         riskDistribution,
         cvssDistribution,
+        licenses,
       },
     };
   },

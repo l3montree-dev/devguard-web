@@ -48,6 +48,7 @@ import { buttonVariants } from "../../../../../../../../../components/ui/button"
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 import DateString from "../../../../../../../../../components/common/DateString";
+import { osiLicenseColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -131,21 +132,6 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
       ),
   }),
 ];
-
-const osiLicenseColors: Record<string, string> = {
-  MIT: "bg-green-500",
-  "Apache-2.0": "bg-blue-500",
-  "GPL-3.0": "bg-red-500",
-  "GPL-2.0": "bg-orange-500",
-  "BSD-2-Clause": "bg-yellow-500",
-  "BSD-3-Clause": "bg-yellow-500",
-  "LGPL-3.0": "bg-purple-500",
-  "AGPL-3.0": "bg-pink-500",
-  "EPL-2.0": "bg-indigo-500",
-  "MPL-2.0": "bg-teal-500",
-  unknown: "bg-gray-500",
-  "CC0-1.0": "bg-gray-600",
-};
 
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
