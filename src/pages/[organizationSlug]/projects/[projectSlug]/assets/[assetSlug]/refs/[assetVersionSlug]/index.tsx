@@ -38,8 +38,14 @@ import {
   TooltipTrigger,
 } from "../../../../../../../../components/ui/tooltip";
 
-import { CrossIcon, InfoIcon } from "lucide-react";
+import {
+  CrossIcon,
+  InfoIcon,
+  ShieldCheckIcon,
+  ShieldCloseIcon,
+} from "lucide-react";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { Badge } from "../../../../../../../../components/ui/badge";
 
 interface PolicyEvaluation {
   result: boolean | null;
@@ -51,6 +57,8 @@ interface PolicyEvaluation {
 }
 interface Props {
   compliance: Record<string, Array<PolicyEvaluation>>;
+  riskDistribution: Record<string, number>;
+  cvssDistribution: Record<string, number>;
 }
 
 const selectedCompliance = "iso27001";
@@ -70,7 +78,11 @@ const fakePolicyGenerator = (count: number) => {
   return policies;
 };
 
-const Index: FunctionComponent<Props> = ({ compliance }) => {
+const Index: FunctionComponent<Props> = ({
+  compliance,
+  riskDistribution,
+  cvssDistribution,
+}) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
@@ -110,8 +122,8 @@ const Index: FunctionComponent<Props> = ({ compliance }) => {
         Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific asset poses to your organization."
         title="Overview"
       >
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
+        <div className="grid grid-cols-8 gap-4">
+          <Card className="col-span-4 row-span-1">
             <CardHeader>
               <CardTitle>Security Posture</CardTitle>
               <CardDescription>
@@ -122,13 +134,27 @@ const Index: FunctionComponent<Props> = ({ compliance }) => {
             </CardHeader>
             <CardContent>
               {amountOfFailingControls > 0 ? (
-                <CrossIcon />
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"danger"}>
+                    <ShieldCloseIcon className="-ml-2 h-8 w-8 text-red-500" />
+                    <span className="pl-2 text-base">
+                      {amountOfFailingControls} controls are failing
+                    </span>
+                  </Badge>
+                </div>
               ) : (
-                <CheckBadgeIcon className="h-10 w-10 text-green-500" />
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"success"}>
+                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <span className="pl-2 text-base">
+                      All controls are passing
+                    </span>
+                  </Badge>
+                </div>
               )}
             </CardContent>
           </Card>
-          <Card className="row-span-2">
+          <Card className="col-span-4 row-span-2">
             <CardHeader>
               <CardTitle>Tasks until ready</CardTitle>
               <CardDescription>
@@ -137,7 +163,7 @@ const Index: FunctionComponent<Props> = ({ compliance }) => {
               </CardDescription>
             </CardHeader>
           </Card>
-          <Card>
+          <Card className="col-span-4 row-span-1">
             <div className="flex w-full flex-row items-start gap-2 p-6">
               <Image
                 className="mr-2 inline-block"
@@ -194,6 +220,122 @@ const Index: FunctionComponent<Props> = ({ compliance }) => {
               </div>
             </div>
           </Card>
+          <Card className="col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle>Critical Severity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col">
+                <div
+                  className={classNames(
+                    "flex flex-col",
+                    riskDistribution["critical"]
+                      ? "text-red-700"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  <span className={classNames("text-4xl font-bold")}>
+                    {riskDistribution["critical"] ?? 0}
+                  </span>
+                </div>
+
+                <div className={classNames("text-xs text-muted-foreground")}>
+                  <span>By CVSS you would have</span>
+                  <span className={classNames("inline px-1 font-bold")}>
+                    {cvssDistribution["critical"] ?? 0}
+                  </span>
+                  critical severity vulnerabilities
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle>High Severity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col">
+                <div
+                  className={classNames(
+                    "flex flex-col",
+                    riskDistribution["high"]
+                      ? "text-red-500"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  <span className={classNames("text-4xl font-bold")}>
+                    {riskDistribution["high"] ?? 0}
+                  </span>
+                </div>
+
+                <div className={classNames("text-xs text-muted-foreground")}>
+                  <span>By CVSS you would have</span>
+                  <span className={classNames("inline px-1 font-bold")}>
+                    {cvssDistribution["high"] ?? 0}
+                  </span>
+                  high severity vulnerabilities
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle>Medium Severity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col">
+                <div
+                  className={classNames(
+                    "flex flex-col",
+                    riskDistribution["medium"]
+                      ? "text-orange-500"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  <span className={classNames("text-4xl font-bold")}>
+                    {riskDistribution["medium"] ?? 0}
+                  </span>
+                </div>
+
+                <div className={classNames("text-xs text-muted-foreground")}>
+                  <span>By CVSS you would have</span>
+                  <span className={classNames("inline px-1 font-bold")}>
+                    {cvssDistribution["medium"] ?? 0}
+                  </span>
+                  medium severity vulnerabilities
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle>Low Severity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col">
+                <div
+                  className={classNames(
+                    "flex flex-col",
+                    riskDistribution["low"]
+                      ? "text-yellow-500"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  <span className={classNames("text-4xl font-bold")}>
+                    {riskDistribution["low"] ?? 0}
+                  </span>
+                </div>
+
+                <div className={classNames("text-xs text-muted-foreground")}>
+                  <span>By CVSS you would have</span>
+                  <span className={classNames("inline px-1 font-bold")}>
+                    {cvssDistribution["low"] ?? 0}
+                  </span>
+                  low severity vulnerabilities
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Section>
     </Page>
@@ -218,8 +360,10 @@ export const getServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/";
-    const [compliance] = await Promise.all([
+    const [compliance, riskDistribution, cvssDistribution] = await Promise.all([
       apiClient(url + "compliance").then((r) => r.json()),
+      apiClient(url + "stats/risk-distribution").then((r) => r.json()),
+      apiClient(url + "stats/cvss-distribution").then((r) => r.json()),
     ]);
 
     // group by compliance framework
@@ -238,6 +382,8 @@ export const getServerSideProps = middleware(
     return {
       props: {
         compliance: complianceByFramework,
+        riskDistribution,
+        cvssDistribution,
       },
     };
   },
