@@ -1,8 +1,5 @@
 import Page from "@/components/Page";
-import AssetForm, {
-  AssetFormValues,
-  EnableTicketRange,
-} from "@/components/asset/AssetForm";
+import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -22,7 +19,7 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "@/services/devGuardApi";
-import { AssetDTO } from "@/types/api/api";
+import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
@@ -30,6 +27,10 @@ import { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
+import Alert from "../../../../../../components/common/Alert";
+import DangerZone from "../../../../../../components/common/DangerZone";
+import ListItem from "../../../../../../components/common/ListItem";
+import Section from "../../../../../../components/common/Section";
 import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
 
 interface Props {
@@ -42,6 +43,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   }
   return el[0];
 };
+
 const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -54,18 +56,40 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
     defaultValues: {
       ...asset,
 
-      cvssAutomaticTicketThreshold: asset.cvssAutomaticTicketThreshold
+      cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],
-      riskAutomaticTicketThreshold: asset.riskAutomaticTicketThreshold
+      riskAutomaticTicketThreshold: isNumber(asset.riskAutomaticTicketThreshold)
         ? [asset.riskAutomaticTicketThreshold]
         : [],
       enableTicketRange: Boolean(
-        asset.riskAutomaticTicketThreshold ||
-          asset.cvssAutomaticTicketThreshold,
+        isNumber(asset.riskAutomaticTicketThreshold) ||
+          isNumber(asset.cvssAutomaticTicketThreshold),
       ),
     },
   });
+
+  const handleDeleteAsset = async () => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project!.slug + // can never be null
+        "/assets/" +
+        asset.slug,
+      {
+        method: "DELETE",
+      },
+    );
+    if (resp.ok) {
+      toast("Asset deleted", {
+        description: "The asset has been deleted",
+      });
+      router.push("/" + activeOrg.slug + "/projects/" + project!.slug);
+    } else {
+      toast.error("Could not delete asset");
+    }
+  };
 
   const handleUpdate = async (data: Partial<AssetFormValues>) => {
     const resp = await browserApiClient(
@@ -149,6 +173,29 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
           </form>
         </Form>
       </div>
+      <DangerZone>
+        <Section
+          className="m-2"
+          title="Advanced"
+          description="These settings are for advanced users only. Please be careful when changing these settings."
+        >
+          <ListItem
+            Title="Delete Asset"
+            description={
+              "This will delete the asset and all of its data. This action cannot be undone."
+            }
+            Button={
+              <Alert
+                title="Are you sure to delete this asset?"
+                description="This action cannot be undone. All data associated with this asset will be deleted."
+                onConfirm={handleDeleteAsset}
+              >
+                <Button variant={"destructive"}>Delete</Button>
+              </Alert>
+            }
+          />
+        </Section>
+      </DangerZone>
     </Page>
   );
 };

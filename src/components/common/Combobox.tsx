@@ -29,10 +29,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { classNames } from "@/utils/common";
 
 interface Props {
   onSelect: (value: string) => void;
@@ -69,7 +67,10 @@ export function Combobox(props: Props) {
           <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent
+        align="end"
+        className="popover-content-width-same-as-its-trigger min-w-full max-w-full p-0"
+      >
         <Command shouldFilter={props.onValueChange === undefined}>
           <CommandInput />
           <CommandList>

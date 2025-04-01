@@ -264,7 +264,7 @@ const Home: FunctionComponent = () => {
                       "!text-black hover:no-underline",
                     )}
                     href={
-                      "https://github.com/apps/devguard-app/installations/new?state=" +
+                      "https://github.com/apps/devguard-bot/installations/new?state=" +
                       encodeObjectBase64({
                         orgSlug: activeOrg.slug,
                         redirectTo: router.asPath,
