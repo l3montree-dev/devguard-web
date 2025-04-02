@@ -15,34 +15,19 @@
 import { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
 import { Identity } from "@ory/client";
 
-export const osiLicenseColors: Record<string, string> = {
-  MIT: "bg-green-500",
-  "Apache-2.0": "bg-blue-500",
-  "GPL-3.0": "bg-red-500",
-  "GPL-2.0": "bg-orange-500",
-  "BSD-2-Clause": "bg-yellow-500",
-  "BSD-3-Clause": "bg-yellow-500",
-  "LGPL-3.0": "bg-purple-500",
-  "AGPL-3.0": "bg-pink-500",
-  "EPL-2.0": "bg-indigo-500",
-  "MPL-2.0": "bg-teal-500",
-  unknown: "bg-gray-500",
-  "CC0-1.0": "bg-gray-600",
-};
-
 export const osiLicenseHexColors: Record<string, string> = {
-  MIT: "#28a745",
-  "Apache-2.0": "#007bff",
-  "GPL-3.0": "#dc3545",
-  "GPL-2.0": "#fd7e14",
-  "BSD-2-Clause": "#ffc107",
-  "BSD-3-Clause": "#ffc107",
-  "LGPL-3.0": "#6f42c1",
-  "AGPL-3.0": "#d63384",
-  "EPL-2.0": "#6610f2",
-  "MPL-2.0": "#20c997",
-  unknown: "#6c757d",
-  "CC0-1.0": "#343a40",
+  MIT: "#fbbd25",
+  "Apache-2.0": "#fdc758",
+  "GPL-3.0": "#fed180",
+  "GPL-2.0": "#fddba6",
+  "BSD-2-Clause": "#f8e6cb",
+  "BSD-3-Clause": "#f1f1f1",
+  "LGPL-3.0": "#d5d2f4",
+  "AGPL-3.0": "#b7b5f7",
+  "EPL-2.0": "#9698f9",
+  "MPL-2.0": "#6d7dfa",
+  unknown: "#2563fb",
+  "CC0-1.0": "#ffffff",
 };
 
 export const getParentRepositoryIdAndName = (

@@ -28,28 +28,26 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 import { classNames } from "../../../../../../../../utils/common";
 
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { ShieldCloseIcon, TrendingUp } from "lucide-react";
+import {
+  CheckBadgeIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
+import Link from "next/link";
+import { Pie, PieChart } from "recharts";
+import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "../../../../../../../../components/ui/chart";
-import { LabelList, Pie, PieChart } from "recharts";
-import {
-  osiLicenseColors,
-  osiLicenseHexColors,
-} from "../../../../../../../../utils/view";
+import { osiLicenseHexColors } from "../../../../../../../../utils/view";
 
 interface PolicyEvaluation {
   result: boolean | null;
@@ -58,6 +56,7 @@ interface PolicyEvaluation {
   tags: Array<string>;
   relatedResources: Array<string>;
   complianceFrameworks: Array<string>;
+  priority: number;
 }
 interface Props {
   compliance: Record<string, Array<PolicyEvaluation>>;
@@ -66,7 +65,7 @@ interface Props {
   licenses: Record<string, number>;
 }
 
-const selectedCompliance = "iso27001";
+const selectedCompliance = "ISO 27001";
 
 const fakePolicyGenerator = (count: number) => {
   const policies = [];
@@ -103,7 +102,6 @@ const Index: FunctionComponent<Props> = ({
         ...acc,
         [key]: {
           label: key,
-          color: osiLicenseColors[key] ?? "hsl(var(--chart-1))",
         },
       };
     }, {} satisfies ChartConfig);
@@ -129,11 +127,11 @@ const Index: FunctionComponent<Props> = ({
     [compliance],
   );
 
-  const amountOfFailingControls = useMemo(
+  const failingControls = useMemo(
     () =>
-      compliance[selectedCompliance].reduce((acc, policy) => {
-        return acc + (policy.result === false ? 1 : 0);
-      }, 0),
+      compliance[selectedCompliance].filter(
+        (policy) => policy.result === false,
+      ),
     [compliance],
   );
 
@@ -171,12 +169,12 @@ const Index: FunctionComponent<Props> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {amountOfFailingControls > 0 ? (
+              {failingControls.length > 0 ? (
                 <div className="flex flex-row items-center gap-2">
                   <Badge variant={"danger"}>
-                    <ShieldCloseIcon className="-ml-2 h-8 w-8 text-red-500" />
+                    <ExclamationCircleIcon className="-ml-2 h-8 w-8 text-red-500" />
                     <span className="pl-2 text-base">
-                      {amountOfFailingControls} controls are failing
+                      {failingControls.length} controls are failing
                     </span>
                   </Badge>
                 </div>
@@ -194,12 +192,61 @@ const Index: FunctionComponent<Props> = ({
           </Card>
           <Card className="col-span-4 row-span-2">
             <CardHeader>
-              <CardTitle>Tasks until ready</CardTitle>
+              <CardTitle>To-Do&apos;s</CardTitle>
               <CardDescription>
                 Tasks that need to be completed before the asset is ready for
-                production. Before it meets all compliance requirements.
+                production, ordered by priority.
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              {failingControls.length > 0 ? (
+                <div className="flex flex-col">
+                  {failingControls.slice(0, 4).map((policy, i, arr) => (
+                    <div
+                      className={
+                        i === 0
+                          ? "border-b pb-4"
+                          : i === arr.length - 1
+                            ? "pt-4"
+                            : "border-b py-4"
+                      }
+                      key={policy.title}
+                    >
+                      <span className="text-sm font-semibold">
+                        {policy.title}{" "}
+                      </span>
+                      <p className="text-sm text-muted-foreground">
+                        {policy.description}
+                      </p>
+                      <div className="mt-2 flex flex-row flex-wrap gap-2">
+                        <Badge variant={"secondary"}>
+                          Priority {policy.priority}
+                        </Badge>
+                        {policy.complianceFrameworks.map((t) => (
+                          <Badge key={t} variant={"secondary"}>
+                            <Image
+                              className="-ml-1.5 mr-1 inline-block"
+                              src="/assets/iso.svg"
+                              width={15}
+                              height={15}
+                              alt="Compliance"
+                            />{" "}
+                            {t}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"success"}>
+                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <span className="pl-2 text-base">No tasks until ready</span>
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
           </Card>
           <Card className="col-span-4 row-span-1">
             <div className="flex w-full flex-row items-start gap-2 p-6">
@@ -258,67 +305,29 @@ const Index: FunctionComponent<Props> = ({
               </div>
             </div>
           </Card>
-          <Card className="col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle>Critical Severity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div
-                  className={classNames(
-                    "flex flex-col",
-                    riskDistribution["critical"]
-                      ? "text-red-700"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <span className={classNames("text-4xl font-bold")}>
-                    {riskDistribution["critical"] ?? 0}
-                  </span>
-                </div>
-
-                <div className={classNames("text-xs text-muted-foreground")}>
-                  <span>By CVSS you would have</span>
-                  <span className={classNames("inline px-1 font-bold")}>
-                    {cvssDistribution["critical"] ?? 0}
-                  </span>
-                  critical severity vulnerabilities
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle>High Severity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div
-                  className={classNames(
-                    "flex flex-col",
-                    riskDistribution["high"]
-                      ? "text-red-500"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <span className={classNames("text-4xl font-bold")}>
-                    {riskDistribution["high"] ?? 0}
-                  </span>
-                </div>
-
-                <div className={classNames("text-xs text-muted-foreground")}>
-                  <span>By CVSS you would have</span>
-                  <span className={classNames("inline px-1 font-bold")}>
-                    {cvssDistribution["high"] ?? 0}
-                  </span>
-                  high severity vulnerabilities
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <SeverityCard
+            title="Critical Severity"
+            queryIntervalStart={8}
+            amountByRisk={riskDistribution["critical"]}
+            amountByCVSS={cvssDistribution["critical"]}
+          />
+          <SeverityCard
+            title="High Severity"
+            queryIntervalStart={7}
+            amountByRisk={riskDistribution["high"]}
+            amountByCVSS={cvssDistribution["high"]}
+          />
           <Card className="col-span-4 row-span-2 flex flex-col">
             <CardHeader className="items-center pb-0">
-              <CardTitle>Licenses</CardTitle>
+              <CardTitle className="relative w-full text-center">
+                Licenses
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
               <CardDescription>
                 Displays the distribution of dependency licenses
               </CardDescription>
@@ -334,7 +343,13 @@ const Index: FunctionComponent<Props> = ({
                       cursor={false}
                       content={<ChartTooltipContent />}
                     />
-                    <Pie data={chartData} dataKey="amount" nameKey="license" />
+                    <Pie
+                      data={chartData}
+                      dataKey="amount"
+                      nameKey="license"
+                      innerRadius={60}
+                      strokeWidth={5}
+                    />
                   </PieChart>
                 </ChartContainer>
                 <div>
@@ -359,64 +374,18 @@ const Index: FunctionComponent<Props> = ({
               </div>
             </CardContent>
           </Card>
-          <Card className="col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle>Medium Severity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div
-                  className={classNames(
-                    "flex flex-col",
-                    riskDistribution["medium"]
-                      ? "text-orange-500"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <span className={classNames("text-4xl font-bold")}>
-                    {riskDistribution["medium"] ?? 0}
-                  </span>
-                </div>
-
-                <div className={classNames("text-xs text-muted-foreground")}>
-                  <span>By CVSS you would have</span>
-                  <span className={classNames("inline px-1 font-bold")}>
-                    {cvssDistribution["medium"] ?? 0}
-                  </span>
-                  medium severity vulnerabilities
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle>Low Severity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div
-                  className={classNames(
-                    "flex flex-col",
-                    riskDistribution["low"]
-                      ? "text-yellow-500"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  <span className={classNames("text-4xl font-bold")}>
-                    {riskDistribution["low"] ?? 0}
-                  </span>
-                </div>
-
-                <div className={classNames("text-xs text-muted-foreground")}>
-                  <span>By CVSS you would have</span>
-                  <span className={classNames("inline px-1 font-bold")}>
-                    {cvssDistribution["low"] ?? 0}
-                  </span>
-                  low severity vulnerabilities
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <SeverityCard
+            title="Medium Severity"
+            queryIntervalStart={4}
+            amountByRisk={riskDistribution["medium"]}
+            amountByCVSS={cvssDistribution["medium"]}
+          />
+          <SeverityCard
+            title="Low Severity"
+            queryIntervalStart={0}
+            amountByRisk={riskDistribution["low"]}
+            amountByCVSS={cvssDistribution["low"]}
+          />
         </div>
       </Section>
     </Page>
@@ -452,7 +421,7 @@ export const getServerSideProps = middleware(
     // group by compliance framework
     const complianceByFramework: Record<string, Array<PolicyEvaluation>> = {};
     compliance
-      .concat(fakePolicyGenerator(90))
+      //.concat(fakePolicyGenerator(90))
       .forEach((policy: PolicyEvaluation) => {
         policy.complianceFrameworks.forEach((framework) => {
           if (!complianceByFramework[framework]) {

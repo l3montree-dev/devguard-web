@@ -48,7 +48,7 @@ import { buttonVariants } from "../../../../../../../../../components/ui/button"
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 import DateString from "../../../../../../../../../components/common/DateString";
-import { osiLicenseColors } from "../../../../../../../../../utils/view";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged>;
@@ -173,10 +173,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   key={license}
                   className={classNames(
                     "h-2",
-                    osiLicenseColors[license] ?? "",
+
                     i === arr.length - 1 ? "" : "border-r",
                   )}
-                  style={{ width: percent + "%" }}
+                  style={{
+                    width: percent + "%",
+                    backgroundColor: osiLicenseHexColors[license],
+                  }}
                 />
               ))}
             </span>
@@ -184,11 +187,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               {licenseToPercentMapEntries.map(([license, percent]) => (
                 <span className="whitespace-nowrap text-xs" key={license}>
                   <span
+                    style={{
+                      backgroundColor: osiLicenseHexColors[license],
+                    }}
                     className={classNames(
                       "mr-1 inline-block h-2 w-2 rounded-full text-xs",
-                      osiLicenseColors[license]
-                        ? osiLicenseColors[license]
-                        : "bg-gray-600",
                     )}
                   />
                   {license}{" "}
