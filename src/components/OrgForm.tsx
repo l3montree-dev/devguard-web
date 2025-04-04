@@ -280,7 +280,7 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
           render={({ field }) => (
             <FormItem>
               <ListItem
-                description={
+                Description={
                   "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
                 }
                 Title="Public Organization"

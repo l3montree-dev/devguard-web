@@ -17,8 +17,6 @@ import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
-  ScaleIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
@@ -30,19 +28,9 @@ export const useOrganizationMenu = () => {
   const loggedIn = useCurrentUser();
   const menu = [
     {
-      title: "Overview",
-      href: "/" + orgSlug,
-      Icon: ChartBarSquareIcon,
-    },
-    {
       title: "Projects",
-      href: "/" + orgSlug + "/projects",
+      href: "/" + orgSlug,
       Icon: ListBulletIcon,
-    },
-    {
-      title: "Compliance",
-      href: "/" + orgSlug + "/compliance",
-      Icon: ScaleIcon,
     },
   ];
 

@@ -14,6 +14,16 @@
 
 import { Modify } from "../common";
 
+export interface PolicyEvaluation {
+  result: boolean | null;
+  title: string;
+  description: string;
+  tags: Array<string>;
+  relatedResources: Array<string>;
+  complianceFrameworks: Array<string>;
+  priority: number;
+}
+
 export interface InviteRequest {
   email: string;
 }

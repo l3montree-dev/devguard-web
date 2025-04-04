@@ -15,6 +15,21 @@
 import { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
 import { Identity } from "@ory/client";
 
+export const osiLicenseHexColors: Record<string, string> = {
+  MIT: "#fbbd25",
+  "Apache-2.0": "#fdc758",
+  "GPL-3.0": "#fed180",
+  "GPL-2.0": "#fddba6",
+  "BSD-2-Clause": "#f8e6cb",
+  "BSD-3-Clause": "#f1f1f1",
+  "LGPL-3.0": "#d5d2f4",
+  "AGPL-3.0": "#b7b5f7",
+  "EPL-2.0": "#9698f9",
+  "MPL-2.0": "#6d7dfa",
+  unknown: "#2563fb",
+  "CC0-1.0": "#ffffff",
+};
+
 export const getParentRepositoryIdAndName = (
   project?: ProjectDTO,
 ): {

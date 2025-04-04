@@ -83,7 +83,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               <FormItem>
                 <div className={classNames(!org.isPublic && "opacity-50")}>
                   <ListItem
-                    description={
+                    Description={
                       "Setting this to true will make the project visible to the public. It allows creating public and private assets."
                     }
                     Title="Public Project"
@@ -111,7 +111,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
           {onConfirmDelete && (
             <ListItem
               Title="Delete Project"
-              description={
+              Description={
                 "This will delete the project and all of its data. This action cannot be undone."
               }
               Button={

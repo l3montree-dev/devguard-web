@@ -193,7 +193,7 @@ const Home: FunctionComponent = () => {
                   {installation.targetLogin}
                 </>
               }
-              description={
+              Description={
                 "DevGuard uses a GitHub App to access your repositories and interact with your code."
               }
               Button={
@@ -227,7 +227,7 @@ const Home: FunctionComponent = () => {
                   </div>
                 </>
               }
-              description={
+              Description={
                 "DevGuard uses an Access-Token to access your repositories and interact with your code."
               }
               Button={
@@ -254,7 +254,7 @@ const Home: FunctionComponent = () => {
                 Add a GitHub App
               </div>
             }
-            description="DevGuard uses a GitHub App to access your repositories and interact with your code."
+            Description="DevGuard uses a GitHub App to access your repositories and interact with your code."
             Button={
               <GithubAppInstallationAlert
                 Button={
@@ -292,7 +292,7 @@ const Home: FunctionComponent = () => {
                 Integrate with GitLab
               </div>
             }
-            description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <GitLabIntegrationDialog
                 onNewIntegration={handleNewGitLabIntegration}

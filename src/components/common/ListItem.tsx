@@ -12,12 +12,12 @@ interface Props {
   Button?: React.ReactNode;
   Title: ReactNode;
   reactOnHover?: boolean;
-  description?: string | JSX.Element;
+  Description?: string | JSX.Element;
 }
 const ListItem: FunctionComponent<Props> = ({
   Button,
   Title,
-  description,
+  Description: Description,
   reactOnHover,
 }) => {
   return (
@@ -28,9 +28,9 @@ const ListItem: FunctionComponent<Props> = ({
       )}
     >
       <CardHeader className="justify-center">
-        <CardTitle className="text-base">{Title}</CardTitle>
-        {Boolean(description) && (
-          <CardDescription>{description}</CardDescription>
+        <CardTitle>{Title}</CardTitle>
+        {Boolean(Description) && (
+          <CardDescription>{Description}</CardDescription>
         )}
       </CardHeader>
       {Boolean(Button) && (

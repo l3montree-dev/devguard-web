@@ -56,7 +56,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 {parentRepositoryName}
               </>
             }
-            description={
+            Description={
               "This asset is connected to a " +
               (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
               " repository "
@@ -108,7 +108,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 {repositoryName}
               </>
             }
-            description={
+            Description={
               "This asset is connected to a " +
               (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
               " repository "
@@ -172,7 +172,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
               </Button>
             </div>
           }
-          description={
+          Description={
             "Select a repository to connect this asset to. This list contains all repositories of all GitHub App Installations belonging to this organization."
           }
         />
@@ -191,7 +191,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 Add a GitHub App
               </div>
             }
-            description="DevGuard uses a GitHub App to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a GitHub App to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <Link
                 className={cn(
@@ -217,7 +217,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 Integrate with GitLab
               </div>
             }
-            description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <Link
                 className={cn(

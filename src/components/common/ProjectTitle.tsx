@@ -56,7 +56,7 @@ export const ProjectElement = ({
         <span className="opacity-75">/</span>
         <Link
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+          href={`/${activeOrg.slug}/projects/${project.slug}/`}
         >
           {project.name}
           <ProjectBadge type={project.type} />
@@ -67,7 +67,7 @@ export const ProjectElement = ({
   return (
     <Link
       className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-      href={`/${activeOrg.slug}/projects/${project.slug}/assets`}
+      href={`/${activeOrg.slug}/projects/${project.slug}/`}
     >
       {project.name}
       <ProjectBadge type={project.type} />

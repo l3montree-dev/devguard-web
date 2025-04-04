@@ -181,7 +181,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         >
           <ListItem
             Title="Delete Asset"
-            description={
+            Description={
               "This will delete the asset and all of its data. This action cannot be undone."
             }
             Button={
