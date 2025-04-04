@@ -36,7 +36,9 @@ import { classNames } from "../../../../../../../../utils/common";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
+  ScaleIcon,
 } from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { Pie, PieChart } from "recharts";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
@@ -47,6 +49,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../../../../../../../../components/ui/chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../../../../../components/ui/tooltip";
 import { osiLicenseHexColors } from "../../../../../../../../utils/view";
 
 interface PolicyEvaluation {
@@ -201,7 +208,7 @@ const Index: FunctionComponent<Props> = ({
             <CardContent>
               {failingControls.length > 0 ? (
                 <div className="flex flex-col">
-                  {failingControls.slice(0, 4).map((policy, i, arr) => (
+                  {failingControls.slice(0, 3).map((policy, i, arr) => (
                     <div
                       className={
                         i === 0
@@ -212,29 +219,26 @@ const Index: FunctionComponent<Props> = ({
                       }
                       key={policy.title}
                     >
-                      <span className="text-sm font-semibold">
-                        {policy.title}{" "}
-                      </span>
+                      <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
+                        {policy.title}
+                        <div className="flex flex-row flex-wrap gap-2">
+                          {policy.complianceFrameworks.map((t) => (
+                            <Badge key={t} variant={"secondary"}>
+                              <Image
+                                className="mr-1 inline-block"
+                                src="/assets/iso.svg"
+                                width={15}
+                                height={15}
+                                alt="Compliance"
+                              />{" "}
+                              {t}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {policy.description}
                       </p>
-                      <div className="mt-2 flex flex-row flex-wrap gap-2">
-                        <Badge variant={"secondary"}>
-                          Priority {policy.priority}
-                        </Badge>
-                        {policy.complianceFrameworks.map((t) => (
-                          <Badge key={t} variant={"secondary"}>
-                            <Image
-                              className="-ml-1.5 mr-1 inline-block"
-                              src="/assets/iso.svg"
-                              width={15}
-                              height={15}
-                              alt="Compliance"
-                            />{" "}
-                            {t}
-                          </Badge>
-                        ))}
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -249,61 +253,70 @@ const Index: FunctionComponent<Props> = ({
             </CardContent>
           </Card>
           <Card className="col-span-4 row-span-1">
-            <div className="flex w-full flex-row items-start gap-2 p-6">
-              <Image
-                className="mr-2 inline-block"
-                src="/assets/iso.svg"
-                width={35}
-                height={35}
-                alt="Compliance"
-              />
-              <div className="flex-1">
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle className="relative flex flex-row justify-between">
-                    ISO 27001
-                  </CardTitle>
-                  <CardDescription>
-                    ISO/IEC 27001 is an international standard on how to manage
-                    information security. It details requirements for
-                    establishing, implementing, maintaining, and continually
-                    improving an information security management system (ISMS).
-                    <br />
-                    Based on a community driven mapping between technical checks
-                    and compliance controls
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-0 pb-0">
-                  <div className="grid-cols-25 grid gap-1">
-                    {compliance[selectedCompliance].map((policy) => (
-                      <div
-                        className={classNames(
-                          "aspect-square rounded-sm",
-                          Boolean(policy.result)
-                            ? " bg-green-500 shadow-green-400 drop-shadow"
-                            : "border border-gray-500/30 bg-gray-500/20",
-                        )}
-                        key={policy.title}
-                      ></div>
-                    ))}
-                  </div>
-                  <div className="mt-2">
-                    <span className="text-sm">
-                      {controlsPassing}{" "}
-                      <span className="text-muted-foreground">
-                        / {compliance[selectedCompliance].length} Controls are
-                        passing (
-                        {(
-                          (controlsPassing /
-                            compliance[selectedCompliance].length) *
-                          100
-                        ).toFixed(1)}{" "}
-                        %)
-                      </span>
-                    </span>
-                  </div>
-                </CardContent>
+            <CardHeader className="">
+              <CardTitle className="relative flex flex-row items-end gap-2">
+                <ScaleIcon className="h-6 w-6 text-muted-foreground" />
+                <div className="flex flex-row items-center gap-2">
+                  Compliance Controls
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <InformationCircleIcon className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <Link
+                        className="text-sm !text-muted-foreground"
+                        href={
+                          "https://github.com/l3montree-dev/attestation-compliance-policies"
+                        }
+                      >
+                        Based on a community driven mapping between technical
+                        checks and compliance controls
+                      </Link>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings#compliance`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  Modify Policies
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Displays the compliance of the asset with the security policies
+                of the asset.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid-cols-25 grid gap-1">
+                {compliance[selectedCompliance].map((policy) => (
+                  <div
+                    className={classNames(
+                      "aspect-square rounded-sm",
+                      Boolean(policy.result)
+                        ? " bg-green-500 shadow-green-400 drop-shadow"
+                        : "border border-gray-500/30 bg-gray-500/20",
+                    )}
+                    key={policy.title}
+                  ></div>
+                ))}
               </div>
-            </div>
+              <div className="mt-2">
+                <span className="text-sm">
+                  {controlsPassing}{" "}
+                  <span className="text-muted-foreground">
+                    / {compliance[selectedCompliance].length} Controls are
+                    passing (
+                    {(
+                      (controlsPassing /
+                        compliance[selectedCompliance].length) *
+                      100
+                    ).toFixed(1)}{" "}
+                    %)
+                  </span>
+                </span>
+              </div>
+            </CardContent>
           </Card>
           <SeverityCard
             title="Critical Severity"
@@ -364,7 +377,7 @@ const Index: FunctionComponent<Props> = ({
                           backgroundColor: entry.fill,
                         }}
                       ></div>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm capitalize text-muted-foreground">
                         {entry.license}{" "}
                         {((entry.amount / totalDependencies) * 100).toFixed(1)}%
                       </span>
