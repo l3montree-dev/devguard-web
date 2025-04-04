@@ -28,13 +28,8 @@ export const useOrganizationMenu = () => {
   const loggedIn = useCurrentUser();
   const menu = [
     {
-      title: "Overview",
-      href: "/" + orgSlug,
-      Icon: ChartBarSquareIcon,
-    },
-    {
       title: "Projects",
-      href: "/" + orgSlug + "/projects",
+      href: "/" + orgSlug,
       Icon: ListBulletIcon,
     },
   ];
