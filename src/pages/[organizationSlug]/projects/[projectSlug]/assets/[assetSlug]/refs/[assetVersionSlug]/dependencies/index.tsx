@@ -76,7 +76,7 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   }),
   columnHelper.accessor("dependency.license", {
     header: "License",
-    id: "Component.license",
+    id: "Dependency.license",
     cell: (row) =>
       row.getValue() === "unknown" ? (
         <Badge variant={"outline"}>

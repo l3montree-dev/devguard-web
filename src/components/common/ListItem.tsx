@@ -28,7 +28,7 @@ const ListItem: FunctionComponent<Props> = ({
       )}
     >
       <CardHeader className="justify-center">
-        <CardTitle className="text-base">{Title}</CardTitle>
+        <CardTitle>{Title}</CardTitle>
         {Boolean(Description) && (
           <CardDescription>{Description}</CardDescription>
         )}

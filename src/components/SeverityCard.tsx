@@ -1,31 +1,37 @@
 import Link from "next/link";
+import { FunctionComponent } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { classNames } from "../utils/common";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { FunctionComponent } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+
+const variantColors = {
+  critical: "bg-red-700 text-white",
+  high: "bg-red-500 text-white",
+  medium: "bg-orange-500 text-white",
+  low: "bg-blue-500 text-white",
+};
 
 export const SeverityStats = ({
   amountByRisk,
   amountByCVSS,
-  title,
+  variant,
 }: {
   amountByRisk: number;
   amountByCVSS: number;
-  title: string;
+  variant: "high" | "medium" | "low" | "critical";
 }) => {
   return (
     <div className="flex flex-col">
-      <div className={classNames("flex flex-col", "text-muted-foreground")}>
-        <span className={classNames("text-4xl font-bold")}>
+      <div className="my-2">
+        <span
+          className={classNames(
+            "rounded-lg px-2 text-4xl font-bold",
+            variantColors[variant],
+          )}
+        >
           {amountByRisk ?? 0}
         </span>
       </div>
@@ -35,7 +41,7 @@ export const SeverityStats = ({
         <span className={classNames("inline px-1 font-bold")}>
           {amountByCVSS ?? 0}
         </span>
-        {title.toLowerCase()} vulnerabilities
+        {variant} severity vulnerabilities
       </div>
     </div>
   );
@@ -44,13 +50,13 @@ interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
-  title: string;
+  variant: "high" | "medium" | "low" | "critical";
 }
 
 const SeverityCard: FunctionComponent<Props> = ({
   amountByRisk,
   amountByCVSS,
-  title,
+  variant,
   queryIntervalStart,
 }) => {
   const activeOrg = useActiveOrg();
@@ -60,8 +66,8 @@ const SeverityCard: FunctionComponent<Props> = ({
   return (
     <Card className="col-span-2">
       <CardHeader className="pb-2">
-        <CardTitle className="flex flex-row items-center justify-between">
-          {title}
+        <CardTitle className="flex flex-row items-center justify-between capitalize">
+          {variant} severity
           <Link
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/risk-handling?` +
@@ -80,7 +86,7 @@ const SeverityCard: FunctionComponent<Props> = ({
         <SeverityStats
           amountByRisk={amountByRisk}
           amountByCVSS={amountByCVSS}
-          title={title}
+          variant={variant}
         />
       </CardContent>
     </Card>

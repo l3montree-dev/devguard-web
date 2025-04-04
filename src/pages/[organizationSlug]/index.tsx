@@ -53,6 +53,7 @@ import { withContentTree } from "@/decorators/withContentTree";
 import EmptyOverview from "@/components/common/EmptyOverview";
 import { padRiskHistory } from "@/utils/server";
 import { Button } from "../../components/ui/button";
+import Section from "../../components/common/Section";
 
 interface Props {
   organization: OrganizationDTO & {
@@ -63,12 +64,6 @@ interface Props {
     >;
   };
   riskDistribution: RiskDistribution[] | null;
-  riskHistory: Array<{
-    history: RiskHistory[];
-    label: string;
-    slug: string;
-    description: string;
-  }>;
   flawCountByScanner: FlawCountByScanner;
   dependencyCountByscanner: DependencyCountByscanner;
   flawAggregationStateAndChange: FlawAggregationStateAndChange;
@@ -81,7 +76,6 @@ interface Props {
 const Home: FunctionComponent<Props> = ({
   organization,
   riskDistribution,
-  riskHistory,
   flawAggregationStateAndChange,
   avgLowFixingTime,
   avgMediumFixingTime,
@@ -90,7 +84,7 @@ const Home: FunctionComponent<Props> = ({
 }) => {
   const orgMenu = useOrganizationMenu();
 
-  if (riskHistory.length === 0) {
+  if (false) {
     return (
       <Page
         Title={
@@ -145,76 +139,8 @@ const Home: FunctionComponent<Props> = ({
       title={organization.name ?? "Loading..."}
       Menu={orgMenu}
     >
-      {" "}
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Overview</h1>
-      </div>
-      <div className="mt-4 grid gap-4">
-        <FlawAggregationState
-          description="The total risk this project poses to the organization"
-          title="Organization Risk"
-          totalRisk={riskHistory
-            .map((r) => r.history[r.history.length - 1])
-            .filter((r) => !!r)
-            .reduce((acc, curr) => acc + curr.sumOpenRisk, 0)}
-          data={flawAggregationStateAndChange}
-        />
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2">
-            <RiskDistributionDiagram data={riskDistribution ?? []} />
-          </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Vulnerable Projects</CardTitle>
-              <CardDescription>
-                The most vulnerable Projects in this organization
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                {riskHistory.slice(0, 5).map((r) => (
-                  <Link
-                    href={organization.slug + "/projects/" + r.slug}
-                    key={r.slug}
-                    className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
-                  >
-                    <div
-                      key={r.label}
-                      className={classNames("flex items-center gap-4")}
-                    >
-                      <Avatar>
-                        <AvatarFallback>{r.label[0]}</AvatarFallback>
-                      </Avatar>
-
-                      <div className="grid ">
-                        <p className="text-sm font-medium leading-none">
-                          {r.label}
-                        </p>
-                        <small className="line-clamp-1 text-ellipsis text-muted-foreground">
-                          {r.description}
-                        </small>
-                      </div>
-                      <div className="ml-auto font-medium">
-                        <Badge
-                          className="whitespace-nowrap"
-                          variant="secondary"
-                        >
-                          {" "}
-                          {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
-                            2,
-                          ) ?? "0.00"}{" "}
-                          Risk
-                        </Badge>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              <div className="flex items-center gap-4"></div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="grid grid-cols-4 gap-4">
+      <Section forceVertical primaryHeadline title="Overview">
+        <div className="mt-2 grid grid-cols-4 gap-4">
           <AverageFixingTimeChart
             title="Low severity"
             description="Average fixing time for low severity vulnerabilities"
@@ -236,12 +162,7 @@ const Home: FunctionComponent<Props> = ({
             avgFixingTime={avgCriticalFixingTime}
           />
         </div>
-        <RiskHistoryChart data={riskHistory} />
-        {/* <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2"></div>
-      <DependenciesPieChart data={dependencyCountByscanner} />
-    </div> */}
-      </div>
+      </Section>
     </Page>
   );
 };

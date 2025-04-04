@@ -1,19 +1,16 @@
+import {
+  CheckBadgeIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
 import { EllipsisVerticalIcon } from "lucide-react";
-import React, { FunctionComponent, useMemo } from "react";
-import ListItem from "./common/ListItem";
-import { buttonVariants } from "./ui/button";
-import { AssetDTO, PolicyEvaluation, RiskDistribution } from "../types/api/api";
+import Link from "next/link";
+import { FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
+import { AssetDTO, PolicyEvaluation, RiskDistribution } from "../types/api/api";
+import { classNames } from "../utils/common";
 import { Badge } from "./ui/badge";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import Link from "next/link";
+import { buttonVariants } from "./ui/button";
 import {
   Card,
   CardContent,
@@ -21,14 +18,12 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import ComplianceGrid from "./ComplianceGrid";
-import SeverityCard, { SeverityStats } from "./SeverityCard";
 import {
-  CheckBadgeIcon,
-  ExclamationCircleIcon,
-  ScaleIcon,
-} from "@heroicons/react/24/outline";
-import { classNames } from "../utils/common";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 interface Props {
   asset: AssetDTO & {
@@ -53,7 +48,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
       key={asset.id}
       href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
     >
-      <Card>
+      <Card className="transition-all hover:bg-accent">
         <CardHeader>
           <CardTitle className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-4">
@@ -106,8 +101,8 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
               : "No asset description..."}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-4">
+        {/*<CardContent>
+         <div className="grid grid-cols-4 gap-4">
             <div className={classNames("text-sm text-muted-foreground")}>
               <Badge className="mr-2 bg-red-700 text-white">
                 {asset.stats.riskDistribution.critical ?? 0}
@@ -117,7 +112,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
               </span>
             </div>
             <div className="text-sm text-muted-foreground">
-              <Badge className="mr-2 bg-orange-500">
+              <Badge className="mr-2 bg-red-500 text-white">
                 {asset.stats.riskDistribution.high ?? 0}
               </Badge>
               <span className="font-semibold">
@@ -126,7 +121,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
             </div>
 
             <div className={classNames("text-sm text-muted-foreground")}>
-              <Badge className="mr-2 bg-yellow-500">
+              <Badge className="mr-2 bg-orange-500 text-white">
                 {asset.stats.riskDistribution.medium ?? 0}
               </Badge>
               <span className="font-semibold">
@@ -144,6 +139,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
             </div>
           </div>
         </CardContent>
+        */}
       </Card>
     </Link>
   );

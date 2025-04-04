@@ -268,13 +268,13 @@ const Index: FunctionComponent<Props> = ({
             </CardContent>
           </Card>
           <SeverityCard
-            title="Critical Severity"
+            variant="critical"
             queryIntervalStart={8}
             amountByRisk={riskDistribution.critical}
             amountByCVSS={cvssDistribution.critical}
           />
           <SeverityCard
-            title="High Severity"
+            variant="high"
             queryIntervalStart={7}
             amountByRisk={riskDistribution.high}
             amountByCVSS={cvssDistribution.high}
@@ -337,13 +337,13 @@ const Index: FunctionComponent<Props> = ({
             </CardContent>
           </Card>
           <SeverityCard
-            title="Medium Severity"
+            variant="medium"
             queryIntervalStart={4}
             amountByRisk={riskDistribution.medium}
             amountByCVSS={cvssDistribution.medium}
           />
           <SeverityCard
-            title="Low Severity"
+            variant="low"
             queryIntervalStart={0}
             amountByRisk={riskDistribution.low}
             amountByCVSS={cvssDistribution.low}

@@ -32,7 +32,7 @@ export const useProjectMenu = () => {
   const menu = [
     {
       title: "Subprojects & Assets",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/assets",
+      href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
     },
   ];
