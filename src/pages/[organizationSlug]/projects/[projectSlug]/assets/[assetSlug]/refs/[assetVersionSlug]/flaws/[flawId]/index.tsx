@@ -460,6 +460,44 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </div>
                                 </Button>
                               )}
+
+                            {flaw.ticketId !== null &&
+                              flaw.ticketState !== "open" &&
+                              getRepositoryId(asset, project)?.startsWith(
+                                "gitlab:",
+                              ) && (
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => {
+                                    handleSubmit({
+                                      status:
+                                        flaw.ticketState === "closed"
+                                          ? "reopened"
+                                          : flaw.ticketState === "deleted"
+                                            ? "mitigate"
+                                            : undefined,
+                                      justification,
+                                    });
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <Image
+                                        alt="GitLab Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2"
+                                        src={"/assets/gitlab.svg"}
+                                      />
+                                      {flaw.ticketState === "closed" &&
+                                        "Reopen GitLab Ticket"}
+                                      {flaw.ticketState === "deleted" &&
+                                        "Create GitLab Ticket"}
+                                    </div>
+                                  </div>
+                                </Button>
+                              )}
+
                             {flaw.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
@@ -483,6 +521,43 @@ const Index: FunctionComponent<Props> = (props) => {
                                         src={"/assets/github.svg"}
                                       />
                                       Create GitHub Ticket
+                                    </div>
+                                  </div>
+                                </Button>
+                              )}
+
+                            {flaw.ticketId !== null &&
+                              flaw.ticketState !== "open" &&
+                              getRepositoryId(asset, project)?.startsWith(
+                                "github:",
+                              ) && (
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => {
+                                    handleSubmit({
+                                      status:
+                                        flaw.ticketState === "closed"
+                                          ? "reopened"
+                                          : flaw.ticketState === "deleted"
+                                            ? "mitigate"
+                                            : undefined,
+                                      justification,
+                                    });
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <Image
+                                        alt="GitLab Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2 dark:invert"
+                                        src={"/assets/github.svg"}
+                                      />
+                                      {flaw.ticketState === "closed" &&
+                                        "Reopen GitHub Ticket"}
+                                      {flaw.ticketState === "deleted" &&
+                                        "Create GitHab Ticket"}
                                     </div>
                                   </div>
                                 </Button>
@@ -564,7 +639,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </form>
                     )}
-                    {flaw.ticketUrl && (
+                    {flaw.ticketUrl && flaw.ticketState === "open" && (
                       <small className="mt-2 block w-full text-right text-muted-foreground">
                         Comment will be synced with{" "}
                         <Link href={flaw.ticketUrl} target="_blank">
