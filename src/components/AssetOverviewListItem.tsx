@@ -63,7 +63,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
                   <div className="flex flex-row items-center gap-2">
                     <Badge variant={"danger"}>
                       <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
-                      <span className="pl-2 text-sm">
+                      <span className="pl-2">
                         {failingControls.length}/{asset.stats.compliance.length}{" "}
                         controls are failing
                       </span>

@@ -168,7 +168,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                   <ListItem
                     reactOnHover
                     Title={project.name}
-                    description={
+                    Description={
                       <span>
                         {project.description}
                         {project.type !== "default" && (

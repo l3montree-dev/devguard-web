@@ -249,10 +249,9 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               >
                 <ListItem
                   reactOnHover
-                  Title={subproject.name}
-                  description={
+                  Title={
                     <div className="flex flex-row gap-2">
-                      {subproject.description}
+                      <span>{subproject.name}</span>
                       <Badge variant={"outline"}>Subproject</Badge>
                       {subproject.type === "kubernetesNamespace" && (
                         <Badge variant={"outline"}>
@@ -268,6 +267,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                       )}
                     </div>
                   }
+                  Description={<div>{subproject.description}</div>}
                   Button={
                     <DropdownMenu>
                       <DropdownMenuTrigger
