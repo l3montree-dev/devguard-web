@@ -1,5 +1,3 @@
-import Page from "@/components/Page";
-
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -12,7 +10,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useRef, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -44,14 +42,38 @@ import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { buttonVariants } from "../../../../../../../../../components/ui/button";
+import {
+  Button,
+  buttonVariants,
+} from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 import DateString from "../../../../../../../../../components/common/DateString";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
+import { Label } from "@radix-ui/react-label";
+import DependencyDialog from "./dependencyDialog";
+import Page from "@/components/Page";
 
 interface Props {
   components: Paged<ComponentPaged>;
   licenses: Record<string, number>;
+}
+
+interface Dictionary {
+  details: string[];
+  name: string;
+  reason: string;
+  score: number;
+  url: string;
+  shortDescription: string;
 }
 
 const columnHelper = createColumnHelper<ComponentPaged>();
@@ -150,11 +172,33 @@ const osiLicenseColors: Record<string, string> = {
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const [open, setOpen] = useState(false);
+  const [datasets, setDatasets] = useState<Record<string, Dictionary>>({});
 
   const { table } = useTable({
     data: components.data,
     columnsDef,
   });
+
+  function dataPassthrough(data: any) {
+    console.log(data);
+
+    setOpen(true);
+
+    setDatasets({
+      purl: data.dependency.purl,
+      // purl2: data.dependencyPurl,
+      details: data.dependency.project?.scoreCard.checks[0].details,
+      name: data.dependency.project?.scoreCard.checks[0].name,
+      reason: data.dependency.project?.scoreCard.checks[0].reason,
+      score: data.dependency.project?.scoreCard.checks[0].score,
+      url: data.dependency.project?.scoreCard.checks[0].documentation.url,
+      shortDescription:
+        data.dependency.project?.scoreCard.checks[0].documentation
+          .shortDescription,
+    });
+  }
+
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -267,8 +311,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
+                  onClick={() => dataPassthrough(row.original)}
                   className={classNames(
-                    "relative cursor-pointer bg-background align-top transition-all",
+                    "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                   )}
@@ -289,6 +334,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         </div>
         <CustomPagination {...components} />
       </Section>
+      <DependencyDialog
+        open={open}
+        setOpen={setOpen}
+        data={datasets}
+      ></DependencyDialog>
     </Page>
   );
 };
