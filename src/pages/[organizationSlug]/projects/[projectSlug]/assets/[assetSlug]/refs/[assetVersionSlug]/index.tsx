@@ -31,7 +31,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../../../../../components/ui/card";
-import { classNames } from "../../../../../../../../utils/common";
 
 import {
   CheckBadgeIcon,
@@ -41,6 +40,7 @@ import {
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { Pie, PieChart } from "recharts";
+import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
 import {
@@ -54,40 +54,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../../../../../../../../components/ui/tooltip";
+import { fetchAssetStats } from "../../../../../../../../services/statService";
+import {
+  PolicyEvaluation,
+  RiskDistribution,
+} from "../../../../../../../../types/api/api";
 import { osiLicenseHexColors } from "../../../../../../../../utils/view";
 
-interface PolicyEvaluation {
-  result: boolean | null;
-  title: string;
-  description: string;
-  tags: Array<string>;
-  relatedResources: Array<string>;
-  complianceFrameworks: Array<string>;
-  priority: number;
-}
 interface Props {
-  compliance: Record<string, Array<PolicyEvaluation>>;
-  riskDistribution: Record<string, number>;
-  cvssDistribution: Record<string, number>;
+  compliance: Array<PolicyEvaluation>;
+  riskDistribution: RiskDistribution;
+  cvssDistribution: RiskDistribution;
   licenses: Record<string, number>;
 }
-
-const selectedCompliance = "ISO 27001";
-
-const fakePolicyGenerator = (count: number) => {
-  const policies = [];
-  for (let i = 0; i < count; i++) {
-    policies.push({
-      result: null,
-      title: `Policy ${i}`,
-      description: `Description ${i}`,
-      tags: ["tag1", "tag2"],
-      relatedResources: ["resource1", "resource2"],
-      complianceFrameworks: ["iso27001"],
-    });
-  }
-  return policies;
-};
 
 const Index: FunctionComponent<Props> = ({
   compliance,
@@ -128,17 +107,14 @@ const Index: FunctionComponent<Props> = ({
 
   const controlsPassing = useMemo(
     () =>
-      compliance[selectedCompliance].reduce((acc, policy) => {
+      compliance.reduce((acc, policy) => {
         return acc + (policy.result ? 1 : 0);
       }, 0),
     [compliance],
   );
 
   const failingControls = useMemo(
-    () =>
-      compliance[selectedCompliance].filter(
-        (policy) => policy.result === false,
-      ),
+    () => compliance.filter((policy) => policy.result === false),
     [compliance],
   );
 
@@ -288,47 +264,20 @@ const Index: FunctionComponent<Props> = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid-cols-25 grid gap-1">
-                {compliance[selectedCompliance].map((policy) => (
-                  <div
-                    className={classNames(
-                      "aspect-square rounded-sm",
-                      Boolean(policy.result)
-                        ? " bg-green-500 shadow-green-400 drop-shadow"
-                        : "border border-gray-500/30 bg-gray-500/20",
-                    )}
-                    key={policy.title}
-                  ></div>
-                ))}
-              </div>
-              <div className="mt-2">
-                <span className="text-sm">
-                  {controlsPassing}{" "}
-                  <span className="text-muted-foreground">
-                    / {compliance[selectedCompliance].length} Controls are
-                    passing (
-                    {(
-                      (controlsPassing /
-                        compliance[selectedCompliance].length) *
-                      100
-                    ).toFixed(1)}{" "}
-                    %)
-                  </span>
-                </span>
-              </div>
+              <ComplianceGrid compliance={compliance} />
             </CardContent>
           </Card>
           <SeverityCard
             title="Critical Severity"
             queryIntervalStart={8}
-            amountByRisk={riskDistribution["critical"]}
-            amountByCVSS={cvssDistribution["critical"]}
+            amountByRisk={riskDistribution.critical}
+            amountByCVSS={cvssDistribution.critical}
           />
           <SeverityCard
             title="High Severity"
             queryIntervalStart={7}
-            amountByRisk={riskDistribution["high"]}
-            amountByCVSS={cvssDistribution["high"]}
+            amountByRisk={riskDistribution.high}
+            amountByCVSS={cvssDistribution.high}
           />
           <Card className="col-span-4 row-span-2 flex flex-col">
             <CardHeader className="items-center pb-0">
@@ -390,14 +339,14 @@ const Index: FunctionComponent<Props> = ({
           <SeverityCard
             title="Medium Severity"
             queryIntervalStart={4}
-            amountByRisk={riskDistribution["medium"]}
-            amountByCVSS={cvssDistribution["medium"]}
+            amountByRisk={riskDistribution.medium}
+            amountByCVSS={cvssDistribution.medium}
           />
           <SeverityCard
             title="Low Severity"
             queryIntervalStart={0}
-            amountByRisk={riskDistribution["low"]}
-            amountByCVSS={cvssDistribution["low"]}
+            amountByRisk={riskDistribution.low}
+            amountByCVSS={cvssDistribution.low}
           />
         </div>
       </Section>
@@ -413,40 +362,17 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/";
-    const [compliance, riskDistribution, cvssDistribution, licenses] =
-      await Promise.all([
-        apiClient(url + "compliance").then((r) => r.json()),
-        apiClient(url + "stats/risk-distribution").then((r) => r.json()),
-        apiClient(url + "stats/cvss-distribution").then((r) => r.json()),
-        apiClient(url + "components/licenses").then((r) => r.json()),
-      ]);
-
-    // group by compliance framework
-    const complianceByFramework: Record<string, Array<PolicyEvaluation>> = {};
-    compliance
-      //.concat(fakePolicyGenerator(90))
-      .forEach((policy: PolicyEvaluation) => {
-        policy.complianceFrameworks.forEach((framework) => {
-          if (!complianceByFramework[framework]) {
-            complianceByFramework[framework] = [];
-          }
-          complianceByFramework[framework].push(policy);
-        });
+    const { compliance, riskDistribution, cvssDistribution, licenses } =
+      await fetchAssetStats({
+        organizationSlug: organizationSlug as string,
+        projectSlug: projectSlug as string,
+        assetSlug: assetSlug as string,
+        assetVersionSlug: assetVersionSlug as string,
+        apiClient,
       });
-
     return {
       props: {
-        compliance: complianceByFramework,
+        compliance,
         riskDistribution,
         cvssDistribution,
         licenses,

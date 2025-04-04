@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ProjectDTO } from "@/types/api/api";
+import { AssetDTO, ProjectDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
@@ -39,6 +39,8 @@ export async function withProject(ctx: GetServerSidePropsContext) {
     });
   }
   // parse the organization
-  const project: ProjectDTO = await r.json();
+  const project: ProjectDTO & {
+    assets: Array<AssetDTO>;
+  } = await r.json();
   return project;
 }

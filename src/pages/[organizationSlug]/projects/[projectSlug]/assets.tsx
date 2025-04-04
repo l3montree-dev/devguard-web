@@ -1,10 +1,3 @@
-import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
-import { useForm } from "react-hook-form";
-import Page from "../../../../components/Page";
-import ListItem from "../../../../components/common/ListItem";
-import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,11 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
+import { GetServerSidePropsContext } from "next";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
+import Page from "../../../../components/Page";
+import ListItem from "../../../../components/common/ListItem";
 
-import AssetForm, {
-  AssetFormValues,
-  EnableTicketRange,
-} from "@/components/asset/AssetForm";
+import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -31,6 +28,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
@@ -38,35 +36,46 @@ import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { toast } from "sonner";
 import z from "zod";
+import CopyCode from "../../../../components/common/CopyCode";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
+import { ProjectForm } from "../../../../components/project/ProjectForm";
+import PatSection from "../../../../components/risk-identification/PatSection";
+import Steps from "../../../../components/risk-identification/Steps";
+import { config } from "../../../../config";
 import { withOrgs } from "../../../../decorators/withOrgs";
+import { withProject } from "../../../../decorators/withProject";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
+import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
 import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/devGuardApi";
+import { fetchAssetStats } from "../../../../services/statService";
 import {
   AssetDTO,
   EnvDTO,
+  PolicyEvaluation,
   ProjectDTO,
   RequirementsLevel,
+  RiskDistribution,
 } from "../../../../types/api/api";
-import { withContentTree } from "@/decorators/withContentTree";
-import { ProjectForm } from "../../../../components/project/ProjectForm";
-import { withProject } from "../../../../decorators/withProject";
-import ProjectTitle from "../../../../components/common/ProjectTitle";
-import Steps from "../../../../components/risk-identification/Steps";
-import CopyCode from "../../../../components/common/CopyCode";
-import PatSection from "../../../../components/risk-identification/PatSection";
-import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
-import { config } from "../../../../config";
-import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
-import { Modify } from "@/types/common";
+import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
+  assets: Array<
+    AssetDTO & {
+      stats: {
+        compliance: Array<PolicyEvaluation>;
+        licenses: Record<string, number>;
+        riskDistribution: RiskDistribution;
+        cvssDistribution: RiskDistribution;
+      };
+    }
+  >;
   subprojects: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
@@ -84,7 +93,7 @@ const formSchema = z.object({
   availabilityRequirement: z.string(),
 });
 
-const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
+const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
@@ -174,7 +183,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {project.assets.length === 0 && subprojects.length === 0 ? (
+        {assets.length === 0 && subprojects.length === 0 ? (
           <EmptyList
             title="Your Assets will show up here!"
             description="You can understand assets as a software project. An asset is a
@@ -282,81 +291,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects }) => {
                 />
               </Link>
             ))}
-            {project.assets.map((asset) => (
-              <Link
-                key={asset.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
-                className="flex flex-col gap-2 hover:no-underline"
-              >
-                <ListItem
-                  reactOnHover
-                  key={asset.id}
-                  Title={asset.name}
-                  description={
-                    <div>
-                      {asset.description}{" "}
-                      <div className="mt-2 flex flex-row gap-2">
-                        {project.type === "kubernetesNamespace" && (
-                          <Badge variant={"outline"}>
-                            <Image
-                              alt="Kubernetes logo"
-                              src="/assets/kubernetes.svg"
-                              className="-ml-1.5 mr-2"
-                              width={16}
-                              height={16}
-                            />
-                            Kubernetes Workload
-                          </Badge>
-                        )}
-                        {asset.lastSecretScan && (
-                          <Badge variant={"outline"}>Secret-Scanning</Badge>
-                        )}
-                        {asset.lastSastScan && (
-                          <Badge variant={"outline"}>
-                            Static-Application-Security-Testing
-                          </Badge>
-                        )}
-                        {asset.lastScaScan && (
-                          <Badge variant={"outline"}>
-                            Software Composition Analysis
-                          </Badge>
-                        )}
-                        {asset.lastIacScan && (
-                          <Badge variant={"outline"}>
-                            Infrastructure-as-Code-Scanning
-                          </Badge>
-                        )}
-                        {asset.lastContainerScan && (
-                          <Badge variant={"outline"}>Container-Scanning</Badge>
-                        )}
-                        {asset.lastDastScan && (
-                          <Badge variant={"outline"}>Dynamic-Analysis</Badge>
-                        )}
-                      </div>
-                    </div>
-                  }
-                  Button={
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className={buttonVariants({
-                          variant: "outline",
-                          size: "icon",
-                        })}
-                      >
-                        <EllipsisVerticalIcon className="h-5 w-5" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <Link
-                          className="!text-foreground hover:no-underline"
-                          href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
-                        >
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                        </Link>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  }
-                />
-              </Link>
+            {assets.map((asset) => (
+              <AssetOverviewListItem asset={asset} key={asset.id} />
             ))}
           </Section>
         )}
@@ -462,11 +398,32 @@ export const getServerSideProps = middleware(
     const { organizationSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
 
-    const resp = await apiClient(
-      "/organizations/" + organizationSlug + "/projects?parentId=" + project.id,
-    );
+    const [subprojects, assets] = await Promise.all([
+      apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects?parentId=" +
+          project.id,
+      ).then((r) => r.json()),
+      // fetch the stats for all assets
+      await Promise.all(
+        project.assets.map(async (asset) => {
+          const stats = await fetchAssetStats({
+            apiClient,
+            assetSlug: asset.slug,
+            projectSlug: project.slug,
+            organizationSlug: organizationSlug as string,
+          });
 
-    const subprojects = await resp.json();
+          return {
+            ...asset,
+            stats,
+          };
+        }),
+      ),
+    ]);
+
+    // get the stats for all assets
 
     return {
       props: {
@@ -475,6 +432,7 @@ export const getServerSideProps = middleware(
         },
         subprojects,
         project,
+        assets,
       },
     };
   },

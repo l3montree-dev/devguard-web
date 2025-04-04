@@ -13,12 +13,40 @@ import {
 } from "./ui/card";
 import { FunctionComponent } from "react";
 
+export const SeverityStats = ({
+  amountByRisk,
+  amountByCVSS,
+  title,
+}: {
+  amountByRisk: number;
+  amountByCVSS: number;
+  title: string;
+}) => {
+  return (
+    <div className="flex flex-col">
+      <div className={classNames("flex flex-col", "text-muted-foreground")}>
+        <span className={classNames("text-4xl font-bold")}>
+          {amountByRisk ?? 0}
+        </span>
+      </div>
+
+      <div className={classNames("text-xs text-muted-foreground")}>
+        <span>By CVSS you would have</span>
+        <span className={classNames("inline px-1 font-bold")}>
+          {amountByCVSS ?? 0}
+        </span>
+        {title.toLowerCase()} vulnerabilities
+      </div>
+    </div>
+  );
+};
 interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
   title: string;
 }
+
 const SeverityCard: FunctionComponent<Props> = ({
   amountByRisk,
   amountByCVSS,
@@ -49,21 +77,11 @@ const SeverityCard: FunctionComponent<Props> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col">
-          <div className={classNames("flex flex-col", "text-muted-foreground")}>
-            <span className={classNames("text-4xl font-bold")}>
-              {amountByRisk ?? 0}
-            </span>
-          </div>
-
-          <div className={classNames("text-xs text-muted-foreground")}>
-            <span>By CVSS you would have</span>
-            <span className={classNames("inline px-1 font-bold")}>
-              {amountByCVSS ?? 0}
-            </span>
-            {title.toLowerCase()} vulnerabilities
-          </div>
-        </div>
+        <SeverityStats
+          amountByRisk={amountByRisk}
+          amountByCVSS={amountByCVSS}
+          title={title}
+        />
       </CardContent>
     </Card>
   );
