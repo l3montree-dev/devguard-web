@@ -462,6 +462,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               )}
 
                             {flaw.ticketId !== null &&
+                              flaw.ticketState !== "open" &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
                               ) && (
@@ -469,7 +470,12 @@ const Index: FunctionComponent<Props> = (props) => {
                                   variant={"secondary"}
                                   onClick={() => {
                                     handleSubmit({
-                                      status: "mitigate",
+                                      status:
+                                        flaw.ticketState === "closed"
+                                          ? "reopened"
+                                          : flaw.ticketState === "deleted"
+                                            ? "mitigate"
+                                            : undefined,
                                       justification,
                                     });
                                   }}
@@ -521,6 +527,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               )}
 
                             {flaw.ticketId !== null &&
+                              flaw.ticketState !== "open" &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
                               ) && (
@@ -528,7 +535,12 @@ const Index: FunctionComponent<Props> = (props) => {
                                   variant={"secondary"}
                                   onClick={() => {
                                     handleSubmit({
-                                      status: "mitigate",
+                                      status:
+                                        flaw.ticketState === "closed"
+                                          ? "reopened"
+                                          : flaw.ticketState === "deleted"
+                                            ? "mitigate"
+                                            : undefined,
                                       justification,
                                     });
                                   }}
