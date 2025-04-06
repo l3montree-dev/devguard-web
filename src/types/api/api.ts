@@ -405,14 +405,18 @@ export interface ComponentRisk {
 }
 
 export interface License {
-  reference: string;
-  isDeprecatedLicenseId: boolean;
-  detailsUrl: string;
-  referenceNumber: number;
+  reference?: string;
+  isDeprecatedLicenseId?: boolean;
+  detailsUrl?: string;
+  referenceNumber?: number;
   name: string;
   licenseId: string;
   seeAlso: string[];
   isOsiApproved: boolean;
+}
+
+export interface LicenseResponse {
+  license: License;
   count: number;
 }
 

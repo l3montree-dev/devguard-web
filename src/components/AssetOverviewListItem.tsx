@@ -64,7 +64,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
               ) : (
                 <div className="flex flex-row items-center gap-2">
                   <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <CheckBadgeIcon className="-ml-2 h-5 w-5 text-green-500" />
                     <span className="pl-2 text-sm">
                       All controls are passing
                     </span>
