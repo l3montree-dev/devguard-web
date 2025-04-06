@@ -39,16 +39,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { Pie, PieChart } from "recharts";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "../../../../../../../../components/ui/chart";
+import { ChartConfig } from "../../../../../../../../components/ui/chart";
 import {
   Tooltip,
   TooltipContent,
@@ -57,17 +51,16 @@ import {
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
   License,
+  LicenseResponse,
   PolicyEvaluation,
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
-import { osiLicenseHexColors } from "../../../../../../../../utils/view";
-import { classNames } from "../../../../../../../../utils/common";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
-  licenses: Array<License>;
+  licenses: Array<LicenseResponse>;
 }
 
 const Index: FunctionComponent<Props> = ({
@@ -289,7 +282,7 @@ const Index: FunctionComponent<Props> = ({
             </CardHeader>
             <CardContent>
               <div className="flex  flex-col">
-                {licenses.map((license, i, arr) => (
+                {licenses.map((el, i, arr) => (
                   <div
                     className={
                       i === 0
@@ -298,14 +291,12 @@ const Index: FunctionComponent<Props> = ({
                           ? "pt-4"
                           : "border-b py-4"
                     }
-                    key={license.licenseId}
+                    key={el.license.licenseId}
                   >
                     <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                      {license.licenseId
-                        ? license.licenseId
-                        : "Unknown license"}
+                      <span className="capitalize">{el.license.licenseId}</span>
                       <div className="flex flex-row flex-wrap gap-2">
-                        {license.isOsiApproved && (
+                        {el.license.isOsiApproved && (
                           <Badge variant={"secondary"}>
                             <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
                             OSI Approved
@@ -314,10 +305,10 @@ const Index: FunctionComponent<Props> = ({
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {license.name
-                        ? license.name
+                      {el.license.name
+                        ? el.license.name
                         : "Unknown license information"}
-                      , {license.count} dependencies
+                      , {el.count} dependencies
                     </p>
                   </div>
                 ))}

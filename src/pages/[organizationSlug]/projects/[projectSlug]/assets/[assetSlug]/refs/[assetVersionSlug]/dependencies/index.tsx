@@ -26,7 +26,12 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
-import { ComponentPaged, License, Paged } from "@/types/api/api";
+import {
+  ComponentPaged,
+  License,
+  LicenseResponse,
+  Paged,
+} from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
 import {
@@ -58,15 +63,18 @@ import {
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
-  components: Paged<ComponentPaged & { license: License }>;
-  licenses: License[];
+  components: Paged<ComponentPaged & { license: LicenseResponse }>;
+  licenses: LicenseResponse[];
 }
 
 const columnHelper = createColumnHelper<
-  ComponentPaged & { license: License }
+  ComponentPaged & { license: LicenseResponse }
 >();
 
-const columnsDef: ColumnDef<ComponentPaged & { license: License }, any>[] = [
+const columnsDef: ColumnDef<
+  ComponentPaged & { license: LicenseResponse },
+  any
+>[] = [
   columnHelper.accessor("dependencyPurl", {
     header: "Package",
     id: "dependency_purl",
@@ -88,7 +96,7 @@ const columnsDef: ColumnDef<ComponentPaged & { license: License }, any>[] = [
     id: "Dependency.license",
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
-        <Badge variant={"outline"}>
+        <Badge className="capitalize" variant={"outline"}>
           <ExclamationTriangleIcon
             className={"mr-1 h-4 w-4 text-muted-foreground"}
           />
@@ -206,9 +214,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           <span className="text-xs text-muted-foreground">Licenses</span>
           <span>
             <span className="flex flex-row overflow-hidden rounded-full">
-              {licenseToPercentMapEntries.map(([license, percent], i, arr) => (
+              {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
                 <span
-                  key={license.licenseId}
+                  key={el.license.licenseId}
                   className={classNames(
                     "h-2",
                     i === arr.length - 1 ? "" : "border-r",
@@ -216,27 +224,27 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                   style={{
                     width: percent + "%",
                     backgroundColor:
-                      osiLicenseHexColors[license.licenseId] || "#eeeeee",
+                      osiLicenseHexColors[el.license.licenseId] || "#eeeeee",
                   }}
                 />
               ))}
             </span>
             <span className="mt-2 flex flex-row flex-wrap gap-2">
-              {licenseToPercentMapEntries.map(([license, percent]) => (
+              {licenseToPercentMapEntries.map(([el, percent]) => (
                 <span
-                  className="whitespace-nowrap text-xs"
-                  key={license.licenseId}
+                  className="whitespace-nowrap text-xs capitalize"
+                  key={el.license.licenseId}
                 >
                   <span
                     style={{
                       backgroundColor:
-                        osiLicenseHexColors[license.licenseId] ?? "#eeeeee",
+                        osiLicenseHexColors[el.license.licenseId] ?? "#eeeeee",
                     }}
                     className={classNames(
-                      "mr-1 inline-block h-2 w-2 rounded-full text-xs",
+                      "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
                     )}
                   />
-                  {license.licenseId ? license.licenseId : "Unknown"}{" "}
+                  {el.license.licenseId}{" "}
                   <span className="text-muted-foreground">
                     {Math.round(percent as number)}%
                   </span>
@@ -349,14 +357,14 @@ export const getServerSideProps = middleware(
         Paged<ComponentPaged>
       >,
       apiClient(url + "/licenses?" + params.toString()).then(
-        (r) => r.json() as Promise<License[]>,
+        (r) => r.json() as Promise<LicenseResponse[]>,
       ),
     ]);
 
     const licenseMap = licenses.reduce(
       (acc, curr) => ({
         ...acc,
-        [curr.licenseId]: curr,
+        [curr.license.licenseId]: curr.license,
       }),
       {} as Record<string, License>,
     );
@@ -365,7 +373,7 @@ export const getServerSideProps = middleware(
       ...component,
       license: licenseMap[component.dependency.license ?? ""] ?? {
         licenseId: "unknown",
-        name: "Unknown",
+        name: "unknown",
         count: 0,
       },
     }));
