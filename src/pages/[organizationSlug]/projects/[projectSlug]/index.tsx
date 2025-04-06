@@ -411,14 +411,14 @@ export const getServerSideProps = middleware(
             "/assets/" +
             asset.slug;
 
-          const compliance = await apiClient(url + "/compliance").then((r) =>
+          const compliance = (await apiClient(url + "/compliance").then((r) =>
             r.json(),
-          );
+          )) as PolicyEvaluation[] | null;
 
           return {
             ...asset,
             stats: {
-              compliance,
+              compliance: compliance ?? [],
             },
           };
         }),

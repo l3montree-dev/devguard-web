@@ -7,17 +7,10 @@ import Link from "next/link";
 import { FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import { AssetDTO, PolicyEvaluation, RiskDistribution } from "../types/api/api";
-import { classNames } from "../utils/common";
+import { AssetDTO, PolicyEvaluation } from "../types/api/api";
+import ListItem from "./common/ListItem";
 import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,98 +38,54 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
       key={asset.id}
       href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
     >
-      <Card className="transition-all hover:bg-accent">
-        <CardHeader>
-          <CardTitle className="flex flex-row items-center justify-between">
-            <div className="flex flex-row items-center gap-4">
-              {asset.name}
-
-              {failingControls.length > 0 ? (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"danger"}>
-                    <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
-                    <span className="pl-2">
-                      {failingControls.length}/{asset.stats.compliance.length}{" "}
-                      controls are failing
-                    </span>
-                  </Badge>
-                </div>
-              ) : (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-5 w-5 text-green-500" />
-                    <span className="pl-2 text-sm">
-                      All controls are passing
-                    </span>
-                  </Badge>
-                </div>
-              )}
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "icon",
-                })}
+      <ListItem
+        reactOnHover
+        Description={asset.description}
+        Button={
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={buttonVariants({
+                variant: "outline",
+                size: "icon",
+              })}
+            >
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                className="!text-foreground hover:no-underline"
+                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
               >
-                <EllipsisVerticalIcon className="h-5 w-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Link
-                  className="!text-foreground hover:no-underline"
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
-                >
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </CardTitle>
-          <CardDescription>
-            {Boolean(asset.description)
-              ? asset.description
-              : "No asset description..."}
-          </CardDescription>
-        </CardHeader>
-        {/*<CardContent>
-         <div className="grid grid-cols-4 gap-4">
-            <div className={classNames("text-sm text-muted-foreground")}>
-              <Badge className="mr-2 bg-red-700 text-white">
-                {asset.stats.riskDistribution.critical ?? 0}
-              </Badge>
-              <span className="font-semibold">
-                Critical severity vulnerabilities
-              </span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <Badge className="mr-2 bg-red-500 text-white">
-                {asset.stats.riskDistribution.high ?? 0}
-              </Badge>
-              <span className="font-semibold">
-                High severity vulnerabilities
-              </span>
-            </div>
+                <DropdownMenuItem>Edit</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+        Title={
+          <div className="flex flex-row items-center gap-4">
+            {asset.name}
 
-            <div className={classNames("text-sm text-muted-foreground")}>
-              <Badge className="mr-2 bg-orange-500 text-white">
-                {asset.stats.riskDistribution.medium ?? 0}
-              </Badge>
-              <span className="font-semibold">
-                Medium severity vulnerabilities
-              </span>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              <Badge className="mr-2 bg-blue-500 text-white">
-                {asset.stats.riskDistribution.low ?? 0}
-              </Badge>
-              <span className="font-semibold">
-                Low severity vulnerabilities
-              </span>
-            </div>
+            {failingControls.length > 0 ? (
+              <div className="flex flex-row items-center gap-2">
+                <Badge variant={"danger"}>
+                  <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
+                  <span className="pl-2">
+                    {failingControls.length}/{asset.stats.compliance.length}{" "}
+                    controls are failing
+                  </span>
+                </Badge>
+              </div>
+            ) : (
+              <div className="flex flex-row items-center gap-2">
+                <Badge variant={"success"}>
+                  <CheckBadgeIcon className="-ml-2 h-5 w-5 text-green-500" />
+                  <span className="pl-2 ">All controls are passing</span>
+                </Badge>
+              </div>
+            )}
           </div>
-        </CardContent>
-        */}
-      </Card>
+        }
+      />
     </Link>
   );
 };

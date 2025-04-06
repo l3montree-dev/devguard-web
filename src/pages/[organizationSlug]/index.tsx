@@ -113,7 +113,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
     <Page
       Title={
         <Link
-          href={`/${activeOrg.slug}/projects`}
+          href={`/${activeOrg.slug}`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
           {activeOrg.name}{" "}
@@ -262,6 +262,7 @@ export const getServerSideProps = middleware(
         const resp = await apiClient(
           `/organizations/${slug}/projects/${project.slug}/compliance`,
         );
+
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
         const compliantAssets = stats.filter((asset) =>
@@ -274,8 +275,10 @@ export const getServerSideProps = middleware(
             compliantAssets: compliantAssets.length,
             totalAssets: stats.length,
             passingControlsPercentage:
-              stats.flat(1).filter((r) => r.result).length /
-              stats.flat(1).length,
+              stats.flat(1).length === 0
+                ? 1 // if no assets, we assume 100% compliance
+                : stats.flat(1).filter((r) => r.result).length /
+                  (stats.flat(1).length || 1),
           },
         };
       }),
