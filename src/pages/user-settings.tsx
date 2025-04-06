@@ -356,7 +356,7 @@ const Settings: FunctionComponent<{
                 <ListItem
                   key={pat.id}
                   Title={pat.description}
-                  description={
+                  Description={
                     <>
                       Scopes: {pat.scopes}
                       <br />

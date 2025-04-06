@@ -27,7 +27,6 @@ import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
 import { FunctionComponent, useState } from "react";
-import CopyCode from "../../../../../../components/common/CopyCode";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
 import { Button } from "../../../../../../components/ui/button";
@@ -46,6 +45,7 @@ import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog"
 
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
 import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
+import PatSection from "@/components/risk-identification/PatSection";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
   Card,
@@ -55,7 +55,6 @@ import {
   CardTitle,
 } from "../../../../../../components/ui/card";
 import { classNames } from "../../../../../../utils/common";
-import PatSection from "@/components/risk-identification/PatSection";
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {

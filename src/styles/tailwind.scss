@@ -120,7 +120,7 @@ pre {
 }
 
 a {
-    @apply dark:text-primary text-blue-600 hover:underline;
+    @apply dark:text-primary text-blue-600;
 }
 
 .dark header a {
@@ -204,6 +204,11 @@ a {
 
 .react-flow__attribution {
     @apply text-xs text-gray-400 dark:bg-black
+}
+
+
+.grid-cols-25 {
+    grid-template-columns: repeat(25, minmax(0, 1fr));
 }
 
 .popover-content-width-same-as-its-trigger {

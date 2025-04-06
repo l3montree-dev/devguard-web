@@ -13,127 +13,110 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { Button, buttonVariants } from "@/components/ui/button";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent } from "react";
+import { useRouter } from "next/router";
+import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import Page from "../../components/Page";
+
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../../services/devGuardApi";
+import { PolicyEvaluation, ProjectDTO } from "../../types/api/api";
+import { CreateProjectReq } from "../../types/api/req";
 
-import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import FlawAggregationState from "@/components/overview/FlawAggregationState";
-import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
-import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
+import ListItem from "@/components/common/ListItem";
+import Section from "@/components/common/Section";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+
+import EmptyList from "@/components/common/EmptyList";
+import { ProjectForm } from "@/components/project/ProjectForm";
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { withOrganization } from "@/decorators/withOrganization";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import {
-  AssetDTO,
-  AverageFixingTime,
-  DependencyCountByscanner,
-  FlawAggregationStateAndChange,
-  FlawCountByScanner,
-  OrganizationDTO,
-  ProjectDTO,
-  RiskDistribution,
-  RiskHistory,
-} from "@/types/api/api";
-import { classNames } from "@/utils/common";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { withContentTree } from "@/decorators/withContentTree";
-import EmptyOverview from "@/components/common/EmptyOverview";
-import { padRiskHistory } from "@/utils/server";
-import { Button } from "../../components/ui/button";
+import { ProjectBadge } from "../../components/common/ProjectTitle";
 
 interface Props {
-  organization: OrganizationDTO & {
-    projects: Array<
-      ProjectDTO & {
-        assets: Array<AssetDTO>;
-      }
-    >;
-  };
-  riskDistribution: RiskDistribution[] | null;
-  riskHistory: Array<{
-    history: RiskHistory[];
-    label: string;
-    slug: string;
-    description: string;
-  }>;
-  flawCountByScanner: FlawCountByScanner;
-  dependencyCountByscanner: DependencyCountByscanner;
-  flawAggregationStateAndChange: FlawAggregationStateAndChange;
-  avgLowFixingTime: AverageFixingTime;
-  avgMediumFixingTime: AverageFixingTime;
-  avgHighFixingTime: AverageFixingTime;
-  avgCriticalFixingTime: AverageFixingTime;
+  projects: Array<
+    ProjectDTO & {
+      stats: {
+        compliantAssets: number;
+        totalAssets: number;
+        passingControlsPercentage: number;
+      };
+    }
+  >;
 }
 
-const Home: FunctionComponent<Props> = ({
-  organization,
-  riskDistribution,
-  riskHistory,
-  flawAggregationStateAndChange,
-  avgLowFixingTime,
-  avgMediumFixingTime,
-  avgHighFixingTime,
-  avgCriticalFixingTime,
-}) => {
+const formSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+
+const Home: FunctionComponent<Props> = ({ projects }) => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const activeOrg = useActiveOrg();
+
+  const form = useForm<ProjectDTO>({
+    mode: "onBlur",
+    resolver: zodResolver(formSchema),
+  });
+
+  const handleCreateProject = async (req: CreateProjectReq) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/projects",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      },
+    );
+    if (resp.ok) {
+      const res: ProjectDTO = await resp.json();
+      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
+    } else {
+      toast("Error", {
+        description: "Could not create project",
+      });
+    }
+  };
+
   const orgMenu = useOrganizationMenu();
 
-  if (riskHistory.length === 0) {
-    return (
-      <Page
-        Title={
-          <Link
-            href={`/${organization.slug}/projects`}
-            className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-          >
-            {organization.name}{" "}
-            <Badge
-              className="font-body font-normal !text-white"
-              variant="outline"
-            >
-              Organization
-            </Badge>
-          </Link>
-        }
-        title={organization.name ?? "Loading..."}
-        Menu={orgMenu}
-      >
-        <EmptyOverview
-          title="No Data Available"
-          description="There is no data available for this organization. Please add a project to get started."
-          Button={
-            <Button
-              onClick={() => {
-                window.location.href = `/${organization.slug}/projects/`;
-              }}
-            >
-              Add Project
-            </Button>
-          }
-        />
-      </Page>
-    );
-  }
   return (
     <Page
       Title={
         <Link
-          href={`/${organization.slug}/projects`}
+          href={`/${activeOrg.slug}/projects`}
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
         >
-          {organization.name}{" "}
+          {activeOrg.name}{" "}
           <Badge
             className="font-body font-normal !text-white"
             variant="outline"
@@ -142,105 +125,120 @@ const Home: FunctionComponent<Props> = ({
           </Badge>
         </Link>
       }
-      title={organization.name ?? "Loading..."}
+      title={activeOrg.name ?? "Loading..."}
       Menu={orgMenu}
     >
-      {" "}
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Overview</h1>
-      </div>
-      <div className="mt-4 grid gap-4">
-        <FlawAggregationState
-          description="The total risk this project poses to the organization"
-          title="Organization Risk"
-          totalRisk={riskHistory
-            .map((r) => r.history[r.history.length - 1])
-            .filter((r) => !!r)
-            .reduce((acc, curr) => acc + curr.sumOpenRisk, 0)}
-          data={flawAggregationStateAndChange}
-        />
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2">
-            <RiskDistributionDiagram data={riskDistribution ?? []} />
-          </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Vulnerable Projects</CardTitle>
-              <CardDescription>
-                The most vulnerable Projects in this organization
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                {riskHistory.slice(0, 5).map((r) => (
-                  <Link
-                    href={organization.slug + "/projects/" + r.slug}
-                    key={r.slug}
-                    className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
-                  >
-                    <div
-                      key={r.label}
-                      className={classNames("flex items-center gap-4")}
-                    >
-                      <Avatar>
-                        <AvatarFallback>{r.label[0]}</AvatarFallback>
-                      </Avatar>
-
-                      <div className="grid ">
-                        <p className="text-sm font-medium leading-none">
-                          {r.label}
-                        </p>
-                        <small className="line-clamp-1 text-ellipsis text-muted-foreground">
-                          {r.description}
-                        </small>
-                      </div>
-                      <div className="ml-auto font-medium">
+      <Dialog open={open}>
+        <DialogContent setOpen={setOpen}>
+          <DialogHeader>
+            <DialogTitle>Create new Project</DialogTitle>
+            <DialogDescription>
+              A project groups multiple software projects (repositories) inside
+              a single enitity. Something like: frontend and backend
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Form {...form}>
+            <form
+              className="space-y-8"
+              onSubmit={form.handleSubmit(handleCreateProject)}
+            >
+              <ProjectForm forceVerticalSections form={form} />
+              <DialogFooter>
+                <Button type="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <div>
+        {projects.length === 0 ? (
+          <EmptyList
+            title="Here you will see all your projects"
+            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
+            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+          />
+        ) : (
+          <Section
+            primaryHeadline
+            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            forceVertical
+            title="Projects"
+          >
+            <div className="flex flex-col gap-2">
+              {projects.map((project) => (
+                <Link
+                  key={project.id}
+                  href={`/${activeOrg.slug}/projects/${project.slug}`}
+                  className="flex flex-col gap-2 hover:no-underline"
+                >
+                  <ListItem
+                    reactOnHover
+                    Title={
+                      <div className="flex flex-row items-center gap-2">
+                        <span>{project.name}</span>
                         <Badge
-                          className="whitespace-nowrap"
-                          variant="secondary"
+                          variant={
+                            project.stats.compliantAssets ===
+                            project.stats.totalAssets
+                              ? "success"
+                              : "danger"
+                          }
+                          className=""
                         >
-                          {" "}
-                          {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
-                            2,
-                          ) ?? "0.00"}{" "}
-                          Risk
+                          {project.stats.compliantAssets}/
+                          {project.stats.totalAssets} assets compliant
+                        </Badge>
+                        <Badge
+                          variant={
+                            project.stats.passingControlsPercentage === 1
+                              ? "success"
+                              : "danger"
+                          }
+                          className=""
+                        >
+                          {Math.round(
+                            project.stats.passingControlsPercentage * 100,
+                          )}
+                          % controls passing
                         </Badge>
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              <div className="flex items-center gap-4"></div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="grid grid-cols-4 gap-4">
-          <AverageFixingTimeChart
-            title="Low severity"
-            description="Average fixing time for low severity vulnerabilities"
-            avgFixingTime={avgLowFixingTime}
-          />
-          <AverageFixingTimeChart
-            title="Medium severity"
-            description="Average fixing time for medium severity vulnerabilities"
-            avgFixingTime={avgMediumFixingTime}
-          />
-          <AverageFixingTimeChart
-            title="High severity"
-            description="Average fixing time for high severity vulnerabilities"
-            avgFixingTime={avgHighFixingTime}
-          />
-          <AverageFixingTimeChart
-            title="Critical severity"
-            description="Average fixing time for critical severity vulnerabilities"
-            avgFixingTime={avgCriticalFixingTime}
-          />
-        </div>
-        <RiskHistoryChart data={riskHistory} />
-        {/* <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2"></div>
-      <DependenciesPieChart data={dependencyCountByscanner} />
-    </div> */}
+                    }
+                    Description={
+                      <span>
+                        {project.description}
+                        {project.type !== "default" && (
+                          <ProjectBadge type={project.type} />
+                        )}
+                      </span>
+                    }
+                    Button={
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "icon",
+                          })}
+                        >
+                          <EllipsisVerticalIcon className="h-5 w-5" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <Link
+                            className="!text-foreground hover:no-underline"
+                            href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                          >
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    }
+                  />
+                </Link>
+              ))}
+            </div>
+          </Section>
+        )}
       </div>
     </Page>
   );
@@ -248,78 +246,44 @@ const Home: FunctionComponent<Props> = ({
 
 export default Home;
 
-const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
-
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { organization }) => {
-    const { organizationSlug } = context.params!;
-
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    const last3Month = new Date();
-    last3Month.setMonth(last3Month.getMonth() - 3);
-
+  async (context: GetServerSidePropsContext) => {
+    // list the projects from the active organization
     const apiClient = getApiClientFromContext(context);
-    const url = "/organizations/" + organizationSlug + "/stats";
-    const [
-      riskDistribution,
-      riskHistory,
-      flawAggregationStateAndChange,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-    ] = await Promise.all([
-      apiClient(url + "/risk-distribution").then((r) => r.json()),
-      apiClient(
-        url +
-          "/risk-history?start=" +
-          extractDateOnly(last3Month) +
-          "&end=" +
-          extractDateOnly(new Date()),
-      ).then(
-        (r) =>
-          r.json() as Promise<
-            Array<{ riskHistory: RiskHistory[]; project: ProjectDTO }>
-          >,
-      ),
-      apiClient(
-        url +
-          "/flaw-aggregation-state-and-change?compareTo=" +
-          lastMonth.toISOString().split("T")[0],
-      ).then((r) => r.json()),
-      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
-        r.json(),
-      ),
-    ]);
 
-    const paddedRiskHistory = padRiskHistory(riskHistory);
+    const slug = context.params?.organizationSlug as string;
+
+    const resp = await apiClient("/organizations/" + slug + "/projects");
+
+    const projects = await resp.json();
+    // fetch all the project stats
+    const projectsWithCompliance = await Promise.all(
+      projects.map(async (project: ProjectDTO) => {
+        const resp = await apiClient(
+          `/organizations/${slug}/projects/${project.slug}/compliance`,
+        );
+        const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
+
+        const compliantAssets = stats.filter((asset) =>
+          asset.every((r) => r.result),
+        );
+
+        return {
+          ...project,
+          stats: {
+            compliantAssets: compliantAssets.length,
+            totalAssets: stats.length,
+            passingControlsPercentage:
+              stats.flat(1).filter((r) => r.result).length /
+              stats.flat(1).length,
+          },
+        };
+      }),
+    );
 
     return {
       props: {
-        organization,
-        riskDistribution,
-        riskHistory: paddedRiskHistory.map((r) => ({
-          label: r.project.name,
-          history: r.riskHistory,
-          slug: r.project.slug,
-          description: r.project.description,
-        })),
-        flawAggregationStateAndChange,
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
+        projects: projectsWithCompliance,
       },
     };
   },

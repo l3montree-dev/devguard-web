@@ -140,21 +140,6 @@ export const useAssetMenu = () => {
         Icon: ShareIcon,
         isActive: router.pathname.includes("dependencies"),
       },
-      {
-        title: "Compliance",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/compliance",
-        Icon: ScaleIcon,
-        isActive: router.pathname.includes("compliance"),
-      },
     ]);
   }
 

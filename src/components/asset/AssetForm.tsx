@@ -75,7 +75,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
       render={({ field }) => (
         <FormItem>
           <ListItem
-            description={
+            Description={
               "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
             }
             Title="Central Flaw Management"
@@ -192,7 +192,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
     render={({ field }) => (
       <FormItem>
         <ListItem
-          description={
+          Description={
             "Is the asset publicly availabe. Does it have a static IP-Address assigned to it or a domain name?"
           }
           Title="Reachable from the internet"
@@ -215,7 +215,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
     render={({ field }) => (
       <FormItem>
         <ListItem
-          description={
+          Description={
             "Enables automatic ticket creation for vulnerabilities exceeding the defined CVSS-BTE and Risk Value thresholds."
           }
           Title="Reporting range"

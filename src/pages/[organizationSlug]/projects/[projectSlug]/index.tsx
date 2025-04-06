@@ -1,317 +1,440 @@
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent } from "react";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { FunctionComponent, useState } from "react";
+import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";
+import ListItem from "../../../../components/common/ListItem";
 
+import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import FlawAggregationState from "@/components/overview/FlawAggregationState";
-import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
-import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import EmptyList from "@/components/common/EmptyList";
+import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
-import { withProject } from "@/decorators/withProject";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
-import { beautifyPurl, classNames } from "@/utils/common";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
+import { toast } from "sonner";
+import z from "zod";
+import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
+import CopyCode from "../../../../components/common/CopyCode";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
+import { ProjectForm } from "../../../../components/project/ProjectForm";
+import PatSection from "../../../../components/risk-identification/PatSection";
+import Steps from "../../../../components/risk-identification/Steps";
+import { config } from "../../../../config";
 import { withOrgs } from "../../../../decorators/withOrgs";
+import { withProject } from "../../../../decorators/withProject";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import { getApiClientFromContext } from "../../../../services/devGuardApi";
+import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../../../../services/devGuardApi";
 import {
   AssetDTO,
-  AverageFixingTime,
-  DependencyCountByscanner,
-  FlawAggregationStateAndChange,
-  FlawCountByScanner,
+  EnvDTO,
+  PolicyEvaluation,
   ProjectDTO,
-  RiskDistribution,
-  RiskHistory,
+  RequirementsLevel,
 } from "../../../../types/api/api";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { withContentTree } from "@/decorators/withContentTree";
-import EmptyOverview from "@/components/common/EmptyOverview";
-import { useRouter } from "next/router";
-import { padRiskHistory } from "@/utils/server";
-import ProjectTitle from "../../../../components/common/ProjectTitle";
-import { Button } from "../../../../components/ui/button";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
-  riskDistribution: RiskDistribution[] | null;
-  riskHistory: Array<{
-    history: RiskHistory[];
-    label: string;
-    slug: string;
-    description: string;
-    type: "project" | "asset";
-  }>;
-  flawCountByScanner: FlawCountByScanner;
-  dependencyCountByscanner: DependencyCountByscanner;
-  flawAggregationStateAndChange: FlawAggregationStateAndChange;
-  avgLowFixingTime: AverageFixingTime;
-  avgMediumFixingTime: AverageFixingTime;
-  avgHighFixingTime: AverageFixingTime;
-  avgCriticalFixingTime: AverageFixingTime;
+  assets: Array<
+    AssetDTO & {
+      stats: {
+        compliance: Array<PolicyEvaluation>;
+      };
+    }
+  >;
+  subprojects: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
-const Index: FunctionComponent<Props> = ({
-  project,
-  riskDistribution,
-  riskHistory,
-  flawAggregationStateAndChange,
-  avgLowFixingTime,
-  avgMediumFixingTime,
-  avgHighFixingTime,
-  avgCriticalFixingTime,
-}) => {
-  const activeOrg = useActiveOrg();
-  const projectMenu = useProjectMenu();
-  const router = useRouter();
-  const activeProject = useActiveProject();
+const formSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
 
-  if (riskHistory.length === 0) {
-    return (
-      <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
-        <EmptyOverview
-          title={"No data available for this project"}
-          Button={
-            <Button
-              onClick={() => {
-                router.push(
-                  `/${activeOrg.slug}/projects/${project.slug}/assets`,
-                );
-              }}
-            >
-              Create new asset
-            </Button>
-          }
-          description="Create an asset and start scanning it to see the data here."
-        />
-      </Page>
+  reachableFromTheInternet: z.boolean().optional(),
+  enableTicketRange: z.boolean().optional(),
+  cvssAutomaticTicketThreshold: z.number().array(),
+  riskAutomaticTicketThreshold: z.number().array(),
+
+  confidentialityRequirement: z.string(),
+  integrityRequirement: z.string(),
+  availabilityRequirement: z.string(),
+});
+
+const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const router = useRouter();
+  const activeOrg = useActiveOrg();
+  const form = useForm<AssetFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      confidentialityRequirement: RequirementsLevel.Medium,
+      integrityRequirement: RequirementsLevel.Medium,
+      availabilityRequirement: RequirementsLevel.Medium,
+      cvssAutomaticTicketThreshold: [], //here are the values, when enabled I enable reproting range
+      riskAutomaticTicketThreshold: [],
+      centralFlawManagement: true,
+    },
+  });
+
+  const projectForm = useForm<ProjectDTO>({
+    defaultValues: {
+      parentId: project.id,
+    },
+  });
+
+  const { pat, onCreatePat } = usePersonalAccessToken();
+
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showK8sModal, setShowK8sModal] = useState(false);
+
+  const projectMenu = useProjectMenu();
+
+  const handleCreateProject = async (data: ProjectDTO) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/projects/",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
     );
-  }
+    if (resp.ok) {
+      const res: ProjectDTO = await resp.json();
+      // navigate to the new application
+      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
+    } else {
+      toast("Error", { description: "Could not create project" });
+    }
+  };
+
+  const handleCreateAsset = async (data: AssetFormValues) => {
+    const modifiedData: AssetDTO = {
+      ...data,
+      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
+        ? data.cvssAutomaticTicketThreshold[0]
+        : 2,
+
+      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
+        ? data.riskAutomaticTicketThreshold[0]
+        : 2,
+    };
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/assets",
+      {
+        method: "POST",
+        body: JSON.stringify(modifiedData),
+      },
+    );
+    if (resp.ok) {
+      const res: AssetDTO & {
+        env: Array<EnvDTO>;
+      } = await resp.json();
+      // navigate to the new application
+      router.push(
+        `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
+      );
+    } else {
+      toast("Error", { description: "Could not create asset" });
+    }
+  };
 
   return (
-    <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
-      <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-semibold">Overview</h1>
-      </div>
-      <div className="mt-4 grid gap-4">
-        <FlawAggregationState
-          description="The total risk this project poses to the organization"
-          title="Project Risk"
-          totalRisk={riskHistory
-            .map((r) => r.history[r.history.length - 1])
-            .filter((r) => !!r)
-            .reduce((acc, curr) => acc + curr.sumOpenRisk, 0)}
-          data={flawAggregationStateAndChange}
-        />
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2">
-            <RiskDistributionDiagram data={riskDistribution ?? []} />
-          </div>
+    <>
+      <Page
+        Button={<Button onClick={() => setShowModal(true)}>New Asset</Button>}
+        title={project.name}
+        Menu={projectMenu}
+        Title={<ProjectTitle />}
+      >
+        {assets.length === 0 && subprojects.length === 0 ? (
+          <EmptyList
+            title="Your Assets will show up here!"
+            description="You can understand assets as a software project. An asset is a
+                github repository, a gitlab repository, a bundle of source code
+                files, ..."
+            Button={
+              <div className="flex flex-row justify-center gap-2">
+                <Button
+                  onClick={() => setShowK8sModal(true)}
+                  variant="secondary"
+                >
+                  <Image
+                    alt="Kubernetes logo"
+                    src="/assets/kubernetes.svg"
+                    className="mr-2"
+                    width={24}
+                    height={24}
+                  />
+                  Use a Kubernetes Operator to index your assets
+                </Button>
+                <Button
+                  variant={"secondary"}
+                  onClick={() => setShowProjectModal(true)}
+                >
+                  Create new Subproject
+                </Button>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Vulnerable Assets</CardTitle>
-              <CardDescription>
-                The most vulnerable assets in this project
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-2">
-                {riskHistory.slice(0, 5).map((r) => (
-                  <Link
-                    href={
-                      r.type === "project"
-                        ? "/" + activeOrg.slug + "/projects/" + r.slug
-                        : "/" +
-                          activeOrg.slug +
-                          "/projects/" +
-                          activeProject?.slug +
-                          "/assets/" +
-                          r.slug
-                    }
-                    key={r.slug}
-                    className="-mx-2 rounded-lg px-2 py-2 !text-card-foreground transition-all hover:bg-background hover:no-underline"
-                  >
-                    <div
-                      key={r.label}
-                      className={classNames("flex items-center gap-4")}
-                    >
-                      <Avatar>
-                        <AvatarFallback>{r.label[0]}</AvatarFallback>
-                      </Avatar>
-
-                      <div className="grid">
-                        <p className="text-sm font-medium leading-none">
-                          {beautifyPurl(r.label)}
-                        </p>
-                        <small className="line-clamp-1 text-ellipsis text-muted-foreground">
-                          {r.description}
-                        </small>
-                      </div>
-                      <div className="ml-auto font-medium">
-                        <Badge
-                          className="whitespace-nowrap"
-                          variant="secondary"
-                        >
-                          {r.history[r.history.length - 1]?.sumOpenRisk.toFixed(
-                            2,
-                          ) ?? "0.00"}{" "}
-                          Risk
-                        </Badge>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                <Button onClick={() => setShowModal(true)}>
+                  Create new Asset
+                </Button>
               </div>
-              <div className="flex items-center gap-4"></div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="grid grid-cols-4 gap-4">
-          <AverageFixingTimeChart
-            title="Low severity"
-            description="Average fixing time for low severity flaws"
-            avgFixingTime={avgLowFixingTime}
+            }
           />
-          <AverageFixingTimeChart
-            title="Medium severity"
-            description="Average fixing time for medium severity flaws"
-            avgFixingTime={avgMediumFixingTime}
-          />
-          <AverageFixingTimeChart
-            title="High severity"
-            description="Average fixing time for high severity flaws"
-            avgFixingTime={avgHighFixingTime}
-          />
-          <AverageFixingTimeChart
-            title="Critical severity"
-            description="Average fixing time for critical severity flaws"
-            avgFixingTime={avgCriticalFixingTime}
-          />
-        </div>
-        <RiskHistoryChart data={riskHistory} />
-        {/* <div className="grid grid-cols-3 gap-4">
-      <div className="col-span-2"></div>
-      <DependenciesPieChart data={dependencyCountByscanner} />
-    </div> */}
-      </div>
-    </Page>
+        ) : (
+          <Section
+            Button={
+              <div className="flex flex-row gap-2">
+                <Button
+                  disabled={project.type !== "default"}
+                  variant={"secondary"}
+                  onClick={() => setShowProjectModal(true)}
+                >
+                  New subproject
+                </Button>
+                <Button
+                  disabled={project.type !== "default"}
+                  onClick={() => setShowModal(true)}
+                >
+                  New Asset
+                </Button>
+              </div>
+            }
+            primaryHeadline
+            description={"Assets managed by the " + project.name + " project"}
+            forceVertical
+            title="Subprojects & Assets"
+          >
+            {subprojects.map((subproject) => (
+              <Link
+                key={subproject.id}
+                href={`/${activeOrg.slug}/projects/${subproject.slug}/assets`}
+                className="flex flex-col gap-2 hover:no-underline"
+              >
+                <ListItem
+                  reactOnHover
+                  Title={
+                    <div className="flex flex-row gap-2">
+                      <span>{subproject.name}</span>
+                      <Badge variant={"outline"}>Subproject</Badge>
+                      {subproject.type === "kubernetesNamespace" && (
+                        <Badge variant={"outline"}>
+                          <Image
+                            alt="Kubernetes logo"
+                            src="/assets/kubernetes.svg"
+                            className="-ml-1.5 mr-2"
+                            width={16}
+                            height={16}
+                          />
+                          Kubernetes Namespace
+                        </Badge>
+                      )}
+                    </div>
+                  }
+                  Description={<div>{subproject.description}</div>}
+                  Button={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        className={buttonVariants({
+                          variant: "outline",
+                          size: "icon",
+                        })}
+                      >
+                        <EllipsisVerticalIcon className="h-5 w-5" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <Link
+                          className="!text-foreground hover:no-underline"
+                          href={`/${activeOrg.slug}/projects/${subproject.slug}/settings`}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                />
+              </Link>
+            ))}
+            {assets.map((asset) => (
+              <AssetOverviewListItem asset={asset} key={asset.id} />
+            ))}
+          </Section>
+        )}
+      </Page>
+      <Dialog open={showK8sModal}>
+        <DialogContent setOpen={setShowK8sModal}>
+          <DialogHeader>
+            <DialogTitle className="flex flex-row items-center">
+              <Image
+                alt="Kubernetes logo"
+                src="/assets/kubernetes.svg"
+                className="mr-2"
+                width={24}
+                height={24}
+              />
+              Connect a Kubernetes Cluster
+            </DialogTitle>
+            <DialogDescription>
+              Connect a Kubernetes cluster to DevGuard to automatically index
+              your assets.
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Steps>
+            <div className="mb-10">
+              <PatSection
+                onCreatePat={onCreatePat}
+                pat={pat}
+                description={`Kubernetes Cluster Token generated at ${new Date().toLocaleString()}`}
+              />
+            </div>
+            <Section
+              className="mt-0"
+              forceVertical
+              title="Install the DevGuard Kubernetes Operator"
+              description="The DevGuard Kubernetes Operator is a small piece of software
+                that runs inside your Kubernetes cluster and indexes your
+                assets. It watches for new deployments and namespaces."
+            >
+              <CopyCode
+                codeString={`go run main.go --projectName=${activeOrg.slug + "/projects/" + project.slug} --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} --apiUrl=${config.devguardApiUrlPublicInternet}`}
+                language="shell"
+              />
+            </Section>
+          </Steps>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showProjectModal}>
+        <DialogContent setOpen={setShowProjectModal}>
+          <DialogHeader>
+            <DialogTitle>Create new Project</DialogTitle>
+            <DialogDescription>
+              A project groups multiple software projects (repositories) inside
+              a single enitity. Something like: frontend and backend
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Form {...form}>
+            <form
+              className="space-y-8"
+              onSubmit={projectForm.handleSubmit(handleCreateProject)}
+            >
+              <ProjectForm forceVerticalSections form={projectForm} />
+              <DialogFooter>
+                <Button type="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showModal}>
+        <DialogContent setOpen={setShowModal}>
+          <DialogHeader>
+            <DialogTitle>Create new asset</DialogTitle>
+            <DialogDescription>
+              An asset is a software project you would like to manage the risks
+              of.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              className="flex flex-col"
+              onSubmit={form.handleSubmit(handleCreateAsset)}
+            >
+              <AssetForm forceVerticalSections form={form} />
+              <DialogFooter>
+                <Button type="submit" variant="default">
+                  Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
-export default Index;
-
-const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { project }) => {
-    const { organizationSlug, projectSlug } = context.params!;
-
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    const last3Month = new Date();
-    last3Month.setMonth(last3Month.getMonth() - 3);
-
+    // fetch the project
+    const { organizationSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/stats";
-    const [
-      riskDistribution,
-      riskHistory,
-      flawAggregationStateAndChange,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-    ] = await Promise.all([
-      apiClient(url + "/risk-distribution").then((r) => r.json()),
+
+    const [subprojects, assets] = await Promise.all([
       apiClient(
-        url +
-          "/risk-history?start=" +
-          extractDateOnly(last3Month) +
-          "&end=" +
-          extractDateOnly(new Date()),
-      ).then(
-        (r) =>
-          r.json() as Promise<
-            Array<
-              | { riskHistory: RiskHistory[]; asset: AssetDTO }
-              | {
-                  riskHistory: [];
-                  project: ProjectDTO;
-                }
-            >
-          >,
-      ),
-      apiClient(
-        url +
-          "/flaw-aggregation-state-and-change?compareTo=" +
-          lastMonth.toISOString().split("T")[0],
+        "/organizations/" +
+          organizationSlug +
+          "/projects?parentId=" +
+          project.id,
       ).then((r) => r.json()),
-      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
-        r.json(),
+      // fetch the stats for all assets
+      await Promise.all(
+        project.assets.map(async (asset) => {
+          let url =
+            "/organizations/" +
+            organizationSlug +
+            "/projects/" +
+            project.slug +
+            "/assets/" +
+            asset.slug;
+
+          const compliance = await apiClient(url + "/compliance").then((r) =>
+            r.json(),
+          );
+
+          return {
+            ...asset,
+            stats: {
+              compliance,
+            },
+          };
+        }),
       ),
     ]);
 
-    /*
-    // check the longest array in the results
-	longest := 0
-	var firstDay *time.Time = nil
-	for _, r := range results {
-		if len(r.RiskHistory) > longest {
-			longest = len(r.RiskHistory)
-		}
-		if len(r.RiskHistory) > 0 && (firstDay == nil || r.RiskHistory[0].Day.Before(*firstDay)) {
-			firstDay = &r.RiskHistory[0].Day
-		}
-	}
-    */
-    const paddedRiskHistory = padRiskHistory(riskHistory);
+    // get the stats for all assets
 
     return {
       props: {
+        initialZustand: {
+          project,
+        },
+        subprojects,
         project,
-        riskDistribution,
-        riskHistory: paddedRiskHistory.map((r) => ({
-          label: "asset" in r ? r.asset.name : r.project.name,
-          history: r.riskHistory,
-          type: "asset" in r ? "asset" : "project",
-          slug: "asset" in r ? r.asset.slug : r.project.slug,
-          description:
-            "asset" in r ? r.asset.description : r.project.description,
-        })),
-        flawAggregationStateAndChange,
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
+        assets,
       },
     };
   },
@@ -319,7 +442,9 @@ export const getServerSideProps = middleware(
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,
-    project: withProject,
     contentTree: withContentTree,
+    project: withProject,
   },
 );
+
+export default Index;

@@ -21,6 +21,11 @@ export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
   return getApiClientFromRequest(req);
 };
 
+export type DevGuardApiClient = (
+  input: string,
+  init?: RequestInit,
+) => Promise<Response>;
+
 export const getApiClientFromRequest = (req: {
   cookies: Partial<{
     [key: string]: string;

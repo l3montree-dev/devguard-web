@@ -26,11 +26,12 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
-import { ComponentPaged, Paged } from "@/types/api/api";
+import { ComponentPaged, License, Paged } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
 import {
   CalendarDateRangeIcon,
+  CheckBadgeIcon,
   ExclamationTriangleIcon,
   ScaleIcon,
   StarIcon,
@@ -48,15 +49,24 @@ import { buttonVariants } from "../../../../../../../../../components/ui/button"
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 import DateString from "../../../../../../../../../components/common/DateString";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
+import { Pagination } from "../../../../../../../../../components/ui/pagination";
+import {
+  Tooltip,
+  TooltipContent,
+} from "../../../../../../../../../components/ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
-  components: Paged<ComponentPaged>;
-  licenses: Record<string, number>;
+  components: Paged<ComponentPaged & { license: License }>;
+  licenses: License[];
 }
 
-const columnHelper = createColumnHelper<ComponentPaged>();
+const columnHelper = createColumnHelper<
+  ComponentPaged & { license: License }
+>();
 
-const columnsDef: ColumnDef<ComponentPaged, any>[] = [
+const columnsDef: ColumnDef<ComponentPaged & { license: License }, any>[] = [
   columnHelper.accessor("dependencyPurl", {
     header: "Package",
     id: "dependency_purl",
@@ -73,22 +83,51 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
     cell: (row) =>
       row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
-  columnHelper.accessor("dependency.license", {
+  columnHelper.accessor("license", {
     header: "License",
-    id: "Component.license",
+    id: "Dependency.license",
     cell: (row) =>
-      row.getValue() === "unknown" ? (
+      (row.getValue() as License).licenseId === "unknown" ? (
         <Badge variant={"outline"}>
           <ExclamationTriangleIcon
             className={"mr-1 h-4 w-4 text-muted-foreground"}
           />
-          {row.getValue()}
+          {(row.getValue() as License).licenseId}
         </Badge>
       ) : (
-        <Badge variant={"outline"}>
-          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {row.getValue()}
-        </Badge>
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge variant={"outline"}>
+              <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+              {(row.getValue() as License).licenseId}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex flex-col items-start justify-start gap-1">
+              <span className="flex flex-row items-center text-sm font-bold">
+                {(row.getValue() as License).isOsiApproved && (
+                  <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
+                )}
+                {(row.getValue() as License).name}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {(row.getValue() as License).isOsiApproved
+                  ? "OSI Approved"
+                  : "Not OSI Approved"}
+                ,{" "}
+                <a
+                  href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
+                  target="_blank"
+                  className="text-sm font-semibold !text-muted-foreground underline"
+                >
+                  Open Source License
+                </a>
+              </span>
+            </div>
+
+            <span className="text-sm text-muted-foreground"></span>
+          </TooltipContent>
+        </Tooltip>
       ),
   }),
   columnHelper.accessor("dependency.project.projectKey", {
@@ -132,21 +171,6 @@ const columnsDef: ColumnDef<ComponentPaged, any>[] = [
   }),
 ];
 
-const osiLicenseColors: Record<string, string> = {
-  MIT: "bg-green-500",
-  "Apache-2.0": "bg-blue-500",
-  "GPL-3.0": "bg-red-500",
-  "GPL-2.0": "bg-orange-500",
-  "BSD-2-Clause": "bg-yellow-500",
-  "BSD-3-Clause": "bg-yellow-500",
-  "LGPL-3.0": "bg-purple-500",
-  "AGPL-3.0": "bg-pink-500",
-  "EPL-2.0": "bg-indigo-500",
-  "MPL-2.0": "bg-teal-500",
-  unknown: "bg-gray-500",
-  "CC0-1.0": "bg-gray-600",
-};
-
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
@@ -161,18 +185,18 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetVersion = useActiveAssetVersion();
 
   const licenseToPercentMapEntries = useMemo(() => {
-    const total = Object.values(licenses).reduce((acc, curr) => acc + curr, 0);
+    const total = licenses.reduce((acc, curr) => acc + curr.count, 0);
 
-    return Object.entries(licenses)
-      .map(([license, count]) => [license, (count / total) * 100])
+    return licenses
+      .map((license) => [license, (license.count / total) * 100] as const)
       .sort(([_aLicense, a], [_bLicense, b]) => (b as number) - (a as number));
   }, [licenses]);
 
   return (
     <Page
       Menu={assetMenu}
-      title="Overview"
-      description="Overview of the asset"
+      title="Dependencies"
+      description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
       <div className="mb-10 flex flex-row items-start justify-between">
@@ -184,28 +208,35 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <span className="flex flex-row overflow-hidden rounded-full">
               {licenseToPercentMapEntries.map(([license, percent], i, arr) => (
                 <span
-                  key={license}
+                  key={license.licenseId}
                   className={classNames(
                     "h-2",
-                    osiLicenseColors[license] ?? "",
                     i === arr.length - 1 ? "" : "border-r",
                   )}
-                  style={{ width: percent + "%" }}
+                  style={{
+                    width: percent + "%",
+                    backgroundColor:
+                      osiLicenseHexColors[license.licenseId] || "#eeeeee",
+                  }}
                 />
               ))}
             </span>
             <span className="mt-2 flex flex-row flex-wrap gap-2">
               {licenseToPercentMapEntries.map(([license, percent]) => (
-                <span className="whitespace-nowrap text-xs" key={license}>
+                <span
+                  className="whitespace-nowrap text-xs"
+                  key={license.licenseId}
+                >
                   <span
+                    style={{
+                      backgroundColor:
+                        osiLicenseHexColors[license.licenseId] ?? "#eeeeee",
+                    }}
                     className={classNames(
                       "mr-1 inline-block h-2 w-2 rounded-full text-xs",
-                      osiLicenseColors[license]
-                        ? osiLicenseColors[license]
-                        : "bg-gray-600",
                     )}
                   />
-                  {license}{" "}
+                  {license.licenseId ? license.licenseId : "Unknown"}{" "}
                   <span className="text-muted-foreground">
                     {Math.round(percent as number)}%
                   </span>
@@ -314,9 +345,30 @@ export const getServerSideProps = middleware(
 
     const params = buildFilterSearchParams(context).toString();
     const [components, licenses] = await Promise.all([
-      apiClient(url + "?" + params.toString()).then((r) => r.json()),
-      apiClient(url + "/licenses?" + params.toString()).then((r) => r.json()),
+      apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
+        Paged<ComponentPaged>
+      >,
+      apiClient(url + "/licenses?" + params.toString()).then(
+        (r) => r.json() as Promise<License[]>,
+      ),
     ]);
+
+    const licenseMap = licenses.reduce(
+      (acc, curr) => ({
+        ...acc,
+        [curr.licenseId]: curr,
+      }),
+      {} as Record<string, License>,
+    );
+
+    components.data = components.data.map((component) => ({
+      ...component,
+      license: licenseMap[component.dependency.license ?? ""] ?? {
+        licenseId: "unknown",
+        name: "Unknown",
+        count: 0,
+      },
+    }));
 
     return {
       props: {
