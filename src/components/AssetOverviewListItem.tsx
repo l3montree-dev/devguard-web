@@ -40,7 +40,29 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
     >
       <ListItem
         reactOnHover
-        Description={asset.description}
+        Description={
+          <div className="flex flex-col">
+            <span>{asset.description}</span>
+            {failingControls.length > 0 ? (
+              <div className="mt-4 flex flex-row items-center gap-2">
+                <Badge variant={"danger"}>
+                  <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
+                  <span className="pl-2">
+                    {failingControls.length}/{asset.stats.compliance.length}{" "}
+                    controls are failing
+                  </span>
+                </Badge>
+              </div>
+            ) : (
+              <div className="flex flex-row items-center gap-2">
+                <Badge variant={"success"}>
+                  <CheckBadgeIcon className="-ml-2 h-5 w-5 text-green-500" />
+                  <span className="pl-2 ">All controls are passing</span>
+                </Badge>
+              </div>
+            )}
+          </div>
+        }
         Button={
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -62,28 +84,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           </DropdownMenu>
         }
         Title={
-          <div className="flex flex-row items-center gap-4">
-            {asset.name}
-
-            {failingControls.length > 0 ? (
-              <div className="flex flex-row items-center gap-2">
-                <Badge variant={"danger"}>
-                  <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
-                  <span className="pl-2">
-                    {failingControls.length}/{asset.stats.compliance.length}{" "}
-                    controls are failing
-                  </span>
-                </Badge>
-              </div>
-            ) : (
-              <div className="flex flex-row items-center gap-2">
-                <Badge variant={"success"}>
-                  <CheckBadgeIcon className="-ml-2 h-5 w-5 text-green-500" />
-                  <span className="pl-2 ">All controls are passing</span>
-                </Badge>
-              </div>
-            )}
-          </div>
+          <div className="flex flex-row items-center gap-4">{asset.name}</div>
         }
       />
     </Link>

@@ -178,40 +178,43 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                     Title={
                       <div className="flex flex-row items-center gap-2">
                         <span>{project.name}</span>
-                        <Badge
-                          variant={
-                            project.stats.compliantAssets ===
-                            project.stats.totalAssets
-                              ? "success"
-                              : "danger"
-                          }
-                          className=""
-                        >
-                          {project.stats.compliantAssets}/
-                          {project.stats.totalAssets} assets compliant
-                        </Badge>
-                        <Badge
-                          variant={
-                            project.stats.passingControlsPercentage === 1
-                              ? "success"
-                              : "danger"
-                          }
-                          className=""
-                        >
-                          {Math.round(
-                            project.stats.passingControlsPercentage * 100,
-                          )}
-                          % controls passing
-                        </Badge>
                       </div>
                     }
                     Description={
-                      <span>
-                        {project.description}
-                        {project.type !== "default" && (
-                          <ProjectBadge type={project.type} />
-                        )}
-                      </span>
+                      <div className="flex flex-col">
+                        <span>{project.description}</span>
+
+                        <div className="mt-4 flex flex-row items-center gap-2">
+                          {project.type !== "default" && (
+                            <ProjectBadge type={project.type} />
+                          )}
+                          <Badge
+                            variant={
+                              project.stats.compliantAssets ===
+                              project.stats.totalAssets
+                                ? "success"
+                                : "danger"
+                            }
+                            className=""
+                          >
+                            {project.stats.compliantAssets}/
+                            {project.stats.totalAssets} assets compliant
+                          </Badge>
+                          <Badge
+                            variant={
+                              project.stats.passingControlsPercentage === 1
+                                ? "success"
+                                : "danger"
+                            }
+                            className=""
+                          >
+                            {Math.round(
+                              project.stats.passingControlsPercentage * 100,
+                            )}
+                            % controls passing
+                          </Badge>
+                        </div>
+                      </div>
                     }
                     Button={
                       <DropdownMenu>
