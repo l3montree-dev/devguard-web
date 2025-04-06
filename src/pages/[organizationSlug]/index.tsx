@@ -193,7 +193,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                               project.stats.compliantAssets ===
                               project.stats.totalAssets
                                 ? "success"
-                                : "danger"
+                                : "secondary"
                             }
                             className=""
                           >
@@ -204,7 +204,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                             variant={
                               project.stats.passingControlsPercentage === 1
                                 ? "success"
-                                : "danger"
+                                : "secondary"
                             }
                             className=""
                           >
