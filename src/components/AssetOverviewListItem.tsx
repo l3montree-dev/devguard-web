@@ -28,10 +28,7 @@ import {
 interface Props {
   asset: AssetDTO & {
     stats: {
-      cvssDistribution: RiskDistribution;
-      riskDistribution: RiskDistribution;
       compliance: Array<PolicyEvaluation>;
-      licenses: Record<string, number>;
     };
   };
 }
@@ -53,28 +50,27 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           <CardTitle className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-4">
               {asset.name}
-              <div className="col-span-4">
-                {failingControls.length > 0 ? (
-                  <div className="flex flex-row items-center gap-2">
-                    <Badge variant={"danger"}>
-                      <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
-                      <span className="pl-2">
-                        {failingControls.length}/{asset.stats.compliance.length}{" "}
-                        controls are failing
-                      </span>
-                    </Badge>
-                  </div>
-                ) : (
-                  <div className="flex flex-row items-center gap-2">
-                    <Badge variant={"success"}>
-                      <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
-                      <span className="pl-2 text-sm">
-                        All controls are passing
-                      </span>
-                    </Badge>
-                  </div>
-                )}
-              </div>
+
+              {failingControls.length > 0 ? (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"danger"}>
+                    <ExclamationCircleIcon className="-ml-2 h-5 w-5 text-red-500" />
+                    <span className="pl-2">
+                      {failingControls.length}/{asset.stats.compliance.length}{" "}
+                      controls are failing
+                    </span>
+                  </Badge>
+                </div>
+              ) : (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"success"}>
+                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <span className="pl-2 text-sm">
+                      All controls are passing
+                    </span>
+                  </Badge>
+                </div>
+              )}
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger

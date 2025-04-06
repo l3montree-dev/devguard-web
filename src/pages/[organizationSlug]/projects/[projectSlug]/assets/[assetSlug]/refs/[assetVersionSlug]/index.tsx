@@ -56,16 +56,18 @@ import {
 } from "../../../../../../../../components/ui/tooltip";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
+  License,
   PolicyEvaluation,
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
 import { osiLicenseHexColors } from "../../../../../../../../utils/view";
+import { classNames } from "../../../../../../../../utils/common";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
-  licenses: Record<string, number>;
+  licenses: Array<License>;
 }
 
 const Index: FunctionComponent<Props> = ({
@@ -93,36 +95,13 @@ const Index: FunctionComponent<Props> = ({
     }, {} satisfies ChartConfig);
   }, [licenses]);
 
-  const chartData = useMemo(() => {
-    return Object.entries(licenses)
-      .map(([key, value]) => ({
-        license: key,
-        amount: value,
-        fill: osiLicenseHexColors[key] ?? osiLicenseHexColors["unknown"],
-      }))
-      .sort((a, b) => {
-        return b.amount - a.amount;
-      });
-  }, [licenses]);
-
-  const controlsPassing = useMemo(
-    () =>
-      compliance.reduce((acc, policy) => {
-        return acc + (policy.result ? 1 : 0);
-      }, 0),
-    [compliance],
-  );
-
   const failingControls = useMemo(
     () => compliance.filter((policy) => policy.result === false),
     [compliance],
   );
 
   const totalDependencies = useMemo(
-    () =>
-      Object.values(licenses).reduce((acc, value) => {
-        return acc + value;
-      }, 0),
+    () => licenses.reduce((acc, license) => acc + license.count, 0),
     [licenses],
   );
 
@@ -199,9 +178,9 @@ const Index: FunctionComponent<Props> = ({
                         {policy.title}
                         <div className="flex flex-row flex-wrap gap-2">
                           {policy.complianceFrameworks.map((t) => (
-                            <Badge key={t} variant={"secondary"}>
+                            <Badge key={t} className="" variant={"secondary"}>
                               <Image
-                                className="mr-1 inline-block"
+                                className="-ml-1.5 mr-1 inline-block"
                                 src="/assets/iso.svg"
                                 width={15}
                                 height={15}
@@ -267,21 +246,35 @@ const Index: FunctionComponent<Props> = ({
               <ComplianceGrid compliance={compliance} />
             </CardContent>
           </Card>
-          <SeverityCard
-            variant="critical"
-            queryIntervalStart={8}
-            amountByRisk={riskDistribution.critical}
-            amountByCVSS={cvssDistribution.critical}
-          />
-          <SeverityCard
-            variant="high"
-            queryIntervalStart={7}
-            amountByRisk={riskDistribution.high}
-            amountByCVSS={cvssDistribution.high}
-          />
+          <div className="col-span-4 grid grid-cols-2 gap-4">
+            <SeverityCard
+              variant="critical"
+              queryIntervalStart={8}
+              amountByRisk={riskDistribution.critical}
+              amountByCVSS={cvssDistribution.critical}
+            />
+            <SeverityCard
+              variant="high"
+              queryIntervalStart={7}
+              amountByRisk={riskDistribution.high}
+              amountByCVSS={cvssDistribution.high}
+            />
+            <SeverityCard
+              variant="medium"
+              queryIntervalStart={4}
+              amountByRisk={riskDistribution.medium}
+              amountByCVSS={cvssDistribution.medium}
+            />
+            <SeverityCard
+              variant="low"
+              queryIntervalStart={0}
+              amountByRisk={riskDistribution.low}
+              amountByCVSS={cvssDistribution.low}
+            />
+          </div>
           <Card className="col-span-4 row-span-2 flex flex-col">
-            <CardHeader className="items-center pb-0">
-              <CardTitle className="relative w-full text-center">
+            <CardHeader>
+              <CardTitle className="relative w-full">
                 Licenses
                 <Link
                   href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
@@ -290,64 +283,47 @@ const Index: FunctionComponent<Props> = ({
                   See all
                 </Link>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-left">
                 Displays the distribution of dependency licenses
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-1 flex-row justify-center pb-0">
-              <div className="flex flex-row items-center">
-                <ChartContainer
-                  config={chartConfig}
-                  className="aspect-square max-h-[250px] w-[250px]"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent />}
-                    />
-                    <Pie
-                      data={chartData}
-                      dataKey="amount"
-                      nameKey="license"
-                      innerRadius={60}
-                      strokeWidth={5}
-                    />
-                  </PieChart>
-                </ChartContainer>
-                <div>
-                  {chartData.map((entry, index) => (
-                    <div
-                      key={`cell-${index}`}
-                      className="flex flex-row items-center gap-2"
-                    >
-                      <div
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                          backgroundColor: entry.fill,
-                        }}
-                      ></div>
-                      <span className="text-sm capitalize text-muted-foreground">
-                        {entry.license}{" "}
-                        {((entry.amount / totalDependencies) * 100).toFixed(1)}%
-                      </span>
+            <CardContent>
+              <div className="flex  flex-col">
+                {licenses.map((license, i, arr) => (
+                  <div
+                    className={
+                      i === 0
+                        ? "border-b pb-4"
+                        : i === arr.length - 1
+                          ? "pt-4"
+                          : "border-b py-4"
+                    }
+                    key={license.licenseId}
+                  >
+                    <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                      {license.licenseId
+                        ? license.licenseId
+                        : "Unknown license"}
+                      <div className="flex flex-row flex-wrap gap-2">
+                        {license.isOsiApproved && (
+                          <Badge variant={"secondary"}>
+                            <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                            OSI Approved
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-sm text-muted-foreground">
+                      {license.name
+                        ? license.name
+                        : "Unknown license information"}
+                      , {license.count} dependencies
+                    </p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-          <SeverityCard
-            variant="medium"
-            queryIntervalStart={4}
-            amountByRisk={riskDistribution.medium}
-            amountByCVSS={cvssDistribution.medium}
-          />
-          <SeverityCard
-            variant="low"
-            queryIntervalStart={0}
-            amountByRisk={riskDistribution.low}
-            amountByCVSS={cvssDistribution.low}
-          />
         </div>
       </Section>
     </Page>

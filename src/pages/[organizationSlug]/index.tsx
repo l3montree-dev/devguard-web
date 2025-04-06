@@ -29,7 +29,7 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import { ProjectDTO } from "../../types/api/api";
+import { PolicyEvaluation, ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -63,7 +63,15 @@ import { withContentTree } from "@/decorators/withContentTree";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 
 interface Props {
-  projects: Array<ProjectDTO>;
+  projects: Array<
+    ProjectDTO & {
+      stats: {
+        compliantAssets: number;
+        totalAssets: number;
+        passingControlsPercentage: number;
+      };
+    }
+  >;
 }
 
 const formSchema = z.object({
@@ -167,7 +175,36 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                 >
                   <ListItem
                     reactOnHover
-                    Title={project.name}
+                    Title={
+                      <div className="flex flex-row items-center gap-2">
+                        <span>{project.name}</span>
+                        <Badge
+                          variant={
+                            project.stats.compliantAssets ===
+                            project.stats.totalAssets
+                              ? "success"
+                              : "danger"
+                          }
+                          className=""
+                        >
+                          {project.stats.compliantAssets}/
+                          {project.stats.totalAssets} assets compliant
+                        </Badge>
+                        <Badge
+                          variant={
+                            project.stats.passingControlsPercentage === 1
+                              ? "success"
+                              : "danger"
+                          }
+                          className=""
+                        >
+                          {Math.round(
+                            project.stats.passingControlsPercentage * 100,
+                          )}
+                          % controls passing
+                        </Badge>
+                      </div>
+                    }
                     Description={
                       <span>
                         {project.description}
@@ -219,10 +256,34 @@ export const getServerSideProps = middleware(
     const resp = await apiClient("/organizations/" + slug + "/projects");
 
     const projects = await resp.json();
+    // fetch all the project stats
+    const projectsWithCompliance = await Promise.all(
+      projects.map(async (project: ProjectDTO) => {
+        const resp = await apiClient(
+          `/organizations/${slug}/projects/${project.slug}/compliance`,
+        );
+        const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
+
+        const compliantAssets = stats.filter((asset) =>
+          asset.every((r) => r.result),
+        );
+
+        return {
+          ...project,
+          stats: {
+            compliantAssets: compliantAssets.length,
+            totalAssets: stats.length,
+            passingControlsPercentage:
+              stats.flat(1).filter((r) => r.result).length /
+              stats.flat(1).length,
+          },
+        };
+      }),
+    );
 
     return {
       props: {
-        projects,
+        projects: projectsWithCompliance,
       },
     };
   },

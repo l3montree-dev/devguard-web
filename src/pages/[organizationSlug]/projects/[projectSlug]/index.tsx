@@ -36,6 +36,7 @@ import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { toast } from "sonner";
 import z from "zod";
+import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
 import CopyCode from "../../../../components/common/CopyCode";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import { ProjectForm } from "../../../../components/project/ProjectForm";
@@ -51,16 +52,13 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/devGuardApi";
-import { fetchAssetStats } from "../../../../services/statService";
 import {
   AssetDTO,
   EnvDTO,
   PolicyEvaluation,
   ProjectDTO,
   RequirementsLevel,
-  RiskDistribution,
 } from "../../../../types/api/api";
-import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
 
 interface Props {
   project: ProjectDTO & {
@@ -70,9 +68,6 @@ interface Props {
     AssetDTO & {
       stats: {
         compliance: Array<PolicyEvaluation>;
-        licenses: Record<string, number>;
-        riskDistribution: RiskDistribution;
-        cvssDistribution: RiskDistribution;
       };
     }
   >;
@@ -408,16 +403,23 @@ export const getServerSideProps = middleware(
       // fetch the stats for all assets
       await Promise.all(
         project.assets.map(async (asset) => {
-          const stats = await fetchAssetStats({
-            apiClient,
-            assetSlug: asset.slug,
-            projectSlug: project.slug,
-            organizationSlug: organizationSlug as string,
-          });
+          let url =
+            "/organizations/" +
+            organizationSlug +
+            "/projects/" +
+            project.slug +
+            "/assets/" +
+            asset.slug;
+
+          const compliance = await apiClient(url + "/compliance").then((r) =>
+            r.json(),
+          );
 
           return {
             ...asset,
-            stats,
+            stats: {
+              compliance,
+            },
           };
         }),
       ),

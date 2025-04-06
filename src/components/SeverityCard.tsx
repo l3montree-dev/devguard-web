@@ -24,12 +24,12 @@ export const SeverityStats = ({
   variant: "high" | "medium" | "low" | "critical";
 }) => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-row items-center gap-2">
       <div className="my-2">
         <span
           className={classNames(
-            "rounded-lg px-2 text-4xl font-bold",
-            variantColors[variant],
+            "rounded-lg bg-secondary px-2 text-4xl font-bold",
+            //variantColors[variant],
           )}
         >
           {amountByRisk ?? 0}
@@ -37,7 +37,7 @@ export const SeverityStats = ({
       </div>
 
       <div className={classNames("text-xs text-muted-foreground")}>
-        <span>By CVSS you would have</span>
+        <span>By Risk. By CVSS you would have</span>
         <span className={classNames("inline px-1 font-bold")}>
           {amountByCVSS ?? 0}
         </span>
@@ -64,7 +64,7 @@ const SeverityCard: FunctionComponent<Props> = ({
   const asset = useActiveAsset()!;
   const activeAssetVersion = useActiveAssetVersion()!;
   return (
-    <Card className="col-span-2">
+    <Card>
       <CardHeader className="pb-2">
         <CardTitle className="flex flex-row items-center justify-between capitalize">
           {variant} severity

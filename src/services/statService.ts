@@ -1,4 +1,4 @@
-import { PolicyEvaluation, RiskDistribution } from "../types/api/api";
+import { License, PolicyEvaluation, RiskDistribution } from "../types/api/api";
 import { DevGuardApiClient } from "./devGuardApi";
 
 export const fetchAssetStats = async ({
@@ -17,7 +17,7 @@ export const fetchAssetStats = async ({
   compliance: Array<PolicyEvaluation>;
   riskDistribution: Array<RiskDistribution>;
   cvssDistribution: Array<RiskDistribution>;
-  licenses: Record<string, number>;
+  licenses: Array<License>;
 }> => {
   let url =
     "/organizations/" +
@@ -37,8 +37,13 @@ export const fetchAssetStats = async ({
       apiClient(url + "/compliance").then((r) => r.json()),
       apiClient(url + "/stats/risk-distribution").then((r) => r.json()),
       apiClient(url + "/stats/cvss-distribution").then((r) => r.json()),
-      apiClient(url + "/components/licenses").then((r) => r.json()),
+      apiClient(url + "/components/licenses").then(
+        (r) => r.json() as Promise<License[]>,
+      ),
     ]);
+
+  // sort the licenses by count
+  licenses.sort((a, b) => b.count - a.count);
 
   return {
     compliance,
