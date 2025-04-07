@@ -28,7 +28,7 @@ export const SeverityStats = ({
       <div className="my-2">
         <span
           className={classNames(
-            "rounded-lg bg-secondary px-2 text-4xl font-bold",
+            "whitespace-nowrap rounded-lg bg-secondary px-2 text-4xl font-bold",
             //variantColors[variant],
           )}
         >
