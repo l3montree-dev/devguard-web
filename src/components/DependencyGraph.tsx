@@ -33,10 +33,12 @@ import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 
-const nodeWidth = 300;
-const nodeHeight = 100;
-
-const addRecursive = (dagreGraph: graphlib.Graph, node: DependencyTreeNode) => {
+const addRecursive = (
+  dagreGraph: graphlib.Graph,
+  node: DependencyTreeNode,
+  nodeWidth: number,
+  nodeHeight: number,
+) => {
   if (node.name !== "") {
     dagreGraph.setNode(node.name, { width: nodeWidth, height: nodeHeight });
     node.children.forEach((dep) => {
@@ -45,7 +47,7 @@ const addRecursive = (dagreGraph: graphlib.Graph, node: DependencyTreeNode) => {
       }
       dagreGraph.setNode(dep.name, { width: nodeWidth, height: nodeHeight });
       dagreGraph.setEdge(node.name, dep.name);
-      addRecursive(dagreGraph, dep);
+      addRecursive(dagreGraph, dep, nodeWidth, nodeHeight);
     });
   }
 };
@@ -81,6 +83,8 @@ const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
   flaws: Array<FlawDTO> = [],
   direction = "LR",
+  nodeWidth: number,
+  nodeHeight: number,
 ): [
   Array<{
     id: string;
@@ -117,7 +121,7 @@ const getLayoutedElements = (
 
   dagreGraph.setGraph({ rankdir: direction });
 
-  addRecursive(dagreGraph, tree);
+  addRecursive(dagreGraph, tree, nodeWidth, nodeHeight);
 
   dagre.layout(dagreGraph);
 
@@ -142,6 +146,8 @@ const getLayoutedElements = (
         label: el,
         risk: riskMap[el],
         flaw: flawMap[el],
+        nodeWidth,
+        nodeHeight,
       },
     };
   });
@@ -174,9 +180,10 @@ const nodeTypes = {
 const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
+  variant?: "compact";
   flaws: Array<FlawDTO>;
   graph: { root: ViewDependencyTreeNode };
-}> = ({ graph, width, height, flaws }) => {
+}> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();
   const router = useRouter();
 
@@ -185,7 +192,13 @@ const DependencyGraph: FunctionComponent<{
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     graph.root.name = asset?.name ?? "";
 
-    const [nodes, edges] = getLayoutedElements(graph.root, flaws);
+    const [nodes, edges] = getLayoutedElements(
+      graph.root,
+      flaws,
+      "LR",
+      variant === "compact" ? 150 : 300,
+      variant === "compact" ? 150 : 300,
+    );
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
     return [nodes, edges, rootNode];

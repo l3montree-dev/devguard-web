@@ -56,7 +56,10 @@ const DependencyDialog: FunctionComponent<Props> = ({
     }
   };
 
-  console.log(graphData);
+  useEffect(() => {
+    handleGraphFetch(data.purl);
+  }, [data.purl]);
+
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
@@ -68,14 +71,12 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <DialogTitle>shortDescription: {data.shortDescription}</DialogTitle>
           <DialogTitle>dependencyPurl: {data.purl}</DialogTitle>
         </DialogHeader>
-
-        <Button onClick={() => handleGraphFetch(data.purl)}>Fetch Graph</Button>
-
         <hr />
 
         {graphData && (
-          <div className="h-52 w-full">
+          <div className="h-52 w-full" style={{ height: 500 }}>
             <DependencyGraph
+              variant="compact"
               width={100}
               height={100}
               flaws={[]}
@@ -83,10 +84,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
             />
           </div>
         )}
-
-        <DialogFooter>
-          <div>hi</div>
-        </DialogFooter>
+        <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   );
