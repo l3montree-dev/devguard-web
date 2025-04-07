@@ -17,14 +17,19 @@ import { Switch } from "../ui/switch";
 import { classNames } from "@/utils/common";
 import DangerZone from "../common/DangerZone";
 
+import Alert from "../common/Alert";
+import { Button } from "../ui/button";
+
 interface Props {
   form: UseFormReturn<ProjectDTO, any, undefined>;
   forceVerticalSections: boolean;
+  onConfirmDelete?: () => Promise<void>;
 }
 
 export const ProjectForm: FunctionComponent<Props> = ({
   form,
   forceVerticalSections,
+  onConfirmDelete,
 }) => {
   const org = useActiveOrg();
   return (
@@ -68,8 +73,8 @@ export const ProjectForm: FunctionComponent<Props> = ({
         <Section
           className="pb-0"
           forceVertical={forceVerticalSections}
-          description="Should this organization be made visible to the public? The organization can be accessed without any authentication."
-          title="Visibility"
+          title="Advanced"
+          description="These settings are for advanced users only. Please be careful when changing these settings."
         >
           <FormField
             control={form.control}
@@ -78,7 +83,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               <FormItem>
                 <div className={classNames(!org.isPublic && "opacity-50")}>
                   <ListItem
-                    description={
+                    Description={
                       "Setting this to true will make the project visible to the public. It allows creating public and private assets."
                     }
                     Title="Public Project"
@@ -102,6 +107,23 @@ export const ProjectForm: FunctionComponent<Props> = ({
               The organization is not public. You can not make the project
               public.
             </small>
+          )}
+          {onConfirmDelete && (
+            <ListItem
+              Title="Delete Project"
+              Description={
+                "This will delete the project and all of its data. This action cannot be undone."
+              }
+              Button={
+                <Alert
+                  title="Are you sure to delete this project?"
+                  description="This action cannot be undone. All data associated with this asset will be deleted."
+                  onConfirm={onConfirmDelete}
+                >
+                  <Button variant={"destructive"}>Delete</Button>
+                </Alert>
+              }
+            />
           )}
         </Section>
       </DangerZone>

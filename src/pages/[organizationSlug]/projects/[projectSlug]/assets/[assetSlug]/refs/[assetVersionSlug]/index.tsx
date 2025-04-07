@@ -1,7 +1,5 @@
 import Page from "@/components/Page";
 
-import { RiskDistributionDiagram } from "@/components/overview/RiskDistributionDiagram";
-
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -13,82 +11,63 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import {
-  AssetMetricsDTO,
-  AverageFixingTime,
-  ComponentRisk,
-  DependencyCountByscanner,
-  FlawAggregationStateAndChange,
-  FlawCountByScanner,
-  RiskDistribution,
-  RiskHistory,
-} from "@/types/api/api";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import FlawAggregationState from "@/components/overview/FlawAggregationState";
-import { RiskHistoryChart } from "@/components/overview/RiskHistoryDiagram";
-import { VulnerableComponents } from "@/components/overview/VulnerableComponents";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
-import CollapsibleControlTrigger from "@/components/common/CollapsibleControlTrigger";
-import EmptyOverview from "@/components/common/EmptyOverview";
-import SDLC from "@/components/common/SDLC";
 import Section from "@/components/common/Section";
-import AverageFixingTimeChart from "@/components/overview/AverageFixingTimeChart";
-import ThreatsMitigationsCollapsibles from "@/components/ssdlc/ThreatsMitigations";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { withContentTree } from "@/decorators/withContentTree";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Collapsible } from "@/components/ui/collapsible";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
-import { CollapsibleContent } from "@radix-ui/react-collapsible";
-import Image from "next/image";
+} from "../../../../../../../../components/ui/card";
+
+import {
+  CheckBadgeIcon,
+  ExclamationCircleIcon,
+  ScaleIcon,
+} from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { Button } from "../../../../../../../../components/ui/button";
+import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
+import SeverityCard from "../../../../../../../../components/SeverityCard";
+import { Badge } from "../../../../../../../../components/ui/badge";
+import { ChartConfig } from "../../../../../../../../components/ui/chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../../../../../components/ui/tooltip";
+import { fetchAssetStats } from "../../../../../../../../services/statService";
+import {
+  License,
+  LicenseResponse,
+  PolicyEvaluation,
+  RiskDistribution,
+} from "../../../../../../../../types/api/api";
 
 interface Props {
-  componentRisk: ComponentRisk;
-  riskDistribution: RiskDistribution | null;
-  riskHistory: RiskHistory[];
-  flawCountByScanner: FlawCountByScanner;
-  dependencyCountByscanner: DependencyCountByscanner;
-  flawAggregationStateAndChange: FlawAggregationStateAndChange;
-  avgLowFixingTime: AverageFixingTime;
-  avgMediumFixingTime: AverageFixingTime;
-  avgHighFixingTime: AverageFixingTime;
-  avgCriticalFixingTime: AverageFixingTime;
-  metrics: AssetMetricsDTO;
+  compliance: Array<PolicyEvaluation>;
+  riskDistribution: RiskDistribution;
+  cvssDistribution: RiskDistribution;
+  licenses: Array<LicenseResponse>;
 }
 
-const metrics2CurrentEvidence = (metrics: AssetMetricsDTO) => {
-  return (
-    Number(metrics.enabledContainerScanning) +
-    Number(metrics.enabledImageSigning) * 2 +
-    Number(metrics.enabledSCA) +
-    Number(Boolean(metrics.verifiedSupplyChainsPercentage > 0)) * 8
-  );
-};
-
 const Index: FunctionComponent<Props> = ({
-  componentRisk,
+  compliance,
   riskDistribution,
-  riskHistory,
-  flawAggregationStateAndChange,
-  avgLowFixingTime,
-  avgMediumFixingTime,
-  avgHighFixingTime,
-  avgCriticalFixingTime,
-  metrics,
+  cvssDistribution,
+  licenses,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -98,33 +77,26 @@ const Index: FunctionComponent<Props> = ({
 
   const router = useRouter();
 
-  if (riskHistory.length === 0) {
-    return (
-      <Page
-        Menu={assetMenu}
-        title="Overview"
-        description="Overview of the asset"
-        Title={<AssetTitle />}
-      >
-        <EmptyOverview
-          title="No data available"
-          description="There is no data available for this asset. Please run a scan to get data."
-          Button={
-            <Button
-              onClick={() =>
-                router.push(
-                  `/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/security-control-center`,
-                )
-              }
-              className="btn btn-primary"
-            >
-              Run a scan
-            </Button>
-          }
-        />
-      </Page>
-    );
-  }
+  const chartConfig = useMemo(() => {
+    return Object.entries(licenses).reduce((acc, [key, value]) => {
+      return {
+        ...acc,
+        [key]: {
+          label: key,
+        },
+      };
+    }, {} satisfies ChartConfig);
+  }, [licenses]);
+
+  const failingControls = useMemo(
+    () => compliance.filter((policy) => policy.result === false),
+    [compliance],
+  );
+
+  const totalDependencies = useMemo(
+    () => licenses.reduce((acc, license) => acc + license.count, 0),
+    [licenses],
+  );
 
   return (
     <Page
@@ -141,104 +113,208 @@ const Index: FunctionComponent<Props> = ({
         Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific asset poses to your organization."
         title="Overview"
       >
-        <SDLC metrics={metrics} />
-        <p className="mt-2 text-sm text-muted-foreground">
-          This diagram displays the current state of your software development
-          lifecycle. It shows which threats are mitigated already as well as
-          which threats are still open. The threat model is heavily based on the
-          proposed threat model by{" "}
-          <Link href="https://slsa.dev/spec/v1.0/threats" target="_blank">
-            <Image
-              src="/assets/slsa.svg"
-              alt="SLSA Logo"
-              className="inline dark:hidden"
-              width={60}
-              height={20}
-            />
-            <Image
-              src="/assets/slsa_dark.svg"
-              alt="SLSA Logo"
-              className="hidden dark:inline-block"
-              width={60}
-              height={20}
-            />
-          </Link>
-          .
-        </p>
-        <div>
-          <Card className="flex-1">
-            <Collapsible>
-              <CardHeader>
-                <CardTitle className="-mb-3">
-                  <CollapsibleControlTrigger
-                    maxEvidence={15}
-                    currentEvidence={metrics2CurrentEvidence(metrics)}
-                  >
-                    <div className="w-full text-left">
-                      Threats and mitigations
-                    </div>
-                  </CollapsibleControlTrigger>
-                </CardTitle>
-                <CardDescription>
-                  Details of your secure software development lifecycle
-                </CardDescription>
-              </CardHeader>
-              <CollapsibleContent className="py-2">
-                <CardContent>
-                  <ThreatsMitigationsCollapsibles
-                    metrics={metrics}
-                    router={router}
-                    asset={asset}
-                  />
-                </CardContent>
-              </CollapsibleContent>
-            </Collapsible>
+        <div className="grid grid-cols-8 gap-4">
+          <Card className="col-span-4 row-span-1">
+            <CardHeader>
+              <CardTitle>Security Posture</CardTitle>
+              <CardDescription>
+                The security posture of the asset is determined by the
+                compliance of the asset with the security policies of the
+                organization.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {failingControls.length > 0 ? (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"danger"}>
+                    <ExclamationCircleIcon className="-ml-2 h-8 w-8 text-red-500" />
+                    <span className="pl-2 text-base">
+                      {failingControls.length} controls are failing
+                    </span>
+                  </Badge>
+                </div>
+              ) : (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"success"}>
+                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <span className="pl-2 text-base">
+                      All controls are passing
+                    </span>
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
           </Card>
-        </div>
-        <div className="mt-2 grid gap-4">
-          <FlawAggregationState
-            title="Asset Risk"
-            description="The total risk this asset poses to the organization"
-            totalRisk={riskHistory[riskHistory.length - 1]?.sumOpenRisk ?? 0}
-            data={flawAggregationStateAndChange}
-          />
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <RiskDistributionDiagram
-                data={riskDistribution ? [riskDistribution] : []}
-              />
-            </div>
-            <VulnerableComponents data={componentRisk} />
+          <Card className="col-span-4 row-span-2">
+            <CardHeader>
+              <CardTitle>To-Do&apos;s</CardTitle>
+              <CardDescription>
+                Tasks that need to be completed before the asset is ready for
+                production, ordered by priority.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {failingControls.length > 0 ? (
+                <div className="flex flex-col">
+                  {failingControls.slice(0, 3).map((policy, i, arr) => (
+                    <div
+                      className={
+                        i === 0
+                          ? "border-b pb-4"
+                          : i === arr.length - 1
+                            ? "pt-4"
+                            : "border-b py-4"
+                      }
+                      key={policy.title}
+                    >
+                      <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
+                        {policy.title}
+                        <div className="flex flex-row flex-wrap gap-2">
+                          {policy.complianceFrameworks.map((t) => (
+                            <Badge key={t} className="" variant={"secondary"}>
+                              <Image
+                                className="-ml-1.5 mr-1 inline-block"
+                                src="/assets/iso.svg"
+                                width={15}
+                                height={15}
+                                alt="Compliance"
+                              />{" "}
+                              {t}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {policy.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-row items-center gap-2">
+                  <Badge variant={"success"}>
+                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
+                    <span className="pl-2 text-base">No tasks until ready</span>
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="col-span-4 row-span-1">
+            <CardHeader className="">
+              <CardTitle className="relative flex flex-row items-end gap-2">
+                <ScaleIcon className="h-6 w-6 text-muted-foreground" />
+                <div className="flex flex-row items-center gap-2">
+                  Compliance Controls
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <InformationCircleIcon className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <Link
+                        className="text-sm !text-muted-foreground"
+                        href={
+                          "https://github.com/l3montree-dev/attestation-compliance-policies"
+                        }
+                      >
+                        Based on a community driven mapping between technical
+                        checks and compliance controls
+                      </Link>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings#compliance`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  Modify Policies
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Displays the compliance of the asset with the security policies
+                of the asset.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ComplianceGrid compliance={compliance} />
+            </CardContent>
+          </Card>
+          <div className="col-span-4 grid grid-cols-2 gap-4">
+            <SeverityCard
+              variant="critical"
+              queryIntervalStart={8}
+              amountByRisk={riskDistribution.critical}
+              amountByCVSS={cvssDistribution.critical}
+            />
+            <SeverityCard
+              variant="high"
+              queryIntervalStart={7}
+              amountByRisk={riskDistribution.high}
+              amountByCVSS={cvssDistribution.high}
+            />
+            <SeverityCard
+              variant="medium"
+              queryIntervalStart={4}
+              amountByRisk={riskDistribution.medium}
+              amountByCVSS={cvssDistribution.medium}
+            />
+            <SeverityCard
+              variant="low"
+              queryIntervalStart={0}
+              amountByRisk={riskDistribution.low}
+              amountByCVSS={cvssDistribution.low}
+            />
           </div>
-          <div className="grid grid-cols-4 gap-4">
-            <AverageFixingTimeChart
-              title="Low severity"
-              description="Average fixing time for low severity flaws"
-              avgFixingTime={avgLowFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="Medium severity"
-              description="Average fixing time for medium severity flaws"
-              avgFixingTime={avgMediumFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="High severity"
-              description="Average fixing time for high severity flaws"
-              avgFixingTime={avgHighFixingTime}
-            />
-            <AverageFixingTimeChart
-              title="Critical severity"
-              description="Average fixing time for critical severity flaws"
-              avgFixingTime={avgCriticalFixingTime}
-            />
-          </div>
-          <RiskHistoryChart
-            data={[{ label: asset.name, history: riskHistory }]}
-          />
-          {/* <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2"></div>
-          <DependenciesPieChart data={dependencyCountByscanner} />
-        </div> */}
+          <Card className="col-span-4 row-span-2 flex flex-col">
+            <CardHeader>
+              <CardTitle className="relative w-full">
+                Licenses
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
+              <CardDescription className="text-left">
+                Displays the distribution of dependency licenses
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex  flex-col">
+                {licenses.map((el, i, arr) => (
+                  <div
+                    className={
+                      i === 0
+                        ? "border-b pb-4"
+                        : i === arr.length - 1
+                          ? "pt-4"
+                          : "border-b py-4"
+                    }
+                    key={el.license.licenseId}
+                  >
+                    <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                      <span className="capitalize">{el.license.licenseId}</span>
+                      <div className="flex flex-row flex-wrap gap-2">
+                        {el.license.isOsiApproved && (
+                          <Badge variant={"secondary"}>
+                            <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                            OSI Approved
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {el.license.name
+                        ? el.license.name
+                        : "Unknown license information"}
+                      , {el.count} dependencies
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Section>
     </Page>
@@ -246,92 +322,27 @@ const Index: FunctionComponent<Props> = ({
 };
 export default Index;
 
-const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
-
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
 
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    const last3Month = new Date();
-    last3Month.setMonth(last3Month.getMonth() - 3);
-
     const apiClient = getApiClientFromContext(context);
 
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/stats";
-    const [
-      componentRisk,
-      riskDistribution,
-      riskHistory,
-      flawAggregationStateAndChange,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-      metrics,
-    ] = await Promise.all([
-      apiClient(url + "/component-risk").then((r) => r.json()),
-      apiClient(url + "/risk-distribution").then((r) => r.json()),
-      apiClient(
-        url +
-          "/risk-history?start=" +
-          extractDateOnly(last3Month) +
-          "&end=" +
-          extractDateOnly(new Date()),
-      ).then((r) => r.json()),
-      apiClient(
-        url +
-          "/flaw-aggregation-state-and-change?compareTo=" +
-          lastMonth.toISOString().split("T")[0],
-      ).then((r) => r.json()),
-      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
-        r.json(),
-      ),
-      apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/metrics",
-      ).then((r) => r.json()),
-    ]);
-
+    const { compliance, riskDistribution, cvssDistribution, licenses } =
+      await fetchAssetStats({
+        organizationSlug: organizationSlug as string,
+        projectSlug: projectSlug as string,
+        assetSlug: assetSlug as string,
+        assetVersionSlug: assetVersionSlug as string,
+        apiClient,
+      });
     return {
       props: {
-        componentRisk,
+        compliance,
         riskDistribution,
-        riskHistory,
-        flawAggregationStateAndChange,
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
-        metrics,
+        cvssDistribution,
+        licenses,
       },
     };
   },

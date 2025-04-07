@@ -14,6 +14,16 @@
 
 import { Modify } from "../common";
 
+export interface PolicyEvaluation {
+  result: boolean | null;
+  title: string;
+  description: string;
+  tags: Array<string>;
+  relatedResources: Array<string>;
+  complianceFrameworks: Array<string>;
+  priority: number;
+}
+
 export interface InviteRequest {
   email: string;
 }
@@ -81,6 +91,8 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
 
 export interface PersonalAccessTokenDTO {
   description: string;
+  scopes: string;
+
   userId: string;
   createdAt: string;
   id: string;
@@ -390,6 +402,22 @@ export interface AffectedPackage {
 
 export interface ComponentRisk {
   [component: string]: number;
+}
+
+export interface License {
+  reference?: string;
+  isDeprecatedLicenseId?: boolean;
+  detailsUrl?: string;
+  referenceNumber?: number;
+  name: string;
+  licenseId: string;
+  seeAlso: string[];
+  isOsiApproved: boolean;
+}
+
+export interface LicenseResponse {
+  license: License;
+  count: number;
 }
 
 export interface RiskDistribution {

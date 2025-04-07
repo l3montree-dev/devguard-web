@@ -56,6 +56,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
     }
   };
 
+  console.log(graphData);
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
@@ -73,12 +74,14 @@ const DependencyDialog: FunctionComponent<Props> = ({
         <hr />
 
         {graphData && (
-          <DependencyGraph
-            width={100}
-            height={100}
-            flaws={[]}
-            graph={graphData}
-          />
+          <div className="h-52 w-full">
+            <DependencyGraph
+              width={100}
+              height={100}
+              flaws={[]}
+              graph={graphData}
+            />
+          </div>
         )}
 
         <DialogFooter>

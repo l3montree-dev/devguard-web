@@ -35,6 +35,8 @@ import ConnectToRepoSection from "../../../../components/ConnectToRepoSection";
 import MemberDialog from "../../../../components/MemberDialog";
 import MembersTable from "../../../../components/MembersTable";
 import ProjectMemberDialog from "../../../../components/ProjectMemberDialog";
+import ListItem from "../../../../components/common/ListItem";
+import Alert from "../../../../components/common/Alert";
 
 interface Props {
   project: ProjectDTO;
@@ -74,6 +76,23 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
       toast.success("Role successfully changed");
     } else {
       toast.error("Failed to update member role");
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/projects/" + project!.slug, // can never be null
+      {
+        method: "DELETE",
+      },
+    );
+    if (resp.ok) {
+      toast("Project deleted", {
+        description: "The project has been deleted",
+      });
+      router.push("/" + activeOrg.slug + "/projects/");
+    } else {
+      toast.error("Could not delete asset");
     }
   };
 
@@ -179,7 +198,11 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
         <hr />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <ProjectForm forceVerticalSections={false} form={form} />
+            <ProjectForm
+              onConfirmDelete={handleDeleteProject}
+              forceVerticalSections={false}
+              form={form}
+            />
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>

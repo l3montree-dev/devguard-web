@@ -31,19 +31,8 @@ export const useProjectMenu = () => {
 
   const menu = [
     {
-      title: "Overview",
-      href: "/" + orgSlug + "/projects/" + projectSlug,
-      Icon: ChartBarSquareIcon,
-    },
-    {
-      title: "Compliance",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
-      Icon: ScaleIcon,
-    },
-
-    {
       title: "Subprojects & Assets",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/assets",
+      href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
     },
   ];

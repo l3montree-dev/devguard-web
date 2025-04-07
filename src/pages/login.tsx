@@ -15,12 +15,18 @@
 
 import {
   LoginFlow,
-  UiNodeGroupEnum,
   UiNodeScriptAttributes,
   UpdateLoginFlowBody,
 } from "@ory/client";
 
+import Callout from "@/components/common/Callout";
+import Carriage from "@/components/common/Carriage";
+import CustomTab from "@/components/common/CustomTab";
+import { Messages } from "@/components/kratos/Messages";
+import { Tab } from "@headlessui/react";
+import { filterNodesByGroups } from "@ory/integrations/ui";
 import { AxiosError } from "axios";
+import { uniq } from "lodash";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -35,15 +41,6 @@ import {
 import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
-import { filterNodesByGroups } from "@ory/integrations/ui";
-import { Tab } from "@headlessui/react";
-import { classNames } from "@/utils/common";
-import CustomTab from "@/components/common/CustomTab";
-import { FingerPrintIcon } from "@heroicons/react/24/outline";
-import Callout from "@/components/common/Callout";
-import Carriage from "@/components/common/Carriage";
-import { Message, Messages } from "@/components/kratos/Messages";
-import { uniq } from "lodash";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -210,56 +207,65 @@ const Login: NextPage = () => {
             </div>
 
             <div className="mt-10 sm:mx-auto">
-              <Tab.Group>
-                <CustomTab>Passwordless</CustomTab>
-                <CustomTab>Legacy Password login</CustomTab>
-                <Tab.Panels className={"mt-6"}>
-                  <Tab.Panel>
-                    <Flow
-                      only="passkey"
-                      hideGlobalMessages
-                      onSubmit={onSubmit}
-                      flow={flow as LoginFlow}
-                    />
-                    {availableMethods.includes("oidc") && (
-                      <div className="mt-6 border-t-2 pt-6">
-                        <div className="flex flex-row items-center justify-end gap-4">
-                          <span className="text-sm text-gray-400">
-                            Social-Login
-                          </span>
-                          <Flow
-                            only="oidc"
-                            hideGlobalMessages
-                            onSubmit={onSubmit}
-                            flow={flow as LoginFlow}
-                          />
+              {flow?.requested_aal !== "aal2" ? (
+                <Tab.Group>
+                  <CustomTab>Passwordless</CustomTab>
+                  <CustomTab>Legacy Password login</CustomTab>
+                  <Tab.Panels className={"mt-6"}>
+                    <Tab.Panel>
+                      <Flow
+                        only="passkey"
+                        hideGlobalMessages
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                      {availableMethods.includes("oidc") && (
+                        <div className="mt-6 border-t-2 pt-6">
+                          <div className="flex flex-row items-center justify-end gap-4">
+                            <span className="text-sm text-gray-400">
+                              Social-Login
+                            </span>
+                            <Flow
+                              only="oidc"
+                              hideGlobalMessages
+                              onSubmit={onSubmit}
+                              flow={flow as LoginFlow}
+                            />
+                          </div>
                         </div>
+                      )}
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <div className="my-4">
+                        <Callout intent="warning">
+                          <div className="flex flex-row gap-4">
+                            <p className="flex-1">
+                              Passwords are insecure by design. We recommend
+                              using a passwordless authentication methods.{" "}
+                              <div className="mr-2 inline-block w-10">
+                                <Carriage />
+                              </div>
+                            </p>
+                          </div>
+                        </Callout>
                       </div>
-                    )}
-                  </Tab.Panel>
-                  <Tab.Panel>
-                    <div className="my-4">
-                      <Callout intent="warning">
-                        <div className="flex flex-row gap-4">
-                          <p className="flex-1">
-                            Passwords are insecure by design. We recommend using
-                            a passwordless authentication methods.{" "}
-                            <div className="mr-2 inline-block w-10">
-                              <Carriage />
-                            </div>
-                          </p>
-                        </div>
-                      </Callout>
-                    </div>
-                    <Flow
-                      only="password"
-                      hideGlobalMessages
-                      onSubmit={onSubmit}
-                      flow={flow as LoginFlow}
-                    />
-                  </Tab.Panel>
-                </Tab.Panels>
-              </Tab.Group>
+                      <Flow
+                        only="password"
+                        hideGlobalMessages
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
+              ) : (
+                <Flow
+                  only="totp"
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  flow={flow as LoginFlow}
+                />
+              )}
             </div>
             <div className="mt-4">
               <Messages messages={flow?.ui.messages} />

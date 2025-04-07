@@ -27,7 +27,6 @@ import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
 import { FunctionComponent, useState } from "react";
-import CopyCode from "../../../../../../components/common/CopyCode";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
 import { Button } from "../../../../../../components/ui/button";
@@ -46,6 +45,7 @@ import UploadSbomDialog from "@/components/risk-identification/UploadSbomDialog"
 
 import GithubInstructionsSteps from "@/components/risk-identification/GithubInstructionsSteps";
 import GitlabInstructionsSteps from "@/components/risk-identification/GitlabInstructionsSteps";
+import PatSection from "@/components/risk-identification/PatSection";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
   Card,
@@ -275,38 +275,11 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
           </DialogHeader>
           <hr />
           <div>
-            <Section
-              className="mb-10 mt-0 pb-0 pt-0"
-              description="To use the Devguard-Scanner, you need to create a Personal Access
-Token. You can create such a token by clicking the button below."
-              title="Create a Personal Access Token"
-              forceVertical
-            >
-              {pat && (
-                <div className="flex flex-row items-center justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex flex-row gap-2">
-                      <CopyCode language="shell" codeString={pat?.privKey} />
-                    </div>
-
-                    <span className=" block text-right text-sm text-destructive">
-                      Make sure to copy the token. You won&apos;t be able to see
-                      it ever again!
-                    </span>
-                  </div>
-                </div>
-              )}
-              {!pat && (
-                <div>
-                  <Button
-                    variant={"default"}
-                    onClick={() => onCreatePat({ description: "SCA Analysis" })}
-                  >
-                    Create Personal Access Token
-                  </Button>
-                </div>
-              )}
-            </Section>
+            <PatSection
+              onCreatePat={onCreatePat}
+              pat={pat}
+              description={`CI/CD-Pipeline Token generated at ${new Date().toLocaleString()}`}
+            />
           </div>
           <hr />
           <Tab.Group>

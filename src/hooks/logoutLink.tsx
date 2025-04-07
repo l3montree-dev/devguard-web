@@ -19,7 +19,7 @@ import { ory } from "../services/ory";
 import { AxiosError } from "axios";
 
 // Returns a function which will log the user out
-export function LogoutLink(deps?: DependencyList) {
+export function LogoutLink(deps: DependencyList = []) {
   const [logoutToken, setLogoutToken] = useState<string>("");
   const router = useRouter();
 

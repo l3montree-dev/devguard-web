@@ -16,7 +16,7 @@ const AssetTitle = () => {
   return (
     <span className="flex flex-row gap-2">
       <Link
-        href={`/${activeOrg.slug}/projects`}
+        href={`/${activeOrg.slug}`}
         className="flex flex-row items-center gap-1 !text-white hover:no-underline"
       >
         {activeOrg.name}{" "}
