@@ -47,6 +47,11 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
+    case "ticketClosed":
+      return <CheckIcon />;
+    case "ticketDeleted":
+      return <StopIcon />;
+
     case "accepted":
       return <SpeakerXMarkIcon />;
     case "fixed":
