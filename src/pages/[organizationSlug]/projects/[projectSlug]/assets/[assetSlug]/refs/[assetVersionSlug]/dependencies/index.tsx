@@ -362,13 +362,14 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               ))}
             </tbody>
           </table>
+        </div>
         <CustomPagination {...components} />
       </Section>
 
       {datasets && (
         <DependencyDialog
           open={true}
-          setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the rendering
+          setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
           scoreCard={datasets.scoreCard}
         ></DependencyDialog>
