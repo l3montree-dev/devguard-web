@@ -21,6 +21,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 import { ScoreCard } from "@/types/api/api";
+import { withProject } from "@/decorators/withProject";
 
 interface Props {
   open: boolean;
@@ -64,25 +65,33 @@ const DependencyDialog: FunctionComponent<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogContent setOpen={setOpen}>
+      <DialogContent className={"w-full"} setOpen={setOpen}>
         <DialogHeader>{purl}</DialogHeader>
         <hr />
         <table>
-          <tr>
-            <th>name</th>
-            <th>score</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>name</th>
+              <th>score</th>
+              <th>reason</th>
 
-          {scoreCard?.checks.map((e) => (
-            <div key={e.name}>
-              <td>{e.name}</td>
-              <td>{e.score}</td>
-              {/* <td>{e.reason}</td> */}
-              <td>{e.score}</td>
-              <td>{e.score}</td>
-              <td>{e.score}</td>
-            </div>
-          ))}
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {scoreCard?.checks.map((e) => (
+              <tr key={e.name}>
+                <td>
+                  {/* <td>{e.reason}</td> */}
+                  {e.name}
+                </td>
+                <td>{e.score}</td>
+                <td>{e.reason}</td>
+
+                <td>{e.documentation.shortDescription}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
 
         {graphData && (
