@@ -47,6 +47,11 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
   switch (eventType) {
+    case "ticketClosed":
+      return <CheckIcon />;
+    case "ticketDeleted":
+      return <StopIcon />;
+
     case "accepted":
       return <SpeakerXMarkIcon />;
     case "fixed":
@@ -140,6 +145,10 @@ const eventTypeMessages = (
   events?: FlawEventDTO[],
 ) => {
   switch (event.type) {
+    case "ticketClosed":
+      return "closed the ticket for " + flawName;
+    case "ticketDeleted":
+      return "deleted the ticket for " + flawName;
     case "mitigate":
       return "created a ticket for " + flawName;
     case "reopened":
@@ -187,6 +196,8 @@ const evTypeBackground: { [key in FlawEventDTO["type"]]: string } = {
   rawRiskAssessmentUpdated: "bg-secondary",
   reopened: "bg-red-600 text-white",
   comment: "bg-secondary",
+  ticketClosed: "bg-red-600 text-white",
+  ticketDeleted: "bg-red-600 text-white",
 };
 
 export default function RiskAssessmentFeed({

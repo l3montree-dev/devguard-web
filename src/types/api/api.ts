@@ -165,6 +165,7 @@ export interface BaseFlawDTO {
   rawRiskAssessment: number;
   ticketId: string | null;
   ticketUrl: string | null;
+  ticketState: string | null;
   riskRecalculatedAt: string;
   assetId: string;
 }
@@ -200,6 +201,14 @@ interface BaseFlawEventDTO {
   flawName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;
+}
+
+export interface TicketClosedFlawEventDTO extends BaseFlawEventDTO {
+  type: "ticketClosed";
+}
+
+export interface TickedDeletedFlawEventDTO extends BaseFlawEventDTO {
+  type: "ticketDeleted";
 }
 
 export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
@@ -253,7 +262,9 @@ export type FlawEventDTO =
   | MarkedForTransferFlawEventDTO
   | RiskAssessmentUpdatedFlawEventDTO
   | ReopenedFlawEventDTO
-  | CommentFlawEventDTO;
+  | CommentFlawEventDTO
+  | TicketClosedFlawEventDTO
+  | TickedDeletedFlawEventDTO;
 
 export interface CWE {
   cwe: string;
