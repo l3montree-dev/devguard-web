@@ -23,6 +23,17 @@ import { toast } from "sonner";
 import { ScoreCard } from "@/types/api/api";
 import { withProject } from "@/decorators/withProject";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { Progress } from "@/components/ui/progress";
+import { classNames } from "@/utils/common";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
+
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -68,32 +79,53 @@ const DependencyDialog: FunctionComponent<Props> = ({
       <DialogContent className={"w-full"} setOpen={setOpen}>
         <DialogHeader>{purl}</DialogHeader>
         <hr />
-        <table>
-          <thead>
-            <tr>
-              <th>name</th>
-              <th>score</th>
-              <th>reason</th>
-
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scoreCard?.checks.map((e) => (
-              <tr key={e.name}>
-                <td>
-                  {/* <td>{e.reason}</td> */}
-                  {e.name}
-                </td>
-                <td>{e.score}</td>
-                <td>{e.reason}</td>
-
-                <td>{e.documentation.shortDescription}</td>
+        <div className="rounded-lg border">
+          <table className="overflow-hidden rounded-lg">
+            <thead>
+              <tr className="whitespace-nowrap text-left text-sm">
+                <th className="p-2 text-left">Check Name</th>
+                <th className="p-2 text-left">Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
+            </thead>
+            <tbody>
+              {scoreCard?.checks.map((e, i, arr) => (
+                <tr
+                  className={classNames(
+                    "text-sm",
+                    i % 2 === 0 ? "bg-card" : "",
+                    i + 1 !== arr.length ? "border-b" : "",
+                  )}
+                  key={e.name}
+                >
+                  <td className="p-2 text-left">
+                    <Tooltip>
+                      <TooltipTrigger className="text-left">
+                        {e.name}
+                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{e.documentation.shortDescription}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </td>
+                  <td className="p-2 text-left">
+                    <Tooltip>
+                      <TooltipTrigger className="text-left">
+                        {e.score}
+                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{e.reason}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Progress value={e.score * 10}></Progress>
+                  </td>
+                  <td className="p-2 text-left"></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {graphData && (
           <div className="h-52 w-full" style={{ height: 500 }}>
             <DependencyGraph

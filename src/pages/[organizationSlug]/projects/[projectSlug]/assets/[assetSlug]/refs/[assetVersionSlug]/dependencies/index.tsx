@@ -68,6 +68,7 @@ import {
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -180,7 +181,11 @@ const columnsDef: ColumnDef<
   columnHelper.accessor("dependency.project.scoreCardScore", {
     header: "OpenSSF Scorecard Score",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
-    cell: (row) => <div>{row.getValue()}</div>,
+    cell: (row) => (
+      <div>
+        {row.getValue()} <Progress value={row.getValue() * 10}></Progress>
+      </div>
+    ),
   }),
   columnHelper.accessor("dependency.published", {
     header: "Published",
