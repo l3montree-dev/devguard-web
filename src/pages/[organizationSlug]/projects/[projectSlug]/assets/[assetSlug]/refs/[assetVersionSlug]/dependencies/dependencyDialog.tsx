@@ -81,17 +81,10 @@ const DependencyDialog: FunctionComponent<Props> = ({
         <hr />
         <div className="grid grid-cols-3 rounded-lg border">
           {scoreCard?.checks.map((e, i, arr) => (
-            <div
-              className={classNames(
-                "text-sm",
-                i % 2 === 0 ? "bg-card" : "",
-                i + 1 !== arr.length ? "border-b" : "",
-              )}
-              key={e.name}
-            >
+            <div className={classNames("border text-sm")} key={e.name}>
               <div className="p-2 text-left">
                 <Tooltip>
-                  <div className="flex flex-row justify-center">
+                  <div className="flex flex-row ">
                     <TooltipTrigger className="">
                       {e.name}
                       <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
@@ -103,18 +96,20 @@ const DependencyDialog: FunctionComponent<Props> = ({
                 </Tooltip>
               </div>
               <div className="p-2 text-left">
-                <Tooltip>
-                  <div className="flex flex-row justify-center">
-                    <TooltipTrigger className="text-left">
-                      {e.score === -1 ? 0 : e.score}
-                      <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                  </div>
-                  <TooltipContent>
-                    <p>{e.reason}</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Progress value={e.score * 10}></Progress>
+                <div className="flex flex-row">
+                  <Tooltip>
+                    <div className="text flex-ro flex flex-1">
+                      <TooltipTrigger className="text-left">
+                        {e.score === -1 ? 0 : e.score}
+                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                    </div>
+                    <TooltipContent>
+                      <p>{e.reason}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Progress className={""} value={e.score * 10}></Progress>
+                </div>
               </div>
               <div className="p-2 text-left"></div>
             </div>
