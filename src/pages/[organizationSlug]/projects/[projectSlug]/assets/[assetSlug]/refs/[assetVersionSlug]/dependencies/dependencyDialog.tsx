@@ -67,13 +67,23 @@ const DependencyDialog: FunctionComponent<Props> = ({
       <DialogContent setOpen={setOpen}>
         <DialogHeader>{purl}</DialogHeader>
         <hr />
+        <table>
+          <tr>
+            <th>name</th>
+            <th>score</th>
+          </tr>
 
-        {scoreCard?.checks.map((e) => (
-          <div key={e.name}>
-            {e.name}
-            {e.documentation.shortDescription}
-          </div>
-        ))}
+          {scoreCard?.checks.map((e) => (
+            <div key={e.name}>
+              <td>{e.name}</td>
+              <td>{e.score}</td>
+              {/* <td>{e.reason}</td> */}
+              <td>{e.score}</td>
+              <td>{e.score}</td>
+              <td>{e.score}</td>
+            </div>
+          ))}
+        </table>
 
         {graphData && (
           <div className="h-52 w-full" style={{ height: 500 }}>
