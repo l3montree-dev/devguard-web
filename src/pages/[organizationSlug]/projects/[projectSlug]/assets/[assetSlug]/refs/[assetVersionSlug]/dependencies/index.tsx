@@ -29,6 +29,7 @@ import {
   License,
   LicenseResponse,
   Paged,
+  ScoreCard,
 } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -204,30 +205,21 @@ const columnsDef: ColumnDef<
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
-  const [open, setOpen] = useState(false);
-  const [datasets, setDatasets] = useState<Record<string, Dictionary>>({});
+
+  const [datasets, setDatasets] = useState<{
+    purl: string;
+    scoreCard?: ScoreCard;
+  }>();
 
   const { table } = useTable({
     data: components.data,
     columnsDef,
   });
 
-  function dataPassthrough(data: any) {
-    console.log(data);
-
-    setOpen(true);
-
+  function dataPassthrough(data: ComponentPaged) {
     setDatasets({
       purl: data.dependency.purl,
-      // purl2: data.dependencyPurl,
-      details: data.dependency.project?.scoreCard.checks[0].details,
-      name: data.dependency.project?.scoreCard.checks[0].name,
-      reason: data.dependency.project?.scoreCard.checks[0].reason,
-      score: data.dependency.project?.scoreCard.checks[0].score,
-      url: data.dependency.project?.scoreCard.checks[0].documentation.url,
-      shortDescription:
-        data.dependency.project?.scoreCard.checks[0].documentation
-          .shortDescription,
+      scoreCard: data.dependency.project?.scoreCard,
     });
   }
 
@@ -373,11 +365,15 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         </div>
         <CustomPagination {...components} />
       </Section>
-      <DependencyDialog
-        open={open}
-        setOpen={setOpen}
-        data={datasets}
-      ></DependencyDialog>
+
+      {datasets && (
+        <DependencyDialog
+          open={true}
+          setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the rendering
+          purl={datasets.purl}
+          scoreCard={datasets.scoreCard}
+        ></DependencyDialog>
+      )}
     </Page>
   );
 };

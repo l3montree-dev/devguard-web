@@ -19,19 +19,21 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { ScoreCard } from "@/types/api/api";
 
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  data: any;
+  purl: string;
+  scoreCard?: ScoreCard;
 }
 
 const DependencyDialog: FunctionComponent<Props> = ({
   open,
   setOpen,
-  data,
+  scoreCard,
+  purl,
 }) => {
   const asset = useActiveAsset();
   const router = useRouter();
@@ -57,21 +59,21 @@ const DependencyDialog: FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    handleGraphFetch(data.purl);
-  }, [data.purl]);
+    handleGraphFetch(purl);
+  }, [purl]);
 
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>
-        <DialogHeader>
-          <DialogTitle>reason: {data.reason}</DialogTitle>
-          <DialogTitle>details: {data.details}</DialogTitle>
-          <DialogTitle>name: {data.name}</DialogTitle>
-          <DialogTitle>score: {data.score}</DialogTitle>
-          <DialogTitle>shortDescription: {data.shortDescription}</DialogTitle>
-          <DialogTitle>dependencyPurl: {data.purl}</DialogTitle>
-        </DialogHeader>
+        <DialogHeader>{purl}</DialogHeader>
         <hr />
+
+        {scoreCard?.checks.map((e) => (
+          <div key={e.name}>
+            {e.name}
+            {e.documentation.shortDescription}
+          </div>
+        ))}
 
         {graphData && (
           <div className="h-52 w-full" style={{ height: 500 }}>
