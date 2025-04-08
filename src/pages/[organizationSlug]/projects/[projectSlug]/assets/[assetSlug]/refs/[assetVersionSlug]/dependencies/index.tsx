@@ -362,7 +362,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               ))}
             </tbody>
           </table>
-        </div>
         <CustomPagination {...components} />
       </Section>
 
