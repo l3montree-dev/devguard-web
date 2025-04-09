@@ -258,7 +258,8 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
             />
           </FormControl>
           <FormDescription>
-            Calculates Risk including multiple factors.
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
           </FormDescription>
           <FormMessage />
         </FormItem>
@@ -286,8 +287,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
             />
           </FormControl>
           <FormDescription>
-            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
-            Score given by experts
+            Calculates Risk including multiple factors.
           </FormDescription>
           <FormMessage />
         </FormItem>
