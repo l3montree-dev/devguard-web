@@ -272,8 +272,8 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
 };
 
 const AssetSettingsForm: FunctionComponent<
-  Props & { forceVerticalSections?: boolean }
-> = ({ form, forceVerticalSections }) => {
+  Props & { forceVerticalSections?: boolean; showReportingRange: boolean }
+> = ({ form, forceVerticalSections, showReportingRange }) => {
   return (
     <>
       <Section
@@ -300,23 +300,27 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <AssetFormMisc form={form} />
       </Section>
-      <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        description="CVSS-BTE is the latest Scoring System standard.
+      {showReportingRange && (
+        <>
+          <hr />
+          <Section
+            forceVertical={forceVerticalSections}
+            description="CVSS-BTE is the latest Scoring System standard.
         It combines multiple metrics into one, your defined range will automatically create tickets that 
         "
-        title="Reporting range"
-      >
-        <EnableTicketRange form={form}></EnableTicketRange>
+            title="Reporting range"
+          >
+            <EnableTicketRange form={form}></EnableTicketRange>
 
-        {form.watch("enableTicketRange") && (
-          <React.Fragment>
-            <SliderForm form={form}></SliderForm>
-            <RiskSliderForm form={form}></RiskSliderForm>
-          </React.Fragment>
-        )}
-      </Section>
+            {form.watch("enableTicketRange") && (
+              <React.Fragment>
+                <SliderForm form={form}></SliderForm>
+                <RiskSliderForm form={form}></RiskSliderForm>
+              </React.Fragment>
+            )}
+          </Section>
+        </>
+      )}
       <></>
     </>
   );

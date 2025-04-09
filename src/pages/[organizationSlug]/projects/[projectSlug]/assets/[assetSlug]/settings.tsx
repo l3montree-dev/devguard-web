@@ -166,7 +166,10 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <AssetForm form={form} />
+            <AssetForm
+              form={form}
+              showReportingRange={asset.repositoryId !== null}
+            />
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>
             </div>
