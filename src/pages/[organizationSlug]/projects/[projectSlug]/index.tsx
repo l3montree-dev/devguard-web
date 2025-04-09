@@ -373,7 +373,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               className="flex flex-col"
               onSubmit={form.handleSubmit(handleCreateAsset)}
             >
-              <AssetForm forceVerticalSections form={form} />
+              <AssetForm
+                forceVerticalSections
+                form={form}
+                showReportingRange={false}
+              />
               <DialogFooter>
                 <Button type="submit" variant="default">
                   Create
