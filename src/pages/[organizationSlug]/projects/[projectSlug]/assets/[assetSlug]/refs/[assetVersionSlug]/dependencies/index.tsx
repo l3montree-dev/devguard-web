@@ -25,6 +25,7 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import {
+  Component,
   ComponentPaged,
   License,
   LicenseResponse,
@@ -69,6 +70,7 @@ import {
 } from "../../../../../../../../../components/ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Progress } from "@/components/ui/progress";
+import { Project } from "@/types/common";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -207,6 +209,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const [datasets, setDatasets] = useState<{
     purl: string;
     scoreCard?: ScoreCard;
+    project: Component["project"];
   }>();
 
   const { table } = useTable({
@@ -218,6 +221,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     setDatasets({
       purl: data.dependency.purl,
       scoreCard: data.dependency.project?.scoreCard,
+      project: data.dependency.project,
     });
   }
 
@@ -364,9 +368,10 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         <CustomPagination {...components} />
       </Section>
 
-      {datasets && (
+      {datasets && datasets.project && (
         <DependencyDialog
           open={true}
+          project={datasets.project} //undefined will make it go kaboom
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
           scoreCard={datasets.scoreCard}

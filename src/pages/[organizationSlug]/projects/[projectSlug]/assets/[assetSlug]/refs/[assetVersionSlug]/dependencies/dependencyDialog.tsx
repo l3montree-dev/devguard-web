@@ -10,6 +10,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -20,7 +21,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
-import { ScoreCard } from "@/types/api/api";
+import { Project, ScoreCard } from "@/types/api/api";
 import { withProject } from "@/decorators/withProject";
 
 import {
@@ -33,12 +34,16 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { classNames } from "@/utils/common";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
+import { Badge } from "@/components/ui/badge";
+import ListItem from "@/components/common/ListItem";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   purl: string;
   scoreCard?: ScoreCard;
+  project: Project;
 }
 
 const DependencyDialog: FunctionComponent<Props> = ({
@@ -46,6 +51,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
   setOpen,
   scoreCard,
   purl,
+  project: componentProject,
 }) => {
   const asset = useActiveAsset();
   const router = useRouter();
@@ -77,17 +83,30 @@ const DependencyDialog: FunctionComponent<Props> = ({
   return (
     <Dialog open={open}>
       <DialogContent className={"w-full"} setOpen={setOpen}>
-        <DialogHeader>{purl}</DialogHeader>
-        <hr />
-        <div className="grid grid-cols-3 rounded-lg border">
+        <DialogHeader>
+          <DialogTitle>{purl}</DialogTitle>
+          <DialogDescription>
+            Details of package: {componentProject.description}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 rounded-lg border">
           {scoreCard?.checks.map((e, i, arr) => (
-            <div className={classNames("border text-sm")} key={e.name}>
-              <div className="p-2 text-left">
+            <div
+              className={classNames("flex flex-col border text-sm")}
+              key={e.name}
+            >
+              <div className="px-2 pt-2 text-left">
                 <Tooltip>
                   <div className="flex flex-row ">
-                    <TooltipTrigger className="">
-                      {e.name}
-                      <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
+                    <TooltipTrigger className="flex w-full flex-row items-center justify-between font-semibold">
+                      <div className="">
+                        {e.name}
+
+                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <Badge variant={e.score < 3 ? "danger" : "secondary"}>
+                        {e.score}
+                      </Badge>
                     </TooltipTrigger>
                   </div>
                   <TooltipContent>
@@ -96,20 +115,8 @@ const DependencyDialog: FunctionComponent<Props> = ({
                 </Tooltip>
               </div>
               <div className="p-2 text-left">
-                <div className="flex flex-row">
-                  <Tooltip>
-                    <div className="text flex-ro flex flex-1">
-                      <TooltipTrigger className="text-left">
-                        {e.score === -1 ? 0 : e.score}
-                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                    </div>
-                    <TooltipContent>
-                      <p>{e.reason}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Progress className={""} value={e.score * 10}></Progress>
-                </div>
+                <p className="capitalize text-muted-foreground">{e.reason}</p>
+                <div className="flex flex-row"></div>
               </div>
               <div className="p-2 text-left"></div>
             </div>
@@ -117,7 +124,10 @@ const DependencyDialog: FunctionComponent<Props> = ({
         </div>
 
         {graphData && (
-          <div className="h-52 w-full" style={{ height: 500 }}>
+          <div
+            className="h-52 w-full rounded-lg border bg-black"
+            style={{ height: 500 }}
+          >
             <DependencyGraph
               variant="compact"
               width={100}
