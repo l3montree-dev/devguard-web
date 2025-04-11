@@ -392,9 +392,13 @@ const Index: FunctionComponent<Props> = (props) => {
                 )}
                 <FlawState state={flaw.state} />
                 {cve && <Severity risk={flaw.rawRiskAssessment} />}
-                <Badge variant={"outline"}>
-                  <div>{flaw.scanner}</div>
-                </Badge>
+                <div className="flex flex-row gap-2">
+                  {flaw.scannerIds.split(" ").map((s) => (
+                    <Badge key={s} variant={"secondary"}>
+                      {s}
+                    </Badge>
+                  ))}
+                </div>
               </div>
               <div className="mb-16 mt-4">
                 <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
@@ -837,10 +841,10 @@ const Index: FunctionComponent<Props> = (props) => {
                               className={buttonVariants({ variant: "outline" })}
                               href={
                                 router.asPath +
-                                "/../../dependency-graph?pkg=" +
+                                "/../../dependencies/graph?pkg=" +
                                 flaw.componentPurl +
                                 "&scanner=" +
-                                flaw.scanner
+                                flaw.scannerIds.split(" ")[0]
                               }
                             >
                               Show in dependency graph

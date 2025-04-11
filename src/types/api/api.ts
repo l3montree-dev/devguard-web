@@ -159,7 +159,7 @@ export interface BaseFlawDTO {
   updatedAt: string;
   cveId: string | null;
 
-  scanner: string;
+  scannerIds: string;
   state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
   rawRiskAssessment: number;

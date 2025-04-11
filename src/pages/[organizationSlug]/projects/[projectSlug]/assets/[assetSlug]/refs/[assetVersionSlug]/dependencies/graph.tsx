@@ -25,13 +25,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
@@ -61,9 +54,8 @@ import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useAct
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
-  versions: string[];
   flaws: Array<FlawDTO>;
-}> = ({ graph, flaws, versions }) => {
+}> = ({ graph, flaws }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
   const dimensions = useDimensions();
@@ -350,7 +342,7 @@ export const getServerSideProps = middleware(
       context.query.scanner = "sca";
     }
 
-    const [resp, flawResp, versionsResp] = await Promise.all([
+    const [resp, flawResp] = await Promise.all([
       apiClient(
         uri +
           "dependency-graph?" +
@@ -372,15 +364,13 @@ export const getServerSideProps = middleware(
               "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
           }),
       ),
-      apiClient(uri + "versions"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [graph, flaws, versions] = await Promise.all([
+    const [graph, flaws] = await Promise.all([
       resp.json() as Promise<{ root: DependencyTreeNode }>,
       flawResp.json() as Promise<Array<FlawDTO>>,
-      versionsResp.json() as Promise<Array<string>>,
     ]);
 
     let converted = convertGraph(graph.root);
@@ -420,7 +410,6 @@ export const getServerSideProps = middleware(
       props: {
         graph: { root: converted },
         flaws,
-        versions,
       },
     };
   },

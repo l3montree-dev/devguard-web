@@ -47,10 +47,12 @@ const FlawWithCveTableRow = ({
           <FlawState state={flaw.state} />
         </div>
       </td>
-      <td className="p-4">
-        <Badge variant={"secondary"}>
-          {flaw.scanner.replace(defaultScanner, "")}
-        </Badge>
+      <td className="flex flex-row flex-wrap gap-1 p-4">
+        {flaw.scannerIds.split(" ").map((s) => (
+          <Badge key={s} variant={"secondary"}>
+            {s.replace(defaultScanner, "")}
+          </Badge>
+        ))}
       </td>
       <td className="p-4">{flaw.cveId}</td>
       <td className="p-4">{flaw.rawRiskAssessment.toFixed(1)}</td>
