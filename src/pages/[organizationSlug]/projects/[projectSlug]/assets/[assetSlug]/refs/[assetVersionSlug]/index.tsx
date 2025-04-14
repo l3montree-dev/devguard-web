@@ -50,24 +50,32 @@ import {
 } from "../../../../../../../../components/ui/tooltip";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
+  FlawEventDTO,
   License,
   LicenseResponse,
+  Paged,
   PolicyEvaluation,
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
+import useTable from "@/hooks/useTable";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
   licenses: Array<LicenseResponse>;
+  events: Paged<FlawEventDTO>;
 }
+const columnHelper = createColumnHelper<FlawEventDTO>();
+const columnsDef: ColumnDef<FlawEventDTO, any>[] = [];
 
 const Index: FunctionComponent<Props> = ({
   compliance,
   riskDistribution,
   cvssDistribution,
   licenses,
+  events,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -76,6 +84,11 @@ const Index: FunctionComponent<Props> = ({
   const { branches, tags } = useAssetBranchesAndTags();
 
   const router = useRouter();
+
+  const { table, isLoading, handleSearch } = useTable({
+    columnsDef,
+    data: events.data,
+  });
 
   const chartConfig = useMemo(() => {
     return Object.entries(licenses).reduce((acc, [key, value]) => {
@@ -315,6 +328,30 @@ const Index: FunctionComponent<Props> = ({
               </div>
             </CardContent>
           </Card>
+
+          <Card className="col-span-4 row-span-2">
+            <CardHeader>
+              <CardTitle>Events</CardTitle>
+              <CardDescription>
+                Displays the events of the asset.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex flex-row items-center justify-center">
+                  Loading...
+                </div>
+              ) : (
+                <div className="h-full w-full">
+                  {events.data.length === 0 && (
+                    <div className="flex-Tasks that need to berow flex items-center justify-center">
+                      No events found
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </Section>
     </Page>
@@ -329,20 +366,24 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const { compliance, riskDistribution, cvssDistribution, licenses } =
+    const { compliance, riskDistribution, cvssDistribution, licenses, events } =
       await fetchAssetStats({
         organizationSlug: organizationSlug as string,
         projectSlug: projectSlug as string,
         assetSlug: assetSlug as string,
         assetVersionSlug: assetVersionSlug as string,
         apiClient,
+        context,
       });
+
+    console.log("events", events.data);
     return {
       props: {
         compliance,
         riskDistribution,
         cvssDistribution,
         licenses,
+        events,
       },
     };
   },
