@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { PatWithPrivKey } from "../../types/api/api";
 import CopyCode from "../common/CopyCode";
 import ListItem from "../common/ListItem";
@@ -44,9 +43,10 @@ const PatSection = ({
         </div>
       ) : (
         <>
-          <div>
+          <div className="flex justify-between">
             <Button
               variant="default"
+              className=""
               onClick={() =>
                 onCreatePat({
                   description,
@@ -56,14 +56,14 @@ const PatSection = ({
             >
               Create Personal Access Token
             </Button>
+            <Link
+              href="/user-settings#pat"
+              target="_blank"
+              className="flex items-end justify-end align-super text-sm"
+            >
+              <span>Manage your tokens</span>
+            </Link>
           </div>
-          <Link
-            href="/user-settings#pat"
-            target="_blank"
-            className=" flex justify-end text-sm"
-          >
-            <span>Manage your tokens</span>
-          </Link>
         </>
       )}
     </Section>
