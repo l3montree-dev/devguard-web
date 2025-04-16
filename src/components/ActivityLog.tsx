@@ -18,8 +18,8 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
   DetectedEventDTO,
   VulnEventDTO,
-  RiskAssessmentUpdatedFlawEventDTO,
   RiskCalculationReport,
+  RiskAssessmentUpdatedEventDTO,
 } from "@/types/api/api";
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -124,7 +124,7 @@ const eventMessages = (
       const beforeThisEvent = events.slice(0, index);
       const lastRiskEvent = beforeThisEvent.findLast(
         (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
-      ) as DetectedEventDTO | RiskAssessmentUpdatedFlawEventDTO | undefined;
+      ) as DetectedEventDTO | RiskAssessmentUpdatedEventDTO | undefined;
       if (!lastRiskEvent) return "";
       return diffReports(
         lastRiskEvent?.arbitraryJsonData,
@@ -174,7 +174,7 @@ const eventTypeMessages = (
       );
       return (
         "updated the risk assessment from " +
-        ((lastRiskEvent as RiskAssessmentUpdatedFlawEventDTO)?.arbitraryJsonData
+        ((lastRiskEvent as RiskAssessmentUpdatedEventDTO)?.arbitraryJsonData
           .risk ?? 0) +
         " to " +
         event.arbitraryJsonData.risk
