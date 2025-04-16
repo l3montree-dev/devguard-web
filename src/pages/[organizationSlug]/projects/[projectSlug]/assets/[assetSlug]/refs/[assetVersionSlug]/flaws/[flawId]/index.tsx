@@ -15,7 +15,7 @@ import {
 import {
   AssetDTO,
   DetailedFlawDTO,
-  FlawEventDTO,
+  VulnEventDTO,
   RequirementsLevel,
 } from "@/types/api/api";
 import Image from "next/image";
@@ -293,7 +293,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetVersion = useStore((s) => s.assetVersion);
 
   const handleSubmit = async (data: {
-    status?: FlawEventDTO["type"];
+    status?: VulnEventDTO["type"];
     justification?: string;
   }) => {
     if (data.status === undefined) {
@@ -405,7 +405,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
 
               <RiskAssessmentFeed
-                flawName={flaw.cve?.cve ?? ""}
+                vulnerabilityName={flaw.cveId ?? ""}
                 events={flaw.events}
               />
               <div>
@@ -888,7 +888,7 @@ export const getServerSideProps = middleware(
       "/flaws/" +
       flawId;
 
-    const [resp, events]: [DetailedFlawDTO, FlawEventDTO[]] = await Promise.all(
+    const [resp, events]: [DetailedFlawDTO, VulnEventDTO[]] = await Promise.all(
       [
         apiClient(uri).then((r) => r.json()),
         apiClient(uri + "/events").then((r) => r.json()),

@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from "react";
-import { date } from "zod";
+import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const timeAgo = (prevDate: Date) => {
   const diff = Number(new Date()) - Number(prevDate);
@@ -44,12 +44,32 @@ const timeAgo = (prevDate: Date) => {
 };
 
 const FormatDate = ({ dateString }: { dateString: string }) => {
-  const [time, setTime] = useState<string | null>(null);
+  const [time, setTime] = useState<{
+    localeTime: string;
+    timeAgo: string;
+  } | null>(null);
   useEffect(() => {
-    setTime(timeAgo(new Date(dateString)));
+    const date = new Date(dateString);
+    setTime({
+      localeTime:
+        date.toLocaleDateString() +
+        ", " +
+        date.toLocaleTimeString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      timeAgo: timeAgo(date),
+    });
   }, [dateString]);
   if (!time) return null;
-  return <time dateTime={dateString}>{time}</time>;
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <time dateTime={dateString}>{time.timeAgo}</time>
+      </TooltipTrigger>
+      <TooltipContent>{time.localeTime}</TooltipContent>
+    </Tooltip>
+  );
 };
 
 export default FormatDate;

@@ -191,80 +191,83 @@ export interface RiskCalculationReport {
   risk: number;
   oldRisk?: number;
 }
-
-interface BaseFlawEventDTO {
+interface EventArbitraryJsonData {
+  scannerIds: string;
+}
+interface BaseVulnEventDTO {
   userId: string;
   createdAt: string;
   id: string;
   vulnId: string;
   justification: string;
-  flawName: string | null;
+  vulnerabilityName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;
+  arbitraryJsonData: EventArbitraryJsonData;
 }
 
-export interface TicketClosedFlawEventDTO extends BaseFlawEventDTO {
+export interface TicketClosedEventDTO extends BaseVulnEventDTO {
   type: "ticketClosed";
 }
 
-export interface TickedDeletedFlawEventDTO extends BaseFlawEventDTO {
+export interface TickedDeletedEventDTO extends BaseVulnEventDTO {
   type: "ticketDeleted";
 }
 
-export interface AcceptedFlawEventDTO extends BaseFlawEventDTO {
+export interface AcceptedEventDTO extends BaseVulnEventDTO {
   type: "accepted";
 }
 
-export interface ReopenedFlawEventDTO extends BaseFlawEventDTO {
+export interface ReopenedEventDTO extends BaseVulnEventDTO {
   type: "reopened";
 }
 
-export interface FixedFlawEventDTO extends BaseFlawEventDTO {
+export interface FixedEventDTO extends BaseVulnEventDTO {
   type: "fixed";
 }
 
-export interface DetectedFlawEventDTO extends BaseFlawEventDTO {
+export interface DetectedEventDTO extends BaseVulnEventDTO {
   type: "detected";
-  arbitraryJsonData: RiskCalculationReport;
+  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
-export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
+export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
   type: "falsePositive";
 }
 
-export interface MitigateFlawEventDTO extends BaseFlawEventDTO {
+export interface MitigateEventDTO extends BaseVulnEventDTO {
   type: "mitigate";
-  arbitraryJsonData: {
+  arbitraryJsonData: EventArbitraryJsonData & {
     ticketUrl: string;
     ticketId: string;
   };
 }
 
-export interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
+export interface MarkedForTransferEventDTO extends BaseVulnEventDTO {
   type: "markedForTransfer";
 }
 
-export interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
+export interface RiskAssessmentUpdatedEventDTO extends BaseVulnEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJsonData: RiskCalculationReport;
+  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
-export interface CommentFlawEventDTO extends BaseFlawEventDTO {
+export interface CommentEventDTO extends BaseVulnEventDTO {
   type: "comment";
 }
 
-export type FlawEventDTO =
-  | AcceptedFlawEventDTO
-  | FixedFlawEventDTO
-  | DetectedFlawEventDTO
-  | FalsePositiveFlawEventDTO
-  | MitigateFlawEventDTO
-  | MarkedForTransferFlawEventDTO
-  | RiskAssessmentUpdatedFlawEventDTO
-  | ReopenedFlawEventDTO
-  | CommentFlawEventDTO
-  | TicketClosedFlawEventDTO
-  | TickedDeletedFlawEventDTO;
+export type VulnEventDTO =
+  | AcceptedEventDTO
+  | FixedEventDTO
+  | DetectedEventDTO
+  | FalsePositiveEventDTO
+  | MitigateEventDTO
+  | MarkedForTransferEventDTO
+  | RiskAssessmentUpdatedEventDTO
+  | ReopenedEventDTO
+  | CommentEventDTO
+  | TicketClosedEventDTO
+  | TickedDeletedEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -336,7 +339,7 @@ export interface FlawWithCVE extends ScaFlawDTO {
 }
 
 export interface DetailedFlawDTO extends FlawWithCVE {
-  events: FlawEventDTO[];
+  events: VulnEventDTO[];
 }
 
 export interface AssetVersionDTO {

@@ -13,15 +13,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { VulnEventDTO, RiskCalculationReport } from "@/types/api/api";
+import { classNames } from "@/utils/common";
 import {
-  DetectedFlawEventDTO,
-  FlawEventDTO,
-  RiskAssessmentUpdatedFlawEventDTO,
-  RiskCalculationReport,
-} from "@/types/api/api";
-import { findUser } from "@/utils/view";
+  eventMessages,
+  eventTypeMessages,
+  evTypeBackground,
+  findUser,
+} from "@/utils/view";
 import {
   ArrowPathIcon,
   ArrowRightStartOnRectangleIcon,
@@ -32,20 +36,15 @@ import {
   StopIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
+import { GitBranchIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import FormatDate from "./FormatDate";
-import { classNames } from "@/utils/common";
-import { useRouter } from "next/router";
 import { Badge } from "../ui/badge";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
-import { GitBranchIcon } from "lucide-react";
-import Link from "next/link";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
+import FormatDate from "./FormatDate";
 
-function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
+function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
     case "ticketClosed":
       return <CheckIcon />;
@@ -120,92 +119,12 @@ const diffReports = (
   return changes.join(" ");
 };
 
-const eventMessages = (
-  event: FlawEventDTO,
-  index: number,
-  events?: FlawEventDTO[],
-) => {
-  switch (event.type) {
-    case "mitigate":
-      return (
-        "Everything after this entry will be synced with the external system. The ticket can be found at [" +
-        event.arbitraryJsonData.ticketUrl +
-        "](" +
-        event.arbitraryJsonData.ticketUrl +
-        ")"
-      );
-  }
-  return event.justification;
-};
-
-const eventTypeMessages = (
-  event: FlawEventDTO,
-  index: number,
-  flawName: string,
-  events?: FlawEventDTO[],
-) => {
-  switch (event.type) {
-    case "ticketClosed":
-      return "closed the ticket for " + flawName;
-    case "ticketDeleted":
-      return "deleted the ticket for " + flawName;
-    case "mitigate":
-      return "created a ticket for " + flawName;
-    case "reopened":
-      return "reopened " + flawName;
-    case "accepted":
-      return "accepted the risk of " + flawName;
-    case "fixed":
-      return "fixed " + flawName;
-    case "comment":
-      return "added a comment";
-    case "detected":
-      return (
-        "detected " +
-        flawName +
-        " with a risk of " +
-        event.arbitraryJsonData.risk
-      );
-    case "falsePositive":
-      return "marked " + flawName + " as false positive ";
-    case "rawRiskAssessmentUpdated":
-      if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
-      }
-      const oldRisk = event.arbitraryJsonData.oldRisk;
-      if (!oldRisk && oldRisk !== 0) {
-        return "updated the risk assessment to " + event.arbitraryJsonData.risk;
-      }
-      return (
-        "updated the risk assessment from " +
-        oldRisk +
-        " to " +
-        event.arbitraryJsonData.risk
-      );
-  }
-  return "";
-};
-
-const evTypeBackground: { [key in FlawEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600 text-white",
-  fixed: "bg-green-600 text-white",
-  detected: "bg-red-600 text-white",
-  falsePositive: "bg-purple-600 text-white",
-  mitigate: "bg-green-600 text-black",
-  markedForTransfer: "bg-blue-600 text-white",
-  rawRiskAssessmentUpdated: "bg-secondary",
-  reopened: "bg-red-600 text-white",
-  comment: "bg-secondary",
-  ticketClosed: "bg-red-600 text-white",
-  ticketDeleted: "bg-red-600 text-white",
-};
-
 export default function RiskAssessmentFeed({
   events,
-  flawName,
+  vulnerabilityName,
 }: {
-  events: FlawEventDTO[];
-  flawName: string;
+  events: VulnEventDTO[];
+  vulnerabilityName: string;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -272,7 +191,12 @@ export default function RiskAssessmentFeed({
                       <div className="w-full">
                         <p className="w-full bg-card px-2 py-2 font-medium">
                           {findUser(event.userId, org, currentUser).displayName}{" "}
-                          {eventTypeMessages(event, index, flawName, events)}
+                          {eventTypeMessages(
+                            event,
+                            index,
+                            vulnerabilityName,
+                            events,
+                          )}
                         </p>
 
                         <div className="absolute right-2 top-2">

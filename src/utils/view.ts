@@ -12,8 +12,93 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
+import {
+  AssetDTO,
+  OrganizationDetailsDTO,
+  ProjectDTO,
+  VulnEventDTO,
+} from "@/types/api/api";
 import { Identity } from "@ory/client";
+
+export const eventMessages = (
+  event: VulnEventDTO,
+  index: number,
+  events?: VulnEventDTO[],
+) => {
+  switch (event.type) {
+    case "mitigate":
+      return (
+        "Everything after this entry will be synced with the external system. The ticket can be found at [" +
+        event.arbitraryJsonData.ticketUrl +
+        "](" +
+        event.arbitraryJsonData.ticketUrl +
+        ")"
+      );
+  }
+  return event.justification;
+};
+
+export const eventTypeMessages = (
+  event: VulnEventDTO,
+  index: number,
+  flawName: string,
+  events?: VulnEventDTO[],
+) => {
+  switch (event.type) {
+    case "ticketClosed":
+      return "closed the ticket for " + flawName;
+    case "ticketDeleted":
+      return "deleted the ticket for " + flawName;
+    case "mitigate":
+      return "created a ticket for " + flawName;
+    case "reopened":
+      return "reopened " + flawName;
+    case "accepted":
+      return "accepted the risk of " + flawName;
+    case "fixed":
+      return "fixed " + flawName;
+    case "comment":
+      return "added a comment";
+    case "detected":
+      return (
+        "detected " +
+        flawName +
+        " with a risk of " +
+        event.arbitraryJsonData.risk
+      );
+    case "falsePositive":
+      return "marked " + flawName + " as false positive ";
+    case "rawRiskAssessmentUpdated":
+      if (events === undefined) {
+        return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
+      }
+      const oldRisk = event.arbitraryJsonData.oldRisk;
+      if (!oldRisk && oldRisk !== 0) {
+        return "updated the risk assessment to " + event.arbitraryJsonData.risk;
+      }
+      return (
+        "updated the risk assessment from " +
+        oldRisk +
+        " to " +
+        event.arbitraryJsonData.risk
+      );
+  }
+  return "";
+};
+
+export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
+  accepted: "bg-purple-600 text-white",
+  fixed: "bg-green-600 text-white",
+  detected: "bg-red-600 text-white",
+  falsePositive: "bg-purple-600 text-white",
+  mitigate: "bg-green-600 text-black",
+  markedForTransfer: "bg-blue-600 text-white",
+  rawRiskAssessmentUpdated: "bg-secondary",
+  reopened: "bg-red-600 text-white",
+  comment: "bg-secondary",
+  ticketClosed: "bg-red-600 text-white",
+  ticketDeleted: "bg-red-600 text-white",
+};
 
 export const osiLicenseHexColors: Record<string, string> = {
   MIT: "#fbbd25",
