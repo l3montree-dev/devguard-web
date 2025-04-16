@@ -9,7 +9,7 @@ import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { getAssetVersionSlug, useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
@@ -21,7 +21,10 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -58,7 +61,26 @@ import {
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
 import useTable from "@/hooks/useTable";
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  createColumnHelper,
+  flexRender,
+} from "@tanstack/react-table";
+import { Tabs, TabsList } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { GitBranchIcon, Loader2 } from "lucide-react";
+import SortingCaret from "@/components/common/SortingCaret";
+import { classNames } from "@/utils/common";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { defaultScanner, findUser } from "@/utils/view";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  eventMessages,
+  eventTypeMessages,
+} from "@/components/risk-assessment/RiskAssessmentFeed";
+import Markdown from "react-markdown";
+import FormatDate from "@/components/risk-assessment/FormatDate";
+import CustomPagination from "@/components/common/CustomPagination";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -67,8 +89,6 @@ interface Props {
   licenses: Array<LicenseResponse>;
   events: Paged<FlawEventDTO>;
 }
-const columnHelper = createColumnHelper<FlawEventDTO>();
-const columnsDef: ColumnDef<FlawEventDTO, any>[] = [];
 
 const Index: FunctionComponent<Props> = ({
   compliance,
@@ -81,14 +101,10 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
+  const currentUser = useCurrentUser();
   const { branches, tags } = useAssetBranchesAndTags();
-
+  const assetVersion = useActiveAssetVersion();
   const router = useRouter();
-
-  const { table, isLoading, handleSearch } = useTable({
-    columnsDef,
-    data: events.data,
-  });
 
   const chartConfig = useMemo(() => {
     return Object.entries(licenses).reduce((acc, [key, value]) => {
@@ -329,27 +345,126 @@ const Index: FunctionComponent<Props> = ({
             </CardContent>
           </Card>
 
-          <Card className="col-span-4 row-span-2">
+          <Card className="col-span-4 row-span-2 flex flex-col">
             <CardHeader>
-              <CardTitle>Events</CardTitle>
+              <CardTitle className="relative w-full">
+                Activity Stream
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
               <CardDescription>
-                Displays the events of the asset.
+                Displays the last events that happened on the asset.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="flex flex-row items-center justify-center">
-                  Loading...
-                </div>
-              ) : (
-                <div className="h-full w-full">
-                  {events.data.length === 0 && (
-                    <div className="flex-Tasks that need to berow flex items-center justify-center">
-                      No events found
-                    </div>
-                  )}
-                </div>
-              )}
+              <div>
+                <ul
+                  className="relative flex flex-col gap-10 pb-10 text-foreground"
+                  role="list"
+                >
+                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
+                  {events.data.map((event, index) => {
+                    const user = findUser(event.userId, activeOrg, currentUser);
+                    const msg = eventMessages(event, index, events.data);
+                    return (
+                      <li
+                        className={classNames(
+                          "relative flex flex-row items-start gap-4 transition-all",
+                        )}
+                        key={event.id}
+                      >
+                        <div className="w-full">
+                          <div className="flex w-full flex-col">
+                            <div className="flex flex-row items-start gap-2">
+                              {event.userId === "system" ? (
+                                <Avatar>
+                                  <AvatarFallback className="bg-secondary">
+                                    <Image
+                                      width={20}
+                                      height={20}
+                                      src="/logo_icon.svg"
+                                      alt="logo"
+                                    />
+                                  </AvatarFallback>
+                                </Avatar>
+                              ) : (
+                                <Avatar>
+                                  {Boolean(user?.avatarUrl) && (
+                                    <AvatarImage
+                                      src={user?.avatarUrl}
+                                      alt={event.userId}
+                                    />
+                                  )}
+                                  <AvatarFallback className="bg-secondary">
+                                    {user.realName.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                              <div>
+                                <div className="flex flex-row items-start gap-2">
+                                  {event.type && (
+                                    <Badge variant={"secondary"}>
+                                      {event.type}
+                                    </Badge>
+                                  )}
+                                  {event.arbitraryJsonData.scannerIds
+                                    ?.split(" ")
+                                    .map((s) => (
+                                      <Badge key={s} variant={"secondary"}>
+                                        {s.replace(defaultScanner, "")}
+                                      </Badge>
+                                    ))}
+                                </div>
+
+                                <div className="w-full overflow-hidden rounded border">
+                                  <Link
+                                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/flaws/${event.vulnId}`}
+                                    className="text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
+                                  >
+                                    <div className="w-full">
+                                      <p className="w-full bg-card px-2 py-2 font-medium">
+                                        {
+                                          findUser(
+                                            event.userId,
+                                            activeOrg,
+                                            currentUser,
+                                          ).displayName
+                                        }{" "}
+                                        {eventTypeMessages(
+                                          event,
+                                          index,
+                                          event.flawName || "a vulnerability",
+                                          events.data,
+                                        )}
+                                      </p>
+                                    </div>
+
+                                    {Boolean(msg) && (
+                                      <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
+                                        <Markdown className={"text-foreground"}>
+                                          {msg}
+                                        </Markdown>
+                                      </div>
+                                    )}
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
+                            <FormatDate dateString={event.createdAt} />
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -376,7 +491,6 @@ export const getServerSideProps = middleware(
         context,
       });
 
-    console.log("events", events.data);
     return {
       props: {
         compliance,

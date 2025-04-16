@@ -54,7 +54,9 @@ export const fetchAssetStats = async ({
       apiClient(url + "/components/licenses").then(
         (r) => r.json() as Promise<LicenseResponse[]>,
       ),
-      apiClient(url + "/events/?" + query.toString()).then((r) => r.json()),
+      apiClient(url + "/events/?pageSize=5&" + query.toString()).then((r) =>
+        r.json(),
+      ),
     ]);
 
   // sort the licenses by count

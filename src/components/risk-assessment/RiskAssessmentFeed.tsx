@@ -120,7 +120,7 @@ const diffReports = (
   return changes.join(" ");
 };
 
-const eventMessages = (
+export const eventMessages = (
   event: FlawEventDTO,
   index: number,
   events?: FlawEventDTO[],
@@ -138,7 +138,7 @@ const eventMessages = (
   return event.justification;
 };
 
-const eventTypeMessages = (
+export const eventTypeMessages = (
   event: FlawEventDTO,
   index: number,
   flawName: string,

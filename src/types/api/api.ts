@@ -191,7 +191,9 @@ export interface RiskCalculationReport {
   risk: number;
   oldRisk?: number;
 }
-
+interface EventArbitraryJsonData {
+  scannerIds: string;
+}
 interface BaseFlawEventDTO {
   userId: string;
   createdAt: string;
@@ -201,6 +203,7 @@ interface BaseFlawEventDTO {
   flawName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;
+  arbitraryJsonData: EventArbitraryJsonData;
 }
 
 export interface TicketClosedFlawEventDTO extends BaseFlawEventDTO {
@@ -225,7 +228,7 @@ export interface FixedFlawEventDTO extends BaseFlawEventDTO {
 
 export interface DetectedFlawEventDTO extends BaseFlawEventDTO {
   type: "detected";
-  arbitraryJsonData: RiskCalculationReport;
+  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
@@ -234,7 +237,7 @@ export interface FalsePositiveFlawEventDTO extends BaseFlawEventDTO {
 
 export interface MitigateFlawEventDTO extends BaseFlawEventDTO {
   type: "mitigate";
-  arbitraryJsonData: {
+  arbitraryJsonData: EventArbitraryJsonData & {
     ticketUrl: string;
     ticketId: string;
   };
@@ -246,7 +249,7 @@ export interface MarkedForTransferFlawEventDTO extends BaseFlawEventDTO {
 
 export interface RiskAssessmentUpdatedFlawEventDTO extends BaseFlawEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJsonData: RiskCalculationReport;
+  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface CommentFlawEventDTO extends BaseFlawEventDTO {
