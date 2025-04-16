@@ -9,7 +9,7 @@ import { withSession } from "@/decorators/withSession";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { getAssetVersionSlug, useAssetMenu } from "@/hooks/useAssetMenu";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
@@ -35,6 +35,17 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
+import FormatDate from "@/components/risk-assessment/FormatDate";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { classNames } from "@/utils/common";
+import {
+  defaultScanner,
+  eventMessages,
+  eventTypeMessages,
+  findUser,
+} from "@/utils/view";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
@@ -42,6 +53,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import Markdown from "react-markdown";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
@@ -53,41 +65,20 @@ import {
 } from "../../../../../../../../components/ui/tooltip";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
-  FlawEventDTO,
-  License,
+  VulnEventDTO,
   LicenseResponse,
   Paged,
   PolicyEvaluation,
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
-import useTable from "@/hooks/useTable";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
-import { Tabs, TabsList } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { GitBranchIcon, Loader2 } from "lucide-react";
-import SortingCaret from "@/components/common/SortingCaret";
-import { classNames } from "@/utils/common";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { defaultScanner, findUser } from "@/utils/view";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import {
-  eventMessages,
-  eventTypeMessages,
-} from "@/components/risk-assessment/RiskAssessmentFeed";
-import Markdown from "react-markdown";
-import FormatDate from "@/components/risk-assessment/FormatDate";
-import CustomPagination from "@/components/common/CustomPagination";
+import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
   licenses: Array<LicenseResponse>;
-  events: Paged<FlawEventDTO>;
+  events: Paged<VulnEventDTO>;
 }
 
 const Index: FunctionComponent<Props> = ({
@@ -345,7 +336,7 @@ const Index: FunctionComponent<Props> = ({
             </CardContent>
           </Card>
 
-          <Card className="col-span-4 row-span-2 flex flex-col">
+          <Card className="col-span-4 row-span-1 flex flex-col bg-transparent">
             <CardHeader>
               <CardTitle className="relative w-full">
                 Activity Stream
@@ -367,100 +358,14 @@ const Index: FunctionComponent<Props> = ({
                   role="list"
                 >
                   <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-                  {events.data.map((event, index) => {
-                    const user = findUser(event.userId, activeOrg, currentUser);
-                    const msg = eventMessages(event, index, events.data);
+                  {events.data.map((event, index, events) => {
                     return (
-                      <li
-                        className={classNames(
-                          "relative flex flex-row items-start gap-4 transition-all",
-                        )}
+                      <VulnEventItem
                         key={event.id}
-                      >
-                        <div className="w-full">
-                          <div className="flex w-full flex-col">
-                            <div className="flex flex-row items-start gap-2">
-                              {event.userId === "system" ? (
-                                <Avatar>
-                                  <AvatarFallback className="bg-secondary">
-                                    <Image
-                                      width={20}
-                                      height={20}
-                                      src="/logo_icon.svg"
-                                      alt="logo"
-                                    />
-                                  </AvatarFallback>
-                                </Avatar>
-                              ) : (
-                                <Avatar>
-                                  {Boolean(user?.avatarUrl) && (
-                                    <AvatarImage
-                                      src={user?.avatarUrl}
-                                      alt={event.userId}
-                                    />
-                                  )}
-                                  <AvatarFallback className="bg-secondary">
-                                    {user.realName.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                              )}
-                              <div>
-                                <div className="flex flex-row items-start gap-2">
-                                  {event.type && (
-                                    <Badge variant={"secondary"}>
-                                      {event.type}
-                                    </Badge>
-                                  )}
-                                  {event.arbitraryJsonData.scannerIds
-                                    ?.split(" ")
-                                    .map((s) => (
-                                      <Badge key={s} variant={"secondary"}>
-                                        {s.replace(defaultScanner, "")}
-                                      </Badge>
-                                    ))}
-                                </div>
-
-                                <div className="w-full overflow-hidden rounded border">
-                                  <Link
-                                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/flaws/${event.vulnId}`}
-                                    className="text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
-                                  >
-                                    <div className="w-full">
-                                      <p className="w-full bg-card px-2 py-2 font-medium">
-                                        {
-                                          findUser(
-                                            event.userId,
-                                            activeOrg,
-                                            currentUser,
-                                          ).displayName
-                                        }{" "}
-                                        {eventTypeMessages(
-                                          event,
-                                          index,
-                                          event.flawName || "a vulnerability",
-                                          events.data,
-                                        )}
-                                      </p>
-                                    </div>
-
-                                    {Boolean(msg) && (
-                                      <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                                        <Markdown className={"text-foreground"}>
-                                          {msg}
-                                        </Markdown>
-                                      </div>
-                                    )}
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="ml-10 mt-2 text-xs font-normal text-muted-foreground">
-                            <FormatDate dateString={event.createdAt} />
-                          </div>
-                        </div>
-                      </li>
+                        event={event}
+                        index={index}
+                        events={events}
+                      />
                     );
                   })}
                 </ul>

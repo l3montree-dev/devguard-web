@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import {
-  FlawEventDTO,
+  VulnEventDTO,
   License,
   LicenseResponse,
   Paged,
@@ -29,7 +29,7 @@ export const fetchAssetStats = async ({
   riskDistribution: Array<RiskDistribution>;
   cvssDistribution: Array<RiskDistribution>;
   licenses: Array<LicenseResponse>;
-  events: Paged<FlawEventDTO>;
+  events: Paged<VulnEventDTO>;
 }> => {
   let url =
     "/organizations/" +
@@ -44,8 +44,6 @@ export const fetchAssetStats = async ({
     url += "/refs/" + assetVersionSlug;
   }
 
-  const query = buildFilterSearchParams(context);
-
   const [compliance, riskDistribution, cvssDistribution, licenses, events] =
     await Promise.all([
       apiClient(url + "/compliance").then((r) => r.json()),
@@ -54,15 +52,11 @@ export const fetchAssetStats = async ({
       apiClient(url + "/components/licenses").then(
         (r) => r.json() as Promise<LicenseResponse[]>,
       ),
-      apiClient(url + "/events/?pageSize=5&" + query.toString()).then((r) =>
-        r.json(),
-      ),
+      apiClient(url + "/events/?pageSize=3").then((r) => r.json()),
     ]);
 
   // sort the licenses by count
   licenses.sort((a, b) => b.count - a.count);
-
-  console.log("events", events.data);
 
   return {
     compliance,

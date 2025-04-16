@@ -16,8 +16,8 @@
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
-  DetectedFlawEventDTO,
-  FlawEventDTO,
+  DetectedEventDTO,
+  VulnEventDTO,
   RiskAssessmentUpdatedFlawEventDTO,
   RiskCalculationReport,
 } from "@/types/api/api";
@@ -42,7 +42,7 @@ import FormatDate from "./risk-assessment/FormatDate";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 
-function EventTypeIcon({ eventType }: { eventType: FlawEventDTO["type"] }) {
+function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
     case "accepted":
       return <SpeakerXMarkIcon />;
@@ -111,9 +111,9 @@ const diffReports = (
 };
 
 const eventMessages = (
-  event: FlawEventDTO,
+  event: VulnEventDTO,
   index: number,
-  events?: FlawEventDTO[],
+  events?: VulnEventDTO[],
 ) => {
   switch (event.type) {
     case "rawRiskAssessmentUpdated":
@@ -124,7 +124,7 @@ const eventMessages = (
       const beforeThisEvent = events.slice(0, index);
       const lastRiskEvent = beforeThisEvent.findLast(
         (e) => e.type === "rawRiskAssessmentUpdated" || e.type === "detected",
-      ) as DetectedFlawEventDTO | RiskAssessmentUpdatedFlawEventDTO | undefined;
+      ) as DetectedEventDTO | RiskAssessmentUpdatedFlawEventDTO | undefined;
       if (!lastRiskEvent) return "";
       return diffReports(
         lastRiskEvent?.arbitraryJsonData,
@@ -135,10 +135,10 @@ const eventMessages = (
 };
 
 const eventTypeMessages = (
-  event: FlawEventDTO,
+  event: VulnEventDTO,
   index: number,
   flawName: string,
-  events?: FlawEventDTO[],
+  events?: VulnEventDTO[],
 ) => {
   switch (event.type) {
     case "reopened":
@@ -193,9 +193,9 @@ const maybeAddDot = (str: string) => {
 };
 
 interface ActivityLogProps {
-  event: FlawEventDTO;
+  event: VulnEventDTO;
   index: number;
-  events?: FlawEventDTO[];
+  events?: VulnEventDTO[];
   flawName: string;
 }
 
