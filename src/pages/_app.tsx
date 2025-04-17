@@ -48,7 +48,7 @@ export default function App({ Component, pageProps }) {
       enableSystem
       disableTransitionOnChange
     >
-      <TooltipProvider>
+      <TooltipProvider delayDuration={100}>
         <StoreProvider initialZustand={pageProps.initialZustand}>
           <div className="font-body">
             <Component {...pageProps} />

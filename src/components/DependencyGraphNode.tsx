@@ -32,6 +32,8 @@ export interface DependencyGraphNodeProps {
     label: string;
     flaw: FlawDTO[];
     risk: number;
+    nodeWidth: number;
+    nodeHeight: number;
   };
 }
 
@@ -47,7 +49,7 @@ export const DependencyGraphNode: FunctionComponent<
   const Node = (
     <div
       style={{
-        maxWidth: 300,
+        maxWidth: props.data.nodeWidth,
         //     borderColor: props.data.flaw !== undefined ? color : undefined,
         //backgroundColor: props.data.flaw !== undefined ? color : "white",
       }}
