@@ -122,16 +122,16 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
     }),
   },*/
   {
-    ...columnHelper.accessor("totalRisk", {
-      header: "Total Risk",
-      id: "total_risk",
+    ...columnHelper.accessor("maxCvss", {
+      header: "Max CVSS",
+      id: "max_cvss",
       enableSorting: true,
       cell: (row) => row.getValue().toFixed(1),
     }),
   },
   {
     ...columnHelper.accessor("flawCount", {
-      header: "Flaw Count",
+      header: "Vulnerability Count",
       id: "dependency_vuln_count",
       enableSorting: true,
       cell: (row) => row.getValue(),
