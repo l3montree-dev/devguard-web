@@ -1,3 +1,4 @@
+// Copyright (C) 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -48,15 +49,12 @@ const FlawWithCveTableRow = ({
       </td>
       <td className="p-4">
         <Badge variant={"secondary"}>
-          {flaw.scanner.replace(defaultScanner, "")}
+          {flaw.scannerIds.replace(defaultScanner, "")}
         </Badge>
       </td>
       <td className="p-4">{flaw.cveId}</td>
-      <td className="p-4">
-        {" "}
-        <Badge variant={"secondary"}> {flaw.cve?.cvss}</Badge>
-      </td>
       <td className="p-4">{flaw.rawRiskAssessment.toFixed(1)}</td>
+      <td className="p-4">{flaw.cve?.cvss}</td>
       <td className="p-4">
         {flaw.componentFixedVersion ? (
           <span>
@@ -126,9 +124,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     <th className="w-32 p-4">State</th>
                     <th className="w-32 p-4">Scanner</th>
                     <th className="w-40 p-4">CVE</th>
-                    <th className="w-40 p-4">CVSS</th>
-
                     <th className="w-20 p-4">Risk</th>
+                    <th className="w-40 p-4">CVSS</th>
                     <th className="w-40 p-4">Fixed in Version</th>
                     <th className="w-full p-4">Description</th>
                   </tr>
