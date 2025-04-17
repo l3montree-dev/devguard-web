@@ -483,6 +483,7 @@ export interface FlawAggregationStateAndChange {
 export interface FlawByPackage {
   packageName: string;
   maxRisk: number;
+  maxCvss: number;
   totalRisk: number;
   flawCount: number;
   avgRisk: number;
