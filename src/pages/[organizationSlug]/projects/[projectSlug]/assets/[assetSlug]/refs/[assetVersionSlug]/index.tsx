@@ -21,7 +21,10 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -32,6 +35,17 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
+import FormatDate from "@/components/risk-assessment/FormatDate";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { classNames } from "@/utils/common";
+import {
+  defaultScanner,
+  eventMessages,
+  eventTypeMessages,
+  findUser,
+} from "@/utils/view";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
@@ -39,6 +53,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import Markdown from "react-markdown";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
@@ -50,17 +65,20 @@ import {
 } from "../../../../../../../../components/ui/tooltip";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
-  License,
+  VulnEventDTO,
   LicenseResponse,
+  Paged,
   PolicyEvaluation,
   RiskDistribution,
 } from "../../../../../../../../types/api/api";
+import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
   licenses: Array<LicenseResponse>;
+  events: Paged<VulnEventDTO>;
 }
 
 const Index: FunctionComponent<Props> = ({
@@ -68,13 +86,15 @@ const Index: FunctionComponent<Props> = ({
   riskDistribution,
   cvssDistribution,
   licenses,
+  events,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
+  const currentUser = useCurrentUser();
   const { branches, tags } = useAssetBranchesAndTags();
-
+  const assetVersion = useActiveAssetVersion();
   const router = useRouter();
 
   const chartConfig = useMemo(() => {
@@ -315,6 +335,43 @@ const Index: FunctionComponent<Props> = ({
               </div>
             </CardContent>
           </Card>
+
+          <Card className="col-span-4 row-span-1 flex flex-col bg-transparent">
+            <CardHeader>
+              <CardTitle className="relative w-full">
+                Activity Stream
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Displays the last events that happened on the asset.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <ul
+                  className="relative flex flex-col gap-10 pb-10 text-foreground"
+                  role="list"
+                >
+                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
+                  {events.data.map((event, index, events) => {
+                    return (
+                      <VulnEventItem
+                        key={event.id}
+                        event={event}
+                        index={index}
+                        events={events}
+                      />
+                    );
+                  })}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Section>
     </Page>
@@ -329,20 +386,23 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const { compliance, riskDistribution, cvssDistribution, licenses } =
+    const { compliance, riskDistribution, cvssDistribution, licenses, events } =
       await fetchAssetStats({
         organizationSlug: organizationSlug as string,
         projectSlug: projectSlug as string,
         assetSlug: assetSlug as string,
         assetVersionSlug: assetVersionSlug as string,
         apiClient,
+        context,
       });
+
     return {
       props: {
         compliance,
         riskDistribution,
         cvssDistribution,
         licenses,
+        events,
       },
     };
   },
