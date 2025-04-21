@@ -281,33 +281,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 <table className="w-full table-fixed overflow-x-auto text-sm">
                   <thead className="border-b bg-card text-foreground">
                     {table.getHeaderGroups().map((headerGroup) => (
-                      <tr key={headerGroup.id}>
-                        <th className="w-6" />
-                        {headerGroup.headers.map((header) => (
-                          <th
-                            className="w-40 cursor-pointer break-normal p-4 text-left"
-                            onClick={
-                              header.column.columnDef.enableSorting
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                            key={header.id}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-
-                              <SortingCaret
-                                sortDirection={header.column.getIsSorted()}
-                              />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
+                      <tr key={headerGroup.id}></tr>
                     ))}
                   </thead>
                   <tbody className="text-sm text-foreground">

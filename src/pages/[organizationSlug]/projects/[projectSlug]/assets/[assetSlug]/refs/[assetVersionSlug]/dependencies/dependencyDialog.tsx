@@ -39,6 +39,7 @@ import ListItem from "@/components/common/ListItem";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { Podium } from "./Podium";
+import OpenSSFtable from "./SSFtable";
 
 interface Props {
   open: boolean;
@@ -90,7 +91,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
             <DialogTitle className="flex">{purl}</DialogTitle>
             <div className="mr-5 flex flex-row-reverse space-x-5">
               <Badge variant="success" className="flex">
-                {componentProject.license} MIT
+                {componentProject.license}
               </Badge>
               <div className="flex">
                 <div className="">
@@ -113,12 +114,21 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <div>Priority</div>
           <Podium></Podium>
           <div className="mt-5">
-            <div className="border-4 border-double border-red-500">
-              Veery bad
+            <div className="border border-2 border-red-500">
+              <table>
+                <tr>
+                  <th>Compnay</th>
+                </tr>
+                <tr>
+                  <td>l3montree</td>
+                </tr>
+              </table>
             </div>
             <div className="border-2 border-t-0 border-dashed border-gray-500">
               Veery good
             </div>
+            {/* https://hillmann.cc/tailwindcss-bg-patterns/ try to look for some good patterns here*/}
+            <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
           </div>
         </div>
 
