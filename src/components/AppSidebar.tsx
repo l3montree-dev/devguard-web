@@ -19,11 +19,9 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import {
   BuildingOffice2Icon,
   BuildingOfficeIcon,
-  ChartBarSquareIcon,
   ChevronUpDownIcon,
   CogIcon,
   LifebuoyIcon,
-  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
@@ -59,6 +57,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 const AppSidebar = () => {
   const orgs = useStore((s) => s.organizations);
@@ -108,7 +107,6 @@ const AppSidebar = () => {
                     </span>
                   </div>
                 </div>
-
                 <ChevronUpDownIcon className="block h-7 w-7 p-1" />
               </div>
             </SidebarMenuButton>
@@ -213,68 +211,6 @@ const AppSidebar = () => {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              isActive={
-                                router.asPath ===
-                                "/" + activeOrg.slug + "/projects/" + item.slug
-                              }
-                              className="text-sm !text-foreground hover:no-underline"
-                              href={
-                                "/" + activeOrg.slug + "/projects/" + item.slug
-                              }
-                            >
-                              <ChartBarSquareIcon className="h-5 w-5 opacity-75" />
-                              <span>Overview</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              isActive={
-                                router.asPath ===
-                                "/" +
-                                  activeOrg.slug +
-                                  "/projects/" +
-                                  item.slug +
-                                  "/compliance"
-                              }
-                              className="text-sm !text-foreground hover:no-underline"
-                              href={
-                                "/" +
-                                activeOrg.slug +
-                                "/projects/" +
-                                item.slug +
-                                "/compliance"
-                              }
-                            >
-                              <ScaleIcon className="h-5 w-5 opacity-75" />
-                              <span>Compliance</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              isActive={
-                                router.asPath ===
-                                "/" +
-                                  activeOrg.slug +
-                                  "/projects/" +
-                                  item.slug +
-                                  "/settings"
-                              }
-                              className="text-sm !text-foreground hover:no-underline"
-                              href={
-                                "/" +
-                                activeOrg.slug +
-                                "/projects/" +
-                                item.slug +
-                                "/settings"
-                              }
-                            >
-                              <CogIcon className="h-5 w-5 opacity-75" />
-                              <span>Settings</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-
                           {item.assets?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
@@ -336,7 +272,7 @@ const AppSidebar = () => {
             className="truncate !text-foreground hover:no-underline"
             href="https://github.com/l3montree-dev/devguard-web"
           >
-            <LifebuoyIcon className="mr-1 h-5 w-5" />
+            <GitHubLogoIcon className="mr-1 h-5 w-5" />
             <span>Support</span>
           </Link>
         </SidebarMenuButton>

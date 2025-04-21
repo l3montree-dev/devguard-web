@@ -15,7 +15,7 @@ import {
 import {
   AssetDTO,
   DetailedFlawDTO,
-  FlawEventDTO,
+  VulnEventDTO,
   RequirementsLevel,
 } from "@/types/api/api";
 import Image from "next/image";
@@ -293,7 +293,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetVersion = useStore((s) => s.assetVersion);
 
   const handleSubmit = async (data: {
-    status?: FlawEventDTO["type"];
+    status?: VulnEventDTO["type"];
     justification?: string;
   }) => {
     if (data.status === undefined) {
@@ -392,16 +392,20 @@ const Index: FunctionComponent<Props> = (props) => {
                 )}
                 <FlawState state={flaw.state} />
                 {cve && <Severity risk={flaw.rawRiskAssessment} />}
-                <Badge variant={"outline"}>
-                  <div>{flaw.scanner}</div>
-                </Badge>
+                <div className="flex flex-row gap-2">
+                  {flaw.scannerIds.split(" ").map((s) => (
+                    <Badge key={s} variant={"secondary"}>
+                      {s}
+                    </Badge>
+                  ))}
+                </div>
               </div>
               <div className="mb-16 mt-4">
                 <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
 
               <RiskAssessmentFeed
-                flawName={flaw.cve?.cve ?? ""}
+                vulnerabilityName={flaw.cveId ?? ""}
                 events={flaw.events}
               />
               <div>
@@ -460,6 +464,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </div>
                                 </Button>
                               )}
+
                             {flaw.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
@@ -487,6 +492,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </div>
                                 </Button>
                               )}
+
                             <Button
                               onClick={() =>
                                 handleSubmit({
@@ -835,10 +841,10 @@ const Index: FunctionComponent<Props> = (props) => {
                               className={buttonVariants({ variant: "outline" })}
                               href={
                                 router.asPath +
-                                "/../../dependency-graph?pkg=" +
+                                "/../../dependencies/graph?pkg=" +
                                 flaw.componentPurl +
                                 "&scanner=" +
-                                flaw.scanner
+                                flaw.scannerIds.split(" ")[0]
                               }
                             >
                               Show in dependency graph
@@ -882,7 +888,7 @@ export const getServerSideProps = middleware(
       "/flaws/" +
       flawId;
 
-    const [resp, events]: [DetailedFlawDTO, FlawEventDTO[]] = await Promise.all(
+    const [resp, events]: [DetailedFlawDTO, VulnEventDTO[]] = await Promise.all(
       [
         apiClient(uri).then((r) => r.json()),
         apiClient(uri + "/events").then((r) => r.json()),

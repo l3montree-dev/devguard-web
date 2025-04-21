@@ -68,31 +68,6 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         </FormItem>
       )}
     />
-
-    <FormField
-      control={form.control}
-      name="centralFlawManagement"
-      render={({ field }) => (
-        <FormItem>
-          <ListItem
-            Description={
-              "If enabled, the asset will be included in the central flaw management system. That means if you handle a flaw in a branch or a version of the asset, it will be marked as handled in all other branches and versions of the asset."
-            }
-            Title="Central Flaw Management"
-            Button={
-              <FormControl>
-                <Switch
-                  defaultChecked={field.value}
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            }
-          />
-          <FormMessage />
-        </FormItem>
-      )}
-    />
   </>
 );
 
@@ -258,7 +233,8 @@ const SliderForm: FunctionComponent<Props> = ({ form }) => {
             />
           </FormControl>
           <FormDescription>
-            Calculates Risk including multiple factors.
+            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
+            Score given by experts
           </FormDescription>
           <FormMessage />
         </FormItem>
@@ -286,8 +262,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
             />
           </FormControl>
           <FormDescription>
-            CVSS-BTE [Base] from experts [T] adapted [E]nvironment = adapted
-            Score given by experts
+            Calculates Risk including multiple factors.
           </FormDescription>
           <FormMessage />
         </FormItem>
@@ -297,8 +272,8 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
 };
 
 const AssetSettingsForm: FunctionComponent<
-  Props & { forceVerticalSections?: boolean }
-> = ({ form, forceVerticalSections }) => {
+  Props & { forceVerticalSections?: boolean; showReportingRange: boolean }
+> = ({ form, forceVerticalSections, showReportingRange }) => {
   return (
     <>
       <Section
@@ -325,23 +300,27 @@ Security requirements are specific criteria or conditions that an application, s
       >
         <AssetFormMisc form={form} />
       </Section>
-      <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        description="CVSS-BTE is the latest Scoring System standard.
+      {showReportingRange && (
+        <>
+          <hr />
+          <Section
+            forceVertical={forceVerticalSections}
+            description="CVSS-BTE is the latest Scoring System standard.
         It combines multiple metrics into one, your defined range will automatically create tickets that 
         "
-        title="Reporting range"
-      >
-        <EnableTicketRange form={form}></EnableTicketRange>
+            title="Reporting range"
+          >
+            <EnableTicketRange form={form}></EnableTicketRange>
 
-        {form.watch("enableTicketRange") && (
-          <React.Fragment>
-            <SliderForm form={form}></SliderForm>
-            <RiskSliderForm form={form}></RiskSliderForm>
-          </React.Fragment>
-        )}
-      </Section>
+            {form.watch("enableTicketRange") && (
+              <React.Fragment>
+                <SliderForm form={form}></SliderForm>
+                <RiskSliderForm form={form}></RiskSliderForm>
+              </React.Fragment>
+            )}
+          </Section>
+        </>
+      )}
       <></>
     </>
   );

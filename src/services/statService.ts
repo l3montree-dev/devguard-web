@@ -1,10 +1,14 @@
+import { GetServerSidePropsContext } from "next";
 import {
+  VulnEventDTO,
   License,
   LicenseResponse,
+  Paged,
   PolicyEvaluation,
   RiskDistribution,
 } from "../types/api/api";
 import { DevGuardApiClient } from "./devGuardApi";
+import { buildFilterSearchParams } from "@/utils/url";
 
 export const fetchAssetStats = async ({
   organizationSlug,
@@ -12,17 +16,20 @@ export const fetchAssetStats = async ({
   assetSlug,
   apiClient,
   assetVersionSlug,
+  context,
 }: {
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
   apiClient: DevGuardApiClient;
   assetVersionSlug?: string;
+  context: GetServerSidePropsContext;
 }): Promise<{
   compliance: Array<PolicyEvaluation>;
   riskDistribution: Array<RiskDistribution>;
   cvssDistribution: Array<RiskDistribution>;
   licenses: Array<LicenseResponse>;
+  events: Paged<VulnEventDTO>;
 }> => {
   let url =
     "/organizations/" +
@@ -37,7 +44,7 @@ export const fetchAssetStats = async ({
     url += "/refs/" + assetVersionSlug;
   }
 
-  const [compliance, riskDistribution, cvssDistribution, licenses] =
+  const [compliance, riskDistribution, cvssDistribution, licenses, events] =
     await Promise.all([
       apiClient(url + "/compliance").then((r) => r.json()),
       apiClient(url + "/stats/risk-distribution").then((r) => r.json()),
@@ -45,6 +52,7 @@ export const fetchAssetStats = async ({
       apiClient(url + "/components/licenses").then(
         (r) => r.json() as Promise<LicenseResponse[]>,
       ),
+      apiClient(url + "/events/?pageSize=3").then((r) => r.json()),
     ]);
 
   // sort the licenses by count
@@ -55,5 +63,6 @@ export const fetchAssetStats = async ({
     riskDistribution,
     cvssDistribution,
     licenses,
+    events,
   };
 };

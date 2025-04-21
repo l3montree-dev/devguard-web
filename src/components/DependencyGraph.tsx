@@ -164,9 +164,9 @@ const getLayoutedElements = (
       animated: false,
       style: {
         stroke:
-          riskMap[target] > 0
+          /* riskMap[target] > 0
             ? severityToColor(riskToSeverity(riskMap[target]))
-            : "#a1a1aa",
+            : */ "#a1a1aa",
       },
     };
   });
