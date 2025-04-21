@@ -37,6 +37,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import { Badge } from "@/components/ui/badge";
 import ListItem from "@/components/common/ListItem";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 interface Props {
   open: boolean;
@@ -84,8 +85,26 @@ const DependencyDialog: FunctionComponent<Props> = ({
     <Dialog open={open}>
       <DialogContent className={"w-full"} setOpen={setOpen}>
         <DialogHeader>
-          <DialogTitle>{purl}</DialogTitle>
-          <DialogDescription>
+          <div className="flex justify-between">
+            <DialogTitle className="flex">{purl}</DialogTitle>
+            <div className="mr-5 flex flex-row-reverse">
+              <Badge variant="success" className="flex">
+                {componentProject.license}
+              </Badge>
+              <div>
+                <div className="">
+                  <Image
+                    src={"/assets/openssf-horizontal-black.svg"}
+                    alt="openssf logo"
+                    width={100}
+                    height={100}
+                    className="mr-2 dark:invert"
+                  ></Image>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogDescription className="">
             Details of package: {componentProject.description}
           </DialogDescription>
         </DialogHeader>
