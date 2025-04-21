@@ -1,10 +1,10 @@
 export function Podium() {
   return (
-    <div className="flex items-center justify-center">
-      <div className=" flex grid-cols-3 space-x-5">
-        <div className="h-20 w-20 bg-gradient-to-b from-red-500"></div>
-        <div className="h-20 w-20 bg-gradient-to-b from-red-500"></div>
-        <div className="h-20 w-20 bg-current"></div>
+    <div>
+      <div className="flex items-end justify-center space-x-0">
+        <div className="h-24 w-28 rounded-l-lg bg-gradient-to-b from-red-500 via-red-500" />
+        <div className="h-36 w-28 rounded-t-lg bg-gradient-to-b from-red-500 via-red-500" />
+        <div className="h-16 w-28 rounded-r-lg bg-gradient-to-b from-red-500 via-red-500" />
       </div>
     </div>
   );

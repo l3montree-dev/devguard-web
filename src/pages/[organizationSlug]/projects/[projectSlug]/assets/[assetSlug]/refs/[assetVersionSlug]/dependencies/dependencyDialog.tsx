@@ -90,7 +90,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
             <DialogTitle className="flex">{purl}</DialogTitle>
             <div className="mr-5 flex flex-row-reverse space-x-5">
               <Badge variant="success" className="flex">
-                {componentProject.license}
+                {componentProject.license} MIT
               </Badge>
               <div className="flex">
                 <div className="">
@@ -110,10 +110,18 @@ const DependencyDialog: FunctionComponent<Props> = ({
           </DialogDescription>
         </DialogHeader>
         <div>
-          <div>Prior</div>
+          <div>Priority</div>
           <Podium></Podium>
-          <div></div>
+          <div className="mt-5">
+            <div className="border-4 border-double border-red-500">
+              Veery bad
+            </div>
+            <div className="border-2 border-t-0 border-dashed border-gray-500">
+              Veery good
+            </div>
+          </div>
         </div>
+
         {graphData && (
           <div
             className="h-52 w-full rounded-lg border bg-black"
