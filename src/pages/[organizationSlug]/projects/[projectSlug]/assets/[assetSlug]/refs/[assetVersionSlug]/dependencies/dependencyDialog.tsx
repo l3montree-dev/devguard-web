@@ -38,6 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import ListItem from "@/components/common/ListItem";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { Podium } from "./Podium";
 
 interface Props {
   open: boolean;
@@ -87,11 +88,11 @@ const DependencyDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <div className="flex justify-between">
             <DialogTitle className="flex">{purl}</DialogTitle>
-            <div className="mr-5 flex flex-row-reverse">
+            <div className="mr-5 flex flex-row-reverse space-x-5">
               <Badge variant="success" className="flex">
                 {componentProject.license}
               </Badge>
-              <div>
+              <div className="flex">
                 <div className="">
                   <Image
                     src={"/assets/openssf-horizontal-black.svg"}
@@ -108,40 +109,11 @@ const DependencyDialog: FunctionComponent<Props> = ({
             Details of package: {componentProject.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 rounded-lg border">
-          {scoreCard?.checks.map((e, i, arr) => (
-            <div
-              className={classNames("flex flex-col border text-sm")}
-              key={e.name}
-            >
-              <div className="px-2 pt-2 text-left">
-                <Tooltip>
-                  <div className="flex flex-row ">
-                    <TooltipTrigger className="flex w-full flex-row items-center justify-between font-semibold">
-                      <div className="">
-                        {e.name}
-
-                        <InformationCircleIcon className="ml-1 inline-block h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <Badge variant={e.score < 3 ? "danger" : "secondary"}>
-                        {e.score}
-                      </Badge>
-                    </TooltipTrigger>
-                  </div>
-                  <TooltipContent>
-                    <p>{e.documentation.shortDescription}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <div className="p-2 text-left">
-                <p className="capitalize text-muted-foreground">{e.reason}</p>
-                <div className="flex flex-row"></div>
-              </div>
-              <div className="p-2 text-left"></div>
-            </div>
-          ))}
+        <div>
+          <div>Prior</div>
+          <Podium></Podium>
+          <div></div>
         </div>
-
         {graphData && (
           <div
             className="h-52 w-full rounded-lg border bg-black"
