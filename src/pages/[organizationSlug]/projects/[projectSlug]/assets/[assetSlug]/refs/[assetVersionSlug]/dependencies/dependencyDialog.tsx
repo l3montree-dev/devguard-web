@@ -115,7 +115,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <Podium></Podium>
           <div className="mt-5">
             <div className="border border-2 border-red-500">
-              <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
+              <OpenSSFtable  scoreCard={scoreCard}></OpenSSFtable>
             </div>
             <div className="border-2 border-t-0 border-dashed border-gray-500">
               <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
