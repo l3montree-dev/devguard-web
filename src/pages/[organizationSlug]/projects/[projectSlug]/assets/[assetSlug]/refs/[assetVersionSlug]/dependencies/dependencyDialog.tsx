@@ -115,20 +115,12 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <Podium></Podium>
           <div className="mt-5">
             <div className="border border-2 border-red-500">
-              <table>
-                <tr>
-                  <th>Compnay</th>
-                </tr>
-                <tr>
-                  <td>l3montree</td>
-                </tr>
-              </table>
+              <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
             </div>
             <div className="border-2 border-t-0 border-dashed border-gray-500">
-              Veery good
+              <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
             </div>
             {/* https://hillmann.cc/tailwindcss-bg-patterns/ try to look for some good patterns here*/}
-            <OpenSSFtable scoreCard={scoreCard}></OpenSSFtable>
           </div>
         </div>
 

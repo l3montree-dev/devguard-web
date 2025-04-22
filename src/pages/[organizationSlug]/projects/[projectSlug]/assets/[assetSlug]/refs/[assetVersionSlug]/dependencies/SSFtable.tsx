@@ -24,26 +24,20 @@ import { Badge } from "../../../../../../../../../components/ui/badge";
 import { defaultScanner } from "@/utils/view";
 
 interface Props {
-  purl: string;
   scoreCard?: ScoreCard;
 }
 
 const SSFTableRow = ({ scoreCard }: { scoreCard: ScoreCard }) => {
   return (
     <tr>
-      <td className="p-4">
-        <div className="flex flex-row"></div>
-      </td>
-      <td className="p-4">
-        <Badge variant={"secondary"}>{scoreCard.date}</Badge>
-      </td>
-      <td className="p-4">{scoreCard.date}</td>
-      <td className="p-4">{scoreCard.date}</td>
-      <td className="p-4">{scoreCard.date}</td>
-
-      <td className="p-4" colSpan={2}>
-        <div className="line-clamp-3">{scoreCard.date} </div>
-      </td>
+      {scoreCard?.checks.map((e) => (
+        <tr key={e.name}>
+          <td>{e.name}</td>
+          <td>{e.score}</td>
+          <td>{e.reason}</td>
+          <td>{e.documentation.shortDescription}</td>
+        </tr>
+      ))}
     </tr>
   );
 };
@@ -53,8 +47,14 @@ const OpenSSFtable: FunctionComponent<Props> = ({ scoreCard }) => {
   const router = useRouter();
   return (
     <>
+      <tr>
+        <td>acorn</td>
+        <td>2</td>
+        <td>3</td>
+      </tr>
+
       <tr onClick={() => setIsOpen((prev) => !prev)}>
-        <td className="py-4 text-center align-baseline">
+        <td className="py-4 ">
           {isOpen ? (
             <ChevronDownIcon className="relative top-0.5 mx-auto w-4 text-muted-foreground" />
           ) : (
@@ -65,14 +65,9 @@ const OpenSSFtable: FunctionComponent<Props> = ({ scoreCard }) => {
       {isOpen && (
         <tr>
           <td colSpan={7}>
-            <div className="m-2 ml-12 overflow-hidden rounded-lg border">
+            <div className="m-2 ml-12 overflow-hidden">
               <table className="w-full table-fixed">
-                <thead>
-                  <tr className=""></tr>
-                </thead>
-                <tbody>
-                  scoreCard && {<SSFTableRow scoreCard={scoreCard} />}
-                </tbody>
+                <td>{scoreCard && <SSFTableRow scoreCard={scoreCard} />}</td>
               </table>
             </div>
           </td>
