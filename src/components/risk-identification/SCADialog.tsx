@@ -27,6 +27,7 @@ import { Button } from "../ui/button";
 import GithubInstructionsSteps from "./GithubInstructionsSteps";
 import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 import PatSection from "./PatSection";
+import useDialogScroll from "../../hooks/useDialogScroll";
 
 interface Props {
   open: boolean;
@@ -44,16 +45,7 @@ const SCADialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const { handleAutosetup, isLoading, Loader, progress, onCreatePat, pat } =
     useAutosetup("sca");
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        const el = document.querySelector('[data-state="open"]');
-        if (el) {
-          el.scrollTo({ behavior: "instant", top: 0 });
-        }
-      });
-    }
-  }, [open]);
+  useDialogScroll(open);
 
   return (
     <Dialog open={open}>

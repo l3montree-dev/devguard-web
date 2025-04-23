@@ -12,18 +12,25 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { useState } from "react";
+import SastDialog from "./SastDialog";
 import Stage from "./Stage";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function SAST() {
+  const [isOpen, setOpen] = useState(false);
   return (
-    <Stage
-      id="sast"
-      title="Static Application Security Testing"
-      description="Find security vulnerabilities in produced source code."
-      buttonTitle="Coming soon"
-      buttonVariant="outline"
-    />
+    <>
+      <Stage
+        id="sast"
+        title="Static Application Security Testing"
+        description="Find security vulnerabilities in produced source code."
+        buttonTitle="Add SAST"
+        onButtonClick={() => setOpen(true)}
+        buttonVariant="secondary"
+      />
+      <SastDialog open={isOpen} setOpen={setOpen} />
+    </>
   );
 }
 
