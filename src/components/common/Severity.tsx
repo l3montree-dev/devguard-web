@@ -1,17 +1,17 @@
-import { Badge } from "../ui/badge";
+import { classNames } from "../../utils/common";
 
 export const getClassNames = (severity: string) => {
   switch (severity) {
     case "CRITICAL":
-      return "text-white bg-red-600 border border-red-600";
+      return "text-red-600 bg-red-600/20 dark:text-red-400";
     case "HIGH":
-      return "text-white border border-orange-500 bg-orange-500";
+      return "text-orange-700 dark:text-orange-300 bg-orange-500/20";
     case "MEDIUM":
-      return "text-black bg-yellow-500 border border-yellow-500";
+      return "text-yellow-700 dark:text-yellow-300 bg-yellow-500/20";
     case "LOW":
-      return "text-black border bg-green-500 border-green-500";
+      return "dark:text-green-300 text-green-600 bg-green-500/20";
     default:
-      return "text-white bg-gray-500";
+      return "text-gray-700 bg-gray-500/20 dark:text-gray-200";
   }
 };
 
@@ -34,16 +34,22 @@ export const riskToSeverity = (risk: number) => {
   if (risk >= 9) return "CRITICAL";
   if (risk >= 7) return "HIGH";
   if (risk >= 4) return "MEDIUM";
-  return "LOW";
+  if (risk > 0) return "LOW";
+  return "NONE";
 };
 
 const Severity = ({ risk }: { risk: number }) => {
   const cls = getClassNames(riskToSeverity(risk));
 
   return (
-    <Badge variant={"outline"} className={cls}>
-      {riskToSeverity(risk)}
-    </Badge>
+    <span
+      className={classNames(
+        "whitespace-nowrap rounded-md p-1 px-1.5 font-medium",
+        cls,
+      )}
+    >
+      {riskToSeverity(risk)} ({risk.toFixed(1)})
+    </span>
   );
 };
 

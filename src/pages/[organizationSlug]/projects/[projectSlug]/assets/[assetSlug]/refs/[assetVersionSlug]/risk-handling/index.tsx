@@ -48,6 +48,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import { buttonVariants } from "@/components/ui/button";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
+import Severity from "../../../../../../../../../components/common/Severity";
 
 interface Props {
   exists: boolean;
@@ -108,7 +109,9 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
       id: "max_risk",
       cell: (row) => (
         <div>
-          <span className="whitespace-nowrap">{row.getValue().toFixed(1)}</span>
+          <span className="whitespace-nowrap">
+            <Severity risk={row.getValue()} />
+          </span>
         </div>
       ),
     }),
@@ -126,7 +129,7 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
       header: "Max CVSS",
       id: "max_cvss",
       enableSorting: true,
-      cell: (row) => row.getValue().toFixed(1),
+      cell: (row) => <Severity risk={row.getValue()} />,
     }),
   },
   {
@@ -300,7 +303,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                     header.column.columnDef.header,
                                     header.getContext(),
                                   )}
-
                               <SortingCaret
                                 sortDirection={header.column.getIsSorted()}
                               />
