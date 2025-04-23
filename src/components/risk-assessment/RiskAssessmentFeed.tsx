@@ -201,7 +201,7 @@ export default function RiskAssessmentFeed({
 
                         <div className="absolute right-2 top-2">
                           <Link
-                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionSlug}/flaws/${event.vulnId}`}
+                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionSlug}/vulns/${event.vulnId}`}
                           >
                             <Badge variant={"outline"}>
                               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />

@@ -13,64 +13,64 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FlawByPackage, FlawWithCVE } from "@/types/api/api";
+import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { classNames } from "@/utils/common";
+import { defaultScanner } from "@/utils/view";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
-import React, { FunctionComponent } from "react";
-import FlawState from "../common/FlawState";
 import { useRouter } from "next/router";
-import { Badge } from "../ui/badge";
-import { defaultScanner } from "@/utils/view";
+import React, { FunctionComponent } from "react";
 import Severity from "../common/Severity";
+import VulnState from "../common/VulnState";
+import { Badge } from "../ui/badge";
 
 interface Props {
-  row: Row<FlawByPackage>;
+  row: Row<VulnByPackage>;
   index: number;
   arrLength: number;
 }
 
-const FlawWithCveTableRow = ({
+const VulnWithCveTableRow = ({
   onClick,
-  flaw,
+  vuln,
 }: {
   onClick: () => void;
-  flaw: FlawWithCVE;
+  vuln: VulnWithCVE;
 }) => {
   return (
     <tr
       onClick={onClick}
       className="border-b align-top hover:bg-gray-50 dark:hover:bg-secondary"
-      key={flaw.id}
+      key={vuln.id}
     >
       <td className="p-4">
         <div className="flex flex-row">
-          <FlawState state={flaw.state} />
+          <VulnState state={vuln.state} />
         </div>
       </td>
       <td className="p-4">
         <Badge variant={"secondary"}>
-          {flaw.scannerIds.replace(defaultScanner, "")}
+          {vuln.scannerIds.replace(defaultScanner, "")}
         </Badge>
       </td>
-      <td className="p-4">{flaw.cveId}</td>
+      <td className="p-4">{vuln.cveId}</td>
       <td className="p-4">
-        <Severity risk={flaw.rawRiskAssessment} />
+        <Severity risk={vuln.rawRiskAssessment} />
       </td>
       <td className="p-4">
-        <Severity risk={flaw.cve?.cvss ?? 0} />
+        <Severity risk={vuln.cve?.cvss ?? 0} />
       </td>
       <td className="p-4">
-        {flaw.componentFixedVersion ? (
+        {vuln.componentFixedVersion ? (
           <span>
-            <Badge variant={"secondary"}>{flaw.componentFixedVersion}</Badge>
+            <Badge variant={"secondary"}>{vuln.componentFixedVersion}</Badge>
           </span>
         ) : (
           <span className="text-muted-foreground">No fix available</span>
         )}
       </td>
       <td className="p-4" colSpan={2}>
-        <div className="line-clamp-3">{flaw.cve?.description} </div>
+        <div className="line-clamp-3">{vuln.cve?.description} </div>
       </td>
     </tr>
   );
@@ -136,13 +136,15 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {row.original.flaws?.map((flaw) => (
-                    <FlawWithCveTableRow
-                      flaw={flaw}
-                      key={flaw.id}
+                  {row.original.vulns?.map((vuln) => (
+                    <VulnWithCveTableRow
+                      vuln={vuln}
+                      key={vuln.id}
                       onClick={() =>
                         router.push(
-                          router.asPath.split("?")[0] + "/../flaws/" + flaw.id,
+                          router.asPath.split("?")[0] +
+                            "/../dependency-risks/" +
+                            vuln.id,
                         )
                       }
                     />

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { DetailedFlawDTO, Paged } from "@/types/api/api";
+import { DetailedVulnDTO, Paged } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import React, { FunctionComponent, useMemo } from "react";
 import DateString from "./DateString";
@@ -23,10 +23,10 @@ import { Badge } from "../ui/badge";
 import Link from "next/link";
 
 interface Props {
-  flaws: Paged<DetailedFlawDTO>;
+  vulns: Paged<DetailedVulnDTO>;
 }
 
-const AcceptedVulnerabilitiesTable: FunctionComponent<Props> = ({ flaws }) => {
+const AcceptedVulnerabilitiesTable: FunctionComponent<Props> = ({ vulns }) => {
   const router = useRouter();
   const contentTree = useStore((s) => s.contentTree);
   const assetMap = useMemo(
@@ -49,8 +49,8 @@ const AcceptedVulnerabilitiesTable: FunctionComponent<Props> = ({ flaws }) => {
           </tr>
         </thead>
         <tbody>
-          {flaws.data.map((flaw, i) => {
-            const acceptedEvent = flaw.events.findLast(
+          {vulns.data.map((vuln, i) => {
+            const acceptedEvent = vuln.events.findLast(
               (e) => e.type === "accepted",
             );
 
@@ -64,24 +64,24 @@ const AcceptedVulnerabilitiesTable: FunctionComponent<Props> = ({ flaws }) => {
                 className={classNames(
                   "cursor-pointer",
                   i % 2 !== 0 ? "bg-card/75 hover:bg-card" : "hover:bg-card/50",
-                  i + 1 !== flaws.data.length && "border-b",
+                  i + 1 !== vulns.data.length && "border-b",
                 )}
-                key={flaw.id}
+                key={vuln.id}
                 onClick={() => {
                   router.push(
-                    `/${activeOrg.slug}/projects/${assetMap[flaw.assetId].project.slug}/assets/${assetMap[flaw.assetId]?.slug}/flaws/${flaw.id}`,
+                    `/${activeOrg.slug}/projects/${assetMap[vuln.assetId].project.slug}/assets/${assetMap[vuln.assetId]?.slug}/vulns/${vuln.id}`,
                   );
                 }}
               >
-                <td className="p-4">{flaw.cveId}</td>
-                <td className="p-4">{flaw.rawRiskAssessment}</td>
+                <td className="p-4">{vuln.cveId}</td>
+                <td className="p-4">{vuln.rawRiskAssessment}</td>
                 <td className="p-4">
                   <Link
                     onClick={(e) => e.stopPropagation()}
-                    href={`/${activeOrg.slug}/projects/${assetMap[flaw.assetId].project.slug}/assets/${assetMap[flaw.assetId]?.slug}`}
+                    href={`/${activeOrg.slug}/projects/${assetMap[vuln.assetId].project.slug}/assets/${assetMap[vuln.assetId]?.slug}`}
                   >
                     <Badge variant={"outline"}>
-                      {assetMap[flaw.assetId]?.title}
+                      {assetMap[vuln.assetId]?.title}
                     </Badge>
                   </Link>
                 </td>

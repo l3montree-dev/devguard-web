@@ -29,7 +29,7 @@ const AssetTitle = () => {
       <span className="opacity-75">/</span>
       <Link
         className="flex items-center gap-1 text-white hover:no-underline"
-        href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/risk-handling`}
+        href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
       >
         {asset?.name}
         <Badge className="font-body font-normal !text-white" variant="outline">

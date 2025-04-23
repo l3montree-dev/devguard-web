@@ -1,6 +1,6 @@
 import Page from "@/components/Page";
 
-import FlawState from "@/components/common/FlawState";
+import VulnState from "@/components/common/VulnState";
 
 import Severity from "@/components/common/Severity";
 import { middleware } from "@/decorators/middleware";
@@ -14,9 +14,9 @@ import {
 } from "@/services/devGuardApi";
 import {
   AssetDTO,
-  DetailedFlawDTO,
   VulnEventDTO,
   RequirementsLevel,
+  DetailedVulnDTO,
 } from "@/types/api/api";
 import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
@@ -75,7 +75,7 @@ const MarkdownEditor = dynamic(
 );
 
 interface Props {
-  flaw: DetailedFlawDTO;
+  vuln: DetailedVulnDTO;
 }
 
 const parseCvssVector = (vector: string) => {
@@ -91,7 +91,7 @@ const parseCvssVector = (vector: string) => {
 };
 
 const exploitMessage = (
-  flaw: DetailedFlawDTO,
+  vuln: DetailedVulnDTO,
   obj: { [key: string]: string },
 ): {
   short: string;
@@ -104,7 +104,7 @@ const exploitMessage = (
         <>
           A proof of concept is available for this vulnerability:
           <div>
-            {flaw.cve?.exploits.map((exploit) => (
+            {vuln.cve?.exploits.map((exploit) => (
               <Link
                 className="block"
                 key={exploit.sourceURL}
@@ -124,7 +124,7 @@ const exploitMessage = (
         <>
           A functional exploit is available for this vulnerability
           <div>
-            {flaw.cve?.exploits.map((exploit) => (
+            {vuln.cve?.exploits.map((exploit) => (
               <Link key={exploit.sourceURL} href={exploit.sourceURL}>
                 {exploit.sourceURL}
               </Link>
@@ -273,11 +273,11 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
-  const [flaw, setFlaw] = useState<DetailedFlawDTO>(props.flaw);
+  const [vuln, setVuln] = useState<DetailedVulnDTO>(props.vuln);
   useEffect(() => {
-    setFlaw(props.flaw);
-  }, [props.flaw]);
-  const cve = flaw.cve;
+    setVuln(props.vuln);
+  }, [props.vuln]);
+  const cve = vuln.cve;
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -337,7 +337,7 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     }
 
-    setFlaw((prev) => ({
+    setVuln((prev) => ({
       ...prev,
       ...json,
       events: prev.events.concat(json.events.slice(-1)),
@@ -347,7 +347,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
   const { short: exploitShort, long: ExploitLong } = exploitMessage(
-    flaw,
+    vuln,
     cvssVectorObj,
   );
 
@@ -355,21 +355,21 @@ const Index: FunctionComponent<Props> = (props) => {
     <Page
       Menu={assetMenu}
       Title={<AssetTitle />}
-      title={flaw.cve?.cve ?? "Flaw Details"}
+      title={vuln.cve?.cve ?? "Vuln Details"}
     >
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">{flaw.cveId}</h1>
+              <h1 className="text-2xl font-semibold">{vuln.cveId}</h1>
               <p className="mt-4 text-muted-foreground">
-                {flaw.cve?.description}
+                {vuln.cve?.description}
               </p>
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
-                {flaw.ticketUrl && (
-                  <Link href={flaw.ticketUrl} target="_blank">
+                {vuln.ticketUrl && (
+                  <Link href={vuln.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
-                      {flaw.ticketId?.startsWith("github:") ? (
+                      {vuln.ticketId?.startsWith("github:") ? (
                         <Image
                           src="/assets/github.svg"
                           alt="GitHub Logo"
@@ -386,14 +386,14 @@ const Index: FunctionComponent<Props> = (props) => {
                           height={15}
                         />
                       )}
-                      <span>{flaw.ticketUrl}</span>
+                      <span>{vuln.ticketUrl}</span>
                     </Badge>
                   </Link>
                 )}
-                <FlawState state={flaw.state} />
-                {cve && <Severity risk={flaw.rawRiskAssessment} />}
+                <VulnState state={vuln.state} />
+                {cve && <Severity risk={vuln.rawRiskAssessment} />}
                 <div className="flex flex-row gap-2">
-                  {flaw.scannerIds.split(" ").map((s) => (
+                  {vuln.scannerIds.split(" ").map((s) => (
                     <Badge key={s} variant={"secondary"}>
                       {s}
                     </Badge>
@@ -401,25 +401,25 @@ const Index: FunctionComponent<Props> = (props) => {
                 </div>
               </div>
               <div className="mb-16 mt-4">
-                <Markdown>{flaw.message?.replaceAll("\n", "\n\n")}</Markdown>
+                <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
 
               <RiskAssessmentFeed
-                vulnerabilityName={flaw.cveId ?? ""}
-                events={flaw.events}
+                vulnerabilityName={vuln.cveId ?? ""}
+                events={vuln.events}
               />
               <div>
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {flaw.state === "open"
+                      {vuln.state === "open"
                         ? "Add a comment"
                         : "Reopen this vulnerability"}
                     </CardTitle>
                     <CardDescription></CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {flaw.state === "open" ? (
+                    {vuln.state === "open" ? (
                       <form
                         className="flex flex-col gap-4"
                         onSubmit={(e) => e.preventDefault()}
@@ -437,7 +437,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-center gap-2">
-                            {flaw.ticketId === null &&
+                            {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
                               ) && (
@@ -465,7 +465,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </Button>
                               )}
 
-                            {flaw.ticketId === null &&
+                            {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
                               ) && (
@@ -550,8 +550,8 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <p className="text-sm text-muted-foreground">
-                          You can reopen this flaw, if you plan to mitigate the
-                          risk now, or accepted this flaw by accident.
+                          You can reopen this vuln, if you plan to mitigate the
+                          risk now, or accepted this vuln by accident.
                         </p>
                         <div className="flex flex-row justify-end">
                           <Button
@@ -570,11 +570,11 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </form>
                     )}
-                    {flaw.ticketUrl && (
+                    {vuln.ticketUrl && (
                       <small className="mt-2 block w-full text-right text-muted-foreground">
                         Comment will be synced with{" "}
-                        <Link href={flaw.ticketUrl} target="_blank">
-                          {flaw.ticketUrl}
+                        <Link href={vuln.ticketUrl} target="_blank">
+                          {vuln.ticketUrl}
                         </Link>
                       </small>
                     )}
@@ -590,12 +590,12 @@ const Index: FunctionComponent<Props> = (props) => {
                       data={[
                         {
                           name: "Total",
-                          score: 10 - flaw.rawRiskAssessment,
+                          score: 10 - vuln.rawRiskAssessment,
                           fill: "hsl(var(--secondary))",
                         },
                         {
                           name: "Risk",
-                          score: flaw.rawRiskAssessment,
+                          score: vuln.rawRiskAssessment,
                           fill: "hsl(var(--primary))",
                         },
                       ]}
@@ -620,7 +620,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   y={viewBox.cy}
                                   className="fill-foreground text-3xl font-bold"
                                 >
-                                  {flaw.rawRiskAssessment}
+                                  {vuln.rawRiskAssessment}
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
@@ -646,7 +646,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   </CollapsibleTrigger>
                   <small className="text-muted-foreground">
                     Last calculated at:{" "}
-                    <FormatDate dateString={flaw.riskRecalculatedAt} />
+                    <FormatDate dateString={vuln.riskRecalculatedAt} />
                   </small>
                   <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
                     <div className="w-full border-b pb-4">
@@ -671,12 +671,12 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {((flaw.cve?.epss ?? 0) * 100).toFixed(1)}%
+                            {((vuln.cve?.epss ?? 0) * 100).toFixed(1)}%
                           </Badge>
                         </div>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {epssMessage(flaw.cve?.epss ?? 0)}
+                        {epssMessage(vuln.cve?.epss ?? 0)}
                       </p>
                     </div>
                     <div className="w-full border-b pb-4">
@@ -730,14 +730,14 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {flaw.componentDepth === 1
+                            {vuln.componentDepth === 1
                               ? "Direct"
                               : "Transitive"}
                           </Badge>
                         </div>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {componentDepthMessages(flaw.componentDepth ?? 0)}
+                        {componentDepthMessages(vuln.componentDepth ?? 0)}
                       </p>
                     </div>
                     <div className="w-full border-b pb-4">
@@ -761,7 +761,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.withEnvironment ?? 0).toFixed(1)}
+                            {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -792,7 +792,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </span>
                         <div className="whitespace-nowrap">
                           <Badge variant="outline">
-                            {(flaw.cve?.risk.baseScore ?? 0).toFixed(1)}
+                            {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
                           </Badge>
                         </div>
                       </div>
@@ -803,7 +803,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              {flaw.componentPurl !== null && (
+              {vuln.componentPurl !== null && (
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
                     Affected component
@@ -813,8 +813,8 @@ const Index: FunctionComponent<Props> = (props) => {
                       <div className="rounded-lg border bg-card p-4">
                         <p className="text-sm">
                           <span className="flex flex-row gap-2">
-                            <EcosystemImage packageName={flaw.componentPurl} />{" "}
-                            {beautifyPurl(flaw.componentPurl)}
+                            <EcosystemImage packageName={vuln.componentPurl} />{" "}
+                            {beautifyPurl(vuln.componentPurl)}
                           </span>
                         </p>
                         <div className="mt-4 text-sm">
@@ -823,7 +823,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               Installed version:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {extractVersion(flaw.componentPurl) ?? "unknown"}
+                              {extractVersion(vuln.componentPurl) ?? "unknown"}
                             </Badge>
                           </div>
                           <div className="mt-1 flex flex-row justify-between">
@@ -831,8 +831,8 @@ const Index: FunctionComponent<Props> = (props) => {
                               Fixed in:{" "}
                             </span>
                             <Badge variant={"outline"}>
-                              {Boolean(flaw.componentFixedVersion)
-                                ? flaw.componentFixedVersion
+                              {Boolean(vuln.componentFixedVersion)
+                                ? vuln.componentFixedVersion
                                 : "no patch available"}
                             </Badge>
                           </div>
@@ -842,9 +842,9 @@ const Index: FunctionComponent<Props> = (props) => {
                               href={
                                 router.asPath +
                                 "/../../dependencies/graph?pkg=" +
-                                flaw.componentPurl +
+                                vuln.componentPurl +
                                 "&scanner=" +
-                                flaw.scannerIds.split(" ")[0]
+                                vuln.scannerIds.split(" ")[0]
                               }
                             >
                               Show in dependency graph
@@ -872,7 +872,7 @@ export const getServerSideProps = middleware(
       projectSlug,
       assetSlug,
       assetVersionSlug,
-      flawId,
+      vulnId,
     } = context.params!;
 
     const apiClient = getApiClientFromContext(context);
@@ -885,10 +885,10 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/flaws/" +
-      flawId;
+      "/dependency-vulns/" +
+      vulnId;
 
-    const [resp, events]: [DetailedFlawDTO, VulnEventDTO[]] = await Promise.all(
+    const [resp, events]: [DetailedVulnDTO, VulnEventDTO[]] = await Promise.all(
       [
         apiClient(uri).then((r) => r.json()),
         apiClient(uri + "/events").then((r) => r.json()),
@@ -908,7 +908,7 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        flaw: resp,
+        vuln: resp,
       },
     };
   },

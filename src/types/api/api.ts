@@ -138,19 +138,19 @@ export interface EnvDTO {
   lastReportTime: string;
 }
 
-export interface ScaFlawDTO extends BaseFlawDTO {
+export interface ScaVulnDTO extends BaseVulnDTO {
   componentFixedVersion: string | null;
   componentDepth: number;
   componentPurl: string;
 }
 
-export interface NonScaFlawDTO extends BaseFlawDTO {
+export interface NonScaVulnDTO extends BaseVulnDTO {
   componentFixedVersion: null;
   componentDepth: null;
   componentPurl: null;
 }
 
-export interface BaseFlawDTO {
+export interface BaseVulnDTO {
   message: string | null;
   ruleId: string;
   level: string | null;
@@ -170,7 +170,7 @@ export interface BaseFlawDTO {
   assetId: string;
 }
 
-export type FlawDTO = ScaFlawDTO | NonScaFlawDTO;
+export type VulnDTO = ScaVulnDTO | NonScaVulnDTO;
 
 export interface Paged<T> {
   data: T[];
@@ -319,7 +319,7 @@ export interface Exploit {
   subscribers_count: number;
   stargazers_count: number;
 }
-export interface FlawWithCVE extends ScaFlawDTO {
+export interface VulnWithCVE extends ScaVulnDTO {
   cve:
     | (Modify<
         CVE,
@@ -338,7 +338,7 @@ export interface FlawWithCVE extends ScaFlawDTO {
     | null;
 }
 
-export interface DetailedFlawDTO extends FlawWithCVE {
+export interface DetailedVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
 }
 
@@ -395,7 +395,7 @@ export interface AssetDTO {
   signingPubKey?: string;
 
   enableTicketRange: boolean;
-  centralFlawManagement: boolean;
+  centralVulnManagement: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
 }
@@ -457,11 +457,11 @@ export interface RiskHistory {
   maxClosedRisk: number;
   minClosedRisk: number;
 
-  openFlaws: number;
-  fixedFlaws: number;
+  openVulns: number;
+  fixedVulns: number;
 }
 
-export interface FlawCountByScanner {
+export interface VulnCountByScanner {
   [scannerId: string]: number;
 }
 
@@ -469,7 +469,7 @@ export interface DependencyCountByscanner {
   [scanner: string]: number;
 }
 
-export interface FlawAggregationStateAndChange {
+export interface VulnAggregationStateAndChange {
   was: {
     open: number;
     fixed: number;
@@ -480,14 +480,14 @@ export interface FlawAggregationStateAndChange {
   };
 }
 
-export interface FlawByPackage {
+export interface VulnByPackage {
   packageName: string;
   maxRisk: number;
   maxCvss: number;
   totalRisk: number;
   flawCount: number;
   avgRisk: number;
-  flaws: FlawWithCVE[];
+  vulns: VulnWithCVE[];
 }
 
 export interface AverageFixingTime {

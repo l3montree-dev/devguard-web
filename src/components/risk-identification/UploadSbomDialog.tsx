@@ -72,7 +72,7 @@ export default function UploadSbomDialog() {
       toast.error("SBOM has not been send successfully");
     }
     router.push(
-      `/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/main/risk-handling/`,
+      `/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/main/dependency-risks/`,
     );
   };
 

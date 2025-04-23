@@ -7,12 +7,8 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
-import {
-  AssetVersionDTO,
-  FlawByPackage,
-  FlawWithCVE,
-  Paged,
-} from "@/types/api/api";
+import Page from "@/components/Page";
+import { VulnByPackage, VulnWithCVE, Paged } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -22,7 +18,6 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
-import Page from "@/components/Page";
 
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
@@ -34,32 +29,32 @@ import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
+import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
-import { Loader2 } from "lucide-react";
-import EmptyParty from "@/components/common/EmptyParty";
-import { buttonVariants } from "@/components/ui/button";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
+import { Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
+import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 
 interface Props {
-  exists: boolean;
-  flaws: Paged<FlawByPackage>;
+  vulns: Paged<VulnByPackage>;
 }
 
-const columnHelper = createColumnHelper<FlawByPackage>();
+const columnHelper = createColumnHelper<VulnByPackage>();
 
-const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
-  // order the flaws by fixedVersion
-  const orderedFlaws = flaws.sort((a, b) => {
+const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
+  // order the vulns by fixedVersion
+  const orderedVulns = vulns.sort((a, b) => {
     if (a.componentFixedVersion && b.componentFixedVersion) {
       return a.componentFixedVersion.localeCompare(b.componentFixedVersion);
     }
@@ -67,27 +62,27 @@ const getMaxSemverVersionAndRiskReduce = (flaws: FlawWithCVE[]) => {
   });
 
   // remove all without fixed version
-  const filteredFlaws = orderedFlaws.filter(
+  const filteredVulns = orderedVulns.filter(
     (f) => f.componentFixedVersion !== null,
   );
 
-  if (filteredFlaws.length === 0) {
+  if (filteredVulns.length === 0) {
     return null;
   }
   // aggregate the risk
-  const totalRisk = filteredFlaws.reduce(
+  const totalRisk = filteredVulns.reduce(
     (acc, f) => acc + f.rawRiskAssessment,
     0,
   );
 
   return {
     version:
-      filteredFlaws[filteredFlaws.length - 1].componentFixedVersion ?? "",
+      filteredVulns[filteredVulns.length - 1].componentFixedVersion ?? "",
     riskReduction: totalRisk,
   };
 };
 
-const columnsDef: ColumnDef<FlawByPackage, any>[] = [
+const columnsDef: ColumnDef<VulnByPackage, any>[] = [
   {
     ...columnHelper.accessor("packageName", {
       header: "Package",
@@ -147,7 +142,7 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
     cell: ({ row }: any) => (
       <span>
         <Badge variant={"secondary"}>
-          {extractVersion((row.original.flaws[0] as FlawWithCVE).componentPurl)}
+          {extractVersion((row.original.vulns[0] as VulnWithCVE).componentPurl)}
         </Badge>
       </span>
     ),
@@ -158,7 +153,7 @@ const columnsDef: ColumnDef<FlawByPackage, any>[] = [
     enableSorting: false,
     cell: ({ row }: any) => {
       const versionAndReduction = getMaxSemverVersionAndRiskReduce(
-        row.original.flaws,
+        row.original.vulns,
       );
       if (versionAndReduction === null) {
         return <span className="text-muted-foreground">No fix available</span>;
@@ -183,7 +178,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const { table, isLoading, handleSearch } = useTable({
     columnsDef,
-    data: props.flaws.data,
+    data: props.vulns.data,
   });
 
   const assetMenu = useAssetMenu();
@@ -193,7 +188,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
-      {!props.exists ? (
+      {!props.vulns.data.length ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
@@ -326,7 +321,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
             </div>
             <div className="mt-4">
-              <CustomPagination {...props.flaws} />
+              <CustomPagination {...props.vulns} />
             </div>
           </Section>
         </div>
@@ -354,54 +349,14 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    let branches: string[] = [];
-    let tags: string[] = [];
-
-    let exists = false;
-
-    if (asset.refs.length !== 0) {
-      asset.refs.map((av: AssetVersionDTO) => {
-        if (av.type === "branch") {
-          branches.push(av.slug);
-        } else if (av.type === "tag") {
-          tags.push(av.slug);
-        } else {
-          throw new Error("Unknown asset version type " + av.type);
-        }
-      });
-      const assetVersionSlugString = assetVersionSlug as string;
-      if (
-        branches.includes(assetVersionSlugString) ||
-        tags.includes(assetVersionSlugString)
-      ) {
-        exists = true;
-      } else {
-        if (branches.includes("main")) {
-          assetVersionSlug = "main";
-          return {
-            redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/main/risk-handling`,
-              permanent: false,
-            },
-          };
-        } else if (branches.length > 0) {
-          assetVersionSlug = branches[0];
-          return {
-            redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${branches[0]}/risk-handling`,
-              permanent: false,
-            },
-          };
-        } else if (tags.length > 0) {
-          assetVersionSlug = tags[0];
-          return {
-            redirect: {
-              destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${tags[0]}/risk-handling`,
-              permanent: false,
-            },
-          };
-        }
-      }
+    const maybeRedirect = maybeGetRedirectDestination(
+      asset,
+      organizationSlug as string,
+      projectSlug as string,
+      assetVersionSlug as string,
+    );
+    if (maybeRedirect) {
+      return maybeRedirect;
     }
 
     const filterQuery = buildFilterQuery(context);
@@ -420,18 +375,22 @@ export const getServerSideProps = middleware(
 
     // check for page and page size query params
     // if they are there, append them to the uri
-    const flawResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/" + "flaws/?" + query.toString(),
+    const v = await apiClient(
+      uri +
+        "refs/" +
+        assetVersionSlug +
+        "/" +
+        "dependency-vulns/?" +
+        query.toString(),
     );
 
     // fetch a personal access token from the user
 
-    const flaws = await flawResp.json();
+    const vulns = await v.json();
 
     return {
       props: {
-        exists,
-        flaws,
+        vulns,
       },
     };
   },

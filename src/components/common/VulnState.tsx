@@ -1,16 +1,15 @@
-import { FlawDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
+  BugAntIcon,
   CheckCircleIcon,
   SpeakerXMarkIcon,
   StopIcon,
-  ClockIcon,
-  BugAntIcon,
 } from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
+import { VulnDTO } from "../../types/api/api";
 
-const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
+const VulnState: FunctionComponent<{ state: VulnDTO["state"] }> = ({
   state,
 }) => {
   const defaultClasses =
@@ -72,4 +71,4 @@ const FlawState: FunctionComponent<{ state: FlawDTO["state"] }> = ({
   }
 };
 
-export default FlawState;
+export default VulnState;

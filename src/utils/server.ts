@@ -11,7 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 
-import { AssetDTO, ProjectDTO, RiskHistory } from "@/types/api/api";
+import {
+  AssetDTO,
+  AssetVersionDTO,
+  ProjectDTO,
+  RiskHistory,
+} from "@/types/api/api";
 
 type RiskHistoryEl = {
   riskHistory: RiskHistory[];
@@ -59,8 +64,8 @@ export function padRiskHistory<T extends RiskHistoryEl>(
           maxOpenRisk: 0,
           averageClosedRisk: 0,
           averageOpenRisk: 0,
-          openFlaws: 0,
-          fixedFlaws: 0,
+          openVulns: 0,
+          fixedVulns: 0,
           minClosedRisk: 0,
           minOpenRisk: 0,
         },
@@ -79,3 +84,57 @@ export function padRiskHistory<T extends RiskHistoryEl>(
 
   return riskHistory;
 }
+
+export const maybeGetRedirectDestination = (
+  asset: AssetDTO,
+  organizationSlug: string,
+  projectSlug: string,
+  assetVersionSlug: string,
+) => {
+  const branches: string[] = [];
+  const tags: string[] = [];
+
+  if (asset.refs.length !== 0) {
+    asset.refs.map((av: AssetVersionDTO) => {
+      if (av.type === "branch") {
+        branches.push(av.slug);
+      } else if (av.type === "tag") {
+        tags.push(av.slug);
+      } else {
+        throw new Error("Unknown asset version type " + av.type);
+      }
+    });
+    const assetVersionSlugString = assetVersionSlug as string;
+    if (
+      branches.includes(assetVersionSlugString) ||
+      tags.includes(assetVersionSlugString)
+    ) {
+    } else {
+      if (branches.includes("main")) {
+        assetVersionSlug = "main";
+        return {
+          redirect: {
+            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/main/dependency-risks`,
+            permanent: false,
+          },
+        };
+      } else if (branches.length > 0) {
+        assetVersionSlug = branches[0];
+        return {
+          redirect: {
+            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${branches[0]}/dependency-risks`,
+            permanent: false,
+          },
+        };
+      } else if (tags.length > 0) {
+        assetVersionSlug = tags[0];
+        return {
+          redirect: {
+            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${tags[0]}/dependency-risks`,
+            permanent: false,
+          },
+        };
+      }
+    }
+  }
+};
