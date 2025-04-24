@@ -98,7 +98,7 @@ const Index: FunctionComponent<Props> = (props) => {
     let json: any;
     if (data.status === "mitigate") {
       const resp = await browserApiClient(
-        "/api/v1/organizations/" +
+        "/organizations/" +
           activeOrg.slug +
           "/projects/" +
           project.slug +
@@ -114,15 +114,13 @@ const Index: FunctionComponent<Props> = (props) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            comment: data.justification,
-          }),
+          body: JSON.stringify(data),
         },
       );
       json = await resp.json();
     } else {
       const resp = await browserApiClient(
-        "/api/v1/organizations/" +
+        "/organizations/" +
           activeOrg.slug +
           "/projects/" +
           project.slug +
@@ -139,9 +137,14 @@ const Index: FunctionComponent<Props> = (props) => {
           },
           body: JSON.stringify(data),
         },
-        "",
       );
       json = await resp.json();
+    }
+
+    if (!json.events) {
+      return toast("Failed to update vulnerability", {
+        description: "Please try again later.",
+      });
     }
 
     setVuln((prev) => ({
@@ -208,7 +211,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               {vuln.snippet && (
                 <div className="mt-4 rounded-lg border bg-secondary">
-                  <div className="px-4 py-2 font-mono text-sm font-medium">
+                  <div className="font-mono px-4 py-2 text-sm font-medium">
                     {vuln.uri}
                   </div>
                   <CopyCode

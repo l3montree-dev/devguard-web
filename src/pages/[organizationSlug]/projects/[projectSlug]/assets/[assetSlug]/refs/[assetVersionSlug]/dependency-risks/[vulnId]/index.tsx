@@ -356,6 +356,12 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     }
 
+    if (!json.events) {
+      return toast("Failed to update vulnerability", {
+        description: "Please try again later.",
+      });
+    }
+
     setVuln((prev) => ({
       ...prev,
       ...json,
