@@ -16,7 +16,7 @@ import {
   AssetDTO,
   VulnEventDTO,
   RequirementsLevel,
-  DetailedVulnDTO,
+  DetailedDependencyVulnDTO,
 } from "@/types/api/api";
 import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
@@ -75,7 +75,7 @@ const MarkdownEditor = dynamic(
 );
 
 interface Props {
-  vuln: DetailedVulnDTO;
+  vuln: DetailedDependencyVulnDTO;
 }
 
 const parseCvssVector = (vector: string) => {
@@ -91,7 +91,7 @@ const parseCvssVector = (vector: string) => {
 };
 
 const exploitMessage = (
-  vuln: DetailedVulnDTO,
+  vuln: DetailedDependencyVulnDTO,
   obj: { [key: string]: string },
 ): {
   short: string;
@@ -273,7 +273,7 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
-  const [vuln, setVuln] = useState<DetailedVulnDTO>(props.vuln);
+  const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
   useEffect(() => {
     setVuln(props.vuln);
   }, [props.vuln]);
@@ -283,7 +283,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const project = useActiveProject();
 
   const assetMenu = useAssetMenu();
-  const asset = useActiveAsset();
+  const asset = useActiveAsset()!;
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -309,7 +309,17 @@ const Index: FunctionComponent<Props> = (props) => {
     let json: any;
     if (data.status === "mitigate") {
       const resp = await browserApiClient(
-        "/api/v1/organizations/" + router.asPath + "/mitigate",
+        "/api/v1/organizations/" +
+          activeOrg.slug +
+          "/projects/" +
+          project.slug +
+          "/assets/" +
+          asset.slug +
+          "/refs/" +
+          assetVersion?.name +
+          "/dependency-vulns/" +
+          vuln.id +
+          "/mitigate",
         {
           method: "POST",
           headers: {
@@ -324,7 +334,16 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     } else {
       const resp = await browserApiClient(
-        "/api/v1/organizations/" + router.asPath,
+        "/api/v1/organizations/" +
+          activeOrg.slug +
+          "/projects/" +
+          project.slug +
+          "/assets/" +
+          asset.slug +
+          "/refs/" +
+          assetVersion?.name +
+          "/dependency-vulns/" +
+          vuln.id,
         {
           method: "POST",
           headers: {
@@ -340,7 +359,9 @@ const Index: FunctionComponent<Props> = (props) => {
     setVuln((prev) => ({
       ...prev,
       ...json,
-      events: prev.events.concat(json.events.slice(-1)),
+      events: prev.events.concat([
+        { ...json.events.slice(-1)[0], assetVersionName: assetVersion?.name },
+      ]),
     }));
     setJustification("");
   };
@@ -403,7 +424,6 @@ const Index: FunctionComponent<Props> = (props) => {
               <div className="mb-16 mt-4">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
-
               <RiskAssessmentFeed
                 vulnerabilityName={vuln.cveId ?? ""}
                 events={vuln.events}
@@ -443,12 +463,13 @@ const Index: FunctionComponent<Props> = (props) => {
                               ) && (
                                 <Button
                                   variant={"secondary"}
-                                  onClick={() => {
+                                  disabled={isLoading}
+                                  onClick={waitFor(() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    });
-                                  }}
+                                    }),
+                                  )}
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -471,12 +492,13 @@ const Index: FunctionComponent<Props> = (props) => {
                               ) && (
                                 <Button
                                   variant={"secondary"}
-                                  onClick={() => {
+                                  disabled={isLoading}
+                                  onClick={waitFor(() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    });
-                                  }}
+                                    }),
+                                  )}
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -494,25 +516,28 @@ const Index: FunctionComponent<Props> = (props) => {
                               )}
 
                             <Button
-                              onClick={() =>
+                              onClick={waitFor(() =>
                                 handleSubmit({
                                   status: "accepted",
                                   justification,
-                                })
-                              }
+                                }),
+                              )}
+                              disabled={isLoading}
                               variant={"secondary"}
                             >
+                              <Loader />
                               Accept risk
                             </Button>
                             <Button
-                              onClick={() =>
+                              onClick={waitFor(() =>
                                 handleSubmit({
                                   status: "falsePositive",
                                   justification,
-                                })
-                              }
+                                }),
+                              )}
                               variant={"secondary"}
                             >
+                              <Loader />
                               Mark False Positive
                             </Button>
                             <Button
@@ -526,6 +551,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               className="-mr-3"
                               variant={"default"}
                             >
+                              <Loader />
                               Comment
                             </Button>
                           </div>
@@ -565,6 +591,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             variant={"secondary"}
                             type="submit"
                           >
+                            <Loader />
                             Reopen
                           </Button>
                         </div>
@@ -888,12 +915,11 @@ export const getServerSideProps = middleware(
       "/dependency-vulns/" +
       vulnId;
 
-    const [resp, events]: [DetailedVulnDTO, VulnEventDTO[]] = await Promise.all(
-      [
+    const [resp, events]: [DetailedDependencyVulnDTO, VulnEventDTO[]] =
+      await Promise.all([
         apiClient(uri).then((r) => r.json()),
         apiClient(uri + "/events").then((r) => r.json()),
-      ],
-    );
+      ]);
 
     //filter events with type detected
     const ev = events.filter((event) => {

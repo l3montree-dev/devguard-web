@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { DetailedVulnDTO, Paged } from "@/types/api/api";
+import { DetailedDependencyVulnDTO, Paged } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import React, { FunctionComponent, useMemo } from "react";
 import DateString from "./DateString";
@@ -23,7 +23,7 @@ import { Badge } from "../ui/badge";
 import Link from "next/link";
 
 interface Props {
-  vulns: Paged<DetailedVulnDTO>;
+  vulns: Paged<DetailedDependencyVulnDTO>;
 }
 
 const AcceptedVulnerabilitiesTable: FunctionComponent<Props> = ({ vulns }) => {

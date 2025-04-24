@@ -8,7 +8,12 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { CodeVuln, Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import {
+  FirstPartyVuln,
+  Paged,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -48,10 +53,10 @@ import CopyCode, {
 } from "../../../../../../../../../components/common/CopyCode";
 
 interface Props {
-  vulns: Paged<CodeVuln>;
+  vulns: Paged<FirstPartyVuln>;
 }
 
-const columnHelper = createColumnHelper<CodeVuln>();
+const columnHelper = createColumnHelper<FirstPartyVuln>();
 
 const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   // order the vulns by fixedVersion
@@ -83,14 +88,12 @@ const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   };
 };
 
-const columnsDef: ColumnDef<CodeVuln, any>[] = [
+const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
   columnHelper.accessor("uri", {
     header: "Filename",
     cell: (info) => {
       return (
-        <CopyCodeFragment
-          codeString={info.getValue() + ":" + info.row.original.startLine}
-        />
+        info.getValue() && <CopyCodeFragment codeString={info.getValue()} />
       );
     },
   }),
@@ -170,6 +173,42 @@ const Index: FunctionComponent<Props> = (props) => {
             description="This table shows all the identified risks for this asset."
           >
             <div className="relative flex flex-row gap-2">
+              <Tabs
+                defaultValue={
+                  (router.query.state as string | undefined)
+                    ? (router.query.state as string)
+                    : "open"
+                }
+              >
+                <TabsList>
+                  <TabsTrigger
+                    onClick={() =>
+                      router.push({
+                        query: {
+                          ...router.query,
+                          state: "open",
+                        },
+                      })
+                    }
+                    value="open"
+                  >
+                    Open
+                  </TabsTrigger>
+                  <TabsTrigger
+                    onClick={() =>
+                      router.push({
+                        query: {
+                          ...router.query,
+                          state: "closed",
+                        },
+                      })
+                    }
+                    value="closed"
+                  >
+                    Closed
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
               <Input
                 onChange={handleSearch}
                 defaultValue={router.query.search as string}

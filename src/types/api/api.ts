@@ -334,7 +334,11 @@ export interface VulnWithCVE extends ScaVulnDTO {
     | null;
 }
 
-export interface DetailedVulnDTO extends VulnWithCVE {
+export interface DetailedDependencyVulnDTO extends VulnWithCVE {
+  events: VulnEventDTO[];
+}
+
+export interface DetailedFirstPartyVulnDTO extends FirstPartyVuln {
   events: VulnEventDTO[];
 }
 
@@ -486,7 +490,7 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface CodeVuln extends BaseVulnDTO {
+export interface FirstPartyVuln extends BaseVulnDTO {
   uri: string;
   startLine: number;
   endLine: number;

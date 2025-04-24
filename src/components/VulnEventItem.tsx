@@ -30,7 +30,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const user = findUser(event.userId, activeOrg, currentUser);
-  const msg = eventMessages(event, index, events);
+  const msg = eventMessages(event);
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
@@ -81,7 +81,6 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
                       }{" "}
                       {eventTypeMessages(
                         event,
-                        index,
                         event.vulnerabilityName || "a vulnerability",
                         events,
                       )}
