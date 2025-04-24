@@ -211,7 +211,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               {vuln.snippet && (
                 <div className="mt-4 rounded-lg border bg-secondary">
-                  <div className="font-mono px-4 py-2 text-sm font-medium">
+                  <div className="px-4 py-2 font-mono text-sm font-medium">
                     {vuln.uri}
                   </div>
                   <CopyCode
