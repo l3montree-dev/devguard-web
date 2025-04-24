@@ -138,39 +138,35 @@ export interface EnvDTO {
   lastReportTime: string;
 }
 
-export interface ScaVulnDTO extends BaseVulnDTO {
+export interface ScaVulnDTO extends DependencyVuln {
   componentFixedVersion: string | null;
   componentDepth: number;
   componentPurl: string;
 }
 
-export interface NonScaVulnDTO extends BaseVulnDTO {
-  componentFixedVersion: null;
-  componentDepth: null;
-  componentPurl: null;
-}
-
 export interface BaseVulnDTO {
   message: string | null;
   ruleId: string;
-  level: string | null;
   id: string;
   createdAt: string;
   updatedAt: string;
-  cveId: string | null;
-
-  scannerIds: string;
   state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
-  rawRiskAssessment: number;
   ticketId: string | null;
   ticketUrl: string | null;
-  ticketState: string | null;
-  riskRecalculatedAt: string;
   assetId: string;
+  assetVersionName: string;
+  scannerIds: string;
+}
+export interface DependencyVuln extends BaseVulnDTO {
+  level: string | null;
+  cveId: string | null;
+  priority: number | null; // will be null, if not prioritized yet.
+  rawRiskAssessment: number;
+  riskRecalculatedAt: string;
 }
 
-export type VulnDTO = ScaVulnDTO | NonScaVulnDTO;
+export type VulnDTO = ScaVulnDTO;
 
 export interface Paged<T> {
   data: T[];
@@ -488,6 +484,21 @@ export interface VulnByPackage {
   flawCount: number;
   avgRisk: number;
   vulns: VulnWithCVE[];
+}
+
+export interface CodeVuln extends BaseVulnDTO {
+  uri: string;
+  startLine: number;
+  endLine: number;
+  startColumn: number;
+  endColumn: number;
+  snippet: string;
+
+  ruleHelp: string;
+  ruleName: string;
+  ruleHelpUri: string;
+  ruleDescription: string;
+  ruleProperties: any;
 }
 
 export interface AverageFixingTime {

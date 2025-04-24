@@ -8,7 +8,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import { CodeVuln, Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -22,17 +22,14 @@ import { FunctionComponent } from "react";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import { classNames } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
-import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyList from "@/components/common/EmptyList";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
-import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,14 +40,18 @@ import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
-import Severity from "../../../../../../../../../components/common/Severity";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import { defaultScanner } from "../../../../../../../../../utils/view";
+import { Badge } from "../../../../../../../../../components/ui/badge";
+import CopyCode, {
+  CopyCodeFragment,
+} from "../../../../../../../../../components/common/CopyCode";
 
 interface Props {
-  vulns: Paged<VulnByPackage>;
+  vulns: Paged<CodeVuln>;
 }
 
-const columnHelper = createColumnHelper<VulnByPackage>();
+const columnHelper = createColumnHelper<CodeVuln>();
 
 const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   // order the vulns by fixedVersion
@@ -82,94 +83,36 @@ const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   };
 };
 
-const columnsDef: ColumnDef<VulnByPackage, any>[] = [
-  {
-    ...columnHelper.accessor("packageName", {
-      header: "Package",
-      id: "packageName",
-      cell: (row) => (
-        <span className="flex flex-row gap-2">
-          <span className="flex h-5 w-5 flex-row items-center justify-center">
-            <EcosystemImage packageName={row.getValue()} />
-          </span>
-          {beautifyPurl(row.getValue())}
-        </span>
-      ),
-    }),
-  },
-  {
-    ...columnHelper.accessor("maxRisk", {
-      header: "Max Risk",
-      enableSorting: true,
-      id: "max_risk",
-      cell: (row) => (
-        <div>
-          <span className="whitespace-nowrap">
-            <Severity risk={row.getValue()} />
-          </span>
-        </div>
-      ),
-    }),
-  },
-  /*{
-    ...columnHelper.accessor("avgRisk", {
-      header: "Average Risk",
-      id: "avg_risk",
-      enableSorting: true,
-      cell: (row) => row.getValue().toFixed(1),
-    }),
-  },*/
-  {
-    ...columnHelper.accessor("maxCvss", {
-      header: "Max CVSS",
-      id: "max_cvss",
-      enableSorting: true,
-      cell: (row) => <Severity risk={row.getValue()} />,
-    }),
-  },
-  {
-    ...columnHelper.accessor("flawCount", {
-      header: "Vulnerability Count",
-      id: "dependency_vuln_count",
-      enableSorting: true,
-      cell: (row) => row.getValue(),
-    }),
-  },
-  {
-    header: "Installed Version",
-    id: "installed",
-    enableSorting: false,
-    cell: ({ row }: any) => (
-      <span>
-        <Badge variant={"secondary"}>
-          {extractVersion((row.original.vulns[0] as VulnWithCVE).componentPurl)}
-        </Badge>
-      </span>
-    ),
-  },
-  {
-    header: "Action",
-    id: "fixAvailable",
-    enableSorting: false,
-    cell: ({ row }: any) => {
-      const versionAndReduction = getMaxSemverVersionAndRiskReduce(
-        row.original.vulns,
-      );
-      if (versionAndReduction === null) {
-        return <span className="text-muted-foreground">No fix available</span>;
-      }
+const columnsDef: ColumnDef<CodeVuln, any>[] = [
+  columnHelper.accessor("uri", {
+    header: "Filename",
+    cell: (info) => {
       return (
-        <span>
-          <span className="text-muted-foreground">Update to version</span>{" "}
-          <span>
-            <Badge variant={"secondary"}>{versionAndReduction.version}</Badge>
-          </span>{" "}
-          <span className="text-muted-foreground">to reduce total risk by</span>{" "}
-          <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
-        </span>
+        <CopyCodeFragment
+          codeString={info.getValue() + ":" + info.row.original.startLine}
+        />
       );
     },
-  },
+  }),
+
+  columnHelper.accessor("message", {
+    header: "Message",
+    cell: (info) => {
+      return (
+        <span className="text-sm text-muted-foreground">{info.getValue()}</span>
+      );
+    },
+  }),
+  columnHelper.accessor("scannerIds", {
+    header: "Scanner",
+    cell: (info) => {
+      return (
+        <Badge className="whitespace-nowrap" variant={"secondary"}>
+          {info.getValue().replace(defaultScanner, "")}
+        </Badge>
+      );
+    },
+  }),
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
@@ -227,42 +170,6 @@ const Index: FunctionComponent<Props> = (props) => {
             description="This table shows all the identified risks for this asset."
           >
             <div className="relative flex flex-row gap-2">
-              <Tabs
-                defaultValue={
-                  (router.query.state as string | undefined)
-                    ? (router.query.state as string)
-                    : "open"
-                }
-              >
-                <TabsList>
-                  <TabsTrigger
-                    onClick={() =>
-                      router.push({
-                        query: {
-                          ...router.query,
-                          state: "open",
-                        },
-                      })
-                    }
-                    value="open"
-                  >
-                    Open
-                  </TabsTrigger>
-                  <TabsTrigger
-                    onClick={() =>
-                      router.push({
-                        query: {
-                          ...router.query,
-                          state: "closed",
-                        },
-                      })
-                    }
-                    value="closed"
-                  >
-                    Closed
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
               <Input
                 onChange={handleSearch}
                 defaultValue={router.query.search as string}
@@ -276,14 +183,13 @@ const Index: FunctionComponent<Props> = (props) => {
             </div>
             <div className="overflow-hidden rounded-lg border shadow-sm">
               <div className="overflow-auto">
-                <table className="w-full table-fixed overflow-x-auto text-sm">
+                <table className="w-full overflow-x-auto text-sm">
                   <thead className="border-b bg-card text-foreground">
                     {table.getHeaderGroups().map((headerGroup) => (
                       <tr key={headerGroup.id}>
-                        <th className="w-6" />
                         {headerGroup.headers.map((header) => (
                           <th
-                            className="w-40 cursor-pointer break-normal p-4 text-left"
+                            className="cursor-pointer whitespace-nowrap break-normal p-4 text-left"
                             onClick={
                               header.column.columnDef.enableSorting
                                 ? header.column.getToggleSortingHandler()
@@ -309,12 +215,29 @@ const Index: FunctionComponent<Props> = (props) => {
                   </thead>
                   <tbody className="text-sm text-foreground">
                     {table.getRowModel().rows.map((row, i, arr) => (
-                      <RiskHandlingRow
-                        row={row}
-                        index={i}
-                        arrLength={arr.length}
-                        key={row.original.packageName}
-                      />
+                      <tr
+                        onClick={() =>
+                          router.push(
+                            router.asPath.split("?")[0] + "/" + row.original.id,
+                          )
+                        }
+                        className={classNames(
+                          "relative cursor-pointer align-top transition-all",
+                          i === arr.length - 1 ? "" : "border-b",
+                          i % 2 != 0 && "bg-card/50",
+                          "hover:bg-gray-50 dark:hover:bg-card",
+                        )}
+                        key={row.id}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td className="p-4" key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
+                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -383,8 +306,6 @@ export const getServerSideProps = middleware(
         "first-party-vulns/?" +
         query.toString(),
     );
-
-    // fetch a personal access token from the user
 
     const vulns = await flawResp.json();
 

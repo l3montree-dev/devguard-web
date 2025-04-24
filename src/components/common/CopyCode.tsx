@@ -16,7 +16,30 @@
 import React, { FunctionComponent } from "react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import { CopyIcon } from "@radix-ui/react-icons";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
+
+export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
+  codeString,
+}) => {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(codeString);
+    toast("Copied to clipboard", {
+      description: "The code has been copied to your clipboard.",
+    });
+  };
+  return (
+    <div className="relative w-full overflow-hidden rounded-lg border p-2">
+      <button
+        onClick={handleCopy}
+        className="absolute right-1 top-1 z-10 rounded-lg bg-gray-700/20 p-1 px-2 text-xs text-white transition-all hover:bg-gray-700/40"
+      >
+        <CopyIcon />
+      </button>
+      <div className="font-mono relative text-sm">{codeString}</div>
+    </div>
+  );
+};
 
 interface Props {
   codeString: string;
