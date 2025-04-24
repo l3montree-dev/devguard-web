@@ -37,7 +37,7 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
       >
         <CopyIcon />
       </button>
-      <div className="font-mono relative text-sm">{codeString}</div>
+      <div className="relative font-mono text-sm">{codeString}</div>
     </div>
   );
 };
