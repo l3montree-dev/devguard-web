@@ -44,7 +44,7 @@ const Severity = ({ risk }: { risk: number }) => {
   return (
     <span
       className={classNames(
-        "whitespace-nowrap rounded-full p-1 px-2 font-medium",
+        "px-2font-medium whitespace-nowrap rounded-full p-1",
         cls,
       )}
     >
