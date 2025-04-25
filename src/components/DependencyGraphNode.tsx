@@ -32,6 +32,8 @@ export interface DependencyGraphNodeProps {
     label: string;
     vuln: VulnDTO[];
     risk: number;
+    nodeWidth: number;
+    nodeHeight: number;
   };
 }
 
@@ -47,9 +49,9 @@ export const DependencyGraphNode: FunctionComponent<
   const Node = (
     <div
       style={{
-        maxWidth: 300,
-        //     borderColor: props.data.vuln !== undefined ? color : undefined,
-        //backgroundColor: props.data.vuln !== undefined ? color : "white",
+        maxWidth: props.data.nodeWidth,
+        //     borderColor: props.data.flaw !== undefined ? color : undefined,
+        //backgroundColor: props.data.flaw !== undefined ? color : "white",
       }}
       className={classNames(
         "relative rounded border bg-card p-3 text-xs text-card-foreground",

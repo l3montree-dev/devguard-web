@@ -1,5 +1,3 @@
-import Page from "@/components/Page";
-
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -12,7 +10,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -27,10 +25,12 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import {
+  Component,
   ComponentPaged,
   License,
   LicenseResponse,
   Paged,
+  ScoreCard,
 } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -48,23 +48,35 @@ import {
 } from "@tanstack/react-table";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
+import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import { buttonVariants } from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
-import DateString from "../../../../../../../../../components/common/DateString";
-import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
-import { Pagination } from "../../../../../../../../../components/ui/pagination";
+
+import Page from "@/components/Page";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
+import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
 import {
   Tooltip,
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
+}
+
+interface Dictionary {
+  details: string[];
+  name: string;
+  reason: string;
+  score: number;
+  url: string;
+  shortDescription: string;
 }
 
 const columnHelper = createColumnHelper<
@@ -162,9 +174,13 @@ const columnsDef: ColumnDef<
   }),
 
   columnHelper.accessor("dependency.project.scoreCardScore", {
-    header: "OpenSSF Scorecard Score",
+    header: "OpenSSF Scorecard",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
-    cell: (row) => <div>{row.getValue()}</div>,
+    cell: (row) => (
+      <div>
+        <OpenSsfScore score={row.getValue()} />
+      </div>
+    ),
   }),
   columnHelper.accessor("dependency.published", {
     header: "Published",
@@ -183,10 +199,25 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
 
+  const [datasets, setDatasets] = useState<{
+    purl: string;
+    scoreCard?: ScoreCard;
+    project: Component["project"];
+  }>();
+
   const { table } = useTable({
     data: components.data,
     columnsDef,
   });
+
+  function dataPassthrough(data: ComponentPaged) {
+    setDatasets({
+      purl: data.dependency.purl,
+      scoreCard: data.dependency.project?.scoreCard,
+      project: data.dependency.project,
+    });
+  }
+
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -306,8 +337,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             <tbody>
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
+                  onClick={() => dataPassthrough(row.original)}
                   className={classNames(
-                    "relative cursor-pointer bg-background align-top transition-all",
+                    "relative cursor-pointer bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                   )}
@@ -328,6 +360,16 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
         </div>
         <CustomPagination {...components} />
       </Section>
+
+      {datasets && datasets.project && (
+        <DependencyDialog
+          open={true}
+          project={datasets.project} //undefined will make it go kaboom
+          setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
+          purl={datasets.purl}
+          scoreCard={datasets.scoreCard}
+        ></DependencyDialog>
+      )}
     </Page>
   );
 };
