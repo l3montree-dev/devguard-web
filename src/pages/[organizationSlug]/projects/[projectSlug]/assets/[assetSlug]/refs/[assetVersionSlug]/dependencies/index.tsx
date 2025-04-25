@@ -177,9 +177,7 @@ const columnsDef: ColumnDef<
     header: "OpenSSF Scorecard",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => (
-      <div>
-        <OpenSsfScore score={row.getValue()} />
-      </div>
+      <div>{row.getValue() && <OpenSsfScore score={row.getValue()} />}</div>
     ),
   }),
   columnHelper.accessor("dependency.published", {
