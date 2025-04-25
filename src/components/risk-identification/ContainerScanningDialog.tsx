@@ -46,6 +46,7 @@ import GitlabInstructionsSteps from "./GitlabInstructionsSteps";
 import GithubInstructionsSteps from "./GithubInstructionsSteps";
 import { useStore } from "@/zustand/globalStoreProvider";
 import PatSection from "./PatSection";
+import useDialogScroll from "../../hooks/useDialogScroll";
 
 interface Props {
   open: boolean;
@@ -66,16 +67,7 @@ const ContainerScanningDialog: FunctionComponent<Props> = ({
   const { progress, pat, onCreatePat, handleAutosetup } =
     useAutosetup("container-scanning");
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        const el = document.querySelector('[data-state="open"]');
-        if (el) {
-          el.scrollTo({ behavior: "instant", top: 0 });
-        }
-      });
-    }
-  }, [open]);
+  useDialogScroll(open);
 
   return (
     <Dialog open={open}>

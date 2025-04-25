@@ -35,17 +35,7 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
-import FormatDate from "@/components/risk-assessment/FormatDate";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { classNames } from "@/utils/common";
-import {
-  defaultScanner,
-  eventMessages,
-  eventTypeMessages,
-  findUser,
-} from "@/utils/view";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
@@ -53,7 +43,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import Markdown from "react-markdown";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
@@ -63,15 +52,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../../../../../../../../components/ui/tooltip";
+import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
-  VulnEventDTO,
   LicenseResponse,
   Paged,
   PolicyEvaluation,
   RiskDistribution,
+  VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;

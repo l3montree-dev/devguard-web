@@ -26,6 +26,7 @@ import GithubTokenInstructions from "./GithubTokenInstructions";
 import GitlabTokenInstructions from "./GitlabTokenInstructions";
 import Link from "next/link";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import useDialogScroll from "../../hooks/useDialogScroll";
 
 interface Props {
   open: boolean;
@@ -35,16 +36,7 @@ interface Props {
 const VerificationDialog: FunctionComponent<Props> = ({ open, setOpen }) => {
   const asset = useActiveAsset()!;
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        const el = document.querySelector('[data-state="open"]');
-        if (el) {
-          el.scrollTo({ behavior: "instant", top: 0 });
-        }
-      });
-    }
-  }, [open]);
+  useDialogScroll(open);
 
   const downloadPublicKey = () => {
     if (!asset.signingPubKey) return;

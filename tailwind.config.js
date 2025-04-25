@@ -18,7 +18,8 @@ module.exports = {
     	},
     	fontFamily: {
     		display: ["Lexend"],
-    		body: ["Inter, Roboto, sans-serif"]
+    		body: ["Inter, Roboto, sans-serif"],
+            mono: ["Fira Code", "Fira Mono", "monospace"]
     	},
     	extend: {
     		colors: {

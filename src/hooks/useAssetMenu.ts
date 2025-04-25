@@ -25,6 +25,7 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
 import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
+import { CodeIcon } from "lucide-react";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   // if we know the default branch - get that one
@@ -109,7 +110,7 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "Risk handling",
+        title: "Code Risk-Handling",
         href:
           "/" +
           orgSlug +
@@ -119,11 +120,24 @@ export const useAssetMenu = () => {
           assetSlug +
           "/refs/" +
           assetVersionSlug +
-          "/risk-handling",
+          "/code-risks",
+        Icon: CodeIcon,
+        isActive: router.pathname.includes("code-risks"),
+      },
+      {
+        title: "Dependency Risk-Handling",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/dependency-risks",
         Icon: WrenchScrewdriverIcon,
-        isActive:
-          router.pathname.includes("[flawId]") ||
-          router.pathname.includes("risk-handling"),
+        isActive: router.pathname.includes("dependency-risks"),
       },
       {
         title: "Dependencies",

@@ -35,16 +35,16 @@ const GitlabInstructionsSteps: FunctionComponent<Props> = ({
   return (
     <>
       <div className="mb-8">
-        <div>
+        <div className="text-sm text-muted-foreground">
           To integrate Devguard&apos;s CI/CD pipeline with your GitLab project,
           follow the steps below. Once completed, you will see the results in
           the Devguard Dashboard.
         </div>
-        <div className="mt-4">
+        <div className="mt-4 text-sm text-muted-foreground">
           To manage and create issues in your GitLab project, you need to
           generate a Token on GitLab, add it to Devguard, and configure a
           webhook for your GitLab project. Refer to the documentation for
-          detailed instructions on setting up the GitLab integration.
+          detailed instructions on setting up the GitLab integration.{" "}
           <Link
             href="https://devguard.org/getting-started/setup-gitlab-integration"
             target="_blank"
