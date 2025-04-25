@@ -56,13 +56,11 @@ const VulnWithCveTableRow = ({
           .map((scannerID, key) => (
             <Tooltip key={key}>
               <TooltipTrigger>
-                <Badge variant={"secondary"} className="line-clamp-1">
+                <Badge variant={"secondary"} className="line-clamp-1 m-1">
                   {scannerID}
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent>
-                {vuln.scannerIds.replace(defaultScanner, "")}
-              </TooltipContent>
+              <TooltipContent>{scannerID}</TooltipContent>
             </Tooltip>
           ))}
       </td>
