@@ -51,7 +51,7 @@ const VulnWithCveTableRow = ({
       </td>
       <td className="p-4">
         {vuln.scannerIds
-          .replace(defaultScanner, "")
+          .replaceAll(defaultScanner, "")
           .split(" ")
           .map((scannerID, key) => (
             <Tooltip key={key}>
