@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
+import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
@@ -31,7 +31,6 @@ import { DependencyGraphNode } from "./DependencyGraphNode";
 import { beautifyPurl } from "@/utils/common";
 import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
-import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const addRecursive = (
   dagreGraph: graphlib.Graph,
@@ -81,7 +80,7 @@ const recursiveFlatten = (
 
 const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
-  flaws: Array<FlawDTO> = [],
+  flaws: Array<VulnDTO> = [],
   direction = "LR",
   nodeWidth: number,
   nodeHeight: number,
@@ -108,7 +107,7 @@ const getLayoutedElements = (
       acc[cur.componentPurl!].push(cur);
       return acc;
     },
-    {} as { [key: string]: FlawDTO[] },
+    {} as { [key: string]: VulnDTO[] },
   );
 
   const riskMap = recursiveFlatten(tree).reduce(
@@ -181,7 +180,7 @@ const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
   variant?: "compact";
-  flaws: Array<FlawDTO>;
+  flaws: Array<VulnDTO>;
   graph: { root: ViewDependencyTreeNode };
 }> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();

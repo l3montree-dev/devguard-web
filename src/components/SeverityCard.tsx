@@ -70,7 +70,7 @@ const SeverityCard: FunctionComponent<Props> = ({
           {variant} severity
           <Link
             href={
-              `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/risk-handling?` +
+              `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
               new URLSearchParams({
                 "filterQuery[raw_risk_assessment][is greater than]":
                   queryIntervalStart.toString(),

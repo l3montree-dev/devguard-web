@@ -12,18 +12,25 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { useState } from "react";
 import Stage from "./Stage";
+import IacDialog from "./IacDialog";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function IaC() {
+  const [isOpen, setOpen] = useState(false);
   return (
-    <Stage
-      id="iac"
-      title="Infrastructure as Code"
-      description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
-      buttonTitle="Coming soon"
-      buttonVariant="outline"
-    />
+    <>
+      <Stage
+        id="iac"
+        title="Infrastructure as Code"
+        description="Find security vulnerabilities in infrastructure code like Dockerfiles, Terraform, etc."
+        buttonTitle="Add IaC"
+        onButtonClick={() => setOpen(true)}
+        buttonVariant="secondary"
+      />
+      <IacDialog open={isOpen} setOpen={setOpen} />
+    </>
   );
 }
 

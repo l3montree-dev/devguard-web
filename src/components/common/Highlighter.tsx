@@ -21,14 +21,17 @@ import docco from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
 
 SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
+
 const Highlighter: FunctionComponent<{
   codeString: string;
-  language: "yaml" | "shell";
+  language?: "yaml" | "shell";
+  startingLineNumber?: number;
 }> = (props) => {
   return (
     <div className="w-full bg-black">
       <SyntaxHighlighter
         showLineNumbers
+        startingLineNumber={props.startingLineNumber ?? 1}
         lineNumberStyle={{ color: "rgba(255, 255, 255, 0.3)" }}
         language={props.language}
         style={docco}

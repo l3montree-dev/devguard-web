@@ -13,17 +13,24 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { useState } from "react";
 import Stage from "./Stage";
+import SecretScanningDialog from "./SecretScanningDialog";
 
 function SecretScanning() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Stage
-      title="Secret Scanning"
-      description="Scan git repositories for finding potential credentials leakage."
-      buttonTitle="Coming soon"
-      buttonVariant="outline"
-      id="secret-scanning"
-    />
+    <>
+      <Stage
+        onButtonClick={() => setIsOpen(true)}
+        title="Secret Scanning"
+        description="Scan git repositories for finding potential credentials leakage."
+        buttonTitle="Add Secret Scanning"
+        buttonVariant="secondary"
+        id="secret-scanning"
+      />
+      <SecretScanningDialog open={isOpen} setOpen={setIsOpen} />
+    </>
   );
 }
 

@@ -22,7 +22,15 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveProject } from "./useActiveProject";
 
 // limitations under the License.
-export function useAutosetup(scanner: "full" | "sca" | "container-scanning") {
+export function useAutosetup(
+  scanner:
+    | "full"
+    | "sca"
+    | "container-scanning"
+    | "secret-scanning"
+    | "iac"
+    | "sast",
+) {
   const { waitFor, isLoading, Loader } = useLoader();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
   const activeOrg = useActiveOrg();

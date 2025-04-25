@@ -101,7 +101,6 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
       availabilityRequirement: RequirementsLevel.Medium,
       cvssAutomaticTicketThreshold: [], //here are the values, when enabled I enable reproting range
       riskAutomaticTicketThreshold: [],
-      centralFlawManagement: true,
     },
   });
 

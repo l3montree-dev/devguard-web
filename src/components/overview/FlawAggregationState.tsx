@@ -1,4 +1,3 @@
-import { FlawAggregationStateAndChange } from "@/types/api/api";
 import {
   BoltIcon,
   BugAntIcon,
@@ -6,6 +5,7 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { VulnAggregationStateAndChange } from "../../types/api/api";
 
 function changeType(change: number) {
   if (change === 0) return "same";
@@ -18,7 +18,7 @@ export default function FlawAggregationState({
   description,
   title,
 }: {
-  data: FlawAggregationStateAndChange;
+  data: VulnAggregationStateAndChange;
   totalRisk: number;
   description: string;
   title: string;

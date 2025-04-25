@@ -21,6 +21,7 @@ import { PatWithPrivKey } from "@/types/api/api";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
 import PatSection from "./PatSection";
+import useDialogScroll from "../../hooks/useDialogScroll";
 
 interface Props {
   open: boolean;
@@ -40,17 +41,7 @@ const InTotoProvenanceDialog: FunctionComponent<Props> = ({
       ? (personalAccessTokens[0] as PatWithPrivKey)
       : undefined;
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        const el = document.querySelector('[data-state="open"]');
-        if (el) {
-          el.scrollTo({ behavior: "instant", top: 0 });
-        }
-      });
-    }
-  }, [open]);
-
+  useDialogScroll(open);
   return (
     <Dialog open={open}>
       <DialogContent setOpen={setOpen}>

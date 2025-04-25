@@ -20,11 +20,7 @@ import {
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
 
-export const eventMessages = (
-  event: VulnEventDTO,
-  index: number,
-  events?: VulnEventDTO[],
-) => {
+export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
     case "mitigate":
       return (
@@ -40,7 +36,6 @@ export const eventMessages = (
 
 export const eventTypeMessages = (
   event: VulnEventDTO,
-  index: number,
   flawName: string,
   events?: VulnEventDTO[],
 ) => {
@@ -60,6 +55,9 @@ export const eventTypeMessages = (
     case "comment":
       return "added a comment";
     case "detected":
+      if (event.arbitraryJsonData.risk === 0) {
+        return "detected " + flawName;
+      }
       return (
         "detected " +
         flawName +
@@ -215,17 +213,6 @@ const colors = [
   "#bcbdf9",
   "#979ef5",
   "#6c7ff0",
-  "#2563eb",
-];
-
-const colors1 = [
-  "#fbbd25",
-  "#ff9b37",
-  "#ff7755",
-  "#ff5578",
-  "#ff409d",
-  "#e044c0",
-  "#a154dc",
   "#2563eb",
 ];
 

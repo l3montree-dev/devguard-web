@@ -72,53 +72,6 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   }
 }
 
-const diffReports = (
-  old: RiskCalculationReport,
-  n: RiskCalculationReport,
-): string => {
-  // check what changed
-  const changes = [];
-  if (old.epss < n.epss) {
-    // epss increased
-    changes.push(
-      `The probability of exploitation (EPSS) increased from ${(old.epss * 100).toFixed(1)}% to ${(n.epss * 100).toFixed(1)}%.`,
-    );
-  } else if (old.epss > n.epss) {
-    // epss decreased
-    changes.push(
-      `The probability of exploitation (EPSS) decreased from ${(old.epss * 100).toFixed(1)}% to ${(n.epss * 100).toFixed(1)}%.`,
-    );
-  }
-
-  if (!old.exploitExists && n.exploitExists && n.verifiedExploitExists) {
-    changes.push("An exploit was discovered and verified.");
-  } else if (old.exploitExists && !n.exploitExists) {
-    changes.push("An already discovered exploit was removed.");
-  } else if (!old.verifiedExploitExists && n.verifiedExploitExists) {
-    changes.push("An exploit was verified.");
-  }
-
-  if (old.confidentialityRequirement !== n.confidentialityRequirement) {
-    changes.push(
-      `Confidentiality requirement changed from ${old.confidentialityRequirement} to ${n.confidentialityRequirement}.`,
-    );
-  }
-
-  if (old.integrityRequirement !== n.integrityRequirement) {
-    changes.push(
-      `Integrity requirement changed from ${old.integrityRequirement} to ${n.integrityRequirement}.`,
-    );
-  }
-
-  if (old.availabilityRequirement !== n.availabilityRequirement) {
-    changes.push(
-      `Availability requirement changed from ${old.availabilityRequirement} to ${n.availabilityRequirement}.`,
-    );
-  }
-
-  return changes.join(" ");
-};
-
 export default function RiskAssessmentFeed({
   events,
   vulnerabilityName,
@@ -142,7 +95,7 @@ export default function RiskAssessmentFeed({
         <div className="absolute left-3 h-full border-l border-r bg-secondary" />
         {events.map((event, index) => {
           const user = findUser(event.userId, org, currentUser);
-          const msg = eventMessages(event, index, events);
+          const msg = eventMessages(event);
           return (
             <li
               className={classNames(
@@ -189,19 +142,14 @@ export default function RiskAssessmentFeed({
                     )}
                     <div className="w-full overflow-hidden rounded border">
                       <div className="w-full">
-                        <p className="w-full bg-card px-2 py-2 font-medium">
+                        <p className="w-full bg-card px-2 py-2 pr-20 font-medium">
                           {findUser(event.userId, org, currentUser).displayName}{" "}
-                          {eventTypeMessages(
-                            event,
-                            index,
-                            vulnerabilityName,
-                            events,
-                          )}
+                          {eventTypeMessages(event, vulnerabilityName, events)}
                         </p>
 
                         <div className="absolute right-2 top-2">
                           <Link
-                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionSlug}/flaws/${event.vulnId}`}
+                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionSlug}/vulns/${event.vulnId}`}
                           >
                             <Badge variant={"outline"}>
                               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />

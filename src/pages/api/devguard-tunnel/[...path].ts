@@ -33,6 +33,7 @@ export default async function handler(
   // include the session cookie
   // check the url
   const url = new URL(req.url!, appConfig.devGuardApiUrl);
+
   url.pathname = url.pathname.replace("/api/devguard-tunnel", "");
 
   const bytes = await buffer(req);

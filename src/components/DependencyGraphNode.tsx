@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FlawDTO } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import Link from "next/link";
@@ -26,11 +25,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { VulnDTO } from "../types/api/api";
 
 export interface DependencyGraphNodeProps {
   data: {
     label: string;
-    flaw: FlawDTO[];
+    vuln: VulnDTO[];
     risk: number;
     nodeWidth: number;
     nodeHeight: number;
@@ -64,7 +64,7 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-row items-start gap-2">
-        {props.data.flaw && (
+        {props.data.vuln && (
           <span className="relative mt-0.5 flex h-3 w-3">
             <span
               style={{
@@ -94,20 +94,20 @@ export const DependencyGraphNode: FunctionComponent<
     </div>
   );
 
-  if (!props.data.flaw) {
+  if (!props.data.vuln) {
     return Node;
   }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>
       <DropdownMenuContent className="text-xs">
-        {props.data.flaw.map((flaw) => (
-          <DropdownMenuItem key={flaw.id}>
+        {props.data.vuln.map((vuln) => (
+          <DropdownMenuItem key={vuln.id}>
             <Link
               className="!text-foreground hover:no-underline"
-              href={router.asPath.split("?")[0] + `/../flaws/${flaw.id}`}
+              href={router.asPath.split("?")[0] + `/../vulns/${vuln.id}`}
             >
-              {flaw.cveId}
+              {vuln.cveId}
             </Link>
           </DropdownMenuItem>
         ))}

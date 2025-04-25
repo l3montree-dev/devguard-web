@@ -30,7 +30,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const user = findUser(event.userId, activeOrg, currentUser);
-  const msg = eventMessages(event, index, events);
+  const msg = eventMessages(event);
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
@@ -70,7 +70,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
             <div className="flex-1">
               <div className="w-full flex-1 overflow-hidden rounded border">
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/flaws/${event.vulnId}`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/vulns/${event.vulnId}`}
                   className="!text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
                 >
                   <div className="w-full">
@@ -81,7 +81,6 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
                       }{" "}
                       {eventTypeMessages(
                         event,
-                        index,
                         event.vulnerabilityName || "a vulnerability",
                         events,
                       )}
