@@ -25,8 +25,6 @@ import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-const results: string[] = str.split(" ");
-
 interface Props {
   row: Row<VulnByPackage>;
   index: number;
@@ -52,16 +50,21 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
       <td className="p-4">
-        <Tooltip>
-          <TooltipTrigger>
-            <Badge variant={"secondary"} className="line-clamp-1">
-              {vuln.scannerIds.replace(defaultScanner, "")}
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent>
-            {vuln.scannerIds.replace(defaultScanner, "")}
-          </TooltipContent>
-        </Tooltip>
+        {vuln.scannerIds
+          .replace(defaultScanner, "")
+          .split(" ")
+          .map((scannerID, key) => (
+            <Tooltip key={key}>
+              <TooltipTrigger>
+                <Badge variant={"secondary"} className="line-clamp-1">
+                  {scannerID}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                {vuln.scannerIds.replace(defaultScanner, "")}
+              </TooltipContent>
+            </Tooltip>
+          ))}
       </td>
       <td className="p-4">{vuln.cveId}</td>
       <td className="p-4">
