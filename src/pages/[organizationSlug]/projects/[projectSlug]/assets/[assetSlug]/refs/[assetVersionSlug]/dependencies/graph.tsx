@@ -38,7 +38,7 @@ import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
+import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
 import {
@@ -54,7 +54,7 @@ import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useAct
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
-  flaws: Array<FlawDTO>;
+  flaws: Array<VulnDTO>;
 }> = ({ graph, flaws }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -258,7 +258,7 @@ export default DependencyGraphPage;
 const RISK_INHERITANCE_FACTOR = 1;
 const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
-  flaws: Array<FlawDTO>,
+  flaws: Array<VulnDTO>,
 ) => {
   const nodeFlaws = flaws.filter((p) => p.componentPurl === node.name);
 
@@ -370,7 +370,7 @@ export const getServerSideProps = middleware(
 
     const [graph, flaws] = await Promise.all([
       resp.json() as Promise<{ root: DependencyTreeNode }>,
-      flawResp.json() as Promise<Array<FlawDTO>>,
+      flawResp.json() as Promise<Array<VulnDTO>>,
     ]);
 
     let converted = convertGraph(graph.root);

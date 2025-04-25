@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { DependencyTreeNode, FlawDTO } from "@/types/api/api";
+import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
@@ -79,7 +79,7 @@ const recursiveFlatten = (
 
 const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
-  flaws: Array<FlawDTO> = [],
+  flaws: Array<VulnDTO> = [],
   direction = "LR",
 ): [
   Array<{
@@ -104,7 +104,7 @@ const getLayoutedElements = (
       acc[cur.componentPurl!].push(cur);
       return acc;
     },
-    {} as { [key: string]: FlawDTO[] },
+    {} as { [key: string]: VulnDTO[] },
   );
 
   const riskMap = recursiveFlatten(tree).reduce(
@@ -174,7 +174,7 @@ const nodeTypes = {
 const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
-  flaws: Array<FlawDTO>;
+  flaws: Array<VulnDTO>;
   graph: { root: ViewDependencyTreeNode };
 }> = ({ graph, width, height, flaws }) => {
   const asset = useActiveAsset();

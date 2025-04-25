@@ -13,11 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent, useMemo } from "react";
-import dynamic from "next/dynamic";
-import { toast } from "sonner";
 import { CopyIcon } from "@radix-ui/react-icons";
-import { uniq } from "lodash";
+import dynamic from "next/dynamic";
+import { FunctionComponent, useMemo } from "react";
+import { toast } from "sonner";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 
 export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
@@ -37,7 +36,7 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
       >
         <CopyIcon />
       </button>
-      <div className="relative font-mono text-sm">{codeString}</div>
+      <div className="font-mono relative text-sm">{codeString}</div>
     </div>
   );
 };

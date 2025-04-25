@@ -43,7 +43,6 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
 import { getRepositoryId } from "@/utils/view";
-import { useStore } from "@/zustand/globalStoreProvider";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import CopyCode from "../../../../../../../../../../components/common/CopyCode";
@@ -211,7 +210,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               {vuln.snippet && (
                 <div className="mt-4 rounded-lg border bg-secondary">
-                  <div className="px-4 py-2 font-mono text-sm font-medium">
+                  <div className="font-mono px-4 py-2 text-sm font-medium">
                     {vuln.uri}
                   </div>
                   <CopyCode
