@@ -263,16 +263,18 @@ const DependencyGraph: FunctionComponent<{
       viewport={viewPort}
       onViewportChange={setViewPort}
     >
-      <MiniMap
-        maskColor="rgba(0, 0, 0, 0.3)"
-        zoomable
-        style={{
-          backgroundColor:
-            theme === "dark"
-              ? "rgba(255, 255, 255, 0.5)"
-              : "rgba(255, 255, 255, 0.5)",
-        }}
-      />
+      {variant !== "compact" && (
+        <MiniMap
+          maskColor="rgba(0, 0, 0, 0.3)"
+          zoomable
+          style={{
+            backgroundColor:
+              theme === "dark"
+                ? "rgba(255, 255, 255, 0.5)"
+                : "rgba(255, 255, 255, 0.5)",
+          }}
+        />
+      )}
     </ReactFlow>
   );
 };

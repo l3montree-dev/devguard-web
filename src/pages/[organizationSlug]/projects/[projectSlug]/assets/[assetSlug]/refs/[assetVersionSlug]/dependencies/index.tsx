@@ -10,7 +10,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo, useRef, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -48,29 +48,22 @@ import {
 } from "@tanstack/react-table";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
+import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import {
-  Button,
-  buttonVariants,
-} from "../../../../../../../../../components/ui/button";
+import { buttonVariants } from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
-import DateString from "../../../../../../../../../components/common/DateString";
 
-import { DialogContent } from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-label";
-import DependencyDialog from "./dependencyDialog";
 import Page from "@/components/Page";
-import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
-import { Pagination } from "../../../../../../../../../components/ui/pagination";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
+import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
 import {
   Tooltip,
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
-import { Progress } from "@/components/ui/progress";
-import { Project } from "@/types/common";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -181,11 +174,11 @@ const columnsDef: ColumnDef<
   }),
 
   columnHelper.accessor("dependency.project.scoreCardScore", {
-    header: "OpenSSF Scorecard Score",
+    header: "OpenSSF Scorecard",
     id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => (
       <div>
-        {row.getValue()} <Progress value={row.getValue() * 10}></Progress>
+        <OpenSsfScore score={row.getValue()} />
       </div>
     ),
   }),

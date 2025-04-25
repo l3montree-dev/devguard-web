@@ -27,7 +27,7 @@ const ListItem: FunctionComponent<Props> = ({
         reactOnHover && "transition-all hover:bg-accent",
       )}
     >
-      <CardHeader className="justify-center">
+      <CardHeader className="justify-center w-full">
         <CardTitle className="text-base">{Title}</CardTitle>
         {Boolean(Description) && (
           <CardDescription>{Description}</CardDescription>
