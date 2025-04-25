@@ -37,6 +37,7 @@ interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>;
   purl: string;
   scoreCard?: ScoreCard;
+  scannerId: string;
   project: Project;
 }
 
@@ -44,6 +45,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
   open,
   setOpen,
   scoreCard,
+  scannerId,
   purl,
   project: componentProject,
 }) => {
@@ -56,7 +58,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const handleGraphFetch = useCallback(
     async (data: string) => {
       const resp = await browserApiClient(
-        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=SBOM-File-Upload&purl=${encodeURIComponent(data)}`,
+        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=${scannerId}&purl=${encodeURIComponent(data)}`,
         {
           method: "GET",
         },
@@ -69,7 +71,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
         toast.error("Could not fetch Graph Data from Endpoint");
       }
     },
-    [asset?.slug, organization.slug, project.slug],
+    [asset?.slug, organization.slug, project.slug, scannerId],
   );
 
   useEffect(() => {

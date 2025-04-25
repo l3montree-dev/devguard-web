@@ -514,7 +514,7 @@ export interface ComponentPaged {
   dependency: Component;
   dependencyPurl: string;
   assetVersionId: string;
-  scannerId: string;
+  scannerIds: string;
 }
 
 export interface Component {

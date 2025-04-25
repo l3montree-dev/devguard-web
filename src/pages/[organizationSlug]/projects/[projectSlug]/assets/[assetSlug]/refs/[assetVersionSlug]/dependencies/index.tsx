@@ -70,15 +70,6 @@ interface Props {
   licenses: LicenseResponse[];
 }
 
-interface Dictionary {
-  details: string[];
-  name: string;
-  reason: string;
-  score: number;
-  url: string;
-  shortDescription: string;
-}
-
 const columnHelper = createColumnHelper<
   ComponentPaged & { license: LicenseResponse }
 >();
@@ -199,6 +190,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
 
   const [datasets, setDatasets] = useState<{
     purl: string;
+    scannerId: string;
     scoreCard?: ScoreCard;
     project: Component["project"];
   }>();
@@ -213,6 +205,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       purl: data.dependency.purl,
       scoreCard: data.dependency.project?.scoreCard,
       project: data.dependency.project,
+      scannerId: data.scannerIds.split(" ")[0],
     });
   }
 
@@ -362,6 +355,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       {datasets && datasets.project && (
         <DependencyDialog
           open={true}
+          scannerId={datasets.scannerId}
           project={datasets.project} //undefined will make it go kaboom
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
