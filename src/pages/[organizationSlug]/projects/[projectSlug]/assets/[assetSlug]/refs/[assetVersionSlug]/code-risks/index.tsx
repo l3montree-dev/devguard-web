@@ -58,42 +58,16 @@ interface Props {
 
 const columnHelper = createColumnHelper<FirstPartyVuln>();
 
-const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
-  // order the vulns by fixedVersion
-  const orderedVulns = vulns.sort((a, b) => {
-    if (a.componentFixedVersion && b.componentFixedVersion) {
-      return a.componentFixedVersion.localeCompare(b.componentFixedVersion);
-    }
-    return 0;
-  });
-
-  // remove all without fixed version
-  const filteredVulns = orderedVulns.filter(
-    (f) => f.componentFixedVersion !== null,
-  );
-
-  if (filteredVulns.length === 0) {
-    return null;
-  }
-  // aggregate the risk
-  const totalRisk = filteredVulns.reduce(
-    (acc, f) => acc + f.rawRiskAssessment,
-    0,
-  );
-
-  return {
-    version:
-      filteredVulns[filteredVulns.length - 1].componentFixedVersion ?? "",
-    riskReduction: totalRisk,
-  };
-};
-
 const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
   columnHelper.accessor("uri", {
     header: "Filename",
     cell: (info) => {
       return (
-        info.getValue() && <CopyCodeFragment codeString={info.getValue()} />
+        info.getValue() && (
+          <div className="w-52">
+            <CopyCodeFragment codeString={info.getValue()} />
+          </div>
+        )
       );
     },
   }),
@@ -165,7 +139,6 @@ const Index: FunctionComponent<Props> = (props) => {
       ) : (
         <div>
           <BranchTagSelector branches={branches} tags={tags} />
-
           <Section
             forceVertical
             primaryHeadline
