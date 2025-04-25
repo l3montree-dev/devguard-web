@@ -23,6 +23,9 @@ import React, { FunctionComponent } from "react";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+
+const results: string[] = str.split(" ");
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -49,9 +52,16 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
       <td className="p-4">
-        <Badge variant={"secondary"}>
-          {vuln.scannerIds.replace(defaultScanner, "")}
-        </Badge>
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge variant={"secondary"} className="line-clamp-1">
+              {vuln.scannerIds.replace(defaultScanner, "")}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            {vuln.scannerIds.replace(defaultScanner, "")}
+          </TooltipContent>
+        </Tooltip>
       </td>
       <td className="p-4">{vuln.cveId}</td>
       <td className="p-4">
