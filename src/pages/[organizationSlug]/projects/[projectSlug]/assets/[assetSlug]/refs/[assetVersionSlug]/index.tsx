@@ -274,57 +274,60 @@ const Index: FunctionComponent<Props> = ({
               amountByCVSS={cvssDistribution.low}
             />
           </div>
-          <Card className="col-span-4 row-span-2 flex flex-col">
-            <CardHeader>
-              <CardTitle className="relative w-full">
-                Licenses
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  See all
-                </Link>
-              </CardTitle>
-              <CardDescription className="text-left">
-                Displays the distribution of dependency licenses
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex  flex-col">
-                {licenses.map((el, i, arr) => (
-                  <div
-                    className={
-                      i === 0
-                        ? "border-b pb-4"
-                        : i === arr.length - 1
-                          ? "pt-4"
-                          : "border-b py-4"
-                    }
-                    key={el.license.licenseId}
+          <div className="col-span-4 row-span-2 flex flex-col">
+            <Card>
+              <CardHeader>
+                <CardTitle className="relative w-full">
+                  Licenses
+                  <Link
+                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
+                    className="absolute right-0 top-0 text-xs !text-muted-foreground"
                   >
-                    <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                      <span className="capitalize">{el.license.licenseId}</span>
-                      <div className="flex flex-row flex-wrap gap-2">
-                        {el.license.isOsiApproved && (
-                          <Badge variant={"secondary"}>
-                            <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
-                            OSI Approved
-                          </Badge>
-                        )}
+                    See all
+                  </Link>
+                </CardTitle>
+                <CardDescription className="text-left">
+                  Displays the distribution of dependency licenses
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex  flex-col">
+                  {licenses.map((el, i, arr) => (
+                    <div
+                      className={
+                        i === 0
+                          ? "border-b pb-4"
+                          : i === arr.length - 1
+                            ? "pt-4"
+                            : "border-b py-4"
+                      }
+                      key={el.license.licenseId}
+                    >
+                      <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                        <span className="capitalize">
+                          {el.license.licenseId}
+                        </span>
+                        <div className="flex flex-row flex-wrap gap-2">
+                          {el.license.isOsiApproved && (
+                            <Badge variant={"secondary"}>
+                              <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                              OSI Approved
+                            </Badge>
+                          )}
+                        </div>
                       </div>
+                      <p className="text-sm text-muted-foreground">
+                        {el.license.name
+                          ? el.license.name
+                          : "Unknown license information"}
+                        , {el.count} dependencies
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {el.license.name
-                        ? el.license.name
-                        : "Unknown license information"}
-                      , {el.count} dependencies
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           <Card className="col-span-4 row-span-1 flex flex-col bg-transparent">
             <CardHeader>
               <CardTitle className="relative w-full">
