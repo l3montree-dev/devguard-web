@@ -22,9 +22,8 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent } from "react";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
-import { Badge } from "../ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import ScannerBadge from "../ScannerBadge";
+import { Badge } from "../ui/badge";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -60,10 +59,14 @@ const VulnWithCveTableRow = ({
       </td>
       <td className="p-4">{vuln.cveId}</td>
       <td className="p-4">
-        <Severity risk={vuln.rawRiskAssessment} />
+        <div className="flex flex-row">
+          <Severity risk={vuln.rawRiskAssessment} />
+        </div>
       </td>
       <td className="p-4">
-        <Severity risk={vuln.cve?.cvss ?? 0} />
+        <div className="flex justify-start flex-row">
+          <Severity risk={vuln.cve?.cvss ?? 0} />
+        </div>
       </td>
       <td className="p-4">
         {vuln.componentFixedVersion ? (

@@ -103,10 +103,8 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       enableSorting: true,
       id: "max_risk",
       cell: (row) => (
-        <div>
-          <span className="whitespace-nowrap">
-            <Severity risk={row.getValue()} />
-          </span>
+        <div className="flex flex-row">
+          <Severity risk={row.getValue()} />
         </div>
       ),
     }),
@@ -124,7 +122,11 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       header: "Max CVSS",
       id: "max_cvss",
       enableSorting: true,
-      cell: (row) => <Severity risk={row.getValue()} />,
+      cell: (row) => (
+        <div className="flex flex-row">
+          <Severity risk={row.getValue()} />
+        </div>
+      ),
     }),
   },
   {
