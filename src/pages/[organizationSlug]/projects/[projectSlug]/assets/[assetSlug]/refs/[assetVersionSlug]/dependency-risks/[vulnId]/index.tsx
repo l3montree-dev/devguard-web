@@ -14,9 +14,9 @@ import {
 } from "@/services/devGuardApi";
 import {
   AssetDTO,
-  VulnEventDTO,
-  RequirementsLevel,
   DetailedDependencyVulnDTO,
+  RequirementsLevel,
+  VulnEventDTO,
 } from "@/types/api/api";
 import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
@@ -67,6 +67,8 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
+import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
+import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -419,13 +421,9 @@ const Index: FunctionComponent<Props> = (props) => {
                 )}
                 <VulnState state={vuln.state} />
                 {cve && <Severity risk={vuln.rawRiskAssessment} />}
-                <div className="flex flex-row gap-2">
-                  {vuln.scannerIds.split(" ").map((s) => (
-                    <Badge key={s} variant={"secondary"}>
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
+                {vuln.scannerIds.split(" ").map((s) => (
+                  <ScannerBadge key={s} scannerID={s} />
+                ))}
               </div>
               <div className="mb-16 mt-4">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
@@ -921,17 +919,16 @@ export const getServerSideProps = middleware(
       "/dependency-vulns/" +
       vulnId;
 
-    const [resp, events]: [DetailedDependencyVulnDTO, VulnEventDTO[]] =
+    const [resp, events]: [DetailedDependencyVulnDTO, VulnEventDTO[] | null] =
       await Promise.all([
         apiClient(uri).then((r) => r.json()),
         apiClient(uri + "/events").then((r) => r.json()),
       ]);
 
     //filter events with type detected
-    const ev = events.filter((event) => {
+    const ev = (events || []).filter((event) => {
       return (
-        (event.type !== "detected" &&
-          event.type !== "rawRiskAssessmentUpdated") ||
+        !filterEventTypesFromOtherBranches.includes(event.type) ||
         event.vulnId === resp.id
       );
     });

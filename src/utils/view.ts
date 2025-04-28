@@ -40,6 +40,19 @@ export const eventTypeMessages = (
   events?: VulnEventDTO[],
 ) => {
   switch (event.type) {
+    case "addedScanner":
+      return (
+        "detected " +
+        flawName +
+        " with scanner: " +
+        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+      );
+
+    case "removedScanner":
+      return (
+        "removed scanner: " +
+        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+      );
     case "ticketClosed":
       return "closed the ticket for " + flawName;
     case "ticketDeleted":
@@ -96,6 +109,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   comment: "bg-secondary",
   ticketClosed: "bg-red-600 text-white",
   ticketDeleted: "bg-red-600 text-white",
+  addedScanner: "bg-secondary",
+  removedScanner: "bg-secondary",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

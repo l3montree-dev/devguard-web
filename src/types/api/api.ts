@@ -227,6 +227,20 @@ export interface DetectedEventDTO extends BaseVulnEventDTO {
   arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
+export interface AddedScannerEventDTO extends BaseVulnEventDTO {
+  type: "addedScanner";
+  arbitraryJsonData: EventArbitraryJsonData & {
+    scannerIds: string;
+  };
+}
+
+export interface RemovedScannerEventDTO extends BaseVulnEventDTO {
+  type: "removedScanner";
+  arbitraryJsonData: EventArbitraryJsonData & {
+    scannerIds: string;
+  };
+}
+
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
   type: "falsePositive";
 }
@@ -263,7 +277,9 @@ export type VulnEventDTO =
   | ReopenedEventDTO
   | CommentEventDTO
   | TicketClosedEventDTO
-  | TickedDeletedEventDTO;
+  | TickedDeletedEventDTO
+  | AddedScannerEventDTO
+  | RemovedScannerEventDTO;
 
 export interface CWE {
   cwe: string;

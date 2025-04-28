@@ -24,6 +24,7 @@ import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import ScannerBadge from "../ScannerBadge";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -54,14 +55,7 @@ const VulnWithCveTableRow = ({
           .replaceAll(defaultScanner, "")
           .split(" ")
           .map((scannerID, key) => (
-            <Tooltip key={key}>
-              <TooltipTrigger>
-                <Badge variant={"secondary"} className="line-clamp-1 m-1">
-                  {scannerID}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>{scannerID}</TooltipContent>
-            </Tooltip>
+            <ScannerBadge scannerID={scannerID} key={key} />
           ))}
       </td>
       <td className="p-4">{vuln.cveId}</td>

@@ -46,6 +46,10 @@ import FormatDate from "./FormatDate";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
+    case "addedScanner":
+      return <MagnifyingGlassIcon />;
+    case "removedScanner":
+      return <CheckIcon />;
     case "ticketClosed":
       return <CheckIcon />;
     case "ticketDeleted":

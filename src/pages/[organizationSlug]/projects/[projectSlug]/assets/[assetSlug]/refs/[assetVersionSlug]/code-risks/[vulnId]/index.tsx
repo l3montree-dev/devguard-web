@@ -48,6 +48,7 @@ import { toast } from "sonner";
 import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -62,7 +63,6 @@ interface Props {
 const highlightRegex = new RegExp(/\+\+\+(.+)\+\+\+/, "gms");
 
 const Index: FunctionComponent<Props> = (props) => {
-  const router = useRouter();
   const [vuln, setVuln] = useState<DetailedFirstPartyVulnDTO>(props.vuln);
   useEffect(() => {
     setVuln(props.vuln);
@@ -457,10 +457,9 @@ export const getServerSideProps = middleware(
       ]);
 
     //filter events with type detected
-    const ev = events.filter((event) => {
+    const ev = (events || []).filter((event) => {
       return (
-        (event.type !== "detected" &&
-          event.type !== "rawRiskAssessmentUpdated") ||
+        !filterEventTypesFromOtherBranches.includes(event.type) ||
         event.vulnId === resp.id
       );
     });

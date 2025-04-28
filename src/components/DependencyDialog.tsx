@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import {
   Dispatch,
   FunctionComponent,
@@ -26,11 +25,11 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { GitBranch, ScaleIcon, StarIcon } from "lucide-react";
+import { beautifyPurl } from "../utils/common";
 import OpenSsfDetails from "./OpenSsfDetails";
+import DateString from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
-import DateString from "./common/DateString";
-import { beautifyPurl } from "../utils/common";
 
 interface Props {
   open: boolean;

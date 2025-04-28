@@ -138,3 +138,21 @@ export const maybeGetRedirectDestination = (
     }
   }
 };
+
+export const filterEventTypesFromOtherBranches = [
+  "detected",
+  "rawRiskAssessmentUpdated",
+  "addedScanner",
+  "removedScanner",
+];
+
+export const extractResponse = async <T>(
+  response: Response,
+  defaultValue: T,
+): Promise<T> => {
+  if (response.ok) {
+    return response.json() as Promise<T>;
+  } else {
+    return defaultValue;
+  }
+};
