@@ -113,12 +113,12 @@ on:
 jobs:
   # ----- BEGIN Secret Scanning Job -----
     secret-scanning:
-         uses: l3montree-dev/devguard-action/.github/workflows/secret-scanning.yml@main
-         with:
-             asset-name: "psyslop/projects/psyslop/assets/psyslop"
-             api-url: https://api.main.devguard.org
-         secrets:
-      devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
+      uses: l3montree-dev/devguard-action/.github/workflows/secret-scanning.yml@main
+      with:
+        asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
+        api-url: ${apiUrl}
+      secrets:
+    devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
 
   # ----- END Secret Scanning Job -----`}
               />
