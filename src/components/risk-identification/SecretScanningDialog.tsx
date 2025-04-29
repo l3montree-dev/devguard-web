@@ -118,7 +118,7 @@ jobs:
         asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
         api-url: ${apiUrl}
       secrets:
-    devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
+        devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
 
   # ----- END Secret Scanning Job -----`}
               />
