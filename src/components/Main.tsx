@@ -120,7 +120,7 @@ const Main: FunctionComponent<Props> = ({
           {children}
         </div>
 
-        <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8 absolute">
+        <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8">
           <div className="mb-2 flex flex-row gap-5">
             <Link
               className="!text-muted-foreground"
