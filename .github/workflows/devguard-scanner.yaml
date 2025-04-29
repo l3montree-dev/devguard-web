@@ -24,4 +24,4 @@ jobs:
         asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
     secrets:
         devguard-token: ${{ secrets.DEVGUARD_TOKEN }} 
-        build-args: "--context=. --dockerfile=Dockerfile --build-arg=DEVGUARD_API_URL=https://api.main.devguard.org"
+        build-args: "--context=. --dockerfile=Dockerfile --build-arg=DEVGUARD_API_URL=https://api.main.devguard.org  --build-arg=VERSION=${{ github.sha }}"
