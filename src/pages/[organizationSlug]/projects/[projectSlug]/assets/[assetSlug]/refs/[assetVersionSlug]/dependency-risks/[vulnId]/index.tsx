@@ -283,12 +283,21 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
+export const removeUnderscores = (input: string): string => {
+  return input.replace(/_/g, " ");
+};
+
 export const options: Record<string, string> = {
-  "Component Missing": "The vulnerable component is not part of the artifact.",
-  "Code Missing": "The component exists, but the vulnerable code was excluded.",
-  "Code Inaccessible": "The vulnerable code exists but is never executed.",
-  "Code Uncontrollable": "The attacker cannot control the vulnerable code.",
-  "Mitigations Exist": "Built-in defenses prevent known exploitation paths.",
+  component_not_present:
+    "The_vulnerable_component_is_not_part_of_the_artifact.",
+  vulnerable_code_not_present:
+    "The component exists, but the vulnerable code was excluded.",
+  vulnerable_code_not_in_execute_path:
+    "The vulnerable code exists but is never executed.",
+  vulnerable_code_cannot_be_controlled_by_adversary:
+    "The attacker cannot control the vulnerable code.",
+  inline_mitigations_already_exis:
+    "Built-in defenses prevent known exploitation paths.",
 };
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
@@ -309,7 +318,7 @@ const Index: FunctionComponent<Props> = (props) => {
   );
 
   const [selectedOption, setSelectedOption] = useState<string>(
-    Object.keys(options)[0],
+    Object.keys(options)[2],
   );
   const { Loader, waitFor, isLoading } = useLoader();
 
@@ -568,7 +577,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   className="mr-0 rounded-r-none pr-0"
                                 >
                                   <Loader />
-                                  {selectedOption}
+                                  {removeUnderscores(selectedOption)}
                                 </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -592,7 +601,9 @@ const Index: FunctionComponent<Props> = (props) => {
                                           }
                                         >
                                           <div className="flex flex-col  ">
-                                            <span>{option}</span>
+                                            <span>
+                                              {removeUnderscores(option)}{" "}
+                                            </span>
                                             <span className="text-xs text-muted-foreground">
                                               {description}
                                             </span>

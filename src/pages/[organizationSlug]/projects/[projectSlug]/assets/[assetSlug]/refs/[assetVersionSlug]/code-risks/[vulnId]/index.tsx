@@ -56,7 +56,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { options } from "../../dependency-risks/[vulnId]";
+import { options, removeUnderscores } from "../../dependency-risks/[vulnId]";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -350,7 +350,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   className="mr-0 rounded-r-none pr-0"
                                 >
                                   <Loader />
-                                  {selectedOption}
+                                  {removeUnderscores(selectedOption)}
                                 </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -374,7 +374,10 @@ const Index: FunctionComponent<Props> = (props) => {
                                           }
                                         >
                                           <div className="flex flex-col  ">
-                                            <span>{option}</span>
+                                            <span>
+                                              {removeUnderscores(option)}
+                                            </span>
+
                                             <span className="text-xs text-muted-foreground">
                                               {description}
                                             </span>

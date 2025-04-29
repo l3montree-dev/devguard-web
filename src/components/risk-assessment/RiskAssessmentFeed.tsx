@@ -43,6 +43,7 @@ import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
+import { removeUnderscores } from "@/pages/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/dependency-risks/[vulnId]";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -150,7 +151,10 @@ export default function RiskAssessmentFeed({
                           {findUser(event.userId, org, currentUser).displayName}{" "}
                           {eventTypeMessages(event, vulnerabilityName, events)}
                           {event.mechanicalJustification &&
-                            "- " + event.mechanicalJustification.toLowerCase()}
+                            "- " +
+                              removeUnderscores(
+                                event.mechanicalJustification,
+                              ).toLowerCase()}
                         </p>
 
                         <div className="absolute right-2 top-2">
