@@ -49,6 +49,14 @@ import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { options } from "../../dependency-risks/[vulnId]";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -78,11 +86,15 @@ const Index: FunctionComponent<Props> = (props) => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+  const [selectedOption, setSelectedOption] = useState<string>(
+    Object.keys(options)[0],
+  );
   const { Loader, waitFor, isLoading } = useLoader();
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
+    mechanicalJustification?: string;
   }) => {
     if (data.status === undefined) {
       return;
@@ -210,7 +222,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               {vuln.snippet && (
                 <div className="mt-4 rounded-lg border bg-secondary">
-                  <div className="px-4 py-2 font-mono text-sm font-medium">
+                  <div className="font-mono px-4 py-2 text-sm font-medium">
                     {vuln.uri}
                   </div>
                   <CopyCode
@@ -324,19 +336,61 @@ const Index: FunctionComponent<Props> = (props) => {
                               <Loader />
                               Accept risk
                             </Button>
-                            <Button
-                              disabled={isLoading}
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "falsePositive",
-                                  justification,
-                                })
-                              }
-                              variant={"secondary"}
-                            >
-                              <Loader />
-                              Mark False Positive
-                            </Button>
+                            <div className="flex flex-col items-center">
+                              <div className="flex flex-row items-center">
+                                <Button
+                                  onClick={waitFor(() =>
+                                    handleSubmit({
+                                      status: "falsePositive",
+                                      justification,
+                                      mechanicalJustification: selectedOption,
+                                    }),
+                                  )}
+                                  variant={"secondary"}
+                                  className="mr-0 rounded-r-none pr-0"
+                                >
+                                  <Loader />
+                                  {selectedOption}
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      disabled={isLoading}
+                                      variant={"secondary"}
+                                      className=" flex items-center rounded-l-none pl-1 pr-2"
+                                    >
+                                      {isLoading && <Loader />}
+                                      <ChevronDown className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+
+                                  <DropdownMenuContent align="end">
+                                    {Object.entries(options).map(
+                                      ([option, description]) => (
+                                        <DropdownMenuItem
+                                          key={option}
+                                          onClick={() =>
+                                            setSelectedOption(option)
+                                          }
+                                        >
+                                          <div className="flex flex-col  ">
+                                            <span>{option}</span>
+                                            <span className="text-xs text-muted-foreground">
+                                              {description}
+                                            </span>
+                                          </div>
+                                        </DropdownMenuItem>
+                                      ),
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                              <div>
+                                <span className="text-xs text-muted-foreground">
+                                  {'Mark as "false positive"'}
+                                </span>
+                              </div>
+                            </div>
                             <Button
                               onClick={waitFor(() =>
                                 handleSubmit({
