@@ -149,6 +149,8 @@ export default function RiskAssessmentFeed({
                         <p className="w-full bg-card px-2 py-2 pr-20 font-medium">
                           {findUser(event.userId, org, currentUser).displayName}{" "}
                           {eventTypeMessages(event, vulnerabilityName, events)}
+                          {event.mechanicalJustification &&
+                            "- " + event.mechanicalJustification.toLowerCase()}
                         </p>
 
                         <div className="absolute right-2 top-2">
