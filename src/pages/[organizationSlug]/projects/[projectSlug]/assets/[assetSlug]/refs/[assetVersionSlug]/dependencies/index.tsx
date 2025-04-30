@@ -229,10 +229,10 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <div className="mb-10 flex flex-row items-start justify-between">
+      <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
 
-        <div>
+        <div className="w-1/3">
           <span className="text-xs text-muted-foreground">Licenses</span>
           <span>
             <span className="flex flex-row overflow-hidden rounded-full">
@@ -252,26 +252,29 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               ))}
             </span>
             <span className="mt-2 flex flex-row flex-wrap gap-2">
-              {licenseToPercentMapEntries.map(([el, percent]) => (
-                <span
-                  className="whitespace-nowrap text-xs capitalize"
-                  key={el.license.licenseId}
-                >
+              {licenseToPercentMapEntries
+                .filter((el) => el[1] > 0.5)
+                .map(([el, percent]) => (
                   <span
-                    style={{
-                      backgroundColor:
-                        osiLicenseHexColors[el.license.licenseId] ?? "#eeeeee",
-                    }}
-                    className={classNames(
-                      "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
-                    )}
-                  />
-                  {el.license.licenseId}{" "}
-                  <span className="text-muted-foreground">
-                    {Math.round(percent as number)}%
+                    className="whitespace-nowrap text-xs capitalize"
+                    key={el.license.licenseId}
+                  >
+                    <span
+                      style={{
+                        backgroundColor:
+                          osiLicenseHexColors[el.license.licenseId] ??
+                          "#eeeeee",
+                      }}
+                      className={classNames(
+                        "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
+                      )}
+                    />
+                    {el.license.licenseId}{" "}
+                    <span className="text-muted-foreground">
+                      {Math.round(percent as number)}%
+                    </span>
                   </span>
-                </span>
-              ))}
+                ))}
             </span>
           </span>
         </div>
