@@ -105,7 +105,9 @@ export const useAssetMenu = () => {
       Icon: ChartBarSquareIcon,
       isActive:
         router.pathname ===
-        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]",
+          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]" ||
+        router.pathname ===
+          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/controls/[control]",
     });
 
     menu = menu.concat([

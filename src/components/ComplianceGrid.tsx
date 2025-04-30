@@ -2,32 +2,44 @@ import React, { FunctionComponent, useMemo } from "react";
 import { PolicyEvaluation } from "../types/api/api";
 import { classNames } from "../utils/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
 }
 const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
   const controlsPassing = useMemo(
-    () => compliance.filter((policy) => policy.result).length,
+    () => compliance.filter((policy) => policy.compliant).length,
     [compliance],
   );
 
+  const router = useRouter();
   return (
     <div>
       <div className="grid-cols-25 grid gap-1">
         {compliance.map((policy) => (
           <Tooltip key={policy.title}>
-            <TooltipTrigger>
+            <TooltipTrigger
+              onClick={() =>
+                router.push(
+                  router.asPath +
+                    "/controls/" +
+                    policy.filename.replace(".rego", ""),
+                )
+              }
+            >
               <div
                 className={classNames(
-                  "aspect-square rounded-sm",
-                  Boolean(policy.result)
+                  "aspect-square rounded-sm block",
+                  Boolean(policy.compliant)
                     ? " bg-green-500 shadow-green-400 drop-shadow"
                     : "border border-gray-500/30 bg-gray-500/20",
                 )}
                 key={policy.title}
               />
             </TooltipTrigger>
+
             <TooltipContent>
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-semibold">{policy.title}</span>
@@ -38,10 +50,10 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
               <span
                 className={classNames(
                   "text-sm font-semibold",
-                  Boolean(policy.result) ? "text-green-500" : "text-red-500",
+                  Boolean(policy.compliant) ? "text-green-500" : "text-red-500",
                 )}
               >
-                {policy.result ? "Passing" : "Failing"}
+                {policy.compliant ? "Passing" : "Failing"}
               </span>
             </TooltipContent>
           </Tooltip>

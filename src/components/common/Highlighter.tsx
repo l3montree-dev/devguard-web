@@ -17,14 +17,16 @@ import React, { FunctionComponent } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import yaml from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
 import shell from "react-syntax-highlighter/dist/esm/languages/hljs/bash";
+import basic from "react-syntax-highlighter/dist/esm/languages/hljs/basic";
 import docco from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
 
 SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
+SyntaxHighlighter.registerLanguage("rego", basic);
 
 const Highlighter: FunctionComponent<{
   codeString: string;
-  language?: "yaml" | "shell";
+  language?: "yaml" | "shell" | "rego";
   startingLineNumber?: number;
 }> = (props) => {
   return (

@@ -43,7 +43,7 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
 
 interface Props {
   codeString: string;
-  language?: "yaml" | "shell";
+  language?: "yaml" | "shell" | "rego";
   startingLineNumber?: number;
   highlightRegexPattern?: RegExp;
 }

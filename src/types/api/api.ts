@@ -15,13 +15,16 @@
 import { Modify } from "../common";
 
 export interface PolicyEvaluation {
-  result: boolean | null;
+  compliant: boolean | null;
+  violations: Array<string>;
   title: string;
   description: string;
   tags: Array<string>;
   relatedResources: Array<string>;
   complianceFrameworks: Array<string>;
   priority: number;
+  content: string;
+  filename: string;
 }
 
 export interface InviteRequest {

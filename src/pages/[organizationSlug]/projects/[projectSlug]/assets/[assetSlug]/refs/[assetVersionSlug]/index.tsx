@@ -21,10 +21,7 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "@/hooks/useActiveAssetVersion";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -35,7 +32,6 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
@@ -46,7 +42,6 @@ import Link from "next/link";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
-import { ChartConfig } from "../../../../../../../../components/ui/chart";
 import {
   Tooltip,
   TooltipContent,
@@ -81,24 +76,13 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
-  const currentUser = useCurrentUser();
+
   const { branches, tags } = useAssetBranchesAndTags();
-  const assetVersion = useActiveAssetVersion();
+
   const router = useRouter();
 
-  const chartConfig = useMemo(() => {
-    return Object.entries(licenses).reduce((acc, [key, value]) => {
-      return {
-        ...acc,
-        [key]: {
-          label: key,
-        },
-      };
-    }, {} satisfies ChartConfig);
-  }, [licenses]);
-
   const failingControls = useMemo(
-    () => compliance.filter((policy) => policy.result === false),
+    () => compliance.filter((policy) => policy.compliant === false),
     [compliance],
   );
 
