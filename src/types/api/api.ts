@@ -414,6 +414,9 @@ export interface AssetDTO {
   centralVulnManagement: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
+
+  badgeSecret: string;
+  webhookSecret: string | null;
 }
 
 export interface DependencyTreeNode {
