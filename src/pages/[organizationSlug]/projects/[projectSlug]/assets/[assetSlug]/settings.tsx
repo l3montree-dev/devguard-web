@@ -37,6 +37,10 @@ import { set } from "lodash";
 import { Label } from "@/components/ui/label";
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
+  secrets: {
+    badgeSecret: string;
+    webhookSecret: string;
+  };
 }
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
@@ -46,7 +50,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
-const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
+const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
@@ -54,9 +58,9 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
 
-  const [badgeSecret, setBadgeSecret] = useState<string>(asset.badgeSecret);
+  const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
   const [webhookSecret, setWebhookSecret] = useState<string | null>(
-    asset.webhookSecret,
+    secrets.webhookSecret,
   );
 
   const form = useForm<AssetFormValues>({
@@ -83,17 +87,18 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         "/projects/" +
         project!.slug + // can never be null
         "/assets/" +
-        asset.slug +
-        "/generate-badge-secret",
+        asset.slug,
       {
-        method: "GET",
+        method: "PATCH",
+        body: JSON.stringify({
+          badgeSecretUpdate: true,
+        }),
       },
     );
     if (resp.ok) {
-      const secret = await resp.json();
-      console.log("secret", secret);
-      setBadgeSecret(secret);
-      asset.badgeSecret = secret;
+      const r = await resp.json();
+      setBadgeSecret(r.badgeSecret);
+      asset.badgeSecret = r.badgeSecret;
 
       updateAsset(asset);
       toast("New badge secret generated", {
@@ -111,16 +116,18 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
         "/projects/" +
         project!.slug + // can never be null
         "/assets/" +
-        asset.slug +
-        "/generate-webhook-secret",
+        asset.slug,
       {
-        method: "GET",
+        method: "PATCH",
+        body: JSON.stringify({
+          webhookSecretUpdate: true,
+        }),
       },
     );
     if (resp.ok) {
-      const secret = await resp.json();
-      setWebhookSecret(secret);
-      asset.webhookSecret = secret;
+      const r = await resp.json();
+      setWebhookSecret(r.webhookSecret);
+      asset.webhookSecret = r.webhookSecret;
       updateAsset(asset);
       toast("New webhook secret generated", {
         description: "The webhook secret has been generated",
@@ -129,6 +136,7 @@ const Index: FunctionComponent<Props> = ({ repositories }: Props) => {
       toast.error("Could not generate new secret");
     }
   };
+
   const handleDeleteAsset = async () => {
     const resp = await browserApiClient(
       "/organizations/" +
@@ -346,10 +354,19 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/";
 
-    const [resp, repoResp] = await Promise.all([
+    const [resp, repoResp, secretsResp] = await Promise.all([
       apiClient(uri),
       apiClient(
         "/organizations/" + organizationSlug + "/integrations/repositories",
+      ),
+      apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/secrets",
       ),
     ]);
 
@@ -361,10 +378,13 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
     const [asset] = await Promise.all([resp.json()]);
 
+    const secrets = await secretsResp.json();
+
     return {
       props: {
         asset,
         repositories: repos,
+        secrets,
       },
     };
   },
