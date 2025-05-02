@@ -24,7 +24,7 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
               onClick={() =>
                 router.push(
                   router.asPath +
-                    "/controls/" +
+                    "/compliance/" +
                     policy.filename.replace(".rego", ""),
                 )
               }

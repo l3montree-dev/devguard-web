@@ -269,7 +269,7 @@ export const getServerSideProps = middleware(
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
         const compliantAssets = stats.filter((asset) =>
-          asset.every((r) => r.result),
+          asset.every((r) => r.compliant),
         );
 
         return {
@@ -280,7 +280,7 @@ export const getServerSideProps = middleware(
             passingControlsPercentage:
               stats.flat(1).length === 0
                 ? 1 // if no assets, we assume 100% compliance
-                : stats.flat(1).filter((r) => r.result).length /
+                : stats.flat(1).filter((r) => r.compliant).length /
                   (stats.flat(1).length || 1),
           },
         };

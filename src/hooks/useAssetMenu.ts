@@ -92,6 +92,24 @@ export const useAssetMenu = () => {
 
   if ((activeAsset?.refs.length ?? 0) > 0) {
     menu.unshift({
+      title: "Compliance",
+      href:
+        "/" +
+        orgSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/compliance",
+      Icon: ScaleIcon,
+      isActive: router.pathname.startsWith(
+        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/compliance",
+      ),
+    });
+
+    menu.unshift({
       title: "Overview",
       href:
         "/" +
@@ -107,7 +125,9 @@ export const useAssetMenu = () => {
         router.pathname ===
           "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]" ||
         router.pathname ===
-          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/controls/[control]",
+          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/controls/[control]" ||
+        router.pathname ===
+          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/events",
     });
 
     menu = menu.concat([

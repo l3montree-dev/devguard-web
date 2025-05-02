@@ -16,7 +16,7 @@ import { Modify } from "../common";
 
 export interface PolicyEvaluation {
   compliant: boolean | null;
-  violations: Array<string>;
+  violations: Array<string> | null;
   title: string;
   description: string;
   tags: Array<string>;
@@ -25,6 +25,15 @@ export interface PolicyEvaluation {
   priority: number;
   content: string;
   filename: string;
+  predicateType: string;
+}
+
+export interface Policy {
+  id: string;
+  title: string;
+  description: string;
+  predicateType: string;
+  rego: string;
 }
 
 export interface InviteRequest {

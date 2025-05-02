@@ -82,7 +82,7 @@ const Index: FunctionComponent<Props> = ({
   const router = useRouter();
 
   const failingControls = useMemo(
-    () => compliance.filter((policy) => policy.compliant === false),
+    () => compliance.filter((policy) => policy.compliant !== true),
     [compliance],
   );
 
@@ -217,10 +217,10 @@ const Index: FunctionComponent<Props> = ({
                   </Tooltip>
                 </div>
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings#compliance`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/compliance`}
                   className="absolute right-0 top-0 text-xs !text-muted-foreground"
                 >
-                  Modify Policies
+                  Overview
                 </Link>
               </CardTitle>
               <CardDescription>

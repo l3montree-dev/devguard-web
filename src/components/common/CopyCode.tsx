@@ -29,14 +29,17 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
     });
   };
   return (
-    <div className="relative w-full overflow-hidden rounded-lg border p-2">
-      <button
-        onClick={handleCopy}
-        className="absolute right-1 top-1 z-10 rounded-lg bg-gray-700/20 p-1 px-2 text-xs text-white transition-all hover:bg-gray-700/40"
-      >
-        <CopyIcon />
-      </button>
-      <div className="relative font-mono text-sm">{codeString}</div>
+    <div className="inline-flex">
+      <div className="relative w-full overflow-hidden rounded-lg border px-1.5 py-0.5">
+        <button
+          onClick={handleCopy}
+          type="button"
+          className="absolute right-1 top-1 z-10 rounded-lg p-0.5  text-xs hover:text-foreground text-muted-foreground transition-all"
+        >
+          <CopyIcon className="w-3.5 h-3.5" />
+        </button>
+        <div className="relative font-mono text-sm pr-6">{codeString}</div>
+      </div>
     </div>
   );
 };
