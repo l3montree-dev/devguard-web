@@ -20,16 +20,10 @@ import ColoredBadge from "../../../../../../../../../components/common/ColoredBa
 import ListItem from "../../../../../../../../../components/common/ListItem";
 import { withAssetVersion } from "../../../../../../../../../decorators/withAssetVersion";
 import { getApiClientFromContext } from "../../../../../../../../../services/devGuardApi";
+import { violationLengthToLevel } from "../../../../../compliance";
 interface Props {
   compliance: PolicyEvaluation[];
 }
-
-export const violationLengthToLevel = (length: number) => {
-  if (length === 0) return "low";
-  if (length <= 2) return "medium";
-  if (length <= 4) return "high";
-  return "critical";
-};
 
 const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
   const router = useRouter();
@@ -45,15 +39,9 @@ const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
             forceVertical
           >
             {compliance.map((control) => (
-              <Link
-                key={control.filename}
-                href={
-                  router.asPath + "/" + control.filename.replace(".rego", "")
-                }
-              >
+              <Link key={control.id} href={router.asPath + "/" + control.id}>
                 <ListItem
                   reactOnHover
-                  key={control.filename}
                   Title={
                     <span className="flex flex-row items-center gap-2">
                       {control.title}

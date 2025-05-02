@@ -14,18 +14,9 @@
 
 import { Modify } from "../common";
 
-export interface PolicyEvaluation {
+export interface PolicyEvaluation extends Policy {
   compliant: boolean | null;
   violations: Array<string> | null;
-  title: string;
-  description: string;
-  tags: Array<string>;
-  relatedResources: Array<string>;
-  complianceFrameworks: Array<string>;
-  priority: number;
-  content: string;
-  filename: string;
-  predicateType: string;
 }
 
 export interface Policy {
@@ -33,6 +24,7 @@ export interface Policy {
   title: string;
   description: string;
   predicateType: string;
+  organizationId: string | null; // null if community managed
   rego: string;
 }
 

@@ -39,8 +39,7 @@ import {
   CardTitle,
 } from "../../../../../../../../../components/ui/card";
 import ColoredBadge from "../../../../../../../../../components/common/ColoredBadge";
-import { violationLengthToLevel } from ".";
-import Link from "next/link";
+import { violationLengthToLevel } from "../../../../../compliance";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -75,15 +74,6 @@ const Index: FunctionComponent<Props> = (props) => {
                 </Markdown>
               </div>
 
-              <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
-                <div className="flex flex-row gap-2">
-                  {props.policyDetails.tags.map((s) => (
-                    <Badge key={s} variant={"secondary"}>
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
               <div>
                 <Collapsible className="bg-secondary border rounded-lg mt-4">
                   <CollapsibleTrigger className="w-full flex justify-between items-center text-left font-semibold rounded-lg px-2 py-1 ">
@@ -93,7 +83,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   <CollapsibleContent>
                     <CopyCode
                       language="rego"
-                      codeString={props.policyDetails.content}
+                      codeString={props.policyDetails.rego}
                     />
                   </CollapsibleContent>
                 </Collapsible>
@@ -176,13 +166,6 @@ const Index: FunctionComponent<Props> = (props) => {
                         {props.policyDetails.violations?.length ?? 0} Violations
                       </ColoredBadge>
                     )}
-                  </div>
-                  <div className="text-sm mt-4">
-                    {props.policyDetails.relatedResources.map((el) => (
-                      <Link key={el} href={el}>
-                        {el}
-                      </Link>
-                    ))}
                   </div>
                   <hr className="mt-4" />
                   <div className="flex-1 text-sm mt-4">

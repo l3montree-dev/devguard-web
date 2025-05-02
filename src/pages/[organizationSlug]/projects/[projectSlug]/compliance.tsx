@@ -23,6 +23,8 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/devGuardApi";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
+import { withProject } from "../../../../decorators/withProject";
 
 interface Props {
   policies: Array<Policy & { enabled: boolean }>;
@@ -61,12 +63,21 @@ export const PolicyListItem = ({
           reactOnHover
           key={policy.id}
           Button={
-            <Switch
-              checked={policy.enabled}
-              onCheckedChange={handlePolicyToggle}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <Switch
+                checked={policy.enabled}
+                onCheckedChange={handlePolicyToggle}
+              />
+            </div>
           }
-          Title={policy.title}
+          Title={
+            <span className="flex flex-row items-center gap-2">
+              {policy.title}
+              {policy.organizationId === null && (
+                <Badge variant="secondary">Community Managed</Badge>
+              )}
+            </span>
+          }
           Description={policy.description}
         />
       </div>
@@ -175,24 +186,7 @@ const ComplianceIndex: FunctionComponent<Props> = ({
   };
 
   return (
-    <Page
-      Menu={menu}
-      Title={
-        <Link
-          href={`/${activeOrg.slug}`}
-          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-        >
-          {activeOrg.name}{" "}
-          <Badge
-            className="font-body font-normal !text-white"
-            variant="outline"
-          >
-            Organization
-          </Badge>
-        </Link>
-      }
-      title="Compliance Controls"
-    >
+    <Page Menu={menu} Title={<ProjectTitle />} title="Compliance Controls">
       <div className="flex flex-row">
         <div className="flex-1">
           <Section
@@ -261,6 +255,7 @@ export const getServerSideProps = middleware(
   {
     session: withSession,
     organizations: withOrgs,
+    project: withProject,
     contentTree: withContentTree,
     organization: withOrganization,
   },

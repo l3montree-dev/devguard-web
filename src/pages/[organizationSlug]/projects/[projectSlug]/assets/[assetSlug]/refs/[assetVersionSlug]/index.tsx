@@ -56,6 +56,9 @@ import {
   RiskDistribution,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
+import ColoredBadge from "../../../../../../../../components/common/ColoredBadge";
+import { TriangleAlert } from "lucide-react";
+import { violationLengthToLevel } from "../../../../../../../../utils/view";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -158,28 +161,33 @@ const Index: FunctionComponent<Props> = ({
                             ? "pt-4"
                             : "border-b py-4"
                       }
-                      key={policy.title}
+                      key={policy.id}
                     >
-                      <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
-                        {policy.title}
-                        <div className="flex flex-row flex-wrap gap-2">
-                          {policy.complianceFrameworks.map((t) => (
-                            <Badge key={t} className="" variant={"secondary"}>
-                              <Image
-                                className="-ml-1.5 mr-1 inline-block"
-                                src="/assets/iso.svg"
-                                width={15}
-                                height={15}
-                                alt="Compliance"
-                              />{" "}
-                              {t}
-                            </Badge>
-                          ))}
+                      <Link
+                        className="!text-foreground"
+                        href={router.asPath + "/compliance/" + policy.id}
+                      >
+                        <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
+                          {policy.title}
+                          {policy.compliant === null ? (
+                            <ColoredBadge variant="high">
+                              <TriangleAlert className="h-4 w-4 mr-1" />
+                              Could not evaluate control
+                            </ColoredBadge>
+                          ) : (
+                            <ColoredBadge
+                              variant={violationLengthToLevel(
+                                policy.violations?.length ?? 0,
+                              )}
+                            >
+                              {policy.violations?.length ?? 0} Violations
+                            </ColoredBadge>
+                          )}
                         </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {policy.description}
-                      </p>
+                        <p className="text-sm text-muted-foreground">
+                          {policy.description}
+                        </p>
+                      </Link>
                     </div>
                   ))}
                 </div>

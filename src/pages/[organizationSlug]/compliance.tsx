@@ -29,17 +29,11 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { EllipsisVerticalIcon } from "lucide-react";
+import ColoredBadge from "../../components/common/ColoredBadge";
 
 interface Props {
   policies: Policy[];
 }
-
-export const violationLengthToLevel = (length: number) => {
-  if (length === 0) return "low";
-  if (length <= 2) return "medium";
-  if (length <= 4) return "high";
-  return "critical";
-};
 
 export const PolicyListItem = ({
   policy,
@@ -58,42 +52,55 @@ export const PolicyListItem = ({
   };
   return (
     <React.Fragment key={policy.id}>
-      <ListItem
-        key={policy.id}
-        Button={
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={buttonVariants({
-                variant: "outline",
-                size: "icon",
-              })}
-            >
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setIsOpen(true);
-                }}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onPolicyDelete(policy)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        }
-        Title={policy.title}
-        Description={policy.description}
-      />
+      <div className="cursor-pointer" onClick={() => setIsOpen(true)}>
+        <ListItem
+          key={policy.id}
+          Button={
+            policy.organizationId !== null && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "icon",
+                  })}
+                >
+                  <EllipsisVerticalIcon className="h-5 w-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setIsOpen(true);
+                    }}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onPolicyDelete(policy)}>
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )
+          }
+          Title={
+            <span className="flex flex-row items-center gap-2">
+              {policy.title}
+              {policy.organizationId === null && (
+                <Badge variant={"secondary"}>Community Managed</Badge>
+              )}
+            </span>
+          }
+          Description={policy.description}
+        />
+      </div>
       <PolicyDialog
         isOpen={isOpen}
         title="Edit Policy"
         description="Edit the policy for your organization."
         buttonTitle="Update Policy"
         onOpenChange={setIsOpen}
-        onSubmit={handlePolicyUpdate}
+        onSubmit={
+          policy.organizationId !== null ? handlePolicyUpdate : undefined
+        }
         policy={policy}
       />
     </React.Fragment>
