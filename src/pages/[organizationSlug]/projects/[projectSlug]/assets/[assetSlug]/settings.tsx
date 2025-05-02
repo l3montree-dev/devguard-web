@@ -35,13 +35,17 @@ import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
 import { Input } from "@/components/ui/input";
 import { set } from "lodash";
 import { Label } from "@/components/ui/label";
+import { config } from "@/config";
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
   secrets: {
     badgeSecret: string;
     webhookSecret: string;
   };
+  apiBadgeUrl: string;
 }
+
+import Image from "next/image";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -50,7 +54,11 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
-const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
+const Index: FunctionComponent<Props> = ({
+  repositories,
+  secrets,
+  apiBadgeUrl,
+}) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
@@ -62,6 +70,8 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   const [webhookSecret, setWebhookSecret] = useState<string | null>(
     secrets.webhookSecret,
   );
+
+  const [badgeURL, setBadgeURL] = useState<string>(apiBadgeUrl + badgeSecret);
 
   const form = useForm<AssetFormValues>({
     defaultValues: {
@@ -98,6 +108,7 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
     if (resp.ok) {
       const r = await resp.json();
       setBadgeSecret(r.badgeSecret);
+      setBadgeURL(config.devGuardApiUrl + "/api/v1/badges/" + r.badgeSecret);
       asset.badgeSecret = r.badgeSecret;
 
       updateAsset(asset);
@@ -246,36 +257,53 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
       </div>
       <div>
         <Section title="Secrets Management" description="Secrets management">
-          <div className="flex flex-col items-stretch gap-2">
-            <Label>Badge Secret</Label>
-            <div className="flex flex-row items-start justify-between">
-              <Input value={badgeSecret} />
+          <div>
+            <div className="flex flex-col items-stretch gap-2">
+              <Label>Badge Secret</Label>
+              <div className="flex flex-row items-start justify-between">
+                <Input value={badgeSecret} />
 
-              <Button
-                variant="secondary"
-                onClick={handleGenerateNewBadgeSecret}
-              >
-                <div className="h-4 w-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                </div>
-              </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleGenerateNewBadgeSecret}
+                >
+                  <div className="h-4 w-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                      />
+                    </svg>
+                  </div>
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                This secret is used to authenticate the badge requests.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              This secret is used to authenticate the badge requests.
-            </p>
+            <div className="space-y-2 p-4 border rounded-xl bg-muted">
+              <p className="text-sm text-muted-foreground">
+                You can use the following URL to display this badge in your
+                README or other documentation:
+              </p>
+              <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
+                {badgeURL}
+              </code>
+
+              <img
+                src={badgeURL}
+                alt="CVSS Badge"
+                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+              />
+            </div>
           </div>
           <div className="flex flex-col items-stretch gap-2 pt-4">
             <Label>Webhook Secret</Label>
@@ -380,11 +408,14 @@ export const getServerSideProps = middleware(
 
     const secrets = await secretsResp.json();
 
+    const apiBadgeUrl = config.devGuardApiUrl + "/api/v1/badges/";
+
     return {
       props: {
         asset,
         repositories: repos,
         secrets,
+        apiBadgeUrl,
       },
     };
   },
