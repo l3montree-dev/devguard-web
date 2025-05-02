@@ -42,7 +42,11 @@ import AssetTitle from "@/components/common/AssetTitle";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
-import { getRepositoryId } from "@/utils/view";
+import {
+  getRepositoryId,
+  removeUnderscores,
+  vexOptionMessages,
+} from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import CopyCode from "../../../../../../../../../../components/common/CopyCode";
@@ -56,7 +60,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { options, removeUnderscores } from "../../dependency-risks/[vulnId]";
+
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -87,7 +91,7 @@ const Index: FunctionComponent<Props> = (props) => {
     undefined,
   );
   const [selectedOption, setSelectedOption] = useState<string>(
-    Object.keys(options)[0],
+    Object.keys(vexOptionMessages)[0],
   );
   const { Loader, waitFor, isLoading } = useLoader();
 
@@ -265,7 +269,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <div className="flex flex-row justify-end gap-1">
-                          <div className="flex flex-row items-center gap-2">
+                          <div className="flex flex-row items-start gap-2">
                             {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
@@ -347,7 +351,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                     }),
                                   )}
                                   variant={"secondary"}
-                                  className="mr-0 rounded-r-none pr-0"
+                                  className="mr-0 capitalize rounded-r-none pr-0"
                                 >
                                   <Loader />
                                   {removeUnderscores(selectedOption)}
@@ -365,7 +369,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </DropdownMenuTrigger>
 
                                   <DropdownMenuContent align="end">
-                                    {Object.entries(options).map(
+                                    {Object.entries(vexOptionMessages).map(
                                       ([option, description]) => (
                                         <DropdownMenuItem
                                           key={option}
@@ -373,8 +377,8 @@ const Index: FunctionComponent<Props> = (props) => {
                                             setSelectedOption(option)
                                           }
                                         >
-                                          <div className="flex flex-col  ">
-                                            <span>
+                                          <div className="flex flex-col">
+                                            <span className="capitalize">
                                               {removeUnderscores(option)}
                                             </span>
 
@@ -388,9 +392,9 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              <div>
-                                <span className="text-xs text-muted-foreground">
-                                  {'Mark as "false positive"'}
+                              <div className="text-left w-full">
+                                <span className="text-left w-full text-xs text-muted-foreground">
+                                  {"Mark as False Positive"}
                                 </span>
                               </div>
                             </div>
@@ -402,7 +406,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                 }),
                               )}
                               disabled={isLoading}
-                              className="-mr-3"
                               variant={"default"}
                             >
                               <Loader />

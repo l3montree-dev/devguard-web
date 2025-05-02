@@ -25,6 +25,7 @@ import {
   eventTypeMessages,
   evTypeBackground,
   findUser,
+  removeUnderscores,
 } from "@/utils/view";
 import {
   ArrowPathIcon,
@@ -43,7 +44,6 @@ import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
-import { removeUnderscores } from "@/pages/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/dependency-risks/[vulnId]";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {

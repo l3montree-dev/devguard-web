@@ -62,7 +62,11 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
 import { beautifyPurl, extractVersion } from "@/utils/common";
-import { getRepositoryId } from "@/utils/view";
+import {
+  getRepositoryId,
+  removeUnderscores,
+  vexOptionMessages,
+} from "@/utils/view";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
@@ -283,22 +287,6 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
-export const removeUnderscores = (input: string): string => {
-  return input.replace(/_/g, " ");
-};
-
-export const options: Record<string, string> = {
-  component_not_present:
-    "The_vulnerable_component_is_not_part_of_the_artifact.",
-  vulnerable_code_not_present:
-    "The component exists, but the vulnerable code was excluded.",
-  vulnerable_code_not_in_execute_path:
-    "The vulnerable code exists but is never executed.",
-  vulnerable_code_cannot_be_controlled_by_adversary:
-    "The attacker cannot control the vulnerable code.",
-  inline_mitigations_already_exis:
-    "Built-in defenses prevent known exploitation paths.",
-};
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
@@ -318,7 +306,7 @@ const Index: FunctionComponent<Props> = (props) => {
   );
 
   const [selectedOption, setSelectedOption] = useState<string>(
-    Object.keys(options)[2],
+    Object.keys(vexOptionMessages)[2],
   );
   const { Loader, waitFor, isLoading } = useLoader();
 
@@ -574,7 +562,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                     }),
                                   )}
                                   variant={"secondary"}
-                                  className="mr-0 rounded-r-none pr-0"
+                                  className="mr-0 capitalize rounded-r-none pr-0"
                                 >
                                   <Loader />
                                   {removeUnderscores(selectedOption)}
@@ -592,7 +580,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </DropdownMenuTrigger>
 
                                   <DropdownMenuContent align="end">
-                                    {Object.entries(options).map(
+                                    {Object.entries(vexOptionMessages).map(
                                       ([option, description]) => (
                                         <DropdownMenuItem
                                           key={option}
@@ -600,8 +588,8 @@ const Index: FunctionComponent<Props> = (props) => {
                                             setSelectedOption(option)
                                           }
                                         >
-                                          <div className="flex flex-col  ">
-                                            <span>
+                                          <div className="flex flex-col">
+                                            <span className="capitalize">
                                               {removeUnderscores(option)}{" "}
                                             </span>
                                             <span className="text-xs text-muted-foreground">
@@ -614,9 +602,9 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              <div>
-                                <span className="text-xs text-muted-foreground">
-                                  {'Mark as "false positive"'}
+                              <div className="flex-1 w-full">
+                                <span className=" text-left text-xs text-muted-foreground">
+                                  {"Mark as False Positive"}
                                 </span>
                               </div>
                             </div>
@@ -629,7 +617,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                 }),
                               )}
                               disabled={isLoading}
-                              className="-mr-3"
                               variant={"default"}
                             >
                               <Loader />
