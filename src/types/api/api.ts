@@ -200,6 +200,7 @@ interface BaseVulnEventDTO {
   id: string;
   vulnId: string;
   justification: string;
+  mechanicalJustification: string;
   vulnerabilityName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;

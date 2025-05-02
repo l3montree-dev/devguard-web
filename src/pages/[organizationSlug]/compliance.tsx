@@ -8,28 +8,27 @@ import { Policy } from "@/types/api/api";
 
 import React, { FunctionComponent, useState } from "react";
 
+import { EllipsisVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import ListItem from "../../components/common/ListItem";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
-import { useOrganizationMenu } from "../../hooks/useOrganizationMenu";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../../services/devGuardApi";
-import { Badge } from "../../components/ui/badge";
-import { withContentTree } from "../../decorators/withContentTree";
-import { Button, buttonVariants } from "../../components/ui/button";
-import PolicyDialog from "../../components/PolicyDialog";
 import { toast } from "sonner";
+import ListItem from "../../components/common/ListItem";
+import PolicyDialog from "../../components/PolicyDialog";
+import { Badge } from "../../components/ui/badge";
+import { Button, buttonVariants } from "../../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
-import { EllipsisVerticalIcon } from "lucide-react";
-import ColoredBadge from "../../components/common/ColoredBadge";
+import { withContentTree } from "../../decorators/withContentTree";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import { useOrganizationMenu } from "../../hooks/useOrganizationMenu";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "../../services/devGuardApi";
 
 interface Props {
   policies: Policy[];

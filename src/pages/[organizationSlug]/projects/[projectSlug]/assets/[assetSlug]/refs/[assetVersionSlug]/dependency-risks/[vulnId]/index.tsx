@@ -62,13 +62,27 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
 import { beautifyPurl, extractVersion } from "@/utils/common";
-import { getRepositoryId } from "@/utils/view";
+import {
+  getRepositoryId,
+  removeUnderscores,
+  vexOptionMessages,
+} from "@/utils/view";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -290,6 +304,10 @@ const Index: FunctionComponent<Props> = (props) => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+
+  const [selectedOption, setSelectedOption] = useState<string>(
+    Object.keys(vexOptionMessages)[2],
+  );
   const { Loader, waitFor, isLoading } = useLoader();
 
   const assetVersion = useStore((s) => s.assetVersion);
@@ -297,6 +315,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
+    mechanicalJustification?: string;
   }) => {
     if (data.status === undefined) {
       return;
@@ -460,7 +479,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <div className="flex flex-row justify-end gap-1">
-                          <div className="flex flex-row items-center gap-2">
+                          <div className="flex flex-row items-start gap-2 pt-2">
                             {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
@@ -532,18 +551,64 @@ const Index: FunctionComponent<Props> = (props) => {
                               <Loader />
                               Accept risk
                             </Button>
-                            <Button
-                              onClick={waitFor(() =>
-                                handleSubmit({
-                                  status: "falsePositive",
-                                  justification,
-                                }),
-                              )}
-                              variant={"secondary"}
-                            >
-                              <Loader />
-                              Mark False Positive
-                            </Button>
+                            <div className="flex flex-col items-center">
+                              <div className="flex flex-row items-center">
+                                <Button
+                                  onClick={waitFor(() =>
+                                    handleSubmit({
+                                      status: "falsePositive",
+                                      justification,
+                                      mechanicalJustification: selectedOption,
+                                    }),
+                                  )}
+                                  variant={"secondary"}
+                                  className="mr-0 capitalize rounded-r-none pr-0"
+                                >
+                                  <Loader />
+                                  {removeUnderscores(selectedOption)}
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      disabled={isLoading}
+                                      variant={"secondary"}
+                                      className=" flex items-center rounded-l-none pl-1 pr-2"
+                                    >
+                                      {isLoading && <Loader />}
+                                      <ChevronDown className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+
+                                  <DropdownMenuContent align="end">
+                                    {Object.entries(vexOptionMessages).map(
+                                      ([option, description]) => (
+                                        <DropdownMenuItem
+                                          key={option}
+                                          onClick={() =>
+                                            setSelectedOption(option)
+                                          }
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="capitalize">
+                                              {removeUnderscores(option)}{" "}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                              {description}
+                                            </span>
+                                          </div>
+                                        </DropdownMenuItem>
+                                      ),
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                              <div className="flex-1 w-full">
+                                <span className=" text-left text-xs text-muted-foreground">
+                                  {"Mark as False Positive"}
+                                </span>
+                              </div>
+                            </div>
+
                             <Button
                               onClick={waitFor(() =>
                                 handleSubmit({
@@ -552,7 +617,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                 }),
                               )}
                               disabled={isLoading}
-                              className="-mr-3"
                               variant={"default"}
                             >
                               <Loader />
