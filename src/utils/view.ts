@@ -50,6 +50,13 @@ export const vexOptionMessages: Record<string, string> = {
     "Built-in defenses prevent known exploitation paths.",
 };
 
+export const violationLengthToLevel = (length: number) => {
+  if (length === 0) return "low";
+  if (length <= 2) return "medium";
+  if (length <= 4) return "high";
+  return "critical";
+};
+
 export const eventTypeMessages = (
   event: VulnEventDTO,
   flawName: string,

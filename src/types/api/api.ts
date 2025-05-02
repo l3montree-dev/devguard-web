@@ -14,14 +14,18 @@
 
 import { Modify } from "../common";
 
-export interface PolicyEvaluation {
-  result: boolean | null;
+export interface PolicyEvaluation extends Policy {
+  compliant: boolean | null;
+  violations: Array<string> | null;
+}
+
+export interface Policy {
+  id: string;
   title: string;
   description: string;
-  tags: Array<string>;
-  relatedResources: Array<string>;
-  complianceFrameworks: Array<string>;
-  priority: number;
+  predicateType: string;
+  organizationId: string | null; // null if community managed
+  rego: string;
 }
 
 export interface InviteRequest {

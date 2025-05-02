@@ -21,10 +21,7 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "@/hooks/useActiveAssetVersion";
+import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -35,7 +32,6 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import {
   CheckBadgeIcon,
   ExclamationCircleIcon,
@@ -46,7 +42,6 @@ import Link from "next/link";
 import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
-import { ChartConfig } from "../../../../../../../../components/ui/chart";
 import {
   Tooltip,
   TooltipContent,
@@ -61,6 +56,9 @@ import {
   RiskDistribution,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
+import ColoredBadge from "../../../../../../../../components/common/ColoredBadge";
+import { TriangleAlert } from "lucide-react";
+import { violationLengthToLevel } from "../../../../../../../../utils/view";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -81,24 +79,13 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
-  const currentUser = useCurrentUser();
+
   const { branches, tags } = useAssetBranchesAndTags();
-  const assetVersion = useActiveAssetVersion();
+
   const router = useRouter();
 
-  const chartConfig = useMemo(() => {
-    return Object.entries(licenses).reduce((acc, [key, value]) => {
-      return {
-        ...acc,
-        [key]: {
-          label: key,
-        },
-      };
-    }, {} satisfies ChartConfig);
-  }, [licenses]);
-
   const failingControls = useMemo(
-    () => compliance.filter((policy) => policy.result === false),
+    () => compliance.filter((policy) => policy.compliant !== true),
     [compliance],
   );
 
@@ -174,28 +161,33 @@ const Index: FunctionComponent<Props> = ({
                             ? "pt-4"
                             : "border-b py-4"
                       }
-                      key={policy.title}
+                      key={policy.id}
                     >
-                      <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
-                        {policy.title}
-                        <div className="flex flex-row flex-wrap gap-2">
-                          {policy.complianceFrameworks.map((t) => (
-                            <Badge key={t} className="" variant={"secondary"}>
-                              <Image
-                                className="-ml-1.5 mr-1 inline-block"
-                                src="/assets/iso.svg"
-                                width={15}
-                                height={15}
-                                alt="Compliance"
-                              />{" "}
-                              {t}
-                            </Badge>
-                          ))}
+                      <Link
+                        className="!text-foreground"
+                        href={router.asPath + "/compliance/" + policy.id}
+                      >
+                        <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
+                          {policy.title}
+                          {policy.compliant === null ? (
+                            <ColoredBadge variant="high">
+                              <TriangleAlert className="h-4 w-4 mr-1" />
+                              Could not evaluate control
+                            </ColoredBadge>
+                          ) : (
+                            <ColoredBadge
+                              variant={violationLengthToLevel(
+                                policy.violations?.length ?? 0,
+                              )}
+                            >
+                              {policy.violations?.length ?? 0} Violations
+                            </ColoredBadge>
+                          )}
                         </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {policy.description}
-                      </p>
+                        <p className="text-sm text-muted-foreground">
+                          {policy.description}
+                        </p>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -233,10 +225,10 @@ const Index: FunctionComponent<Props> = ({
                   </Tooltip>
                 </div>
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings#compliance`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/compliance`}
                   className="absolute right-0 top-0 text-xs !text-muted-foreground"
                 >
-                  Modify Policies
+                  Overview
                 </Link>
               </CardTitle>
               <CardDescription>
