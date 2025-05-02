@@ -43,6 +43,7 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
 import {
+  emptyThenNull,
   getRepositoryId,
   removeUnderscores,
   vexOptionMessages,
@@ -185,7 +186,11 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">{vuln.ruleName}</h1>
+              <h1 className="text-2xl font-semibold">
+                {emptyThenNull(vuln.ruleName) ??
+                  emptyThenNull(vuln.ruleId) ??
+                  "Vuln Details"}
+              </h1>
               <div className="mt-4 text-muted-foreground">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
@@ -237,7 +242,11 @@ const Index: FunctionComponent<Props> = (props) => {
               )}
               <div className="mt-16">
                 <RiskAssessmentFeed
-                  vulnerabilityName={vuln.ruleName ?? ""}
+                  vulnerabilityName={
+                    emptyThenNull(vuln.ruleName) ??
+                    emptyThenNull(vuln.ruleId) ??
+                    ""
+                  }
                   events={vuln.events}
                 />
               </div>

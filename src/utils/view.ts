@@ -38,6 +38,13 @@ export const removeUnderscores = (input: string): string => {
   return input.replace(/_/g, " ");
 };
 
+export const emptyThenNull = (input: string | null): string | null => {
+  if (input === "") {
+    return null;
+  }
+  return input;
+};
+
 export const vexOptionMessages: Record<string, string> = {
   component_not_present: "The vulnerable component is not part of the product.",
   vulnerable_code_not_present:
