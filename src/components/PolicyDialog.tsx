@@ -8,8 +8,13 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 
+import Link from "next/link";
+import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { Policy } from "../types/api/api";
+import Callout from "./common/Callout";
+import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
+import FileUpload from "./FileUpload";
 import { Button } from "./ui/button";
 import {
   Form,
@@ -21,11 +26,6 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import FileUpload from "./FileUpload";
-import { useDropzone } from "react-dropzone";
-import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
-import Callout from "./common/Callout";
-import Link from "next/link";
 
 interface Props {
   isOpen: boolean;
@@ -33,7 +33,7 @@ interface Props {
   description: string;
   buttonTitle: string;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (policy: Policy) => void;
+  onSubmit?: (policy: Policy) => void;
   policy?: Policy; // if defined -  we need to update
 }
 
@@ -82,62 +82,72 @@ const PolicyDialog: FunctionComponent<Props> = ({
         <Form {...form}>
           <form
             className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={(e) => (onSubmit ? form.handleSubmit(onSubmit) : null)}
           >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Description" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="predicateType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Predicate Type</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://cyclonedx.org/bom" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                  <FormDescription>
-                    This value will be used to match attestations to policies.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
+            {onSubmit && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Description" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="predicateType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Predicate Type</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://cyclonedx.org/bom"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <FormDescription>
+                        This value will be used to match attestations to
+                        policies.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
             {content ? (
               <div>
                 <CopyCode codeString={content} />
-                <div className="flex flex-row justify-end">
-                  <Button
-                    className="mt-4"
-                    variant={"outline"}
-                    onClick={() => form.setValue("rego", "")}
-                  >
-                    Change content
-                  </Button>
-                </div>
+                {onSubmit && (
+                  <div className="flex flex-row justify-end">
+                    <Button
+                      className="mt-4"
+                      variant={"outline"}
+                      onClick={() => form.setValue("rego", "")}
+                    >
+                      Change content
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <FileUpload dropzone={dropzone} />
@@ -161,9 +171,11 @@ const PolicyDialog: FunctionComponent<Props> = ({
                 )}" <json file>`}
               />
             </Callout>
-            <DialogFooter>
-              <Button type="submit">{buttonTitle}</Button>
-            </DialogFooter>
+            {onSubmit && (
+              <DialogFooter>
+                <Button type="submit">{buttonTitle}</Button>
+              </DialogFooter>
+            )}
           </form>
         </Form>
       </DialogContent>

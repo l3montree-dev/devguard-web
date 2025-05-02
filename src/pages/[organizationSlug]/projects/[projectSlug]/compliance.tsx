@@ -10,28 +10,22 @@ import React, { FunctionComponent, useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 import ListItem from "../../../../components/common/ListItem";
+import PolicyDialog from "../../../../components/PolicyDialog";
+import { Badge } from "../../../../components/ui/badge";
+import { buttonVariants } from "../../../../components/ui/button";
+import { Switch } from "../../../../components/ui/switch";
+import { withContentTree } from "../../../../decorators/withContentTree";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
+import { useProjectMenu } from "../../../../hooks/useProjectMenu";
 import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../../../services/devGuardApi";
-import { Badge } from "../../../../components/ui/badge";
-import { withContentTree } from "../../../../decorators/withContentTree";
-import { Button, buttonVariants } from "../../../../components/ui/button";
-import PolicyDialog from "../../../../components/PolicyDialog";
-import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../components/ui/dropdown-menu";
-import { EllipsisVerticalIcon } from "lucide-react";
 
 interface Props {
-  policies: Policy[];
+  policies: Array<Policy & { enabled: boolean }>;
 }
 
 export const violationLengthToLevel = (length: number) => {
@@ -43,57 +37,45 @@ export const violationLengthToLevel = (length: number) => {
 
 export const PolicyListItem = ({
   policy,
-  onPolicyUpdate,
-  onPolicyDelete,
+  onEnablePolicy,
+  onDisablePolicy,
 }: {
-  policy: Policy;
-  onPolicyUpdate: (policy: Policy) => Promise<void>;
-  onPolicyDelete: (policy: Policy) => Promise<void>;
+  policy: Policy & { enabled: boolean };
+  onEnablePolicy: (policy: Policy) => Promise<void>;
+  onDisablePolicy: (policy: Policy) => Promise<void>;
 }) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const handlePolicyUpdate = async (newPolicy: Policy) => {
-    await onPolicyUpdate({ ...newPolicy, id: policy.id });
-    setIsOpen(false);
+  const handlePolicyToggle = async (enabled: boolean) => {
+    if (enabled) {
+      await onEnablePolicy(policy);
+    } else {
+      await onDisablePolicy(policy);
+    }
   };
+
   return (
     <React.Fragment key={policy.id}>
-      <ListItem
-        key={policy.id}
-        Button={
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={buttonVariants({
-                variant: "outline",
-                size: "icon",
-              })}
-            >
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setIsOpen(true);
-                }}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onPolicyDelete(policy)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        }
-        Title={policy.title}
-        Description={policy.description}
-      />
+      <div className="cursor-pointer" onClick={() => setIsOpen(true)}>
+        <ListItem
+          reactOnHover
+          key={policy.id}
+          Button={
+            <Switch
+              checked={policy.enabled}
+              onCheckedChange={handlePolicyToggle}
+            />
+          }
+          Title={policy.title}
+          Description={policy.description}
+        />
+      </div>
       <PolicyDialog
         isOpen={isOpen}
-        title="Edit Policy"
-        description="Edit the policy for your organization."
+        title={policy.title}
+        description={policy.description}
         buttonTitle="Update Policy"
         onOpenChange={setIsOpen}
-        onSubmit={handlePolicyUpdate}
         policy={policy}
       />
     </React.Fragment>
@@ -104,10 +86,11 @@ const ComplianceIndex: FunctionComponent<Props> = ({
   policies: propsPolicies,
 }) => {
   const router = useRouter();
-  const menu = useOrganizationMenu();
+  const menu = useProjectMenu();
   const activeOrg = useActiveOrg();
   const [open, setOpen] = useState(false);
-  const [policies, setPolicy] = useState<Array<Policy>>(propsPolicies);
+  const [policies, setPolicy] =
+    useState<Array<Policy & { enabled: boolean }>>(propsPolicies);
 
   const handleCreatePolicy = async (policy: Policy) => {
     const { organizationSlug } = router.query as {
@@ -133,51 +116,62 @@ const ComplianceIndex: FunctionComponent<Props> = ({
     setOpen(false);
   };
 
-  const handlePolicyUpdate = async (policy: Policy) => {
-    const { organizationSlug } = router.query as {
+  const handleEnablePolicy = async (policy: Policy) => {
+    const { organizationSlug, projectSlug } = router.query as {
       organizationSlug: string;
+      projectSlug: string;
     };
 
-    let url = "/organizations/" + organizationSlug + "/policies/" + policy.id;
+    let url =
+      "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/policies/" +
+      policy.id;
 
     const resp = await browserApiClient(url, {
       method: "PUT",
-      body: JSON.stringify(policy),
     });
 
     if (!resp.ok) {
-      toast.error("Failed to update policy");
+      toast.error("Failed to enable policy");
       return;
     }
 
     // update the policies
-    const newPolicy = await resp.json();
-
     setPolicy((prev) =>
-      prev.map((p) => (p.id === newPolicy.id ? newPolicy : p)),
+      prev.map((p) => (p.id === policy.id ? { ...p, enabled: true } : p)),
     );
-    toast.success("Policy updated successfully");
   };
 
-  const handlePolicyDelete = async (policy: Policy) => {
-    const { organizationSlug } = router.query as {
+  const handleDisablePolicy = async (policy: Policy) => {
+    const { organizationSlug, projectSlug } = router.query as {
       organizationSlug: string;
+      projectSlug: string;
     };
 
-    let url = "/organizations/" + organizationSlug + "/policies/" + policy.id;
+    let url =
+      "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/policies/" +
+      policy.id;
 
     const resp = await browserApiClient(url, {
       method: "DELETE",
     });
 
     if (!resp.ok) {
-      toast.error("Failed to delete policy");
+      toast.error("Failed to disable policy");
       return;
     }
 
     // update the policies
-    setPolicy((prev) => prev.filter((p) => p.id !== policy.id));
-    toast.success("Policy deleted successfully");
+    setPolicy((prev) =>
+      prev.map((p) => (p.id === policy.id ? { ...p, enabled: false } : p)),
+    );
   };
 
   return (
@@ -203,17 +197,24 @@ const ComplianceIndex: FunctionComponent<Props> = ({
         <div className="flex-1">
           <Section
             primaryHeadline
-            description="Modify your organization compliance policies here."
-            title="Compliance Controls"
+            description="Enable or disable policies created by your organization for this project."
+            title="Organization Compliance Controls"
             forceVertical
             Button={
-              <Button onClick={() => setOpen(true)}>Upload new Policy</Button>
+              <Link
+                className={buttonVariants({
+                  variant: "outline",
+                })}
+                href={`/${activeOrg.slug}/compliance/`}
+              >
+                Modify Policies
+              </Link>
             }
           >
             {policies.map((policy) => (
               <PolicyListItem
-                onPolicyDelete={handlePolicyDelete}
-                onPolicyUpdate={handlePolicyUpdate}
+                onDisablePolicy={handleDisablePolicy}
+                onEnablePolicy={handleEnablePolicy}
                 key={policy.id}
                 policy={policy}
               />
@@ -221,14 +222,6 @@ const ComplianceIndex: FunctionComponent<Props> = ({
           </Section>
         </div>
       </div>
-      <PolicyDialog
-        isOpen={open}
-        title="Create new Policy"
-        description="Create a new policy for your organization."
-        buttonTitle="Create Policy"
-        onOpenChange={setOpen}
-        onSubmit={handleCreatePolicy}
-      />
     </Page>
   );
 };
@@ -239,15 +232,29 @@ export const getServerSideProps = middleware(
   async (context) => {
     const apiClient = getApiClientFromContext(context);
     // fetch the compliance stats
-    const { organizationSlug } = context.query as {
+    const { organizationSlug, projectSlug } = context.query as {
       organizationSlug: string;
+      projectSlug: string;
     };
 
-    let url = "/organizations/" + organizationSlug + "/policies/";
-
+    const [allPolicies, enabledPolicies] = await Promise.all([
+      apiClient("/organizations/" + organizationSlug + "/policies/").then((r) =>
+        r.json(),
+      ),
+      apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/policies/",
+      ).then((r) => r.json()),
+    ]);
     return {
       props: {
-        policies: await apiClient(url).then((r) => r.json()),
+        policies: allPolicies.map((policy: Policy) => ({
+          ...policy,
+          enabled: enabledPolicies.some((p: Policy) => p.id === policy.id),
+        })),
       },
     };
   },
