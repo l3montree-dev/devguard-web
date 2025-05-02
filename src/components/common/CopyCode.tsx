@@ -120,7 +120,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
         />
         {highlightLineNumbers && (
           <div
-            className="absolute left-0 right-0 top-0 z-10 w-full bg-white/10 bg-blend-darken"
+            className="absolute pointer-events-none left-0 right-0 top-0 z-10 w-full bg-white/10 bg-blend-darken"
             style={{
               top: `${7 + (highlightLineNumbers[0] - 1) * 20}px`,
               height:
