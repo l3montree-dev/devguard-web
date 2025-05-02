@@ -22,11 +22,7 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
           <Tooltip key={policy.title}>
             <TooltipTrigger
               onClick={() =>
-                router.push(
-                  router.asPath +
-                    "/compliance/" +
-                    policy.filename.replace(".rego", ""),
-                )
+                router.push(router.asPath + "/compliance/" + policy.id)
               }
             >
               <div
