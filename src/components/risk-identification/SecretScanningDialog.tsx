@@ -112,12 +112,13 @@ on:
 
 jobs:
   # ----- BEGIN Secret Scanning Job -----
-    uses: l3montree-dev/devguard-action/.github/workflows/secret-scanning.yml@main
-    with:
-      asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
-      api-url: ${apiUrl}
-    secrets:
-      devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
+    secret-scanning:
+      uses: l3montree-dev/devguard-action/.github/workflows/secret-scanning.yml@main
+      with:
+        asset-name: "${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}"
+        api-url: ${apiUrl}
+      secrets:
+        devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"
 
   # ----- END Secret Scanning Job -----`}
               />

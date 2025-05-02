@@ -12,5 +12,5 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-export const HEADER_HEIGHT = 87.5;
+export const HEADER_HEIGHT = 109;
 export const SIDEBAR_WIDTH = 79;

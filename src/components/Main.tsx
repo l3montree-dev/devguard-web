@@ -21,6 +21,8 @@ import AppSidebar from "./AppSidebar";
 import UserNav from "./navigation/UserNav";
 import { SidebarProvider } from "./ui/sidebar";
 import { useStore } from "@/zustand/globalStoreProvider";
+import useDimensions from "@/hooks/useDimensions";
+import { HEADER_HEIGHT } from "@/const/viewConstants";
 
 interface Props {
   title: string;
@@ -45,7 +47,7 @@ const Main: FunctionComponent<Props> = ({
   const router = useRouter();
   const isSidebarOpen = useStore((s) => s.isSidebarOpen);
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
-
+  const dimensions = useDimensions();
   useEffect(() => {
     // check local storage
     const open = localStorage.getItem("sidebarOpen");
@@ -109,10 +111,10 @@ const Main: FunctionComponent<Props> = ({
         </header>
 
         <div
+          style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
           className={classNames(
-            fullscreen
-              ? ""
-              : "mx-auto  max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
+            !fullscreen &&
+              "mx-auto max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
           )}
         >
           {children}
@@ -148,5 +150,4 @@ const Main: FunctionComponent<Props> = ({
     </SidebarProvider>
   );
 };
-
 export default Main;
