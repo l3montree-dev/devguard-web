@@ -289,7 +289,7 @@ const Index: FunctionComponent<Props> = ({
                 This secret is used to authenticate the badge requests.
               </p>
             </div>
-            <div className="space-y-2 p-4 border rounded-xl bg-muted">
+            <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
               <p className="text-sm text-muted-foreground">
                 You can use the following URL to display this badge in your
                 README or other documentation:
