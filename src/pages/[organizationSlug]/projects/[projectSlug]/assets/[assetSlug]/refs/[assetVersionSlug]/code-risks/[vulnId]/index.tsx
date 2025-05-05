@@ -519,21 +519,9 @@ export const getServerSideProps = middleware(
       "/first-party-vulns/" +
       vulnId;
 
-    const [resp, events]: [DetailedDependencyVulnDTO, VulnEventDTO[]] =
-      await Promise.all([
-        apiClient(uri).then((r) => r.json()),
-        apiClient(uri + "/events").then((r) => r.json()),
-      ]);
-
-    //filter events with type detected
-    const ev = (events || []).filter((event) => {
-      return (
-        !filterEventTypesFromOtherBranches.includes(event.type) ||
-        event.vulnId === resp.id
-      );
-    });
-
-    resp.events = ev;
+    const [resp]: [DetailedDependencyVulnDTO] = await Promise.all([
+      apiClient(uri).then((r) => r.json()),
+    ]);
 
     return {
       props: {
