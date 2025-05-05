@@ -32,7 +32,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
-            src={"/assets/gitlab-var-settings.png"}
+            src={"/assets/gitlab-project-settings.png"}
           />
         </div>
       </div>
@@ -42,7 +42,6 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           <br />
           Press the button {"<"}Add variable{">"}
         </h3>
-        x
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
           <ImageZoom
             alt="Open the project settings in GitHub"

@@ -22,7 +22,6 @@ import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import {
   Card,

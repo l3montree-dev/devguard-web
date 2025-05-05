@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import React from "react";
-import Image from "next/image";
 import CopyCode from "../common/CopyCode";
 import { Card, CardContent } from "../ui/card";
 import { ImageZoom } from "../common/Zoom";
-import Zoom from "react-medium-image-zoom";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
