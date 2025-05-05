@@ -1,7 +1,14 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
-import { useEffect, useRef, useState, type FC } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+  type FC,
+} from "react";
 import { Root } from "@radix-ui/react-portal";
 import { Dialog } from "../ui/dialog";
 
@@ -15,18 +22,24 @@ function getImageSrc(src: ImageProps["src"]): string {
   return src.src;
 }
 
-const Zoomable = (props) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const animation =
-    "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-0";
+const Zoomable = (props: {
+  className: string;
+  src: string;
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
+  alt: string;
+}) => {
+  const [cls, setCls] = useState(
+    "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-0",
+  );
 
   useEffect(() => {
-    const animation =
-      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100";
-  }, [isOpen]);
+    setCls(
+      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100",
+    );
+  }, []);
   return (
     <Root>
-      <div className={`${animation}`} onClick={() => setIsOpen(false)}>
+      <div className={cls} onClick={() => props.onOpenChange(false)}>
         <Image
           fill
           quality={100}
@@ -45,15 +58,9 @@ export const ImageZoom: FC<ImageProps> = (props) => {
   const [isInsideAnchor, setIsInsideAnchor] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    setIsInsideAnchor(imgRef.current.closest("a") !== null);
-  }, []);
-
   const img = (
     <Image
       onClick={() => setIsOpen(true)}
-      width={300}
-      height={300}
       {...props}
       ref={imgRef}
       alt={props.alt}
@@ -70,9 +77,12 @@ export const ImageZoom: FC<ImageProps> = (props) => {
       {img}
       {isOpen && (
         <Zoomable
-          src={props.src}
-          className="fixed scale-0 z-[9999]
-           transition-all top-0 left-0 right-0 bottom-0 bg-black/20"
+          src={props.src as string}
+          className={
+            "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100"
+          }
+          onOpenChange={setIsOpen}
+          alt={props.alt}
         />
       )}
     </>
