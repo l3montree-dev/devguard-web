@@ -13,10 +13,9 @@
 // limitations under the License.
 
 import React from "react";
-import Image from "next/image";
 import CopyCode from "../common/CopyCode";
 import { Card, CardContent } from "../ui/card";
-import Zoom from "react-medium-image-zoom";
+import { ImageZoom } from "../common/Zoom";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -29,7 +28,13 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           It looks something like this:
           https://gitlab.com/l3montree/example-project/-/settings/ci_cd
         </small>
-        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
+        <div className="relative mt-2 aspect-video w-full max-w-4xl">
+          <ImageZoom
+            alt="Open the project settings in GitHub"
+            className="rounded-lg border object-fill"
+            src={"/assets/gitlab-var-settings.png"}
+          />
+        </div>
       </div>
       <div className="mb-10">
         <h3 className="mb-4 mt-2 font-semibold">
@@ -37,12 +42,26 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           <br />
           Press the button {"<"}Add variable{">"}
         </h3>
-
-        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
+        x
+        <div className="relative mt-2 aspect-video w-full max-w-4xl">
+          <ImageZoom
+            alt="Open the project settings in GitHub"
+            className="rounded-lg border object-fill"
+            src={"/assets/gitlab-secret.png"}
+            fill
+          />
+        </div>
       </div>
       <div className="mb-10">
         <h3 className="mb-4 mt-2 font-semibold">Create a new variable</h3>
-        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
+        <div className="relative mt-2 aspect-video w-full max-w-4xl">
+          <ImageZoom
+            alt="Open the project settings in GitHub"
+            className="rounded-lg border object-fill"
+            src={"/assets/gitlab-var-settings.png"}
+            fill
+          />
+        </div>
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="mb-4">

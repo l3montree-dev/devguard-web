@@ -61,6 +61,7 @@ export const ImageZoom: FC<ImageProps> = (props) => {
   const img = (
     <Image
       onClick={() => setIsOpen(true)}
+      fill
       {...props}
       ref={imgRef}
       alt={props.alt}
