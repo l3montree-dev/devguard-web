@@ -15,6 +15,8 @@ import React from "react";
 import Image from "next/image";
 import CopyCode from "../common/CopyCode";
 import { Card, CardContent } from "../ui/card";
+import { ImageZoom } from "../common/Zoom";
+import Zoom from "react-medium-image-zoom";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -27,12 +29,11 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
           For example, for the DevGuard project its following url:
           https://github.com/l3montree-dev/devguard/settings
         </small>
-        <div className="relative aspect-video w-full max-w-4xl">
-          <Image
+        <div>
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
-            src={"/assets/project-settings.png"}
-            fill
+            src={"/assets/testimage.jpg"}
           />
         </div>
       </div>
@@ -46,12 +47,11 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
           For example, for the DevGuard project its following url:
           https://github.com/l3montree-dev/devguard/settings/secrets/actions
         </small>
-        <div className="relative aspect-video w-full max-w-4xl">
-          <Image
+        <div className="">
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
-            src={"/assets/repo-secret.png"}
-            fill
+            src={"/assets/testimage.jpg"}
           />
         </div>
       </div>

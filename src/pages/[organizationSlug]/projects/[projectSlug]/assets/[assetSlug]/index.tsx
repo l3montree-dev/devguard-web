@@ -55,6 +55,7 @@ import {
   CardTitle,
 } from "../../../../../../components/ui/card";
 import { classNames } from "../../../../../../utils/common";
+
 interface Props extends AssetMetricsDTO {}
 
 const SecurityControlCenter: FunctionComponent<Props> = () => {

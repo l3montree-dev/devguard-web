@@ -16,6 +16,7 @@ import React from "react";
 import Image from "next/image";
 import CopyCode from "../common/CopyCode";
 import { Card, CardContent } from "../ui/card";
+import Zoom from "react-medium-image-zoom";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -28,14 +29,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           It looks something like this:
           https://gitlab.com/l3montree/example-project/-/settings/ci_cd
         </small>
-        <div className="relative mt-2 aspect-video w-full max-w-4xl">
-          <Image
-            alt="Open the project settings in GitHub"
-            className="rounded-lg border object-fill"
-            src={"/assets/gitlab-project-settings.png"}
-            fill
-          />
-        </div>
+        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
       </div>
       <div className="mb-10">
         <h3 className="mb-4 mt-2 font-semibold">
@@ -44,25 +38,11 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           Press the button {"<"}Add variable{">"}
         </h3>
 
-        <div className="relative mt-2 aspect-video w-full max-w-4xl">
-          <Image
-            alt="Open the project settings in GitHub"
-            className="rounded-lg border object-fill"
-            src={"/assets/gitlab-secret.png"}
-            fill
-          />
-        </div>
+        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
       </div>
       <div className="mb-10">
         <h3 className="mb-4 mt-2 font-semibold">Create a new variable</h3>
-        <div className="relative mt-2 aspect-video w-full max-w-4xl">
-          <Image
-            alt="Open the project settings in GitHub"
-            className="rounded-lg border object-fill"
-            src={"/assets/gitlab-var-settings.png"}
-            fill
-          />
-        </div>
+        <div className="relative mt-2 aspect-video w-full max-w-4xl"></div>
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="mb-4">
