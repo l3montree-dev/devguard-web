@@ -10,7 +10,7 @@ import {
   type FC,
 } from "react";
 import { Root } from "@radix-ui/react-portal";
-import { Dialog } from "../ui/dialog";
+import { XCircleIcon } from "@heroicons/react/20/solid";
 
 function getImageSrc(src: ImageProps["src"]): string {
   if (typeof src === "string") {
@@ -34,22 +34,27 @@ const Zoomable = (props: {
 
   useEffect(() => {
     setCls(
-      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100",
+      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100 m-10",
     );
   }, []);
   return (
-    <Root>
-      <div className={cls} onClick={() => props.onOpenChange(false)}>
-        <Image
-          fill
-          quality={100}
-          {...props}
-          className="object-contain"
-          alt={props.alt}
-          src={getImageSrc(props as any)}
-        />
-      </div>
-    </Root>
+    <>
+      <Root asChild>
+        <div className={cls} onClick={() => props.onOpenChange(false)}>
+          <Image
+            fill
+            quality={100}
+            {...props}
+            className="object-contain relative"
+            alt={props.alt}
+            src={getImageSrc(props as any)}
+          />
+          <div className="absolute top-0 right-0 ">
+            <XCircleIcon className="z-[9999] top-0 right-0"></XCircleIcon>
+          </div>
+        </div>
+      </Root>
+    </>
   );
 };
 
@@ -75,7 +80,7 @@ export const ImageZoom: FC<ImageProps> = (props) => {
 
   return (
     <>
-      {img}
+      <div className={"cursor-zoom-in"}>{img}</div>
       {isOpen && (
         <Zoomable
           src={props.src as string}
