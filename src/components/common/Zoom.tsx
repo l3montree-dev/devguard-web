@@ -15,31 +15,31 @@ function getImageSrc(src: ImageProps["src"]): string {
   return src.src;
 }
 
+const Zoomable = (props) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const animation =
+    "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-0";
 
-const Zoomable = ()) => {
   useEffect(() => {
-    
-  }, [])
+    const animation =
+      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100";
+  }, [isOpen]);
   return (
-     <Root>
-          <div
-            className="fixed scale-100 z-[9999]
-           transition-all top-0 left-0 right-0 bottom-0 bg-black/20"
-            onClick={() => setIsOpen(false)}
-          >
-            <Image
-              fill
-              quality={100}
-              {...props}
-              className="object-contain"
-              alt={props.alt}
-              src={getImageSrc(props as any)}
+    <Root>
+      <div className={`${animation}`} onClick={() => setIsOpen(false)}>
+        <Image
+          fill
+          quality={100}
+          {...props}
+          className="object-contain"
+          alt={props.alt}
+          src={getImageSrc(props as any)}
+        />
+      </div>
+    </Root>
+  );
+};
 
-            />
-          </div>
-        </Root>
-  )
-}
 export const ImageZoom: FC<ImageProps> = (props) => {
   const imgRef = useRef<HTMLImageElement>(null!);
   const [isInsideAnchor, setIsInsideAnchor] = useState(false);
@@ -69,7 +69,11 @@ export const ImageZoom: FC<ImageProps> = (props) => {
     <>
       {img}
       {isOpen && (
-       
+        <Zoomable
+          src={props.src}
+          className="fixed scale-0 z-[9999]
+           transition-all top-0 left-0 right-0 bottom-0 bg-black/20"
+        />
       )}
     </>
   );
