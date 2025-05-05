@@ -82,7 +82,7 @@ const PolicyDialog: FunctionComponent<Props> = ({
         <Form {...form}>
           <form
             className="flex flex-col gap-4"
-            onSubmit={(e) => (onSubmit ? form.handleSubmit(onSubmit) : null)}
+            onSubmit={(e) => (onSubmit ? form.handleSubmit(onSubmit)(e) : null)}
           >
             {onSubmit && (
               <>
