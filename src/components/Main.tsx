@@ -74,7 +74,7 @@ const Main: FunctionComponent<Props> = ({
         >
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
-              <Link href={`/${activeOrg.slug}`}>
+              <Link href={`/${activeOrg?.slug}`}>
                 <Image
                   src="/logo_inverse_icon.svg"
                   alt="DevGuard Logo"
