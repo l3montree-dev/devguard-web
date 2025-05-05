@@ -17,12 +17,11 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
-  BuildingOffice2Icon,
   BuildingOfficeIcon,
   ChevronUpDownIcon,
   CogIcon,
-  LifebuoyIcon,
 } from "@heroicons/react/24/outline";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,18 +56,15 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { Badge } from "./ui/badge";
 
-const AppSidebar = () => {
+export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
 
   const router = useRouter();
   const activeOrg = useOrg() ?? orgs[0];
   const updateOrganization = useStore((s) => s.updateOrganization);
-  const currentUser = useCurrentUser();
-  const contentTree = useStore((s) => s.contentTree);
 
-  const sidebar = useSidebar();
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.id === id);
@@ -82,65 +78,72 @@ const AppSidebar = () => {
     router.push(`/setup-organization`);
   };
 
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
+        <div className="flex w-full flex-row items-center justify-between gap-1">
+          <div className="flex flex-row items-center gap-1 text-ellipsis">
+            <div className="flex flex-col gap-0 ">
+              <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
+                {activeOrg?.name}{" "}
+                <Badge className="!text-white" variant={"outline"}>
+                  Organization
+                </Badge>
+              </span>
+            </div>
+          </div>
+          <ChevronUpDownIcon className="block h-7 w-7 p-1" />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">
+            Organizations
+          </DropdownMenuLabel>
+          {orgs.length !== 0 && (
+            <>
+              {orgs.map((o) => (
+                <DropdownMenuItem
+                  key={o.id}
+                  onClick={handleActiveOrgChange(o.id)}
+                >
+                  <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
+                    <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  {o.name}
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+          <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
+            <PlusIcon className="h-4 w-4 text-muted-foreground" />
+          </div>
+          Create Organization
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const AppSidebar = () => {
+  const orgs = useStore((s) => s.organizations);
+
+  const router = useRouter();
+  const activeOrg = useOrg() ?? orgs[0];
+  const currentUser = useCurrentUser();
+  const contentTree = useStore((s) => s.contentTree);
+
+  const sidebar = useSidebar();
+
   const items = useOrganizationMenu();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size={"lg"}
-              className="rounded-lg text-white data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex w-full flex-row items-center justify-between gap-1">
-                <div className="flex flex-row items-center gap-1 text-ellipsis">
-                  <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
-                    <BuildingOffice2Icon className="h-6 w-6" />
-                  </div>
-                  <div className="flex flex-col gap-0 ">
-                    <span className="line-clamp-1 inline-block max-w-[155px] truncate text-ellipsis text-left text-sm font-semibold">
-                      {activeOrg?.name}
-                    </span>
-                    <span className="truncate text-left text-xs">
-                      Organization
-                    </span>
-                  </div>
-                </div>
-                <ChevronUpDownIcon className="block h-7 w-7 p-1" />
-              </div>
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Organizations
-              </DropdownMenuLabel>
-              {orgs.length !== 0 && (
-                <>
-                  {orgs.map((o) => (
-                    <DropdownMenuItem
-                      key={o.id}
-                      onClick={handleActiveOrgChange(o.id)}
-                    >
-                      <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
-                        <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      {o.name}
-                    </DropdownMenuItem>
-                  ))}
-                </>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-              <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
-                <PlusIcon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              Create Organization
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <OrganizationDropDown />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

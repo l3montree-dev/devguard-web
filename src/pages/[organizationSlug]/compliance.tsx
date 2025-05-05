@@ -187,24 +187,7 @@ const ComplianceIndex: FunctionComponent<Props> = ({
   };
 
   return (
-    <Page
-      Menu={menu}
-      Title={
-        <Link
-          href={`/${activeOrg.slug}`}
-          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-        >
-          {activeOrg.name}{" "}
-          <Badge
-            className="font-body font-normal !text-white"
-            variant="outline"
-          >
-            Organization
-          </Badge>
-        </Link>
-      }
-      title="Compliance Controls"
-    >
+    <Page Menu={menu} Title={null} title="">
       <div className="flex flex-row">
         <div className="flex-1">
           <Section

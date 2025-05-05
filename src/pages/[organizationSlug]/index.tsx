@@ -110,24 +110,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
   const orgMenu = useOrganizationMenu();
 
   return (
-    <Page
-      Title={
-        <Link
-          href={`/${activeOrg.slug}`}
-          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-        >
-          {activeOrg.name}{" "}
-          <Badge
-            className="font-body font-normal !text-white"
-            variant="outline"
-          >
-            Organization
-          </Badge>
-        </Link>
-      }
-      title={activeOrg.name ?? "Loading..."}
-      Menu={orgMenu}
-    >
+    <Page Title={null} title={""} Menu={orgMenu}>
       <Dialog open={open}>
         <DialogContent setOpen={setOpen}>
           <DialogHeader>

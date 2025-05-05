@@ -17,12 +17,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FunctionComponent, useEffect, useState } from "react";
-import AppSidebar from "./AppSidebar";
+import AppSidebar, { OrganizationDropDown } from "./AppSidebar";
 import UserNav from "./navigation/UserNav";
 import { SidebarProvider } from "./ui/sidebar";
 import { useStore } from "@/zustand/globalStoreProvider";
 import useDimensions from "@/hooks/useDimensions";
 import { HEADER_HEIGHT } from "@/const/viewConstants";
+import { useActiveOrg } from "../hooks/useActiveOrg";
 
 interface Props {
   title: string;
@@ -48,6 +49,7 @@ const Main: FunctionComponent<Props> = ({
   const isSidebarOpen = useStore((s) => s.isSidebarOpen);
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const dimensions = useDimensions();
+  const activeOrg = useActiveOrg();
   useEffect(() => {
     // check local storage
     const open = localStorage.getItem("sidebarOpen");
@@ -62,7 +64,7 @@ const Main: FunctionComponent<Props> = ({
       }}
       open={isSidebarOpen}
     >
-      <AppSidebar />
+      {/*<AppSidebar /> */}
       <main className="flex-1 font-body">
         <header
           className={classNames(
@@ -70,15 +72,19 @@ const Main: FunctionComponent<Props> = ({
             Boolean(Menu) ? "pb-3" : "pb-5",
           )}
         >
-          <div className="absolute -left-1 bottom-0 top-0 z-10 w-2 bg-blue-950 dark:bg-[#02040a]" />
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
-              <Image
-                src="/logo_inverse_icon.svg"
-                alt="DevGuard Logo"
-                width={30}
-                height={30}
-              />
+              <Link href={`/${activeOrg.slug}`}>
+                <Image
+                  src="/logo_inverse_icon.svg"
+                  alt="DevGuard Logo"
+                  width={30}
+                  height={30}
+                />
+              </Link>
+              <div>
+                <OrganizationDropDown />
+              </div>
               <div className="flex w-full flex-row items-center justify-between">
                 <h1 className="font-display text-lg font-semibold leading-7 text-white">
                   {Title ?? title}
