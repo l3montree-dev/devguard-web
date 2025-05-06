@@ -42,53 +42,58 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
   return (
     <div className="relative grid w-full items-center gap-1.5 ">
       <Label>{labelText ?? ""}</Label>
-      <Input
-        className="flex"
-        type={inputType}
-        name={attributes.name}
-        value={value}
-        disabled={attributes.disabled || disabled}
-        onClick={onClick}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
-      />
+      <div className="relative ">
+        <Input
+          className="flex"
+          type={inputType}
+          name={attributes.name}
+          value={value}
+          disabled={attributes.disabled || disabled}
+          onClick={onClick}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
 
-      {attributes.type && attributes.type === "password" && (
-        <div className="absolute bottom-0 right-0 scale-75 ">
-          {inputType === "password" ? (
-            <Button
-              variant="secondary"
-              onClick={() => setInputType("text")}
-              size={"icon"}
-              type="button"
-            >
-              <LucideEyeOff />
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="secondary"
-              size={"icon"}
-              onClick={() => setInputType("password")}
-            >
-              <LucideEye />
-            </Button>
-          )}
-
-          <>
-            {node.messages.map(({ text, id }, k) => (
-              <span
-                key={`${id}-${k}`}
-                className="mt-2 block text-sm text-red-500"
-                data-testid={`ui/message/${id}`}
-              >
-                {text}
-              </span>
-            ))}
-          </>
-        </div>
-      )}
+        {attributes.type && attributes.type === "password" && (
+          <div>
+            <div>
+              <div className="absolute right-0 bottom-0  mt-2 scale-75 ">
+                {inputType === "password" ? (
+                  <Button
+                    variant="secondary"
+                    onClick={() => setInputType("text")}
+                    size={"icon"}
+                    type="button"
+                  >
+                    <LucideEyeOff />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size={"icon"}
+                    onClick={() => setInputType("password")}
+                  >
+                    <LucideEye />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div>
+        {node.messages.map(({ text, id }, k) => (
+          <span
+            key={`${id}-${k}`}
+            className="mt-2 block text-sm text-red-500"
+            data-testid={`ui/message/${id}`}
+          >
+            {text}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
