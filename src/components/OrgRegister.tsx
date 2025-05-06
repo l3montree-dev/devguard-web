@@ -43,6 +43,8 @@ import { OrgForm } from "./OrgForm";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useStore } from "@/zustand/globalStoreProvider";
 
+import { toast } from "sonner";
+
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
@@ -52,22 +54,30 @@ export default function OrgRegisterForm(props: Props) {
 
   const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
-    const resp: OrganizationDTO = await (
-      await browserApiClient("/organizations/", {
-        method: "POST",
-        body: JSON.stringify({
-          ...data,
-          numberOfEmployees: !!data.numberOfEmployees
-            ? Number(data.numberOfEmployees)
-            : undefined,
-        }),
-      })
-    ).json();
+    const resp = await browserApiClient("/organizations/", {
+      method: "POST",
+      body: JSON.stringify({
+        ...data,
+        numberOfEmployees: !!data.numberOfEmployees
+          ? Number(data.numberOfEmployees)
+          : undefined,
+      }),
+    });
 
-    updateOrganization(resp as OrganizationDetailsDTO);
+    if (resp.status !== 200) {
+      const error = await resp.json();
+      toast.error("Error creating organization", {
+        description: error,
+      });
+      return;
+    }
+
+    const orgDTO: OrganizationDetailsDTO = await resp.json();
+
+    updateOrganization(orgDTO);
 
     // move the user to the newly created organization
-    router.push(`/${resp.slug}`);
+    router.push(`/${orgDTO.slug}`);
   };
 
   return (
