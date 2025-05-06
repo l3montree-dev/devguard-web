@@ -36,6 +36,24 @@ import {
   useState,
 } from "react";
 import { handleFlowError, ory } from "../services/ory";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -167,85 +185,60 @@ const Registration: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Create your DevGuard account</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
-      </Head>
-      <div className="flex min-h-screen flex-1  flex-row bg-white ">
-        <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
-          <Image
-            src="/bg.png"
-            alt="DevGuard by l3montree Logo"
-            objectFit="cover"
-            fill
-          />
+      <div className="flex min-h-screen flex-1  flex-row bg-secondary ">
+        <div className="relative w-1/2 bg-slate-200 dark:bg-yellow-400">
+          <div></div>
         </div>
-        <div className="flex w-2/5 flex-col items-center justify-center bg-background">
-          <div className="w-full px-8">
-            <div>
-              <Image
-                className="hidden h-20 w-auto dark:block"
-                src="/logo_inverse_horizontal.svg"
-                alt="DevGuard by l3montree Logo"
-                width={300}
-                height={300}
-              />
-              <Image
-                className="h-20 w-auto dark:hidden"
-                src="/logo_horizontal.svg"
-                alt="DevGuard by l3montree Logo"
-                width={300}
-                height={300}
-              />
-              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight ">
-                Create your DevGuard account
-              </h2>
-            </div>
 
-            <div className="mb-4 mt-10 border-b-2 pb-4 sm:mx-auto">
-              {hasSignupWithPasskey && (
-                <div className={"mb-4"}>
-                  <div className="mb-4 border-b-2 pb-4">
-                    <Flow
-                      only="passkey"
-                      onSubmit={onSubmit}
-                      flow={flow as LoginFlow}
-                    />
+        <div className="flex-1 flex-row justify-center items-center bg-secondary">
+          <Card className="m-10 rounded-3xl outlo">
+            <CardHeader>
+              <div>
+                <Image
+                  className="hidden h-20 w-auto dark:block"
+                  src="/logo_inverse_horizontal.svg"
+                  alt="DevGuard by l3montree Logo"
+                  width={300}
+                  height={300}
+                />
+                <Image
+                  className="h-20 w-auto dark:hidden"
+                  src="/logo_horizontal.svg"
+                  alt="DevGuard by l3montree Logo"
+                  width={300}
+                  height={300}
+                />
+              </div>
+
+              <CardTitle className="text-4xl">Login</CardTitle>
+              <CardDescription>Welcome back!</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="">
+                <form>
+                  <div className="w-1/2">
+                    <div className="grid w-full items-center gap-4">
+                      <div className="flex  space-y-1.5">
+                        <Input id="name" placeholder="Your@E-Mail.com" />
+                      </div>
+                      <div className="flex flex-col space-y-1.5">
+                        <Label htmlFor="framework">
+                          Forgot your E-Mail Adresse?
+                        </Label>
+                      </div>
+                    </div>
                   </div>
-                  <Flow
-                    hideGlobalMessages
-                    only="password"
-                    onSubmit={onSubmit}
-                    flow={flow as LoginFlow}
-                  />
-                </div>
-              )}
-              <Flow
-                hideGlobalMessages
-                only="profile"
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
-            </div>
-            <div>
-              <Flow
-                only="oidc"
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
-            </div>
-            <p className="mt-10 text-left text-sm">
-              Already have an Account?{" "}
-              <Link
-                data-testid="cta-link"
-                href="/login"
-                className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
+                </form>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between justify-end ">
+              <Button className="" variant="ghost">
+                Create Account
+              </Button>
+              <div className="m-2"></div>
+              <Button variant="default">Continue</Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </>
