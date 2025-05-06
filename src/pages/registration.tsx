@@ -213,11 +213,11 @@ const Registration: NextPage = () => {
                 <CardDescription>Welcome back!</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="">
+                <div className="flex flex-col">
                   <form>
-                    <div className="w-1/2">
-                      <div className="grid w-full items-center gap-4">
-                        <div className="flex  space-y-1.5">
+                    <div className=" justify-end">
+                      <div className="grid w-full items-center gap-4 ">
+                        <div className="flex space-y-1.5">
                           <Input id="name" placeholder="Your@E-Mail.com" />
                         </div>
                         <div className="flex flex-col space-y-1.5">
