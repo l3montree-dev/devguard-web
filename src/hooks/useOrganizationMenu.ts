@@ -21,6 +21,7 @@ import {
 import { useRouter } from "next/router";
 
 import { useCurrentUser } from "./useCurrentUser";
+import { ScaleIcon } from "lucide-react";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
@@ -36,6 +37,11 @@ export const useOrganizationMenu = () => {
 
   if (loggedIn) {
     return menu.concat([
+      {
+        title: "Compliance",
+        href: "/" + orgSlug + "/compliance",
+        Icon: ScaleIcon,
+      },
       {
         title: "Settings",
         href: "/" + orgSlug + "/settings",

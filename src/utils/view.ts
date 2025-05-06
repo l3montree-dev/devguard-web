@@ -34,6 +34,36 @@ export const eventMessages = (event: VulnEventDTO) => {
   return event.justification;
 };
 
+export const removeUnderscores = (input: string): string => {
+  return input.replace(/_/g, " ");
+};
+
+export const emptyThenNull = (input: string | null): string | null => {
+  if (input === "") {
+    return null;
+  }
+  return input;
+};
+
+export const vexOptionMessages: Record<string, string> = {
+  component_not_present: "The vulnerable component is not part of the product.",
+  vulnerable_code_not_present:
+    "The component exists, but the vulnerable code was excluded.",
+  vulnerable_code_not_in_execute_path:
+    "The vulnerable code exists but is never executed.",
+  vulnerable_code_cannot_be_controlled_by_adversary:
+    "The attacker cannot control the vulnerable code.",
+  inline_mitigations_already_exis:
+    "Built-in defenses prevent known exploitation paths.",
+};
+
+export const violationLengthToLevel = (length: number) => {
+  if (length === 0) return "low";
+  if (length <= 2) return "medium";
+  if (length <= 4) return "high";
+  return "critical";
+};
+
 export const eventTypeMessages = (
   event: VulnEventDTO,
   flawName: string,

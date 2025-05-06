@@ -145,7 +145,7 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={addVersionAndscannerQueryParams(
-                    pathname + `/../sbom.json`,
+                    pathname + `/../../sbom.json`,
                   )}
                   className="!text-foreground hover:no-underline"
                 >
@@ -156,7 +156,7 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={addVersionAndscannerQueryParams(
-                    pathname + `/../sbom.xml`,
+                    pathname + `/../../sbom.xml`,
                   )}
                   className="!text-foreground hover:no-underline"
                 >
@@ -174,7 +174,7 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={addVersionAndscannerQueryParams(
-                    pathname + `/../vex.json`,
+                    pathname + `/../../vex.json`,
                   )}
                   className="!text-foreground hover:no-underline"
                 >
@@ -185,7 +185,7 @@ const DependencyGraphPage: FunctionComponent<{
                   target="_blank"
                   prefetch={false}
                   href={addVersionAndscannerQueryParams(
-                    pathname + `/../vex.xml`,
+                    pathname + `/../../vex.xml`,
                   )}
                   className="!text-foreground hover:no-underline"
                 >

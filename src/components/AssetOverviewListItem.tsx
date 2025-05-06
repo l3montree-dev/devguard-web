@@ -29,7 +29,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const failingControls = useMemo(
-    () => asset.stats.compliance.filter((policy) => !policy.result),
+    () => asset.stats.compliance.filter((policy) => !policy.compliant),
     [asset.stats.compliance],
   );
 

@@ -168,12 +168,6 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
           <Label>Project ID</Label>
           <CopyInput value={project?.id ?? ""} />
         </Section>
-        <ConnectToRepoSection
-          repositories={repositories}
-          onUpdate={handleUpdate}
-          repositoryId={project?.repositoryId}
-          repositoryName={project?.repositoryName}
-        />
         <hr />
         <Section
           title="Member"

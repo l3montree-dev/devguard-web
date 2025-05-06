@@ -110,24 +110,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
   const orgMenu = useOrganizationMenu();
 
   return (
-    <Page
-      Title={
-        <Link
-          href={`/${activeOrg.slug}`}
-          className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-        >
-          {activeOrg.name}{" "}
-          <Badge
-            className="font-body font-normal !text-white"
-            variant="outline"
-          >
-            Organization
-          </Badge>
-        </Link>
-      }
-      title={activeOrg.name ?? "Loading..."}
-      Menu={orgMenu}
-    >
+    <Page Title={null} title={""} Menu={orgMenu}>
       <Dialog open={open}>
         <DialogContent setOpen={setOpen}>
           <DialogHeader>
@@ -269,7 +252,7 @@ export const getServerSideProps = middleware(
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
         const compliantAssets = stats.filter((asset) =>
-          asset.every((r) => r.result),
+          asset.every((r) => r.compliant),
         );
 
         return {
@@ -280,7 +263,7 @@ export const getServerSideProps = middleware(
             passingControlsPercentage:
               stats.flat(1).length === 0
                 ? 1 // if no assets, we assume 100% compliance
-                : stats.flat(1).filter((r) => r.result).length /
+                : stats.flat(1).filter((r) => r.compliant).length /
                   (stats.flat(1).length || 1),
           },
         };

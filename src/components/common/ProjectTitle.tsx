@@ -9,7 +9,7 @@ import Image from "next/image";
 export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
   if (type === "kubernetesNamespace") {
     return (
-      <Badge className="font-body font-normal !text-white" variant="outline">
+      <Badge className=" !text-white" variant="outline">
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -22,7 +22,7 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else if (type === "kubernetesCluster") {
     return (
-      <Badge className="font-body font-normal !text-white" variant="outline">
+      <Badge className=" !text-white" variant="outline">
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -35,7 +35,7 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else {
     return (
-      <Badge className="font-body font-normal !text-white" variant="outline">
+      <Badge className="!text-white" variant="outline">
         {type === "default" ? "Project" : "Subproject"}
       </Badge>
     );
@@ -81,16 +81,6 @@ const ProjectTitle = () => {
 
   return (
     <span className="flex flex-row gap-2">
-      <Link
-        href={`/${activeOrg.slug}`}
-        className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-      >
-        {activeOrg.name}{" "}
-        <Badge className="font-body font-normal !text-white" variant="outline">
-          Organization
-        </Badge>
-      </Link>
-      <span className="opacity-75">/</span>
       <ProjectElement project={project} activeOrg={activeOrg} />
     </span>
   );
