@@ -66,8 +66,6 @@ const Index: FunctionComponent<Props> = ({
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
 
-  console.log("webhook secret", secrets.webhookSecret);
-
   const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
   const [webhookSecret, setWebhookSecret] = useState<string | null>(
     secrets.webhookSecret,
