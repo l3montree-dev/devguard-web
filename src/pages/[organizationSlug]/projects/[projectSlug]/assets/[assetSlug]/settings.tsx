@@ -54,6 +54,8 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
+type SecretType = "badge" | "webhook";
+
 const Index: FunctionComponent<Props> = ({
   repositories,
   secrets,
@@ -90,59 +92,43 @@ const Index: FunctionComponent<Props> = ({
     },
   });
 
-  const handleGenerateNewBadgeSecret = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          badgeSecretUpdate: true,
-        }),
-      },
-    );
-    if (resp.ok) {
-      const r = await resp.json();
-      setBadgeSecret(r.badgeSecret);
-      setBadgeURL(config.devGuardApiUrl + "/api/v1/badges/" + r.badgeSecret);
-      asset.badgeSecret = r.badgeSecret;
-
-      updateAsset(asset);
-      toast("New badge secret generated", {
-        description: "The badge secret has been generated",
-      });
+  const handleGenerateNewSecret = async (type: SecretType) => {
+    let bodyKey: string;
+    if (type === "badge") {
+      bodyKey = "badgeSecretUpdate";
     } else {
-      toast.error("Could not generate new secret");
+      bodyKey = "webhookSecretUpdate";
     }
-  };
 
-  const handleGenerateNewWebhookSecret = async () => {
     const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug,
+      `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
       {
         method: "PATCH",
         body: JSON.stringify({
-          webhookSecretUpdate: true,
+          [bodyKey]: true,
         }),
       },
     );
+
     if (resp.ok) {
       const r = await resp.json();
-      setWebhookSecret(r.webhookSecret);
-      asset.webhookSecret = r.webhookSecret;
+
+      if (type === "badge") {
+        setBadgeSecret(r.badgeSecret);
+        setBadgeURL(`${config.devGuardApiUrl}/api/v1/badges/${r.badgeSecret}`);
+        asset.badgeSecret = r.badgeSecret;
+        toast("New badge secret generated", {
+          description: "The badge secret has been generated",
+        });
+      } else if (type === "webhook") {
+        setWebhookSecret(r.webhookSecret);
+        asset.webhookSecret = r.webhookSecret;
+        toast("New webhook secret generated", {
+          description: "The webhook secret has been generated",
+        });
+      }
+
       updateAsset(asset);
-      toast("New webhook secret generated", {
-        description: "The webhook secret has been generated",
-      });
     } else {
       toast.error("Could not generate new secret");
     }
@@ -265,7 +251,7 @@ const Index: FunctionComponent<Props> = ({
 
                 <Button
                   variant="secondary"
-                  onClick={handleGenerateNewBadgeSecret}
+                  onClick={() => handleGenerateNewSecret("badge")}
                 >
                   <div className="h-4 w-4">
                     <svg
@@ -321,7 +307,7 @@ const Index: FunctionComponent<Props> = ({
 
               <Button
                 variant="secondary"
-                onClick={handleGenerateNewWebhookSecret}
+                onClick={() => handleGenerateNewSecret("webhook")}
               >
                 <div className="h-4 w-4">
                   <svg
