@@ -80,8 +80,8 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
       },
       {} as { [key: string]: boolean },
     );
-    return activeOrg.members.filter((m) => !projectMemberIds[m.id]);
-  }, [activeProject.members, activeOrg.members]);
+    return activeOrg?.members.filter((m) => !projectMemberIds[m.id]);
+  }, [activeProject?.members, activeOrg?.members]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -103,7 +103,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
             {selectedMembers.length} currently selected)
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-full">
-            {membersToInvite.map((m) => (
+            {membersToInvite?.map((m) => (
               <DropdownMenuCheckboxItem
                 onClick={() =>
                   setSelectedMembers((prev) => {

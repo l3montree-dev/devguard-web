@@ -199,7 +199,7 @@ const ComplianceIndex: FunctionComponent<Props> = ({
                 className={buttonVariants({
                   variant: "outline",
                 })}
-                href={`/${activeOrg.slug}/compliance/`}
+                href={`/${activeOrg?.slug}/compliance/`}
               >
                 Modify Policies
               </Link>

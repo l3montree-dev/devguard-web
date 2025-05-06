@@ -81,7 +81,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
             name="isPublic"
             render={({ field }) => (
               <FormItem>
-                <div className={classNames(!org.isPublic && "opacity-50")}>
+                <div className={classNames(!org?.isPublic && "opacity-50")}>
                   <ListItem
                     Description={
                       "Setting this to true will make the project visible to the public. It allows creating public and private assets."
@@ -90,7 +90,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                     Button={
                       <FormControl>
                         <Switch
-                          disabled={!org.isPublic}
+                          disabled={!org?.isPublic}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -102,7 +102,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               </FormItem>
             )}
           />
-          {!org.isPublic && (
+          {!org?.isPublic && (
             <small>
               The organization is not public. You can not make the project
               public.

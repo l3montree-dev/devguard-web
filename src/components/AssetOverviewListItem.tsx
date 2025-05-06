@@ -36,7 +36,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
   return (
     <Link
       key={asset.id}
-      href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
+      href={`/${activeOrg?.slug}/projects/${project.slug}/assets/${asset.slug}/`}
     >
       <ListItem
         reactOnHover
@@ -76,7 +76,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
             <DropdownMenuContent>
               <Link
                 className="!text-foreground hover:no-underline"
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
+                href={`/${activeOrg?.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
               >
                 <DropdownMenuItem>Edit</DropdownMenuItem>
               </Link>

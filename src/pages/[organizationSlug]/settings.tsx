@@ -163,7 +163,7 @@ const Home: FunctionComponent = () => {
           }
           title="Third-Party Integrations"
         >
-          {activeOrg.githubAppInstallations?.map((installation) => (
+          {activeOrg?.githubAppInstallations?.map((installation) => (
             <ListItem
               key={installation.installationId}
               Title={
@@ -193,7 +193,7 @@ const Home: FunctionComponent = () => {
               }
             />
           ))}
-          {activeOrg.gitLabIntegrations.map((integration) => (
+          {activeOrg?.gitLabIntegrations?.map((integration) => (
             <ListItem
               key={integration.id}
               Title={
@@ -249,7 +249,7 @@ const Home: FunctionComponent = () => {
                     href={
                       "https://github.com/apps/devguard-bot/installations/new?state=" +
                       encodeObjectBase64({
-                        orgSlug: activeOrg.slug,
+                        orgSlug: activeOrg?.slug,
                         redirectTo: router.asPath,
                       })
                     }
@@ -295,7 +295,7 @@ const Home: FunctionComponent = () => {
         <MembersTable
           onChangeMemberRole={handleChangeMemberRole}
           onRemoveMember={handleRemoveMember}
-          members={activeOrg.members}
+          members={activeOrg?.members}
         />
         <MemberDialog
           isOpen={memberDialogOpen}

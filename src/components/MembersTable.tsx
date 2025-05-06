@@ -54,7 +54,7 @@ const MembersTable: FunctionComponent<Props> = ({
         </thead>
         <tbody>
           {members
-            .filter(
+            ?.filter(
               (m) => !(m.id.startsWith("gitlab") || m.id.startsWith("github")),
             )
             .map((m, i, arr) => {

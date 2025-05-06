@@ -327,7 +327,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 assets. It watches for new deployments and namespaces."
             >
               <CopyCode
-                codeString={`go run main.go --projectName=${activeOrg.slug + "/projects/" + project.slug} --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} --apiUrl=${config.devguardApiUrlPublicInternet}`}
+                codeString={`go run main.go --projectName=${activeOrg?.slug + "/projects/" + project.slug} --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} --apiUrl=${config.devguardApiUrlPublicInternet}`}
                 language="shell"
               />
             </Section>

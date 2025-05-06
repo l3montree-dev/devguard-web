@@ -153,7 +153,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
               {projects.map((project) => (
                 <Link
                   key={project.id}
-                  href={`/${activeOrg.slug}/projects/${project.slug}`}
+                  href={`/${activeOrg?.slug}/projects/${project.slug}`}
                   className="flex flex-col gap-2 hover:no-underline"
                 >
                   <ListItem
@@ -212,7 +212,7 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                         <DropdownMenuContent>
                           <Link
                             className="!text-foreground hover:no-underline"
-                            href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                            href={`/${activeOrg?.slug}/projects/${project.slug}/settings`}
                           >
                             <DropdownMenuItem>Edit</DropdownMenuItem>
                           </Link>

@@ -67,7 +67,7 @@ export const ProjectElement = ({
   return (
     <Link
       className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-      href={`/${activeOrg.slug}/projects/${project.slug}/`}
+      href={`/${activeOrg?.slug}/projects/${project.slug}/`}
     >
       {project.name}
       <ProjectBadge type={project.type} />
