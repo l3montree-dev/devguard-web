@@ -185,60 +185,60 @@ const Registration: NextPage = () => {
 
   return (
     <>
-      <div className="flex min-h-screen flex-1  flex-row bg-secondary ">
-        <div className="relative w-1/2 bg-slate-200 dark:bg-yellow-400">
-          <div></div>
-        </div>
+      <div>
+        <div className="flex min-h-screen flex-1 flex-row bg-secondary ">
+          <div className="relative w-1/2 bg-slate-200 dark:bg-yellow-400"></div>
 
-        <div className="flex-1 flex-row justify-center items-center bg-secondary">
-          <Card className="m-10 rounded-3xl outlo">
-            <CardHeader>
-              <div>
-                <Image
-                  className="hidden h-20 w-auto dark:block"
-                  src="/logo_inverse_horizontal.svg"
-                  alt="DevGuard by l3montree Logo"
-                  width={300}
-                  height={300}
-                />
-                <Image
-                  className="h-20 w-auto dark:hidden"
-                  src="/logo_horizontal.svg"
-                  alt="DevGuard by l3montree Logo"
-                  width={300}
-                  height={300}
-                />
-              </div>
+          <div className="flex-1 flex-row justify-center self-center items-center bg-secondary">
+            <Card className="m-10 rounded-3xl">
+              <CardHeader>
+                <div>
+                  <Image
+                    className="hidden h-20 w-auto dark:block"
+                    src="/logo_inverse_horizontal.svg"
+                    alt="DevGuard by l3montree Logo"
+                    width={300}
+                    height={300}
+                  />
+                  <Image
+                    className="h-20 w-auto dark:hidden"
+                    src="/logo_horizontal.svg"
+                    alt="DevGuard by l3montree Logo"
+                    width={300}
+                    height={300}
+                  />
+                </div>
 
-              <CardTitle className="text-4xl">Login</CardTitle>
-              <CardDescription>Welcome back!</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="">
-                <form>
-                  <div className="w-1/2">
-                    <div className="grid w-full items-center gap-4">
-                      <div className="flex  space-y-1.5">
-                        <Input id="name" placeholder="Your@E-Mail.com" />
-                      </div>
-                      <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="framework">
-                          Forgot your E-Mail Adresse?
-                        </Label>
+                <CardTitle className="text-4xl">Login</CardTitle>
+                <CardDescription>Welcome back!</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="">
+                  <form>
+                    <div className="w-1/2">
+                      <div className="grid w-full items-center gap-4">
+                        <div className="flex  space-y-1.5">
+                          <Input id="name" placeholder="Your@E-Mail.com" />
+                        </div>
+                        <div className="flex flex-col space-y-1.5">
+                          <Label htmlFor="framework">
+                            Forgot your E-Mail Adresse?
+                          </Label>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </form>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between justify-end ">
-              <Button className="" variant="ghost">
-                Create Account
-              </Button>
-              <div className="m-2"></div>
-              <Button variant="default">Continue</Button>
-            </CardFooter>
-          </Card>
+                  </form>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between justify-end ">
+                <Button className="" variant="ghost">
+                  Create Account
+                </Button>
+                <div className="m-2"></div>
+                <Button variant="default">Continue</Button>
+              </CardFooter>
+            </Card>
+          </div>
         </div>
       </div>
     </>
