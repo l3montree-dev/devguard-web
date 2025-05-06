@@ -66,6 +66,8 @@ const Index: FunctionComponent<Props> = ({
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
 
+  console.log("webhook secret", secrets.webhookSecret);
+
   const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
   const [webhookSecret, setWebhookSecret] = useState<string | null>(
     secrets.webhookSecret,
@@ -289,26 +291,35 @@ const Index: FunctionComponent<Props> = ({
                 This secret is used to authenticate the badge requests.
               </p>
             </div>
-            <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
-              <p className="text-sm text-muted-foreground">
-                You can use the following URL to display this badge in your
-                README or other documentation:
-              </p>
-              <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
-                {badgeURL}
-              </code>
+            {asset.lastScaScan || asset.lastContainerScan ? (
+              <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+                <p className="text-sm text-muted-foreground">
+                  You can use the following URL to display this badge in your
+                  README or other documentation:
+                </p>
+                <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
+                  {badgeURL}
+                </code>
 
-              <img
-                src={badgeURL}
-                alt="CVSS Badge"
-                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-              />
-            </div>
+                <img
+                  src={badgeURL}
+                  alt="CVSS Badge"
+                  className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+                />
+              </div>
+            ) : (
+              <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+                <p className="text-sm text-muted-foreground">
+                  No dependencies scans have been performed yet. The badge will
+                  be displayed here once a scan has been performed.
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex flex-col items-stretch gap-2 pt-4">
             <Label>Webhook Secret</Label>
             <div className="flex flex-row items-start justify-between">
-              <Input value={webhookSecret ?? ""} />
+              <Input value={webhookSecret ?? "No webhook secret set"} />
 
               <Button
                 variant="secondary"
