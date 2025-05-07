@@ -1,4 +1,3 @@
-// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -187,21 +186,32 @@ const Registration: NextPage = () => {
     <>
       <div>
         <div className="flex min-h-screen flex-1 flex-row bg-secondary ">
-          <div className="relative w-1/2 bg-slate-200 dark:bg-yellow-400"></div>
+          <div className="relative w-2/5 bg-slate-200 dark:bg-yellow-400">
+            <div className="flex justify-center items-center h-screen">
+
+              
+              {/* <Image
+                src="/assets/supply_chain.png"
+                width={300}
+                height={300}
+                alt="meddle"
+              ></Image> */}
+            </div>
+          </div>
 
           <div className="flex-1 flex-row justify-center self-center items-center bg-secondary">
             <Card className="m-10 rounded-3xl">
               <CardHeader>
-                <div>
+                <div className="mb-2">
                   <Image
-                    className="hidden h-20 w-auto dark:block"
+                    className="hidden h-10 w-auto dark:block "
                     src="/logo_inverse_horizontal.svg"
                     alt="DevGuard by l3montree Logo"
                     width={300}
                     height={300}
                   />
                   <Image
-                    className="h-20 w-auto dark:hidden"
+                    className="h-10 w-auto dark:hidden"
                     src="/logo_horizontal.svg"
                     alt="DevGuard by l3montree Logo"
                     width={300}
@@ -209,28 +219,48 @@ const Registration: NextPage = () => {
                   />
                 </div>
 
-                <CardTitle className="text-4xl">Login</CardTitle>
-                <CardDescription>Welcome back!</CardDescription>
+                <CardTitle className="text-4xl">Sign In</CardTitle>
+                <CardDescription>W3lcome back!</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col">
+                <div className="flex justify-end">
                   <form>
-                    <div className=" justify-end">
-                      <div className="grid w-full items-center gap-4 ">
-                        <div className="flex space-y-1.5">
-                          <Input id="name" placeholder="Your@E-Mail.com" />
+                    <div className="flex justify-end">
+                      <div className="grid w-full gap-4 ">
+                        <div className="flex items-end">
+                          <Input
+                            id="name"
+                            placeholder="Your@E-Mail.com"
+                          ></Input>
+                          <div className="w-px h-8 bg-secondary mx-4 mt-1"/>
+                          <div className="flex">
+                            <Button variant="default">
+                              <Image
+                                src="/assets/github.svg"
+                                alt="GitHub"
+                                width={30}
+                                height={30}
+                                className="inline-block dark:"
+                              />
+                            </Button>
+                          </div>
                         </div>
                         <div className="flex flex-col space-y-1.5">
                           <Label htmlFor="framework">
                             Forgot your E-Mail Adresse?
                           </Label>
+                          <div className="flex flex-row w-1/2">
+                            <div className="grid grid-cols-3 gap-4 opacity-50">
+                              <hr className="" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </form>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between justify-end ">
+              <CardFooter className="flex justify-end ">
                 <Button className="" variant="ghost">
                   Create Account
                 </Button>
