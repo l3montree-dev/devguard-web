@@ -100,7 +100,7 @@ const Settings: FunctionComponent<{
       description: "",
       scan: true, // so scan is checked by default
       manage: false,
-    }
+    },
   });
 
   const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
