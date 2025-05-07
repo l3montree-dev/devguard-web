@@ -18,7 +18,6 @@ import Page from "@/components/Page";
 import { middleware } from "@/decorators/middleware";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
-import { withOrganization } from "@/decorators/withOrganization";
 
 export default function SetupOrg() {
   return (
@@ -45,6 +44,5 @@ export const getServerSideProps = middleware(
   {
     session: withSession,
     organizations: withOrgs,
-    organization: withOrganization,
   },
 );
