@@ -95,7 +95,13 @@ const Settings: FunctionComponent<{
     description: string;
     scan: boolean;
     manage: boolean;
-  }>();
+  }>({
+    defaultValues: {
+      description: "",
+      scan: true, // so scan is checked by default
+      manage: false,
+    }
+  });
 
   const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
     usePersonalAccessToken(pats);
@@ -296,7 +302,7 @@ const Settings: FunctionComponent<{
 
                 <div className="mt-4 flex items-center justify-between gap-2">
                   <Label htmlFor="scan" className="flex-1">
-                    scan
+                    Scan
                     <span className="block text-sm text-gray-500">
                       Use this token to scan your repositories.
                     </span>
@@ -309,7 +315,7 @@ const Settings: FunctionComponent<{
 
                 <div className="mt-4 flex items-center justify-between gap-2">
                   <Label htmlFor="manage" className="flex-1">
-                    manage
+                    Manage
                     <span className="block text-sm text-gray-500">
                       Use this token to manage your repositories.
                     </span>
