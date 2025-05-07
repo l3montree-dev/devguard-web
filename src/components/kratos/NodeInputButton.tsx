@@ -16,6 +16,7 @@
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { callWebauthnFunction, NodeInputProps } from "./helpers";
+import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import { Button } from "../ui/button";
 
 export function NodeInputButton<T>({
@@ -53,6 +54,12 @@ export function NodeInputButton<T>({
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
+        {attributes.name === "passkey_login_trigger" && (
+          <FingerPrintIcon
+            className="mr-2 h-4 w-4 shrink-0"
+            aria-hidden="true"
+          />
+        )}
         {getNodeLabel(node)}
       </Button>
     </div>
