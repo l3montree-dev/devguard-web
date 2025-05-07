@@ -54,7 +54,12 @@ export function NodeInputButton<T>({
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
-        <FingerPrintIcon className="mr-2 h-4 w-4 shrink-0" aria-hidden="true"/>
+        {attributes.name === "passkey_login_trigger" && (
+          <FingerPrintIcon
+            className="mr-2 h-4 w-4 shrink-0"
+            aria-hidden="true"
+          />
+        )}
         {getNodeLabel(node)}
       </Button>
     </div>
