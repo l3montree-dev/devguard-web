@@ -46,6 +46,7 @@ interface Props {
 }
 
 import Image from "next/image";
+import { UUID } from "crypto";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -55,6 +56,10 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
 };
 
 type SecretType = "badge" | "webhook";
+
+const generateNewSecret = (): string => {
+  return crypto.randomUUID();
+};
 
 const Index: FunctionComponent<Props> = ({
   repositories,
@@ -95,9 +100,9 @@ const Index: FunctionComponent<Props> = ({
   const handleGenerateNewSecret = async (type: SecretType) => {
     let bodyKey: string;
     if (type === "badge") {
-      bodyKey = "badgeSecretUpdate";
+      bodyKey = "badgeSecret";
     } else {
-      bodyKey = "webhookSecretUpdate";
+      bodyKey = "webhookSecret";
     }
 
     const resp = await browserApiClient(
@@ -105,7 +110,7 @@ const Index: FunctionComponent<Props> = ({
       {
         method: "PATCH",
         body: JSON.stringify({
-          [bodyKey]: true,
+          [bodyKey]: generateNewSecret(),
         }),
       },
     );
