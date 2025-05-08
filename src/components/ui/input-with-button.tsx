@@ -21,11 +21,20 @@ const InputWithButton = (props: InputWithButtonProps) => {
   return (
     <div className="flex flex-col items-stretch gap-2 pt-4">
       <Label>{props.label}</Label>
-      <div className="flex flex-row items-start justify-between">
-        <Input value={props.value ?? "No webhook secret set"} />
-        <Button variant="secondary" onClick={() => props.onClick()}>
-          <div className="h-4 w-4">{props.svg}</div>
-        </Button>
+      <div
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        )}
+      >
+        <div className="flex flex-row  justify-between w-full">
+          <input
+            value={props.value ?? ""}
+            className="w-full bg-transparent focus:outline-none"
+          />
+          <button onClick={() => props.onClick()}>
+            <div className="h-4 w-4">{props.svg}</div>
+          </button>
+        </div>
       </div>
       <p className="text-sm text-muted-foreground">{props.message}</p>
     </div>
