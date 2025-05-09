@@ -237,6 +237,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   <CopyCode
                     highlightRegexPattern={highlightRegex}
                     codeString={vuln.snippet}
+                    startingLineNumber={vuln.startLine}
                   />
                 </div>
               )}
@@ -360,7 +361,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               variant={"secondary"}
                             >
                               <Loader />
-                              Mark False Positive
+                              False Positive
                             </Button>
                             <Button
                               onClick={waitFor(() =>
