@@ -47,6 +47,7 @@ interface Props {
 
 import Image from "next/image";
 import { UUID } from "crypto";
+import { InputWithButton } from "@/components/ui/input-with-button";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -249,36 +250,31 @@ const Index: FunctionComponent<Props> = ({
       <div>
         <Section title="Secrets Management" description="Secrets management">
           <div>
-            <div className="flex flex-col items-stretch gap-2">
-              <Label>Badge Secret</Label>
-              <div className="flex flex-row items-start justify-between">
-                <Input value={badgeSecret} />
-
-                <Button
-                  variant="secondary"
-                  onClick={() => handleGenerateNewSecret("badge")}
-                >
-                  <div className="h-4 w-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="size-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                      />
-                    </svg>
-                  </div>
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                This secret is used to authenticate the badge requests.
-              </p>
+            <div>
+              <InputWithButton
+                label="Badge Secret"
+                value={badgeSecret}
+                message="This secret is used to authenticate the badge requests."
+                onClick={() => {
+                  handleGenerateNewSecret("badge");
+                }}
+                SVG={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                  </svg>
+                }
+              />
             </div>
             {asset.lastScaScan || asset.lastContainerScan ? (
               <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
@@ -305,36 +301,32 @@ const Index: FunctionComponent<Props> = ({
               </div>
             )}
           </div>
-          <div className="flex flex-col items-stretch gap-2 pt-4">
-            <Label>Webhook Secret</Label>
-            <div className="flex flex-row items-start justify-between">
-              <Input value={webhookSecret ?? "No webhook secret set"} />
 
-              <Button
-                variant="secondary"
-                onClick={() => handleGenerateNewSecret("webhook")}
-              >
-                <div className="h-4 w-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                </div>
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              This secret is used to authenticate the webhook requests.
-            </p>
+          <div>
+            <InputWithButton
+              label="Webhook Secret"
+              value={webhookSecret ?? "No webhook secret set"}
+              message="This secret is used to authenticate the webhook requests."
+              onClick={() => {
+                handleGenerateNewSecret("webhook");
+              }}
+              SVG={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+              }
+            />
           </div>
         </Section>
         <hr />
