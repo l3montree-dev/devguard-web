@@ -14,7 +14,7 @@ interface InputWithButtonProps
   value: string;
   message?: string;
   onClick: () => void;
-  svg?: React.ReactNode;
+  SVG?: React.ReactNode;
 }
 
 const InputWithButton = (props: InputWithButtonProps) => {
@@ -32,7 +32,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
             className="w-full bg-transparent focus:outline-none"
           />
           <button onClick={() => props.onClick()}>
-            <div className="h-4 w-4">{props.svg}</div>
+            <div className="h-4 w-4">{props.SVG}</div>
           </button>
         </div>
       </div>
