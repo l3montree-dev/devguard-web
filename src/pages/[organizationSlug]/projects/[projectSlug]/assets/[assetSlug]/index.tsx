@@ -26,6 +26,7 @@ import { AssetMetricsDTO, PatWithPrivKey } from "@/types/api/api";
 import { Tab } from "@headlessui/react";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FunctionComponent, useState } from "react";
 import CustomTab from "../../../../../../components/common/CustomTab";
 import Stage from "../../../../../../components/risk-identification/Stage";
@@ -105,20 +106,34 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
               <div>
                 <h3 className="mb-4 text-xl font-semibold">
                   Development{" "}
-                  <Image
-                    className="mr-2 inline-block"
-                    src={"/assets/git.svg"}
-                    alt="Git logo"
-                    width={30}
-                    height={30}
-                  />
-                  <Image
-                    className="mr-2 inline-block"
-                    src={"/assets/intoto.png"}
-                    alt="InToto logo"
-                    width={30}
-                    height={30}
-                  />
+                  <Link
+                    href="https://git-scm.com/docs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Git Logo"
+                  >
+                    <Image
+                      className="mr-2 inline-block"
+                      src={"/assets/git.svg"}
+                      alt="Git logo"
+                      width={30}
+                      height={30}
+                    />
+                  </Link>
+                  <Link
+                    href="https://in-toto.io/docs/what-is-in-toto/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="In-Toto Logo"
+                  >
+                    <Image
+                      className="mr-2 inline-block"
+                      src={"/assets/intoto.png"}
+                      alt="InToto logo"
+                      width={30}
+                      height={30}
+                    />
+                  </Link>
                 </h3>
                 <div className="mb-10 grid grid-cols-3 gap-4">
                   <Card className={classNames("h-full")}>
@@ -128,20 +143,27 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
                           <CardTitle className="text-base">
                             <div className="flex flex-row items-center justify-between gap-2">
                               SBOM Upload
-                              <Image
-                                className="mr-2 dark:hidden"
-                                src={"/assets/cyclonedx-logo-black.svg"}
-                                alt="CycloneDX logo"
-                                width={100}
-                                height={30}
-                              />
-                              <Image
-                                className="mr-2 hidden dark:inline-block"
-                                src={"/assets/cyclonedx-logo-white.svg"}
-                                alt="CycloneDX logo"
-                                width={100}
-                                height={30}
-                              />
+                              <Link
+                                href="https://cyclonedx.org/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="CycloneDX Logo"
+                              >
+                                <Image
+                                  className="mr-2 dark:hidden"
+                                  src={"/assets/cyclonedx-logo-black.svg"}
+                                  alt="CycloneDX logo"
+                                  width={100}
+                                  height={30}
+                                />
+                                <Image
+                                  className="mr-2 hidden dark:inline-block"
+                                  src={"/assets/cyclonedx-logo-white.svg"}
+                                  alt="CycloneDX logo"
+                                  width={100}
+                                  height={30}
+                                />
+                              </Link>
                             </div>
                           </CardTitle>
                           <CardDescription>
@@ -171,27 +193,48 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
 
               <h3 className="text-xl font-semibold">
                 Integrating DevGuard into your CI/CD-Pipeline{" "}
-                <Image
-                  className="mr-1 inline-block"
-                  src={"/assets/gitlab.svg"}
-                  alt="GitLab logo"
-                  width={30}
-                  height={30}
-                />{" "}
-                <Image
-                  className="mr-2 inline-block dark:invert"
-                  src={"/assets/github.svg"}
-                  alt="GitHub logo"
-                  width={30}
-                  height={30}
-                />
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/intoto.png"}
-                  alt="InToto logo"
-                  width={30}
-                  height={30}
-                />
+                <Link 
+                  href="https://devguard.org/getting-started/setup-gitlab-integration"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="DevGuard GitLab Integration"
+                >
+                  <Image
+                    className="mr-1 inline-block"
+                    src={"/assets/gitlab.svg"}
+                    alt="GitLab logo"
+                    width={30}
+                    height={30}
+                  />{" "}
+                </Link>
+                <Link
+                  href="https://devguard.org/getting-started/setup-github-integration"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="DevGuard GitHub Integration"
+                >
+                  <Image
+                    className="mr-2 inline-block dark:invert"
+                    src={"/assets/github.svg"}
+                    alt="GitHub logo"
+                    width={30}
+                    height={30}
+                  />
+                </Link>
+                <Link
+                  href="https://in-toto.io/docs/what-is-in-toto/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="In-Toto Logo"
+                >
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/intoto.png"}
+                    alt="InToto logo"
+                    width={30}
+                    height={30}
+                  />
+                </Link>
               </h3>
               <div className="mb-10">
                 <div className="mb-4">
@@ -224,27 +267,48 @@ const SecurityControlCenter: FunctionComponent<Props> = () => {
 
               <h3 id="operations" className="text-xl font-semibold">
                 Operations{" "}
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/kubernetes.svg"}
-                  alt="Kubernetes logo"
-                  width={30}
-                  height={30}
-                />
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/helm.svg"}
-                  alt="Helm logo"
-                  width={30}
-                  height={30}
-                />
-                <Image
-                  className="mr-2 inline-block"
-                  src={"/assets/intoto.png"}
-                  alt="InToto logo"
-                  width={30}
-                  height={30}
-                />
+                <Link
+                  href="https://devguard.org/getting-started/self-hosting-devguard/kubernetes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Kubernetes Logo"
+                >
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/kubernetes.svg"}
+                    alt="Kubernetes logo"
+                    width={30}
+                    height={30}
+                  />
+                </Link>
+                <Link
+                  href="https://helm.sh/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Helm Logo"
+                >
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/helm.svg"}
+                    alt="Helm logo"
+                    width={30}
+                    height={30}
+                  />
+                </Link>
+                <Link
+                  href="https://in-toto.io/docs/what-is-in-toto/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="In-Toto Logo"
+                >
+                  <Image
+                    className="mr-2 inline-block"
+                    src={"/assets/intoto.png"}
+                    alt="InToto logo"
+                    width={30}
+                    height={30}
+                  />
+                </Link>
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 <ImageVerification />
