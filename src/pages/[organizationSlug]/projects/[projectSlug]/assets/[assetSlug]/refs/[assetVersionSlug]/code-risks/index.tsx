@@ -8,12 +8,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import {
-  FirstPartyVuln,
-  Paged,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
+import { FirstPartyVuln, Paged } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -22,7 +17,7 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
@@ -35,7 +30,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EmptyList from "@/components/common/EmptyList";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
@@ -45,15 +40,16 @@ import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
+import CodeRiskScannerDialog from "../../../../../../../../../components/CodeRiskScannerDialog";
+import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
+import { Badge } from "../../../../../../../../../components/ui/badge";
+import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import { defaultScanner } from "../../../../../../../../../utils/view";
-import { Badge } from "../../../../../../../../../components/ui/badge";
-import CopyCode, {
-  CopyCodeFragment,
-} from "../../../../../../../../../components/common/CopyCode";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
+  apiUrl: string;
 }
 
 const columnHelper = createColumnHelper<FirstPartyVuln>();
@@ -96,6 +92,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const { table, isLoading, handleSearch } = useTable({
     columnsDef,
     data: props.vulns.data,
@@ -138,7 +135,17 @@ const Index: FunctionComponent<Props> = (props) => {
         </>
       ) : (
         <div>
-          <BranchTagSelector branches={branches} tags={tags} />
+          <div className="flex flex-row items-center justify-between">
+            <BranchTagSelector branches={branches} tags={tags} />
+            <div className="flex flex-row gap-2">
+              <Button variant={"ghost"} className="cursor-not-allowed">
+                Upload SARIF-File
+              </Button>
+              <Button onClick={() => setIsOpen(true)} variant="default">
+                Integrate Scanner
+              </Button>
+            </div>
+          </div>
           <Section
             forceVertical
             primaryHeadline
@@ -261,6 +268,11 @@ const Index: FunctionComponent<Props> = (props) => {
           </Section>
         </div>
       )}
+      <CodeRiskScannerDialog
+        apiUrl={props.apiUrl}
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      />
     </Page>
   );
 };
@@ -324,6 +336,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vulns,
+        apiUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },

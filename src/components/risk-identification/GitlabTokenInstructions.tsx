@@ -14,8 +14,12 @@
 
 import React from "react";
 import Image from "next/image";
-import CopyCode from "../common/CopyCode";
-import { Card, CardContent } from "../ui/card";
+import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CarouselItem } from "../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { integrationSnippets } from "../../integrationSnippets";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -79,6 +83,117 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
           </CardContent>
         </Card>
       </div>
+    </>
+  );
+};
+
+export const GitlabTokenSlides = ({
+  pat,
+  next,
+  prev,
+  scanner,
+  onPatGenerate,
+  apiUrl,
+  orgSlug,
+  projectSlug,
+  assetSlug,
+}: {
+  pat?: string;
+  next?: () => void;
+  prev?: () => void;
+  onPatGenerate: () => void;
+  scanner?: "secret-scanning" | "iac" | "sast" | "custom" | "devsecops";
+  apiUrl: string;
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
+}) => {
+  return (
+    <>
+      <CarouselItem>
+        <DialogHeader>
+          <DialogTitle>
+            Navigate to CI/CD Settings &gt; Variables &gt; Expand. Press the
+            button &quot;Add variable&quot;
+          </DialogTitle>
+          <DialogDescription>
+            For example, for the DevGuard project its following URL:
+            https://gitlab.com/l3montree/example-project/-/settings/ci_cd
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-10">
+          <div className="relative aspect-video w-full max-w-4xl">
+            <Image
+              alt="Open the CI/CD settings in GitLab"
+              className="rounded-lg border object-fill"
+              src={"/assets/gitlab-secret.png"}
+              fill
+            />
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <Card>
+            <CardHeader>
+              <CardTitle>Create a new variable</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <span className="mb-2 block text-sm font-semibold">Key</span>
+                <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
+              </div>
+              <div className="mb-4">
+                <span className="mb-2 block text-sm font-semibold">Value</span>
+                <CopyCode
+                  language="shell"
+                  codeString={pat ?? "<PERSONAL ACCESS TOKEN>"}
+                />
+              </div>
+              <div className="flex flex-row justify-end">
+                <Button onClick={onPatGenerate} variant={"secondary"}>
+                  Generate personal access token
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="flex mt-10 flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={prev}>
+            Back
+          </Button>
+          <Button onClick={next}>Continue</Button>
+        </div>
+      </CarouselItem>
+      <CarouselItem>
+        <DialogHeader>
+          <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
+          <DialogDescription>
+            Create a new <CopyCodeFragment codeString=".gitlab-ci.yml" /> file
+            or add the code snippet to an existing CI/CD configuration file.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-10">
+          {scanner && (
+            <CopyCode
+              codeString={
+                integrationSnippets({
+                  orgSlug,
+                  projectSlug,
+                  assetSlug,
+                  apiUrl,
+                })["Gitlab"][scanner]
+              }
+              language="yaml"
+            />
+          )}
+        </div>
+        <div className="flex mt-10 flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={prev}>
+            Back
+          </Button>
+          <Button onClick={next}>Done!</Button>
+        </div>
+      </CarouselItem>
     </>
   );
 };
