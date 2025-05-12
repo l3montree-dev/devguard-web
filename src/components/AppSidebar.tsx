@@ -79,52 +79,56 @@ export const OrganizationDropDown = () => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
-        <div className="flex w-full flex-row items-center justify-between gap-1">
-          <div className="flex flex-row items-center gap-1 text-ellipsis">
-            <div className="flex flex-col gap-0 ">
-              <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
-                {activeOrg?.name}{" "}
+    <>
+      <div className="flex w-full flex-row gap-2 items-center justify-between">
+        <div className="flex flex-row items-center gap-1 text-ellipsis">
+          <div className="flex flex-col gap-0 ">
+            <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
+              {activeOrg?.name}{" "}
+              <Link href={`/${activeOrg.slug}`}>
                 <Badge className="!text-white" variant={"outline"}>
                   Organization
                 </Badge>
-              </span>
-            </div>
+              </Link>
+            </span>
           </div>
-          <ChevronUpDownIcon className="block h-7 w-7 p-1" />
         </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-xs text-muted-foreground">
-            Organizations
-          </DropdownMenuLabel>
-          {orgs.length !== 0 && (
-            <>
-              {orgs.map((o) => (
-                <DropdownMenuItem
-                  key={o.id}
-                  onClick={handleActiveOrgChange(o.id)}
-                >
-                  <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
-                    <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  {o.name}
-                </DropdownMenuItem>
-              ))}
-            </>
-          )}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-          <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
-            <PlusIcon className="h-4 w-4 text-muted-foreground" />
-          </div>
-          Create Organization
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
+            <ChevronUpDownIcon className="block h-7 w-7 p-1" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Organizations
+              </DropdownMenuLabel>
+              {orgs.length !== 0 && (
+                <>
+                  {orgs.map((o) => (
+                    <DropdownMenuItem
+                      key={o.id}
+                      onClick={handleActiveOrgChange(o.id)}
+                    >
+                      <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
+                        <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      {o.name}
+                    </DropdownMenuItem>
+                  ))}
+                </>
+              )}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+              <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
+                <PlusIcon className="h-4 w-4 text-muted-foreground" />
+              </div>
+              Create Organization
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </>
   );
 };
 
