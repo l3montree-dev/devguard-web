@@ -12,20 +12,21 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
   ScaleIcon,
   ShareIcon,
-  ShieldCheckIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
+import { CodeIcon } from "lucide-react";
 import { useRouter } from "next/router";
+import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
-import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
-import { CodeIcon } from "lucide-react";
+import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   // if we know the default branch - get that one
@@ -72,23 +73,17 @@ export const useAssetMenu = () => {
 
   const assetVersionSlug = getAssetVersionSlug(activeAsset!, assetVersion);
 
-  let menu = [
-    {
-      title: "Security Control Center",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/",
-      Icon: ShieldCheckIcon,
-      isActive:
-        router.pathname ===
-        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]",
-    },
-  ];
+  let menu: Array<{
+    title: string;
+    href: string;
+    Icon: ForwardRefExoticComponent<
+      Omit<SVGProps<SVGSVGElement>, "ref"> & {
+        title?: string;
+        titleId?: string;
+      } & RefAttributes<SVGSVGElement>
+    >;
+    isActive: boolean;
+  }> = [];
 
   if ((activeAsset?.refs.length ?? 0) > 0) {
     menu.unshift({
@@ -177,6 +172,15 @@ export const useAssetMenu = () => {
         isActive: router.pathname.includes("dependencies"),
       },
     ]);
+  } else {
+    menu.unshift({
+      title: "Onboarding",
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
+      Icon: RocketLaunchIcon,
+      isActive:
+        router.pathname ===
+        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]",
+    });
   }
 
   if (loggedIn) {

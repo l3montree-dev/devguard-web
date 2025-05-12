@@ -13,8 +13,12 @@
 // limitations under the License.
 import React from "react";
 import Image from "next/image";
-import CopyCode from "../common/CopyCode";
-import { Card, CardContent } from "../ui/card";
+import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CarouselItem } from "../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { integrationSnippets } from "../../integrationSnippets";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -73,6 +77,123 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
           </CardContent>
         </Card>
       </div>
+    </>
+  );
+};
+
+export const GithubTokenSlides = ({
+  pat,
+  next,
+  prev,
+  scanner,
+  onPatGenerate,
+  apiUrl,
+  orgSlug,
+  projectSlug,
+  assetSlug,
+}: {
+  pat?: string;
+  next?: () => void;
+  prev?: () => void;
+  onPatGenerate: () => void;
+  scanner?:
+    | "secret-scanning"
+    | "iac"
+    | "sast"
+    | "custom"
+    | "devsecops"
+    | "container-scanning"
+    | "sca";
+  apiUrl: string;
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
+}) => {
+  const codeString = integrationSnippets({
+    orgSlug,
+    projectSlug,
+    assetSlug,
+    apiUrl,
+  })["GitHub"][scanner ?? "devsecops"];
+
+  return (
+    <>
+      <CarouselItem>
+        <DialogHeader>
+          <DialogTitle>
+            Navigate to Settings &gt; Secrets and Variables &gt; Actions. Press
+            the button &quot;New repository secret&quot;
+          </DialogTitle>
+          <DialogDescription>
+            For example, for the DevGuard project its following url:
+            https://github.com/l3montree-dev/devguard/settings/secrets/actions
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-10">
+          <div
+            className="relative aspect-video w-full
+                max-w-4xl"
+          >
+            <Image
+              alt="Open the project settings in GitHub"
+              className="rounded-lg border object-fill"
+              src={"/assets/repo-secret.png"}
+              fill
+            />
+          </div>
+        </div>
+
+        <div className="mt-10">
+          <Card>
+            <CardHeader>
+              <CardTitle>Create a new secret</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <span className="mb-2 block text-sm font-semibold">Name</span>
+                <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
+              </div>
+              <div className="mb-4">
+                <span className="mb-2 block text-sm font-semibold">Secret</span>
+                <CopyCode
+                  language="shell"
+                  codeString={pat ?? "<PERSONAL ACCESS TOKEN>"}
+                />
+              </div>
+              <div className="flex flex-row justify-end">
+                <Button onClick={onPatGenerate} variant={"secondary"}>
+                  Generate personal access token
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="flex mt-10 flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={prev}>
+            Back
+          </Button>
+          <Button onClick={next}>Continue</Button>
+        </div>
+      </CarouselItem>
+      <CarouselItem>
+        <DialogHeader>
+          <DialogTitle>Add the snippet to your GitHub Actions File</DialogTitle>
+          <DialogDescription>
+            Create a new{" "}
+            <CopyCodeFragment codeString=".github/workflows/devsecops.yml" />{" "}
+            file or add the code snippet to an existing workflow file.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-10">
+          <CopyCode codeString={codeString} language="yaml" />
+        </div>
+        <div className="flex mt-10 flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={prev}>
+            Back
+          </Button>
+          <Button onClick={next}>Done!</Button>
+        </div>
+      </CarouselItem>
     </>
   );
 };

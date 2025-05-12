@@ -1,9 +1,7 @@
 import { PatWithPrivKey } from "@/types/api/api";
 import CopyCode from "../common/CopyCode";
-import Section from "../common/Section";
-import { Button } from "../ui/button";
-import Steps from "./Steps";
 import GithubTokenInstructions from "./GithubTokenInstructions";
+import Steps from "./Steps";
 
 const GithubInstructionsSteps = ({
   pat,

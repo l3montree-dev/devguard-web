@@ -509,7 +509,7 @@ export interface VulnByPackage {
   maxRisk: number;
   maxCvss: number;
   totalRisk: number;
-  flawCount: number;
+  vulnCount: number;
   avgRisk: number;
   vulns: VulnWithCVE[];
 }
