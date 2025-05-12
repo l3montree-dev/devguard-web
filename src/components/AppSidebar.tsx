@@ -80,7 +80,7 @@ export const OrganizationDropDown = () => {
 
   return (
     <>
-      <div className="flex w-full flex-row items-center justify-between">
+      <div className="flex w-full flex-row gap-2 items-center justify-between">
         <div className="flex flex-row items-center gap-1 text-ellipsis">
           <div className="flex flex-col gap-0 ">
             <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
