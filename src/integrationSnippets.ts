@@ -65,6 +65,22 @@ export const integrationSnippets = ({
   token?: string;
 }) => ({
   GitHub: {
+    sca: generateWorkflowSnippet(
+      "call-sca",
+      "sca.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
+    "container-scanning": generateWorkflowSnippet(
+      "call-container-scanning",
+      "container-scanning.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
     iac: generateWorkflowSnippet(
       "call-sast",
       "sast.yml",
@@ -116,6 +132,22 @@ export const integrationSnippets = ({
   },
 
   Gitlab: {
+    sca: generateGitlabSnippet(
+      "call-sca",
+      "sca.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
+    "container-scanning": generateGitlabSnippet(
+      "call-container-scanning",
+      "container-scanning.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
     iac: generateGitlabSnippet(
       "call-iac",
       "iac.yml",

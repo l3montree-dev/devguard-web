@@ -96,12 +96,26 @@ export const GithubTokenSlides = ({
   next?: () => void;
   prev?: () => void;
   onPatGenerate: () => void;
-  scanner?: "secret-scanning" | "iac" | "sast" | "custom" | "devsecops";
+  scanner?:
+    | "secret-scanning"
+    | "iac"
+    | "sast"
+    | "custom"
+    | "devsecops"
+    | "container-scanning"
+    | "sca";
   apiUrl: string;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
 }) => {
+  const codeString = integrationSnippets({
+    orgSlug,
+    projectSlug,
+    assetSlug,
+    apiUrl,
+  })["GitHub"][scanner ?? "devsecops"];
+
   return (
     <>
       <CarouselItem>
@@ -171,19 +185,7 @@ export const GithubTokenSlides = ({
           </DialogDescription>
         </DialogHeader>
         <div className="mt-10">
-          {scanner && (
-            <CopyCode
-              codeString={
-                integrationSnippets({
-                  orgSlug,
-                  projectSlug,
-                  assetSlug,
-                  apiUrl,
-                })["GitHub"][scanner]
-              }
-              language="yaml"
-            />
-          )}
+          <CopyCode codeString={codeString} language="yaml" />
         </div>
         <div className="flex mt-10 flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={prev}>

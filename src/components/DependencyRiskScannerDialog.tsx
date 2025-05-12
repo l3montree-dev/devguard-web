@@ -1,14 +1,25 @@
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 import Image from "next/image";
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
+import router from "next/router";
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
 import { integrationSnippets } from "../integrationSnippets";
+import { multipartBrowserApiClient } from "../services/devGuardApi";
 import { classNames } from "../utils/common";
-import CopyCode from "./common/CopyCode";
+import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
+import FileUpload from "./FileUpload";
 import { GithubTokenSlides } from "./risk-identification/GithubTokenInstructions";
 import { GitlabTokenSlides } from "./risk-identification/GitlabTokenInstructions";
 import { AsyncButton, Button } from "./ui/button";
@@ -32,30 +43,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import { useCallback } from "react";
-import { toast } from "sonner";
-import { browserApiClient } from "../services/devGuardApi";
 
-import { useDropzone } from "react-dropzone";
-import { useRouter } from "next/router";
-import FileUpload from "./FileUpload";
-
-interface CodeRiskScannerDialogProps {
+interface DependencyRiskScannerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   apiUrl: string;
 }
 
-const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
-  open,
-  apiUrl,
-  onOpenChange,
-}) => {
+const DependencyRiskScannerDialog: FunctionComponent<
+  DependencyRiskScannerDialogProps
+> = ({ open, apiUrl, onOpenChange }) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [count, setCount] = React.useState(0);
   const [current, setCurrent] = React.useState(0);
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "secret-scanning" | "iac" | "sast" | "custom" | "devsecops"
+    "sca" | "container-scanning" | "devsecops"
   >();
   const [selectedIntegration, setSelectedIntegration] = React.useState<
     "github" | "gitlab" | "docker" | "upload"
@@ -79,26 +81,26 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
 
   const fileContent = useRef<any>();
   const [fileName, setFileName] = useState<string>();
-  const router = useRouter();
 
-  const uploadSARIF = async () => {
+  const uploadSBOM = async () => {
     const formdata = new FormData();
     formdata.append("file", fileContent.current);
-    const resp = await browserApiClient(`/sarif-scan`, {
-      method: "POST",
-      body: fileContent.current,
-      headers: {
-        "X-Scanner": "SARIF-File-Upload",
-        "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset?.slug}`,
+    const resp = await multipartBrowserApiClient(
+      `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/sbom-file`,
+
+      {
+        method: "POST",
+        body: formdata,
+        headers: { "X-Scanner": "SBOM-File-Upload" },
       },
-    });
+    );
     if (resp.ok) {
-      toast.success("SARIF-Report has successfully been send!");
+      toast.success("SBOM has successfully been send!");
     } else {
-      toast.error("SARIF-Report has not been send successfully");
+      toast.error("SBOM has not been send successfully");
     }
     router.push(
-      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/main/code-risks/`,
+      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/main/dependency-risks/`,
     );
 
     onOpenChange(false);
@@ -110,9 +112,23 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
       reader.onabort = () => console.log("file reading was aborted");
       reader.onerror = () => console.log("file reading has failed");
       reader.onload = () => {
-        const readerContent = reader.result as string;
-        fileContent.current = readerContent;
-        setFileName(file.name);
+        try {
+          const readerContent = reader.result as string;
+          let sbomParsed;
+          sbomParsed = JSON.parse(readerContent);
+          if (sbomParsed.bomFormat === "CycloneDX") {
+            fileContent.current = file;
+            setFileName(file.name);
+          } else
+            toast.error(
+              "SBOM does not follow CycloneDX format or Version is <1.6",
+            );
+        } catch (e) {
+          toast.error(
+            "JSON format is not recognized, make sure it is the proper format",
+          );
+          return;
+        }
       };
 
       reader.readAsText(file);
@@ -235,11 +251,11 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                 >
                   <CardHeader>
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      Upload SARIF-Report
+                      Upload SBOM-File
                     </CardTitle>
                     <CardDescription>
                       You can integrate any scanner, which is able to produce a
-                      SARIF-Report.
+                      SBOM-File.
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -260,12 +276,10 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
             {selectedIntegration === "upload" ? (
               <CarouselItem>
                 <DialogHeader>
-                  <DialogTitle>Upload SARIF-Report</DialogTitle>
+                  <DialogTitle>Upload SBOM-File</DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
-                  Just drag and drop the SARIF-Report into the upload area or
-                  click to select the file. The report will be uploaded and the
-                  identified risks inspected.
+                  Just drag and drop your SBOM-File here or click to select it.
                 </DialogDescription>
                 <div className="mt-10">
                   <FileUpload
@@ -280,7 +294,9 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                   >
                     Back
                   </Button>
-                  <AsyncButton onClick={uploadSARIF}>Upload</AsyncButton>
+                  <AsyncButton onClick={uploadSBOM} disabled={!fileName}>
+                    Upload
+                  </AsyncButton>
                 </div>
               </CarouselItem>
             ) : (
@@ -319,10 +335,10 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                       </Card>
                     )}
                     <Card
-                      onClick={() => setSelectedScanner("secret-scanning")}
+                      onClick={() => setSelectedScanner("sca")}
                       className={classNames(
                         "cursor-pointer ",
-                        selectedScanner === "secret-scanning"
+                        selectedScanner === "sca"
                           ? "border border-primary"
                           : "border border-transparent",
                       )}
@@ -330,22 +346,22 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                       <CardContent className="p-0">
                         <CardHeader>
                           <CardTitle className="text-lg">
-                            Secret-Scanning
+                            Software-Composition-Analysis from Repository
                           </CardTitle>
                           <CardDescription>
-                            Secret-Scanning is a process of scanning your code
-                            for hardcoded secrets, such as API keys, passwords,
-                            and tokens. It helps to prevent unauthorized access
-                            to your systems and data.
+                            Inspect your dependency tree for known
+                            vulnerabilities. You should always do this, even
+                            when distributing your software as a OCI- or
+                            Docker-Image.
                           </CardDescription>
                         </CardHeader>
                       </CardContent>
                     </Card>
                     <Card
-                      onClick={() => setSelectedScanner("sast")}
+                      onClick={() => setSelectedScanner("container-scanning")}
                       className={classNames(
                         "cursor-pointer",
-                        selectedScanner === "sast"
+                        selectedScanner === "container-scanning"
                           ? "border border-primary"
                           : "border border-transparent",
                       )}
@@ -353,60 +369,12 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                       <CardContent className="p-0">
                         <CardHeader>
                           <CardTitle className="text-lg leading-tight">
-                            Static-Application-Security-Testing
+                            Container-Scanning
                           </CardTitle>
                           <CardDescription>
-                            Static Application Security Testing (SAST) is a
-                            method of debugging by examining source code before
-                            a program is run. SAST tools scan source code for
-                            coding errors, vulnerabilities, and other security
-                            issues.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-                    <Card
-                      onClick={() => setSelectedScanner("iac")}
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "iac"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg leading-tight">
-                            Infrastructure as Code Scanning
-                          </CardTitle>
-                          <CardDescription>
-                            Infrastructure as Code (IaC) scanning is a process
-                            of scanning your infrastructure code for security
-                            vulnerabilities and compliance issues. It helps to
-                            ensure that your infrastructure is secure and
-                            compliant with industry standards.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-
-                    <Card
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "custom"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                      onClick={() => setSelectedScanner("custom")}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg leading-tight">
-                            I bring my own scanner
-                          </CardTitle>
-                          <CardDescription>
-                            You can integrate any scanner, which is able to
-                            produce a SARIF-Report.
+                            Scans a container image for known vulnerabilties.
+                            Can only be used with local{" "}
+                            <CopyCodeFragment codeString=".tar" /> archives.
                           </CardDescription>
                         </CardHeader>
                       </CardContent>
@@ -515,4 +483,4 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   );
 };
 
-export default CodeRiskScannerDialog;
+export default DependencyRiskScannerDialog;

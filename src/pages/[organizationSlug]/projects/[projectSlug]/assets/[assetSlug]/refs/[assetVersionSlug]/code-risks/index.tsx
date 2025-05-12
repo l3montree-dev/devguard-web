@@ -138,11 +138,8 @@ const Index: FunctionComponent<Props> = (props) => {
           <div className="flex flex-row items-center justify-between">
             <BranchTagSelector branches={branches} tags={tags} />
             <div className="flex flex-row gap-2">
-              <Button variant={"ghost"} className="cursor-not-allowed">
-                Upload SARIF-File
-              </Button>
               <Button onClick={() => setIsOpen(true)} variant="default">
-                Integrate Scanner
+                Identify Code-Risks
               </Button>
             </div>
           </div>
