@@ -133,7 +133,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("flawCount", {
+    ...columnHelper.accessor("vulnCount", {
       header: "Vulnerability Count",
       id: "dependency_vuln_count",
       enableSorting: true,
