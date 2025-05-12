@@ -79,7 +79,9 @@ const Index: FunctionComponent<Props> = ({
     secrets.webhookSecret,
   );
 
-  const [badgeURL, setBadgeURL] = useState<string>(apiBadgeUrl + badgeSecret);
+  const [badgeURL, setBadgeURL] = useState<string>(
+    apiBadgeUrl + "cvss/" + badgeSecret,
+  );
 
   const form = useForm<AssetFormValues>({
     defaultValues: {
@@ -121,7 +123,7 @@ const Index: FunctionComponent<Props> = ({
 
       if (type === "badge") {
         setBadgeSecret(r.badgeSecret);
-        setBadgeURL(`${config.devGuardApiUrl}/api/v1/badges/${r.badgeSecret}`);
+        setBadgeURL(`${apiBadgeUrl}cvss/${r.badgeSecret}`);
         asset.badgeSecret = r.badgeSecret;
         toast("New badge secret generated", {
           description: "The badge secret has been generated",
@@ -276,30 +278,22 @@ const Index: FunctionComponent<Props> = ({
                 }
               />
             </div>
-            {asset.lastScaScan || asset.lastContainerScan ? (
-              <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
-                <p className="text-sm text-muted-foreground">
-                  You can use the following URL to display this badge in your
-                  README or other documentation:
-                </p>
-                <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
-                  {badgeURL}
-                </code>
 
-                <img
-                  src={badgeURL}
-                  alt="CVSS Badge"
-                  className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-                />
-              </div>
-            ) : (
-              <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
-                <p className="text-sm text-muted-foreground">
-                  No dependencies scans have been performed yet. The badge will
-                  be displayed here once a scan has been performed.
-                </p>
-              </div>
-            )}
+            <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+              <p className="text-sm text-muted-foreground">
+                You can use the following URL to display this badge in your
+                README or other documentation:
+              </p>
+              <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
+                {badgeURL}
+              </code>
+
+              <img
+                src={badgeURL}
+                alt="CVSS Badge"
+                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+              />
+            </div>
           </div>
 
           <div>
