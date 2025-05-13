@@ -220,8 +220,8 @@ include:
       apiUrl,
       token,
     ),
-    sca: generateDockerSnippet(
-      "sca",
+    "software-composition-analysis-from-repository": generateDockerSnippet(
+      "software-composition-analysis-from-repository",
       orgSlug,
       projectSlug,
       assetSlug,
@@ -230,6 +230,14 @@ include:
     ),
     "container-scanning": generateDockerSnippet(
       "container-scanning",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+    sca: generateDockerSnippet(
+      "sca",
       orgSlug,
       projectSlug,
       assetSlug,
