@@ -20,6 +20,7 @@ import { CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
+import { ImageZoom } from "../common/Zoom";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -49,7 +50,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
         </h3>
 
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
-          <Image
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
             src={"/assets/gitlab-secret.png"}
@@ -60,7 +61,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
       <div className="mb-10">
         <h3 className="mb-4 mt-2 font-semibold">Create a new variable</h3>
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
-          <Image
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
             src={"/assets/gitlab-var-settings.png"}
@@ -138,7 +139,7 @@ export const GitlabTokenSlides = ({
         </DialogHeader>
         <div className="mt-10">
           <div className="relative aspect-video w-full max-w-4xl">
-            <Image
+            <ImageZoom
               alt="Open the CI/CD settings in GitLab"
               className="rounded-lg border object-fill"
               src={"/assets/gitlab-secret.png"}

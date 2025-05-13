@@ -19,6 +19,7 @@ import { CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
+import { ImageZoom } from "../common/Zoom";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -32,7 +33,7 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
           https://github.com/l3montree-dev/devguard/settings
         </small>
         <div className="relative aspect-video w-full max-w-4xl">
-          <Image
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
             src={"/assets/project-settings.png"}
@@ -51,7 +52,7 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
           https://github.com/l3montree-dev/devguard/settings/secrets/actions
         </small>
         <div className="relative aspect-video w-full max-w-4xl">
-          <Image
+          <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
             src={"/assets/repo-secret.png"}
@@ -134,7 +135,7 @@ export const GithubTokenSlides = ({
             className="relative aspect-video w-full
                 max-w-4xl"
           >
-            <Image
+            <ImageZoom
               alt="Open the project settings in GitHub"
               className="rounded-lg border object-fill"
               src={"/assets/repo-secret.png"}

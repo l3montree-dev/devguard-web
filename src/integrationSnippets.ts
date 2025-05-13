@@ -222,5 +222,22 @@ include:
       apiUrl,
       token,
     ),
+    sca: generateDockerSnippet(
+      "sca",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+
+    "container-scanning": generateDockerSnippet(
+      "container-scanning",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
   },
 });
