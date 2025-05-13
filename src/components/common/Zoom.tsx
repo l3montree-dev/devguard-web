@@ -29,12 +29,12 @@ const Zoomable = (props: {
   alt: string;
 }) => {
   const [cls, setCls] = useState(
-    "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-0",
+    "fixed z-[9999] pointer-events-auto transition-all top-0 left-0 right-0 bottom-0 bg-black/50 scale-0",
   );
 
   useEffect(() => {
     setCls(
-      "fixed z-[9999] transition-all top-0 left-0 right-0 bottom-0 bg-black/20 scale-100 m-10",
+      "fixed z-[9999] pointer-events-auto transition-all top-0 left-0 right-0 bottom-0 bg-black/50 scale-100",
     );
   }, []);
   return (
@@ -45,13 +45,10 @@ const Zoomable = (props: {
             fill
             quality={100}
             {...props}
-            className="object-contain relative"
+            className="object-contain p-10 relative"
             alt={props.alt}
             src={getImageSrc(props as any)}
           />
-          <div className="absolute top-0 right-0 ">
-            <XCircleIcon className="z-[9999] top-0 right-0"></XCircleIcon>
-          </div>
         </div>
       </Root>
     </>
