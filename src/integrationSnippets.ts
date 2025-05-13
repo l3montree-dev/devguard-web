@@ -97,7 +97,6 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
-
     devsecops: generateWorkflowSnippet(
       "call-devsecops",
       "full.yml",
@@ -114,7 +113,6 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
-
     custom: `jobs:
     code-risk-identification: # what you want to name the job
         steps:
@@ -230,7 +228,6 @@ include:
       apiUrl,
       token,
     ),
-
     "container-scanning": generateDockerSnippet(
       "container-scanning",
       orgSlug,
