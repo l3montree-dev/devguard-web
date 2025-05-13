@@ -1,3 +1,4 @@
+import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 import Image from "next/image";
 import React, { FunctionComponent, useEffect, useRef, useState } from "react";
