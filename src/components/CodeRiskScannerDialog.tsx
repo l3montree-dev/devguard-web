@@ -121,7 +121,6 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
 
   const dropzone = useDropzone({
     onDrop,
-    accept: { "application/json": [".json"] },
   });
 
   return (
