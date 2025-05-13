@@ -1,5 +1,3 @@
-import { config } from "./config";
-
 const generateWorkflowSnippet = (
   jobName: string,
   workflowFile: string,
@@ -216,6 +214,30 @@ include:
     ),
     custom: generateDockerSnippet(
       "sarif",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+    "software-composition-analysis-from-repository": generateDockerSnippet(
+      "software-composition-analysis-from-repository",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+    "container-scanning": generateDockerSnippet(
+      "container-scanning",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+    sca: generateDockerSnippet(
+      "sca",
       orgSlug,
       projectSlug,
       assetSlug,
