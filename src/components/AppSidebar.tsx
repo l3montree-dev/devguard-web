@@ -1,4 +1,3 @@
-// Copyright 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +13,7 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { OrganizationDetailsDTO } from "@/types/api/api";
+import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
   BuildingOfficeIcon,
@@ -62,7 +61,10 @@ export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
 
   const router = useRouter();
-  const activeOrg = useOrg() ?? orgs[0];
+  let activeOrg = useOrg();
+  if (!activeOrg && orgs.length > 0) {
+    activeOrg = orgs[0];
+  }
   const updateOrganization = useStore((s) => s.updateOrganization);
 
   const handleActiveOrgChange = (id: string) => () => {
@@ -81,18 +83,20 @@ export const OrganizationDropDown = () => {
   return (
     <>
       <div className="flex w-full flex-row gap-2 items-center justify-between">
-        <div className="flex flex-row items-center gap-1 text-ellipsis">
-          <div className="flex flex-col gap-0 ">
-            <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
-              {activeOrg?.name}{" "}
-              <Link href={`/${activeOrg.slug}`}>
-                <Badge className="!text-white" variant={"outline"}>
-                  Organization
-                </Badge>
-              </Link>
-            </span>
+        {activeOrg && (
+          <div className="flex flex-row items-center gap-1 text-ellipsis">
+            <div className="flex flex-col gap-0 ">
+              <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
+                {activeOrg.name}{" "}
+                <Link href={`/${activeOrg.slug}`}>
+                  <Badge className="!text-white" variant={"outline"}>
+                    Organization
+                  </Badge>
+                </Link>
+              </span>
+            </div>
           </div>
-        </div>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
             <ChevronUpDownIcon className="block h-7 w-7 p-1" />
