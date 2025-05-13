@@ -394,7 +394,7 @@ export const getServerSideProps = middleware(
 
     const secrets = await secretsResp.json();
 
-    const apiBadgeUrl = config.devGuardApiUrl + "/api/v1/badges/";
+    const apiBadgeUrl = config.devguardApiUrlPublicInternet + "/api/v1/badges/";
 
     return {
       props: {
