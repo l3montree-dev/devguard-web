@@ -1,3 +1,5 @@
+import { config } from "./config";
+
 const generateWorkflowSnippet = (
   jobName: string,
   workflowFile: string,
