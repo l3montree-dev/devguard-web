@@ -237,6 +237,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   <CopyCode
                     highlightRegexPattern={highlightRegex}
                     codeString={vuln.snippet}
+                    startingLineNumber={vuln.startLine}
                   />
                 </div>
               )}
@@ -349,64 +350,19 @@ const Index: FunctionComponent<Props> = (props) => {
                               <Loader />
                               Accept risk
                             </Button>
-                            <div className="flex flex-col items-center">
-                              <div className="flex flex-row items-center">
-                                <Button
-                                  onClick={waitFor(() =>
-                                    handleSubmit({
-                                      status: "falsePositive",
-                                      justification,
-                                      mechanicalJustification: selectedOption,
-                                    }),
-                                  )}
-                                  variant={"secondary"}
-                                  className="mr-0 capitalize rounded-r-none pr-0"
-                                >
-                                  <Loader />
-                                  {removeUnderscores(selectedOption)}
-                                </Button>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      disabled={isLoading}
-                                      variant={"secondary"}
-                                      className=" flex items-center rounded-l-none pl-1 pr-2"
-                                    >
-                                      {isLoading && <Loader />}
-                                      <ChevronDown className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-
-                                  <DropdownMenuContent align="end">
-                                    {Object.entries(vexOptionMessages).map(
-                                      ([option, description]) => (
-                                        <DropdownMenuItem
-                                          key={option}
-                                          onClick={() =>
-                                            setSelectedOption(option)
-                                          }
-                                        >
-                                          <div className="flex flex-col">
-                                            <span className="capitalize">
-                                              {removeUnderscores(option)}
-                                            </span>
-
-                                            <span className="text-xs text-muted-foreground">
-                                              {description}
-                                            </span>
-                                          </div>
-                                        </DropdownMenuItem>
-                                      ),
-                                    )}
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                              <div className="text-left w-full">
-                                <span className="text-left w-full text-xs text-muted-foreground">
-                                  {"Mark as False Positive"}
-                                </span>
-                              </div>
-                            </div>
+                            <Button
+                              disabled={isLoading}
+                              onClick={() =>
+                                handleSubmit({
+                                  status: "falsePositive",
+                                  justification,
+                                })
+                              }
+                              variant={"secondary"}
+                            >
+                              <Loader />
+                              False Positive
+                            </Button>
                             <Button
                               onClick={waitFor(() =>
                                 handleSubmit({
@@ -519,21 +475,9 @@ export const getServerSideProps = middleware(
       "/first-party-vulns/" +
       vulnId;
 
-    const [resp, events]: [DetailedDependencyVulnDTO, VulnEventDTO[]] =
-      await Promise.all([
-        apiClient(uri).then((r) => r.json()),
-        apiClient(uri + "/events").then((r) => r.json()),
-      ]);
-
-    //filter events with type detected
-    const ev = (events || []).filter((event) => {
-      return (
-        !filterEventTypesFromOtherBranches.includes(event.type) ||
-        event.vulnId === resp.id
-      );
-    });
-
-    resp.events = ev;
+    const [resp]: [DetailedDependencyVulnDTO] = await Promise.all([
+      apiClient(uri).then((r) => r.json()),
+    ]);
 
     return {
       props: {

@@ -15,15 +15,6 @@ const AssetTitle = () => {
 
   return (
     <span className="flex flex-row gap-2">
-      <Link
-        href={`/${activeOrg.slug}`}
-        className="flex flex-row items-center gap-1 !text-white hover:no-underline"
-      >
-        {activeOrg.name}{" "}
-        <Badge className="font-body font-normal !text-white" variant="outline">
-          Organization
-        </Badge>
-      </Link>
       <span className="opacity-75">/</span>
       <ProjectElement project={project} activeOrg={activeOrg} />
       <span className="opacity-75">/</span>
@@ -32,7 +23,7 @@ const AssetTitle = () => {
         href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
       >
         {asset?.name}
-        <Badge className="font-body font-normal !text-white" variant="outline">
+        <Badge className="!text-white" variant="outline">
           Asset
         </Badge>
       </Link>

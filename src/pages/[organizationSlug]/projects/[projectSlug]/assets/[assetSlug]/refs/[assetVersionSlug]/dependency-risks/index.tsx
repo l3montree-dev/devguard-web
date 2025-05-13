@@ -17,7 +17,7 @@ import {
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
@@ -33,7 +33,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
@@ -45,8 +45,11 @@ import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import DependencyRiskScannerDialog from "../../../../../../../../../components/DependencyRiskScannerDialog";
+import { config } from "../../../../../../../../../config";
 
 interface Props {
+  apiUrl: string;
   vulns: Paged<VulnByPackage>;
 }
 
@@ -130,7 +133,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("flawCount", {
+    ...columnHelper.accessor("vulnCount", {
       header: "Vulnerability Count",
       id: "dependency_vuln_count",
       enableSorting: true,
@@ -182,6 +185,7 @@ const Index: FunctionComponent<Props> = (props) => {
     columnsDef,
     data: props.vulns.data,
   });
+  const [isOpen, setIsOpen] = useState(false);
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -220,7 +224,14 @@ const Index: FunctionComponent<Props> = (props) => {
         </>
       ) : (
         <div>
-          <BranchTagSelector branches={branches} tags={tags} />
+          <div className="flex flex-row items-center justify-between">
+            <BranchTagSelector branches={branches} tags={tags} />
+            <div className="flex flex-row gap-2">
+              <Button onClick={() => setIsOpen(true)} variant="default">
+                Identify Dependency-Risks
+              </Button>
+            </div>
+          </div>
 
           <Section
             forceVertical
@@ -328,6 +339,11 @@ const Index: FunctionComponent<Props> = (props) => {
           </Section>
         </div>
       )}
+      <DependencyRiskScannerDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        apiUrl={props.apiUrl}
+      />
     </Page>
   );
 };
@@ -393,6 +409,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vulns,
+        apiUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },

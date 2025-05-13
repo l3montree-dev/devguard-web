@@ -82,7 +82,7 @@ const PolicyDialog: FunctionComponent<Props> = ({
         <Form {...form}>
           <form
             className="flex flex-col gap-4"
-            onSubmit={(e) => (onSubmit ? form.handleSubmit(onSubmit) : null)}
+            onSubmit={(e) => (onSubmit ? form.handleSubmit(onSubmit)(e) : null)}
           >
             {onSubmit && (
               <>
@@ -150,7 +150,7 @@ const PolicyDialog: FunctionComponent<Props> = ({
                 )}
               </div>
             ) : (
-              <FileUpload dropzone={dropzone} />
+              <FileUpload files={[]} dropzone={dropzone} />
             )}
             <p className="text-muted-foreground text-sm">
               Use a .rego editor to create a policy. Be inspired by our example

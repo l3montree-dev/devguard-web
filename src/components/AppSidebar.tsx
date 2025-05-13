@@ -1,4 +1,3 @@
-// Copyright 2024 Tim Bastin, l3montree UG (haftungsbeschränkt)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +13,14 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { OrganizationDetailsDTO } from "@/types/api/api";
+import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
-  BuildingOffice2Icon,
   BuildingOfficeIcon,
   ChevronUpDownIcon,
   CogIcon,
-  LifebuoyIcon,
 } from "@heroicons/react/24/outline";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,18 +55,18 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { Badge } from "./ui/badge";
 
-const AppSidebar = () => {
+export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
 
   const router = useRouter();
-  const activeOrg = useOrg() ?? orgs[0];
+  let activeOrg = useOrg();
+  if (!activeOrg && orgs.length > 0) {
+    activeOrg = orgs[0];
+  }
   const updateOrganization = useStore((s) => s.updateOrganization);
-  const currentUser = useCurrentUser();
-  const contentTree = useStore((s) => s.contentTree);
 
-  const sidebar = useSidebar();
   const handleActiveOrgChange = (id: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.id === id);
@@ -82,34 +80,26 @@ const AppSidebar = () => {
     router.push(`/setup-organization`);
   };
 
-  const items = useOrganizationMenu();
-
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
+    <>
+      <div className="flex w-full flex-row gap-2 items-center justify-between">
+        {activeOrg && (
+          <div className="flex flex-row items-center gap-1 text-ellipsis">
+            <div className="flex flex-col gap-0 ">
+              <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
+                {activeOrg.name}{" "}
+                <Link href={`/${activeOrg.slug}`}>
+                  <Badge className="!text-white" variant={"outline"}>
+                    Organization
+                  </Badge>
+                </Link>
+              </span>
+            </div>
+          </div>
+        )}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size={"lg"}
-              className="rounded-lg text-white data-[state=open]:bg-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex w-full flex-row items-center justify-between gap-1">
-                <div className="flex flex-row items-center gap-1 text-ellipsis">
-                  <div className="size-8 flex aspect-square flex-row items-center justify-center rounded-lg bg-secondary p-1.5 text-foreground dark:text-white">
-                    <BuildingOffice2Icon className="h-6 w-6" />
-                  </div>
-                  <div className="flex flex-col gap-0 ">
-                    <span className="line-clamp-1 inline-block max-w-[155px] truncate text-ellipsis text-left text-sm font-semibold">
-                      {activeOrg?.name}
-                    </span>
-                    <span className="truncate text-left text-xs">
-                      Organization
-                    </span>
-                  </div>
-                </div>
-                <ChevronUpDownIcon className="block h-7 w-7 p-1" />
-              </div>
-            </SidebarMenuButton>
+          <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
+            <ChevronUpDownIcon className="block h-7 w-7 p-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
@@ -141,6 +131,27 @@ const AppSidebar = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+    </>
+  );
+};
+
+const AppSidebar = () => {
+  const orgs = useStore((s) => s.organizations);
+
+  const router = useRouter();
+  const activeOrg = useOrg() ?? orgs[0];
+  const currentUser = useCurrentUser();
+  const contentTree = useStore((s) => s.contentTree);
+
+  const sidebar = useSidebar();
+
+  const items = useOrganizationMenu();
+
+  return (
+    <Sidebar variant="sidebar" collapsible="icon">
+      <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
+        <OrganizationDropDown />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

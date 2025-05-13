@@ -419,6 +419,9 @@ export interface AssetDTO {
   centralVulnManagement: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
+
+  badgeSecret: string;
+  webhookSecret: string | null;
 }
 
 export interface DependencyTreeNode {
@@ -506,7 +509,7 @@ export interface VulnByPackage {
   maxRisk: number;
   maxCvss: number;
   totalRisk: number;
-  flawCount: number;
+  vulnCount: number;
   avgRisk: number;
   vulns: VulnWithCVE[];
 }
