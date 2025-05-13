@@ -251,7 +251,14 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 >
                   <CardHeader>
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      Upload SBOM-File
+                      <Image
+                        src="/assets/cyclonedx-logo.svg"
+                        alt="GitLab"
+                        width={20}
+                        height={20}
+                        className="inline-block mr-2"
+                      />
+                      Upload SBOM
                     </CardTitle>
                     <CardDescription>
                       You can integrate any scanner, which is able to produce a
