@@ -226,14 +226,14 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                   disabled={project.type !== "default"}
                   onClick={() => setShowModal(true)}
                 >
-                  New Asset
+                  New Repository
                 </Button>
               </div>
             }
             primaryHeadline
             description={"Assets managed by the " + project.name + " project"}
             forceVertical
-            title="Subprojects & Assets"
+            title="Subprojects & Repositories"
           >
             {subprojects.map((subproject) => (
               <Link

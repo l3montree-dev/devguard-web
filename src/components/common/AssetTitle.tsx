@@ -24,7 +24,7 @@ const AssetTitle = () => {
       >
         {asset?.name}
         <Badge className="!text-white" variant="outline">
-          Asset
+          Repository
         </Badge>
       </Link>
     </span>

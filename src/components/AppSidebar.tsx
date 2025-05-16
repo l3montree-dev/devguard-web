@@ -92,14 +92,9 @@ export const OrganizationDropDown = () => {
                 text-white "
                 >
                   {activeOrg.name}{" "}
-                  <Link href={`/${activeOrg.slug}`}>
-                    <Badge
-                      className="!text-white ml-2 mb-2"
-                      variant={"outline"}
-                    >
-                      Organization
-                    </Badge>
-                  </Link>
+                  <Badge className="!text-white ml-2" variant={"outline"}>
+                    Organization
+                  </Badge>
                 </span>
               </Link>
             </div>
