@@ -22,14 +22,40 @@ import {
 import { Switch } from "./ui/switch";
 import ListItem from "./common/ListItem";
 import DangerZone from "./common/DangerZone";
+import { browserApiClient } from "@/services/devGuardApi";
+import { toast } from "sonner";
+import router from "next/router";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 interface Props {
   form:
     | UseFormReturn<OrganizationDTO, any, undefined>
     | UseFormReturn<OrganizationDetailsDTO, any, undefined>;
+  forceVerticalSections: boolean;
+  onConfirmDelete?: () => Promise<void>;
 }
 
-export const OrgForm: FunctionComponent<Props> = ({ form }) => (
+const handleDeleteProject = async () => {
+  const resp = await browserApiClient(
+    "/organizations/" + activeOrg.slug, // can never be null
+    {
+      method: "DELETE",
+    },
+  );
+  if (resp.ok) {
+    toast("Project deleted", {
+      description: "The project has been deleted",
+    });
+    router.push("/" + activeOrg.slug);
+  } else {
+    toast.error("Could not delete asset");
+  }
+};
+
+export const OrgForm: FunctionComponent<Props> = ({
+  form,
+  onConfirmDelete,
+}) => (
   <>
     <Section
       description="General and required information about your organization."
