@@ -234,7 +234,14 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                 >
                   <CardHeader>
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      Upload SARIF-Report
+                      <Image
+                        src="/assets/sarif-logo.svg"
+                        alt="GitLab"
+                        width={20}
+                        height={20}
+                        className="inline-block mr-2"
+                      />
+                      Upload SARIF
                     </CardTitle>
                     <CardDescription>
                       You can integrate any scanner, which is able to produce a
