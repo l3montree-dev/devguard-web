@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from "next";
 import { FunctionComponent, useState } from "react";
 import Page from "../../../../components/Page";
 
