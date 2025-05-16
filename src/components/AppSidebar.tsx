@@ -86,10 +86,13 @@ export const OrganizationDropDown = () => {
         {activeOrg && (
           <div className="flex flex-row items-center gap-1 text-ellipsis">
             <div className="flex flex-col gap-0 ">
-              <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold">
+              <span
+                className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold
+              text-white"
+              >
                 {activeOrg.name}{" "}
                 <Link href={`/${activeOrg.slug}`}>
-                  <Badge className="!text-white" variant={"outline"}>
+                  <Badge className="!text-white ml-2" variant={"outline"}>
                     Organization
                   </Badge>
                 </Link>
@@ -150,7 +153,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#02040a]">
+      <SidebarHeader className="relative border-b bg-blue-950 pb-[46px] pt-3.5 dark:bg-[#ffffff]">
         <OrganizationDropDown />
       </SidebarHeader>
       <SidebarContent>
