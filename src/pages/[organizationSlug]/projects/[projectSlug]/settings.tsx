@@ -1,4 +1,3 @@
-import { GetServerSidePropsContext } from "next";
 import { FunctionComponent, useState } from "react";
 import Page from "../../../../components/Page";
 
@@ -90,7 +89,7 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
       toast("Project deleted", {
         description: "The project has been deleted",
       });
-      router.push("/" + activeOrg.slug + "/projects/");
+      router.push("/" + activeOrg.slug);
     } else {
       toast.error("Could not delete asset");
     }
