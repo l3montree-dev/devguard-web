@@ -86,17 +86,22 @@ export const OrganizationDropDown = () => {
         {activeOrg && (
           <div className="flex flex-row items-center gap-1 text-ellipsis">
             <div className="flex flex-col gap-0 ">
-              <span
-                className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold
-              text-white"
-              >
-                {activeOrg.name}{" "}
-                <Link href={`/${activeOrg.slug}`}>
-                  <Badge className="!text-white ml-2" variant={"outline"}>
-                    Organization
-                  </Badge>
-                </Link>
-              </span>
+              <Link href={`/${activeOrg?.slug}`}>
+                <span
+                  className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold
+                text-white "
+                >
+                  {activeOrg.name}{" "}
+                  <Link href={`/${activeOrg.slug}`}>
+                    <Badge
+                      className="!text-white ml-2 mb-2"
+                      variant={"outline"}
+                    >
+                      Organization
+                    </Badge>
+                  </Link>
+                </span>
+              </Link>
             </div>
           </div>
         )}
