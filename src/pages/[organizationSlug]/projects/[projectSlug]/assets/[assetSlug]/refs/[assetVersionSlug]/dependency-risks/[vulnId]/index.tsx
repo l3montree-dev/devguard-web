@@ -22,7 +22,7 @@ import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -305,7 +305,6 @@ const Index: FunctionComponent<Props> = (props) => {
   const [selectedOption, setSelectedOption] = useState<string>(
     Object.keys(vexOptionMessages)[2],
   );
-  const { Loader, waitFor, isLoading } = useLoader();
 
   const assetVersion = useStore((s) => s.assetVersion);
 
@@ -481,15 +480,14 @@ const Index: FunctionComponent<Props> = (props) => {
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
                               ) && (
-                                <Button
+                                <AsyncButton
                                   variant={"secondary"}
-                                  disabled={isLoading}
-                                  onClick={waitFor(() =>
+                                  onClick={() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    }),
-                                  )}
+                                    })
+                                  }
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -503,22 +501,21 @@ const Index: FunctionComponent<Props> = (props) => {
                                       Create GitLab Ticket
                                     </div>
                                   </div>
-                                </Button>
+                                </AsyncButton>
                               )}
 
                             {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
                               ) && (
-                                <Button
+                                <AsyncButton
                                   variant={"secondary"}
-                                  disabled={isLoading}
-                                  onClick={waitFor(() =>
+                                  onClick={() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    }),
-                                  )}
+                                    })
+                                  }
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -532,46 +529,41 @@ const Index: FunctionComponent<Props> = (props) => {
                                       Create GitHub Ticket
                                     </div>
                                   </div>
-                                </Button>
+                                </AsyncButton>
                               )}
 
-                            <Button
-                              onClick={waitFor(() =>
+                            <AsyncButton
+                              onClick={() =>
                                 handleSubmit({
                                   status: "accepted",
                                   justification,
-                                }),
-                              )}
-                              disabled={isLoading}
+                                })
+                              }
                               variant={"secondary"}
                             >
-                              <Loader />
                               Accept risk
-                            </Button>
+                            </AsyncButton>
                             <div className="flex flex-col items-center">
                               <div className="flex flex-row items-center">
-                                <Button
-                                  onClick={waitFor(() =>
+                                <AsyncButton
+                                  onClick={() =>
                                     handleSubmit({
                                       status: "falsePositive",
                                       justification,
                                       mechanicalJustification: selectedOption,
-                                    }),
-                                  )}
+                                    })
+                                  }
                                   variant={"secondary"}
                                   className="mr-0 capitalize rounded-r-none pr-0"
                                 >
-                                  <Loader />
                                   {removeUnderscores(selectedOption)}
-                                </Button>
+                                </AsyncButton>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      disabled={isLoading}
                                       variant={"secondary"}
                                       className=" flex items-center rounded-l-none pl-1 pr-2"
                                     >
-                                      {isLoading && <Loader />}
                                       <ChevronDown className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
@@ -606,19 +598,17 @@ const Index: FunctionComponent<Props> = (props) => {
                               </div>
                             </div>
 
-                            <Button
-                              onClick={waitFor(() =>
+                            <AsyncButton
+                              onClick={() =>
                                 handleSubmit({
                                   status: "comment",
                                   justification,
-                                }),
-                              )}
-                              disabled={isLoading}
+                                })
+                              }
                               variant={"default"}
                             >
-                              <Loader />
                               Comment
-                            </Button>
+                            </AsyncButton>
                           </div>
                         </div>
                       </form>
@@ -645,20 +635,18 @@ const Index: FunctionComponent<Props> = (props) => {
                           risk now, or accepted this vuln by accident.
                         </p>
                         <div className="flex flex-row justify-end">
-                          <Button
-                            onClick={waitFor(() =>
+                          <AsyncButton
+                            onClick={() =>
                               handleSubmit({
                                 status: "reopened",
                                 justification,
-                              }),
-                            )}
-                            disabled={isLoading}
+                              })
+                            }
                             variant={"secondary"}
                             type="submit"
                           >
-                            <Loader />
                             Reopen
-                          </Button>
+                          </AsyncButton>
                         </div>
                       </form>
                     )}
