@@ -17,14 +17,13 @@ import {
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { Button } from "@/components/ui/button";
+import { AsyncButton } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { FunctionComponent, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
@@ -41,26 +40,12 @@ import { withOrganization } from "@/decorators/withOrganization";
 import AssetTitle from "@/components/common/AssetTitle";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { useLoader } from "@/hooks/useLoader";
-import {
-  emptyThenNull,
-  getRepositoryId,
-  removeUnderscores,
-  vexOptionMessages,
-} from "@/utils/view";
+import { emptyThenNull, getRepositoryId } from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
-import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -91,10 +76,6 @@ const Index: FunctionComponent<Props> = (props) => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
-  const [selectedOption, setSelectedOption] = useState<string>(
-    Object.keys(vexOptionMessages)[0],
-  );
-  const { Loader, waitFor, isLoading } = useLoader();
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -284,14 +265,14 @@ const Index: FunctionComponent<Props> = (props) => {
                               getRepositoryId(asset, project)?.startsWith(
                                 "gitlab:",
                               ) && (
-                                <Button
+                                <AsyncButton
                                   variant={"secondary"}
-                                  onClick={waitFor(() =>
+                                  onClick={() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    }),
-                                  )}
+                                    })
+                                  }
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -305,22 +286,21 @@ const Index: FunctionComponent<Props> = (props) => {
                                       Create GitLab Ticket
                                     </div>
                                   </div>
-                                </Button>
+                                </AsyncButton>
                               )}
 
                             {vuln.ticketId === null &&
                               getRepositoryId(asset, project)?.startsWith(
                                 "github:",
                               ) && (
-                                <Button
+                                <AsyncButton
                                   variant={"secondary"}
-                                  disabled={isLoading}
-                                  onClick={waitFor(() =>
+                                  onClick={() =>
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
-                                    }),
-                                  )}
+                                    })
+                                  }
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
@@ -334,24 +314,21 @@ const Index: FunctionComponent<Props> = (props) => {
                                       Create GitHub Ticket
                                     </div>
                                   </div>
-                                </Button>
+                                </AsyncButton>
                               )}
 
-                            <Button
-                              disabled={isLoading}
-                              onClick={waitFor(() =>
+                            <AsyncButton
+                              onClick={() =>
                                 handleSubmit({
                                   status: "accepted",
                                   justification,
-                                }),
-                              )}
+                                })
+                              }
                               variant={"secondary"}
                             >
-                              <Loader />
                               Accept risk
-                            </Button>
-                            <Button
-                              disabled={isLoading}
+                            </AsyncButton>
+                            <AsyncButton
                               onClick={() =>
                                 handleSubmit({
                                   status: "falsePositive",
@@ -360,22 +337,19 @@ const Index: FunctionComponent<Props> = (props) => {
                               }
                               variant={"secondary"}
                             >
-                              <Loader />
                               False Positive
-                            </Button>
-                            <Button
-                              onClick={waitFor(() =>
+                            </AsyncButton>
+                            <AsyncButton
+                              onClick={() =>
                                 handleSubmit({
                                   status: "comment",
                                   justification,
-                                }),
-                              )}
-                              disabled={isLoading}
+                                })
+                              }
                               variant={"default"}
                             >
-                              <Loader />
                               Comment
-                            </Button>
+                            </AsyncButton>
                           </div>
                         </div>
                       </form>
@@ -402,20 +376,18 @@ const Index: FunctionComponent<Props> = (props) => {
                           risk now, or accepted this vuln by accident.
                         </p>
                         <div className="flex flex-row justify-end">
-                          <Button
-                            onClick={waitFor(() =>
+                          <AsyncButton
+                            onClick={() =>
                               handleSubmit({
                                 status: "reopened",
                                 justification,
-                              }),
-                            )}
-                            disabled={isLoading}
+                              })
+                            }
                             variant={"secondary"}
                             type="submit"
                           >
-                            <Loader />
                             Reopen
-                          </Button>
+                          </AsyncButton>
                         </div>
                       </form>
                     )}
