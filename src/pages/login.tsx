@@ -39,8 +39,26 @@ import {
   useState,
 } from "react";
 import { Flow } from "../components/kratos/Flow";
+
 import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
+import dynamic from "next/dynamic";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { BlocksIcon, FileCheckIcon, LandmarkIcon } from "lucide-react";
+import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
+
+const ThreeJSScene = dynamic(
+  () => import("../components/threejs/ThreeJSScene"),
+  {
+    ssr: false,
+  },
+);
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -169,14 +187,7 @@ const Login: NextPage = () => {
         <meta name="description" content="DevGuard Sign in" />
       </Head>
       <div className="flex min-h-screen flex-1 flex-row bg-white ">
-        <div className="relative w-3/5 bg-slate-200 dark:bg-gray-500">
-          <Image
-            src={"/bg.png"}
-            alt="DevGuard by l3montree Logo"
-            objectFit="cover"
-            fill
-          />
-        </div>
+        <ThreeJSFeatureScreen />
         <div className="flex w-2/5 flex-col items-center justify-center bg-background">
           <div className="w-full px-8">
             <div className="">
