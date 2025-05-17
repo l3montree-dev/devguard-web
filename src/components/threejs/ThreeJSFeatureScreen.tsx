@@ -1,15 +1,12 @@
 import { FileCheckIcon, BlocksIcon, LandmarkIcon } from "lucide-react";
 import React from "react";
-import ThreeJSScene from "./ThreeJSScene";
+import { ThreeJSScene } from "./ThreeJSScene";
 import Image from "next/image";
 
 const ThreeJSFeatureScreen = () => {
   return (
     <div className="relative w-3/5 bg-background">
-      <h1 className="animate-charcter font-semibold absolute top-0 left-0 right-0 w-full z-10 pb-4 text-2xl font-display text-center mt-20 opacity-80">
-        Inspect each component of your supply chain
-      </h1>
-      <div className="absolute pointer-events-none bg-card/50 p-5 rounded-lg backdrop-blur-lg w-1/2 m-20 mt-40 top-0 left-0 z-10">
+      <div className="absolute pointer-events-none bg-card/50 p-5 rounded-lg backdrop-blur-lg w-1/2 m-20 top-0 left-0 z-10">
         <div className="mt-2 flex flex-col gap-4">
           <div className="flex gap-4 flex-row">
             <div className="rounded-full bg-card w-10 h-10 flex flex-row items-center justify-center border">
