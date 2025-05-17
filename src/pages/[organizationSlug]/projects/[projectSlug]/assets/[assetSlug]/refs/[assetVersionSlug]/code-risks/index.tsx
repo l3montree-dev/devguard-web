@@ -110,17 +110,9 @@ const Index: FunctionComponent<Props> = (props) => {
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           Button={
-            <Link
-              className={classNames(
-                buttonVariants({
-                  variant: "default",
-                }),
-                "!text-primary-foreground",
-              )}
-              href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/`}
-            >
-              Start identifying risks
-            </Link>
+            <Button onClick={() => setIsOpen(true)} variant="default">
+              Start identifying Risks
+            </Button>
           }
         />
       ) : table.getRowCount() === 0 &&
