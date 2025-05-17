@@ -80,7 +80,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
     });
   }, [api]);
 
-  const fileContent = useRef<any>();
+  const fileContent = useRef<any>(undefined);
   const [fileName, setFileName] = useState<string>();
 
   const uploadSBOM = async () => {
