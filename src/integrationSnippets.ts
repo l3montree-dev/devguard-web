@@ -44,13 +44,19 @@ const generateDockerSnippet = (
   assetSlug: string,
   apiUrl: string,
   token?: string,
-) => `# API URL might be host.docker.internal:PORT if you are running a local devguard instance on localhost
+) => {
+  let path = "/app";
+  if (command === "container-scanning") {
+    path = "/app/image.tar";
+  }
+  return `# API URL might be host.docker.internal:8080 if you are running a local devguard instance on localhost
 docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
 devguard-scanner ${command} \\
-    --path="/app" \\
+    --path="${path}" \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
     --token="${token ? token : "TOKEN"}"`;
+};
 
 export const integrationSnippets = ({
   orgSlug,

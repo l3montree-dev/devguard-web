@@ -18,6 +18,6 @@ export const config = {
   devguardApiUrlPublicInternet:
     process.env.DEVGUARD_API_URL_PUBLIC_INTERNET ||
     "https://api.main.devguard.org",
-  devguardScannerTag: "main-7e94178b-1727680457",
+  devguardScannerTag: "main-68c8b774-1747398026",
   retryInterval: 3000,
 };

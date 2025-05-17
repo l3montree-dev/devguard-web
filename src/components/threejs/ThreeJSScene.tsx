@@ -132,7 +132,6 @@ function Scene() {
 }
 
 const ThreeJSScene = () => {
-  const texture = useLoader(LUTCubeLoader, "/lut/F-6800-STD.cube");
   return (
     <Canvas
       orthographic
