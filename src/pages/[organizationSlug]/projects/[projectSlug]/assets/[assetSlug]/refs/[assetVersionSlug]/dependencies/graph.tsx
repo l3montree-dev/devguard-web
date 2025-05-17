@@ -135,64 +135,6 @@ const DependencyGraphPage: FunctionComponent<{
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={"secondary"}>Download SBOM</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Link
-                  download
-                  target="_blank"
-                  prefetch={false}
-                  href={addVersionAndscannerQueryParams(
-                    pathname + `/../../sbom.json`,
-                  )}
-                  className="!text-foreground hover:no-underline"
-                >
-                  <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-                </Link>
-                <Link
-                  download
-                  target="_blank"
-                  prefetch={false}
-                  href={addVersionAndscannerQueryParams(
-                    pathname + `/../../sbom.xml`,
-                  )}
-                  className="!text-foreground hover:no-underline"
-                >
-                  <DropdownMenuItem>XML-Format</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={"secondary"}>Download VeX</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Link
-                  download
-                  target="_blank"
-                  prefetch={false}
-                  href={addVersionAndscannerQueryParams(
-                    pathname + `/../../vex.json`,
-                  )}
-                  className="!text-foreground hover:no-underline"
-                >
-                  <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-                </Link>
-                <Link
-                  download
-                  target="_blank"
-                  prefetch={false}
-                  href={addVersionAndscannerQueryParams(
-                    pathname + `/../../vex.xml`,
-                  )}
-                  className="!text-foreground hover:no-underline"
-                >
-                  <DropdownMenuItem>XML-Format</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <div className="flex flex-row items-center gap-4">
             {graph.root.risk !== 0 && (

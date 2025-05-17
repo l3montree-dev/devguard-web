@@ -51,7 +51,10 @@ import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { buttonVariants } from "../../../../../../../../../components/ui/button";
+import {
+  Button,
+  buttonVariants,
+} from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 
@@ -64,6 +67,13 @@ import {
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../../../../../../../components/ui/dropdown-menu";
+import { useRouter } from "next/router";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -187,6 +197,7 @@ const columnsDef: ColumnDef<
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const pathname = useRouter().asPath.split("?")[0];
 
   const [datasets, setDatasets] = useState<{
     purl: string;
@@ -231,61 +242,62 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     >
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-
-        <div className="w-1/3">
-          <span className="text-xs text-muted-foreground">Licenses</span>
-          <span>
-            <span className="flex flex-row overflow-hidden rounded-full">
-              {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
-                <span
-                  key={el.license.licenseId}
-                  className={classNames(
-                    "h-2",
-                    i === arr.length - 1 ? "" : "border-r",
-                  )}
-                  style={{
-                    width: percent + "%",
-                    backgroundColor:
-                      osiLicenseHexColors[el.license.licenseId] || "#eeeeee",
-                  }}
-                />
-              ))}
-            </span>
-            <span className="mt-2 flex flex-row flex-wrap gap-2">
-              {licenseToPercentMapEntries
-                .filter((el) => el[1] > 0.5)
-                .map(([el, percent]) => (
-                  <span
-                    className="whitespace-nowrap text-xs capitalize"
-                    key={el.license.licenseId}
-                  >
-                    <span
-                      style={{
-                        backgroundColor:
-                          osiLicenseHexColors[el.license.licenseId] ??
-                          "#eeeeee",
-                      }}
-                      className={classNames(
-                        "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
-                      )}
-                    />
-                    {el.license.licenseId}{" "}
-                    <span className="text-muted-foreground">
-                      {Math.round(percent as number)}%
-                    </span>
-                  </span>
-                ))}
-            </span>
-          </span>
-        </div>
-      </div>
-
-      <Section
-        primaryHeadline
-        forceVertical
-        Button={
+        <div className="flex flex-row gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download SBOM</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../sbom.json`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+              </Link>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../sbom.xml`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>XML-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download VeX</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.json`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+              </Link>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.xml`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>XML-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link
-            className={classNames(buttonVariants({ variant: "secondary" }))}
+            className={classNames(
+              buttonVariants({ variant: "default" }),
+              "!text-background",
+            )}
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.name}/dependencies/graph?` +
               new URLSearchParams({
@@ -296,9 +308,62 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           >
             Open Dependency Graph
           </Link>
-        }
+        </div>
+      </div>
+
+      <Section
+        primaryHeadline
+        forceVertical
         description="Dependencies of the asset"
         title="Dependencies"
+        Button={
+          <div className="w-1/3">
+            <span className="text-xs text-muted-foreground">Licenses</span>
+            <span>
+              <span className="flex flex-row overflow-hidden rounded-full">
+                {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
+                  <span
+                    key={el.license.licenseId}
+                    className={classNames(
+                      "h-2",
+                      i === arr.length - 1 ? "" : "border-r",
+                    )}
+                    style={{
+                      width: percent + "%",
+                      backgroundColor:
+                        osiLicenseHexColors[el.license.licenseId] || "#eeeeee",
+                    }}
+                  />
+                ))}
+              </span>
+              <span className="mt-2 flex flex-row flex-wrap gap-2">
+                {licenseToPercentMapEntries
+                  .filter((el) => el[1] > 0.5)
+                  .map(([el, percent]) => (
+                    <span
+                      className="whitespace-nowrap text-xs capitalize"
+                      key={el.license.licenseId}
+                    >
+                      <span
+                        style={{
+                          backgroundColor:
+                            osiLicenseHexColors[el.license.licenseId] ??
+                            "#eeeeee",
+                        }}
+                        className={classNames(
+                          "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
+                        )}
+                      />
+                      {el.license.licenseId}{" "}
+                      <span className="text-muted-foreground">
+                        {Math.round(percent as number)}%
+                      </span>
+                    </span>
+                  ))}
+              </span>
+            </span>
+          </div>
+        }
       >
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
