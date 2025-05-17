@@ -1,7 +1,11 @@
 // @ts-nocheck
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Bloom, EffectComposer, LUT } from "@react-three/postprocessing";
-import { LUTCubeLoader } from "postprocessing";
+import {
+  Bloom,
+  EffectComposer,
+  HueSaturation,
+} from "@react-three/postprocessing";
+import { BlendFunction, LUTCubeLoader } from "postprocessing";
 import { useCallback, useRef, useState } from "react";
 import * as THREE from "three";
 import { Beam } from "./components/Beam";
@@ -145,7 +149,11 @@ const ThreeJSScene = () => {
           luminanceThreshold={1}
           luminanceSmoothing={1}
         />
-        <LUT lut={texture} />
+        <HueSaturation
+          blendFunction={BlendFunction.NORMAL}
+          saturation={-0.25}
+          hue={0}
+        />
       </EffectComposer>
     </Canvas>
   );
