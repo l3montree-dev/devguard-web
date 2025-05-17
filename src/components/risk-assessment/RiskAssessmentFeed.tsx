@@ -21,21 +21,21 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
-    eventMessages,
-    eventTypeMessages,
-    evTypeBackground,
-    findUser,
-    removeUnderscores,
+  eventMessages,
+  eventTypeMessages,
+  evTypeBackground,
+  findUser,
+  removeUnderscores,
 } from "@/utils/view";
 import {
-    ArrowPathIcon,
-    ArrowRightStartOnRectangleIcon,
-    ChatBubbleOvalLeftEllipsisIcon,
-    CheckIcon,
-    MagnifyingGlassIcon,
-    SpeakerXMarkIcon,
-    StopIcon,
-    WrenchIcon,
+  ArrowPathIcon,
+  ArrowRightStartOnRectangleIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
+  CheckIcon,
+  MagnifyingGlassIcon,
+  SpeakerXMarkIcon,
+  StopIcon,
+  WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { GitBranchIcon } from "lucide-react";
 import Image from "next/image";
@@ -171,9 +171,7 @@ export default function RiskAssessmentFeed({
 
                       {Boolean(msg) && (
                         <div className="mdx-editor-content w-full rounded p-2  text-foreground">
-                          <Markdown >
-                            {msg}
-                          </Markdown>
+                          <Markdown>{msg}</Markdown>
                         </div>
                       )}
                     </div>

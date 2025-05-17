@@ -1,31 +1,31 @@
 import {
-    DiffSourceToggleWrapper,
-    MDXEditorMethods,
-    MDXEditorProps,
+  DiffSourceToggleWrapper,
+  MDXEditorMethods,
+  MDXEditorProps,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import styles from "../../styles/mdxeditor.module.scss"
+import styles from "../../styles/mdxeditor.module.scss";
 import { FunctionComponent, useEffect, useRef } from "react";
 
 import {
-    BoldItalicUnderlineToggles,
-    CodeToggle,
-    ListsToggle,
-    MDXEditor,
-    codeBlockPlugin,
-    codeMirrorPlugin,
-    diffSourcePlugin,
-    frontmatterPlugin,
-    headingsPlugin,
-    imagePlugin,
-    linkDialogPlugin,
-    linkPlugin,
-    listsPlugin,
-    markdownShortcutPlugin,
-    quotePlugin,
-    tablePlugin,
-    thematicBreakPlugin,
-    toolbarPlugin
+  BoldItalicUnderlineToggles,
+  CodeToggle,
+  ListsToggle,
+  MDXEditor,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  diffSourcePlugin,
+  frontmatterPlugin,
+  headingsPlugin,
+  imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
 } from "@mdxeditor/editor";
 import { classNames } from "../../utils/common";
 
@@ -49,7 +49,10 @@ const MarkdownEditor: FunctionComponent<Props> = ({
   return (
     <MDXEditor
       ref={markdownRef}
-      className={classNames("mdx-editor ring-primary focus:ring-2 focus-within:ring-2 rounded border", styles.mdxeditor)}
+      className={classNames(
+        "mdx-editor ring-primary focus:ring-2 focus-within:ring-2 rounded border",
+        styles.mdxeditor,
+      )}
       onChange={(value) => setValue(value)}
       placeholder={placeholder}
       markdown={value}
@@ -59,11 +62,9 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         toolbarPlugin({
           toolbarContents: () => (
             <>
-         
-                <BoldItalicUnderlineToggles />
-                <CodeToggle />
-                <ListsToggle />
-    
+              <BoldItalicUnderlineToggles />
+              <CodeToggle />
+              <ListsToggle />
             </>
           ),
         }),
@@ -87,7 +88,6 @@ const MarkdownEditor: FunctionComponent<Props> = ({
           },
         }),
 
-       
         markdownShortcutPlugin(),
       ]}
     />
