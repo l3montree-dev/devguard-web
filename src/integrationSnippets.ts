@@ -44,7 +44,8 @@ const generateDockerSnippet = (
   assetSlug: string,
   apiUrl: string,
   token?: string,
-) => `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
+) => `# API URL might be host.docker.internal:PORT if you are running a local devguard instance on localhost
+docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
 devguard-scanner ${command} \\
     --path="/app" \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\

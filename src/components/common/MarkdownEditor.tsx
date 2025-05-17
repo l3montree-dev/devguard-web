@@ -4,32 +4,30 @@ import {
   MDXEditorProps,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
+import styles from "../../styles/mdxeditor.module.scss";
 import { FunctionComponent, useEffect, useRef } from "react";
 
-const {
+import {
+  BoldItalicUnderlineToggles,
+  CodeToggle,
+  ListsToggle,
   MDXEditor,
   codeBlockPlugin,
+  codeMirrorPlugin,
+  diffSourcePlugin,
+  frontmatterPlugin,
   headingsPlugin,
-  listsPlugin,
-  linkPlugin,
-  quotePlugin,
-  markdownShortcutPlugin,
-  toolbarPlugin,
-  useCodeBlockEditorContext,
-  linkDialogPlugin,
   imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
   tablePlugin,
   thematicBreakPlugin,
-  frontmatterPlugin,
-
-  codeMirrorPlugin,
-
-  BoldItalicUnderlineToggles,
-  ListsToggle,
-  CodeToggle,
-  diffSourcePlugin,
-  // @ts-expect-error
-} = await import("@mdxeditor/editor");
+  toolbarPlugin,
+} from "@mdxeditor/editor";
+import { classNames } from "../../utils/common";
 
 interface Props extends Partial<MDXEditorProps> {
   value: string;
@@ -51,7 +49,10 @@ const MarkdownEditor: FunctionComponent<Props> = ({
   return (
     <MDXEditor
       ref={markdownRef}
-      className="mdx-editor rounded border bg-white focus-within:ring focus:ring dark:bg-background"
+      className={classNames(
+        "mdx-editor ring-primary focus:ring-2 focus-within:ring-2 rounded border",
+        styles.mdxeditor,
+      )}
       onChange={(value) => setValue(value)}
       placeholder={placeholder}
       markdown={value}
@@ -61,11 +62,9 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         toolbarPlugin({
           toolbarContents: () => (
             <>
-              <DiffSourceToggleWrapper>
-                <BoldItalicUnderlineToggles />
-                <CodeToggle />
-                <ListsToggle />
-              </DiffSourceToggleWrapper>
+              <BoldItalicUnderlineToggles />
+              <CodeToggle />
+              <ListsToggle />
             </>
           ),
         }),
@@ -89,7 +88,6 @@ const MarkdownEditor: FunctionComponent<Props> = ({
           },
         }),
 
-        diffSourcePlugin({ viewMode: "rich-text" }),
         markdownShortcutPlugin(),
       ]}
     />

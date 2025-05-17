@@ -18,7 +18,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { VulnEventDTO, RiskCalculationReport } from "@/types/api/api";
+import { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,
@@ -170,10 +170,8 @@ export default function RiskAssessmentFeed({
                       </div>
 
                       {Boolean(msg) && (
-                        <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                          <Markdown className={"text-foreground"}>
-                            {msg}
-                          </Markdown>
+                        <div className="mdx-editor-content w-full rounded p-2 text-foreground">
+                          <Markdown>{msg}</Markdown>
                         </div>
                       )}
                     </div>

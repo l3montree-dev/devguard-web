@@ -88,8 +88,8 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
                   </div>
 
                   {Boolean(msg) && (
-                    <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                      <Markdown className={"text-foreground"}>{msg}</Markdown>
+                    <div className="mdx-editor-content w-full rounded p-2 text-sm text-foreground">
+                      <Markdown>{msg}</Markdown>
                     </div>
                   )}
                 </Link>

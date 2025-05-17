@@ -14,34 +14,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRouter } from "next/router";
-import { UseFormReturn, useForm } from "react-hook-form";
-import { countries, industryOptions } from "../const/organizationConstants";
+import { useForm } from "react-hook-form";
 import { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
-import Section from "./common/Section";
 
 import { browserApiClient } from "@/services/devGuardApi";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Switch } from "./ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+import { Form } from "./ui/form";
 
-import { Button } from "./ui/button";
-import { OrgForm } from "./OrgForm";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { OrgForm } from "./OrgForm";
+import { Button } from "./ui/button";
 
 import { toast } from "sonner";
 

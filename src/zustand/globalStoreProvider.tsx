@@ -30,7 +30,7 @@ export const StoreProvider: FunctionComponent<
     initialZustand: any;
   }>
 > = ({ children, initialZustand }) => {
-  const storeRef = useRef<ReturnType<typeof createGlobalStore>>();
+  const storeRef = useRef<ReturnType<typeof createGlobalStore>>(undefined);
   if (!storeRef.current) {
     storeRef.current = createGlobalStore(initialZustand);
   } else {

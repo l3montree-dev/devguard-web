@@ -74,27 +74,12 @@ interface Props {
   subprojects: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
-const formSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-
-  reachableFromTheInternet: z.boolean().optional(),
-  enableTicketRange: z.boolean().optional(),
-  cvssAutomaticTicketThreshold: z.number().array(),
-  riskAutomaticTicketThreshold: z.number().array(),
-
-  confidentialityRequirement: z.string(),
-  integrityRequirement: z.string(),
-  availabilityRequirement: z.string(),
-});
-
 const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const form = useForm<AssetFormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
