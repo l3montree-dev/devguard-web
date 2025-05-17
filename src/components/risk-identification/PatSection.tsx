@@ -35,7 +35,7 @@ const PatSection = ({
             <Link
               href="/user-settings#pat"
               target="_blank"
-              className="mt-4 text-sm"
+              className="mt-4 items-end justify-end flex text-sm"
             >
               <span>Create a new token or manage your existing ones</span>
             </Link>
