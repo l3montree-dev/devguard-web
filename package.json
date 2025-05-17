@@ -9,11 +9,7 @@
     "lint": "next lint",
     "test": "jest"
   },
-  "overrides": {
-    "@radix-ui/react-dismissable-layer": "1.0.4",
-    "@types/react": "19.1.4",
-    "@types/react-dom": "19.1.5"
-  },
+
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
     "@headlessui/react": "^2.2.3",
