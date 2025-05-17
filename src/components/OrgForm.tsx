@@ -25,8 +25,8 @@ import DangerZone from "./common/DangerZone";
 
 interface Props {
   form:
-    | UseFormReturn<OrganizationDTO, any, undefined>
-    | UseFormReturn<OrganizationDetailsDTO, any, undefined>;
+    | UseFormReturn<OrganizationDTO, any, OrganizationDTO>
+    | UseFormReturn<OrganizationDetailsDTO, any, OrganizationDetailsDTO>;
 }
 
 export const OrgForm: FunctionComponent<Props> = ({ form }) => (

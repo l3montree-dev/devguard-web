@@ -21,7 +21,7 @@ import Alert from "../common/Alert";
 import { Button } from "../ui/button";
 
 interface Props {
-  form: UseFormReturn<ProjectDTO, any, undefined>;
+  form: UseFormReturn<ProjectDTO, any, ProjectDTO>;
   forceVerticalSections: boolean;
   onConfirmDelete?: () => Promise<void>;
 }

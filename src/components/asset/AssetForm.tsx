@@ -27,7 +27,7 @@ import { Modify } from "@/types/common";
 import React from "react";
 
 interface Props {
-  form: UseFormReturn<AssetFormValues, any, undefined>;
+  form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
 }
 
 export type AssetFormValues = Modify<

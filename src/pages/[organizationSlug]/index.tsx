@@ -74,11 +74,6 @@ interface Props {
   >;
 }
 
-const formSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-});
-
 const Home: FunctionComponent<Props> = ({ projects }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -86,7 +81,6 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
-    resolver: zodResolver(formSchema),
   });
 
   const handleCreateProject = async (req: CreateProjectReq) => {
