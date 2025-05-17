@@ -43,6 +43,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import PatSection from "./risk-identification/PatSection";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -143,11 +144,9 @@ const DependencyRiskScannerDialog: FunctionComponent<
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
-        <span className="text-sm text-muted-foreground">
-          {current} / {count}
-        </span>
         <Carousel
           opts={{
+            watchDrag: false,
             containScroll: false,
           }}
           className="w-full"
@@ -456,6 +455,14 @@ const DependencyRiskScannerDialog: FunctionComponent<
                         environment which is capable of running docker.
                       </DialogDescription>
                       <div className="mt-10">
+                        <div className="mb-5">
+                          <PatSection
+                            {...pat}
+                            description="Docker Integration"
+                          />
+                        </div>
+                        <hr className="pb-5" />
+
                         <CopyCode
                           codeString={
                             // @ts-ignore

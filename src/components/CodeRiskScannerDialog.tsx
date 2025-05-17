@@ -39,6 +39,7 @@ import { browserApiClient } from "../services/devGuardApi";
 import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/router";
 import FileUpload from "./FileUpload";
+import PatSection from "./risk-identification/PatSection";
 
 interface CodeRiskScannerDialogProps {
   open: boolean;
@@ -126,12 +127,10 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
-        <span className="text-sm text-muted-foreground">
-          {current} / {count}
-        </span>
         <Carousel
           opts={{
             containScroll: false,
+            watchDrag: false,
           }}
           className="w-full"
           plugins={[AutoHeight(), Fade()]}
@@ -480,6 +479,13 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                         environment which is capable of running docker.
                       </DialogDescription>
                       <div className="mt-10">
+                        <div className="mb-5">
+                          <PatSection
+                            {...pat}
+                            description="Docker Integration"
+                          />
+                        </div>
+                        <hr className="pb-5" />
                         <CopyCode
                           codeString={
                             // @ts-ignore
