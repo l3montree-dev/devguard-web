@@ -9,14 +9,14 @@ import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import {
-  browserApiClient,
-  getApiClientFromContext,
+    browserApiClient,
+    getApiClientFromContext,
 } from "@/services/devGuardApi";
 import {
-  AssetDTO,
-  DetailedDependencyVulnDTO,
-  RequirementsLevel,
-  VulnEventDTO,
+    AssetDTO,
+    DetailedDependencyVulnDTO,
+    RequirementsLevel,
+    VulnEventDTO,
 } from "@/types/api/api";
 import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
@@ -35,22 +35,22 @@ import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withOrganization } from "@/decorators/withOrganization";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
@@ -58,31 +58,28 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import AssetTitle from "@/components/common/AssetTitle";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import FormatDate from "@/components/risk-assessment/FormatDate";
+import {
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useLoader } from "@/hooks/useLoader";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import {
-  getRepositoryId,
-  removeUnderscores,
-  vexOptionMessages,
+    getRepositoryId,
+    removeUnderscores,
+    vexOptionMessages,
 } from "@/utils/view";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import {
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {

@@ -18,24 +18,24 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { VulnEventDTO, RiskCalculationReport } from "@/types/api/api";
+import { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
-  eventMessages,
-  eventTypeMessages,
-  evTypeBackground,
-  findUser,
-  removeUnderscores,
+    eventMessages,
+    eventTypeMessages,
+    evTypeBackground,
+    findUser,
+    removeUnderscores,
 } from "@/utils/view";
 import {
-  ArrowPathIcon,
-  ArrowRightStartOnRectangleIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  CheckIcon,
-  MagnifyingGlassIcon,
-  SpeakerXMarkIcon,
-  StopIcon,
-  WrenchIcon,
+    ArrowPathIcon,
+    ArrowRightStartOnRectangleIcon,
+    ChatBubbleOvalLeftEllipsisIcon,
+    CheckIcon,
+    MagnifyingGlassIcon,
+    SpeakerXMarkIcon,
+    StopIcon,
+    WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { GitBranchIcon } from "lucide-react";
 import Image from "next/image";
@@ -170,8 +170,8 @@ export default function RiskAssessmentFeed({
                       </div>
 
                       {Boolean(msg) && (
-                        <div className="mdx-editor-content w-full rounded p-2 text-sm text-muted-foreground">
-                          <Markdown className={"text-foreground"}>
+                        <div className="mdx-editor-content w-full rounded p-2  text-foreground">
+                          <Markdown >
                             {msg}
                           </Markdown>
                         </div>
