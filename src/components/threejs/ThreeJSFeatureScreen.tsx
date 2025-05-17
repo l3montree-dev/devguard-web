@@ -1,7 +1,10 @@
 import { FileCheckIcon, BlocksIcon, LandmarkIcon } from "lucide-react";
 import React from "react";
-import ThreeJSScene from "./ThreeJSScene";
+
 import Image from "next/image";
+import dynamic from "next/dynamic";
+
+const ThreeJSScene = dynamic(() => import("./ThreeJSScene"), { ssr: false });
 
 const ThreeJSFeatureScreen = () => {
   return (
