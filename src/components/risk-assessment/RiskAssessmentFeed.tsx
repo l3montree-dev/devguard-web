@@ -170,7 +170,7 @@ export default function RiskAssessmentFeed({
                       </div>
 
                       {Boolean(msg) && (
-                        <div className="mdx-editor-content w-full rounded p-2  text-foreground">
+                        <div className="mdx-editor-content w-full rounded p-2 text-foreground">
                           <Markdown>{msg}</Markdown>
                         </div>
                       )}
