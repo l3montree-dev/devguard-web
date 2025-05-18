@@ -128,7 +128,7 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">
+      <div className="flex min-h-screen flex-1 flex-col justify-center  px-6 py-32 max-sm:py-16 lg:px-8">
         <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
           <CardHeader>
             <CardTitle>Verify your E-Mail</CardTitle>

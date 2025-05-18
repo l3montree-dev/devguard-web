@@ -22,6 +22,9 @@ module.exports = {
             mono: ["Fira Code", "Fira Mono", "monospace"]
     	},
     	extend: {
+             backgroundImage: {
+                'gradient': 'radial-gradient(at bottom left, #131818, hsl(var(--background)))', // blue to purple to pink
+            },
     		colors: {
     			border: 'hsl(var(--border))',
     			input: 'hsl(var(--input))',

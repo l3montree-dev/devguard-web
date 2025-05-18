@@ -174,7 +174,7 @@ const Registration: NextPage = () => {
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
         <ThreeJSFeatureScreen />
-        <div className="flex w-2/5 flex-col items-center justify-center bg-background">
+        <div className="flex w-2/5 flex-col items-center justify-center ">
           <div className="w-full px-8">
             <div>
               <Image
