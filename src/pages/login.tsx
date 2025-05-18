@@ -231,19 +231,14 @@ const Login: NextPage = () => {
                         flow={flow as LoginFlow}
                       />
                       {availableMethods.includes("oidc") && (
-                        <div className="mt-6 border-t-2 pt-6">
-                          <div className="flex flex-row items-center justify-end gap-4">
-                            <span className="text-sm text-gray-400">
-                              Social-Login
-                            </span>
-                            <Flow
-                              className="flex flex-row"
-                              only="oidc"
-                              hideGlobalMessages
-                              onSubmit={onSubmit}
-                              flow={flow as LoginFlow}
-                            />
-                          </div>
+                        <div className="mt-6 border-t pt-6">
+                          <Flow
+                            className="flex flex-wrap justify-end flex-row"
+                            only="oidc"
+                            hideGlobalMessages
+                            onSubmit={onSubmit}
+                            flow={flow as LoginFlow}
+                          />
                         </div>
                       )}
                     </Tab.Panel>

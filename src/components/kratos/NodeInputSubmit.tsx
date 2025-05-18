@@ -98,13 +98,35 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
+  if ((node.meta.label?.context as any)?.provider_id === "gitlab") {
+    // render the google node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign in with gitlab
+        </Button>
+      </div>
+    );
+  }
 
   if ((node.meta.label?.context as any)?.provider_id === "opencode") {
     // render the google node
     return (
       <div className="flex flex-row justify-end">
         <Button
-          className="bg-white hover:bg-white/90"
+          variant={"secondary"}
           name={attributes.name}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
