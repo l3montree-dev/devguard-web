@@ -46,6 +46,8 @@ import Page from "../components/Page";
 import Section from "../components/common/Section";
 import { Flow, Methods } from "../components/kratos/Flow";
 
+import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
+import { Switch } from "@/components/ui/switch";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
@@ -54,9 +56,7 @@ import {
   getApiClientFromContext,
 } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
-import { PatWithPrivKey, PersonalAccessTokenDTO } from "../types/api/api";
-import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
-import { Switch } from "@/components/ui/switch";
+import { PersonalAccessTokenDTO } from "../types/api/api";
 
 interface Props {
   flow?: SettingsFlow;
@@ -499,7 +499,9 @@ const Settings: FunctionComponent<{
         </Section>
 
         <div className="flex flex-row justify-end">
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button variant={"secondary"} onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
       </div>
     </Page>

@@ -82,13 +82,14 @@ export function NodeInputSubmit<T>({
       <div className="flex flex-row justify-end">
         <Button
           name={attributes.name}
+          variant={"secondary"}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
         >
           <Image
             src="/assets/github.svg"
             alt="GitHub Logo"
-            className="mr-2"
+            className="mr-2 dark:invert"
             width={20}
             height={20}
           />
