@@ -237,6 +237,7 @@ const Login: NextPage = () => {
                               Social-Login
                             </span>
                             <Flow
+                              className="flex flex-row"
                               only="oidc"
                               hideGlobalMessages
                               onSubmit={onSubmit}

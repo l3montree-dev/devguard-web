@@ -65,7 +65,6 @@ export function NodeInputSubmit<T>({
     return (
       <div className="mt-6 flex flex-row justify-end">
         <Button
-          className="capitalize"
           name={attributes.name}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
@@ -82,7 +81,6 @@ export function NodeInputSubmit<T>({
     return (
       <div className="flex flex-row justify-end">
         <Button
-          className="capitalize"
           name={attributes.name}
           value={attributes.value || ""}
           disabled={attributes.disabled || disabled}
@@ -100,12 +98,34 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if ((node.meta.label?.context as any)?.provider_id === "opencode") {
+    // render the google node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          className="bg-white hover:bg-white/90"
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="Google Logo"
+            className="-ml-4 mr-0"
+            width={40}
+            height={40}
+          />
+          Sign in with openCode
+        </Button>
+      </div>
+    );
+  }
+
   const text = getNodeLabel(node);
   return (
     <div className="flex flex-row justify-end">
       <Button
-        className="capitalize"
-        variant={text.toLowerCase() === "back" ? "secondary" : "default"}
+        variant={text.toLowerCase() === "back" ? "ghost" : "secondary"}
         name={attributes.name}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}

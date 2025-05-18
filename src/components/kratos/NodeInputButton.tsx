@@ -50,7 +50,7 @@ export function NodeInputButton<T>({
         onClick={(e) => {
           onClick(e);
         }}
-        className="capitalize"
+        variant={"secondary"}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >

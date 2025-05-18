@@ -51,8 +51,8 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
         </div>
       </div>
     </Section>
-    <hr />
-    <Section
+
+    {/* <Section
       description="Help us to improve DevGuard."
       title="Optional Information"
     >
@@ -265,7 +265,7 @@ export const OrgForm: FunctionComponent<Props> = ({ form }) => (
           />
         </div>
       </div>
-    </Section>
+    </Section>*/}
     <hr />
     <DangerZone>
       <Section

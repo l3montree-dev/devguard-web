@@ -32,7 +32,7 @@ const ThreeJSFeatureScreen = () => {
           </div>
           <div className="flex gap-4 flex-row">
             <div className="rounded-full bg-card w-10 h-10 flex flex-row items-center justify-center border">
-              <FileCheckIcon className="h-6 text-primary w-6" />
+              <FileCheckIcon className="h-6 text-white w-6" />
             </div>
             <div className="flex-1">
               <span className="font-medium">
@@ -51,7 +51,7 @@ const ThreeJSFeatureScreen = () => {
         <div className="mt-2 flex flex-col gap-4">
           <div className="flex gap-4 flex-row">
             <div className="rounded-full bg-card w-10 h-10 flex flex-row items-center justify-center border">
-              <BlocksIcon className="h-6 text-primary w-6" />
+              <BlocksIcon className="h-6 text-white w-6" />
             </div>
             <div className="flex-1">
               <span className="font-medium">Use with your favorite tools</span>
@@ -64,7 +64,7 @@ const ThreeJSFeatureScreen = () => {
           </div>
           <div className="flex gap-4 flex-row">
             <div className="rounded-full bg-card w-10 h-10 flex flex-row items-center justify-center border">
-              <LandmarkIcon className="h-6 text-primary w-6" />
+              <LandmarkIcon className="h-6 text-white w-6" />
             </div>
             <div className="flex-1">
               <span className="font-medium">Open Source & Made in Europe</span>

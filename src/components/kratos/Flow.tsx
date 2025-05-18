@@ -33,6 +33,7 @@ import { Component, FormEvent, MouseEvent } from "react";
 import { Messages } from "./Messages";
 import { Node } from "./Node";
 import Callout from "../common/Callout";
+import { classNames } from "../../utils/common";
 
 export type Values = Partial<
   | UpdateLoginFlowBody
@@ -66,6 +67,7 @@ export type Props<T> = {
   onSubmit: (values: T) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
   hideGlobalMessages?: boolean;
+  className?: string;
 };
 
 function emptyState<T>() {
@@ -227,7 +229,7 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       <form
         action={flow.ui.action}
         method={flow.ui.method}
-        className="flex flex-col gap-4"
+        className={classNames("flex flex-col gap-4", this.props.className)}
         onSubmit={this.handleSubmit}
       >
         {!hideGlobalMessages && Boolean(flow.ui.messages) ? (
