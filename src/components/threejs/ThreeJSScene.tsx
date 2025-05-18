@@ -7,6 +7,7 @@ import {
 } from "@react-three/postprocessing";
 import { BlendFunction, LUTCubeLoader } from "postprocessing";
 import { useCallback, useRef, useState } from "react";
+import { Center, Text3D } from "@react-three/drei";
 import * as THREE from "three";
 import { Beam } from "./components/Beam";
 import { Flare } from "./components/Flare";
@@ -102,7 +103,6 @@ function Scene() {
         penumbra={1}
         position={[0, 0, 1]}
       />
-
       {/* Prism + blocks + reflect beam */}
       <Beam ref={boxreflect} bounce={10} far={20}>
         <Prism
@@ -151,7 +151,6 @@ const ThreeJSScene = () => {
         <HueSaturation
           blendFunction={BlendFunction.NORMAL}
           saturation={-0.25}
-          hue={0}
         />
       </EffectComposer>
     </Canvas>
