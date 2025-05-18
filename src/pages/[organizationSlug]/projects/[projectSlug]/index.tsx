@@ -164,10 +164,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
       >
         {assets.length === 0 && subprojects.length === 0 ? (
           <EmptyList
-            title="Your Assets will show up here!"
-            description="You can understand assets as a software project. An asset is a
-                github repository, a gitlab repository, a bundle of source code
-                files, ..."
+            description="No repositories or subprojects found"
+            title="Your Repositories will show up here!"
             Button={
               <div className="flex flex-row justify-center gap-2">
                 <Button
@@ -191,7 +189,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 </Button>
 
                 <Button onClick={() => setShowModal(true)}>
-                  Create new Asset
+                  Create new Repository
                 </Button>
               </div>
             }
@@ -223,7 +221,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
             {subprojects.map((subproject) => (
               <Link
                 key={subproject.id}
-                href={`/${activeOrg.slug}/projects/${subproject.slug}/assets`}
+                href={`/${activeOrg.slug}/projects/${subproject.slug}`}
                 className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem

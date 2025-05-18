@@ -19,7 +19,6 @@ import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import Page from "../../components/Page";
 
 import { withOrgs } from "../../decorators/withOrgs";
@@ -44,7 +43,6 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import EmptyList from "@/components/common/EmptyList";
@@ -56,10 +54,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { withContentTree } from "@/decorators/withContentTree";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 
 interface Props {
@@ -161,36 +159,46 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                       <div className="flex flex-col">
                         <span>{project.description}</span>
 
-                        <div className="mt-4 flex flex-row items-center gap-2">
-                          {project.type !== "default" && (
-                            <ProjectBadge type={project.type} />
-                          )}
-                          <Badge
-                            variant={
-                              project.stats.compliantAssets ===
-                              project.stats.totalAssets
-                                ? "success"
-                                : "secondary"
-                            }
-                            className=""
-                          >
-                            {project.stats.compliantAssets}/
-                            {project.stats.totalAssets} assets compliant
-                          </Badge>
-                          <Badge
-                            variant={
-                              project.stats.passingControlsPercentage === 1
-                                ? "success"
-                                : "secondary"
-                            }
-                            className=""
-                          >
-                            {Math.round(
-                              project.stats.passingControlsPercentage * 100,
+                        {(project.stats.totalAssets > 0 ||
+                          project.type !== "default") && (
+                          <div className="flex mt-4 flex-row items-center gap-2">
+                            {project.type !== "default" && (
+                              <ProjectBadge type={project.type} />
                             )}
-                            % controls passing
-                          </Badge>
-                        </div>
+                            {project.stats.totalAssets > 0 && (
+                              <>
+                                {" "}
+                                <Badge
+                                  variant={
+                                    project.stats.compliantAssets ===
+                                    project.stats.totalAssets
+                                      ? "success"
+                                      : "secondary"
+                                  }
+                                  className=""
+                                >
+                                  {project.stats.compliantAssets}/
+                                  {project.stats.totalAssets} assets compliant
+                                </Badge>
+                                <Badge
+                                  variant={
+                                    project.stats.passingControlsPercentage ===
+                                    1
+                                      ? "success"
+                                      : "secondary"
+                                  }
+                                  className=""
+                                >
+                                  {Math.round(
+                                    project.stats.passingControlsPercentage *
+                                      100,
+                                  )}
+                                  % controls passing
+                                </Badge>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     }
                     Button={
