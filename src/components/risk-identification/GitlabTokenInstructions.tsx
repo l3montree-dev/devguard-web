@@ -35,7 +35,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
         </small>
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
           <Image
-            alt="Open the project settings in GitHub"
+            alt="Open the project settings in Gitlab"
             className="rounded-lg border object-fill"
             src={"/assets/gitlab-project-settings.png"}
             fill
@@ -51,7 +51,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
 
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
           <ImageZoom
-            alt="Open the project settings in GitHub"
+            alt="Open the project settings in Gitlab"
             className="rounded-lg border object-fill"
             src={"/assets/gitlab-secret.png"}
             fill
@@ -62,7 +62,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
         <h3 className="mb-4 mt-2 font-semibold">Create a new variable</h3>
         <div className="relative mt-2 aspect-video w-full max-w-4xl">
           <ImageZoom
-            alt="Open the project settings in GitHub"
+            alt="Open the project settings in Gitlab"
             className="rounded-lg border object-fill"
             src={"/assets/gitlab-var-settings.png"}
             fill
@@ -121,7 +121,7 @@ export const GitlabTokenSlides = ({
     projectSlug,
     assetSlug,
     apiUrl,
-  })["GitHub"][scanner ?? "devsecops"];
+  })["Gitlab"][scanner ?? "devsecops"];
 
   console.log(codeString);
   return (
