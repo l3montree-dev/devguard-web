@@ -28,8 +28,12 @@ export const getServerSideProps: GetServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/vex.xml?scanner=" +
-      (context.query.scanner ? context.query.scanner : "sca");
+      "/vex.xml?" +
+      new URLSearchParams({
+        ...(context.query.scanner
+          ? { scanner: context.query.scanner as string }
+          : {}),
+      });
 
     const vex = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!vex.ok) {

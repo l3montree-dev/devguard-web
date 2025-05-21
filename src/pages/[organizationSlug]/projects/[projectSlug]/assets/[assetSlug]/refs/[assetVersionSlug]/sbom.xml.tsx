@@ -28,8 +28,12 @@ export const getServerSideProps: GetServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/sbom.xml?scanner=" +
-      (context.query.scanner ? context.query.scanner : "sca");
+      "/sbom.xml?" +
+      new URLSearchParams({
+        ...(context.query.scanner
+          ? { scanner: context.query.scanner as string }
+          : {}),
+      });
 
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {
