@@ -121,7 +121,7 @@ export const GitlabTokenSlides = ({
     projectSlug,
     assetSlug,
     apiUrl,
-  })["GitHub"][scanner ?? "devsecops"];
+  })["Gitlab"][scanner ?? "devsecops"];
 
   console.log(codeString);
   return (
