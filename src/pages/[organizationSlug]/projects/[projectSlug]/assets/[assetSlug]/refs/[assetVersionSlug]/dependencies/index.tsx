@@ -37,6 +37,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import {
   CalendarDateRangeIcon,
   CheckBadgeIcon,
+  ChevronDoubleDownIcon,
   ExclamationTriangleIcon,
   ScaleIcon,
   StarIcon,
@@ -46,7 +47,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GitBranch } from "lucide-react";
+import { ChevronDownIcon, GitBranch } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -74,6 +75,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { useRouter } from "next/router";
+import { Combobox } from "@/components/common/Combobox";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -109,18 +111,33 @@ const columnsDef: ColumnDef<
     id: "Dependency.license",
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
-        <Badge className="capitalize" variant={"outline"}>
-          <ExclamationTriangleIcon
-            className={"mr-1 h-4 w-4 text-muted-foreground"}
-          />
+        <Badge
+          className="capitalize"
+          variant={"outline"}
+          onClick={() => {
+            <Combobox
+              onSelect={function (value: string): void {
+                throw new Error("Function not implemented.");
+              }}
+              items={[]}
+              placeholder={""}
+              emptyMessage={""}
+            ></Combobox>;
+          }}
+        >
+          <ChevronDownIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
           {(row.getValue() as License).licenseId}
+          <ChevronDoubleDownIcon />
         </Badge>
       ) : (
         <Tooltip>
           <TooltipTrigger>
-            <Badge variant={"outline"}>
+            <Badge variant={"outline"} onClick={() => {}}>
               <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
               {(row.getValue() as License).licenseId}
+              <ChevronDownIcon
+                className={"ml-2 h-4 w-4 text-muted-foreground"}
+              />
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
@@ -144,6 +161,16 @@ const columnsDef: ColumnDef<
                   Open Source License
                 </a>
               </span>
+              <div className="scale-100">
+                <Combobox
+                  onSelect={function (value: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  items={[]}
+                  placeholder={(row.getValue() as License).licenseId}
+                  emptyMessage={""}
+                ></Combobox>
+              </div>
             </div>
 
             <span className="text-sm text-muted-foreground"></span>
