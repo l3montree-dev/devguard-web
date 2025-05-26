@@ -30,6 +30,11 @@ const generateGitlabSnippet = (
   assetSlug: string,
   apiUrl: string,
 ) => `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+# stages:
+# - build
+# - test
+# - deploy
+
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
