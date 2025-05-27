@@ -76,15 +76,73 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { useRouter } from "next/router";
 import { Combobox } from "@/components/common/Combobox";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog } from "@radix-ui/react-dialog";
+import { DialogContent } from "@/components/ui/dialog";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
+
+const frameworks = [
+  {
+    value: "next.js",
+    label: "Next.js",
+  },
+  {
+    value: "sveltekit",
+    label: "SvelteKit",
+  },
+  {
+    value: "nuxt.js",
+    label: "Nuxt.js",
+  },
+  {
+    value: "remix",
+    label: "Remix",
+  },
+  {
+    value: "astro",
+    label: "Astro",
+  },
+];
 
 const columnHelper = createColumnHelper<
   ComponentPaged & { license: LicenseResponse }
 >();
+
+const BadgeWithLicenseDialog = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <Badge
+      className="capitalize"
+      variant={"outline"}
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsOpen(true);
+      }}
+    >
+      <ChevronDownIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+      {(row.getValue() as License).licenseId}
+      <ChevronDoubleDownIcon />
+      <Dialog onOpenChange={setIsOpen} open={isOpen}>
+        <DialogContent>
+          <Combobox
+            onSelect={function (value: string): void {
+              throw new Error("Function not implemented.");
+            }}
+            items={[]}
+            placeholder={""}
+            emptyMessage={""}
+          />
+        </DialogContent>
+      </Dialog>
+    </Badge>
+  );
+};
 
 const columnsDef: ColumnDef<
   ComponentPaged & { license: LicenseResponse },
@@ -106,33 +164,36 @@ const columnsDef: ColumnDef<
     cell: (row) =>
       row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
+
   columnHelper.accessor("license", {
     header: "License",
     id: "Dependency.license",
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
-        <Badge
-          className="capitalize"
-          variant={"outline"}
-          onClick={() => {
-            <Combobox
-              onSelect={function (value: string): void {
-                throw new Error("Function not implemented.");
-              }}
-              items={[]}
-              placeholder={""}
-              emptyMessage={""}
-            ></Combobox>;
-          }}
-        >
-          <ChevronDownIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {(row.getValue() as License).licenseId}
-          <ChevronDoubleDownIcon />
-        </Badge>
+        <BadgeWithLicenseDialog />
       ) : (
         <Tooltip>
           <TooltipTrigger>
-            <Badge variant={"outline"} onClick={() => {}}>
+            <Badge
+              variant={"outline"}
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("test");
+                <Dialog>
+                  <DialogContent>
+                    <Combobox
+                      onSelect={function (value: string): void {
+                        throw new Error("Function not implemented.");
+                      }}
+                      items={[]}
+                      placeholder={""}
+                      emptyMessage={""}
+                    />
+                    ;
+                  </DialogContent>
+                </Dialog>;
+              }}
+            >
               <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
               {(row.getValue() as License).licenseId}
               <ChevronDownIcon
@@ -161,16 +222,6 @@ const columnsDef: ColumnDef<
                   Open Source License
                 </a>
               </span>
-              <div className="scale-100">
-                <Combobox
-                  onSelect={function (value: string): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                  items={[]}
-                  placeholder={(row.getValue() as License).licenseId}
-                  emptyMessage={""}
-                ></Combobox>
-              </div>
             </div>
 
             <span className="text-sm text-muted-foreground"></span>
