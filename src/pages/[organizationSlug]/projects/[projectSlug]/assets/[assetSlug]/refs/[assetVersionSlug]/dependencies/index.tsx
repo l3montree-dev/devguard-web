@@ -235,18 +235,15 @@ const licenses = [
   // "ZPL-2.1"
 ];
 
-const LicenseCall = (
+const LicenseCall = (props: {
   row: CellContext<
     ComponentPaged & {
       license: LicenseResponse;
     },
     any
-  >,
-) => {
+  >;
+}) => {
   const [open, setOpen] = useState(false);
-  const [selectedLicense, setSelectedLicense] = useState<License>(
-    row.getValue() as License,
-  );
   const activeOrg = useActiveOrg();
 
   const handleLicenseUpdate = async (newlicense: string) => {
@@ -254,7 +251,7 @@ const LicenseCall = (
       "/organizations/" + activeOrg.slug,
 
       {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify({
           license: newlicense,
         }),
@@ -276,7 +273,7 @@ const LicenseCall = (
           }}
         >
           <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {(row.getValue() as License).licenseId}
+          {props.row.getValue().licenseId}
           <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
         </Badge>
       </TooltipTrigger>
@@ -285,18 +282,17 @@ const LicenseCall = (
         <TooltipContent>
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row items-center text-sm font-bold">
-              {(row.getValue() as License).isOsiApproved && (
+              {props.row.getValue().isOsiApproved && (
                 <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
               )}
-              {(row.getValue() as License).name}
+              {props.row.getValue().name}
             </span>
             <span className="text-sm text-muted-foreground">
-              {(row.getValue() as License).isOsiApproved
+              {props.row.getValue().isOsiApproved
                 ? "OSI Approved"
                 : "Not OSI Approved"}
-              ,{" "}
               <a
-                href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
+                href={`https://opensource.org/licenses/${(props.row.getValue() as License).licenseId}`}
                 target="_blank"
                 className="text-sm font-semibold !text-muted-foreground underline"
               >
@@ -313,7 +309,7 @@ const LicenseCall = (
               // }}
 
               items={licenses}
-              placeholder={(row.getValue() as License).name}
+              placeholder={props.row.getValue().name}
               emptyMessage={""}
               onSelect={(selectedLicense) =>
                 handleLicenseUpdate(selectedLicense)
@@ -357,24 +353,10 @@ const columnsDef: ColumnDef<
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
         <>
-          <LicenseCall
-            row={row as any}
-            cell={row.cell}
-            column={row.column}
-            getValue={row.getValue()}
-            renderValue={row.renderValue()}
-            table={row.table}
-          ></LicenseCall>
+          <LicenseCall row={row}></LicenseCall>
         </>
       ) : (
-        <LicenseCall
-          row={row as any}
-          cell={row.cell}
-          column={row.column}
-          getValue={row.getValue()}
-          renderValue={row.renderValue()}
-          table={row.table}
-        ></LicenseCall>
+        <LicenseCall row={row}></LicenseCall>
       ),
   }),
   columnHelper.accessor("dependency.project.projectKey", {
