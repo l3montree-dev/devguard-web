@@ -39,15 +39,18 @@ import {
   CheckBadgeIcon,
   ChevronDoubleDownIcon,
   ExclamationTriangleIcon,
+  PencilSquareIcon,
   ScaleIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
 import {
+  CellContext,
   ColumnDef,
   createColumnHelper,
   flexRender,
+  NoInfer,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch } from "lucide-react";
+import { ChevronDownIcon, GitBranch, PencilIcon } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -76,37 +79,40 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { useRouter } from "next/router";
 import { Combobox } from "@/components/common/Combobox";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog } from "@radix-ui/react-dialog";
-import { DialogContent } from "@/components/ui/dialog";
+
+import { LicenseTrigger } from "@/components/common/LicenseTrigger";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
-const frameworks = [
+const licenses = [
   {
-    value: "next.js",
-    label: "Next.js",
+    value: "mit",
+    label: "MIT",
   },
   {
-    value: "sveltekit",
-    label: "SvelteKit",
+    value: "apache-2",
+    label: "Apache-2.0",
   },
   {
-    value: "nuxt.js",
-    label: "Nuxt.js",
+    value: "bsd-2-clause",
+    label: "BSD-2-Clause",
   },
   {
-    value: "remix",
-    label: "Remix",
+    value: "apgl",
+    label: "APGL",
   },
   {
-    value: "astro",
-    label: "Astro",
+    value: "0bsd",
+    label: "0BSD",
   },
 ];
 
@@ -114,7 +120,14 @@ const columnHelper = createColumnHelper<
   ComponentPaged & { license: LicenseResponse }
 >();
 
-const BadgeWithLicenseDialog = () => {
+const BadgeWithLicenseDialog = (
+  row: CellContext<
+    ComponentPaged & {
+      license: LicenseResponse;
+    },
+    any
+  >,
+) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Badge
@@ -130,14 +143,16 @@ const BadgeWithLicenseDialog = () => {
       <ChevronDoubleDownIcon />
       <Dialog onOpenChange={setIsOpen} open={isOpen}>
         <DialogContent>
-          <Combobox
-            onSelect={function (value: string): void {
-              throw new Error("Function not implemented.");
-            }}
-            items={[]}
-            placeholder={""}
-            emptyMessage={""}
-          />
+          <div>
+            <Combobox
+              onSelect={function (value: string): void {
+                throw new Error("Function not implemented.");
+              }}
+              items={licenses}
+              placeholder={(row.getValue() as License).name}
+              emptyMessage={""}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </Badge>
@@ -170,7 +185,7 @@ const columnsDef: ColumnDef<
     id: "Dependency.license",
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
-        <BadgeWithLicenseDialog />
+        <></>
       ) : (
         <Tooltip>
           <TooltipTrigger>
@@ -178,20 +193,6 @@ const columnsDef: ColumnDef<
               variant={"outline"}
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("test");
-                <Dialog>
-                  <DialogContent>
-                    <Combobox
-                      onSelect={function (value: string): void {
-                        throw new Error("Function not implemented.");
-                      }}
-                      items={[]}
-                      placeholder={""}
-                      emptyMessage={""}
-                    />
-                    ;
-                  </DialogContent>
-                </Dialog>;
               }}
             >
               <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
@@ -201,6 +202,14 @@ const columnsDef: ColumnDef<
               />
             </Badge>
           </TooltipTrigger>
+          <BadgeWithLicenseDialog
+            row={row as any}
+            cell={row.cell}
+            column={row.column}
+            getValue={row.getValue}
+            renderValue={row.renderValue}
+            table={row.table}
+          ></BadgeWithLicenseDialog>
           <TooltipContent>
             <div className="flex flex-col items-start justify-start gap-1">
               <span className="flex flex-row items-center text-sm font-bold">
@@ -223,7 +232,6 @@ const columnsDef: ColumnDef<
                 </a>
               </span>
             </div>
-
             <span className="text-sm text-muted-foreground"></span>
           </TooltipContent>
         </Tooltip>
@@ -318,6 +326,12 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
+      <div>
+        <Popover>
+          <PopoverTrigger>Open</PopoverTrigger>
+          <PopoverContent>Place content for the popover here.</PopoverContent>
+        </Popover>
+      </div>
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
