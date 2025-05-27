@@ -47,6 +47,13 @@
 </div>
 
 
+<p align="center">
+   <a href="https://www.bestpractices.dev/projects/8928"><img src="https://www.bestpractices.dev/projects/8928/badge" alt="OpenSSF Badge"></a>
+   <a href="https://github.com/l3montree-dev/devguard/blob/main/LICENSE.txt"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
+   <a href="https://github.com/l3montree-dev/devguard/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22"><img src="https://img.shields.io/badge/Help%20Wanted-Contribute-blue"></a>
+    <a href="https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/refs/main"><img src="https://api.main.devguard.org/api/v1/badges/cvss/5ac91915-1c88-4180-9606-475cf82e682c" alt="CVSS"></a>
+</p>
+
 
 <!-- TABLE OF CONTENTS -->
 <details>
