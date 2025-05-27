@@ -6,7 +6,10 @@ import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { getApiClientFromContext } from "@/services/devGuardApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
@@ -77,7 +80,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../../../../../../../components/ui/dropdown-menu";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 import { Combobox } from "@/components/common/Combobox";
 
 import { LicenseTrigger } from "@/components/common/LicenseTrigger";
@@ -87,6 +90,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { AssetFormValues } from "@/components/asset/AssetForm";
+import React from "react";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -116,11 +121,7 @@ const licenses = [
   },
 ];
 
-const columnHelper = createColumnHelper<
-  ComponentPaged & { license: LicenseResponse }
->();
-
-const BadgeWithLicenseDialog = (
+const handleUpdate = async (
   row: CellContext<
     ComponentPaged & {
       license: LicenseResponse;
@@ -128,36 +129,29 @@ const BadgeWithLicenseDialog = (
     any
   >,
 ) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <Badge
-      className="capitalize"
-      variant={"outline"}
-      onClick={(e) => {
-        e.stopPropagation();
-        setIsOpen(true);
-      }}
-    >
-      <ChevronDownIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-      {(row.getValue() as License).licenseId}
-      <ChevronDoubleDownIcon />
-      <Dialog onOpenChange={setIsOpen} open={isOpen}>
-        <DialogContent>
-          <div>
-            <Combobox
-              onSelect={function (value: string): void {
-                throw new Error("Function not implemented.");
-              }}
-              items={licenses}
-              placeholder={(row.getValue() as License).name}
-              emptyMessage={""}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </Badge>
+  const resp = await browserApiClient(
+    "/organizations/" +
+      // activeOrg.slug +
+      // "/projects/" +
+      // project!.slug + // can never be null
+      // "/assets/" +
+      // asset.slug,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          license: row.getValue(),
+        }),
+      },
   );
 };
+
+const LicenseCall({ row }: { row: Row<any> }){
+  
+}
+
+const columnHelper = createColumnHelper<
+  ComponentPaged & { license: LicenseResponse }
+>();
 
 const columnsDef: ColumnDef<
   ComponentPaged & { license: LicenseResponse },
@@ -202,38 +196,46 @@ const columnsDef: ColumnDef<
               />
             </Badge>
           </TooltipTrigger>
-          <BadgeWithLicenseDialog
-            row={row as any}
-            cell={row.cell}
-            column={row.column}
-            getValue={row.getValue}
-            renderValue={row.renderValue}
-            table={row.table}
-          ></BadgeWithLicenseDialog>
-          <TooltipContent>
-            <div className="flex flex-col items-start justify-start gap-1">
-              <span className="flex flex-row items-center text-sm font-bold">
-                {(row.getValue() as License).isOsiApproved && (
-                  <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
-                )}
-                {(row.getValue() as License).name}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {(row.getValue() as License).isOsiApproved
-                  ? "OSI Approved"
-                  : "Not OSI Approved"}
-                ,{" "}
-                <a
-                  href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
-                  target="_blank"
-                  className="text-sm font-semibold !text-muted-foreground underline"
-                >
-                  Open Source License
-                </a>
-              </span>
-            </div>
-            <span className="text-sm text-muted-foreground"></span>
-          </TooltipContent>
+
+          <div onClick={(e) => e.stopPropagation}>
+            <TooltipContent>
+              <div className="flex flex-col items-start justify-start gap-1">
+                <span className="flex flex-row items-center text-sm font-bold">
+                  {(row.getValue() as License).isOsiApproved && (
+                    <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
+                  )}
+                  {(row.getValue() as License).name}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {(row.getValue() as License).isOsiApproved
+                    ? "OSI Approved"
+                    : "Not OSI Approved"}
+                  ,{" "}
+                  <a
+                    href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
+                    target="_blank"
+                    className="text-sm font-semibold !text-muted-foreground underline"
+                  >
+                    Open Source License
+                  </a>
+                </span>
+              </div>
+              <span className="text-sm text-muted-foreground"></span>
+              <div className="mt-4" onClick={(e) => e.stopPropagation}>
+                <Combobox
+                  // onSelect={(currentValue) => {
+                  //   setValue(currentValue === value ? "" : currentValue);
+                  //   setOpen(false);
+                  // }}
+                  onValueChange={}
+                  items={licenses}
+                  placeholder={(row.getValue() as License).name}
+                  emptyMessage={""}
+                  onSelect={handleUpdate(open)}
+                ></Combobox>
+              </div>
+            </TooltipContent>
+          </div>
         </Tooltip>
       ),
   }),
@@ -282,6 +284,8 @@ const columnsDef: ColumnDef<
 
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
+
+  const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useRouter().asPath.split("?")[0];
 
