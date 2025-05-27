@@ -92,6 +92,7 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AssetFormValues } from "@/components/asset/AssetForm";
 import React from "react";
+import { toast } from "sonner";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -119,9 +120,122 @@ const licenses = [
     value: "0bsd",
     label: "0BSD",
   },
+
+  // "BSD-1-Clause",
+  // "AFL-3.0",
+  // "APL-1.0",
+  // "Apache-2.0",
+  // "Apache-1.1",
+  // "APSL-2.0",
+  // "Artistic-1.0-Perl",
+  // "Artistic-1.0",
+  // "Artistic-2.0",
+  // "AAL",
+  // "BlueOak-1.0.0",
+  // "BSL-1.0",
+  // "BSD-2-Clause-Patent",
+  // "CECILL-2.1",
+  // "CERN-OHL-P-2.0",
+  // "CERN-OHL-S-2.0",
+  // "CERN-OHL-W-2.0",
+  // "MIT-CMU",
+  // "CDDL-1.0",
+  // "CPAL-1.0",
+  // "CPL-1.0",
+  // "CATOSL-1.1",
+  // "CAL-1.0",
+  // "CUA-OPL-1.0",
+  // "EPL-1.0",
+  // "EPL-2.0",
+  // "eCos-2.0",
+  // "ECL-1.0",
+  // "ECL-2.0",
+  // "EFL-1.0",
+  // "EFL-2.0",
+  // "Entessa",
+  // "EUDatagrid",
+  // "EUPL-1.2",
+  // "Fair",
+  // "Frameworx-1.0",
+  // "AGPL-3.0-only",
+  // "GPL-2.0",
+  // "GPL-3.0-only",
+  // "LGPL-2.1",
+  // "LGPL-3.0-only",
+  // "LGPL-2.0-only",
+  // "HPND",
+  // "IPL-1.0",
+  // "ICU",
+  // "Intel",
+  // "IPA",
+  // "ISC",
+  // "Jam",
+  // "LPPL-1.3c",
+  // "BSD-3-Clause-LBNL",
+  // "LiLiQ-P-1.1",
+  // "LiLiQ-Rplus-1.1",
+  // "LiLiQ-R-1.1",
+  // "LPL-1.02",
+  // "LPL-1.0",
+  // "MS-PL",
+  // "MS-RL",
+  // "MirOS",
+  // "MIT-0",
+  // "Motosoto",
+  // "MPL-1.1",
+  // "MPL-2.0",
+  // "MPL-1.0",
+  // "MulanPSL-2.0",
+  // "Multics",
+  // "NASA-1.3",
+  // "Naumen",
+  // "NOKIA",
+  // "NPOSL-3.0",
+  // "NTP",
+  // "OGTSL",
+  // "OLFL-1.3",
+  // "OSL-2.1",
+  // "OSL-1.0",
+  // "OLDAP-2.8",
+  // "OSET-PL-2.1",
+  // "PHP-3.0",
+  // "PHP-3.01",
+  // "PSF-2.0",
+  // "RPSL-1.0",
+  // "RPL-1.5",
+  // "RPL-1.1",
+  // "OFL-1.1",
+  // "SimPL-2.0",
+  // "SISSL",
+  // "SPL-1.0",
+  // "BSD-2-Clause",
+  // "BSD-3-Clause",
+  // "CNRI-Python",
+  // "EUPL-1.1",
+  // "MIT",
+  // "NGPL",
+  // "OSL-3.0",
+  // "PostgreSQL",
+  // "QPL-1.0",
+  // "RSCPL",
+  // "Sleepycat",
+  // "Watcom-1.0",
+  // "UPL-1.0",
+  // "NCSA",
+  // "Unlicense",
+  // "VSL-0.1",
+  // "W3C-20150513",
+  // "wxWindows",
+  // "Xnet",
+  // "Zlib",
+  // "Unicode-DFS-2015",
+  // "UCL-1.0",
+  // "0BSD",
+  // "ZPL-2.0",
+  // "ZPL-2.1"
 ];
 
-const handleUpdate = async (
+const LicenseCall = (
   row: CellContext<
     ComponentPaged & {
       license: LicenseResponse;
@@ -129,25 +243,88 @@ const handleUpdate = async (
     any
   >,
 ) => {
-  const resp = await browserApiClient(
-    "/organizations/" +
-      // activeOrg.slug +
-      // "/projects/" +
-      // project!.slug + // can never be null
-      // "/assets/" +
-      // asset.slug,
+  const [open, setOpen] = useState(false);
+  const [selectedLicense, setSelectedLicense] = useState<License>(
+    row.getValue() as License,
+  );
+  const activeOrg = useActiveOrg();
+
+  const handleLicenseUpdate = async (newlicense: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug,
+
       {
         method: "PATCH",
         body: JSON.stringify({
-          license: row.getValue(),
+          license: newlicense,
         }),
       },
+    );
+    if (!resp.ok) {
+      toast.error("Failed to change License");
+      return;
+    }
+  };
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <Badge
+          variant={"outline"}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {(row.getValue() as License).licenseId}
+          <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
+        </Badge>
+      </TooltipTrigger>
+
+      <div onClick={(e) => e.stopPropagation}>
+        <TooltipContent>
+          <div className="flex flex-col items-start justify-start gap-1">
+            <span className="flex flex-row items-center text-sm font-bold">
+              {(row.getValue() as License).isOsiApproved && (
+                <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
+              )}
+              {(row.getValue() as License).name}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {(row.getValue() as License).isOsiApproved
+                ? "OSI Approved"
+                : "Not OSI Approved"}
+              ,{" "}
+              <a
+                href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
+                target="_blank"
+                className="text-sm font-semibold !text-muted-foreground underline"
+              >
+                Open Source License
+              </a>
+            </span>
+          </div>
+          <span className="text-sm text-muted-foreground"></span>
+          <div className="mt-4" onClick={(e) => e.stopPropagation}>
+            <Combobox
+              // onSelect={(currentValue) => {
+              //   setValue(currentValue === value ? "" : currentValue);
+              //   setOpen(false);
+              // }}
+
+              items={licenses}
+              placeholder={(row.getValue() as License).name}
+              emptyMessage={""}
+              onSelect={(selectedLicense) =>
+                handleLicenseUpdate(selectedLicense)
+              }
+            ></Combobox>
+          </div>
+        </TooltipContent>
+      </div>
+    </Tooltip>
   );
 };
-
-const LicenseCall({ row }: { row: Row<any> }){
-  
-}
 
 const columnHelper = createColumnHelper<
   ComponentPaged & { license: LicenseResponse }
@@ -179,64 +356,25 @@ const columnsDef: ColumnDef<
     id: "Dependency.license",
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
-        <></>
+        <>
+          <LicenseCall
+            row={row as any}
+            cell={row.cell}
+            column={row.column}
+            getValue={row.getValue()}
+            renderValue={row.renderValue()}
+            table={row.table}
+          ></LicenseCall>
+        </>
       ) : (
-        <Tooltip>
-          <TooltipTrigger>
-            <Badge
-              variant={"outline"}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-              {(row.getValue() as License).licenseId}
-              <ChevronDownIcon
-                className={"ml-2 h-4 w-4 text-muted-foreground"}
-              />
-            </Badge>
-          </TooltipTrigger>
-
-          <div onClick={(e) => e.stopPropagation}>
-            <TooltipContent>
-              <div className="flex flex-col items-start justify-start gap-1">
-                <span className="flex flex-row items-center text-sm font-bold">
-                  {(row.getValue() as License).isOsiApproved && (
-                    <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
-                  )}
-                  {(row.getValue() as License).name}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {(row.getValue() as License).isOsiApproved
-                    ? "OSI Approved"
-                    : "Not OSI Approved"}
-                  ,{" "}
-                  <a
-                    href={`https://opensource.org/licenses/${(row.getValue() as License).licenseId}`}
-                    target="_blank"
-                    className="text-sm font-semibold !text-muted-foreground underline"
-                  >
-                    Open Source License
-                  </a>
-                </span>
-              </div>
-              <span className="text-sm text-muted-foreground"></span>
-              <div className="mt-4" onClick={(e) => e.stopPropagation}>
-                <Combobox
-                  // onSelect={(currentValue) => {
-                  //   setValue(currentValue === value ? "" : currentValue);
-                  //   setOpen(false);
-                  // }}
-                  onValueChange={}
-                  items={licenses}
-                  placeholder={(row.getValue() as License).name}
-                  emptyMessage={""}
-                  onSelect={handleUpdate(open)}
-                ></Combobox>
-              </div>
-            </TooltipContent>
-          </div>
-        </Tooltip>
+        <LicenseCall
+          row={row as any}
+          cell={row.cell}
+          column={row.column}
+          getValue={row.getValue()}
+          renderValue={row.renderValue()}
+          table={row.table}
+        ></LicenseCall>
       ),
   }),
   columnHelper.accessor("dependency.project.projectKey", {
