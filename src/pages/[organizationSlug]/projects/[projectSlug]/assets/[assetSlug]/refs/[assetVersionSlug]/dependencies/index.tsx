@@ -53,7 +53,13 @@ import {
   flexRender,
   NoInfer,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch, PencilIcon } from "lucide-react";
+import {
+  BadgeInfo,
+  BadgeInfoIcon,
+  ChevronDownIcon,
+  GitBranch,
+  PencilIcon,
+} from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -273,10 +279,20 @@ const LicenseCall = (props: {
               )}
               {props.row.getValue().name}
             </span>
+            <span className="flex absolute top-0 right-0 m-2 scale-75 text-">
+              <Tooltip>
+                <TooltipTrigger>
+                  <BadgeInfo className="flex absolute top-0 right-0 text-green-500"></BadgeInfo>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Our Community corrected this license
+                </TooltipContent>
+              </Tooltip>
+            </span>
             <span className="text-sm text-muted-foreground">
               {props.row.getValue().isOsiApproved
-                ? "OSI Approved"
-                : "Not OSI Approved"}
+                ? "OSI Approved, "
+                : "Not OSI Approved, "}
               <a
                 href={`https://opensource.org/licenses/${(props.row.getValue() as License).licenseId}`}
                 target="_blank"
