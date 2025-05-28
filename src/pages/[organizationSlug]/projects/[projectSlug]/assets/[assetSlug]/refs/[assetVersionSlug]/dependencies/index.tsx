@@ -220,9 +220,6 @@ const LicenseCall = (props: {
   row: CellContext<ComponentPaged & { license: LicenseResponse }, any>;
   dependencyPurl: string;
   justification: string;
-
-  // CoreRow<ComponentPaged & { license: LicenseResponse; }>.original: ComponentPaged & {
-  //     license: LicenseResponse;
 }) => {
   const [open, setOpen] = useState(false);
   const activeOrg = useActiveOrg();
@@ -253,22 +250,22 @@ const LicenseCall = (props: {
   };
 
   return (
-    <Tooltip open={true}>
-      <TooltipTrigger>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Badge
           variant={"outline"}
           onClick={(e) => {
             e.stopPropagation();
+            setOpen(!open);
           }}
         >
           <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
           {props.row.getValue().licenseId}
           <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
         </Badge>
-      </TooltipTrigger>
-
+      </PopoverTrigger>
       <div onClick={(e) => e.stopPropagation()}>
-        <TooltipContent>
+        <PopoverContent>
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row items-center text-sm font-bold">
               {props.row.getValue().isOsiApproved && (
@@ -305,9 +302,9 @@ const LicenseCall = (props: {
               }
             ></Combobox>
           </div>
-        </TooltipContent>
+        </PopoverContent>
       </div>
-    </Tooltip>
+    </Popover>
   );
 };
 
