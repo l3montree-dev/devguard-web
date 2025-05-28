@@ -100,160 +100,149 @@ interface Props {
 }
 
 const licenses = [
-  {
-    value: "mit",
-    label: "MIT",
-  },
-  {
-    value: "apache-2",
-    label: "Apache-2.0",
-  },
-  {
-    value: "bsd-2-clause",
-    label: "BSD-2-Clause",
-  },
-  {
-    value: "apgl",
-    label: "APGL",
-  },
-  {
-    value: "0bsd",
-    label: "0BSD",
-  },
-
-  // "BSD-1-Clause",
-  // "AFL-3.0",
-  // "APL-1.0",
-  // "Apache-2.0",
-  // "Apache-1.1",
-  // "APSL-2.0",
-  // "Artistic-1.0-Perl",
-  // "Artistic-1.0",
-  // "Artistic-2.0",
-  // "AAL",
-  // "BlueOak-1.0.0",
-  // "BSL-1.0",
-  // "BSD-2-Clause-Patent",
-  // "CECILL-2.1",
-  // "CERN-OHL-P-2.0",
-  // "CERN-OHL-S-2.0",
-  // "CERN-OHL-W-2.0",
-  // "MIT-CMU",
-  // "CDDL-1.0",
-  // "CPAL-1.0",
-  // "CPL-1.0",
-  // "CATOSL-1.1",
-  // "CAL-1.0",
-  // "CUA-OPL-1.0",
-  // "EPL-1.0",
-  // "EPL-2.0",
-  // "eCos-2.0",
-  // "ECL-1.0",
-  // "ECL-2.0",
-  // "EFL-1.0",
-  // "EFL-2.0",
-  // "Entessa",
-  // "EUDatagrid",
-  // "EUPL-1.2",
-  // "Fair",
-  // "Frameworx-1.0",
-  // "AGPL-3.0-only",
-  // "GPL-2.0",
-  // "GPL-3.0-only",
-  // "LGPL-2.1",
-  // "LGPL-3.0-only",
-  // "LGPL-2.0-only",
-  // "HPND",
-  // "IPL-1.0",
-  // "ICU",
-  // "Intel",
-  // "IPA",
-  // "ISC",
-  // "Jam",
-  // "LPPL-1.3c",
-  // "BSD-3-Clause-LBNL",
-  // "LiLiQ-P-1.1",
-  // "LiLiQ-Rplus-1.1",
-  // "LiLiQ-R-1.1",
-  // "LPL-1.02",
-  // "LPL-1.0",
-  // "MS-PL",
-  // "MS-RL",
-  // "MirOS",
-  // "MIT-0",
-  // "Motosoto",
-  // "MPL-1.1",
-  // "MPL-2.0",
-  // "MPL-1.0",
-  // "MulanPSL-2.0",
-  // "Multics",
-  // "NASA-1.3",
-  // "Naumen",
-  // "NOKIA",
-  // "NPOSL-3.0",
-  // "NTP",
-  // "OGTSL",
-  // "OLFL-1.3",
-  // "OSL-2.1",
-  // "OSL-1.0",
-  // "OLDAP-2.8",
-  // "OSET-PL-2.1",
-  // "PHP-3.0",
-  // "PHP-3.01",
-  // "PSF-2.0",
-  // "RPSL-1.0",
-  // "RPL-1.5",
-  // "RPL-1.1",
-  // "OFL-1.1",
-  // "SimPL-2.0",
-  // "SISSL",
-  // "SPL-1.0",
-  // "BSD-2-Clause",
-  // "BSD-3-Clause",
-  // "CNRI-Python",
-  // "EUPL-1.1",
-  // "MIT",
-  // "NGPL",
-  // "OSL-3.0",
-  // "PostgreSQL",
-  // "QPL-1.0",
-  // "RSCPL",
-  // "Sleepycat",
-  // "Watcom-1.0",
-  // "UPL-1.0",
-  // "NCSA",
-  // "Unlicense",
-  // "VSL-0.1",
-  // "W3C-20150513",
-  // "wxWindows",
-  // "Xnet",
-  // "Zlib",
-  // "Unicode-DFS-2015",
-  // "UCL-1.0",
-  // "0BSD",
-  // "ZPL-2.0",
-  // "ZPL-2.1"
+  { value: "bsd-1-clause", label: "BSD-1-Clause" },
+  { value: "afl-3.0", label: "AFL-3.0" },
+  { value: "apl-1.0", label: "APL-1.0" },
+  { value: "apache-1.1", label: "Apache-1.1" },
+  { value: "apsl-2.0", label: "APSL-2.0" },
+  { value: "artistic-1.0-perl", label: "Artistic-1.0-Perl" },
+  { value: "artistic-1.0", label: "Artistic-1.0" },
+  { value: "artistic-2.0", label: "Artistic-2.0" },
+  { value: "aal", label: "AAL" },
+  { value: "blueoak-1.0.0", label: "BlueOak-1.0.0" },
+  { value: "bsl-1.0", label: "BSL-1.0" },
+  { value: "bsd-2-clause-patent", label: "BSD-2-Clause-Patent" },
+  { value: "cecill-2.1", label: "CECILL-2.1" },
+  { value: "cern-ohl-p-2.0", label: "CERN-OHL-P-2.0" },
+  { value: "cern-ohl-s-2.0", label: "CERN-OHL-S-2.0" },
+  { value: "cern-ohl-w-2.0", label: "CERN-OHL-W-2.0" },
+  { value: "mit-cmu", label: "MIT-CMU" },
+  { value: "cddl-1.0", label: "CDDL-1.0" },
+  { value: "cpal-1.0", label: "CPAL-1.0" },
+  { value: "cpl-1.0", label: "CPL-1.0" },
+  { value: "catosl-1.1", label: "CATOSL-1.1" },
+  { value: "cal-1.0", label: "CAL-1.0" },
+  { value: "cua-opl-1.0", label: "CUA-OPL-1.0" },
+  { value: "epl-1.0", label: "EPL-1.0" },
+  { value: "epl-2.0", label: "EPL-2.0" },
+  { value: "ecos-2.0", label: "eCos-2.0" },
+  { value: "ecl-1.0", label: "ECL-1.0" },
+  { value: "ecl-2.0", label: "ECL-2.0" },
+  { value: "efl-1.0", label: "EFL-1.0" },
+  { value: "efl-2.0", label: "EFL-2.0" },
+  { value: "entessa", label: "Entessa" },
+  { value: "eudatagrid", label: "EUDatagrid" },
+  { value: "eupl-1.2", label: "EUPL-1.2" },
+  { value: "fair", label: "Fair" },
+  { value: "frameworx-1.0", label: "Frameworx-1.0" },
+  { value: "agpl-3.0-only", label: "AGPL-3.0-only" },
+  { value: "gpl-2.0", label: "GPL-2.0" },
+  { value: "gpl-3.0-only", label: "GPL-3.0-only" },
+  { value: "lgpl-2.1", label: "LGPL-2.1" },
+  { value: "lgpl-3.0-only", label: "LGPL-3.0-only" },
+  { value: "lgpl-2.0-only", label: "LGPL-2.0-only" },
+  { value: "hpnd", label: "HPND" },
+  { value: "ipl-1.0", label: "IPL-1.0" },
+  { value: "icu", label: "ICU" },
+  { value: "intel", label: "Intel" },
+  { value: "ipa", label: "IPA" },
+  { value: "isc", label: "ISC" },
+  { value: "jam", label: "Jam" },
+  { value: "lppl-1.3c", label: "LPPL-1.3c" },
+  { value: "bsd-3-clause-lbnl", label: "BSD-3-Clause-LBNL" },
+  { value: "liliq-p-1.1", label: "LiLiQ-P-1.1" },
+  { value: "liliq-rplus-1.1", label: "LiLiQ-Rplus-1.1" },
+  { value: "liliq-r-1.1", label: "LiLiQ-R-1.1" },
+  { value: "lpl-1.02", label: "LPL-1.02" },
+  { value: "lpl-1.0", label: "LPL-1.0" },
+  { value: "ms-pl", label: "MS-PL" },
+  { value: "ms-rl", label: "MS-RL" },
+  { value: "miros", label: "MirOS" },
+  { value: "mit-0", label: "MIT-0" },
+  { value: "motosoto", label: "Motosoto" },
+  { value: "mpl-1.1", label: "MPL-1.1" },
+  { value: "mpl-2.0", label: "MPL-2.0" },
+  { value: "mpl-1.0", label: "MPL-1.0" },
+  { value: "mulanpsl-2.0", label: "MulanPSL-2.0" },
+  { value: "multics", label: "Multics" },
+  { value: "nasa-1.3", label: "NASA-1.3" },
+  { value: "naumen", label: "Naumen" },
+  { value: "nokia", label: "NOKIA" },
+  { value: "nposl-3.0", label: "NPOSL-3.0" },
+  { value: "ntp", label: "NTP" },
+  { value: "ogtsl", label: "OGTSL" },
+  { value: "olfl-1.3", label: "OLFL-1.3" },
+  { value: "osl-2.1", label: "OSL-2.1" },
+  { value: "osl-1.0", label: "OSL-1.0" },
+  { value: "oldap-2.8", label: "OLDAP-2.8" },
+  { value: "oset-pl-2.1", label: "OSET-PL-2.1" },
+  { value: "php-3.0", label: "PHP-3.0" },
+  { value: "php-3.01", label: "PHP-3.01" },
+  { value: "psf-2.0", label: "PSF-2.0" },
+  { value: "rpsl-1.0", label: "RPSL-1.0" },
+  { value: "rpl-1.5", label: "RPL-1.5" },
+  { value: "rpl-1.1", label: "RPL-1.1" },
+  { value: "ofl-1.1", label: "OFL-1.1" },
+  { value: "simpl-2.0", label: "SimPL-2.0" },
+  { value: "sissl", label: "SISSL" },
+  { value: "spl-1.0", label: "SPL-1.0" },
+  { value: "bsd-3-clause", label: "BSD-3-Clause" },
+  { value: "cnri-python", label: "CNRI-Python" },
+  { value: "eupl-1.1", label: "EUPL-1.1" },
+  { value: "ngpl", label: "NGPL" },
+  { value: "osl-3.0", label: "OSL-3.0" },
+  { value: "postgresql", label: "PostgreSQL" },
+  { value: "qpl-1.0", label: "QPL-1.0" },
+  { value: "rscpl", label: "RSCPL" },
+  { value: "sleepycat", label: "Sleepycat" },
+  { value: "watcom-1.0", label: "Watcom-1.0" },
+  { value: "upl-1.0", label: "UPL-1.0" },
+  { value: "ncsa", label: "NCSA" },
+  { value: "unlicense", label: "Unlicense" },
+  { value: "vsl-0.1", label: "VSL-0.1" },
+  { value: "w3c-20150513", label: "W3C-20150513" },
+  { value: "wxwindows", label: "wxWindows" },
+  { value: "xnet", label: "Xnet" },
+  { value: "zlib", label: "Zlib" },
+  { value: "unicode-dfs-2015", label: "Unicode-DFS-2015" },
+  { value: "ucl-1.0", label: "UCL-1.0" },
+  { value: "zpl-2.0", label: "ZPL-2.0" },
+  { value: "zpl-2.1", label: "ZPL-2.1" },
 ];
 
 const LicenseCall = (props: {
-  row: CellContext<
-    ComponentPaged & {
-      license: LicenseResponse;
-    },
-    any
-  >;
+  organizationId(
+    selectedLicense: string,
+    organizationId: any,
+    dependencyPurl: string,
+    id: string,
+  ): void;
+  row: CellContext<ComponentPaged & { license: LicenseResponse }, any>;
+  dependencyPurl: string;
+  justification: string;
+
+  // CoreRow<ComponentPaged & { license: LicenseResponse; }>.original: ComponentPaged & {
+  //     license: LicenseResponse;
 }) => {
   const [open, setOpen] = useState(false);
   const activeOrg = useActiveOrg();
 
-  const handleLicenseUpdate = async (newlicense: string) => {
+  const handleLicenseUpdate = async (
+    newlicense: string,
+    organizationId: string,
+    purl: string,
+    justification: string,
+  ) => {
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug,
 
       {
         method: "PUT",
         body: JSON.stringify({
-          license: newlicense,
+          licenseId: newlicense,
+          organizationId: organizationId,
+          componentPurl: purl,
+          justification: "filler",
         }),
       },
     );
@@ -264,7 +253,7 @@ const LicenseCall = (props: {
   };
 
   return (
-    <Tooltip>
+    <Tooltip open={true}>
       <TooltipTrigger>
         <Badge
           variant={"outline"}
@@ -278,7 +267,7 @@ const LicenseCall = (props: {
         </Badge>
       </TooltipTrigger>
 
-      <div onClick={(e) => e.stopPropagation}>
+      <div onClick={(e) => e.stopPropagation()}>
         <TooltipContent>
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row items-center text-sm font-bold">
@@ -301,18 +290,18 @@ const LicenseCall = (props: {
             </span>
           </div>
           <span className="text-sm text-muted-foreground"></span>
-          <div className="mt-4" onClick={(e) => e.stopPropagation}>
+          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
             <Combobox
-              // onSelect={(currentValue) => {
-              //   setValue(currentValue === value ? "" : currentValue);
-              //   setOpen(false);
-              // }}
-
               items={licenses}
               placeholder={props.row.getValue().name}
               emptyMessage={""}
               onSelect={(selectedLicense) =>
-                handleLicenseUpdate(selectedLicense)
+                handleLicenseUpdate(
+                  selectedLicense,
+                  activeOrg.id,
+                  props.dependencyPurl,
+                  "justification",
+                )
               }
             ></Combobox>
           </div>
@@ -353,10 +342,34 @@ const columnsDef: ColumnDef<
     cell: (row) =>
       (row.getValue() as License).licenseId === "unknown" ? (
         <>
-          <LicenseCall row={row}></LicenseCall>
+          <LicenseCall
+            dependencyPurl={row.row.original.dependencyPurl}
+            row={row}
+            justification={""}
+            organizationId={function (
+              selectedLicense: string,
+              organizationId: any,
+              dependencyPurl: string,
+              id: string,
+            ): void {
+              throw new Error("Function not implemented.");
+            }}
+          ></LicenseCall>
         </>
       ) : (
-        <LicenseCall row={row}></LicenseCall>
+        <LicenseCall
+          dependencyPurl={row.row.original.dependencyPurl}
+          row={row}
+          justification={""}
+          organizationId={function (
+            selectedLicense: string,
+            organizationId: any,
+            dependencyPurl: string,
+            id: string,
+          ): void {
+            throw new Error("Function not implemented.");
+          }}
+        ></LicenseCall>
       ),
   }),
   columnHelper.accessor("dependency.project.projectKey", {
@@ -405,7 +418,6 @@ const columnsDef: ColumnDef<
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
 
-  const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useRouter().asPath.split("?")[0];
 
