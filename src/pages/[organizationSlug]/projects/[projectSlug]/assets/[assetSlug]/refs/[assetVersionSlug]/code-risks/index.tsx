@@ -105,36 +105,21 @@ const Index: FunctionComponent<Props> = (props) => {
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+      <div className="flex flex-row items-center justify-between">
+        <BranchTagSelector branches={branches} tags={tags} />
+        <div className="flex flex-row gap-2">
+          <Button onClick={() => setIsOpen(true)} variant="default">
+            Identify Code-Risks
+          </Button>
+        </div>
+      </div>
       {!props.vulns.data.length ? (
-        <EmptyList
+        <EmptyParty
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
-          Button={
-            <Button onClick={() => setIsOpen(true)} variant="default">
-              Start identifying Risks
-            </Button>
-          }
         />
-      ) : table.getRowCount() === 0 &&
-        Object.keys(router.query).length === 4 ? (
-        <>
-          <BranchTagSelector branches={branches} tags={tags} />
-
-          <EmptyParty
-            title="No identified risks"
-            description="No identified risks for this asset."
-          />
-        </>
       ) : (
         <div>
-          <div className="flex flex-row items-center justify-between">
-            <BranchTagSelector branches={branches} tags={tags} />
-            <div className="flex flex-row gap-2">
-              <Button onClick={() => setIsOpen(true)} variant="default">
-                Identify Code-Risks
-              </Button>
-            </div>
-          </div>
           <Section
             forceVertical
             primaryHeadline

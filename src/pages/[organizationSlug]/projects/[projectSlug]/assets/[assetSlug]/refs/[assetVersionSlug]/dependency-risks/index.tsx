@@ -198,6 +198,64 @@ const Index: FunctionComponent<Props> = (props) => {
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+      <div className="flex flex-row items-center justify-between">
+        <BranchTagSelector branches={branches} tags={tags} />
+        <div className="flex flex-row gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download SBOM</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../sbom.json`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+              </Link>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../sbom.xml`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>XML-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download VeX</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.json`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+              </Link>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.xml`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>XML-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={() => setIsOpen(true)} variant="default">
+            Identify Dependency-Risks
+          </Button>
+        </div>
+      </div>
       {!props.vulns.data.length ? (
         <EmptyList
           title="You do not have any identified risks for this asset."
@@ -208,77 +266,8 @@ const Index: FunctionComponent<Props> = (props) => {
             </Button>
           }
         />
-      ) : table.getRowCount() === 0 &&
-        Object.keys(router.query).length === 4 ? (
-        <>
-          <BranchTagSelector branches={branches} tags={tags} />
-
-          <EmptyParty
-            title="No identified risks"
-            description="No identified risks for this asset."
-          />
-        </>
       ) : (
         <div>
-          <div className="flex flex-row items-center justify-between">
-            <BranchTagSelector branches={branches} tags={tags} />
-            <div className="flex flex-row gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"secondary"}>Download SBOM</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <Link
-                    download
-                    target="_blank"
-                    prefetch={false}
-                    href={pathname + `/../sbom.json`}
-                    className="!text-foreground hover:no-underline"
-                  >
-                    <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-                  </Link>
-                  <Link
-                    download
-                    target="_blank"
-                    prefetch={false}
-                    href={pathname + `/../sbom.xml`}
-                    className="!text-foreground hover:no-underline"
-                  >
-                    <DropdownMenuItem>XML-Format</DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant={"secondary"}>Download VeX</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <Link
-                    download
-                    target="_blank"
-                    prefetch={false}
-                    href={pathname + `/../vex.json`}
-                    className="!text-foreground hover:no-underline"
-                  >
-                    <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-                  </Link>
-                  <Link
-                    download
-                    target="_blank"
-                    prefetch={false}
-                    href={pathname + `/../vex.xml`}
-                    className="!text-foreground hover:no-underline"
-                  >
-                    <DropdownMenuItem>XML-Format</DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button onClick={() => setIsOpen(true)} variant="default">
-                Identify Dependency-Risks
-              </Button>
-            </div>
-          </div>
-
           <Section
             forceVertical
             primaryHeadline
