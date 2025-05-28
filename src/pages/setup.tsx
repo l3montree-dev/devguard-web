@@ -20,7 +20,7 @@ import { withOrgs } from "@/decorators/withOrgs";
 import { useCallback, useEffect, useState } from "react";
 import ListItem from "../components/common/ListItem";
 import Section from "../components/common/Section";
-import { Button } from "../components/ui/button";
+import { AsyncButton, Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { withSession } from "../decorators/withSession";
 import { browserApiClient } from "../services/devGuardApi";
@@ -34,6 +34,14 @@ type Repo = {
   image: string;
   description: string;
 };
+
+function sortRepositories(repositories: Array<Repo>) {
+  repositories.sort((a, b) => {
+    if (a.label.toLowerCase() < b.label.toLowerCase()) return -1;
+    if (a.label.toLowerCase() > b.label.toLowerCase()) return 1;
+    return 0;
+  });
+}
 
 export default function SetupOrg() {
   const [loading, setLoading] = useState(false);
@@ -56,10 +64,20 @@ export default function SetupOrg() {
     [listRepositories],
   );
 
+  const handleAutoSetup = async (repoId: string) => {
+    return browserApiClient("/integrations/fullautosetup", {
+      method: "POST",
+      body: JSON.stringify({
+        repositoryId: repoId,
+      }),
+    });
+  };
+
   useEffect(() => {
     const fetchRepositories = async () => {
       try {
         const repos = await listRepositories();
+        sortRepositories(repos);
         setRepositories(repos);
       } catch (error) {
         console.error("Failed to fetch repositories:", error);
@@ -82,6 +100,9 @@ export default function SetupOrg() {
             debouncedListRepositories(e.target.value);
           }}
         />
+        <a href="http://localhost:8080/api/v1/oauth2/gitlab/opencodeautosetup">
+          Grant scopes
+        </a>
         {loading && (
           <div className="flex flex-row justify-center">
             <Loader2 className="animate-spin h-10 w-10 mr-2" />
@@ -105,7 +126,14 @@ export default function SetupOrg() {
                 {repo.label}
               </span>
             }
-            Button={<Button variant={"secondary"}>Automatically setup</Button>}
+            Button={
+              <AsyncButton
+                onClick={() => handleAutoSetup(repo.id)}
+                variant={"secondary"}
+              >
+                Automatically setup
+              </AsyncButton>
+            }
           ></ListItem>
         ))}
       </Section>
