@@ -285,7 +285,7 @@ const LicenseCall = (props: {
                   <BadgeInfo className="flex absolute top-0 right-0 text-green-500"></BadgeInfo>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Our Community corrected this license
+                  Devguardians corrected this license
                 </TooltipContent>
               </Tooltip>
             </span>
