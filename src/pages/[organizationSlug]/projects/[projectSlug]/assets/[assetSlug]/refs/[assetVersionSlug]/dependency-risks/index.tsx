@@ -257,14 +257,9 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       </div>
       {!props.vulns.data.length ? (
-        <EmptyList
+        <EmptyParty
           title="You do not have any identified risks for this asset."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
-          Button={
-            <Button onClick={() => setIsOpen(true)} variant="default">
-              Start identifying Risks
-            </Button>
-          }
         />
       ) : (
         <div>
