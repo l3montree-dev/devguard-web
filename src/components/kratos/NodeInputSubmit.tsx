@@ -98,7 +98,7 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
-  if ((node.meta.label?.context as any)?.provider_id === "gitlab") {
+  if ((node.meta.label?.context as any)?.provider_id === "official") {
     // render the google node
     return (
       <div className="flex flex-row justify-end">
@@ -115,7 +115,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign in with gitlab
+          Sign in with GitLab
         </Button>
       </div>
     );
