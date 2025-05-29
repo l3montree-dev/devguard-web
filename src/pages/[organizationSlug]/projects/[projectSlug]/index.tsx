@@ -361,7 +361,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 showReportingRange={false}
               />
               <DialogFooter>
-                <Button type="submit" variant="default">
+                <Button
+                  isSubmitting={form.formState.isSubmitting}
+                  type="submit"
+                  variant="default"
+                >
                   Create
                 </Button>
               </DialogFooter>

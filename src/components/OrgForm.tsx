@@ -1,27 +1,18 @@
-import { countries, industryOptions } from "@/const/organizationConstants";
 import { OrganizationDTO, OrganizationDetailsDTO } from "@/types/api/api";
 import { FunctionComponent } from "react";
 import { UseFormReturn } from "react-hook-form";
+import DangerZone from "./common/DangerZone";
+import ListItem from "./common/ListItem";
 import Section from "./common/Section";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { Switch } from "./ui/switch";
-import ListItem from "./common/ListItem";
-import DangerZone from "./common/DangerZone";
 
 interface Props {
   form:
