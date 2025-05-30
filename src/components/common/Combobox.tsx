@@ -72,7 +72,7 @@ export function Combobox(props: Props) {
         className="popover-content-width-same-as-its-trigger min-w-full max-w-full p-0"
       >
         <Command shouldFilter={props.onValueChange === undefined}>
-          <CommandInput />
+          <CommandInput onValueChange={props.onValueChange} />
           <CommandList>
             {loading && (
               <CommandItem>
