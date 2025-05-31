@@ -77,7 +77,7 @@ export const OrganizationDropDown = () => {
   };
 
   const handleNavigateToSetupOrg = () => {
-    router.push(`/setup-organization`);
+    router.push(`/setup`);
   };
 
   return (
