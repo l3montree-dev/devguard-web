@@ -133,6 +133,9 @@ export interface ProjectDTO {
     avatarUrl?: string;
     role?: "member" | "admin";
   }>;
+
+  externalEntityId?: string;
+  externalEntityProvider?: string;
 }
 
 export interface EnvDTO {
@@ -424,6 +427,9 @@ export interface AssetDTO {
 
   badgeSecret: string;
   webhookSecret: string | null;
+
+  externalEntityId?: string;
+  externalEntityProvider?: string;
 }
 
 export interface DependencyTreeNode {
