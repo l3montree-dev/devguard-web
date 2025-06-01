@@ -21,17 +21,21 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
+import { useActiveProject } from "./useActiveProject";
 
 export const useProjectMenu = () => {
   const router = useRouter();
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
+  const project = useActiveProject();
 
   const loggedIn = useCurrentUser();
 
   const menu = [
     {
-      title: "Subprojects & Assets",
+      title: project.externalEntityProviderId
+        ? "Repositories"
+        : "Subprojects & Repositories",
       href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
     },

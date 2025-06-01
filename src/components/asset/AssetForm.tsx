@@ -28,6 +28,7 @@ import React from "react";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
+  disable?: boolean;
 }
 
 export type AssetFormValues = Modify<
@@ -38,7 +39,10 @@ export type AssetFormValues = Modify<
     enableTicketRange: boolean;
   }
 >;
-export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
+export const AssetFormGeneral: FunctionComponent<Props> = ({
+  form,
+  disable,
+}) => (
   <>
     <FormField
       name="name"
@@ -47,7 +51,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <FormLabel>Name</FormLabel>
           <FormControl>
-            <Input required={true} {...field} />
+            <Input disabled={disable} required={true} {...field} />
           </FormControl>
           <FormDescription>The name of the asset.</FormDescription>
           <FormMessage />
@@ -61,7 +65,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({ form }) => (
         <FormItem>
           <FormLabel>Description</FormLabel>
           <FormControl>
-            <Input {...field} />
+            <Input disabled={disable} {...field} />
           </FormControl>
           <FormDescription>The description of the asset.</FormDescription>
           <FormMessage />
@@ -272,8 +276,12 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
 };
 
 const AssetSettingsForm: FunctionComponent<
-  Props & { forceVerticalSections?: boolean; showReportingRange: boolean }
-> = ({ form, forceVerticalSections, showReportingRange }) => {
+  Props & {
+    forceVerticalSections?: boolean;
+    showReportingRange: boolean;
+    disable?: boolean;
+  }
+> = ({ form, forceVerticalSections, showReportingRange, disable }) => {
   return (
     <>
       <Section
@@ -281,7 +289,7 @@ const AssetSettingsForm: FunctionComponent<
         title="General"
         description="General settings"
       >
-        <AssetFormGeneral form={form} />
+        <AssetFormGeneral disable={disable} form={form} />
       </Section>
       <hr />
       <Section

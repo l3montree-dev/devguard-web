@@ -83,7 +83,7 @@ export interface OrganizationDTO extends AppModelDTO {
 
   isPublic: boolean;
 
-  gitProviderId?: string; // GitLab, GitHub, etc.
+  externalEntityProviderId?: "opencode" | "github" | "official";
 }
 
 export interface OrganizationDetailsDTO extends OrganizationDTO {
@@ -135,7 +135,7 @@ export interface ProjectDTO {
   }>;
 
   externalEntityId?: string;
-  externalEntityProvider?: string;
+  externalEntityProviderId?: string;
 }
 
 export interface EnvDTO {
@@ -429,7 +429,7 @@ export interface AssetDTO {
   webhookSecret: string | null;
 
   externalEntityId?: string;
-  externalEntityProvider?: string;
+  externalEntityProviderId?: string;
 }
 
 export interface DependencyTreeNode {

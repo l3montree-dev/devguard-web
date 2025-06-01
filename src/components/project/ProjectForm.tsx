@@ -23,11 +23,13 @@ import { Button } from "../ui/button";
 interface Props {
   form: UseFormReturn<ProjectDTO, any, ProjectDTO>;
   forceVerticalSections: boolean;
+  disabled?: boolean;
   onConfirmDelete?: () => Promise<void>;
 }
 
 export const ProjectForm: FunctionComponent<Props> = ({
   form,
+  disabled,
   forceVerticalSections,
   onConfirmDelete,
 }) => {
@@ -46,7 +48,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input required={true} {...field} />
+                <Input disabled={disabled} required={true} {...field} />
               </FormControl>
               <FormDescription>The name of the project.</FormDescription>
               <FormMessage />
@@ -60,7 +62,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input disabled={disabled} {...field} />
               </FormControl>
               <FormDescription>The description of the project.</FormDescription>
               <FormMessage />

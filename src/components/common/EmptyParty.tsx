@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FunctionComponent, type JSX } from "react";
+import { FunctionComponent, ReactNode } from "react";
 import SkeletonListItem from "./SkeletonListItem";
 
 interface Props {
   title: string;
   description: string;
-  Button?: JSX.Element;
+  Button?: ReactNode;
 }
 const EmptyParty: FunctionComponent<Props> = ({
   title,

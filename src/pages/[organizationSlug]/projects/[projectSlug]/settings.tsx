@@ -26,17 +26,13 @@ import { withContentTree } from "@/decorators/withContentTree";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import MembersTable from "../../../../components/MembersTable";
+import ProjectMemberDialog from "../../../../components/ProjectMemberDialog";
 import CopyInput from "../../../../components/common/CopyInput";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
 import { convertRepos } from "../../../../hooks/useRepositorySearch";
-import ConnectToRepoSection from "../../../../components/ConnectToRepoSection";
-import MemberDialog from "../../../../components/MemberDialog";
-import MembersTable from "../../../../components/MembersTable";
-import ProjectMemberDialog from "../../../../components/ProjectMemberDialog";
-import ListItem from "../../../../components/common/ListItem";
-import Alert from "../../../../components/common/Alert";
 
 interface Props {
   project: ProjectDTO;
@@ -169,36 +165,47 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
           <CopyInput value={project?.id ?? ""} />
         </Section>
         <hr />
-        <Section
-          title="Member"
-          description="Manage the members of your organization"
-        >
-          <MembersTable
-            onChangeMemberRole={handleChangeMemberRole}
-            onRemoveMember={handleRemoveMember}
-            members={project.members}
-          />
-          <ProjectMemberDialog
-            isOpen={memberDialogOpen}
-            onOpenChange={setMemberDialogOpen}
-          />
+        {!project.externalEntityProviderId && (
+          <>
+            <Section
+              title="Member"
+              description="Manage the members of your organization"
+            >
+              <MembersTable
+                onChangeMemberRole={handleChangeMemberRole}
+                onRemoveMember={handleRemoveMember}
+                members={project.members}
+              />
+              <ProjectMemberDialog
+                isOpen={memberDialogOpen}
+                onOpenChange={setMemberDialogOpen}
+              />
 
-          <div className="flex flex-row justify-end">
-            <Button onClick={() => setMemberDialogOpen(true)}>
-              Add Member
-            </Button>
-          </div>
-        </Section>
-        <hr />
+              <div className="flex flex-row justify-end">
+                <Button onClick={() => setMemberDialogOpen(true)}>
+                  Add Member
+                </Button>
+              </div>
+            </Section>
+            <hr />
+          </>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm
-              onConfirmDelete={handleDeleteProject}
+              disabled={Boolean(project.externalEntityProviderId)}
+              onConfirmDelete={
+                Boolean(project.externalEntityProviderId)
+                  ? undefined
+                  : handleDeleteProject
+              }
               forceVerticalSections={false}
               form={form}
             />
             <div className="mt-4 flex flex-row justify-end">
-              <Button>Update</Button>
+              <Button disabled={Boolean(project.externalEntityProviderId)}>
+                Update
+              </Button>
             </div>
           </form>
         </Form>

@@ -5,14 +5,6 @@ interface Props {
   slug: string;
 }
 
-const getProviderIdFromSlug = (slug: string) => {
-  const parts = slug.split("@");
-  if (parts.length > 1) {
-    return parts[1];
-  }
-  return null;
-};
-
 const GitProviderIcon = (props: Props) => {
   if (props.slug === "@official") {
     return (

@@ -22,11 +22,13 @@ import { useRouter } from "next/router";
 
 import { useCurrentUser } from "./useCurrentUser";
 import { ScaleIcon } from "lucide-react";
+import { useActiveOrg } from "./useActiveOrg";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
   const orgSlug = router.query.organizationSlug as string;
   const loggedIn = useCurrentUser();
+  const org = useActiveOrg();
   const menu = [
     {
       title: "Projects",
@@ -35,7 +37,7 @@ export const useOrganizationMenu = () => {
     },
   ];
 
-  if (loggedIn) {
+  if (loggedIn && !org.externalEntityProviderId) {
     return menu.concat([
       {
         title: "Compliance",

@@ -3,6 +3,7 @@ import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { config } from "@/config";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withContentTree } from "@/decorators/withContentTree";
@@ -23,7 +24,7 @@ import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
@@ -32,10 +33,6 @@ import DangerZone from "../../../../../../components/common/DangerZone";
 import ListItem from "../../../../../../components/common/ListItem";
 import Section from "../../../../../../components/common/Section";
 import { getParentRepositoryIdAndName } from "../../../../../../utils/view";
-import { Input } from "@/components/ui/input";
-import { set } from "lodash";
-import { Label } from "@/components/ui/label";
-import { config } from "@/config";
 interface Props {
   repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
   secrets: {
@@ -45,9 +42,8 @@ interface Props {
   apiBadgeUrl: string;
 }
 
-import Image from "next/image";
-import { UUID } from "crypto";
 import { InputWithButton } from "@/components/ui/input-with-button";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -226,20 +222,23 @@ const Index: FunctionComponent<Props> = ({
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold">Asset Settings</h1>
         </div>
-        <ConnectToRepoSection
-          parentRepositoryId={parentRepositoryId}
-          parentRepositoryName={parentRepositoryName}
-          repositoryName={asset.repositoryName}
-          repositoryId={asset.repositoryId}
-          repositories={repos}
-          onUpdate={handleUpdate}
-        />
+        {!asset.externalEntityProviderId && (
+          <ConnectToRepoSection
+            parentRepositoryId={parentRepositoryId}
+            parentRepositoryName={parentRepositoryName}
+            repositoryName={asset.repositoryName}
+            repositoryId={asset.repositoryId}
+            repositories={repos}
+            onUpdate={handleUpdate}
+          />
+        )}
       </div>
       <hr />
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <AssetForm
+              disable={Boolean(asset.externalEntityProviderId)}
               form={form}
               showReportingRange={asset.repositoryId !== null}
             />
@@ -260,22 +259,7 @@ const Index: FunctionComponent<Props> = ({
                 onClick={() => {
                   handleGenerateNewSecret("badge");
                 }}
-                SVG={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                }
+                SVG={<ArrowPathIcon />}
               />
             </div>
 
@@ -304,50 +288,37 @@ const Index: FunctionComponent<Props> = ({
               onClick={() => {
                 handleGenerateNewSecret("webhook");
               }}
-              SVG={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-              }
+              SVG={<ArrowPathIcon />}
             />
           </div>
         </Section>
         <hr />
       </div>
-      <DangerZone>
-        <Section
-          className="m-2"
-          title="Advanced"
-          description="These settings are for advanced users only. Please be careful when changing these settings."
-        >
-          <ListItem
-            Title="Delete Asset"
-            Description={
-              "This will delete the asset and all of its data. This action cannot be undone."
-            }
-            Button={
-              <Alert
-                title="Are you sure to delete this asset?"
-                description="This action cannot be undone. All data associated with this asset will be deleted."
-                onConfirm={handleDeleteAsset}
-              >
-                <Button variant={"destructive"}>Delete</Button>
-              </Alert>
-            }
-          />
-        </Section>
-      </DangerZone>
+      {!asset.externalEntityProviderId && (
+        <DangerZone>
+          <Section
+            className="m-2"
+            title="Advanced"
+            description="These settings are for advanced users only. Please be careful when changing these settings."
+          >
+            <ListItem
+              Title="Delete Asset"
+              Description={
+                "This will delete the asset and all of its data. This action cannot be undone."
+              }
+              Button={
+                <Alert
+                  title="Are you sure to delete this asset?"
+                  description="This action cannot be undone. All data associated with this asset will be deleted."
+                  onConfirm={handleDeleteAsset}
+                >
+                  <Button variant={"destructive"}>Delete</Button>
+                </Alert>
+              }
+            />
+          </Section>
+        </DangerZone>
+      )}
     </Page>
   );
 };

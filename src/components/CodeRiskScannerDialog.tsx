@@ -40,6 +40,7 @@ import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/router";
 import FileUpload from "./FileUpload";
 import PatSection from "./risk-identification/PatSection";
+import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
 
 interface CodeRiskScannerDialogProps {
   open: boolean;
@@ -53,30 +54,17 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   onOpenChange,
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
-  const [count, setCount] = React.useState(0);
-  const [current, setCurrent] = React.useState(0);
+  const asset = useActiveAsset();
   const [selectedScanner, setSelectedScanner] = React.useState<
     "secret-scanning" | "iac" | "sast" | "custom" | "devsecops"
   >();
   const [selectedIntegration, setSelectedIntegration] = React.useState<
-    "github" | "gitlab" | "docker" | "upload"
-  >();
+    "github" | "gitlab" | "docker" | "upload" | undefined
+  >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const asset = useActiveAsset();
 
   const pat = usePersonalAccessToken();
-
-  useEffect(() => {
-    if (!api) return;
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-      setCount(api.scrollSnapList().length);
-    });
-  }, [api]);
 
   const fileContent = useRef<any>(undefined);
   const [fileName, setFileName] = useState<string>();
