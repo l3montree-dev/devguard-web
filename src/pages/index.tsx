@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
       // redirect to the create organization page
       return {
         redirect: {
-          destination: `/setup-organization`,
+          destination: `/setup`,
           permanent: false,
         },
       };

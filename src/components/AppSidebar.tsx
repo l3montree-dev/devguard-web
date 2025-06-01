@@ -13,7 +13,7 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
+import { OrganizationDetailsDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import {
   BuildingOfficeIcon,
@@ -25,6 +25,7 @@ import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Badge } from "./ui/badge";
 import {
   Collapsible,
   CollapsibleContent,
@@ -55,7 +56,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import { Badge } from "./ui/badge";
+import GitProviderIcon from "./GitProviderIcon";
 
 export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
@@ -67,9 +68,9 @@ export const OrganizationDropDown = () => {
   }
   const updateOrganization = useStore((s) => s.updateOrganization);
 
-  const handleActiveOrgChange = (id: string) => () => {
+  const handleActiveOrgChange = (slug: string) => () => {
     // redirect to the new slug
-    const org = orgs.find((o) => o.id === id);
+    const org = orgs.find((o) => o.slug === slug);
     if (org) {
       router.push(`/${org.slug}`);
       updateOrganization(org as OrganizationDetailsDTO);
@@ -77,7 +78,7 @@ export const OrganizationDropDown = () => {
   };
 
   const handleNavigateToSetupOrg = () => {
-    router.push(`/setup-organization`);
+    router.push(`/setup`);
   };
 
   return (
@@ -111,17 +112,19 @@ export const OrganizationDropDown = () => {
               </DropdownMenuLabel>
               {orgs.length !== 0 && (
                 <>
-                  {orgs.map((o) => (
-                    <DropdownMenuItem
-                      key={o.id}
-                      onClick={handleActiveOrgChange(o.id)}
-                    >
-                      <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
-                        <BuildingOfficeIcon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      {o.name}
-                    </DropdownMenuItem>
-                  ))}
+                  {orgs
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((o) => (
+                      <DropdownMenuItem
+                        key={o.id}
+                        onClick={handleActiveOrgChange(o.slug)}
+                      >
+                        <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
+                          <GitProviderIcon slug={o.slug} />
+                        </div>
+                        {o.name}
+                      </DropdownMenuItem>
+                    ))}
                 </>
               )}
             </DropdownMenuGroup>

@@ -59,6 +59,7 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
+import EmptyParty from "../../../../components/common/EmptyParty";
 
 interface Props {
   project: ProjectDTO & {
@@ -163,60 +164,70 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
         Title={<ProjectTitle />}
       >
         {assets.length === 0 && subprojects.length === 0 ? (
-          <EmptyList
+          <EmptyParty
             description="No repositories or subprojects found"
             title="Your Repositories will show up here!"
             Button={
-              <div className="flex flex-row justify-center gap-2">
-                <Button
-                  onClick={() => setShowK8sModal(true)}
-                  variant="secondary"
-                >
-                  <Image
-                    alt="Kubernetes logo"
-                    src="/assets/kubernetes.svg"
-                    className="mr-2"
-                    width={24}
-                    height={24}
-                  />
-                  Use a Kubernetes Operator to index your assets
-                </Button>
-                <Button
-                  variant={"secondary"}
-                  onClick={() => setShowProjectModal(true)}
-                >
-                  Create new Subproject
-                </Button>
+              !project.externalEntityProviderId && (
+                <div className="flex flex-row justify-center gap-2">
+                  <Button
+                    onClick={() => setShowK8sModal(true)}
+                    variant="secondary"
+                  >
+                    <Image
+                      alt="Kubernetes logo"
+                      src="/assets/kubernetes.svg"
+                      className="mr-2"
+                      width={24}
+                      height={24}
+                    />
+                    Use a Kubernetes Operator to index your assets
+                  </Button>
+                  <Button
+                    variant={"secondary"}
+                    onClick={() => setShowProjectModal(true)}
+                  >
+                    Create new Subproject
+                  </Button>
 
-                <Button onClick={() => setShowModal(true)}>
-                  Create new Repository
-                </Button>
-              </div>
+                  <Button onClick={() => setShowModal(true)}>
+                    Create new Repository
+                  </Button>
+                </div>
+              )
             }
           />
         ) : (
           <Section
             Button={
-              <div className="flex flex-row gap-2">
-                <Button
-                  disabled={project.type !== "default"}
-                  variant={"secondary"}
-                  onClick={() => setShowProjectModal(true)}
-                >
-                  New subproject
-                </Button>
-                <Button
-                  disabled={project.type !== "default"}
-                  onClick={() => setShowModal(true)}
-                >
-                  New Repository
-                </Button>
-              </div>
+              !project.externalEntityProviderId && (
+                <div className="flex flex-row gap-2">
+                  <Button
+                    disabled={project.type !== "default"}
+                    variant={"secondary"}
+                    onClick={() => setShowProjectModal(true)}
+                  >
+                    New subproject
+                  </Button>
+                  <Button
+                    disabled={project.type !== "default"}
+                    onClick={() => setShowModal(true)}
+                  >
+                    New Repository
+                  </Button>
+                </div>
+              )
             }
             primaryHeadline
-            description={"Assets managed by the " + project.name + " project"}
+            description={
+              "Repositories managed by the " + project.name + " project"
+            }
             forceVertical
-            title="Subprojects & Repositories"
+            title={
+              project.externalEntityProviderId
+                ? "Repositories"
+                : "Subprojects & Repositories"
+            }
           >
             {subprojects.map((subproject) => (
               <Link

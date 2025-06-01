@@ -24,6 +24,10 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import useDimensions from "@/hooks/useDimensions";
 import { HEADER_HEIGHT } from "@/const/viewConstants";
 import { useActiveOrg } from "../hooks/useActiveOrg";
+import { useActiveProject } from "../hooks/useActiveProject";
+import { useActiveAsset } from "../hooks/useActiveAsset";
+import GitProviderIcon from "./GitProviderIcon";
+import { providerIdToBaseURL } from "../utils/externalProvider";
 
 interface Props {
   title: string;
@@ -38,6 +42,85 @@ interface Props {
   }>;
   fullscreen?: boolean;
 }
+
+const EntityProviderImage = ({ provider }: { provider: string }) => {
+  if (provider === "@official") {
+    return (
+      <Image
+        src="/assets/gitlab.svg"
+        alt="Official Logo"
+        width={30}
+        height={30}
+      />
+    );
+  } else if (provider === "@opencode") {
+    return (
+      <Image
+        src="/logos/opencode.svg"
+        alt="OpenCode Logo"
+        width={30}
+        height={30}
+        className="scale-175 relative right-[1px]"
+      />
+    );
+  }
+  return (
+    <Image
+      src="/logo_inverse_icon.svg"
+      alt="DevGuard Logo"
+      width={30}
+      height={30}
+    />
+  );
+};
+
+const EntityProviderLinkBanner = () => {
+  const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const activeAsset = useActiveAsset();
+  if (!activeOrg && !activeProject && !activeAsset) {
+    return null;
+  }
+
+  if (activeAsset && activeAsset.externalEntityProviderId) {
+    return (
+      <div>
+        <Link
+          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
+          href={
+            providerIdToBaseURL(activeAsset.externalEntityProviderId) +
+            `/-/p/` +
+            activeAsset.externalEntityId
+          }
+        >
+          <GitProviderIcon slug={activeOrg.slug} />
+          {activeProject.name} / {activeAsset.name}
+        </Link>
+      </div>
+    );
+  }
+
+  if (activeProject && activeProject.externalEntityProviderId) {
+    return (
+      <div>
+        <Link
+          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
+          href={
+            providerIdToBaseURL(activeOrg.externalEntityProviderId) +
+            `/-/g/` +
+            activeProject.externalEntityId
+          }
+        >
+          <GitProviderIcon slug={activeOrg.slug} />
+          {activeProject.name}
+        </Link>
+      </div>
+    );
+  }
+
+  return <div></div>;
+};
+
 const Main: FunctionComponent<Props> = ({
   title,
   Title,
@@ -75,12 +158,7 @@ const Main: FunctionComponent<Props> = ({
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
               <Link href={`/${activeOrg?.slug}`}>
-                <Image
-                  src="/logo_inverse_icon.svg"
-                  alt="DevGuard Logo"
-                  width={30}
-                  height={30}
-                />
+                <EntityProviderImage provider={activeOrg?.slug || ""} />
               </Link>
               <div>
                 <OrganizationDropDown />
@@ -115,7 +193,7 @@ const Main: FunctionComponent<Props> = ({
             )}
           </div>
         </header>
-
+        <EntityProviderLinkBanner />
         <div
           style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
           className={classNames(
@@ -125,7 +203,6 @@ const Main: FunctionComponent<Props> = ({
         >
           {children}
         </div>
-
         <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8">
           <div className="mb-2 flex flex-row gap-5">
             <Link

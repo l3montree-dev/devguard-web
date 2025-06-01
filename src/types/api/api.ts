@@ -82,6 +82,8 @@ export interface OrganizationDTO extends AppModelDTO {
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
 
   isPublic: boolean;
+
+  externalEntityProviderId?: "opencode" | "github" | "official";
 }
 
 export interface OrganizationDetailsDTO extends OrganizationDTO {
@@ -131,6 +133,9 @@ export interface ProjectDTO {
     avatarUrl?: string;
     role?: "member" | "admin";
   }>;
+
+  externalEntityId?: string;
+  externalEntityProviderId?: string;
 }
 
 export interface EnvDTO {
@@ -422,6 +427,9 @@ export interface AssetDTO {
 
   badgeSecret: string;
   webhookSecret: string | null;
+
+  externalEntityId?: string;
+  externalEntityProviderId?: string;
 }
 
 export interface DependencyTreeNode {

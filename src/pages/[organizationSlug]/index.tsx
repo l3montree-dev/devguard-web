@@ -59,6 +59,8 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
+import EmptyParty from "../../components/common/EmptyParty";
+import GitProviderIcon from "../../components/GitProviderIcon";
 
 interface Props {
   projects: Array<
@@ -133,15 +135,23 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
       </Dialog>
       <div>
         {projects.length === 0 ? (
-          <EmptyList
+          <EmptyParty
             title="Here you will see all your projects"
             description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+            Button={
+              !activeOrg.externalEntityProviderId && (
+                <Button onClick={() => setOpen(true)}>New Project</Button>
+              )
+            }
           />
         ) : (
           <Section
             primaryHeadline
-            Button={<Button onClick={() => setOpen(true)}>New Project</Button>}
+            Button={
+              !activeOrg.externalEntityProviderId && (
+                <Button onClick={() => setOpen(true)}>New Project</Button>
+              )
+            }
             description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
             forceVertical
             title="Projects"
@@ -163,7 +173,6 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
                     Description={
                       <div className="flex flex-col">
                         <span>{project.description}</span>
-
                         {(project.stats.totalAssets > 0 ||
                           project.type !== "default") && (
                           <div className="flex mt-4 flex-row items-center gap-2">
