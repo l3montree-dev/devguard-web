@@ -38,6 +38,38 @@ interface Props {
   }>;
   fullscreen?: boolean;
 }
+
+const EntityProviderImage = ({ provider }: { provider: string }) => {
+  if (provider === "@official") {
+    return (
+      <Image
+        src="/assets/gitlab.svg"
+        alt="Official Logo"
+        width={30}
+        height={30}
+      />
+    );
+  } else if (provider === "@opencode") {
+    return (
+      <Image
+        src="/logos/opencode.svg"
+        alt="OpenCode Logo"
+        width={30}
+        height={30}
+        className="scale-175 relative right-[1px]"
+      />
+    );
+  }
+  return (
+    <Image
+      src="/logo_inverse_icon.svg"
+      alt="DevGuard Logo"
+      width={30}
+      height={30}
+    />
+  );
+};
+
 const Main: FunctionComponent<Props> = ({
   title,
   Title,
@@ -75,12 +107,7 @@ const Main: FunctionComponent<Props> = ({
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
               <Link href={`/${activeOrg?.slug}`}>
-                <Image
-                  src="/logo_inverse_icon.svg"
-                  alt="DevGuard Logo"
-                  width={30}
-                  height={30}
-                />
+                <EntityProviderImage provider={activeOrg?.slug || ""} />
               </Link>
               <div>
                 <OrganizationDropDown />

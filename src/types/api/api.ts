@@ -82,6 +82,8 @@ export interface OrganizationDTO extends AppModelDTO {
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
 
   isPublic: boolean;
+
+  gitProviderId?: string; // GitLab, GitHub, etc.
 }
 
 export interface OrganizationDetailsDTO extends OrganizationDTO {
