@@ -30,6 +30,11 @@ const generateGitlabSnippet = (
   assetSlug: string,
   apiUrl: string,
 ) => `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+# stages:
+# - build
+# - test
+# - deploy
+
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
@@ -49,8 +54,11 @@ const generateDockerSnippet = (
   if (command === "container-scanning") {
     path = "/app/image.tar";
   }
-  return `# API URL might be host.docker.internal:8080 if you are running a local devguard instance on localhost
-docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
+
+  if (apiUrl === "http://localhost:8080") {
+    apiUrl = "http://host.docker.internal:8080";
+  }
+  return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
 devguard-scanner ${command} \\
     --path="${path}" \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\

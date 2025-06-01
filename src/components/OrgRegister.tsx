@@ -30,7 +30,6 @@ import { toast } from "sonner";
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
-  const activeOrg = useActiveOrg();
   const updateOrganization = useStore((s) => s.updateOrganization);
   const form = useForm<OrganizationDTO>();
 
@@ -71,7 +70,13 @@ export default function OrgRegisterForm(props: Props) {
         <OrgForm form={form} />
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
-          <Button type="submit">Save</Button>
+          <Button
+            disabled={form.formState.isSubmitting}
+            isSubmitting={form.formState.isSubmitting}
+            type="submit"
+          >
+            Save
+          </Button>
         </div>
       </form>
     </Form>

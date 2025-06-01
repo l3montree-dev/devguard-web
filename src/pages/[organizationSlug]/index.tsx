@@ -120,7 +120,12 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
             >
               <ProjectForm forceVerticalSections form={form} />
               <DialogFooter>
-                <Button type="submit">Create</Button>
+                <Button
+                  type="submit"
+                  isSubmitting={form.formState.isSubmitting}
+                >
+                  Create
+                </Button>
               </DialogFooter>
             </form>
           </Form>

@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { useLoader } from "@/hooks/useLoader";
+import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
   "inline-flex items-center hover:no-underline justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:grayscale-[50%]",
@@ -42,18 +43,23 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { isSubmitting?: boolean }
+>(({ className, variant, size, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      ref={ref}
+      {...props}
+      disabled={props.disabled || props.isSubmitting}
+    >
+      {props.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {props.children}
+    </Comp>
+  );
+});
 Button.displayName = "Button";
 
 const AsyncButton = React.forwardRef<

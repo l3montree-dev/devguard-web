@@ -38,7 +38,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
 
   // Render a generic text input field.
   return (
-    <div className="relative grid w-full items-center gap-1.5 ">
+    <div className="relative grid w-full items-center gap-3">
       <Label>{labelText ?? ""}</Label>
       <div className="relative ">
         <Input
