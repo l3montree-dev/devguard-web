@@ -17,16 +17,15 @@ import OrgRegisterForm from "@/components/OrgRegister";
 import Page from "@/components/Page";
 import { middleware } from "@/decorators/middleware";
 import { withOrgs } from "@/decorators/withOrgs";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import ListItem from "../components/common/ListItem";
 import Section from "../components/common/Section";
-import { AsyncButton, Button } from "../components/ui/button";
+import { AsyncButton } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { withSession } from "../decorators/withSession";
 import { browserApiClient } from "../services/devGuardApi";
-import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
-import Image from "next/image";
 
 type Repo = {
   label: string;
@@ -73,70 +72,8 @@ export default function SetupOrg() {
     });
   };
 
-  useEffect(() => {
-    const fetchRepositories = async () => {
-      try {
-        const repos = await listRepositories();
-        sortRepositories(repos);
-        setRepositories(repos);
-      } catch (error) {
-        console.error("Failed to fetch repositories:", error);
-      }
-    };
-
-    fetchRepositories();
-  }, [listRepositories]);
   return (
     <Page title="Setup DevGuard">
-      <Section
-        forceVertical
-        title="Automatically setup one of your repositories"
-      >
-        <Input
-          placeholder="Search for a repository"
-          className="mb-4"
-          type="text"
-          onChange={(e) => {
-            debouncedListRepositories(e.target.value);
-          }}
-        />
-        <a href="http://localhost:8080/api/v1/oauth2/gitlab/opencodeautosetup">
-          Grant scopes
-        </a>
-        {loading && (
-          <div className="flex flex-row justify-center">
-            <Loader2 className="animate-spin h-10 w-10 mr-2" />
-          </div>
-        )}
-        {repositories.map((repo) => (
-          <ListItem
-            key={repo.label}
-            Description={repo.description}
-            Title={
-              <span className="flex flex-row items-center gap-2">
-                {repo.image && (
-                  <img
-                    src={repo.image}
-                    width={32}
-                    height={32}
-                    alt={repo.label}
-                    className="rounded-full"
-                  />
-                )}
-                {repo.label}
-              </span>
-            }
-            Button={
-              <AsyncButton
-                onClick={() => handleAutoSetup(repo.id)}
-                variant={"secondary"}
-              >
-                Automatically setup
-              </AsyncButton>
-            }
-          ></ListItem>
-        ))}
-      </Section>
       <OrgRegisterForm />
     </Page>
   );
