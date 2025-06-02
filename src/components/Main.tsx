@@ -79,6 +79,7 @@ const EntityProviderLinkBanner = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
+  const { organizationSlug } = useParams<{ organizationSlug: string }>();
 
   if (!activeOrg && !activeProject && !activeAsset) {
     return null;
@@ -115,6 +116,20 @@ const EntityProviderLinkBanner = () => {
         >
           <GitProviderIcon slug={activeOrg.slug} />
           {activeProject.name}
+        </Link>
+      </div>
+    );
+  }
+
+  if (organizationSlug.startsWith("@")) {
+    return (
+      <div>
+        <Link
+          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
+          href={providerIdToBaseURL(organizationSlug.replace("@", ""))}
+        >
+          <GitProviderIcon slug={organizationSlug} />
+          {organizationSlug.replace("@", "")}
         </Link>
       </div>
     );
