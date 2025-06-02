@@ -13,15 +13,14 @@
 
 import { browserApiClient } from "@/services/devGuardApi";
 import { PatWithPrivKey } from "@/types/api/api";
+import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useActiveAsset } from "./useActiveAsset";
+import { useActiveOrg } from "./useActiveOrg";
+import { useActiveProject } from "./useActiveProject";
 import { useLoader } from "./useLoader";
 import usePersonalAccessToken from "./usePersonalAccessToken";
-import { useActiveOrg } from "./useActiveOrg";
-import { useActiveAsset } from "./useActiveAsset";
-import { useActiveProject } from "./useActiveProject";
-import { waitFor } from "@testing-library/dom";
-import { once } from "lodash";
 
 // limitations under the License.
 export function useAutosetup(
@@ -124,6 +123,7 @@ export function useAutosetup(
         method: "POST",
         body: JSON.stringify({
           devguardPrivateKey: privKey,
+          devguardAssetName: `${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}`,
         }),
       });
 
