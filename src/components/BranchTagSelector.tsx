@@ -13,6 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
+import {
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+} from "@radix-ui/react-dropdown-menu";
 
 export function BranchTagSelector({
   branches,
@@ -42,14 +46,14 @@ export function BranchTagSelector({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="z-50 w-56">
+        <Input
+          onKeyDown={(e) => e.stopPropagation()}
+          placeholder="Search"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="mb-2"
+        />
         <div className="p-1">
-          <Input
-            placeholder="Search"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="mb-2"
-          />
-
           <div className="mb-2 flex space-x-2">
             <Button
               size={"sm"}
@@ -68,6 +72,7 @@ export function BranchTagSelector({
           </div>
         </div>
         <DropdownMenuSeparator />
+
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
             <DropdownMenuCheckboxItem
