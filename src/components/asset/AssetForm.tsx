@@ -53,7 +53,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           <FormControl>
             <Input disabled={disable} required={true} {...field} />
           </FormControl>
-          <FormDescription>The name of the asset.</FormDescription>
+          <FormDescription>The name of the repository.</FormDescription>
           <FormMessage />
         </FormItem>
       )}
@@ -67,7 +67,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           <FormControl>
             <Input disabled={disable} {...field} />
           </FormControl>
-          <FormDescription>The description of the asset.</FormDescription>
+          <FormDescription>The description of the repository.</FormDescription>
           <FormMessage />
         </FormItem>
       )}
@@ -172,7 +172,7 @@ export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
       <FormItem>
         <ListItem
           Description={
-            "Is the asset publicly availabe. Does it have a static IP-Address assigned to it or a domain name?"
+            "Is the repository publicly available. Does it have a static IP-Address assigned to it or a domain name?"
           }
           Title="Reachable from the internet"
           Button={
@@ -303,7 +303,7 @@ Security requirements are specific criteria or conditions that an application, s
       <hr />
       <Section
         forceVertical={forceVerticalSections}
-        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
+        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the repository."
         title="Environmental information"
       >
         <AssetFormMisc form={form} />

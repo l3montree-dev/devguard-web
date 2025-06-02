@@ -258,7 +258,7 @@ const Index: FunctionComponent<Props> = (props) => {
       </div>
       {!props.vulns.data.length ? (
         <EmptyParty
-          title="You do not have any identified risks for this asset."
+          title="You do not have any identified risks for this repository."
           description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
         />
       ) : (
@@ -267,7 +267,7 @@ const Index: FunctionComponent<Props> = (props) => {
             forceVertical
             primaryHeadline
             title="Identified Risks"
-            description="This table shows all the identified risks for this asset."
+            description="This table shows all the identified risks for this repository."
           >
             <div className="relative flex flex-row gap-2">
               <Tabs
