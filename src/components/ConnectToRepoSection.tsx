@@ -41,7 +41,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
   return (
     <Section
       title="Connect to a repository"
-      description="Connect this asset to a repository to enable automatic scanning and other features."
+      description="Connect this repository to a repository to enable automatic scanning and other features."
     >
       {Boolean(parentRepositoryId) && (
         <div>
@@ -52,12 +52,12 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
                 </span>
-
+                repository
                 {parentRepositoryName}
               </>
             }
             Description={
-              "This asset is connected to a " +
+              "This repository is connected to a " +
               (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
               " repository "
             }
@@ -90,8 +90,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
           <hr />
           <Callout intent="info">
             The parent project is already connected to a repository. You can
-            override this connection by connecting this asset to a different
-            repository.
+            override this connection by connecting this repository to a
+            different repository.
           </Callout>
         </>
       )}
@@ -109,7 +109,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
               </>
             }
             Description={
-              "This asset is connected to a " +
+              "This repository is connected to a " +
               (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
               " repository "
             }
@@ -173,7 +173,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             </div>
           }
           Description={
-            "Select a repository to connect this asset to. This list contains all repositories of all GitHub App Installations belonging to this organization."
+            "Select a repository to connect this repository to. This list contains all repositories of all GitHub App Installations belonging to this organization."
           }
         />
       ) : (

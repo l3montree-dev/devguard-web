@@ -119,7 +119,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               Button={
                 <Alert
                   title="Are you sure to delete this project?"
-                  description="This action cannot be undone. All data associated with this asset will be deleted."
+                  description="This action cannot be undone. All data associated with this repository will be deleted."
                   onConfirm={onConfirmDelete}
                 >
                   <Button variant={"destructive"}>Delete</Button>

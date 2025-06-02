@@ -34,7 +34,7 @@ const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
         <div className="flex-1">
           <Section
             primaryHeadline
-            description="This section contains all compliance controls that are available for your asset."
+            description="This section contains all compliance controls that are available for your repositories."
             title="Compliance Controls"
             forceVertical
           >
