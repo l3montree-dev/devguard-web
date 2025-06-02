@@ -13,10 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
-import {
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-} from "@radix-ui/react-dropdown-menu";
 
 export function BranchTagSelector({
   branches,
