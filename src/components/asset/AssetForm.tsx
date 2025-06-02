@@ -303,7 +303,7 @@ Security requirements are specific criteria or conditions that an application, s
       <hr />
       <Section
         forceVertical={forceVerticalSections}
-        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the asset."
+        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the repository."
         title="Environmental information"
       >
         <AssetFormMisc form={form} />

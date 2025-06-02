@@ -151,12 +151,12 @@ const Index: FunctionComponent<Props> = ({
       },
     );
     if (resp.ok) {
-      toast("Asset deleted", {
+      toast("Repository deleted", {
         description: "The asset has been deleted",
       });
       router.push("/" + activeOrg.slug + "/projects/" + project!.slug);
     } else {
-      toast.error("Could not delete asset");
+      toast.error("Could not delete repository");
     }
   };
 
@@ -304,11 +304,11 @@ const Index: FunctionComponent<Props> = ({
             <ListItem
               Title="Delete Repository"
               Description={
-                "This will delete the asset and all of its data. This action cannot be undone."
+                "This will delete the repository and all of its data. This action cannot be undone."
               }
               Button={
                 <Alert
-                  title="Are you sure to delete this asset?"
+                  title="Are you sure to delete this repository?"
                   description="This action cannot be undone. All data associated with this repository will be deleted."
                   onConfirm={handleDeleteAsset}
                 >

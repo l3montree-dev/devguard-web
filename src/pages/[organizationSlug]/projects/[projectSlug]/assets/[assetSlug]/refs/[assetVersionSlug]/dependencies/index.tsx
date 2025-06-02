@@ -466,15 +466,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     <Page
       Menu={assetMenu}
       title="Dependencies"
-      description="Dependencies of the asset"
+      description="Dependencies of the repository"
       Title={<AssetTitle />}
     >
-      <div>
-        <Popover>
-          <PopoverTrigger>Open</PopoverTrigger>
-          <PopoverContent>Place content for the popover here.</PopoverContent>
-        </Popover>
-      </div>
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
@@ -549,7 +543,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       <Section
         primaryHeadline
         forceVertical
-        description="Dependencies of the asset"
+        description="Dependencies of the repository"
         title="Dependencies"
         Button={
           <div className="w-1/3">

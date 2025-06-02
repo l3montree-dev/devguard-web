@@ -97,7 +97,7 @@ const Index: FunctionComponent<Props> = ({
     <Page
       Menu={assetMenu}
       title="Overview"
-      description="Overview of the asset"
+      description="Overview of the repository"
       Title={<AssetTitle />}
     >
       <BranchTagSelector branches={branches} tags={tags} />
@@ -105,7 +105,7 @@ const Index: FunctionComponent<Props> = ({
         primaryHeadline
         forceVertical
         description="
-        Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific asset poses to your organization."
+        Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific repository poses to your organization."
         title="Overview"
       >
         <div className="grid grid-cols-8 gap-4">
@@ -113,8 +113,8 @@ const Index: FunctionComponent<Props> = ({
             <CardHeader>
               <CardTitle>Security Posture</CardTitle>
               <CardDescription>
-                The security posture of the asset is determined by the
-                compliance of the asset with the security policies of the
+                The security posture of the repository is determined by the
+                compliance of the repository with the security policies of the
                 organization.
               </CardDescription>
             </CardHeader>
@@ -144,8 +144,8 @@ const Index: FunctionComponent<Props> = ({
             <CardHeader>
               <CardTitle>To-Do&apos;s</CardTitle>
               <CardDescription>
-                Tasks that need to be completed before the asset is ready for
-                production, ordered by priority.
+                Tasks that need to be completed before the repository is ready
+                for production, ordered by priority.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -231,8 +231,8 @@ const Index: FunctionComponent<Props> = ({
                 </Link>
               </CardTitle>
               <CardDescription>
-                Displays the compliance of the asset with the security policies
-                of the asset.
+                Displays the compliance of the repository with the security
+                policies of the repository.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -331,7 +331,7 @@ const Index: FunctionComponent<Props> = ({
                 </Link>
               </CardTitle>
               <CardDescription>
-                Displays the last events that happened on the asset.
+                Displays the last events that happened on the repository.
               </CardDescription>
             </CardHeader>
             <CardContent>
