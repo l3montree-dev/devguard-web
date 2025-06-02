@@ -47,10 +47,12 @@ export default async function handler(
       Cookie: req.headers.cookie as string,
     },
     credentials: "include",
+    redirect: "manual",
     // TODO: Remove body parser to avoid parsing and stringifying afterwards
     body: discardBodyMethods.includes(req.method!) ? undefined : bytes,
   });
 
+  console.log(resp);
   // set all headers and copy the status code
   res.status(resp.status);
   resp.headers.forEach((value, key) => {

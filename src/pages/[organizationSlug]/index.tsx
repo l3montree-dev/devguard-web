@@ -150,8 +150,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                 "!text-black",
               )}
               href={
-                config.devguardApiUrlPublicInternet +
-                `/api/v1/oauth2/gitlab/` +
+                `/api/devguard-tunnel/api/v1/oauth2/gitlab/` +
                 organizationSlug.replace(/^@/, "")
               }
             >
