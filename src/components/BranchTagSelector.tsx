@@ -13,10 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
-import {
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-} from "@radix-ui/react-dropdown-menu";
 
 export function BranchTagSelector({
   branches,
@@ -27,18 +23,7 @@ export function BranchTagSelector({
 }) {
   const router = useRouter();
   const [view, setView] = useState("branches");
-  const items =
-    view === "branches"
-      ? [
-          { slug: "a", name: "a" },
-          { slug: "ab", name: "ab" },
-          { slug: "abc", name: "abc" },
-          { slug: "da", name: "da" },
-          { slug: "eb", name: "eb" },
-          { slug: "cf", name: "f" },
-          { slug: "g", name: "g" },
-        ]
-      : tags;
+  const items = view === "branches" ? branches : tags;
   const [selected, setSelected] = useState(
     items.find((i) => i.slug === (router.query.assetVersionSlug as string))
       ?.name,
@@ -56,22 +41,14 @@ export function BranchTagSelector({
           <CaretDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="z-50 w-56"
-        onKeyDown={(e) => e.preventDefault}
-      >
-        <Input
-          aria-modal={true}
-          autoFocus={true}
-          onKeyDown={(e) => e.stopPropagation}
-          placeholder="Search"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="mb-2"
-        />
+      <DropdownMenuContent align="start" className="z-50 w-56">
         <div className="p-1">
-          {/* here */}
+          <Input
+            placeholder="Search"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="mb-2"
+          />
 
           <div className="mb-2 flex space-x-2">
             <Button
@@ -91,7 +68,6 @@ export function BranchTagSelector({
           </div>
         </div>
         <DropdownMenuSeparator />
-
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
             <DropdownMenuCheckboxItem
