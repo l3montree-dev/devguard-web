@@ -355,10 +355,10 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
       <Dialog open={showModal}>
         <DialogContent setOpen={setShowModal}>
           <DialogHeader>
-            <DialogTitle>Create new asset</DialogTitle>
+            <DialogTitle>Create new repository</DialogTitle>
             <DialogDescription>
-              An asset is a software project you would like to manage the risks
-              of.
+              An repository is a software project you would like to manage the
+              risks of.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>

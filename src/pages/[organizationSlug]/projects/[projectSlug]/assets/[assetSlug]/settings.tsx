@@ -214,13 +214,13 @@ const Index: FunctionComponent<Props> = ({
   return (
     <Page
       Menu={assetMenu}
-      title="Asset Settings"
-      description="Update the settings of this asset"
+      title="Repository Settings"
+      description="Update the settings of this repository"
       Title={<AssetTitle />}
     >
       <div>
         <div className="flex flex-row justify-between">
-          <h1 className="text-2xl font-semibold">Asset Settings</h1>
+          <h1 className="text-2xl font-semibold">Repository Settings</h1>
         </div>
         {!asset.externalEntityProviderId && (
           <ConnectToRepoSection
@@ -302,14 +302,14 @@ const Index: FunctionComponent<Props> = ({
             description="These settings are for advanced users only. Please be careful when changing these settings."
           >
             <ListItem
-              Title="Delete Asset"
+              Title="Delete Repository"
               Description={
                 "This will delete the asset and all of its data. This action cannot be undone."
               }
               Button={
                 <Alert
                   title="Are you sure to delete this asset?"
-                  description="This action cannot be undone. All data associated with this asset will be deleted."
+                  description="This action cannot be undone. All data associated with this repository will be deleted."
                   onConfirm={handleDeleteAsset}
                 >
                   <Button variant={"destructive"}>Delete</Button>
