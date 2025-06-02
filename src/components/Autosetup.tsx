@@ -25,11 +25,10 @@ import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Loader2 } from "lucide-react";
-import { Button } from "./ui/button";
+import { AsyncButton, Button } from "./ui/button";
 
 interface Props {
-  isLoading: boolean;
-  handleAutosetup: () => void;
+  handleAutosetup: () => Promise<void>;
   progress: {
     [key: string]: {
       status: "notStarted" | "pending" | "success";
@@ -38,15 +37,17 @@ interface Props {
     };
   };
   Loader: () => React.ReactNode;
+  isLoading: boolean;
 }
 
 const Autosetup: FunctionComponent<Props> = ({
-  isLoading,
   handleAutosetup,
   progress,
+  isLoading,
   Loader,
 }) => {
   const asset = useActiveAsset();
+
   return (
     <Card>
       <CardHeader>
@@ -70,7 +71,7 @@ const Autosetup: FunctionComponent<Props> = ({
         <div className="flex flex-col gap-2">
           {Object.entries(progress).map(([key, value], i) => (
             <div
-              className="flex flex-row items-start gap-2 text-sm text-muted-foreground"
+              className="flex flex-row items-center gap-2 text-sm text-muted-foreground"
               key={key}
             >
               {value.status === "notStarted" ? (
@@ -80,7 +81,7 @@ const Autosetup: FunctionComponent<Props> = ({
               ) : value.status === "pending" && isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin " />
               ) : (
-                <CheckCircleIcon className="mr-2 h-4 w-4 text-green-600" />
+                <CheckCircleIcon className="h-4 w-4 text-green-600" />
               )}
               <span className="flex-1">
                 {value.message}

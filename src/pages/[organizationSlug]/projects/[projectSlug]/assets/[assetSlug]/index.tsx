@@ -21,6 +21,13 @@ import ListItem from "../../../../../../components/common/ListItem";
 import DependencyRiskScannerDialog from "../../../../../../components/DependencyRiskScannerDialog";
 import { Button } from "../../../../../../components/ui/button";
 import { config } from "../../../../../../config";
+import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
+import {
+  externalProviderIdToIntegrationName,
+  providerIdToBaseURL,
+} from "../../../../../../utils/externalProvider";
+import Autosetup from "../../../../../../components/Autosetup";
+import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 
 interface Props {
   apiUrl: string;
@@ -30,6 +37,8 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
   const assetMenu = useAssetMenu();
   const [isOpen, setIsOpen] = useState(false);
   const [dependencyRiskIsOpen, setDependencyRiskIsOpen] = useState(false);
+  const asset = useActiveAsset();
+  const autosetup = useAutosetup("full");
   return (
     <Page
       Menu={assetMenu}
@@ -43,6 +52,16 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
         description="Start scanning your code for vulnerabilities, license issues and policy violations."
         title="Welcome to DevGuard 🚀"
       >
+        {asset?.externalEntityProviderId &&
+          externalProviderIdToIntegrationName(
+            asset.externalEntityProviderId,
+          ) === "gitlab" && (
+            <div className="mb-10">
+              <div className="animated-outline rounded-lg">
+                <Autosetup {...autosetup} />
+              </div>
+            </div>
+          )}
         <div className="flex flex-col gap-4">
           <ListItem
             Title="Start by checking your dependencies for known vulnerabilities."

@@ -5,13 +5,15 @@ export function useLoader() {
   const [isLoading, setIsLoading] = useState(false);
 
   return {
-    waitFor<T>(fn: (() => Promise<T>) | Promise<T>): () => Promise<T> {
-      return async () => {
+    waitFor<Params, T>(
+      fn: ((params?: Params) => Promise<T>) | Promise<T>,
+    ): (params?: Params) => Promise<T> {
+      return async (params?: Params) => {
         try {
           setIsLoading(true);
           let res: T;
           if (typeof fn === "function") {
-            res = await fn();
+            res = await fn(params);
             setIsLoading(false);
           } else {
             res = await fn;

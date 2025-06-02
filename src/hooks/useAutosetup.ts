@@ -13,13 +13,15 @@
 
 import { browserApiClient } from "@/services/devGuardApi";
 import { PatWithPrivKey } from "@/types/api/api";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useLoader } from "./useLoader";
 import usePersonalAccessToken from "./usePersonalAccessToken";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveProject } from "./useActiveProject";
+import { waitFor } from "@testing-library/dom";
+import { once } from "lodash";
 
 // limitations under the License.
 export function useAutosetup(
@@ -68,9 +70,28 @@ export function useAutosetup(
       status: "notStarted",
       message: "A merge request is created",
     },
+    inviteDevguardBot: {
+      status: "notStarted",
+      message:
+        "DevGuard Bot is invited to the project (only required for GitLab)",
+    },
   });
 
-  const handleAutosetup = waitFor(() => {
+  const handleAutosetup = waitFor<boolean, void>((pendingAutosetup = false) => {
+    // check if the asset is an external entity
+    if (asset?.externalEntityProviderId && !pendingAutosetup) {
+      // we need to redirect the user to authorize the "autosetup" oauth2 application
+      sessionStorage.setItem("pending-autosetup", "true");
+      window.location.href =
+        window.location.origin +
+        "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
+        asset.externalEntityProviderId.replace("@", "") +
+        "autosetup?redirectTo=" +
+        encodeURIComponent(window.location.href);
+
+      return Promise.resolve();
+    }
+
     return new Promise<void>(async (resolve) => {
       // check if we already have a pat
       let privKey = pat?.privKey;
@@ -91,16 +112,20 @@ export function useAutosetup(
         return { ...prev };
       });
 
-      const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup?scanner=${scanner}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            devguardPrivateKey: privKey,
-            devguardAssetName: `${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}`,
-          }),
-        },
-      );
+      let url = `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup?scanner=${scanner}`;
+
+      if (asset?.externalEntityProviderId) {
+        url =
+          url +
+          `&providerId=${activeOrg.externalEntityProviderId?.replace("@", "")}autosetup`;
+      }
+
+      const resp = await browserApiClient(url, {
+        method: "POST",
+        body: JSON.stringify({
+          devguardPrivateKey: privKey,
+        }),
+      });
 
       if (resp.ok && resp.body) {
         const reader = resp.body.getReader();
@@ -127,12 +152,23 @@ export function useAutosetup(
             return { ...prev };
           });
         }
+        sessionStorage.removeItem("pending-autosetup");
         resolve();
       } else {
+        sessionStorage.removeItem("pending-autosetup");
         toast("Failed to setup GitLab integration");
       }
     });
   });
+
+  const autosetupOnce = useCallback(once(handleAutosetup), []);
+
+  useEffect(() => {
+    // check for pending autosetup - if so, we should be able to continue
+    //if (sessionStorage.getItem("pending-autosetup")) {
+    autosetupOnce(true);
+    //}
+  }, []);
 
   return {
     handleAutosetup,

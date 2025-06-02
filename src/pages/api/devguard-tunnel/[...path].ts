@@ -52,7 +52,6 @@ export default async function handler(
     body: discardBodyMethods.includes(req.method!) ? undefined : bytes,
   });
 
-  console.log(resp);
   // set all headers and copy the status code
   res.status(resp.status);
   resp.headers.forEach((value, key) => {
