@@ -28,7 +28,7 @@ import { Loader2 } from "lucide-react";
 import { AsyncButton, Button } from "./ui/button";
 
 interface Props {
-  handleAutosetup: () => Promise<void>;
+  handleAutosetup: (pendingAutosetup: false) => Promise<void>;
   progress: {
     [key: string]: {
       status: "notStarted" | "pending" | "success";
@@ -64,7 +64,7 @@ const Autosetup: FunctionComponent<Props> = ({
         </CardDescription>
       </CardContent>
       <CardFooter className="flex flex-col items-start justify-start gap-4">
-        <Button disabled={isLoading} onClick={handleAutosetup}>
+        <Button disabled={isLoading} onClick={() => handleAutosetup(false)}>
           <Loader />
           Use Auto-Setup
         </Button>
