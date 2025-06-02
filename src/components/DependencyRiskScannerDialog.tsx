@@ -92,8 +92,9 @@ const DependencyRiskScannerDialog: FunctionComponent<
     } else {
       toast.error("SBOM has not been send successfully");
     }
+
     router.push(
-      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
+      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
     );
 
     onOpenChange(false);

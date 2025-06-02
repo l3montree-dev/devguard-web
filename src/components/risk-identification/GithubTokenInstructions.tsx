@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -25,6 +25,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { browserApiClient } from "@/services/devGuardApi";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -125,6 +126,22 @@ export const GithubTokenSlides = ({
   const activeProject = useActiveProject();
   const assetVersion = useActiveAssetVersion();
   const asset = useActiveAsset();
+
+  const checkValidPath = useCallback(async (route: string) => {
+    const resp = await browserApiClient(route, {
+      method: "GET",
+    });
+
+    if (resp.ok) {
+      console.log("yippie");
+      router.push(route);
+    } else {
+      console.log("yippie2");
+      router.push(
+        `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}`,
+      );
+    }
+  }, []);
   return (
     <>
       <CarouselItem>
@@ -202,7 +219,7 @@ export const GithubTokenSlides = ({
           </Button>
           <Button
             onClick={() =>
-              router.push(
+              checkValidPath(
                 `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
               )
             }
