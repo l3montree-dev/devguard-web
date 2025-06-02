@@ -165,9 +165,9 @@ export function useAutosetup(
 
   useEffect(() => {
     // check for pending autosetup - if so, we should be able to continue
-    //if (sessionStorage.getItem("pending-autosetup")) {
-    autosetupOnce(true);
-    //}
+    if (sessionStorage.getItem("pending-autosetup")) {
+      autosetupOnce(true);
+    }
   }, []);
 
   return {
