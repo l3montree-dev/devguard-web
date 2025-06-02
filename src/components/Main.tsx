@@ -28,6 +28,7 @@ import { useActiveProject } from "../hooks/useActiveProject";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import GitProviderIcon from "./GitProviderIcon";
 import { providerIdToBaseURL } from "../utils/externalProvider";
+import { useParams } from "next/navigation";
 
 interface Props {
   title: string;
@@ -78,6 +79,7 @@ const EntityProviderLinkBanner = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
+
   if (!activeOrg && !activeProject && !activeAsset) {
     return null;
   }
@@ -133,6 +135,7 @@ const Main: FunctionComponent<Props> = ({
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const dimensions = useDimensions();
   const activeOrg = useActiveOrg();
+  const { organizationSlug } = useParams<{ organizationSlug: string }>();
   useEffect(() => {
     // check local storage
     const open = localStorage.getItem("sidebarOpen");
@@ -157,8 +160,8 @@ const Main: FunctionComponent<Props> = ({
         >
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
-              <Link href={`/${activeOrg?.slug}`}>
-                <EntityProviderImage provider={activeOrg?.slug || ""} />
+              <Link href={`/${organizationSlug}`}>
+                <EntityProviderImage provider={organizationSlug || ""} />
               </Link>
               <div>
                 <OrganizationDropDown />

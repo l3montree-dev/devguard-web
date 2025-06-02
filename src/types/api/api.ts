@@ -93,6 +93,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     avatarUrl?: string;
     role?: "owner" | "member" | "admin";
   }>;
+  oauth2Error?: boolean;
 }
 
 export interface PersonalAccessTokenDTO {

@@ -55,14 +55,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
+import { OAUTH2_ERROR, withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { ProjectBadge } from "../../components/common/ProjectTitle";
 import EmptyParty from "../../components/common/EmptyParty";
-import GitProviderIcon from "../../components/GitProviderIcon";
+import { ProjectBadge } from "../../components/common/ProjectTitle";
+import { classNames } from "../../utils/common";
+import { useParams } from "next/navigation";
+import { config } from "../../config";
 
 interface Props {
+  oauth2Error?: boolean;
   projects: Array<
     ProjectDTO & {
       stats: {
@@ -74,10 +77,13 @@ interface Props {
   >;
 }
 
-const Home: FunctionComponent<Props> = ({ projects }) => {
+const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
+  const { organizationSlug } = useParams<{
+    organizationSlug: string;
+  }>();
 
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
@@ -133,115 +139,137 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
           </Form>
         </DialogContent>
       </Dialog>
-      <div>
-        {projects.length === 0 ? (
-          <EmptyParty
-            title="Here you will see all your projects"
-            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-            Button={
-              !activeOrg.externalEntityProviderId && (
-                <Button onClick={() => setOpen(true)}>New Project</Button>
-              )
-            }
-          />
-        ) : (
-          <Section
-            primaryHeadline
-            Button={
-              !activeOrg.externalEntityProviderId && (
-                <Button onClick={() => setOpen(true)}>New Project</Button>
-              )
-            }
-            description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
-            forceVertical
-            title="Projects"
-          >
-            <div className="flex flex-col gap-2">
-              {projects.map((project) => (
-                <Link
-                  key={project.id}
-                  href={`/${activeOrg.slug}/projects/${project.slug}`}
-                  className="flex flex-col gap-2 hover:no-underline"
-                >
-                  <ListItem
-                    reactOnHover
-                    Title={
-                      <div className="flex flex-row items-center gap-2">
-                        <span>{project.name}</span>
-                      </div>
-                    }
-                    Description={
-                      <div className="flex flex-col">
-                        <span>{project.description}</span>
-                        {(project.stats.totalAssets > 0 ||
-                          project.type !== "default") && (
-                          <div className="flex mt-4 flex-row items-center gap-2">
-                            {project.type !== "default" && (
-                              <ProjectBadge type={project.type} />
-                            )}
-                            {project.stats.totalAssets > 0 && (
-                              <>
-                                {" "}
-                                <Badge
-                                  variant={
-                                    project.stats.compliantAssets ===
-                                    project.stats.totalAssets
-                                      ? "success"
-                                      : "secondary"
-                                  }
-                                  className=""
-                                >
-                                  {project.stats.compliantAssets}/
-                                  {project.stats.totalAssets} assets compliant
-                                </Badge>
-                                <Badge
-                                  variant={
-                                    project.stats.passingControlsPercentage ===
-                                    1
-                                      ? "success"
-                                      : "secondary"
-                                  }
-                                  className=""
-                                >
-                                  {Math.round(
-                                    project.stats.passingControlsPercentage *
-                                      100,
-                                  )}
-                                  % controls passing
-                                </Badge>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    }
-                    Button={
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className={buttonVariants({
-                            variant: "outline",
-                            size: "icon",
-                          })}
-                        >
-                          <EllipsisVerticalIcon className="h-5 w-5" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <Link
-                            className="!text-foreground hover:no-underline"
-                            href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+      {oauth2Error ? (
+        <EmptyList
+          title="You need to reauthorize your identity provider"
+          description="Please reauthorize your identity provider to access your projects."
+          Button={
+            <Link
+              className={classNames(
+                buttonVariants({ variant: "default" }),
+                "!text-black",
+              )}
+              href={
+                config.devguardApiUrlPublicInternet +
+                `/api/v1/oauth2/gitlab/` +
+                organizationSlug.replace(/^@/, "")
+              }
+            >
+              Reauthorize
+            </Link>
+          }
+        />
+      ) : (
+        <div>
+          {projects.length === 0 ? (
+            <EmptyParty
+              title="Here you will see all your projects"
+              description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
+              Button={
+                !activeOrg.externalEntityProviderId && (
+                  <Button onClick={() => setOpen(true)}>New Project</Button>
+                )
+              }
+            />
+          ) : (
+            <Section
+              primaryHeadline
+              Button={
+                !activeOrg.externalEntityProviderId && (
+                  <Button onClick={() => setOpen(true)}>New Project</Button>
+                )
+              }
+              description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+              forceVertical
+              title="Projects"
+            >
+              <div className="flex flex-col gap-2">
+                {projects.map((project) => (
+                  <Link
+                    key={project.id}
+                    href={`/${activeOrg.slug}/projects/${project.slug}`}
+                    className="flex flex-col gap-2 hover:no-underline"
+                  >
+                    <ListItem
+                      reactOnHover
+                      Title={
+                        <div className="flex flex-row items-center gap-2">
+                          <span>{project.name}</span>
+                        </div>
+                      }
+                      Description={
+                        <div className="flex flex-col">
+                          <span>{project.description}</span>
+                          {(project.stats.totalAssets > 0 ||
+                            project.type !== "default") && (
+                            <div className="flex mt-4 flex-row items-center gap-2">
+                              {project.type !== "default" && (
+                                <ProjectBadge type={project.type} />
+                              )}
+                              {project.stats.totalAssets > 0 && (
+                                <>
+                                  {" "}
+                                  <Badge
+                                    variant={
+                                      project.stats.compliantAssets ===
+                                      project.stats.totalAssets
+                                        ? "success"
+                                        : "secondary"
+                                    }
+                                    className=""
+                                  >
+                                    {project.stats.compliantAssets}/
+                                    {project.stats.totalAssets} assets compliant
+                                  </Badge>
+                                  <Badge
+                                    variant={
+                                      project.stats
+                                        .passingControlsPercentage === 1
+                                        ? "success"
+                                        : "secondary"
+                                    }
+                                    className=""
+                                  >
+                                    {Math.round(
+                                      project.stats.passingControlsPercentage *
+                                        100,
+                                    )}
+                                    % controls passing
+                                  </Badge>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      }
+                      Button={
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            className={buttonVariants({
+                              variant: "outline",
+                              size: "icon",
+                            })}
                           >
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                          </Link>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    }
-                  />
-                </Link>
-              ))}
-            </div>
-          </Section>
-        )}
-      </div>
+                            <EllipsisVerticalIcon className="h-5 w-5" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <Link
+                              className="!text-foreground hover:no-underline"
+                              href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                            >
+                              <DropdownMenuItem>Edit</DropdownMenuItem>
+                            </Link>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      }
+                    />
+                  </Link>
+                ))}
+              </div>
+            </Section>
+          )}
+        </div>
+      )}
     </Page>
   );
 };
@@ -249,7 +277,15 @@ const Home: FunctionComponent<Props> = ({ projects }) => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { organization }) => {
+    if (organization?.oauth2Error) {
+      return {
+        props: {
+          oauth2Error: true,
+          projects: [],
+        },
+      };
+    }
     // list the projects from the active organization
     const apiClient = getApiClientFromContext(context);
 

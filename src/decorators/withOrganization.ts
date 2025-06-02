@@ -18,6 +18,8 @@ import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
 import { HttpError } from "./middleware";
 
+export const OAUTH2_ERROR = "OAUTH2_ERROR";
+
 export async function withOrganization(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient
   const devGuardApiClient = getApiClientFromContext(ctx);
@@ -31,7 +33,24 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
     // parse the organization
     const organization: OrganizationDetailsDTO = await org.json();
 
-    if (!org.ok) {
+    // if the organization slug starts with an @ it is actually an identity provider
+    // there has to be a token in the backend - maybe the user just needs to reauthorize.
+    if (!org.ok && (organizationSlug as string).startsWith("@")) {
+      // make sure to redirect to the slug base
+      if (decodeURIComponent(ctx.resolvedUrl) !== `/${organizationSlug}`) {
+        throw new HttpError({
+          redirect: {
+            destination: `/${organizationSlug}`,
+            permanent: false,
+          },
+        });
+      }
+      return {
+        ...organization,
+        oauth2Error: true,
+      };
+    }
+    if (!org.ok && !(organizationSlug as string).startsWith("@")) {
       console.log("LOGIN REDIRECT", org);
       // it must be an 500
       throw new HttpError({
