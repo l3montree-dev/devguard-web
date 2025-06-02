@@ -45,6 +45,7 @@ import {
 } from "./ui/dialog";
 import PatSection from "./risk-identification/PatSection";
 import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -67,6 +68,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
 
   const pat = usePersonalAccessToken();
 
@@ -91,7 +93,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
       toast.error("SBOM has not been send successfully");
     }
     router.push(
-      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/main/dependency-risks/`,
+      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
     );
 
     onOpenChange(false);
@@ -473,7 +475,15 @@ const DependencyRiskScannerDialog: FunctionComponent<
                         >
                           Back
                         </Button>
-                        <Button onClick={() => api?.scrollNext()}>Done!</Button>
+                        <Button
+                          onClick={() =>
+                            router.push(
+                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
+                            )
+                          }
+                        >
+                          Done!
+                        </Button>
                       </div>
                     </CarouselItem>
                   </>

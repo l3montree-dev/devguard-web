@@ -21,6 +21,11 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
 import { ImageZoom } from "../common/Zoom";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import router from "next/router";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -123,7 +128,11 @@ export const GitlabTokenSlides = ({
     apiUrl,
   })["Gitlab"][scanner ?? "devsecops"];
 
-  console.log(codeString);
+  const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
+  const asset = useActiveAsset();
+
   return (
     <>
       <CarouselItem>
@@ -195,7 +204,15 @@ export const GitlabTokenSlides = ({
           <Button variant={"secondary"} onClick={prev}>
             Back
           </Button>
-          <Button onClick={next}>Done!</Button>
+          <Button
+            onClick={() =>
+              router.push(
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
+              )
+            }
+          >
+            Done!
+          </Button>
         </div>
       </CarouselItem>
     </>

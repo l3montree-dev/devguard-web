@@ -20,6 +20,11 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
 import { ImageZoom } from "../common/Zoom";
+import router from "next/router";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -116,7 +121,10 @@ export const GithubTokenSlides = ({
     assetSlug,
     apiUrl,
   })["GitHub"][scanner ?? "devsecops"];
-
+  const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
+  const asset = useActiveAsset();
   return (
     <>
       <CarouselItem>
@@ -192,7 +200,15 @@ export const GithubTokenSlides = ({
           <Button variant={"secondary"} onClick={prev}>
             Back
           </Button>
-          <Button onClick={next}>Done!</Button>
+          <Button
+            onClick={() =>
+              router.push(
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
+              )
+            }
+          >
+            Done!
+          </Button>
         </div>
       </CarouselItem>
     </>
