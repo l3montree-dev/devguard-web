@@ -151,6 +151,9 @@ const Home: FunctionComponent = () => {
     }
   };
 
+
+
+  
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
       <div className="flex flex-row justify-between">
@@ -309,7 +312,7 @@ const Home: FunctionComponent = () => {
       <div className="pb-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <OrgForm form={form} />
+            <OrgForm form={form} onConfirmDelete={} />
             <div className="mt-6 flex items-center justify-end gap-x-6">
               <Button type="submit">Save</Button>
             </div>
