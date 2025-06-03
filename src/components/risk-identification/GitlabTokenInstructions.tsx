@@ -129,10 +129,7 @@ export const GitlabTokenSlides = ({
     apiUrl,
   })["Gitlab"][scanner ?? "devsecops"];
 
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
-  const asset = useActiveAsset();
+
 
   return (
     <>
