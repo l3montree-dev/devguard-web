@@ -26,6 +26,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import router from "next/router";
+import { toast } from "sonner";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -205,11 +206,14 @@ export const GitlabTokenSlides = ({
             Back
           </Button>
           <Button
-            onClick={() =>
+            onClick={() => {
+              toast.error(
+                "Devguard has not recieved your data yet, make sure you have implemented the CI/CD Pipeline Action",
+              );
               router.push(
-                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
-              )
-            }
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+              );
+            }}
           >
             Done!
           </Button>

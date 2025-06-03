@@ -26,6 +26,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { browserApiClient } from "@/services/devGuardApi";
+import { toast } from "sonner";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -218,11 +219,14 @@ export const GithubTokenSlides = ({
             Back
           </Button>
           <Button
-            onClick={() =>
-              checkValidPath(
-                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
-              )
-            }
+            onClick={() => {
+              toast.error(
+                "Devguard has not recieved your data yet, wait for the devguard-scanner to finish",
+              );
+              router.push(
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+              );
+            }}
           >
             Done!
           </Button>

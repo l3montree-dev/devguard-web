@@ -477,11 +477,14 @@ const DependencyRiskScannerDialog: FunctionComponent<
                           Back
                         </Button>
                         <Button
-                          onClick={() =>
+                          onClick={() => {
+                            toast.error(
+                              "Devguard has not recieved your data yet, wait for the scanner to finish",
+                            );
                             router.push(
-                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}/dependency-risks/`,
-                            )
-                          }
+                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                            );
+                          }}
                         >
                           Done!
                         </Button>
