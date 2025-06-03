@@ -129,7 +129,10 @@ export const GitlabTokenSlides = ({
     apiUrl,
   })["Gitlab"][scanner ?? "devsecops"];
 
-
+  const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
+  const asset = useActiveAsset();
 
   return (
     <>
@@ -203,13 +206,21 @@ export const GitlabTokenSlides = ({
             Back
           </Button>
           <Button
-            onClick={() => {
-              toast.error(
-                "Devguard has not recieved your data yet, make sure you have implemented the CI/CD Pipeline Action",
-              );
-              router.push(
+            onClick={async () => {
+              const resp = await fetch(
                 `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                {
+                  method: "GET",
+                },
               );
+              console.log(resp);
+              if (resp.redirected) {
+                router.push(
+                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                );
+              } else {
+                toast.error("Gitlab Pipeline has failed");
+              }
             }}
           >
             Done!

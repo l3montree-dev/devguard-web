@@ -504,13 +504,23 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                           Back
                         </Button>
                         <Button
-                          onClick={() => {
-                            toast.error(
-                              "Devguard has not recieved your data yet, wait for the scanner to finish",
-                            );
-                            router.push(
+                          onClick={async () => {
+                            const resp = await fetch(
                               `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                              {
+                                method: "GET",
+                              },
                             );
+                            console.log(resp);
+                            if (resp.redirected) {
+                              router.push(
+                                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/code-risks`,
+                              );
+                            } else {
+                              toast.error(
+                                "Scanner did not run in Repository yet",
+                              );
+                            }
                           }}
                         >
                           Done!
