@@ -309,7 +309,7 @@ const Home: FunctionComponent = () => {
       <div className="pb-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <OrgForm form={form} onConfirmDelete={} />
+            <OrgForm form={form} />
             <div className="mt-6 flex items-center justify-end gap-x-6">
               <Button type="submit">Save</Button>
             </div>

@@ -120,7 +120,11 @@ export const OrganizationDropDown = () => {
                         onClick={handleActiveOrgChange(o.slug)}
                       >
                         <div className="mr-2 flex  items-center justify-center rounded-md border bg-background p-1">
-                          <GitProviderIcon slug={o.slug} />
+                          <GitProviderIcon
+                            externalEntityProviderIdOrRepositoryId={
+                              o.externalEntityProviderId
+                            }
+                          />
                         </div>
                         {o.name}
                       </DropdownMenuItem>
