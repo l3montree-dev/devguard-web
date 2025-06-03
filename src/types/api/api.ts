@@ -547,6 +547,7 @@ export interface Component {
   componentType: string;
   version: string;
   license?: string;
+  isLicenseOverwritten?: boolean;
   project?: Project;
   projectId: string;
   published?: string;

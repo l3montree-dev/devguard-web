@@ -40,9 +40,6 @@ import { buildFilterSearchParams } from "@/utils/url";
 import {
   CalendarDateRangeIcon,
   CheckBadgeIcon,
-  ChevronDoubleDownIcon,
-  ExclamationTriangleIcon,
-  PencilSquareIcon,
   ScaleIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
@@ -51,15 +48,8 @@ import {
   ColumnDef,
   createColumnHelper,
   flexRender,
-  NoInfer,
 } from "@tanstack/react-table";
-import {
-  BadgeInfo,
-  BadgeInfoIcon,
-  ChevronDownIcon,
-  GitBranch,
-  PencilIcon,
-} from "lucide-react";
+import { BadgeInfo, ChevronDownIcon, GitBranch } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -72,33 +62,31 @@ import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset"
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
 
 import Page from "@/components/Page";
+import { Combobox } from "@/components/common/Combobox";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useRouter } from "next/router";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
-import {
-  Tooltip,
-  TooltipContent,
-} from "../../../../../../../../../components/ui/tooltip";
-import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../../../../../../../components/ui/dropdown-menu";
-import router, { useRouter } from "next/router";
-import { Combobox } from "@/components/common/Combobox";
+import {
+  Tooltip,
+  TooltipContent,
+} from "../../../../../../../../../components/ui/tooltip";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
-import { LicenseTrigger } from "@/components/common/LicenseTrigger";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { AssetFormValues } from "@/components/asset/AssetForm";
-import React from "react";
 import { toast } from "sonner";
+import { Switch } from "../../../../../../../../../components/ui/switch";
+import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -216,19 +204,38 @@ const licenses = [
   { value: "zpl-2.1", label: "ZPL-2.1" },
 ];
 
+const licenseMap = licenses.reduce(
+  (acc, { value, label }) => {
+    acc[value] = label;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+const getLicenseName = (
+  componentOverwrittenLicense: string | undefined,
+  license: string,
+) => {
+  if (componentOverwrittenLicense) {
+    return (
+      licenseMap[componentOverwrittenLicense] || componentOverwrittenLicense
+    );
+  }
+  return licenseMap[license] || license;
+};
+
 const LicenseCall = (props: {
-  organizationId(
-    selectedLicense: string,
-    organizationId: any,
-    dependencyPurl: string,
-    id: string,
-  ): void;
-  row: CellContext<ComponentPaged & { license: LicenseResponse }, any>;
+  license: License;
+  component: Component;
+
   dependencyPurl: string;
   justification: string;
 }) => {
   const [open, setOpen] = useState(false);
   const activeOrg = useActiveOrg();
+  const [manuallyCorrectLicense, setManuallyCorrectLicense] = useState(
+    Boolean(props.component.isLicenseOverwritten),
+  );
 
   const handleLicenseUpdate = async (
     newlicense: string,
@@ -237,21 +244,41 @@ const LicenseCall = (props: {
     justification: string,
   ) => {
     const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug,
-
+      "/organizations/" + activeOrg.slug + "/license-overwrite/",
       {
         method: "PUT",
         body: JSON.stringify({
           licenseId: newlicense,
           organizationId: organizationId,
           componentPurl: purl,
-          justification: "filler",
+          justification: "",
         }),
       },
     );
     if (!resp.ok) {
       toast.error("Failed to change License");
       return;
+    }
+  };
+
+  const handleManuallyOverwriteLicenseChange = async (checked: boolean) => {
+    setManuallyCorrectLicense(checked);
+    if (!checked) {
+      // delete the overwritten license
+      const resp = await browserApiClient(
+        "/organizations/" +
+          activeOrg.slug +
+          "/license-overwrite/" +
+          encodeURIComponent(props.dependencyPurl),
+        {
+          method: "DELETE",
+        },
+      );
+      if (!resp.ok) {
+        toast.error("Failed to delete overwritten license");
+      } else {
+        toast.success("Successfully deleted overwritten license");
+      }
     }
   };
 
@@ -266,35 +293,38 @@ const LicenseCall = (props: {
           }}
         >
           <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {props.row.getValue().licenseId}
+          {getLicenseName(props.component.license, props.license.licenseId)}
           <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
         </Badge>
       </PopoverTrigger>
       <div onClick={(e) => e.stopPropagation()}>
-        <PopoverContent>
+        <PopoverContent className="w-96">
           <div className="flex flex-col items-start justify-start gap-1">
-            <span className="flex flex-row items-center text-sm font-bold">
-              {props.row.getValue().isOsiApproved && (
+            <span className="flex flex-row capitalize items-center text-sm font-bold">
+              {(props.license.isOsiApproved || manuallyCorrectLicense) && (
                 <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
               )}
-              {props.row.getValue().name}
+              {getLicenseName(props.component.license, props.license.licenseId)}
             </span>
-            <span className="flex absolute top-0 right-0 m-2 scale-75 text-">
-              <Tooltip>
-                <TooltipTrigger>
-                  <BadgeInfo className="flex absolute top-0 right-0 text-green-500"></BadgeInfo>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Devguardians corrected this license
-                </TooltipContent>
-              </Tooltip>
-            </span>
+            {manuallyCorrectLicense && (
+              <span className="flex absolute top-0 right-0 m-2 ">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <BadgeInfo className="flex w-5 h-5 absolute top-0 right-0 text-green-500"></BadgeInfo>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    This license was manually overwritten by a user. Originally
+                    it was <CopyCodeFragment codeString={props.license.name} />.
+                  </TooltipContent>
+                </Tooltip>
+              </span>
+            )}
             <span className="text-sm text-muted-foreground">
-              {props.row.getValue().isOsiApproved
+              {props.license.isOsiApproved || manuallyCorrectLicense
                 ? "OSI Approved, "
                 : "Not OSI Approved, "}
               <a
-                href={`https://opensource.org/licenses/${(props.row.getValue() as License).licenseId}`}
+                href={`https://opensource.org/licenses/${props.license.licenseId}`}
                 target="_blank"
                 className="text-sm font-semibold !text-muted-foreground underline"
               >
@@ -302,21 +332,37 @@ const LicenseCall = (props: {
               </a>
             </span>
           </div>
-          <span className="text-sm text-muted-foreground"></span>
+
           <div className="mt-4" onClick={(e) => e.stopPropagation()}>
-            <Combobox
-              items={licenses}
-              placeholder={props.row.getValue().name}
-              emptyMessage={""}
-              onSelect={(selectedLicense) =>
-                handleLicenseUpdate(
-                  selectedLicense,
-                  activeOrg.id,
-                  props.dependencyPurl,
-                  "justification",
-                )
-              }
-            ></Combobox>
+            <div className="flex flex-row items-center justify-between">
+              <span className="text-sm mb-2 block text-muted-foreground">
+                Manually correct the license
+              </span>
+              <Switch
+                onCheckedChange={handleManuallyOverwriteLicenseChange}
+                checked={manuallyCorrectLicense}
+              />
+            </div>
+            {manuallyCorrectLicense && (
+              <div className="mt-2">
+                <Combobox
+                  items={licenses}
+                  placeholder={getLicenseName(
+                    props.component.license,
+                    props.license.licenseId,
+                  )}
+                  emptyMessage={""}
+                  onSelect={(selectedLicense) =>
+                    handleLicenseUpdate(
+                      selectedLicense,
+                      activeOrg.id,
+                      props.dependencyPurl,
+                      "justification",
+                    )
+                  }
+                />
+              </div>
+            )}
           </div>
         </PopoverContent>
       </div>
@@ -352,38 +398,14 @@ const columnsDef: ColumnDef<
   columnHelper.accessor("license", {
     header: "License",
     id: "Dependency.license",
-    cell: (row) =>
-      (row.getValue() as License).licenseId === "unknown" ? (
-        <>
-          <LicenseCall
-            dependencyPurl={row.row.original.dependencyPurl}
-            row={row}
-            justification={""}
-            organizationId={function (
-              selectedLicense: string,
-              organizationId: any,
-              dependencyPurl: string,
-              id: string,
-            ): void {
-              throw new Error("Function not implemented.");
-            }}
-          ></LicenseCall>
-        </>
-      ) : (
-        <LicenseCall
-          dependencyPurl={row.row.original.dependencyPurl}
-          row={row}
-          justification={""}
-          organizationId={function (
-            selectedLicense: string,
-            organizationId: any,
-            dependencyPurl: string,
-            id: string,
-          ): void {
-            throw new Error("Function not implemented.");
-          }}
-        ></LicenseCall>
-      ),
+    cell: (row) => (
+      <LicenseCall
+        dependencyPurl={row.row.original.dependencyPurl}
+        component={row.row.original.dependency}
+        license={row.getValue()}
+        justification={""}
+      />
+    ),
   }),
   columnHelper.accessor("dependency.project.projectKey", {
     header: "Repository",
