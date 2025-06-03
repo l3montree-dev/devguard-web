@@ -128,21 +128,7 @@ export const GithubTokenSlides = ({
   const assetVersion = useActiveAssetVersion();
   const asset = useActiveAsset();
 
-  const checkValidPath = useCallback(async (route: string) => {
-    const resp = await browserApiClient(route, {
-      method: "GET",
-    });
 
-    if (resp.ok) {
-      console.log("yippie");
-      router.push(route);
-    } else {
-      console.log("yippie2");
-      router.push(
-        `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/${assetVersion!.slug}`,
-      );
-    }
-  }, []);
   return (
     <>
       <CarouselItem>
