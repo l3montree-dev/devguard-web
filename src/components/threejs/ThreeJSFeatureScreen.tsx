@@ -13,7 +13,7 @@ const ThreeJSFeatureScreen = () => {
         <div className="mt-2 flex flex-col gap-4">
           <div className="">
             <span className="text-xl text-center font-bold text-white">
-              Shine a light on your supply chain risks
+              See your Software-Supply-Chain in different perspectives
             </span>
           </div>
           <hr />
@@ -88,7 +88,6 @@ const ThreeJSFeatureScreen = () => {
           </div>
         </div>
       </div>
-
       <ThreeJSScene />
     </div>
   );

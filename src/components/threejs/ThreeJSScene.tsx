@@ -1,158 +1,102 @@
 // @ts-nocheck
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+
 import {
-  Bloom,
-  EffectComposer,
-  HueSaturation,
-} from "@react-three/postprocessing";
-import { BlendFunction, LUTCubeLoader } from "postprocessing";
-import { useCallback, useRef, useState } from "react";
-import { Center, Text3D } from "@react-three/drei";
-import * as THREE from "three";
-import { Beam } from "./components/Beam";
-import { Flare } from "./components/Flare";
-import { Prism } from "./components/Prism";
-import { Rainbow } from "./components/Rainbow";
-import { calculateRefractionAngle, lerp, lerpV3 } from "./util";
+  CameraControls,
+  Edges,
+  Environment,
+  MeshPortalMaterial,
+  useGLTF,
+} from "@react-three/drei";
 
-function Scene() {
-  const [isPrismHit, hitPrism] = useState(true);
-  const flare = useRef(null);
-  const ambient = useRef(null);
-  const spot = useRef(null);
-  const boxreflect = useRef(null);
-  const rainbow = useRef(null);
-  const hasInteracted = useRef(false);
-  const rayOut = useCallback(() => hitPrism(false), []);
-  const rayOver = useCallback((e) => {
-    // Break raycast so the ray stops when it touches the prism
-    e.stopPropagation();
-    hitPrism(true);
-    // Set the intensity really high on first contact
-    rainbow.current.material.speed = 1;
-    rainbow.current.material.emissiveIntensity = 20;
-  }, []);
+function Side({ rotation = [0, 0, 0], bg = "#f0f0f0", children, index }) {
+  const meshRef = useRef();
+  const sideRef = useRef();
 
-  const vec = new THREE.Vector3();
-  const rayMove = useCallback(({ api, position, direction, normal }) => {
-    hasInteracted.current = true; // Mark as interacted
-    if (!normal) return;
-    // Extend the line to the prisms center
-    vec.toArray(api.positions, api.number++ * 3);
-    // Set flare
-    flare.current.position.set(position.x, position.y, -0.5);
-    flare.current.rotation.set(0, 0, -Math.atan2(direction.x, direction.y));
-    // Calculate refraction angles
-    let angleScreenCenter = Math.atan2(-position.y, -position.x);
-    const normalAngle = Math.atan2(normal.y, normal.x);
-    // The angle between the ray and the normal
-    const incidentAngle = angleScreenCenter - normalAngle;
-    // Calculate the refraction for the incident angle
-    const refractionAngle = calculateRefractionAngle(incidentAngle) * 6;
-    // Apply the refraction
-    angleScreenCenter += refractionAngle;
-    rainbow.current.rotation.z = angleScreenCenter;
-    // Set spot light
-    lerpV3(
-      spot.current.target.position,
-      [Math.cos(angleScreenCenter), Math.sin(angleScreenCenter), 0],
-      0.05,
-    );
-    spot.current.target.updateMatrixWorld();
-  }, []);
-
-  useFrame((state) => {
-    // Tie beam to the mouse
-    let x = state.pointer.x;
-    let y = state.pointer.y;
-    if (state.pointer.x === 0 && state.pointer.y === 0) {
-      // init with top left
-      x = -1;
-      y = 0.8;
-    }
-
-    boxreflect.current.setRay(
-      [(x * state.viewport.width) / 2, (y * state.viewport.height) / 2, 0],
-      [0, 0, 0],
-    );
-
-    // Animate rainbow intensity
-    lerp(
-      rainbow.current.material,
-      "emissiveIntensity",
-      isPrismHit ? 2.5 : 0,
-      0.1,
-    );
-    spot.current.intensity = rainbow.current.material.emissiveIntensity;
-    // Animate ambience
-    lerp(ambient.current, "intensity", 0, 0.025);
+  const { nodes } = useGLTF("/aobox-transformed.glb");
+  useFrame((state, delta) => {
+    meshRef.current.rotation.x = meshRef.current.rotation.y += delta / 2;
+    sideRef.current.rotation.x += delta / 12;
+    sideRef.current.rotation.y += delta / 12;
   });
-
   return (
-    <>
-      {/* Lights */}
-      <ambientLight ref={ambient} intensity={0} />
-      <pointLight position={[10, -10, 0]} intensity={0.05} />
-      <pointLight position={[0, 10, 0]} intensity={0.05} />
-      <pointLight position={[-10, 0, 0]} intensity={0.05} />
-      <spotLight
-        ref={spot}
-        intensity={1}
-        distance={7}
-        angle={1}
-        penumbra={1}
-        position={[0, 0, 1]}
-      />
-      {/* Prism + blocks + reflect beam */}
-      <Beam ref={boxreflect} bounce={10} far={20}>
-        <Prism
-          position={[0, -0.5, 0]}
-          onRayOver={rayOver}
-          onRayOut={rayOut}
-          onRayMove={rayMove}
+    <MeshPortalMaterial worldUnits={true} attach={`material-${index}`}>
+      {/** Everything in here is inside the portal and isolated from the canvas */}
+      <ambientLight intensity={0.5} />
+
+      <Environment preset="warehouse" />
+      {/** A box with baked AO */}
+      <pointLight position={[2, 2, 2]} intensity={1.5} castShadow />
+      <mesh
+        castShadow
+        receiveShadow
+        ref={sideRef}
+        rotation={rotation}
+        geometry={nodes.Cube.geometry}
+      >
+        <meshStandardMaterial
+          aoMapIntensity={1}
+          aoMap={nodes.Cube.material.aoMap}
+          color={bg}
         />
-      </Beam>
-      {/* Rainbow and flares */}
-      <Rainbow
-        ref={rainbow}
-        startRadius={0}
-        rotation={[0, 0, -Math.PI / 4]}
-        endRadius={0.5}
-        fade={0}
-      />
-      <Flare
-        ref={flare}
-        visible={isPrismHit}
-        renderOrder={10}
-        scale={1.25}
-        streak={[12.5, 20, 1]}
-      />
-    </>
+        <spotLight
+          castShadow
+          color={bg}
+          intensity={2}
+          position={[10, 10, 10]}
+          angle={0.15}
+          penumbra={1}
+          shadow-normalBias={0.05}
+          shadow-bias={0.0001}
+        />
+      </mesh>
+      {/** The shape */}
+      <mesh castShadow receiveShadow ref={meshRef}>
+        {children}
+        <meshStandardMaterial wireframe color={bg} />
+      </mesh>
+    </MeshPortalMaterial>
   );
 }
 
+const Cube = () => {
+  const meshRef = useRef();
+  useFrame((state, delta) => {
+    meshRef.current.rotation.x += delta / 12;
+    meshRef.current.rotation.y += delta / 12;
+  });
+  return (
+    <mesh ref={meshRef} castShadow receiveShadow>
+      <boxGeometry args={[2, 2, 2]} />
+
+      <Side rotation={[0, 0, 0]} bg="#F9BE24" index={0}>
+        <torusGeometry args={[0.65, 0.3, 64]} />
+      </Side>
+      <Side rotation={[0, Math.PI, 0]} bg="#F9BE24" index={1}>
+        <torusKnotGeometry args={[0.55, 0.2, 128, 32]} />
+      </Side>
+      <Side rotation={[0, Math.PI / 2, Math.PI / 2]} bg="#6382FF" index={2}>
+        <boxGeometry args={[1.15, 1.15, 1.15]} />
+      </Side>
+      <Side rotation={[0, Math.PI / 2, -Math.PI / 2]} bg="#62748e" index={3}>
+        <octahedronGeometry />
+      </Side>
+      <Side rotation={[0, -Math.PI / 2, 0]} bg="white" index={4}>
+        <icosahedronGeometry />
+      </Side>
+      <Side rotation={[0, Math.PI / 2, 0]} bg="white" index={5}>
+        <dodecahedronGeometry />
+      </Side>
+    </mesh>
+  );
+};
+
 const ThreeJSScene = () => {
   return (
-    <Canvas
-      orthographic
-      gl={{ antialias: false }}
-      camera={{ position: [0, 0, 100], zoom: 70 }}
-    >
-      <color attach="background" args={["#0C1118"]} />
-      <Scene />
-      <EffectComposer disableNormalPass>
-        <Bloom
-          mipmapBlur
-          levels={9}
-          intensity={1.5}
-          luminanceThreshold={1}
-          luminanceSmoothing={1}
-        />
-        <HueSaturation
-          blendFunction={BlendFunction.NORMAL}
-          saturation={-0.25}
-        />
-      </EffectComposer>
+    <Canvas shadows camera={{ position: [-3, 0.5, 3] }}>
+      <Cube />
+      <CameraControls makeDefault />
     </Canvas>
   );
 };
