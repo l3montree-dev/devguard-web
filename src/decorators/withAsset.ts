@@ -39,8 +39,7 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination:
-          "/" + organization + "/projects/" + projectSlug + "/assets/",
+        destination: "/" + organization + "/projects/" + projectSlug,
         permanent: false,
       },
     });

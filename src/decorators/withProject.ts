@@ -33,7 +33,7 @@ export async function withProject(ctx: GetServerSidePropsContext) {
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination: "/" + organization + "/projects/",
+        destination: "/" + organization,
         permanent: false,
       },
     });
@@ -42,5 +42,7 @@ export async function withProject(ctx: GetServerSidePropsContext) {
   const project: ProjectDTO & {
     assets: Array<AssetDTO>;
   } = await r.json();
+
+  console.log(project.assets.length);
   return project;
 }

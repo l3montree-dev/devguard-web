@@ -240,7 +240,10 @@ const Index: FunctionComponent<Props> = ({
             <AssetForm
               disable={Boolean(asset.externalEntityProviderId)}
               form={form}
-              showReportingRange={asset.repositoryId !== null}
+              showReportingRange={
+                asset.repositoryId !== null ||
+                Boolean(asset.externalEntityProviderId)
+              }
             />
             <div className="mt-4 flex flex-row justify-end">
               <Button>Update</Button>

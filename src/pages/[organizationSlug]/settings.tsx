@@ -151,9 +151,6 @@ const Home: FunctionComponent = () => {
     }
   };
 
-
-
-  
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
       <div className="flex flex-row justify-between">
