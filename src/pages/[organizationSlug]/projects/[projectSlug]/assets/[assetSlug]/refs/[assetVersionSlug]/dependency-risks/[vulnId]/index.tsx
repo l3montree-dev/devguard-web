@@ -26,7 +26,7 @@ import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { getAssetVersionSlug, useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -65,10 +65,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { useLoader } from "@/hooks/useLoader";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import {
-  getRepositoryId,
+  getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
   vexOptionMessages,
 } from "@/utils/view";
@@ -80,6 +79,7 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
+import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -422,13 +422,15 @@ const Index: FunctionComponent<Props> = (props) => {
                           height={15}
                         />
                       ) : (
-                        <Image
-                          src="/assets/gitlab.svg"
-                          alt="GitLab Logo"
-                          className="-ml-1 mr-2"
-                          width={15}
-                          height={15}
-                        />
+                        <div className="mr-2">
+                          <GitProviderIcon
+                            externalEntityProviderIdOrRepositoryId={
+                              asset.externalEntityProviderId ??
+                              asset.repositoryId ??
+                              "official"
+                            }
+                          />
+                        </div>
                       )}
                       <span>{vuln.ticketUrl}</span>
                     </Badge>
@@ -477,9 +479,10 @@ const Index: FunctionComponent<Props> = (props) => {
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-start gap-2 pt-2">
                             {vuln.ticketId === null &&
-                              getRepositoryId(asset, project)?.startsWith(
-                                "gitlab:",
-                              ) && (
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "gitlab" && (
                                 <AsyncButton
                                   variant={"secondary"}
                                   onClick={() =>
@@ -490,14 +493,15 @@ const Index: FunctionComponent<Props> = (props) => {
                                   }
                                 >
                                   <div className="flex flex-col">
-                                    <div className="flex">
-                                      <Image
-                                        alt="GitLab Logo"
-                                        width={15}
-                                        height={15}
-                                        className="mr-2"
-                                        src={"/assets/gitlab.svg"}
-                                      />
+                                    <div className="flex flex-row items-center">
+                                      <div className="mr-2">
+                                        <GitProviderIcon
+                                          externalEntityProviderIdOrRepositoryId={
+                                            asset.externalEntityProviderId ??
+                                            "official"
+                                          }
+                                        />
+                                      </div>
                                       Create GitLab Ticket
                                     </div>
                                   </div>
@@ -505,9 +509,10 @@ const Index: FunctionComponent<Props> = (props) => {
                               )}
 
                             {vuln.ticketId === null &&
-                              getRepositoryId(asset, project)?.startsWith(
-                                "github:",
-                              ) && (
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "github" && (
                                 <AsyncButton
                                   variant={"secondary"}
                                   onClick={() =>

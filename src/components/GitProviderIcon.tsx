@@ -2,11 +2,14 @@ import { BuildingOfficeIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
 interface Props {
-  slug: string;
+  externalEntityProviderIdOrRepositoryId?: string;
 }
 
-const GitProviderIcon = (props: Props) => {
-  if (props.slug === "@official") {
+const GitProviderIcon = ({ externalEntityProviderIdOrRepositoryId }: Props) => {
+  if (
+    externalEntityProviderIdOrRepositoryId === "official" ||
+    externalEntityProviderIdOrRepositoryId?.startsWith("gitlab:")
+  ) {
     return (
       <img
         src="/assets/gitlab.svg"
@@ -14,7 +17,7 @@ const GitProviderIcon = (props: Props) => {
         className="h-4 w-4  relative top-[1px]"
       />
     );
-  } else if (props.slug === "@opencode") {
+  } else if (externalEntityProviderIdOrRepositoryId === "opencode") {
     return (
       <img
         src="/logos/opencode.svg"

@@ -2,13 +2,10 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withProject } from "@/decorators/withProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { VulnByPackage, VulnWithCVE, Paged } from "@/types/api/api";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -22,18 +19,17 @@ import { FunctionComponent, useState } from "react";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import { beautifyPurl, extractVersion } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
-import EmptyList from "@/components/common/EmptyList";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
@@ -44,15 +40,15 @@ import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
-import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/DependencyRiskScannerDialog";
-import { config } from "../../../../../../../../../config";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../../../../../../../components/ui/dropdown-menu";
+import { config } from "../../../../../../../../../config";
+import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 
 interface Props {
   apiUrl: string;

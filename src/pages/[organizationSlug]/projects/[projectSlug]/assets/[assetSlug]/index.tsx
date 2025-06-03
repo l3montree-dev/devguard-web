@@ -16,18 +16,15 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withContentTree } from "@/decorators/withContentTree";
 
+import Autosetup from "../../../../../../components/Autosetup";
 import CodeRiskScannerDialog from "../../../../../../components/CodeRiskScannerDialog";
 import ListItem from "../../../../../../components/common/ListItem";
 import DependencyRiskScannerDialog from "../../../../../../components/DependencyRiskScannerDialog";
 import { Button } from "../../../../../../components/ui/button";
 import { config } from "../../../../../../config";
 import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
-import {
-  externalProviderIdToIntegrationName,
-  providerIdToBaseURL,
-} from "../../../../../../utils/externalProvider";
-import Autosetup from "../../../../../../components/Autosetup";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
+import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
 
 interface Props {
   apiUrl: string;

@@ -19,6 +19,7 @@ import {
   VulnEventDTO,
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
+import { externalProviderIdToIntegrationName } from "./externalProvider";
 
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
@@ -185,11 +186,21 @@ export const getParentRepositoryIdAndName = (
   };
 };
 
-export const getRepositoryId = (asset?: AssetDTO, project?: ProjectDTO) => {
+export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
+  asset?: AssetDTO,
+  project?: ProjectDTO,
+): "gitlab" | "github" => {
   if (asset && asset.repositoryId) {
-    return asset.repositoryId;
+    return asset.repositoryId.startsWith("gitlab:") ? "gitlab" : "github";
   }
-  return getParentRepositoryIdAndName(project).parentRepositoryId;
+  if (asset?.externalEntityProviderId) {
+    return externalProviderIdToIntegrationName(asset.externalEntityProviderId);
+  }
+  return getParentRepositoryIdAndName(project).parentRepositoryId?.startsWith(
+    "gitlab:",
+  )
+    ? "gitlab"
+    : "github";
 };
 
 export const defaultScanner =

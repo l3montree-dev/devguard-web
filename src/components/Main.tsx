@@ -75,6 +75,10 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
   );
 };
 
+const slugToProvider = (slug: string) => {
+  return slug.replace("@", "");
+};
+
 const EntityProviderLinkBanner = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
@@ -96,7 +100,11 @@ const EntityProviderLinkBanner = () => {
             activeAsset.externalEntityId
           }
         >
-          <GitProviderIcon slug={activeOrg.slug} />
+          <GitProviderIcon
+            externalEntityProviderIdOrRepositoryId={slugToProvider(
+              activeOrg.slug,
+            )}
+          />
           {activeProject.name} / {activeAsset.name}
         </Link>
       </div>
@@ -114,7 +122,11 @@ const EntityProviderLinkBanner = () => {
             activeProject.externalEntityId
           }
         >
-          <GitProviderIcon slug={activeOrg.slug} />
+          <GitProviderIcon
+            externalEntityProviderIdOrRepositoryId={slugToProvider(
+              activeOrg.slug,
+            )}
+          />
           {activeProject.name}
         </Link>
       </div>
@@ -128,7 +140,11 @@ const EntityProviderLinkBanner = () => {
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
           href={providerIdToBaseURL(organizationSlug.replace("@", ""))}
         >
-          <GitProviderIcon slug={organizationSlug} />
+          <GitProviderIcon
+            externalEntityProviderIdOrRepositoryId={slugToProvider(
+              activeOrg.slug,
+            )}
+          />
           {organizationSlug.replace("@", "")}
         </Link>
       </div>

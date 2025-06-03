@@ -40,12 +40,16 @@ import { withOrganization } from "@/decorators/withOrganization";
 import AssetTitle from "@/components/common/AssetTitle";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { emptyThenNull, getRepositoryId } from "@/utils/view";
+import {
+  emptyThenNull,
+  getIntegrationNameFromRepositoryIdOrExternalProviderId,
+} from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -188,13 +192,15 @@ const Index: FunctionComponent<Props> = (props) => {
                           height={15}
                         />
                       ) : (
-                        <Image
-                          src="/assets/gitlab.svg"
-                          alt="GitLab Logo"
-                          className="-ml-1 mr-2"
-                          width={15}
-                          height={15}
-                        />
+                        <div className="mr-2">
+                          <GitProviderIcon
+                            externalEntityProviderIdOrRepositoryId={
+                              asset.externalEntityProviderId ??
+                              asset.repositoryId ??
+                              "official"
+                            }
+                          />
+                        </div>
                       )}
                       <span>{vuln.ticketUrl}</span>
                     </Badge>
@@ -262,9 +268,10 @@ const Index: FunctionComponent<Props> = (props) => {
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-start gap-2">
                             {vuln.ticketId === null &&
-                              getRepositoryId(asset, project)?.startsWith(
-                                "gitlab:",
-                              ) && (
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "gitlab" && (
                                 <AsyncButton
                                   variant={"secondary"}
                                   onClick={() =>
@@ -276,12 +283,11 @@ const Index: FunctionComponent<Props> = (props) => {
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
-                                      <Image
-                                        alt="GitLab Logo"
-                                        width={15}
-                                        height={15}
-                                        className="mr-2"
-                                        src={"/assets/gitlab.svg"}
+                                      <GitProviderIcon
+                                        externalEntityProviderIdOrRepositoryId={
+                                          asset.externalEntityProviderId ??
+                                          "official"
+                                        }
                                       />
                                       Create GitLab Ticket
                                     </div>
@@ -290,9 +296,10 @@ const Index: FunctionComponent<Props> = (props) => {
                               )}
 
                             {vuln.ticketId === null &&
-                              getRepositoryId(asset, project)?.startsWith(
-                                "github:",
-                              ) && (
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "github" && (
                                 <AsyncButton
                                   variant={"secondary"}
                                   onClick={() =>
