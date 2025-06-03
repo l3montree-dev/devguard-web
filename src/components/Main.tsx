@@ -255,13 +255,21 @@ const Main: FunctionComponent<Props> = ({
             </Link>
             <Link
               className="!text-muted-foreground"
+              target="_blank"
+              href="https://devguard.org/terms-of-use"
+            >
+              Terms of Use
+            </Link>
+            <Link
+              className="!text-muted-foreground"
               href="https://l3montree.com/datenschutz"
             >
               Privacy
             </Link>
           </div>
-          Copyright © {new Date().getFullYear()} L3montree. All rights
-          reserved. Version {process.env.NEXT_PUBLIC_VERSION}
+          Copyright © {new Date().getFullYear()} L3montree GmbH and the
+          DevGuard Contributors. All rights reserved. Version{" "}
+          {process.env.NEXT_PUBLIC_VERSION}
         </footer>
       </main>
     </SidebarProvider>

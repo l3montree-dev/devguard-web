@@ -43,14 +43,6 @@ import { Flow } from "../components/kratos/Flow";
 import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
 import dynamic from "next/dynamic";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { BlocksIcon, FileCheckIcon, LandmarkIcon } from "lucide-react";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
 
 const ThreeJSScene = dynamic(
@@ -186,20 +178,19 @@ const Login: NextPage = () => {
         <title>DevGuard - Sign in</title>
         <meta name="description" content="DevGuard Sign in" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-row bg-white ">
-        <ThreeJSFeatureScreen />
+      <div className="flex min-h-screen flex-1 flex-row">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-8">
+          <div className="w-full px-18">
             <div className="">
               <Image
-                className="hidden h-20 w-auto dark:block"
+                className="hidden h-16 w-auto dark:block"
                 src={"/logo_inverse_horizontal.svg"}
                 alt="DevGuard by l3montree Logo"
                 width={300}
                 height={300}
               />
               <Image
-                className="h-20 w-auto dark:hidden"
+                className="h-16 w-auto dark:hidden"
                 src={"/logo_horizontal.svg"}
                 alt="DevGuard by l3montree Logo"
                 width={300}
@@ -212,17 +203,34 @@ const Login: NextPage = () => {
                   } else if (flow?.requested_aal === "aal2") {
                     return "Two-Factor Authentication";
                   }
-                  return "Sign In";
+                  return "Sign in to your Account";
                 })()}
               </h2>
+              {!aal && !refresh && (
+                <p className="mt-2 text-sm/6 text-muted-foreground">
+                  You don&apos;t have an Account?{" "}
+                  <Link
+                    href="/registration"
+                    passHref
+                    className="font-semibold hover:underline"
+                  >
+                    Sign up for free
+                  </Link>
+                </p>
+              )}
             </div>
 
-            <div className="mt-10 sm:mx-auto">
+            <div className="mt-12">
+              <p className="text-sm font-semibold text-foreground">
+                How do you want to sign in?
+              </p>
+            </div>
+            <div className="mt-4 sm:mx-auto">
               {flow?.requested_aal !== "aal2" ? (
                 <Tab.Group>
                   <CustomTab>Passwordless</CustomTab>
                   <CustomTab>Legacy Password login</CustomTab>
-                  <Tab.Panels className={"mt-6"}>
+                  <Tab.Panels className={"mt-8"}>
                     <Tab.Panel>
                       <Flow
                         only="passkey"
@@ -283,32 +291,33 @@ const Login: NextPage = () => {
                 Log out
               </a>
             ) : (
-              <>
-                <p className="mt-10 text-left text-sm">
-                  You do not have an Account?{" "}
-                  <Link
-                    href="/registration"
-                    passHref
-                    className="font-semibold leading-6 text-blue-600 hover:text-blue-400"
-                  >
-                    Create account
-                  </Link>
-                </p>
-
-                <p className="mt-4 text-left text-sm">
-                  Forgot password?{" "}
-                  <Link
-                    href="/recovery"
-                    passHref
-                    className="font-semibold leading-6 text-blue-600 hover:text-blue-400"
-                  >
-                    Recover your account
-                  </Link>
-                </p>
-              </>
+              <p className="mt-8 text-sm/6 text-muted-foreground">
+                <Link
+                  href="/recovery"
+                  passHref
+                  className="font-semibold hover:underline"
+                >
+                  Need to recover your account?
+                </Link>
+              </p>
             )}
+            <div className="mt-8">
+              <p className="text-sm/6 text-muted-foreground">
+                By using DevGuard you agree to our{" "}
+                <Link
+                  href="https://devguard.org/terms-of-use"
+                  target="_blank"
+                  rel="noreferrer"
+                  passHref
+                  className="font-semibold hover:underline"
+                >
+                  Terms of Use
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
+        <ThreeJSFeatureScreen />
       </div>
     </>
   );

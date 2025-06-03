@@ -8,7 +8,7 @@ const ThreeJSScene = dynamic(() => import("./ThreeJSScene"), { ssr: false });
 
 const ThreeJSFeatureScreen = () => {
   return (
-    <div className="relative w-3/5 bg-background">
+    <div className="relative w-3/5 bg-card">
       <div className="absolute pointer-events-none dark:bg-card/50 bg-card/5 p-5 rounded-lg backdrop-blur-lg w-1/2 m-10 top-0 right-0 z-10">
         <div className="mt-2 flex flex-col gap-4">
           <div className="">
@@ -55,7 +55,7 @@ const ThreeJSFeatureScreen = () => {
           </div>
         </div>
       </div>
-      <div className="absolute pointer-events-none w-1/2 dark:bg-card/50 bg-card/5 p-5 backdrop-blur-lg rounded-lg bottom-0 m-10 right-0 z-10">
+      <div className="absolute pointer-events-none w-1/2 dark:bg-card/50 bg-card/5 p-5 backdrop-blur-lg rounded-lg bottom-0 m-10 left-0 z-10">
         <div className="mt-2 flex flex-col gap-4">
           <div className="flex gap-4 flex-row">
             <div className="rounded-full bg-card w-10 h-10 flex flex-row items-center justify-center border">

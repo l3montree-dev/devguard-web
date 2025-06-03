@@ -36,6 +36,7 @@ import {
   useState,
 } from "react";
 import { handleFlowError, ory } from "../services/ory";
+import { Messages } from "@/components/kratos/Messages";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
 
 // Renders the registration page
@@ -173,9 +174,8 @@ const Registration: NextPage = () => {
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
-        <ThreeJSFeatureScreen />
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-8">
+          <div className="w-full px-18">
             <div>
               <Image
                 className="hidden h-20 w-auto dark:block"
@@ -194,9 +194,19 @@ const Registration: NextPage = () => {
               <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight ">
                 Create your DevGuard account
               </h2>
+              <p className="mt-2 text-sm/6 text-muted-foreground">
+                Already have an Account?{" "}
+                <Link
+                  data-testid="cta-link"
+                  href="/login"
+                  className="font-semibold hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
             </div>
 
-            <div className="mb-4 mt-10 border-b-2 pb-4 sm:mx-auto">
+            <div className="mb-4 mt-10 pb-4 sm:mx-auto">
               {hasSignupWithPasskey && (
                 <div className={"mb-4"}>
                   <div className="mb-4 border-b-2 pb-4">
@@ -229,18 +239,12 @@ const Registration: NextPage = () => {
                 flow={flow as LoginFlow}
               />
             </div>
-            <p className="mt-10 text-left text-sm">
-              Already have an Account?{" "}
-              <Link
-                data-testid="cta-link"
-                href="/login"
-                className="font-semibold leading-6 text-blue-500 hover:text-blue-400 hover:underline"
-              >
-                Sign in
-              </Link>
-            </p>
+            <div className="mt-4">
+              <Messages messages={flow?.ui.messages} />
+            </div>
           </div>
         </div>
+        <ThreeJSFeatureScreen />
       </div>
     </>
   );
