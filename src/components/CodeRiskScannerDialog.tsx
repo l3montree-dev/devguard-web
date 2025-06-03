@@ -41,6 +41,7 @@ import { useRouter } from "next/router";
 import FileUpload from "./FileUpload";
 import PatSection from "./risk-identification/PatSection";
 import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface CodeRiskScannerDialogProps {
   open: boolean;
@@ -63,6 +64,7 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
 
   const pat = usePersonalAccessToken();
 
@@ -501,7 +503,27 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                         >
                           Back
                         </Button>
-                        <Button onClick={() => api?.scrollNext()}>Done!</Button>
+                        <Button
+                          onClick={async () => {
+                            const resp = await fetch(
+                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                              {
+                                method: "GET",
+                              },
+                            );
+                            if (resp.redirected) {
+                              router.push(
+                                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/code-risks`,
+                              );
+                            } else {
+                              toast.error(
+                                "Scanner did not run in Repository yet",
+                              );
+                            }
+                          }}
+                        >
+                          Done!
+                        </Button>
                       </div>
                     </CarouselItem>
                   </>

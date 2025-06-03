@@ -16,7 +16,10 @@ import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
 import { integrationSnippets } from "../integrationSnippets";
-import { multipartBrowserApiClient } from "../services/devGuardApi";
+import {
+  browserApiClient,
+  multipartBrowserApiClient,
+} from "../services/devGuardApi";
 import { classNames } from "../utils/common";
 import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
 import FileUpload from "./FileUpload";
@@ -45,6 +48,7 @@ import {
 } from "./ui/dialog";
 import PatSection from "./risk-identification/PatSection";
 import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -67,6 +71,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
 
   const pat = usePersonalAccessToken();
 
@@ -90,8 +95,9 @@ const DependencyRiskScannerDialog: FunctionComponent<
     } else {
       toast.error("SBOM has not been send successfully");
     }
+
     router.push(
-      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/refs/main/dependency-risks/`,
+      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
     );
 
     onOpenChange(false);
@@ -473,7 +479,27 @@ const DependencyRiskScannerDialog: FunctionComponent<
                         >
                           Back
                         </Button>
-                        <Button onClick={() => api?.scrollNext()}>Done!</Button>
+                        <Button
+                          onClick={async () => {
+                            const resp = await fetch(
+                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                              {
+                                method: "GET",
+                              },
+                            );
+                            if (resp.redirected) {
+                              router.push(
+                                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                              );
+                            } else {
+                              toast.error(
+                                "Scanner did not run in Repository yet",
+                              );
+                            }
+                          }}
+                        >
+                          Done!
+                        </Button>
                       </div>
                     </CarouselItem>
                   </>
