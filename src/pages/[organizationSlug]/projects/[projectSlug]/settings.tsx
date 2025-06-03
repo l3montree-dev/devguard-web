@@ -9,10 +9,7 @@ import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../../../../services/devGuardApi";
+import { browserApiClient } from "../../../../services/devGuardApi";
 import { ProjectDTO } from "../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
@@ -32,14 +29,10 @@ import CopyInput from "../../../../components/common/CopyInput";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
-import { convertRepos } from "../../../../hooks/useRepositorySearch";
 
-interface Props {
-  project: ProjectDTO;
-  repositories: Array<{ value: string; label: string }> | null;
-}
+interface Props {}
 
-const Index: FunctionComponent<Props> = ({ repositories }) => {
+const Index: FunctionComponent<Props> = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const updateProject = useStore((s) => s.updateProject);
@@ -216,24 +209,8 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext) => {
-    // fetch the project
-    const { organizationSlug } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const resp = await apiClient(
-      "/organizations/" + organizationSlug + "/integrations/repositories",
-    );
-
-    let repos: Array<{ value: string; label: string }> | null = null;
-    if (resp.ok) {
-      repos = convertRepos(await resp.json());
-    }
-
     return {
-      props: {
-        repositories: repos,
-      },
+      props: {},
     };
   },
   {
