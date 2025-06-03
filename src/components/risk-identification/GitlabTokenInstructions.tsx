@@ -213,7 +213,6 @@ export const GitlabTokenSlides = ({
                   method: "GET",
                 },
               );
-              console.log(resp);
               if (resp.redirected) {
                 router.push(
                   `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
