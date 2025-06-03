@@ -109,8 +109,10 @@ export default Index;
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { asset }) => {
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
+    const { organizationSlug, projectSlug, assetSlug } = context.params!;
+
+    // check if there is a path query parameter
+    const path = context.query["path"];
 
     // check if there exists a ref on the asset
     if (asset.refs.length > 0) {
@@ -120,9 +122,16 @@ export const getServerSideProps = middleware(
       if (!redirectTo) {
         redirectTo = asset.refs[0];
       }
+
+      let destination = `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${redirectTo.slug}`;
+
+      if (path) {
+        destination += path;
+      }
+
       return {
         redirect: {
-          destination: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${redirectTo.slug}`,
+          destination,
           permanent: false,
         },
       };

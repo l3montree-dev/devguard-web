@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -20,6 +20,13 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
 import { ImageZoom } from "../common/Zoom";
+import router from "next/router";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { browserApiClient } from "@/services/devGuardApi";
+import { toast } from "sonner";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -116,6 +123,10 @@ export const GithubTokenSlides = ({
     assetSlug,
     apiUrl,
   })["GitHub"][scanner ?? "devsecops"];
+  const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const assetVersion = useActiveAssetVersion();
+  const asset = useActiveAsset();
 
   return (
     <>
@@ -192,7 +203,25 @@ export const GithubTokenSlides = ({
           <Button variant={"secondary"} onClick={prev}>
             Back
           </Button>
-          <Button onClick={next}>Done!</Button>
+          <Button
+            onClick={async () => {
+              const resp = await fetch(
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                {
+                  method: "GET",
+                },
+              );
+              if (resp.redirected) {
+                router.push(
+                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                );
+              } else {
+                toast.error("Github Pipeline has failed");
+              }
+            }}
+          >
+            Done!
+          </Button>
         </div>
       </CarouselItem>
     </>
