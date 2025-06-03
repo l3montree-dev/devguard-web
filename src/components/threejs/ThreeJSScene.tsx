@@ -76,7 +76,7 @@ const Cube = () => {
       <Side rotation={[0, Math.PI, 0]} bg="#F9BE24" index={1}>
         <torusKnotGeometry args={[0.55, 0.2, 128, 32]} />
       </Side>
-      <Side rotation={[0, Math.PI / 2, Math.PI / 2]} bg="#6382FF" index={2}>
+      <Side rotation={[0, Math.PI / 2, Math.PI / 2]} bg="#62748e" index={2}>
         <boxGeometry args={[1.15, 1.15, 1.15]} />
       </Side>
       <Side rotation={[0, Math.PI / 2, -Math.PI / 2]} bg="#62748e" index={3}>
