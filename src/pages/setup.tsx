@@ -17,64 +17,31 @@ import OrgRegisterForm from "@/components/OrgRegister";
 import Page from "@/components/Page";
 import { middleware } from "@/decorators/middleware";
 import { withOrgs } from "@/decorators/withOrgs";
-import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import ListItem from "../components/common/ListItem";
-import Section from "../components/common/Section";
-import { AsyncButton } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import { withSession } from "../decorators/withSession";
-import { browserApiClient } from "../services/devGuardApi";
-
-type Repo = {
-  label: string;
-  id: string;
-  image: string;
-  description: string;
-};
-
-function sortRepositories(repositories: Array<Repo>) {
-  repositories.sort((a, b) => {
-    if (a.label.toLowerCase() < b.label.toLowerCase()) return -1;
-    if (a.label.toLowerCase() > b.label.toLowerCase()) return 1;
-    return 0;
-  });
-}
+import Lanyard from "@/components/misc/Lanyard";
 
 export default function SetupOrg() {
-  const [loading, setLoading] = useState(false);
-  const [repositories, setRepositories] = useState<Array<Repo>>([]);
-
-  const listRepositories = useCallback(async (search?: string) => {
-    setLoading(true);
-    // fetch the repositories of the user
-    const resp = await browserApiClient(
-      "/integrations/repositories" + (search ? `?search=${search}` : ""),
-    );
-    setLoading(false);
-    return resp.json() as Promise<Array<Repo>>;
-  }, []);
-
-  const debouncedListRepositories = useCallback(
-    debounce(async (search: string) => {
-      setRepositories(await listRepositories(search));
-    }, 300),
-    [listRepositories],
-  );
-
-  const handleAutoSetup = async (repoId: string) => {
-    return browserApiClient("/integrations/fullautosetup", {
-      method: "POST",
-      body: JSON.stringify({
-        repositoryId: repoId,
-      }),
-    });
-  };
-
   return (
-    <Page title="Setup DevGuard">
-      <OrgRegisterForm />
+    <Page title="Setup Your Organization">
+      <div className="">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
+          <div className="">
+            <div className="absolute inset-0 z-10 -top-10 right-180">
+              <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+            </div>
+          </div>
+          <div className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-48">
+            <div className="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
+              <h2 className="text-3xl font-bold text-foreground">
+                Create your VIP-Area in the
+                <br />
+                DevGuard Universe
+              </h2>
+              <OrgRegisterForm />
+            </div>
+          </div>
+        </div>
+      </div>
     </Page>
   );
 }

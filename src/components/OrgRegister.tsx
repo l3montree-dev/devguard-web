@@ -20,7 +20,6 @@ import { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Form } from "./ui/form";
 
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
@@ -67,7 +66,7 @@ export default function OrgRegisterForm(props: Props) {
         className="text-black dark:text-white"
         onSubmit={form.handleSubmit(handleOrgCreation)}
       >
-        <OrgForm form={form} />
+        <OrgForm />
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <Button
@@ -75,7 +74,7 @@ export default function OrgRegisterForm(props: Props) {
             isSubmitting={form.formState.isSubmitting}
             type="submit"
           >
-            Save
+            Create Organization
           </Button>
         </div>
       </form>
