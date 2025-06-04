@@ -155,7 +155,10 @@ const Settings: FunctionComponent<{
               for (const item of data.continue_with) {
                 switch (item.action) {
                   case "show_verification_ui":
-                    router.push("/login?flow=" + item.flow.id);
+                    console.debug(
+                      "Flow requires verification, redirecting to verification page",
+                    );
+                    router.push("/verification?flow=" + item.flow.id);
                     return;
                 }
               }
@@ -173,6 +176,9 @@ const Settings: FunctionComponent<{
               // Yup, it is!
               //@ts-expect-error
               setFlow(err.response?.data);
+              toast.error("An error occured, your changes where not saved.", {
+                description: "Please check the form and try again.",
+              });
               return;
             }
 
@@ -238,18 +244,6 @@ const Settings: FunctionComponent<{
           title="Profile Management & Security Settings"
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="col-span-full flex items-center gap-x-8">
-              <div className="rounded-lg border bg-card p-2">
-                <UserIcon width={60} height={60} />
-              </div>
-              <div>
-                <Button disabled>Change avatar</Button>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  JPG, GIF or PNG. 1MB max.
-                </p>
-              </div>
-            </div>
-
             <div className="col-span-full">
               <SettingsCard only="profile" flow={flow}>
                 <Flow

@@ -171,19 +171,6 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               !project.externalEntityProviderId && (
                 <div className="flex flex-row justify-center gap-2">
                   <Button
-                    onClick={() => setShowK8sModal(true)}
-                    variant="secondary"
-                  >
-                    <Image
-                      alt="Kubernetes logo"
-                      src="/assets/kubernetes.svg"
-                      className="mr-2"
-                      width={24}
-                      height={24}
-                    />
-                    Use a Kubernetes Operator to index your assets
-                  </Button>
-                  <Button
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
                   >
@@ -344,7 +331,11 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               className="space-y-8"
               onSubmit={projectForm.handleSubmit(handleCreateProject)}
             >
-              <ProjectForm forceVerticalSections form={projectForm} />
+              <ProjectForm
+                forceVerticalSections
+                form={projectForm}
+                hideDangerZone
+              />
               <DialogFooter>
                 <Button type="submit">Create</Button>
               </DialogFooter>

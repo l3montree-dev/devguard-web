@@ -25,6 +25,7 @@ interface Props {
   forceVerticalSections: boolean;
   disabled?: boolean;
   onConfirmDelete?: () => Promise<void>;
+  hideDangerZone?: boolean;
 }
 
 export const ProjectForm: FunctionComponent<Props> = ({
@@ -32,6 +33,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
   disabled,
   forceVerticalSections,
   onConfirmDelete,
+  hideDangerZone = false,
 }) => {
   const org = useActiveOrg();
   return (
@@ -70,65 +72,69 @@ export const ProjectForm: FunctionComponent<Props> = ({
           )}
         />
       </Section>
-      <hr />
-      <DangerZone>
-        <Section
-          className="pb-0"
-          forceVertical={forceVerticalSections}
-          title="Advanced"
-          description="These settings are for advanced users only. Please be careful when changing these settings."
-        >
-          <FormField
-            control={form.control}
-            name="isPublic"
-            render={({ field }) => (
-              <FormItem>
-                <div className={classNames(!org.isPublic && "opacity-50")}>
-                  <ListItem
-                    Description={
-                      "Setting this to true will make the project visible to the public. It allows creating public and private assets."
-                    }
-                    Title="Public Project"
-                    Button={
-                      <FormControl>
-                        <Switch
-                          disabled={!org.isPublic}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    }
-                  />
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-          {!org.isPublic && (
-            <small>
-              The organization is not public. You can not make the project
-              public.
-            </small>
-          )}
-          {onConfirmDelete && (
-            <ListItem
-              Title="Delete Project"
-              Description={
-                "This will delete the project and all of its data. This action cannot be undone."
-              }
-              Button={
-                <Alert
-                  title="Are you sure to delete this project?"
-                  description="This action cannot be undone. All data associated with this repository will be deleted."
-                  onConfirm={onConfirmDelete}
-                >
-                  <Button variant={"destructive"}>Delete</Button>
-                </Alert>
-              }
-            />
-          )}
-        </Section>
-      </DangerZone>
+      {!hideDangerZone && (
+        <>
+          <hr />
+          <DangerZone>
+            <Section
+              className="pb-0"
+              forceVertical={forceVerticalSections}
+              title="Advanced"
+              description="These settings are for advanced users only. Please be careful when changing these settings."
+            >
+              <FormField
+                control={form.control}
+                name="isPublic"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className={classNames(!org.isPublic && "opacity-50")}>
+                      <ListItem
+                        Description={
+                          "Setting this to true will make the project visible to the public. It allows creating public and private assets."
+                        }
+                        Title="Public Project"
+                        Button={
+                          <FormControl>
+                            <Switch
+                              disabled={!org.isPublic}
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              {!org.isPublic && (
+                <small>
+                  The organization is not public. You can not make the project
+                  public.
+                </small>
+              )}
+              {onConfirmDelete && (
+                <ListItem
+                  Title="Delete Project"
+                  Description={
+                    "This will delete the project and all of its data. This action cannot be undone."
+                  }
+                  Button={
+                    <Alert
+                      title="Are you sure to delete this project?"
+                      description="This action cannot be undone. All data associated with this repository will be deleted."
+                      onConfirm={onConfirmDelete}
+                    >
+                      <Button variant={"destructive"}>Delete</Button>
+                    </Alert>
+                  }
+                />
+              )}
+            </Section>
+          </DangerZone>
+        </>
+      )}
     </>
   );
 };
