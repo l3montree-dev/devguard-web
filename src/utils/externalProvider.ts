@@ -9,7 +9,7 @@ export const providerIdToBaseURL = (provider?: string) => {
 
 export const externalProviderIdToIntegrationName = (
   provider?: string,
-): "github" | "gitlab" => {
+): "github" | "gitlab" | undefined => {
   if (provider === "official") {
     return "gitlab";
   } else if (provider === "opencode") {
@@ -17,7 +17,5 @@ export const externalProviderIdToIntegrationName = (
   } else if (provider === "github") {
     return "github";
   }
-  throw new Error(
-    `Unknown external provider ID: ${provider}. Expected 'official', 'opencode', or 'github'.`,
-  );
+  return undefined;
 };

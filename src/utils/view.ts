@@ -189,7 +189,7 @@ export const getParentRepositoryIdAndName = (
 export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
   asset?: AssetDTO,
   project?: ProjectDTO,
-): "gitlab" | "github" => {
+): "gitlab" | "github" | undefined => {
   if (asset && asset.repositoryId) {
     return asset.repositoryId.startsWith("gitlab:") ? "gitlab" : "github";
   }
