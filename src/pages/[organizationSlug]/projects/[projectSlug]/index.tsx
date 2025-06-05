@@ -361,6 +361,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 forceVerticalSections
                 form={form}
                 showReportingRange={false}
+                showSecurityRequirements={false}
+                showEnvironmentalInformation={false}
               />
               <DialogFooter>
                 <Button

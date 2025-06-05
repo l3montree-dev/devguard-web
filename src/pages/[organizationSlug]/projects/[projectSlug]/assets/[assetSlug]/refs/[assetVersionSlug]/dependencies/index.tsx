@@ -154,6 +154,7 @@ const licenses = [
   { value: "ms-rl", label: "MS-RL" },
   { value: "miros", label: "MirOS" },
   { value: "mit-0", label: "MIT-0" },
+  { value: "mit", label: "MIT" },
   { value: "motosoto", label: "Motosoto" },
   { value: "mpl-1.1", label: "MPL-1.1" },
   { value: "mpl-2.0", label: "MPL-2.0" },
@@ -499,12 +500,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <div>
-        <Popover>
-          <PopoverTrigger>Open</PopoverTrigger>
-          <PopoverContent>Place content for the popover here.</PopoverContent>
-        </Popover>
-      </div>
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">

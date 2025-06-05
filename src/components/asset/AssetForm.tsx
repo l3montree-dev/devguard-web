@@ -280,8 +280,17 @@ const AssetSettingsForm: FunctionComponent<
     forceVerticalSections?: boolean;
     showReportingRange: boolean;
     disable?: boolean;
+    showSecurityRequirements?: boolean;
+    showEnvironmentalInformation?: boolean;
   }
-> = ({ form, forceVerticalSections, showReportingRange, disable }) => {
+> = ({
+  form,
+  forceVerticalSections,
+  showReportingRange,
+  disable,
+  showSecurityRequirements = true,
+  showEnvironmentalInformation = true,
+}) => {
   return (
     <>
       <Section
@@ -291,23 +300,31 @@ const AssetSettingsForm: FunctionComponent<
       >
         <AssetFormGeneral disable={disable} form={form} />
       </Section>
-      <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        title="Security Requirements"
-        description="
+      {showSecurityRequirements && (
+        <>
+          <hr />
+          <Section
+            forceVertical={forceVerticalSections}
+            title="Security Requirements"
+            description="
 Security requirements are specific criteria or conditions that an application, system, or organization must meet to ensure the protection of data, maintain integrity, confidentiality, and availability, and guard against threats and vulnerabilities. These requirements help to establish security policies, guide the development of secure systems, and ensure compliance with regulatory and industry standards."
-      >
-        <AssetFormRequirements form={form} />
-      </Section>
-      <hr />
-      <Section
-        forceVertical={forceVerticalSections}
-        description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the repository."
-        title="Environmental information"
-      >
-        <AssetFormMisc form={form} />
-      </Section>
+          >
+            <AssetFormRequirements form={form} />
+          </Section>
+        </>
+      )}
+      {showEnvironmentalInformation && (
+        <>
+          <hr />
+          <Section
+            forceVertical={forceVerticalSections}
+            description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the repository."
+            title="Environmental information"
+          >
+            <AssetFormMisc form={form} />
+          </Section>
+        </>
+      )}
       {showReportingRange && (
         <>
           <hr />
