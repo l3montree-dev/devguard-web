@@ -87,6 +87,7 @@ import {
 import { toast } from "sonner";
 import { Switch } from "../../../../../../../../../components/ui/switch";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -463,7 +464,8 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     project: Component["project"];
   }>();
 
-  const { table } = useTable({
+  const router = useRouter();
+  const { table, isLoading, handleSearch } = useTable({
     data: components.data,
     columnsDef,
   });
@@ -628,6 +630,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           </div>
         }
       >
+        <Input
+          onChange={handleSearch}
+          defaultValue={router.query.search as string}
+          placeholder="Search for dependencies or versions - just start typing..."
+        />
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">
