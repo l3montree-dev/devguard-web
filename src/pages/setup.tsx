@@ -26,7 +26,7 @@ export default function SetupOrg() {
       <div className="">
         <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
           <div className="">
-            <div className="absolute inset-0 z-10 -top-10 right-180">
+            <div className="absolute inset-0 z-10 -top-10 right-230">
               <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
             </div>
           </div>
