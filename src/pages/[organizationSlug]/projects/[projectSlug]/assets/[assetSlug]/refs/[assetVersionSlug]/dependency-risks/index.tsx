@@ -307,52 +307,10 @@ const Index: FunctionComponent<Props> = (props) => {
               )}
             </div>
           </div>
-          <div className="overflow-hidden rounded-lg border shadow-sm">
-            <div className="overflow-auto">
-              <table className="w-full table-fixed overflow-x-auto text-sm">
-                <thead className="border-b bg-card text-foreground">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      <th className="w-6" />
-                      {headerGroup.headers.map((header) => (
-                        <th
-                          className="w-40 cursor-pointer break-normal p-4 text-left"
-                          onClick={
-                            header.column.columnDef.enableSorting
-                              ? header.column.getToggleSortingHandler()
-                              : undefined
-                          }
-                          key={header.id}
-                        >
-                          <div className="flex flex-row items-center gap-2">
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody className="text-sm text-foreground">
-                  {table.getRowModel().rows.map((row, i, arr) => (
-                    <RiskHandlingRow
-                      row={row}
-                      index={i}
-                      arrLength={arr.length}
-                      key={row.original.packageName}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <EmptyParty
+            title="No matching results fouasdf."
+            description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
+          />
           <div className="mt-4">
             <CustomPagination {...props.vulns} />
           </div>
