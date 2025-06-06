@@ -280,14 +280,7 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
               </CarouselItem>
             ) : (
               <>
-                <CarouselItem
-                  className={classNames(
-                    "",
-                    selectedScanner === "custom"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                >
+                <CarouselItem>
                   <DialogHeader>
                     <DialogTitle>
                       What scanner would you like to integrate?
@@ -474,14 +467,7 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                 )}
                 {selectedIntegration === "docker" && (
                   <>
-                    <CarouselItem
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "custom"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                    >
+                    <CarouselItem>
                       <DialogHeader>
                         <DialogTitle>Docker Integration</DialogTitle>
                       </DialogHeader>
