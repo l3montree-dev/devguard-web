@@ -42,7 +42,7 @@ const PatSection = ({
           </div>
         </div>
       ) : (
-        <>
+        <div className="pb-10 pt-6">
           <div className="flex justify-between">
             <Button
               variant="default"
@@ -64,7 +64,7 @@ const PatSection = ({
               <span>Manage your tokens</span>
             </Link>
           </div>
-        </>
+        </div>
       )}
     </Section>
   );
