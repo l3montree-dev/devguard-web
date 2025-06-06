@@ -55,7 +55,6 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
       return <CheckIcon />;
     case "ticketDeleted":
       return <StopIcon />;
-
     case "accepted":
       return <SpeakerXMarkIcon />;
     case "fixed":
@@ -74,6 +73,8 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
       return <MagnifyingGlassIcon />;
     case "comment":
       return <ChatBubbleOvalLeftEllipsisIcon />;
+    case "detectedOnAnotherBranch":
+      return <GitBranchIcon className="h-3.5 w-3.5" />;
   }
 }
 
@@ -113,7 +114,7 @@ export default function RiskAssessmentFeed({
               <div
                 className={classNames(
                   evTypeBackground[event.type],
-                  "h-7 w-7 rounded-full border-2 border-background p-1",
+                  "h-7 w-7 rounded-full border-2 flex flex-row items-center justify-center border-background p-1",
                 )}
               >
                 <EventTypeIcon eventType={event.type} />

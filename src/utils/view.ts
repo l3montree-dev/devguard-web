@@ -71,6 +71,10 @@ export const eventTypeMessages = (
   events?: VulnEventDTO[],
 ) => {
   switch (event.type) {
+    case "detectedOnAnotherBranch":
+      return (
+        "detected " + flawName + " on another ref: " + event.assetVersionName
+      );
     case "addedScanner":
       return (
         "detected " +
@@ -142,6 +146,7 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   ticketDeleted: "bg-red-600 text-white",
   addedScanner: "bg-secondary",
   removedScanner: "bg-secondary",
+  detectedOnAnotherBranch: "bg-secondary",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

@@ -26,7 +26,7 @@ import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { getAssetVersionSlug, useAssetMenu } from "@/hooks/useAssetMenu";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -77,9 +77,8 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
-import { filterEventTypesFromOtherBranches } from "../../../../../../../../../../utils/server";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
+import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -291,6 +290,8 @@ const Index: FunctionComponent<Props> = (props) => {
     setVuln(props.vuln);
   }, [props.vuln]);
   const cve = vuln.cve;
+
+  console.log(props);
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -973,10 +974,7 @@ export const getServerSideProps = middleware(
       "/dependency-vulns/" +
       vulnId;
 
-    const [resp, respEvents]: [Response, Response] = await Promise.all([
-      apiClient(uri),
-      apiClient(uri + "/events"),
-    ]);
+    const [resp]: [Response] = await Promise.all([apiClient(uri)]);
 
     if (!resp.ok) {
       return {
@@ -984,19 +982,6 @@ export const getServerSideProps = middleware(
       };
     }
     const detailedDependencyVulnDTO = await resp.json();
-
-    if (respEvents.ok) {
-      const events = await respEvents.json();
-      if (events && events.length > 0) {
-        const ev = events.filter((event: VulnEventDTO) => {
-          return (
-            !filterEventTypesFromOtherBranches.includes(event.type) ||
-            event.vulnId === detailedDependencyVulnDTO.id
-          );
-        });
-        detailedDependencyVulnDTO.events = ev;
-      }
-    }
 
     return {
       props: {

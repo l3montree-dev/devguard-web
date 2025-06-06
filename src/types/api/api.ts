@@ -252,6 +252,10 @@ export interface RemovedScannerEventDTO extends BaseVulnEventDTO {
   };
 }
 
+export interface DetectedOnAnotherBranchEventDTO extends BaseVulnEventDTO {
+  type: "detectedOnAnotherBranch";
+}
+
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
   type: "falsePositive";
 }
@@ -290,7 +294,8 @@ export type VulnEventDTO =
   | TicketClosedEventDTO
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
-  | RemovedScannerEventDTO;
+  | RemovedScannerEventDTO
+  | DetectedOnAnotherBranchEventDTO;
 
 export interface CWE {
   cwe: string;
