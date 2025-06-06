@@ -75,8 +75,8 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
   );
 };
 
-const slugToProvider = (slug: string) => {
-  return slug.replace("@", "");
+const slugToProvider = (slug: string | undefined) => {
+  return slug?.replace("@", "");
 };
 
 const EntityProviderLinkBanner = () => {
@@ -128,7 +128,7 @@ const EntityProviderLinkBanner = () => {
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug
+              organizationSlug,
             )}
           />
           {activeProject.name}
@@ -142,16 +142,16 @@ const EntityProviderLinkBanner = () => {
       <div>
         <Link
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
-          href={providerIdToBaseURL(organizationSlug.replace("@", ""))}
+          href={providerIdToBaseURL(organizationSlug?.replace("@", ""))}
           target="_blank"
           rel="noopener noreferrer"
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug
+              organizationSlug,
             )}
           />
-          {organizationSlug.replace("@", "")}
+          {organizationSlug?.replace("@", "")}
         </Link>
       </div>
     );
