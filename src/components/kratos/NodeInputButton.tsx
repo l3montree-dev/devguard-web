@@ -43,9 +43,10 @@ export function NodeInputButton<T>({
     setValue(attributes.value).then(() => dispatchSubmit(e));
   };
 
-  console.log(attributes);
+  // console.log(attributes);
+  console.log(node);
 
-  if (attributes.name === "passkey_login_trigger") {
+  if (node.meta.label?.text === "Add passkey") {
     return (
       <div className="flex flex-row justify-end">
         <Button
@@ -67,4 +68,26 @@ export function NodeInputButton<T>({
       </div>
     );
   }
+
+  return (
+    <div className="flex flex-row justify-end">
+      <Button
+        name={attributes.name}
+        onClick={(e) => {
+          onClick(e);
+        }}
+        variant={"secondary"}
+        value={attributes.value || ""}
+        disabled={attributes.disabled || disabled}
+      >
+        {attributes.name === "passkey_login_trigger" && (
+          <FingerPrintIcon
+            className="mr-2 h-4 w-4 shrink-0"
+            aria-hidden="true"
+          />
+        )}
+        {getNodeLabel(node)}
+      </Button>
+    </div>
+  );
 }
