@@ -43,9 +43,6 @@ export function NodeInputButton<T>({
     setValue(attributes.value).then(() => dispatchSubmit(e));
   };
 
-  // console.log(attributes);
-  console.log(node);
-
   if (node.meta.label?.text === "Add passkey") {
     return (
       <div className="flex flex-row justify-end">

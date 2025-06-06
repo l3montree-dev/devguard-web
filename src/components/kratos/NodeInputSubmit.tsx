@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// console.log(node);  If you want to add Icons to Ory Buttons
-
 import { getNodeLabel } from "@ory/integrations/ui";
 
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
