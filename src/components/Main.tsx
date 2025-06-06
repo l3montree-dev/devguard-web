@@ -128,7 +128,7 @@ const EntityProviderLinkBanner = () => {
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug
+              organizationSlug,
             )}
           />
           {activeProject.name}
@@ -148,7 +148,7 @@ const EntityProviderLinkBanner = () => {
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug
+              organizationSlug,
             )}
           />
           {organizationSlug.replace("@", "")}

@@ -36,6 +36,7 @@ export default function useTable<T>({
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
         setIsLoading(true);
         // remove all sorting query params
+        console.log("meow");
         const params = router.query;
         if (e.target.value === "") {
           delete params["search"];

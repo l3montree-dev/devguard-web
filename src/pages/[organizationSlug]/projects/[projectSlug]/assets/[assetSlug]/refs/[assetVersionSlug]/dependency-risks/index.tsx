@@ -253,19 +253,9 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       </div>
       {!props.vulns.data.length ? (
-        <EmptyParty
-          title="You do not have any identified risks for this repository."
-          description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
-        />
-      ) : (
-        <div>
-          <Section
-            forceVertical
-            primaryHeadline
-            title="Identified Risks"
-            description="This table shows all the identified risks for this repository."
-          >
-            <div className="relative flex flex-row gap-2">
+        <>
+          <div className="mt-2 mb-2">
+            <div className="relative flex flex-row ">
               <Tabs
                 defaultValue={
                   (router.query.state as string | undefined)
@@ -313,57 +303,117 @@ const Index: FunctionComponent<Props> = (props) => {
                 )}
               </div>
             </div>
-            <div className="overflow-hidden rounded-lg border shadow-sm">
-              <div className="overflow-auto">
-                <table className="w-full table-fixed overflow-x-auto text-sm">
-                  <thead className="border-b bg-card text-foreground">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <tr key={headerGroup.id}>
-                        <th className="w-6" />
-                        {headerGroup.headers.map((header) => (
-                          <th
-                            className="w-40 cursor-pointer break-normal p-4 text-left"
-                            onClick={
-                              header.column.columnDef.enableSorting
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                            key={header.id}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-                              <SortingCaret
-                                sortDirection={header.column.getIsSorted()}
-                              />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    ))}
-                  </thead>
-                  <tbody className="text-sm text-foreground">
-                    {table.getRowModel().rows.map((row, i, arr) => (
-                      <RiskHandlingRow
-                        row={row}
-                        index={i}
-                        arrLength={arr.length}
-                        key={row.original.packageName}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          </div>
+          <EmptyParty
+            title="No matching results fouasdf."
+            description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
+          />
+        </>
+      ) : (
+        <Section
+          forceVertical
+          primaryHeadline
+          title="Identified Risks"
+          description="This table shows all the identified risks for this repository."
+        >
+          <div className="relative flex flex-row gap-2">
+            <Tabs
+              defaultValue={
+                (router.query.state as string | undefined)
+                  ? (router.query.state as string)
+                  : "open"
+              }
+            >
+              <TabsList>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        state: "open",
+                      },
+                    })
+                  }
+                  value="open"
+                >
+                  Open
+                </TabsTrigger>
+                <TabsTrigger
+                  onClick={() =>
+                    router.push({
+                      query: {
+                        ...router.query,
+                        state: "closed",
+                      },
+                    })
+                  }
+                  value="closed"
+                >
+                  Closed
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Input
+              onChange={handleSearch}
+              defaultValue={router.query.search as string}
+              placeholder="Search for cve, package name or message..."
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
             </div>
-            <div className="mt-4">
-              <CustomPagination {...props.vulns} />
+          </div>
+          <div className="overflow-hidden rounded-lg border shadow-sm">
+            <div className="overflow-auto">
+              <table className="w-full table-fixed overflow-x-auto text-sm">
+                <thead className="border-b bg-card text-foreground">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      <th className="w-6" />
+                      {headerGroup.headers.map((header) => (
+                        <th
+                          className="w-40 cursor-pointer break-normal p-4 text-left"
+                          onClick={
+                            header.column.columnDef.enableSorting
+                              ? header.column.getToggleSortingHandler()
+                              : undefined
+                          }
+                          key={header.id}
+                        >
+                          <div className="flex flex-row items-center gap-2">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                            <SortingCaret
+                              sortDirection={header.column.getIsSorted()}
+                            />
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody className="text-sm text-foreground">
+                  {table.getRowModel().rows.map((row, i, arr) => (
+                    <RiskHandlingRow
+                      row={row}
+                      index={i}
+                      arrLength={arr.length}
+                      key={row.original.packageName}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </Section>
-        </div>
+          </div>
+          <div className="mt-4">
+            <CustomPagination {...props.vulns} />
+          </div>
+        </Section>
       )}
       <DependencyRiskScannerDialog
         open={isOpen}
