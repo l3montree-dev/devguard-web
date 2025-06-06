@@ -308,7 +308,7 @@ const Index: FunctionComponent<Props> = (props) => {
             </div>
           </div>
           <EmptyParty
-            title="No matching results fouasdf."
+            title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           />
           <div className="mt-4">
