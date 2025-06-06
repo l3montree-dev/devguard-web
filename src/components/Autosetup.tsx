@@ -15,6 +15,7 @@ import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface Props {
   handleAutosetup: (pendingAutosetup: false) => Promise<void>;
@@ -35,6 +36,23 @@ const Autosetup: FunctionComponent<Props> = ({
   isLoading,
   Loader,
 }) => {
+  const [timedOut, setTimedOut] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        toast.error(
+          "The auto-setup is taking longer than expected. Please try again later.",
+        );
+        setTimedOut(true);
+      }
+    }, 18000);
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  const isReallyLoading = isLoading && !timedOut;
+
   const asset = useActiveAsset();
   return (
     <div className="">
@@ -49,7 +67,7 @@ const Autosetup: FunctionComponent<Props> = ({
                 hoverIntensity={0.5}
                 rotateOnHover={false}
                 hue={0}
-                forceHoverState={isLoading}
+                forceHoverState={isReallyLoading}
               />
             </div>
             <div className="w-full flex-auto">
@@ -79,14 +97,14 @@ const Autosetup: FunctionComponent<Props> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button disabled={isLoading}>
+                    <Button disabled={isReallyLoading}>
                       <Loader />
                       View Merge Request
                     </Button>
                   </Link>
                 ) : (
                   <Button
-                    disabled={isLoading}
+                    disabled={isReallyLoading}
                     onClick={() => handleAutosetup(false)}
                   >
                     <Loader />
@@ -101,9 +119,9 @@ const Autosetup: FunctionComponent<Props> = ({
                     >
                       {value.status === "notStarted" ? (
                         i + 1 + "."
-                      ) : value.status === "pending" && !isLoading ? (
+                      ) : value.status === "pending" && !isReallyLoading ? (
                         <ExclamationCircleIcon className="mr-2 h-4 w-4 text-red-600" />
-                      ) : value.status === "pending" && isLoading ? (
+                      ) : value.status === "pending" && isReallyLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin " />
                       ) : (
                         <CheckCircleIcon className="h-4 w-4 text-green-600" />
