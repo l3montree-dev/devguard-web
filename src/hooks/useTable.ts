@@ -47,6 +47,7 @@ export default function useTable<T>({
             query: {
               ...params,
               search: e.target.value,
+              page: 1, // reset to first page on search
             },
           });
         }

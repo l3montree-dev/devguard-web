@@ -96,10 +96,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
     },
   });
 
-  const { pat, onCreatePat } = usePersonalAccessToken();
-
   const [showProjectModal, setShowProjectModal] = useState(false);
-  const [showK8sModal, setShowK8sModal] = useState(false);
 
   const projectMenu = useProjectMenu();
 
@@ -170,19 +167,6 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
             Button={
               !project.externalEntityProviderId && (
                 <div className="flex flex-row justify-center gap-2">
-                  <Button
-                    onClick={() => setShowK8sModal(true)}
-                    variant="secondary"
-                  >
-                    <Image
-                      alt="Kubernetes logo"
-                      src="/assets/kubernetes.svg"
-                      className="mr-2"
-                      width={24}
-                      height={24}
-                    />
-                    Use a Kubernetes Operator to index your assets
-                  </Button>
                   <Button
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
@@ -285,49 +269,6 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
           </Section>
         )}
       </Page>
-      <Dialog open={showK8sModal}>
-        <DialogContent setOpen={setShowK8sModal}>
-          <DialogHeader>
-            <DialogTitle className="flex flex-row items-center">
-              <Image
-                alt="Kubernetes logo"
-                src="/assets/kubernetes.svg"
-                className="mr-2"
-                width={24}
-                height={24}
-              />
-              Connect a Kubernetes Cluster
-            </DialogTitle>
-            <DialogDescription>
-              Connect a Kubernetes cluster to DevGuard to automatically index
-              your assets.
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <Steps>
-            <div className="mb-10">
-              <PatSection
-                onCreatePat={onCreatePat}
-                pat={pat}
-                description={`Kubernetes Cluster Token generated at ${new Date().toLocaleString()}`}
-              />
-            </div>
-            <Section
-              className="mt-0"
-              forceVertical
-              title="Install the DevGuard Kubernetes Operator"
-              description="The DevGuard Kubernetes Operator is a small piece of software
-                that runs inside your Kubernetes cluster and indexes your
-                assets. It watches for new deployments and namespaces."
-            >
-              <CopyCode
-                codeString={`go run main.go --projectName=${activeOrg.slug + "/projects/" + project.slug} --token=${pat?.privKey ?? "<YOU NEED TO CREATE A PERSONAL ACCESS TOKEN>"} --apiUrl=${config.devguardApiUrlPublicInternet}`}
-                language="shell"
-              />
-            </Section>
-          </Steps>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={showProjectModal}>
         <DialogContent setOpen={setShowProjectModal}>
@@ -344,14 +285,29 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               className="space-y-8"
               onSubmit={projectForm.handleSubmit(handleCreateProject)}
             >
-              <ProjectForm forceVerticalSections form={projectForm} />
+              <ProjectForm
+                forceVerticalSections
+                form={projectForm}
+                hideDangerZone
+              />
               <DialogFooter>
-                <Button type="submit">Create</Button>
+                <Button
+                  isSubmitting={projectForm.formState.isSubmitting}
+                  type="submit"
+                  variant="default"
+                  onClick={() =>
+                    !projectForm.formState.isSubmitting &&
+                    setShowProjectModal(false)
+                  }
+                >
+                  Create
+                </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
+
       <Dialog open={showModal}>
         <DialogContent setOpen={setShowModal}>
           <DialogHeader>
@@ -361,6 +317,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
               risks of.
             </DialogDescription>
           </DialogHeader>
+          <hr />
           <Form {...form}>
             <form
               className="flex flex-col"
@@ -370,6 +327,8 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 forceVerticalSections
                 form={form}
                 showReportingRange={false}
+                showSecurityRequirements={false}
+                showEnvironmentalInformation={false}
               />
               <DialogFooter>
                 <Button

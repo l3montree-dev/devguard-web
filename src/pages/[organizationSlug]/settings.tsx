@@ -31,7 +31,13 @@ import { encodeObjectBase64 } from "@/services/encodeService";
 
 import { OrgForm } from "@/components/OrgForm";
 import { Badge } from "@/components/ui/badge";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { withOrganization } from "@/decorators/withOrganization";
 import { browserApiClient } from "@/services/devGuardApi";
 import { GitLabIntegrationDTO, OrganizationDetailsDTO } from "@/types/api/api";
@@ -45,6 +51,8 @@ import { withContentTree } from "@/decorators/withContentTree";
 import MembersTable from "@/components/MembersTable";
 import MemberDialog from "@/components/MemberDialog";
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
+import DangerZone from "@/components/common/DangerZone";
+import { Switch } from "@/components/ui/switch";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -150,6 +158,8 @@ const Home: FunctionComponent = () => {
       });
     }
   };
+
+  console.log("Active Org", activeOrg);
 
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
@@ -306,16 +316,55 @@ const Home: FunctionComponent = () => {
         </div>
       </Section>
       <hr />
-      <div className="pb-6">
+      <div className="pb-12">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <OrgForm form={form} />
+            <OrgForm forceVertical={false} />
             <div className="mt-6 flex items-center justify-end gap-x-6">
               <Button type="submit">Save</Button>
             </div>
           </form>
         </Form>
       </div>
+      <hr />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleUpdate)}>
+          <Section
+            title="Visibility"
+            description="Control the visibility of your organization and its projects. If a Organization is public, only the projects that are public will be visible to the public. Private projects are only visible to members of the organization."
+          >
+            <DangerZone displayTitle={false}>
+              <FormField
+                name="isPublic"
+                render={({ field }) => (
+                  <FormItem>
+                    <ListItem
+                      Description={
+                        "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
+                      }
+                      Title="Public Organization"
+                      Button={
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      }
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="mt-6 flex items-center justify-end gap-x-6">
+                <Button variant="destructive" type="submit">
+                  Save
+                </Button>
+              </div>
+            </DangerZone>
+          </Section>
+        </form>
+      </Form>
     </Page>
   );
 };

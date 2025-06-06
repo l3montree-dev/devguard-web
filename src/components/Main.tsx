@@ -99,6 +99,8 @@ const EntityProviderLinkBanner = () => {
             `/-/p/` +
             activeAsset.externalEntityId
           }
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
@@ -121,6 +123,8 @@ const EntityProviderLinkBanner = () => {
             `/-/g/` +
             activeProject.externalEntityId
           }
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
@@ -133,12 +137,14 @@ const EntityProviderLinkBanner = () => {
     );
   }
 
-  if (organizationSlug.startsWith("@")) {
+  if (organizationSlug?.startsWith("@")) {
     return (
       <div>
         <Link
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
           href={providerIdToBaseURL(organizationSlug.replace("@", ""))}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <GitProviderIcon
             externalEntityProviderIdOrRepositoryId={slugToProvider(
@@ -185,7 +191,7 @@ const Main: FunctionComponent<Props> = ({
       <main className="flex-1 font-body">
         <header
           className={classNames(
-            "relative flex min-h-[109px] items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
+            "relative z-20 flex min-h-[109px] items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
             Boolean(Menu) ? "pb-3" : "pb-5",
           )}
         >

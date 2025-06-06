@@ -55,14 +55,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { withContentTree } from "@/decorators/withContentTree";
-import { OAUTH2_ERROR, withOrganization } from "@/decorators/withOrganization";
+import { withOrganization } from "@/decorators/withOrganization";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
 import { useParams } from "next/navigation";
-import { config } from "../../config";
 
 interface Props {
   oauth2Error?: boolean;
@@ -126,7 +125,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               className="space-y-8"
               onSubmit={form.handleSubmit(handleCreateProject)}
             >
-              <ProjectForm forceVerticalSections form={form} />
+              <ProjectForm forceVerticalSections form={form} hideDangerZone />
               <DialogFooter>
                 <Button
                   type="submit"

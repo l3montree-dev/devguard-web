@@ -30,6 +30,7 @@ import OpenSsfDetails from "./OpenSsfDetails";
 import DateString from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   open: boolean;
@@ -86,7 +87,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
             Details of package: {componentProject.description}
           </DialogDescription>
         </DialogHeader>
-        <div className="mr-5 flex f space-x-2">
+        <div className="mr-5 flex space-x-2">
           <Badge variant="outline" className="flex">
             <ScaleIcon className="mr-1 h-4 w-4 text-muted-foreground" />
             {componentProject.license}
@@ -103,8 +104,17 @@ const DependencyDialog: FunctionComponent<Props> = ({
             {componentProject.openIssuesCount} Open Issues
           </Badge>
         </div>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <InformationCircleIcon className="h-7 w-7" />
+          <span className="text-xs">
+            Please note that the data shown is for the whole project{" "}
+            {beautifyPurl(purl)} and not a specific version of the component.
+            Data can therefore be different from specific info in the
+            dependencies table.
+          </span>
+        </div>
         {graphData && (
-          <div className="mt-6">
+          <div className="mt-4">
             <span className="font-semibold mb-2 block">Path to component</span>
             <div className="h-40 w-full rounded-lg border bg-black">
               <DependencyGraph

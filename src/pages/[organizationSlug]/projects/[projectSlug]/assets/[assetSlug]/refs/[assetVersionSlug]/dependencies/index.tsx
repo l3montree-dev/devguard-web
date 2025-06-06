@@ -87,6 +87,7 @@ import {
 import { toast } from "sonner";
 import { Switch } from "../../../../../../../../../components/ui/switch";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -153,6 +154,7 @@ const licenses = [
   { value: "ms-rl", label: "MS-RL" },
   { value: "miros", label: "MirOS" },
   { value: "mit-0", label: "MIT-0" },
+  { value: "mit", label: "MIT" },
   { value: "motosoto", label: "Motosoto" },
   { value: "mpl-1.1", label: "MPL-1.1" },
   { value: "mpl-2.0", label: "MPL-2.0" },
@@ -463,7 +465,8 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
     project: Component["project"];
   }>();
 
-  const { table } = useTable({
+  const router = useRouter();
+  const { table, isLoading, handleSearch } = useTable({
     data: components.data,
     columnsDef,
   });
@@ -497,12 +500,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <div>
-        <Popover>
-          <PopoverTrigger>Open</PopoverTrigger>
-          <PopoverContent>Place content for the popover here.</PopoverContent>
-        </Popover>
-      </div>
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
@@ -628,6 +625,11 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           </div>
         }
       >
+        <Input
+          onChange={handleSearch}
+          defaultValue={router.query.search as string}
+          placeholder="Search for dependencies or versions - just start typing..."
+        />
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">

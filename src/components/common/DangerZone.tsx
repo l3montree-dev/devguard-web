@@ -13,10 +13,19 @@
 // limitations under the License.
 import React, { FunctionComponent, PropsWithChildren } from "react";
 
-const DangerZone: FunctionComponent<PropsWithChildren> = ({ children }) => {
+interface DangerZoneProps {
+  displayTitle?: boolean;
+}
+
+const DangerZone: FunctionComponent<PropsWithChildren<DangerZoneProps>> = ({
+  displayTitle = true,
+  children,
+}) => {
   return (
     <div>
-      <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
+      {displayTitle && (
+        <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
+      )}
       <div className="rounded-lg border border-red-500 p-4">{children}</div>
     </div>
   );

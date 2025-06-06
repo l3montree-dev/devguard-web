@@ -54,12 +54,12 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
             asset.externalEntityProviderId,
           ) === "gitlab" && (
             <div className="mb-10">
-              <div className="animated-outline rounded-lg">
+              <div className="">
                 <Autosetup {...autosetup} />
               </div>
             </div>
           )}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 z-10">
           <ListItem
             Title="Start by checking your dependencies for known vulnerabilities."
             Description={
