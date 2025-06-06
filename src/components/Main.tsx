@@ -75,8 +75,8 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
   );
 };
 
-const slugToProvider = (slug: string) => {
-  return slug.replace("@", "");
+const slugToProvider = (slug: string | undefined) => {
+  return slug?.replace("@", "");
 };
 
 const EntityProviderLinkBanner = () => {
