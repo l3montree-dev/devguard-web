@@ -284,12 +284,17 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
-function Quickfix(props: { vuln: string }) {
+function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   const [ecosystem, setEcosystem] = useState<string>("");
   useEffect(() => {
     switch (getEcosystem(props.vuln)) {
       case "npm": {
-        setEcosystem("npm");
+        setEcosystem(
+          `#update all vulnerable packages
+          npm audit fix
+          #update the specific package 
+          npm install ${props.package}@${props.version}`,
+        );
         break;
       }
       case "golang": {
@@ -994,7 +999,19 @@ const Index: FunctionComponent<Props> = (props) => {
                     <div className="flex flex-col gap-4">
                       <div>
                         <div className="rounded-lg border bg-card p-4">
-                          <Quickfix vuln={vuln.componentPurl}></Quickfix>
+                          <Quickfix
+                            vuln={vuln.componentPurl}
+                            version={
+                              Boolean(vuln.componentFixedVersion)
+                                ? (vuln.componentFixedVersion as string)
+                                : " "
+                            }
+                            package={
+                              Boolean(vuln.componentPurl)
+                                ? (beautifyPurl(vuln.componentPurl) as string)
+                                : " "
+                            }
+                          />
                         </div>
                       </div>
                     </div>
