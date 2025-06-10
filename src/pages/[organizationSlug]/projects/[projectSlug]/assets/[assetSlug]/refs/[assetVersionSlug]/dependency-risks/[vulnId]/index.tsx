@@ -286,39 +286,40 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 function Quickfix(props: { vuln: string }) {
   const [ecosystem, setEcosystem] = useState<string>("");
-
-  switch (getEcosystem(props.vuln)) {
-    case "npm": {
-      setEcosystem("npm");
-      break;
+  useEffect(() => {
+    switch (getEcosystem(props.vuln)) {
+      case "npm": {
+        setEcosystem("npm");
+        break;
+      }
+      case "golang": {
+        setEcosystem("npm");
+        break;
+      }
+      case "pypi": {
+        setEcosystem("pypi");
+        break;
+      }
+      case "crates": {
+        setEcosystem("crates");
+        break;
+      }
+      case "nuget": {
+        setEcosystem("nuget");
+        break;
+      }
+      case "apk": {
+        setEcosystem("apk");
+        break;
+      }
+      case "deb": {
+        setEcosystem("deb");
+        break;
+      }
     }
-    case "golang": {
-      setEcosystem("npm");
-      break;
-    }
-    case "pypi": {
-      setEcosystem("pypi");
-      break;
-    }
-    case "crates": {
-      setEcosystem("crates");
-      break;
-    }
-    case "nuget": {
-      setEcosystem("nuget");
-      break;
-    }
-    case "apk": {
-      setEcosystem("apk");
-      break;
-    }
-    case "deb": {
-      setEcosystem("npm");
-      break;
-    }
-  }
+  });
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 ">
       <div>
         <div className="rounded-lg border bg-card p-4">
           <div className=" text-sm">
