@@ -388,20 +388,22 @@ const Index: FunctionComponent<Props> = (props) => {
                           key={header.id}
                         >
                           <div className="flex flex-row items-center gap-2">
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                            {header.id === "fixAvailable" ? (
+                            {header.isPlaceholder ? null : header.id ===
+                              "fixAvailable" ? (
                               <Badge className="">
                                 {flexRender(
                                   header.column.columnDef.header,
                                   header.getContext(),
                                 )}
                               </Badge>
-                            ) : null}
+                            ) : (
+                              <div>
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </div>
+                            )}
 
                             {/* {console.log(header)} */}
                             {/* {header.column.columnDef.header} */}
