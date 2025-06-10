@@ -83,13 +83,18 @@ const EntityProviderLinkBanner = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
-  const { organizationSlug } = useParams<{ organizationSlug: string }>();
+
+  const { organizationSlug, projectSlug, assetSlug } = useParams<{
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  }>();
 
   if (!activeOrg && !activeProject && !activeAsset) {
     return null;
   }
 
-  if (activeAsset && activeAsset.externalEntityProviderId) {
+  if (assetSlug && activeAsset && activeAsset.externalEntityProviderId) {
     return (
       <div>
         <Link
@@ -113,7 +118,7 @@ const EntityProviderLinkBanner = () => {
     );
   }
 
-  if (activeProject && activeProject.externalEntityProviderId) {
+  if (projectSlug && activeProject && activeProject.externalEntityProviderId) {
     return (
       <div>
         <Link
