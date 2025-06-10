@@ -74,7 +74,7 @@ import {
 import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Copy } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
@@ -286,39 +286,46 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   const [ecosystem, setEcosystem] = useState<string>("");
+  const [globalupdate, setGlobalupdate] = useState<string>("");
   useEffect(() => {
     switch (getEcosystem(props.vuln)) {
       case "npm": {
-        setEcosystem(
-          `#update all vulnerable packages
-          npm audit fix
-          #update the specific package 
-          npm install ${props.package}@${props.version}`,
-        );
+        setGlobalupdate(`npm audit fix`);
+        setEcosystem(`npm install ${props.package}@${props.version}`);
         break;
       }
       case "golang": {
-        setEcosystem("npm");
+        setGlobalupdate(`go get -u ./...`);
+        setEcosystem(`go get ${props.package}@${props.version}`);
         break;
       }
       case "pypi": {
-        setEcosystem("pypi");
+        setGlobalupdate(`pip install pip-audit 
+          pip-audit`);
+        setEcosystem(`npm install ${props.package}@${props.version}`);
         break;
       }
       case "crates": {
-        setEcosystem("crates");
+        setGlobalupdate(`cargo update`);
+        setEcosystem(`# in Cargo.toml: ${props.package}="${props.version}"`);
         break;
       }
       case "nuget": {
-        setEcosystem("nuget");
+        setGlobalupdate(`dotnet list package --vulnerable
+           dotnet outdated`);
+        setEcosystem(
+          `dotnet add package ${props.package} --version${props.version}`,
+        );
         break;
       }
       case "apk": {
-        setEcosystem("apk");
+        setGlobalupdate(`apk update && apk upgrade`);
+        setEcosystem(`apk add ${props.package}=${props.version}`);
         break;
       }
       case "deb": {
-        setEcosystem("deb");
+        setGlobalupdate(`apt update && apt upgrade`);
+        setEcosystem(`npm install ${props.package}=${props.version}`);
         break;
       }
     }
@@ -326,11 +333,9 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   return (
     <div className="flex flex-col gap-4 ">
       <div>
-        <div className="rounded-lg border bg-card p-4">
-          <h1 className="text-2xl font-semibold mb-4">QUICK FIX</h1>
-          <div className=" text-sm">
-            <CopyCode codeString={`${ecosystem}`}></CopyCode>
-          </div>
+        <div className="text-sm">
+          <CopyCode codeString={globalupdate}></CopyCode>
+          <CopyCode codeString={ecosystem}></CopyCode>
         </div>
       </div>
     </div>
@@ -502,21 +507,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
               <div className="mt-4 mb-16">
-                <div className="mt-4">
-                  <Quickfix
-                    vuln={vuln.componentPurl}
-                    version={
-                      Boolean(vuln.componentFixedVersion)
-                        ? (vuln.componentFixedVersion as string)
-                        : " "
-                    }
-                    package={
-                      Boolean(vuln.componentPurl)
-                        ? (beautifyPurl(vuln.componentPurl) as string)
-                        : " "
-                    }
-                  />
-                </div>
+                <div className="mt-4"></div>
               </div>
 
               <RiskAssessmentFeed
@@ -1011,6 +1002,23 @@ const Index: FunctionComponent<Props> = (props) => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div className="rounded-lg border bg-card p-4">
+                      <Quickfix
+                        commentMore
+                        actions
+                        vuln={vuln.componentPurl}
+                        version={
+                          Boolean(vuln.componentFixedVersion)
+                            ? (vuln.componentFixedVersion as string)
+                            : " "
+                        }
+                        package={
+                          Boolean(vuln.componentPurl)
+                            ? (beautifyPurl(vuln.componentPurl) as string)
+                            : " "
+                        }
+                      />
                     </div>
                   </div>
                 </div>
