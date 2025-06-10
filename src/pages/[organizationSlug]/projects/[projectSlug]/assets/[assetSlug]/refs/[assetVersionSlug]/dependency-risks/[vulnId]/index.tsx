@@ -327,6 +327,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     <div className="flex flex-col gap-4 ">
       <div>
         <div className="rounded-lg border bg-card p-4">
+          <h1 className="text-2xl font-semibold mb-4">QUICK FIX</h1>
           <div className=" text-sm">
             <CopyCode codeString={`${ecosystem}`}></CopyCode>
           </div>
@@ -490,6 +491,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     </Badge>
                   </Link>
                 )}
+
                 <VulnState state={vuln.state} />
                 {cve && <Severity risk={vuln.rawRiskAssessment} />}
                 {vuln.scannerIds.split(" ").map((s) => (
@@ -499,6 +501,24 @@ const Index: FunctionComponent<Props> = (props) => {
               <div className="mb-16 mt-4">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
+              <div className="mt-4 mb-16">
+                <div className="mt-4">
+                  <Quickfix
+                    vuln={vuln.componentPurl}
+                    version={
+                      Boolean(vuln.componentFixedVersion)
+                        ? (vuln.componentFixedVersion as string)
+                        : " "
+                    }
+                    package={
+                      Boolean(vuln.componentPurl)
+                        ? (beautifyPurl(vuln.componentPurl) as string)
+                        : " "
+                    }
+                  />
+                </div>
+              </div>
+
               <RiskAssessmentFeed
                 vulnerabilityName={vuln.cveId ?? ""}
                 events={vuln.events}
@@ -989,29 +1009,6 @@ const Index: FunctionComponent<Props> = (props) => {
                               Show in dependency graph
                             </Link>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <h3 className="mb-2 text-sm font-semibold mt-2">Quick fix</h3>
-                  <div>
-                    {" "}
-                    <div className="flex flex-col gap-4">
-                      <div>
-                        <div className="rounded-lg border bg-card p-4">
-                          <Quickfix
-                            vuln={vuln.componentPurl}
-                            version={
-                              Boolean(vuln.componentFixedVersion)
-                                ? (vuln.componentFixedVersion as string)
-                                : " "
-                            }
-                            package={
-                              Boolean(vuln.componentPurl)
-                                ? (beautifyPurl(vuln.componentPurl) as string)
-                                : " "
-                            }
-                          />
                         </div>
                       </div>
                     </div>
