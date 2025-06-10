@@ -24,6 +24,7 @@ import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import ScannerBadge from "../ScannerBadge";
 import { Badge } from "../ui/badge";
+import { Cell } from "@mdxeditor/editor";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -112,6 +113,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         </td>
         {row.getVisibleCells().map((cell, i) => (
           <td className="p-4" key={cell.id}>
+            {/* {console.log(cell, cell.getContext())} */}
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </td>
         ))}

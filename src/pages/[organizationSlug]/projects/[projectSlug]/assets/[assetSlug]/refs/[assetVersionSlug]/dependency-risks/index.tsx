@@ -166,14 +166,22 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
         return <span className="text-muted-foreground">No fix available</span>;
       }
       return (
-        <span>
-          <span className="text-muted-foreground">Update to version</span>{" "}
-          <span>
-            <Badge variant={"secondary"}>{versionAndReduction.version}</Badge>
-          </span>{" "}
-          <span className="text-muted-foreground">to reduce total risk by</span>{" "}
-          <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
-        </span>
+        <div className="animated-outline rounded-lg">
+          <div className="rounded-lg border bg-card p-4 border  ">
+            <span>
+              <span className="text-muted-foreground">Update to version</span>{" "}
+              <span>
+                <Badge variant={"secondary"}>
+                  {versionAndReduction.version}
+                </Badge>
+              </span>{" "}
+              <span className="text-muted-foreground">
+                to reduce total risk by
+              </span>{" "}
+              <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
+            </span>
+          </div>
+        </div>
       );
     },
   },
@@ -405,8 +413,6 @@ const Index: FunctionComponent<Props> = (props) => {
                               </div>
                             )}
 
-                            {/* {console.log(header)} */}
-                            {/* {header.column.columnDef.header} */}
                             <SortingCaret
                               sortDirection={header.column.getIsSorted()}
                             />
