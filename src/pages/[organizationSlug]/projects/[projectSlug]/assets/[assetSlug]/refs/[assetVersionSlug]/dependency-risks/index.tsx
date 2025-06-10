@@ -49,6 +49,8 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import { Tooltip } from "recharts";
+import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
   apiUrl: string;
@@ -166,20 +168,22 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
         return <span className="text-muted-foreground">No fix available</span>;
       }
       return (
-        <div className="animated-outline rounded-lg">
-          <div className="rounded-lg border bg-card p-4 border  ">
-            <span>
-              <span className="text-muted-foreground">Update to version</span>{" "}
+        <div onClick={(e) => e.preventDefault()}>
+          <div className="animated-outline rounded-lg">
+            <div className="rounded-lg border bg-card p-4 border  ">
               <span>
-                <Badge variant={"secondary"}>
-                  {versionAndReduction.version}
-                </Badge>
-              </span>{" "}
-              <span className="text-muted-foreground">
-                to reduce total risk by
-              </span>{" "}
-              <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
-            </span>
+                <span className="text-muted-foreground">Update to version</span>{" "}
+                <span>
+                  <Badge variant={"secondary"}>
+                    {versionAndReduction.version}
+                  </Badge>
+                </span>{" "}
+                <span className="text-muted-foreground">
+                  to reduce total risk by
+                </span>{" "}
+                <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
+              </span>
+            </div>
           </div>
         </div>
       );

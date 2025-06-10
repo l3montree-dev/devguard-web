@@ -65,7 +65,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { beautifyPurl, extractVersion } from "@/utils/common";
+import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
@@ -79,6 +79,7 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
+import CopyCode from "@/components/common/CopyCode";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -283,6 +284,52 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
+function Quickfix(props: { vuln: string }) {
+  const [ecosystem, setEcosystem] = useState<string>("");
+
+  switch (getEcosystem(props.vuln)) {
+    case "npm": {
+      setEcosystem("npm");
+      break;
+    }
+    case "golang": {
+      setEcosystem("npm");
+      break;
+    }
+    case "pypi": {
+      setEcosystem("pypi");
+      break;
+    }
+    case "crates": {
+      setEcosystem("crates");
+      break;
+    }
+    case "nuget": {
+      setEcosystem("nuget");
+      break;
+    }
+    case "apk": {
+      setEcosystem("apk");
+      break;
+    }
+    case "deb": {
+      setEcosystem("npm");
+      break;
+    }
+  }
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className=" text-sm">
+            <CopyCode codeString={`${ecosystem}`}></CopyCode>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
@@ -416,11 +463,11 @@ const Index: FunctionComponent<Props> = (props) => {
                     <Badge className="h-full" variant={"secondary"}>
                       {vuln.ticketId?.startsWith("github:") ? (
                         <Image
+                          height={15}
                           src="/assets/github.svg"
                           alt="GitHub Logo"
                           className="-ml-1 mr-2 dark:invert"
                           width={15}
-                          height={15}
                         />
                       ) : (
                         <div className="mr-2">
@@ -936,6 +983,17 @@ const Index: FunctionComponent<Props> = (props) => {
                               Show in dependency graph
                             </Link>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <h3 className="mb-2 text-sm font-semibold mt-2">Quick fix</h3>
+                  <div>
+                    {" "}
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <div className="rounded-lg border bg-card p-4">
+                          <Quickfix vuln={vuln.componentPurl}></Quickfix>
                         </div>
                       </div>
                     </div>
