@@ -139,7 +139,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign In with OpenCode
+          Sign In with openCode
         </Button>
       </div>
     );
@@ -162,7 +162,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign out of OpenCode
+          Sign out of openCode
         </Button>
       </div>
     );
@@ -185,7 +185,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign out of OpenCode
+          Sign out of openCode
         </Button>
       </div>
     );
