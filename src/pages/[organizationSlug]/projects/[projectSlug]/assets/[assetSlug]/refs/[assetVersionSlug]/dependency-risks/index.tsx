@@ -394,6 +394,17 @@ const Index: FunctionComponent<Props> = (props) => {
                                   header.column.columnDef.header,
                                   header.getContext(),
                                 )}
+                            {header.id === "fixAvailable" ? (
+                              <Badge className="">
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </Badge>
+                            ) : null}
+
+                            {/* {console.log(header)} */}
+                            {/* {header.column.columnDef.header} */}
                             <SortingCaret
                               sortDirection={header.column.getIsSorted()}
                             />

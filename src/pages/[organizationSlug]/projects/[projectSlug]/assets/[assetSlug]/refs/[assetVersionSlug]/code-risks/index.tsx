@@ -122,7 +122,7 @@ const Index: FunctionComponent<Props> = (props) => {
           <Section
             forceVertical
             primaryHeadline
-            title="Identified Risks"
+            title="Identasdfified Risks"
             description="This table shows all the identified risks for this repository."
           >
             <div className="relative flex flex-row gap-2">
