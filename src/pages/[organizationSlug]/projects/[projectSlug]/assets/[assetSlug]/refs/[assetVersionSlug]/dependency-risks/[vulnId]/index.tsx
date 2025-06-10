@@ -325,13 +325,13 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
       }
       case "deb": {
         setGlobalupdate(`apt update && apt upgrade`);
-        setEcosystem(`npm install ${props.package}=${props.version}`);
+        setEcosystem(`apt-get install -y ${props.package}=${props.version}`);
         break;
       }
     }
   });
   return (
-    <div className="flex flex-col gap-4 ">
+    <div className="flex flex-col gap-4  ">
       <div>
         <div className="text-sm">
           <CopyCode codeString={globalupdate}></CopyCode>
@@ -1003,22 +1003,22 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </div>
                     </div>
-                    <div className="rounded-lg border bg-card p-4">
-                      <Quickfix
-                        commentMore
-                        actions
-                        vuln={vuln.componentPurl}
-                        version={
-                          Boolean(vuln.componentFixedVersion)
-                            ? (vuln.componentFixedVersion as string)
-                            : " "
-                        }
-                        package={
-                          Boolean(vuln.componentPurl)
-                            ? (beautifyPurl(vuln.componentPurl) as string)
-                            : " "
-                        }
-                      />
+                    <div className="animated-outline rounded-lg">
+                      <div className="rounded-lg border bg-card p-4 border">
+                        <Quickfix
+                          vuln={vuln.componentPurl}
+                          version={
+                            Boolean(vuln.componentFixedVersion)
+                              ? (vuln.componentFixedVersion as string)
+                              : " "
+                          }
+                          package={
+                            Boolean(vuln.componentPurl)
+                              ? (beautifyPurl(vuln.componentPurl) as string)
+                              : " "
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
