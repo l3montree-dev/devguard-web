@@ -12,7 +12,7 @@ const ThreeJSFeatureScreen = () => {
       <div className="absolute pointer-events-none dark:bg-secondary/50 bg-card/5 p-5 rounded-lg backdrop-blur-lg w-1/2 m-10 top-0 right-0 z-10">
         <div className="mt-2 flex flex-col gap-4">
           <div className="">
-            <span className="text-xl text-center font-bold text-white">
+            <span className="text-xl text-center font-bold dark:text-white">
               See your Software-Supply-Chain in different perspectives
             </span>
           </div>
@@ -28,7 +28,7 @@ const ThreeJSFeatureScreen = () => {
               />
             </div>
             <div className="flex-1">
-              <span className="font-medium text-white">
+              <span className="font-medium dark:text-white">
                 Get AppSec done with ease
               </span>
               <p className="text-sm text-muted-foreground">
@@ -43,7 +43,7 @@ const ThreeJSFeatureScreen = () => {
               <FileCheckIcon className="h-6 dark:text-white w-6" />
             </div>
             <div className="flex-1">
-              <span className="font-medium text-white">
+              <span className="font-medium dark:text-white">
                 Automated Tracking, Documentation & Reporting
               </span>
               <p className="text-sm text-muted-foreground">
@@ -62,7 +62,7 @@ const ThreeJSFeatureScreen = () => {
               <BlocksIcon className="h-6 dark:text-white w-6" />
             </div>
             <div className="flex-1">
-              <span className="font-medium text-white">
+              <span className="font-medium dark:text-white">
                 Use with your favorite tools
               </span>
               <p className="text-sm text-muted-foreground">
@@ -77,7 +77,7 @@ const ThreeJSFeatureScreen = () => {
               <LandmarkIcon className="h-6 dark:text-white w-6" />
             </div>
             <div className="flex-1">
-              <span className="font-medium text-white">
+              <span className="font-medium dark:text-white">
                 Open Source & Made in Europe
               </span>
               <p className="text-sm text-muted-foreground">
