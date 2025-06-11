@@ -13,13 +13,14 @@ interface headerProps {
   project: string;
   repo: string;
   logoLink: string;
+  pdfTitle?: string;
 }
 
 interface footerProps {
   datum: string;
 }
 
-interface PdfDocumentProps {
+export interface PdfDocumentProps {
   header: headerProps;
   body: any;
   footer: footerProps;
@@ -153,28 +154,44 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
   },
+
+  pdfTitleHeader: {},
+
   border: {},
 });
 
 const Logo = ({ logoLink }: { logoLink: string }) => (
   <View style={styles.logo}>
     {/* eslint-disable-next-line jsx-a11y/alt-text */}
-    <Image src={logoLink} style={{ width: 75 }} />
+    <Image src={logoLink} style={{ width: 75, height: 75 / 2.81 }} />
   </View>
 );
 const PdfHeader = (props: headerProps) => (
-  <View fixed style={styles.header}>
-    <View style={styles.headerBox}>
-      <View style={styles.headerText}>
-        <Text>{props.title}</Text>
-        <Text>{props.project}</Text>
-        <Text style={styles.headerRepoText}>{props.repo}</Text>
-      </View>
-      <View style={styles.logo}>
-        <Logo logoLink={props.logoLink} />
-      </View>
-    </View>
-  </View>
+  <View
+    style={styles.header}
+    fixed
+    render={({ pageNumber }) => {
+      if (pageNumber === 1) {
+        return (
+          <View style={styles.headerBox}>
+            <Text style={styles.h1}>{props.pdfTitle}</Text>
+          </View>
+        );
+      }
+      return (
+        <View style={styles.headerBox}>
+          <View style={styles.headerText}>
+            <Text>{props.title}</Text>
+            <Text>{props.project}</Text>
+            <Text style={styles.headerRepoText}>{props.repo}</Text>
+          </View>
+          <View style={styles.logo}>
+            <Logo logoLink={props.logoLink} />
+          </View>
+        </View>
+      );
+    }}
+  ></View>
 );
 
 const PdfFooter = (props: footerProps) => (

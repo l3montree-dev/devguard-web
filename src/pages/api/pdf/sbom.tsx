@@ -4,8 +4,21 @@ import PdfDocument from "../../../components/pdf/PdfDocument";
 import { LogoutLink } from "@/hooks/logoutLink";
 import { any } from "zod";
 import {Text} from "@react-pdf/renderer";
+import SbomPdf from "@/components/pdf/SbomPdf";
 
 
+
+
+
+const componet = {
+  purl: "pkg:npm/react@18.2.0",
+  name: "React",
+  version: "18.2.0",
+  type: "npm",
+  licenses: ["MIT"],
+}
+
+const components = [componet];
 
 const props = {
   header: {
@@ -13,8 +26,9 @@ const props = {
     project: "L3montree GmbH",
     repo: "devGuard Web",
     logoLink: "public/logo_horizontal.jpg",
+    pdfTitle: "SBOM Components",
   },
-  body: <Text>Dies ist ein Beispieltext für den Body des PDFs.</Text>,
+  body: <Text> das ist ein test </Text>,
   footer: {
     datum: "Juni 2026",
   },
@@ -23,7 +37,7 @@ const props = {
 export default async function handler (req: NextApiRequest, res: NextApiResponse) {
   console.log("Received request to generate PDF");
   try {
-    const buffer =   await renderToBuffer(<PdfDocument {...props} />);
+    const buffer =   await renderToBuffer(<SbomPdf {...props} />);
     // set the correct headers for PDF
     res.setHeader("Content-Type", "application/pdf");
 
