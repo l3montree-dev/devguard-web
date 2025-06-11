@@ -59,7 +59,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
   const [api, setApi] = React.useState<CarouselApi>();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "sca" | "container-scanning" | "sbom"
+    "sca" | "container-scanning" | "sbom" | "devsecops" | undefined
   >();
   const asset = useActiveAsset();
 
@@ -68,7 +68,6 @@ const DependencyRiskScannerDialog: FunctionComponent<
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
 
   const pat = usePersonalAccessToken();
 
@@ -169,8 +168,30 @@ const DependencyRiskScannerDialog: FunctionComponent<
               </DialogHeader>
               <div className="mt-10">
                 <Card
+                  onClick={() => setSelectedScanner("devsecops")}
                   className={classNames(
-                    "cursor-pointer",
+                    "col-span-2 cursor-pointer",
+                    selectedScanner === "devsecops"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg leading-tight">
+                        Integrate whole DevSecOps-Pipeline
+                      </CardTitle>
+                      <CardDescription>
+                        Integrate a whole DevSecOps-Pipeline including
+                        dependency risk identification. This is only possible
+                        through CI/CD Components and GitHub-Actions.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+                <Card
+                  className={classNames(
+                    "cursor-pointer mt-2",
                     selectedScanner === "sca"
                       ? "border border-primary"
                       : "border border-transparent",
@@ -330,32 +351,34 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     </CardDescription>
                   </CardHeader>
                 </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedIntegration === "docker"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectIntegration("docker")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      <Image
-                        src="/assets/docker.svg"
-                        alt="Docker"
-                        width={20}
-                        height={20}
-                        className="inline-block mr-2"
-                      />
-                      Docker Integration
-                    </CardTitle>
-                    <CardDescription>
-                      Use our docker image to run the scanner in any environment
-                      which is capable of running docker.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                {selectedScanner !== "devsecops" && (
+                  <Card
+                    className={classNames(
+                      "cursor-pointer mt-2",
+                      selectedIntegration === "docker"
+                        ? "border border-primary"
+                        : "border border-transparent",
+                    )}
+                    onClick={() => selectIntegration("docker")}
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg flex flex-row items-center leading-tight">
+                        <Image
+                          src="/assets/docker.svg"
+                          alt="Docker"
+                          width={20}
+                          height={20}
+                          className="inline-block mr-2"
+                        />
+                        Docker Integration
+                      </CardTitle>
+                      <CardDescription>
+                        Use our docker image to run the scanner in any
+                        environment which is capable of running docker.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                )}
                 {selectedScanner === "sbom" && (
                   <Card
                     className={classNames(

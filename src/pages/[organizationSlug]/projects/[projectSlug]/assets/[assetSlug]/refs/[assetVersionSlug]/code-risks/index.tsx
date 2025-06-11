@@ -15,7 +15,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 
@@ -27,10 +26,9 @@ import { classNames } from "@/utils/common";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
-import EmptyList from "@/components/common/EmptyList";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
@@ -106,11 +104,10 @@ const Index: FunctionComponent<Props> = (props) => {
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row gap-2">
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Code-Risks
-          </Button>
-        </div>
+        <BranchTagSelector branches={branches} tags={tags} />
+        <Button onClick={() => setIsOpen(true)} variant="default">
+          Identify Code-Risks
+        </Button>
       </div>
       {!props.vulns.data.length ? (
         <EmptyParty

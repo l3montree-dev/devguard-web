@@ -59,6 +59,10 @@ const generateDockerSnippet = (
     path = "/app/<SBOM.json>";
   }
 
+  if (command === "sarif") {
+    path = "/app/results.sarif";
+  }
+
   if (apiUrl === "http://localhost:8080") {
     apiUrl = "http://host.docker.internal:8080";
   }

@@ -57,14 +57,13 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   const [api, setApi] = React.useState<CarouselApi>();
   const asset = useActiveAsset();
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "secret-scanning" | "iac" | "sast" | "custom" | "devsecops"
+    "secret-scanning" | "iac" | "sast" | "sarif" | "devsecops"
   >();
   const [selectedIntegration, setSelectedIntegration] = React.useState<
     "github" | "gitlab" | "docker" | "upload" | undefined
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
 
   const pat = usePersonalAccessToken();
 
@@ -114,6 +113,10 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
     onDrop,
   });
 
+  useEffect(() => {
+    api?.reInit();
+  }, [selectedScanner, selectedIntegration, pat.pat, api]);
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -129,7 +132,144 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
           <CarouselContent>
             <CarouselItem>
               <DialogHeader>
-                <DialogTitle>Where would you like to scan?</DialogTitle>
+                <DialogTitle>
+                  What code risks would you like to identify?
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="flex flex-col gap-2 mt-10">
+                <Card
+                  onClick={() => setSelectedScanner("devsecops")}
+                  className={classNames(
+                    "col-span-2 cursor-pointer",
+                    selectedScanner === "devsecops"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg leading-tight">
+                        Integrate whole DevSecOps-Pipeline
+                      </CardTitle>
+                      <CardDescription>
+                        Integrate a whole DevSecOps-Pipeline including
+                        dependency risk identification. This is only possible
+                        through CI/CD Components and GitHub-Actions.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+                <Card
+                  onClick={() => setSelectedScanner("secret-scanning")}
+                  className={classNames(
+                    "cursor-pointer ",
+                    selectedScanner === "secret-scanning"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Secret-Scanning</CardTitle>
+                      <CardDescription>
+                        Secret-Scanning is a process of scanning your code for
+                        hardcoded secrets, such as API keys, passwords, and
+                        tokens. It helps to prevent unauthorized access to your
+                        systems and data.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+                <Card
+                  onClick={() => setSelectedScanner("sast")}
+                  className={classNames(
+                    "cursor-pointer",
+                    selectedScanner === "sast"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg leading-tight">
+                        Static-Application-Security-Testing
+                      </CardTitle>
+                      <CardDescription>
+                        Static Application Security Testing (SAST) is a method
+                        of debugging by examining source code before a program
+                        is run. SAST tools scan source code for coding errors,
+                        vulnerabilities, and other security issues.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+                <Card
+                  onClick={() => setSelectedScanner("iac")}
+                  className={classNames(
+                    "cursor-pointer",
+                    selectedScanner === "iac"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg leading-tight">
+                        Infrastructure as Code Scanning
+                      </CardTitle>
+                      <CardDescription>
+                        Infrastructure as Code (IaC) scanning is a process of
+                        scanning your infrastructure code for security
+                        vulnerabilities and compliance issues. It helps to
+                        ensure that your infrastructure is secure and compliant
+                        with industry standards.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className={classNames(
+                    "cursor-pointer",
+                    selectedScanner === "sarif"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                  onClick={() => setSelectedScanner("sarif")}
+                >
+                  <CardContent className="p-0">
+                    <CardHeader>
+                      <CardTitle className="text-lg leading-tight">
+                        I bring my own scanner
+                      </CardTitle>
+                      <CardDescription>
+                        You can integrate any scanner, which is able to produce
+                        a SARIF-Report.
+                      </CardDescription>
+                    </CardHeader>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="mt-10 flex flex-row gap-2 justify-end">
+                <Button
+                  disabled={selectedScanner === undefined}
+                  onClick={() => api?.scrollNext()}
+                >
+                  {selectedScanner === undefined
+                    ? "Select a scanner"
+                    : "Continue"}
+                </Button>
+              </div>
+            </CarouselItem>
+            <CarouselItem>
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedScanner === "sarif"
+                    ? "How would you like to upload your SARIF-Report?"
+                    : "Where would you like to scan?"}
+                </DialogTitle>
               </DialogHeader>
               <div className="mt-10">
                 <Card
@@ -186,60 +326,74 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                     </CardDescription>
                   </CardHeader>
                 </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedIntegration === "docker"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => setSelectedIntegration("docker")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      <Image
-                        src="/assets/docker.svg"
-                        alt="GitLab"
-                        width={20}
-                        height={20}
-                        className="inline-block mr-2"
-                      />
-                      Docker
-                    </CardTitle>
-                    <CardDescription>
-                      In any environment which is capable of running docker.
-                      Custom-Scanners and individual scanners are supported.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedIntegration === "upload"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => setSelectedIntegration("upload")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      <Image
-                        src="/assets/sarif-logo.svg"
-                        alt="GitLab"
-                        width={20}
-                        height={20}
-                        className="inline-block mr-2"
-                      />
-                      Upload SARIF
-                    </CardTitle>
-                    <CardDescription>
-                      You can integrate any scanner, which is able to produce a
-                      SARIF-Report.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                {selectedScanner !== "devsecops" && (
+                  <Card
+                    className={classNames(
+                      "cursor-pointer mt-2",
+                      selectedIntegration === "docker"
+                        ? "border border-primary"
+                        : "border border-transparent",
+                    )}
+                    onClick={() => setSelectedIntegration("docker")}
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg flex flex-row items-center leading-tight">
+                        <Image
+                          src="/assets/docker.svg"
+                          alt="GitLab"
+                          width={20}
+                          height={20}
+                          className="inline-block mr-2"
+                        />
+                        Docker
+                      </CardTitle>
+                      <CardDescription>
+                        In any environment which is capable of running docker.
+                        Custom-Scanners and individual scanners are supported.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                )}
+                {selectedScanner === "sarif" && (
+                  <Card
+                    className={classNames(
+                      "cursor-pointer mt-2",
+                      selectedIntegration === "upload"
+                        ? "border border-primary"
+                        : "border border-transparent",
+                    )}
+                    onClick={() => setSelectedIntegration("upload")}
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg flex flex-row items-center leading-tight">
+                        <Image
+                          src="/assets/cyclonedx-logo.svg"
+                          alt="Upload"
+                          width={20}
+                          height={20}
+                          className="inline-block mr-2"
+                        />
+                        Upload SARIF-File
+                      </CardTitle>
+                      <CardDescription>
+                        Upload a SBOM-File which is in CycloneDX 1.6 or higher
+                        format. This can be done manually or through the
+                        DevGuard-Scanner.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                )}
               </div>
               <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
+                <Button
+                  variant={"secondary"}
+                  onClick={() => {
+                    api?.scrollPrev();
+                    setSelectedIntegration(undefined);
+                  }}
+                >
+                  Back to scanner selection
+                </Button>
                 <Button
                   disabled={selectedIntegration === undefined}
                   onClick={() => {
@@ -252,22 +406,36 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                 </Button>
               </div>
             </CarouselItem>
-            {selectedIntegration === "upload" ? (
+            {selectedScanner === "sarif" && selectedIntegration === "upload" ? (
               <CarouselItem>
                 <DialogHeader>
-                  <DialogTitle>Upload SARIF-Report</DialogTitle>
+                  <DialogTitle>Bring your own Scanner</DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
-                  Just drag and drop the SARIF-Report into the upload area or
-                  click to select the file. The report will be uploaded and the
-                  identified risks inspected.
+                  You can either manually upload a SBOM-File or use our
+                  DevGuard-Scanner to do it in a automated way.
                 </DialogDescription>
-                <div className="mt-10">
-                  <FileUpload
-                    files={fileName ? [fileName] : []}
-                    dropzone={dropzone}
-                  />
-                </div>
+
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      Upload a SBOM-File
+                    </CardTitle>
+                    <CardDescription>
+                      Upload a SBOM-File which is in CycloneDX 1.6 or higher
+                      format. This can be done manually or through the
+                      DevGuard-Scanner.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div>
+                      <FileUpload
+                        files={fileName ? [fileName] : []}
+                        dropzone={dropzone}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
                 <div className="flex mt-10 flex-row gap-2 justify-end">
                   <Button
                     variant={"secondary"}
@@ -275,160 +443,13 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
                   >
                     Back
                   </Button>
-                  <AsyncButton onClick={uploadSARIF}>Upload</AsyncButton>
+                  <AsyncButton disabled={!fileName} onClick={uploadSARIF}>
+                    Upload
+                  </AsyncButton>
                 </div>
               </CarouselItem>
             ) : (
               <>
-                <CarouselItem>
-                  <DialogHeader>
-                    <DialogTitle>
-                      What scanner would you like to integrate?
-                    </DialogTitle>
-                  </DialogHeader>
-
-                  <div className="grid grid-cols-2 gap-2 mt-10">
-                    {selectedIntegration !== "docker" && (
-                      <Card
-                        onClick={() => setSelectedScanner("devsecops")}
-                        className={classNames(
-                          "col-span-2 cursor-pointer",
-                          selectedScanner === "devsecops"
-                            ? "border border-primary"
-                            : "border border-transparent",
-                        )}
-                      >
-                        <CardContent className="p-0">
-                          <CardHeader>
-                            <CardTitle className="text-lg leading-tight">
-                              Whole DevSecOps-Pipeline
-                            </CardTitle>
-                            <CardDescription>
-                              Integrate a whole DevSecOps-Pipeline including
-                              dependency risk identification. This is only
-                              possible through CI/CD Components and
-                              GitHub-Actions.
-                            </CardDescription>
-                          </CardHeader>
-                        </CardContent>
-                      </Card>
-                    )}
-                    <Card
-                      onClick={() => setSelectedScanner("secret-scanning")}
-                      className={classNames(
-                        "cursor-pointer ",
-                        selectedScanner === "secret-scanning"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg">
-                            Secret-Scanning
-                          </CardTitle>
-                          <CardDescription>
-                            Secret-Scanning is a process of scanning your code
-                            for hardcoded secrets, such as API keys, passwords,
-                            and tokens. It helps to prevent unauthorized access
-                            to your systems and data.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-                    <Card
-                      onClick={() => setSelectedScanner("sast")}
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "sast"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg leading-tight">
-                            Static-Application-Security-Testing
-                          </CardTitle>
-                          <CardDescription>
-                            Static Application Security Testing (SAST) is a
-                            method of debugging by examining source code before
-                            a program is run. SAST tools scan source code for
-                            coding errors, vulnerabilities, and other security
-                            issues.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-                    <Card
-                      onClick={() => setSelectedScanner("iac")}
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "iac"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg leading-tight">
-                            Infrastructure as Code Scanning
-                          </CardTitle>
-                          <CardDescription>
-                            Infrastructure as Code (IaC) scanning is a process
-                            of scanning your infrastructure code for security
-                            vulnerabilities and compliance issues. It helps to
-                            ensure that your infrastructure is secure and
-                            compliant with industry standards.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-
-                    <Card
-                      className={classNames(
-                        "cursor-pointer",
-                        selectedScanner === "custom"
-                          ? "border border-primary"
-                          : "border border-transparent",
-                      )}
-                      onClick={() => setSelectedScanner("custom")}
-                    >
-                      <CardContent className="p-0">
-                        <CardHeader>
-                          <CardTitle className="text-lg leading-tight">
-                            I bring my own scanner
-                          </CardTitle>
-                          <CardDescription>
-                            You can integrate any scanner, which is able to
-                            produce a SARIF-Report.
-                          </CardDescription>
-                        </CardHeader>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <div className="mt-10 flex flex-row gap-2 justify-end">
-                    <Button
-                      variant={"secondary"}
-                      onClick={() => {
-                        api?.scrollPrev();
-                        setSelectedScanner(undefined);
-                      }}
-                    >
-                      Back to integration selection
-                    </Button>
-                    <Button
-                      disabled={selectedScanner === undefined}
-                      onClick={() => api?.scrollNext()}
-                    >
-                      {selectedScanner === undefined
-                        ? "Select a scanner"
-                        : "Continue"}
-                    </Button>
-                  </div>
-                </CarouselItem>
-
                 {selectedIntegration === "github" && (
                   <GithubTokenSlides
                     apiUrl={apiUrl}
