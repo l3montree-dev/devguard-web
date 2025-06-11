@@ -55,6 +55,10 @@ const generateDockerSnippet = (
     path = "/app/image.tar";
   }
 
+  if (command === "sbom") {
+    path = "/app/<SBOM.json>";
+  }
+
   if (apiUrl === "http://localhost:8080") {
     apiUrl = "http://host.docker.internal:8080";
   }
@@ -128,7 +132,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
-    custom: `jobs:
+    sarif: `jobs:
     code-risk-identification: # what you want to name the job
         steps:
             # ...
@@ -142,6 +146,20 @@ export const integrationSnippets = ({
                   api-url: ${apiUrl}
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create`,
+    sbom: `jobs:
+    code-risk-identification: # what you want to name the job
+        steps:
+            # ...
+            # generate the SBOM file
+            # ...
+            - uses: l3montree-dev/devguard-action/.github/workflows/upload-sbom.yml@main
+              with:
+                  # Path to SBOM file relative to the root of the repository
+                  sbom-file: ./results.sbom
+                  asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+                  api-url: ${apiUrl}
+              secrets:
+                  devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
   },
 
   Gitlab: {
@@ -193,7 +211,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
-    custom: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+    sarif: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
     - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sarif.yml"
       inputs:
@@ -201,6 +219,14 @@ include:
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository`,
+    sbom: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+include:
+    - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sbom.yml"
+      inputs:
+          asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+          token: "$DEVGUARD_TOKEN"
+          api_url: ${apiUrl}
+          sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
   },
   Docker: {
     iac: generateDockerSnippet(
@@ -227,8 +253,16 @@ include:
       apiUrl,
       token,
     ),
-    custom: generateDockerSnippet(
+    sarif: generateDockerSnippet(
       "sarif",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      token,
+    ),
+    sbom: generateDockerSnippet(
+      "sbom",
       orgSlug,
       projectSlug,
       assetSlug,

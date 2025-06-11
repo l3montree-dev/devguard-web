@@ -1,10 +1,8 @@
+import Link from "next/link";
 import { PatWithPrivKey } from "../../types/api/api";
 import CopyCode from "../common/CopyCode";
-import ListItem from "../common/ListItem";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
-import Link from "next/link";
 
 const PatSection = ({
   description,
@@ -42,7 +40,7 @@ const PatSection = ({
           </div>
         </div>
       ) : (
-        <div className="pb-10 pt-6">
+        <div>
           <div className="flex justify-between">
             <Button
               variant="default"

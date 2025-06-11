@@ -1,5 +1,4 @@
-@use "tailwindcss";
-@config "../../tailwind.config.js";
+
 
 @layer base {
   :root {
@@ -161,7 +160,6 @@
 }
 
 [data-state="open"] {
-
     > button > div > div .caret, > div > h3 .caret {
         transition: all 0.2s ease;
         transform: rotate(180deg);

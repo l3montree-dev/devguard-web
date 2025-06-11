@@ -108,7 +108,8 @@ export const GithubTokenSlides = ({
     | "secret-scanning"
     | "iac"
     | "sast"
-    | "custom"
+    | "sarif"
+    | "sbom"
     | "devsecops"
     | "container-scanning"
     | "sca";

@@ -113,7 +113,8 @@ export const GitlabTokenSlides = ({
     | "secret-scanning"
     | "iac"
     | "sast"
-    | "custom"
+    | "sbom"
+    | "sarif"
     | "devsecops"
     | "container-scanning"
     | "sca";
@@ -131,7 +132,7 @@ export const GitlabTokenSlides = ({
 
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
+
   const asset = useActiveAsset();
 
   return (

@@ -12,7 +12,10 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@use "tailwindcss";
 @use "globals.scss";
+@config "../../tailwind.config.js";
+
 
 @font-face {
     font-family: 'Lexend';
@@ -223,4 +226,27 @@ body > .mdx-editor {
 input[name="traits.confirmedTerms"] {
     @apply cursor-pointer;
     @apply flex self-start;
+}
+
+
+.border-dance {
+    background-image: linear-gradient(90deg, #FBBD25 50%, transparent 50%), linear-gradient(90deg, #FBBD25 50%, transparent 50%), linear-gradient(0deg, #FBBD25 50%, transparent 50%), linear-gradient(0deg, #FBBD25 50%, transparent 50%);
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
+    background-position: left top, right bottom, left bottom, right top;
+    animation: border-dance 1s infinite linear;
+
+    &:hover {
+        animation-duration: 0.25s;
+    }
+}
+
+@keyframes border-dance {
+    0% {
+        background-position: left top, right bottom, left bottom, right top;
+    }
+
+    100% {
+        background-position: left 15px top, right 15px bottom, left bottom 15px, right top 15px;
+    }
 }
