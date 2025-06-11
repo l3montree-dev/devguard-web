@@ -44,7 +44,6 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import {
-  CellContext,
   ColumnDef,
   createColumnHelper,
   flexRender,
@@ -79,15 +78,15 @@ import {
 } from "../../../../../../../../../components/ui/tooltip";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Switch } from "../../../../../../../../../components/ui/switch";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
-import { Input } from "@/components/ui/input";
+import { Switch } from "../../../../../../../../../components/ui/switch";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -229,12 +228,14 @@ const getLicenseName = (
 const LicenseCall = (props: {
   license: License;
   component: Component;
-
   dependencyPurl: string;
   justification: string;
 }) => {
   const [open, setOpen] = useState(false);
   const activeOrg = useActiveOrg();
+  const [license, setLicense] = useState(
+    props.component.license ?? props.license.licenseId,
+  );
   const [manuallyCorrectLicense, setManuallyCorrectLicense] = useState(
     Boolean(props.component.isLicenseOverwritten),
   );
@@ -261,6 +262,7 @@ const LicenseCall = (props: {
       toast.error("Failed to change License");
       return;
     }
+    setLicense(newlicense);
   };
 
   const handleManuallyOverwriteLicenseChange = async (checked: boolean) => {
@@ -295,7 +297,7 @@ const LicenseCall = (props: {
           }}
         >
           <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
-          {getLicenseName(props.component.license, props.license.licenseId)}
+          {licenseMap[license] || license}
           <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
         </Badge>
       </PopoverTrigger>
@@ -306,7 +308,7 @@ const LicenseCall = (props: {
               {(props.license.isOsiApproved || manuallyCorrectLicense) && (
                 <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
               )}
-              {getLicenseName(props.component.license, props.license.licenseId)}
+              {licenseMap[license] || license}
             </span>
             {manuallyCorrectLicense && (
               <span className="flex absolute top-0 right-0 m-2 ">
@@ -315,8 +317,7 @@ const LicenseCall = (props: {
                     <BadgeInfo className="flex w-5 h-5 absolute top-0 right-0 text-green-500"></BadgeInfo>
                   </TooltipTrigger>
                   <TooltipContent>
-                    This license was manually overwritten by a user. Originally
-                    it was <CopyCodeFragment codeString={props.license.name} />.
+                    This license was manually overwritten by a user.
                   </TooltipContent>
                 </Tooltip>
               </span>
