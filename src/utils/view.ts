@@ -54,7 +54,7 @@ export const vexOptionMessages: Record<string, string> = {
     "The vulnerable code exists but is never executed.",
   vulnerable_code_cannot_be_controlled_by_adversary:
     "The attacker cannot control the vulnerable code.",
-  inline_mitigations_already_exis:
+  inline_mitigations_already_exist:
     "Built-in defenses prevent known exploitation paths.",
 };
 
