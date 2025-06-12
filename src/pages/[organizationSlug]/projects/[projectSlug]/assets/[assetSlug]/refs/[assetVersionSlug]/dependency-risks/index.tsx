@@ -191,12 +191,30 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = router.asPath.split("?")[0];
+  console.log("pathname", pathname);
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download SBOM PDF</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../sbom.pdf`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>PDF-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"secondary"}>Download SBOM</Button>

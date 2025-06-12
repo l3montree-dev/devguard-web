@@ -8,54 +8,20 @@ import {
   View,
   Image,
 } from "@react-pdf/renderer";
-/* type SbomPdfProps = Omit<PdfDocumentProps, "body"> & {
-  body: sbomBody;
+type SbomPdfProps = Omit<PdfDocumentProps, "body"> & {
+  body: SBOM;
 };
- */
-interface sbomBody {
-  components: sbomComponent[];
-}
-
-type sbomComponent = {
-  purl: string;
-  name: string;
-  version: string;
-  type: string;
-  licenses: string[];
-};
-
-type SbomPdfProps = PdfDocumentProps;
-
-const componetA = {
-  purl: "pkg:npm/react@18.2.0",
-  name: "React",
-  version: "18.2.0",
-  type: "npm",
-  licenses: ["MIT"],
-};
-const componetB = {
-  purl: "pkg:npm/react-dom@18.2.0",
-  name: "React DOM",
-  version: "18.2.0",
-  type: "npm",
-  licenses: ["MIT"],
-};
-
-// Create arrays with 10 copies of each component and concatenate them
-const components: sbomComponent[] = [
-  ...Array(10).fill(componetA),
-  ...Array(10).fill(componetB),
-];
 
 import { FunctionComponent } from "react";
 import PdfDocument, { PdfDocumentProps } from "./PdfDocument";
 import { table } from "console";
+import { Components, SBOM } from "./sbom";
 
 const SbomPdf: FunctionComponent<SbomPdfProps> = (props) => {
   return (
     <PdfDocument
       header={props.header}
-      body={sbomBody(components)}
+      body={sbomBody(props.body.components)}
       footer={props.footer}
     />
   );
@@ -63,7 +29,7 @@ const SbomPdf: FunctionComponent<SbomPdfProps> = (props) => {
 
 export default SbomPdf;
 
-const sbomBody = (components: sbomComponent[]) => {
+const sbomBody = (components: Components[]) => {
   return (
     <View>
       <View style={styles.table}>
@@ -84,17 +50,26 @@ const sbomTableHeader = () => (
   </View>
 );
 
-const sbomTableBody = (components: sbomComponent[]) =>
+const sbomTableBody = (components: Components[]) =>
   components.map((component, index) => (
     <View style={styles.tableRow} key={index}>
       <Text style={styles.col1}>{component.purl}</Text>
       <Text style={styles.col2}>{component.name}</Text>
       <Text style={styles.col3}>{component.version}</Text>
-      <Text style={styles.col4}>{component.licenses.join(", ")}</Text>
+      {component.licenses && component.licenses.length > 0 ? (
+        <Text style={styles.col4}>
+          {component.licenses
+            .map((l) => l.license.name || l.license.id)
+            .join(", ")}
+        </Text>
+      ) : (
+        <Text style={styles.col4}></Text>
+      )}
+      <Text style={styles.col4}></Text>
       <Text style={styles.col5}>{component.type}</Text>
     </View>
   ));
-
+//component.licenses.join(", ")
 const styles = StyleSheet.create({
   table: {
     display: "flex",
@@ -107,6 +82,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#000",
     paddingVertical: 10,
+    wordBreak: "break-all",
   },
   tableHeader: {
     flexDirection: "row",
@@ -122,31 +98,3 @@ const styles = StyleSheet.create({
   col4: { flex: 1 },
   col5: { flex: 1 },
 });
-
-/* const PdfHeader = (props: headerProps) => (
-  <View
-    style={styles.header}
-    fixed
-    render={({ pageNumber }) => {
-      if (pageNumber === 1) {
-        return (
-          <View style={styles.headerBox}>
-            <Text style={styles.h1}>{props.pdfTitle}</Text>
-          </View>
-        );
-      }
-      return (
-        <View style={styles.headerBox}>
-          <View style={styles.headerText}>
-            <Text>{props.title}</Text>
-            <Text>{props.project}</Text>
-            <Text style={styles.headerRepoText}>{props.repo}</Text>
-          </View>
-          <View style={styles.logo}>
-            <Logo logoLink={props.logoLink} />
-          </View>
-        </View>
-      );
-    }}
-  ></View>
-); */

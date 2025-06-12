@@ -16,7 +16,6 @@ export interface Metadata {
 }
 
 export interface Component {
-  "bom-ref": string;
   type: string;
   author: string;
   publisher: string;
@@ -25,7 +24,6 @@ export interface Component {
 }
 
 export interface Components {
-  "bom-ref": string;
   type: string;
   name: string;
   version?: string;
