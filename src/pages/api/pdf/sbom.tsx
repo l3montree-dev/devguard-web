@@ -26,6 +26,8 @@ const props = {
     project: "L3montree GmbH",
     repo: "devGuard Web",
     logoLink: "public/logo_horizontal.jpg",
+    logoWidth: 75,
+    logoRatio: 2.832,
     pdfTitle: "SBOM Components",
   },
   body: <Text> das ist ein test </Text>,

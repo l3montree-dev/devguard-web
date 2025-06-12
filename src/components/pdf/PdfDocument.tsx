@@ -1,3 +1,4 @@
+import { TextAlignJustifyIcon } from "@radix-ui/react-icons";
 import {
   Document,
   Page,
@@ -13,6 +14,8 @@ interface headerProps {
   project: string;
   repo: string;
   logoLink: string;
+  logoWidth: number;
+  logoRatio: number;
   pdfTitle?: string;
 }
 
@@ -55,7 +58,9 @@ const styles = StyleSheet.create({
   startPage: {
     //  fontFamily: "Inter",
   },
-  body: {},
+  body: {
+    left: 20,
+  },
   logo: {
     position: "absolute",
     top: 10,
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 75,
     paddingTop: 50,
     top: 0,
-    left: 0,
+    left: 20,
   },
   headerText: {
     display: "flex",
@@ -120,6 +125,12 @@ const styles = StyleSheet.create({
   },
   headerRepoText: {
     fontWeight: "bold",
+    width: "100%",
+  },
+  headerPdfTitle: {
+    // fontWeight: "bold",
+    fontSize: 24,
+    paddingBottom: 20,
     width: "100%",
   },
   footer: {
@@ -160,10 +171,18 @@ const styles = StyleSheet.create({
   border: {},
 });
 
-const Logo = ({ logoLink }: { logoLink: string }) => (
+const Logo = ({
+  logoLink,
+  width,
+  ratio,
+}: {
+  logoLink: string;
+  width: number;
+  ratio: number;
+}) => (
   <View style={styles.logo}>
     {/* eslint-disable-next-line jsx-a11y/alt-text */}
-    <Image src={logoLink} style={{ width: 75, height: 75 / 2.81 }} />
+    <Image src={logoLink} style={{ width: width, height: width / ratio }} />
   </View>
 );
 const PdfHeader = (props: headerProps) => (
@@ -173,8 +192,21 @@ const PdfHeader = (props: headerProps) => (
     render={({ pageNumber }) => {
       if (pageNumber === 1) {
         return (
-          <View style={styles.headerBox}>
-            <Text style={styles.h1}>{props.pdfTitle}</Text>
+          <View>
+            <View>
+              <Text
+                style={{
+                  position: "absolute",
+                  left: 0,
+                }}
+              >
+                *
+              </Text>
+            </View>
+
+            <View style={styles.headerBox}>
+              <Text style={styles.headerPdfTitle}>{props.pdfTitle}</Text>
+            </View>
           </View>
         );
       }
@@ -186,7 +218,11 @@ const PdfHeader = (props: headerProps) => (
             <Text style={styles.headerRepoText}>{props.repo}</Text>
           </View>
           <View style={styles.logo}>
-            <Logo logoLink={props.logoLink} />
+            <Logo
+              logoLink={props.logoLink}
+              width={props.logoWidth}
+              ratio={props.logoRatio}
+            />
           </View>
         </View>
       );
