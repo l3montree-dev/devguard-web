@@ -72,16 +72,14 @@ const SbomPdf: FunctionComponent<SbomPdfProps> = (props) => {
 
 export default SbomPdf;
 
-const sbomBody = (components: Components[]) => {
-  return (
-    <View>
-      <View style={styles.table}>
-        <View>{sbomTableHeader()}</View>
-        <View>{sbomTableBody(components)}</View>
-      </View>
+const sbomBody = (components: Components[]) => (
+  <View>
+    <View style={styles.table}>
+      <View>{sbomTableHeader()}</View>
+      <View>{sbomTableBody(components)}</View>
     </View>
-  );
-};
+  </View>
+);
 
 const sbomTableHeader = () => (
   <View style={styles.tableHeader}>
@@ -111,7 +109,7 @@ const sbomTableBody = (components: Components[]) =>
       <Text style={styles.col5}>{component.type}</Text>
     </View>
   ));
-//component.licenses.join(", ")
+
 const styles = StyleSheet.create({
   table: {
     display: "flex",
@@ -131,9 +129,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#000",
-    paddingVertical: 10,
+    paddingVertical: 8,
     fontFamily: "Inter",
-    fontWeight: "bold",
+    fontWeight: "semibold",
+    gap: 10,
   },
   col1: { flex: 2 },
   col2: { flex: 2 },

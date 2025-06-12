@@ -1,11 +1,10 @@
-import { TextAlignJustifyIcon } from "@radix-ui/react-icons";
 import {
   Document,
+  Image,
   Page,
   StyleSheet,
   Text,
   View,
-  Image,
 } from "@react-pdf/renderer";
 import { FunctionComponent } from "react";
 import { Font } from "@react-pdf/renderer";
@@ -61,6 +60,7 @@ interface footerProps {
 }
 
 export interface PdfDocumentProps {
+  frontPage?: any;
   header: headerProps;
   body: any;
   footer: footerProps;
@@ -68,6 +68,9 @@ export interface PdfDocumentProps {
 
 const PdfDocument: FunctionComponent<PdfDocumentProps> = (props) => (
   <Document>
+    <Page size="A4" style={styles.fullPage}>
+      {frontPage()}
+    </Page>
     <Page size="A4" style={styles.page}>
       <PdfHeader {...props.header} />
       <View style={styles.body}>{props.body}</View>
@@ -77,13 +80,103 @@ const PdfDocument: FunctionComponent<PdfDocumentProps> = (props) => (
 );
 
 export default PdfDocument;
-
+const frontPage = () => (
+  <View style={styles.frontPage.page}>
+    <View style={styles.frontPage.header.header}>
+      <View>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+        <Image
+          src="public/logo_inverse_horizontal.png"
+          style={styles.frontPage.header.logo}
+        />
+      </View>
+      <View style={styles.frontPage.header.symbol}></View>
+    </View>
+    <View>
+      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+      <Image
+        src="public/pdfFrontPageLogo.png"
+        style={styles.frontPage.mainLogo}
+      />
+      <Text style={styles.frontPage.title}>
+        SOFTWARE SECURITY MANAGEMENT REPORT
+      </Text>
+    </View>
+    <View>
+      <Text></Text>
+    </View>
+    <View></View>
+    <View style={styles.frontPage.footer}>
+      <Text>devguard.org</Text>
+      <Text>community@devguard.org</Text>
+    </View>
+  </View>
+);
 const styles = StyleSheet.create({
+  frontPage: {
+    page: {
+      position: "absolute" as const,
+      top: 0,
+      left: 0,
+      paddingHorizontal: 50,
+      paddingVertical: 50,
+      height: "100%",
+      width: "100%",
+      backgroundColor: "black",
+      color: "white",
+    },
+    header: {
+      header: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingBottom: 20,
+      },
+      logo: {
+        width: "75px",
+        height: "26,56px", // 2.832 ratio
+      },
+      symbol: {
+        width: "20px",
+        height: "20px",
+        borderRadius: "2px",
+        border: "1px solid #FBBE23",
+
+        backgroundColor: "#FBBE23",
+      },
+    },
+    title: {
+      fontSize: 44,
+      textAlign: "center",
+      fontFamily: "Inter",
+      fontWeight: "semibold",
+    },
+    mainLogo: {
+      width: "400px",
+      position: "absolute",
+      left: "10%",
+      paddingVertical: "25%",
+    },
+    main: {},
+    footer: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      paddingHorizontal: 50,
+      paddingVertical: 50,
+      fontSize: 10,
+      color: "white",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+  },
   fullPage: {
     position: "absolute",
     top: 0,
     left: 0,
-    height: "100vh",
+    height: "100%",
   },
   page: {
     //    fontFamily: "Inter",
@@ -163,6 +256,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   headerRepoText: {
+    frontFamily: "Lexend",
     fontWeight: "semibold",
     width: "100%",
   },
@@ -213,7 +307,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderBottom: "1px solid #000",
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
 
   pdfTitleHeader: {},
@@ -245,7 +339,7 @@ const PdfHeader = (props: headerProps) => (
     }}
     fixed
     render={({ pageNumber }) => {
-      if (pageNumber === 1) {
+      if (pageNumber === 2) {
         return (
           <View>
             <View style={styles.headerPdfSymbol}>
