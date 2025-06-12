@@ -8,6 +8,43 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { FunctionComponent } from "react";
+import { Font } from "@react-pdf/renderer";
+Font.register({
+  family: "Inter",
+  fonts: [
+    {
+      src: "public/fonts/Inter-VariableFont_opsz,wght.ttf",
+      fontWeight: "medium",
+      fontStyle: "normal",
+    },
+    {
+      src: "public/fonts/Inter-VariableFont_opsz,wght.ttf",
+      fontWeight: "bold",
+      fontStyle: "normal",
+    },
+    {
+      src: "public/fonts/Inter-VariableFont_opsz,wght.ttf",
+      fontWeight: "semibold",
+      fontStyle: "normal",
+    },
+  ],
+});
+
+Font.register({
+  family: "Lexend",
+  fonts: [
+    {
+      src: "public/fonts/Lexend/Lexend-Light.ttf",
+      fontWeight: "light",
+      fontStyle: "normal",
+    },
+    {
+      src: "public/fonts/Lexend/Lexend-Regular.ttf",
+      fontWeight: "medium",
+      fontStyle: "normal",
+    },
+  ],
+});
 
 interface headerProps {
   title: string;
@@ -54,6 +91,8 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
     paddingHorizontal: 75,
     fontSize: 12,
+    fontFamily: "Inter",
+    fontWeight: "medium",
   },
   startPage: {
     //  fontFamily: "Inter",
@@ -124,18 +163,18 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   headerRepoText: {
-    fontWeight: "bold",
+    fontWeight: "semibold",
     width: "100%",
   },
   headerPdfTitle: {
-    // fontWeight: "bold",
-    fontSize: 24,
     paddingBottom: 20,
     width: "100%",
   },
   headerPdfText: {
     width: "100%",
-    wordBreak: "keep-all",
+    fontFamily: "Lexend",
+    fontWeight: "light",
+    fontSize: 24,
   },
   headerPdfSymbol: {
     position: "absolute",

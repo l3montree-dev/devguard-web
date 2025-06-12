@@ -1,5 +1,8 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+import { Font } from "@react-pdf/renderer";
+
 import {
   Document,
   Page,
@@ -8,6 +11,46 @@ import {
   View,
   Image,
 } from "@react-pdf/renderer";
+
+const hyphenationCallback = (word: string) => {
+  const result = [];
+  let lastIndex = 0;
+  let slashCount = 0;
+  let hasSpecialChar = false;
+
+  for (let i = 0; i < word.length; i++) {
+    const char = word[i];
+
+    if (char === "@") {
+      result.push(word.slice(lastIndex, i));
+      lastIndex = i;
+      hasSpecialChar = true;
+    }
+
+    if (char === "/") {
+      slashCount++;
+      if (slashCount % 2 === 0) {
+        result.push(word.slice(lastIndex, i));
+        lastIndex = i;
+        hasSpecialChar = true;
+      }
+    }
+  }
+
+  if (hasSpecialChar) {
+    result.push(word.slice(lastIndex));
+    return result.filter(Boolean);
+  }
+
+  const chunks = [];
+  for (let i = 0; i < word.length; i += 10) {
+    chunks.push(word.slice(i, i + 10));
+  }
+  return chunks;
+};
+
+Font.registerHyphenationCallback(hyphenationCallback);
+
 type SbomPdfProps = Omit<PdfDocumentProps, "body"> & {
   body: SBOM;
 };
@@ -52,7 +95,7 @@ const sbomTableHeader = () => (
 
 const sbomTableBody = (components: Components[]) =>
   components.map((component, index) => (
-    <View style={styles.tableRow} key={index}>
+    <View style={styles.tableRow} key={index} wrap={false}>
       <Text style={styles.col1}>{component.purl}</Text>
       <Text style={styles.col2}>{component.name}</Text>
       <Text style={styles.col3}>{component.version}</Text>
@@ -65,7 +108,6 @@ const sbomTableBody = (components: Components[]) =>
       ) : (
         <Text style={styles.col4}></Text>
       )}
-      <Text style={styles.col4}></Text>
       <Text style={styles.col5}>{component.type}</Text>
     </View>
   ));
@@ -78,22 +120,23 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    fontSize: 12,
+    fontSize: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#000",
-    paddingVertical: 10,
-    wordBreak: "break-all",
+    paddingVertical: 8,
+    gap: 10,
   },
   tableHeader: {
     flexDirection: "row",
-    fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#000",
     paddingVertical: 10,
+    fontFamily: "Inter",
+    fontWeight: "bold",
   },
   col1: { flex: 2 },
-  col2: { flex: 1 },
+  col2: { flex: 2 },
   col3: { flex: 1 },
   col4: { flex: 1 },
   col5: { flex: 1 },
