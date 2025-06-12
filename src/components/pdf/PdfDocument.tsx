@@ -133,6 +133,17 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     width: "100%",
   },
+  headerPdfText: {
+    width: "100%",
+    wordBreak: "keep-all",
+  },
+  headerPdfSymbol: {
+    position: "absolute",
+    fontSize: 100,
+    paddingTop: 50,
+    top: 0,
+    left: 40,
+  },
   footer: {
     position: "absolute",
     fontSize: 10,
@@ -187,42 +198,45 @@ const Logo = ({
 );
 const PdfHeader = (props: headerProps) => (
   <View
-    style={styles.header}
+    style={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+    }}
     fixed
     render={({ pageNumber }) => {
       if (pageNumber === 1) {
         return (
           <View>
-            <View>
-              <Text
-                style={{
-                  position: "absolute",
-                  left: 0,
-                }}
-              >
-                *
-              </Text>
+            <View style={styles.headerPdfSymbol}>
+              <Text>*</Text>
             </View>
-
-            <View style={styles.headerBox}>
-              <Text style={styles.headerPdfTitle}>{props.pdfTitle}</Text>
+            <View style={styles.header}>
+              <View style={styles.headerBox}>
+                <View style={styles.headerPdfTitle}>
+                  <Text style={styles.headerPdfText}>{props.pdfTitle}</Text>
+                </View>
+              </View>
             </View>
           </View>
         );
       }
       return (
-        <View style={styles.headerBox}>
-          <View style={styles.headerText}>
-            <Text>{props.title}</Text>
-            <Text>{props.project}</Text>
-            <Text style={styles.headerRepoText}>{props.repo}</Text>
-          </View>
-          <View style={styles.logo}>
-            <Logo
-              logoLink={props.logoLink}
-              width={props.logoWidth}
-              ratio={props.logoRatio}
-            />
+        <View style={styles.header}>
+          <View style={styles.headerBox}>
+            <View style={styles.headerText}>
+              <Text>{props.title}</Text>
+              <Text>{props.project}</Text>
+              <Text style={styles.headerRepoText}>{props.repo}</Text>
+            </View>
+            <View style={styles.logo}>
+              <Logo
+                logoLink={props.logoLink}
+                width={props.logoWidth}
+                ratio={props.logoRatio}
+              />
+            </View>
           </View>
         </View>
       );
