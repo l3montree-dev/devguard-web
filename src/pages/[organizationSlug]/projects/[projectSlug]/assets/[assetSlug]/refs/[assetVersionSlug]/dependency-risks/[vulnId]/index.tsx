@@ -332,20 +332,26 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   });
   return (
-    <div>
-      <div className="relative rounded-lg">
-        <div className="absolute top-0 right-0">
-          <div>
-            <span className="relative flex size-3">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75"></span>
-              <span className="relative inline-flex size-3 rounded-full bg-yellow-500"></span>
-            </span>
-          </div>
+    <div className="relative rounded-lg mb-8">
+      <div className="absolute top-0 right-0">
+        <div>
+          <span className="relative flex size-3">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+            <span className="relative inline-flex size-3 rounded-full bg-yellow-500"></span>
+          </span>
         </div>
+      </div>
 
-        <div className=" rounded-lg border bg-card p-4 border">
-          <div className="text-sm ">
+      <div className=" rounded-lg border bg-card p-4 border">
+        <div className="text-sm">
+          <div className="mb-2">
+            <div className="block text-sm font-semibold">Global Update</div>
+
             <CopyCode codeString={globalupdate}></CopyCode>
+          </div>
+          <div>
+            <div className="block text-sm font-semibold">Local Update</div>
+
             <CopyCode codeString={ecosystem}></CopyCode>
           </div>
         </div>
@@ -539,7 +545,7 @@ const Index: FunctionComponent<Props> = (props) => {
                   }
                 />
               </div>
-
+              {/* red stuff */}
               <RiskAssessmentFeed
                 vulnerabilityName={vuln.cveId ?? ""}
                 events={vuln.events}
