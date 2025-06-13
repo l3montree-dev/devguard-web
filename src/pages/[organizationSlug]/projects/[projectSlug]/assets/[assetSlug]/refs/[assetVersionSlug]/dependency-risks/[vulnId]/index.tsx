@@ -333,19 +333,20 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   });
   return (
     <div className="relative bg-red">
-      <div className="absolute top-0 right-0">
-        <span className="relative flex size-5 ">
-          <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
-          <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
-        </span>
-      </div>
-      <div className="rounded-lg mb-8">
+      <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
+      <div className="relative rounded-lg ">
+        <div className="absolute top-0 right-0">
+          <span className="relative flex size-5 ">
+            <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+            <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
+          </span>
+        </div>
         <div className=" rounded-lg border bg-card p-4 border">
           <div className="text-sm">
             <div className="mb-2">
-              <div className="block text-sm font-semibold">
+              <span className="text-xs text-muted-foreground">
                 Update all Dependencies
-              </div>
+              </span>
 
               <CopyCode codeString={globalupdate}></CopyCode>
             </div>
@@ -531,24 +532,6 @@ const Index: FunctionComponent<Props> = (props) => {
                 <div className="mt-4"></div>
               </div>
 
-              <h1 className="text-2xl font-semibold mb-4">Quickfix</h1>
-
-              <div className="mb-4">
-                <Quickfix
-                  vuln={vuln.componentPurl}
-                  version={
-                    Boolean(vuln.componentFixedVersion)
-                      ? (vuln.componentFixedVersion as string)
-                      : " "
-                  }
-                  package={
-                    Boolean(vuln.componentPurl)
-                      ? (beautifyPurl(vuln.componentPurl) as string)
-                      : " "
-                  }
-                />
-              </div>
-              {/* red stuff */}
               <RiskAssessmentFeed
                 vulnerabilityName={vuln.cveId ?? ""}
                 events={vuln.events}
@@ -1044,7 +1027,6 @@ const Index: FunctionComponent<Props> = (props) => {
                     </div>
                     {vuln.componentFixedVersion !== null && (
                       <>
-                        <h3 className="text-sm font-semibold ">Quickfix</h3>
                         <Quickfix
                           vuln={vuln.componentPurl}
                           version={
