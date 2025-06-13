@@ -332,30 +332,30 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   });
   return (
-    <div className="relative rounded-lg mb-8">
+    <div className="relative bg-red">
       <div className="absolute top-0 right-0">
-        <div>
-          <span className="relative flex size-5 ">
-            <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
-            <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
-          </span>
-        </div>
+        <span className="relative flex size-5 ">
+          <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+          <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
+        </span>
       </div>
-      <div className=" ounded-lg border bg-card p-4 border">
-        <div className="text-sm">
-          <div className="mb-2">
-            <div className="block text-sm font-semibold">
-              Update all Dependencies
-            </div>
+      <div className="rounded-lg mb-8">
+        <div className=" rounded-lg border bg-card p-4 border">
+          <div className="text-sm">
+            <div className="mb-2">
+              <div className="block text-sm font-semibold">
+                Update all Dependencies
+              </div>
 
-            <CopyCode codeString={globalupdate}></CopyCode>
-          </div>
-          <div>
-            <div className="block text-sm font-semibold">
-              {`Update only ${props.package} `}
+              <CopyCode codeString={globalupdate}></CopyCode>
             </div>
+            <div>
+              <div className="block text-sm font-semibold">
+                {`Update only ${props.package} `}
+              </div>
 
-            <CopyCode codeString={ecosystem}></CopyCode>
+              <CopyCode codeString={ecosystem}></CopyCode>
+            </div>
           </div>
         </div>
       </div>
@@ -1042,21 +1042,24 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-sm font-semibold ">Quickfix</h3>
-
-                    <Quickfix
-                      vuln={vuln.componentPurl}
-                      version={
-                        Boolean(vuln.componentFixedVersion)
-                          ? (vuln.componentFixedVersion as string)
-                          : " "
-                      }
-                      package={
-                        Boolean(vuln.componentPurl)
-                          ? (beautifyPurl(vuln.componentPurl) as string)
-                          : " "
-                      }
-                    />
+                    {vuln.componentFixedVersion !== null && (
+                      <>
+                        <h3 className="text-sm font-semibold ">Quickfix</h3>
+                        <Quickfix
+                          vuln={vuln.componentPurl}
+                          version={
+                            Boolean(vuln.componentFixedVersion)
+                              ? (vuln.componentFixedVersion as string)
+                              : " "
+                          }
+                          package={
+                            Boolean(vuln.componentPurl)
+                              ? (beautifyPurl(vuln.componentPurl) as string)
+                              : " "
+                          }
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )}
