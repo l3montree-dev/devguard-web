@@ -74,7 +74,7 @@ import {
 import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { ChevronDown, Copy } from "lucide-react";
+import { ChevronDown, Copy, DotIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
@@ -86,6 +86,7 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
+import { Dot } from "lucide-react";
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
@@ -331,9 +332,14 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   });
   return (
-    <div className="flex flex-col gap-4  ">
-      <div>
-        <div className="text-sm">
+    <div className="relative rounded-lg">
+      <div className="absolute top-0 right-0">
+        <Dot className="scale-200 text-yellow-500 ping" />
+        <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></div>
+      </div>
+
+      <div className=" rounded-lg border bg-card p-4 border">
+        <div className="text-sm ">
           <CopyCode codeString={globalupdate}></CopyCode>
           <CopyCode codeString={ecosystem}></CopyCode>
         </div>
@@ -508,6 +514,24 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               <div className="mt-4 mb-16">
                 <div className="mt-4"></div>
+              </div>
+
+              <h1 className="text-2xl font-semibold mb-4">Quickfix</h1>
+
+              <div className="mb-4">
+                <Quickfix
+                  vuln={vuln.componentPurl}
+                  version={
+                    Boolean(vuln.componentFixedVersion)
+                      ? (vuln.componentFixedVersion as string)
+                      : " "
+                  }
+                  package={
+                    Boolean(vuln.componentPurl)
+                      ? (beautifyPurl(vuln.componentPurl) as string)
+                      : " "
+                  }
+                />
               </div>
 
               <RiskAssessmentFeed
@@ -1003,23 +1027,21 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </div>
                     </div>
-                    <div className="animated-outline rounded-lg">
-                      <div className="rounded-lg border bg-card p-4 border">
-                        <Quickfix
-                          vuln={vuln.componentPurl}
-                          version={
-                            Boolean(vuln.componentFixedVersion)
-                              ? (vuln.componentFixedVersion as string)
-                              : " "
-                          }
-                          package={
-                            Boolean(vuln.componentPurl)
-                              ? (beautifyPurl(vuln.componentPurl) as string)
-                              : " "
-                          }
-                        />
-                      </div>
-                    </div>
+                    <h3 className="text-sm font-semibold ">Quickfix</h3>
+
+                    <Quickfix
+                      vuln={vuln.componentPurl}
+                      version={
+                        Boolean(vuln.componentFixedVersion)
+                          ? (vuln.componentFixedVersion as string)
+                          : " "
+                      }
+                      package={
+                        Boolean(vuln.componentPurl)
+                          ? (beautifyPurl(vuln.componentPurl) as string)
+                          : " "
+                      }
+                    />
                   </div>
                 </div>
               )}
