@@ -332,16 +332,22 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   });
   return (
-    <div className="relative rounded-lg">
-      <div className="absolute top-0 right-0">
-        <Dot className="scale-200 text-yellow-500 ping" />
-        <div className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></div>
-      </div>
+    <div>
+      <div className="relative rounded-lg">
+        <div className="absolute top-0 right-0">
+          <div>
+            <span className="relative flex size-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex size-3 rounded-full bg-yellow-500"></span>
+            </span>
+          </div>
+        </div>
 
-      <div className=" rounded-lg border bg-card p-4 border">
-        <div className="text-sm ">
-          <CopyCode codeString={globalupdate}></CopyCode>
-          <CopyCode codeString={ecosystem}></CopyCode>
+        <div className=" rounded-lg border bg-card p-4 border">
+          <div className="text-sm ">
+            <CopyCode codeString={globalupdate}></CopyCode>
+            <CopyCode codeString={ecosystem}></CopyCode>
+          </div>
         </div>
       </div>
     </div>
