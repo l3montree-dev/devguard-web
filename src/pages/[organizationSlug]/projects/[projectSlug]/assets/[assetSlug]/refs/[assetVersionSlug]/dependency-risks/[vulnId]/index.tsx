@@ -332,30 +332,32 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   });
   return (
-    <div className="relative bg-red">
+    <div className="relative">
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
-      <div className="relative rounded-lg ">
-        <div className="absolute top-0 right-0">
-          <span className="relative flex size-5 ">
-            <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
-            <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
-          </span>
-        </div>
-        <div className=" rounded-lg border bg-card p-4 border">
-          <div className="text-sm">
-            <div className="mb-2">
-              <span className="text-xs text-muted-foreground">
-                Update all Dependencies
-              </span>
+      <div className="relative ">
+        <div className="rounded-lg ">
+          <div className="absolute -top-2 -right-2">
+            <span className="relative flex size-5 ">
+              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
+            </span>
+          </div>
+          <div className=" rounded-lg border bg-card p-4 border">
+            <div className="text-sm">
+              <div className="mb-2">
+                <span className="text-xs text-muted-foreground">
+                  Update all Dependencies
+                </span>
 
-              <CopyCode codeString={globalupdate}></CopyCode>
-            </div>
-            <div>
-              <div className="block text-sm font-semibold">
-                {`Update only ${props.package} `}
+                <CopyCode codeString={globalupdate}></CopyCode>
               </div>
+              <div>
+                <span className="text-xs text-muted-foreground">
+                  {`Update only ${props.package} `}
+                </span>
 
-              <CopyCode codeString={ecosystem}></CopyCode>
+                <CopyCode codeString={ecosystem}></CopyCode>
+              </div>
             </div>
           </div>
         </div>
