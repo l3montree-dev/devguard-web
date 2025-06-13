@@ -299,7 +299,7 @@ const Index: FunctionComponent<Props> = (props) => {
             <Input
               onChange={handleSearch}
               defaultValue={router.query.search as string}
-              placeholder="Search for cve, package name or message..."
+              placeholder="Search for cve, package name, message or scanner..."
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
               {isLoading && (
@@ -362,7 +362,7 @@ const Index: FunctionComponent<Props> = (props) => {
             <Input
               onChange={handleSearch}
               defaultValue={router.query.search as string}
-              placeholder="Search for cve, package name or message..."
+              placeholder="Search for cve, package name, message or scanner..."
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
               {isLoading && (
