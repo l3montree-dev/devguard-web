@@ -317,7 +317,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
           ecosystemUpdate: `pip install ${props.package}@${props.version}`,
         };
       }
-      case "crates": {
+      case "cargo": {
         return {
           globalUpdate: `cargo update`,
           ecosystemUpdate: `# in Cargo.toml: ${props.package}="${props.version}"`,
@@ -548,9 +548,6 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
               <div className="mb-16 mt-4">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
-              </div>
-              <div className="mt-4 mb-16">
-                <div className="mt-4"></div>
               </div>
 
               <RiskAssessmentFeed
