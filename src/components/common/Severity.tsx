@@ -18,7 +18,7 @@ export const getClassNames = (severity: string, gray: boolean) => {
     }
 };
 
-export const severityToColor = (severity: string, gray: boolean) => {
+export const severityToColor = (severity: string, gray?: boolean) => {
   if (gray) {
     return "gray";
   } else

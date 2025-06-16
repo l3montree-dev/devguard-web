@@ -115,30 +115,6 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       cell: (row) => (
         <div className="flex flex-row">
           <Severity risk={row.getValue()} />
-          <Tooltip>
-            <TooltipTrigger>
-              <CircleHelp className="ml-2 w-4 h-4 text-gray-500" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <div className="relative ">
-                Risk Value is a context-aware score that adjusts the CVSS by
-                factoring in real-world exploitability and system relevance. It
-                reflects the{" "}
-                <span className=" font-bold">
-                  actual risk a vulnerability poses
-                </span>
-                , not just its theoretical severity.
-                <div
-                  onClick={(e) => {
-                    e.preventDefault();
-                  }}
-                  className="size text-xs text-primary absolute bottom-0 right-0"
-                >
-                  Click here to read more about it
-                </div>
-              </div>
-            </TooltipContent>
-          </Tooltip>
         </div>
       ),
     }),
@@ -158,7 +134,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       enableSorting: true,
       cell: (row) => (
         <div className="flex flex-row">
-          <Severity risk={row.getValue()} />
+          <Severity gray risk={row.getValue()} />
         </div>
       ),
     }),
@@ -454,7 +430,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               "max_risk" ? (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <CircleHelp className="ml-2 w-4 h-4 text-gray-500" />
+                                  <CircleHelp className=" w-4 h-4 text-gray-500" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="relative ">
@@ -466,14 +442,6 @@ const Index: FunctionComponent<Props> = (props) => {
                                       actual risk a vulnerability poses
                                     </span>
                                     , not just its theoretical severity.
-                                    <div
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                      }}
-                                      className="size text-xs text-primary absolute bottom-0 right-0"
-                                    >
-                                      Click here to read more about it
-                                    </div>
                                   </div>
                                 </TooltipContent>
                               </Tooltip>
