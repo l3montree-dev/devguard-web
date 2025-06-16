@@ -205,12 +205,15 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
+  vulnType: "dependencyVuln" | "firstPartyVuln";
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;
   arbitraryJsonData: EventArbitraryJsonData;
+  packageName: string | null;
+  uri: string | null;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
