@@ -86,7 +86,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-import { Dot } from "lucide-react";
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
@@ -286,7 +285,6 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 };
 
 function Quickfix(props: { vuln: string; version?: string; package?: string }) {
-  const [open, setOpen] = useState(false);
   const [ecosystem, setEcosystem] = useState<string>("");
   const [globalupdate, setGlobalupdate] = useState<string>("");
   useEffect(() => {
