@@ -38,7 +38,7 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
-import { Loader2 } from "lucide-react";
+import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/DependencyRiskScannerDialog";
 import {
@@ -49,6 +49,11 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   apiUrl: string;
@@ -129,7 +134,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       enableSorting: true,
       cell: (row) => (
         <div className="flex flex-row">
-          <Severity risk={row.getValue()} />
+          <Severity gray risk={row.getValue()} />
         </div>
       ),
     }),
@@ -421,7 +426,26 @@ const Index: FunctionComponent<Props> = (props) => {
                                 )}
                               </div>
                             )}
-
+                            {header.isPlaceholder ? null : header.id ===
+                              "max_risk" ? (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <CircleHelp className=" w-4 h-4 text-gray-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="relative ">
+                                    Risk Value is a context-aware score that
+                                    adjusts the CVSS by factoring in real-world
+                                    exploitability and system relevance. It
+                                    reflects the{" "}
+                                    <span className=" font-bold">
+                                      actual risk a vulnerability poses
+                                    </span>
+                                    , not just its theoretical severity.
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : null}
                             <SortingCaret
                               sortDirection={header.column.getIsSorted()}
                             />
