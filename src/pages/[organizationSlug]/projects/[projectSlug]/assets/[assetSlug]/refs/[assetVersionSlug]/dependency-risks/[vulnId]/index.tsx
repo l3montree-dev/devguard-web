@@ -74,7 +74,7 @@ import {
 import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { ChevronDown, Copy, DotIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";

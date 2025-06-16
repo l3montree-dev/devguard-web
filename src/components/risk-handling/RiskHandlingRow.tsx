@@ -24,7 +24,6 @@ import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import ScannerBadge from "../ScannerBadge";
 import { Badge } from "../ui/badge";
-import { Cell } from "@mdxeditor/editor";
 
 interface Props {
   row: Row<VulnByPackage>;
