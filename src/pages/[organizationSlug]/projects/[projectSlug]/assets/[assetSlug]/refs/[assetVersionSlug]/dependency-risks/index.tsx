@@ -38,7 +38,7 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
-import { Loader2 } from "lucide-react";
+import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/DependencyRiskScannerDialog";
 import {
@@ -115,11 +115,17 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       cell: (row) => (
         <div className="flex flex-row">
           <Tooltip>
+            <Severity risk={row.getValue()} />
             <TooltipTrigger>
-              <Severity risk={row.getValue()} />
+              <CircleHelp className="ml-2 w-4 h-4 text-gray-500" />
             </TooltipTrigger>
             <TooltipContent>
-              <div className="w-20 ">testc</div>
+              <div>
+                Risk Value is a context-aware score that adjusts the CVSS by
+                factoring in real-world exploitability and system relevance. It
+                reflects the actual risk a vulnerability poses, not just its
+                theoretical severity.
+              </div>
             </TooltipContent>
           </Tooltip>
         </div>
