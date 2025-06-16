@@ -30,7 +30,13 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, ReactNode, useEffect, useState } from "react";
+import {
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
@@ -284,52 +290,66 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
+type MemoResult = {
+  globalUpdate: string;
+  ecosystemUpdate: string;
+};
+
 function Quickfix(props: { vuln: string; version?: string; package?: string }) {
-  const [ecosystem, setEcosystem] = useState<string>("");
-  const [globalupdate, setGlobalupdate] = useState<string>("");
-  useEffect(() => {
+  const { globalUpdate, ecosystemUpdate } = useMemo<MemoResult>(() => {
     switch (getEcosystem(props.vuln)) {
       case "npm": {
-        setGlobalupdate(`npm audit fix`);
-        setEcosystem(`npm install ${props.package}@${props.version}`);
-        break;
+        return {
+          globalUpdate: `npm audit fix`,
+          ecosystemUpdate: `npm install ${props.package}@${props.version}`,
+        };
       }
       case "golang": {
-        setGlobalupdate(`go get -u ./...`);
-        setEcosystem(`go get ${props.package}@${props.version}`);
-        break;
+        return {
+          globalUpdate: `go get -u ./...`,
+          ecosystemUpdate: `go get ${props.package}@${props.version}`,
+        };
       }
       case "pypi": {
-        setGlobalupdate(`pip install pip-audit 
-          pip-audit`);
-        setEcosystem(`npm install ${props.package}@${props.version}`);
-        break;
+        return {
+          globalUpdate: `pip install pip-audit 
+          pip-audit`,
+          ecosystemUpdate: `pip install ${props.package}@${props.version}`,
+        };
       }
       case "crates": {
-        setGlobalupdate(`cargo update`);
-        setEcosystem(`# in Cargo.toml: ${props.package}="${props.version}"`);
-        break;
+        return {
+          globalUpdate: `cargo update`,
+          ecosystemUpdate: `# in Cargo.toml: ${props.package}="${props.version}"`,
+        };
       }
       case "nuget": {
-        setGlobalupdate(`dotnet list package --vulnerable
-           dotnet outdated`);
-        setEcosystem(
-          `dotnet add package ${props.package} --version${props.version}`,
-        );
-        break;
+        return {
+          globalUpdate: `dotnet list package --vulnerable
+          dotnet outdated`,
+          ecosystemUpdate: `dotnet add package ${props.package} --version${props.version}`,
+        };
       }
       case "apk": {
-        setGlobalupdate(`apk update && apk upgrade`);
-        setEcosystem(`apk add ${props.package}=${props.version}`);
-        break;
+        return {
+          globalUpdate: `apk update && apk upgrade`,
+          ecosystemUpdate: `apk add ${props.package}=${props.version}`,
+        };
       }
       case "deb": {
-        setGlobalupdate(`apt update && apt upgrade`);
-        setEcosystem(`apt-get install -y ${props.package}=${props.version}`);
-        break;
+        return {
+          globalUpdate: `apt update && apt upgrade`,
+          ecosystemUpdate: `apt-get install -y ${props.package}=${props.version}`,
+        };
       }
+      default:
+        return {
+          globalUpdate: ``,
+          ecosystemUpdate: ``,
+        };
     }
-  });
+  }, []);
+
   return (
     <div className="relative">
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
@@ -348,14 +368,14 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
                   Update all Dependencies
                 </span>
 
-                <CopyCode codeString={globalupdate}></CopyCode>
+                <CopyCode codeString={globalUpdate}></CopyCode>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground">
                   {`Update only ${props.package} `}
                 </span>
 
-                <CopyCode codeString={ecosystem}></CopyCode>
+                <CopyCode codeString={ecosystemUpdate}></CopyCode>
               </div>
             </div>
           </div>
