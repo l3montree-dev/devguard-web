@@ -1,15 +1,10 @@
 import React, { FunctionComponent } from "react";
 import { VulnEventDTO } from "../types/api/api";
-import {
-  defaultScanner,
-  eventMessages,
-  eventTypeMessages,
-  findUser,
-} from "../utils/view";
+import { defaultScanner, eventMessages, findUser } from "../utils/view";
 
 import Markdown from "react-markdown";
 
-import { classNames } from "../utils/common";
+import { beautifyPurl, classNames } from "../utils/common";
 import FormatDate from "./risk-assessment/FormatDate";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -20,6 +15,7 @@ import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import EcosystemImage from "./common/EcosystemImage";
 
 interface Props {
   events: VulnEventDTO[];
@@ -79,11 +75,10 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
                         findUser(event.userId, activeOrg, currentUser)
                           .displayName
                       }{" "}
-                      {eventTypeMessages(
-                        event,
-                        event.vulnerabilityName || "a vulnerability",
-                        events,
-                      )}
+                      <EventTypeMessages
+                        event={event}
+                        flawName={event.vulnerabilityName || "a vulnerability"}
+                      />
                     </p>
                   </div>
 
@@ -114,3 +109,147 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
 };
 
 export default VulnEventItem;
+
+const FoundIn: FunctionComponent<{
+  vulnType: string;
+  packageName: string | null;
+  uri: string | null;
+}> = ({ vulnType, packageName, uri }) => {
+  if (vulnType === "firstPartyVuln") {
+    return <span className="text-muted-foreground">{` ${uri} file`}</span>;
+  }
+  return (
+    <span className="inline-flex items-center gap-2 text-muted-foreground">
+      <EcosystemImage packageName={packageName ?? ""} />
+
+      {beautifyPurl(packageName ?? "")}
+    </span>
+  );
+};
+
+const EventTypeMessages: FunctionComponent<{
+  event: VulnEventDTO;
+  flawName: string;
+}> = ({ event, flawName }) => {
+  let title = "";
+  let found = <></>;
+
+  switch (event.type) {
+    case "detectedOnAnotherBranch":
+      title =
+        "detected " + flawName + "on another ref:" + event.assetVersionName;
+      found = (
+        <>
+          {" "}
+          in{" "}
+          <FoundIn
+            vulnType={event.vulnType}
+            packageName={event.packageName}
+            uri={event.uri}
+          />
+        </>
+      );
+      break;
+    case "addedScanner":
+      title =
+        "detected " +
+        flawName +
+        " with scanner: " +
+        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "");
+      found = (
+        <>
+          {" "}
+          in{" "}
+          <FoundIn
+            vulnType={event.vulnType}
+            packageName={event.packageName}
+            uri={event.uri}
+          />
+        </>
+      );
+
+      break;
+    case "removedScanner":
+      title =
+        "removed scanner: " +
+        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "");
+      found = (
+        <>
+          {" "}
+          from{" "}
+          <FoundIn
+            vulnType={event.vulnType}
+            packageName={event.packageName}
+            uri={event.uri}
+          />
+        </>
+      );
+      break;
+    case "ticketClosed":
+      title = "closed the ticket for " + flawName;
+      break;
+    case "ticketDeleted":
+      title = "deleted the ticket for " + flawName;
+      break;
+    case "mitigate":
+      title = "created a ticket for " + flawName;
+      break;
+    case "reopened":
+      title = "reopened " + flawName;
+      break;
+    case "accepted":
+      title = "accepted the risk of " + flawName;
+      break;
+    case "fixed":
+      title = "fixed " + flawName;
+      break;
+    case "comment":
+      title = "added a comment to " + flawName;
+      break;
+    case "detected":
+      if (event.vulnType === "firstPartyVuln") {
+        title = "detected " + flawName;
+      } else {
+        title =
+          "detected " +
+          flawName +
+          (event.arbitraryJsonData && "risk" in event.arbitraryJsonData
+            ? " with a risk of " + (event.arbitraryJsonData as any).risk
+            : "");
+      }
+      found = (
+        <>
+          {" "}
+          in{" "}
+          <FoundIn
+            vulnType={event.vulnType}
+            packageName={event.packageName}
+            uri={event.uri}
+          />
+        </>
+      );
+      break;
+    case "falsePositive":
+      title = "marked " + flawName + " as false positive ";
+      break;
+    case "rawRiskAssessmentUpdated":
+      const oldRisk = (event.arbitraryJsonData as any)?.oldRisk;
+      if (oldRisk === undefined || oldRisk === null) {
+        title =
+          "updated the risk assessment to " +
+          (event.arbitraryJsonData as any)?.risk;
+      } else {
+        title =
+          "updated the risk assessment from " +
+          oldRisk +
+          " to " +
+          (event.arbitraryJsonData as any)?.risk;
+      }
+      break;
+  }
+  return (
+    <span>
+      {title} {found}
+    </span>
+  );
+};
