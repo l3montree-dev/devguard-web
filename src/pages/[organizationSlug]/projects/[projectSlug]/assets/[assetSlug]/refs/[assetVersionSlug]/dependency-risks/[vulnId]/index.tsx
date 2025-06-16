@@ -1053,12 +1053,12 @@ const Index: FunctionComponent<Props> = (props) => {
                           version={
                             Boolean(vuln.componentFixedVersion)
                               ? (vuln.componentFixedVersion as string)
-                              : " "
+                              : ""
                           }
                           package={
                             Boolean(vuln.componentPurl)
                               ? (beautifyPurl(vuln.componentPurl) as string)
-                              : " "
+                              : ""
                           }
                         />
                       </>
