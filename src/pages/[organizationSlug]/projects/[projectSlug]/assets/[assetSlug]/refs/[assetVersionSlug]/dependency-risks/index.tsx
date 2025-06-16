@@ -49,6 +49,11 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   apiUrl: string;
@@ -109,7 +114,14 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       id: "max_risk",
       cell: (row) => (
         <div className="flex flex-row">
-          <Severity risk={row.getValue()} />
+          <Tooltip>
+            <TooltipTrigger>
+              <Severity risk={row.getValue()} />
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="w-20 ">testc</div>
+            </TooltipContent>
+          </Tooltip>
         </div>
       ),
     }),
@@ -129,7 +141,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       enableSorting: true,
       cell: (row) => (
         <div className="flex flex-row">
-          <Severity risk={row.getValue()} />
+          <Severity gray={true} risk={row.getValue()} />
         </div>
       ),
     }),
