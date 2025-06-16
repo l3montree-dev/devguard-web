@@ -113,7 +113,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         </td>
         {row.getVisibleCells().map((cell, i) => (
           <td className="p-4" key={cell.id}>
-            {/* {console.log(cell, cell.getContext())} */}
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </td>
         ))}

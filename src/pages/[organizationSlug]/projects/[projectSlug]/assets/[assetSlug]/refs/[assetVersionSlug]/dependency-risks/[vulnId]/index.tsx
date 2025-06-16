@@ -286,6 +286,7 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 };
 
 function Quickfix(props: { vuln: string; version?: string; package?: string }) {
+  const [open, setOpen] = useState(false);
   const [ecosystem, setEcosystem] = useState<string>("");
   const [globalupdate, setGlobalupdate] = useState<string>("");
   useEffect(() => {
@@ -336,10 +337,10 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
       <div className="relative ">
         <div className="rounded-lg ">
-          <div className="absolute -top-2 -right-2">
-            <span className="relative flex size-5 ">
-              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-yellow-400 opacity-75"></span>
-              <span className="relative inline-flex size-5 rounded-full bg-yellow-500"></span>
+          <div className="absolute -top-1 -right-1">
+            <span className="relative flex size-4 ">
+              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex size-4 rounded-full bg-green-500"></span>
             </span>
           </div>
           <div className=" rounded-lg border bg-card p-4 border">

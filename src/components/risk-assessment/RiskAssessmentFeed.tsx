@@ -48,31 +48,31 @@ import FormatDate from "./FormatDate";
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
     case "addedScanner":
-      return <MagnifyingGlassIcon />;
+      return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "removedScanner":
-      return <CheckIcon />;
+      return <CheckIcon className="h-4 w-4" />;
     case "ticketClosed":
-      return <CheckIcon />;
+      return <CheckIcon className="h-4 w-4" />;
     case "ticketDeleted":
-      return <StopIcon />;
+      return <StopIcon className="h-4 w-4" />;
     case "accepted":
-      return <SpeakerXMarkIcon />;
+      return <SpeakerXMarkIcon className="h-4 w-4" />;
     case "fixed":
-      return <CheckIcon />;
+      return <CheckIcon className="h-4 w-4" />;
     case "detected":
-      return <MagnifyingGlassIcon />;
+      return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "falsePositive":
-      return <StopIcon />;
+      return <StopIcon className="h-4 w-4" />;
     case "mitigate":
-      return <WrenchIcon />;
+      return <WrenchIcon className="h-4 w-4" />;
     case "markedForTransfer":
-      return <ArrowRightStartOnRectangleIcon />;
+      return <ArrowRightStartOnRectangleIcon className="h-4 w-4" />;
     case "rawRiskAssessmentUpdated":
-      return <ArrowPathIcon />;
+      return <ArrowPathIcon className="h-4 w-4" />;
     case "reopened":
-      return <MagnifyingGlassIcon />;
+      return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "comment":
-      return <ChatBubbleOvalLeftEllipsisIcon />;
+      return <ChatBubbleOvalLeftEllipsisIcon className="h-4 w-4" />;
     case "detectedOnAnotherBranch":
       return <GitBranchIcon className="h-3.5 w-3.5" />;
   }
@@ -102,6 +102,7 @@ export default function RiskAssessmentFeed({
         {events.map((event, index) => {
           const user = findUser(event.userId, org, currentUser);
           const msg = eventMessages(event);
+
           return (
             <li
               className={classNames(

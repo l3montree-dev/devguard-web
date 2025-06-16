@@ -49,8 +49,6 @@ import {
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import { Tooltip } from "recharts";
-import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
   apiUrl: string;
@@ -167,9 +165,16 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       if (versionAndReduction === null) {
         return <span className="text-muted-foreground">No fix available</span>;
       }
+
       return (
-        <div onClick={(e) => e.preventDefault()}>
-          <div className="animated-outline rounded-lg">
+        <div>
+          <div className="relative rounded-lg">
+            <div className="absolute -top-1 -right-1">
+              <span className="relative flex size-3 ">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+              </span>
+            </div>
             <div className="rounded-lg border bg-card p-4 border  ">
               <span>
                 <span className="text-muted-foreground">Update to version</span>{" "}
