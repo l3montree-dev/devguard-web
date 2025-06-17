@@ -88,11 +88,6 @@ const Index: FunctionComponent<Props> = ({
     [compliance],
   );
 
-  const succedingControls = useMemo(
-    () => compliance.filter((policy) => policy.compliant === true),
-    [compliance],
-  );
-
   const totalDependencies = useMemo(
     () => licenses.reduce((acc, license) => acc + license.count, 0),
     [licenses],
@@ -133,8 +128,7 @@ const Index: FunctionComponent<Props> = ({
                     </span>
                   </Badge>
                 </div>
-              ) : failingControls.length === 0 &&
-                succedingControls.length === 0 ? (
+              ) : compliance.length === 0 ? (
                 <Badge variant={"outline"}>
                   <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
                   <span className="pl-2 text-base">
