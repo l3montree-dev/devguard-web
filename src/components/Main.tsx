@@ -177,6 +177,7 @@ const Main: FunctionComponent<Props> = ({
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const dimensions = useDimensions();
   const activeOrg = useActiveOrg();
+
   const { organizationSlug } = useParams<{ organizationSlug: string }>();
   useEffect(() => {
     // check local storage
@@ -202,9 +203,11 @@ const Main: FunctionComponent<Props> = ({
         >
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
-              <Link href={`/${organizationSlug}`}>
-                <EntityProviderImage provider={organizationSlug || ""} />
-              </Link>
+              {activeOrg.slug && (
+                <Link href={`/${activeOrg.slug!}`}>
+                  <EntityProviderImage provider={activeOrg.slug || ""} />
+                </Link>
+              )}
               <div>
                 <OrganizationDropDown />
               </div>
