@@ -110,7 +110,8 @@ export const eventTypeMessages = (
         "detected " +
         flawName +
         " with a risk of " +
-        event.arbitraryJsonData.risk
+        event.arbitraryJsonData.risk +
+        " "
       );
     case "falsePositive":
       return "marked " + flawName + " as false positive ";
@@ -133,17 +134,17 @@ export const eventTypeMessages = (
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600 text-white",
-  fixed: "bg-green-600 text-white",
-  detected: "bg-red-600 text-white",
-  falsePositive: "bg-purple-600 text-white",
+  accepted: "bg-purple-600 text-black",
+  fixed: "bg-green-600 text-black",
+  detected: "bg-red-600 text-black",
+  falsePositive: "bg-purple-600 text-black",
   mitigate: "bg-green-600 text-black",
-  markedForTransfer: "bg-blue-600 text-white",
+  markedForTransfer: "bg-blue-600 text-black",
   rawRiskAssessmentUpdated: "bg-secondary",
-  reopened: "bg-red-600 text-white",
+  reopened: "bg-red-600 text-black",
   comment: "bg-secondary",
-  ticketClosed: "bg-red-600 text-white",
-  ticketDeleted: "bg-red-600 text-white",
+  ticketClosed: "bg-red-600 text-black",
+  ticketDeleted: "bg-red-600 text-black",
   addedScanner: "bg-secondary",
   removedScanner: "bg-secondary",
   detectedOnAnotherBranch: "bg-secondary",

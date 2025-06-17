@@ -109,67 +109,75 @@ const Index: FunctionComponent<Props> = (props) => {
           Identify Code-Risks
         </Button>
       </div>
+      <Section
+        forceVertical
+        primaryHeadline
+        title="Identified Risks"
+        description="This table shows all the identified risks for this repository."
+        className="mb-4 mt-4"
+      >
+        <div className="relative flex flex-row gap-2">
+          <Tabs
+            defaultValue={
+              (router.query.state as string | undefined)
+                ? (router.query.state as string)
+                : "open"
+            }
+          >
+            <TabsList>
+              <TabsTrigger
+                onClick={() =>
+                  router.push({
+                    query: {
+                      ...router.query,
+                      state: "open",
+                    },
+                  })
+                }
+                value="open"
+              >
+                Open
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() =>
+                  router.push({
+                    query: {
+                      ...router.query,
+                      state: "closed",
+                    },
+                  })
+                }
+                value="closed"
+              >
+                Closed
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Input
+            onChange={handleSearch}
+            defaultValue={router.query.search as string}
+            placeholder="Search for filename, message or scanner..."
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+            {isLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
+        </div>
+      </Section>
       {!props.vulns.data.length ? (
-        <EmptyParty
-          title="No matching results found."
-          description="Risk identification is the process of determining what risks exist in the repository and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
-        />
+        <div>
+          <EmptyParty
+            title="No matching results."
+            description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
+          />
+          <div className="mt-4">
+            <CustomPagination {...props.vulns} />
+          </div>
+        </div>
       ) : (
         <div>
-          <Section
-            forceVertical
-            primaryHeadline
-            title="Identified Risks"
-            description="This table shows all the identified risks for this repository."
-          >
-            <div className="relative flex flex-row gap-2">
-              <Tabs
-                defaultValue={
-                  (router.query.state as string | undefined)
-                    ? (router.query.state as string)
-                    : "open"
-                }
-              >
-                <TabsList>
-                  <TabsTrigger
-                    onClick={() =>
-                      router.push({
-                        query: {
-                          ...router.query,
-                          state: "open",
-                        },
-                      })
-                    }
-                    value="open"
-                  >
-                    Open
-                  </TabsTrigger>
-                  <TabsTrigger
-                    onClick={() =>
-                      router.push({
-                        query: {
-                          ...router.query,
-                          state: "closed",
-                        },
-                      })
-                    }
-                    value="closed"
-                  >
-                    Closed
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-              <Input
-                onChange={handleSearch}
-                defaultValue={router.query.search as string}
-                placeholder="Search for cve, package name or message..."
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-                {isLoading && (
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                )}
-              </div>
-            </div>
+          <div>
             <div className="overflow-hidden rounded-lg border shadow-sm">
               <div className="overflow-auto">
                 <table className="w-full overflow-x-auto text-sm">
@@ -235,7 +243,7 @@ const Index: FunctionComponent<Props> = (props) => {
             <div className="mt-4">
               <CustomPagination {...props.vulns} />
             </div>
-          </Section>
+          </div>
         </div>
       )}
       <CodeRiskScannerDialog
