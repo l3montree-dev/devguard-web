@@ -87,27 +87,4 @@ export function NodeInputButton<T>({
       </Button>
     </div>
   );
-
-  if (node.meta.label?.text === "Add passkey") {
-    return (
-      <div className="flex flex-row justify-end">
-        <Button
-          name={attributes.name}
-          onClick={(e) => {
-            onClick(e);
-          }}
-          variant={"secondary"}
-          value={attributes.value || ""}
-          disabled={attributes.disabled || disabled}
-        >
-          <FingerPrintIcon
-            className="mr-2 h-4 w-4 shrink-0"
-            aria-hidden="true"
-          />
-
-          {getNodeLabel(node)}
-        </Button>
-      </div>
-    );
-  }
 }
