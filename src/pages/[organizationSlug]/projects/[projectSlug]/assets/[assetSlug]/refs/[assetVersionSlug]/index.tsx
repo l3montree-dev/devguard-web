@@ -197,7 +197,7 @@ const Index: FunctionComponent<Props> = ({
                     </div>
                   ))}
                 </div>
-              ) : failingControls.length === 0 ? (
+              ) : compliance.length === 0 ? (
                 <Badge variant={"outline"}>
                   <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
                   <span className="pl-2 text-base">
