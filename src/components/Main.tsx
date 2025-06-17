@@ -206,7 +206,6 @@ const Main: FunctionComponent<Props> = ({
               {activeOrg.slug && (
                 <Link href={`/${activeOrg.slug!}`}>
                   <EntityProviderImage provider={activeOrg.slug || ""} />
-                </Link>
               )}
               <div>
                 <OrganizationDropDown />

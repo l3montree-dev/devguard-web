@@ -4,6 +4,8 @@ import { classNames } from "../utils/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Badge } from "./ui/badge";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -55,15 +57,28 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
           </Tooltip>
         ))}
       </div>
-      <div className="mt-2">
-        <span className="text-sm">
-          {controlsPassing}{" "}
-          <span className="text-muted-foreground">
-            / {compliance.length} Controls are passing (
-            {((controlsPassing / compliance.length) * 100).toFixed(1)} %)
+      {compliance.length !== 0 ? (
+        <div className="mt-2">
+          <span className="text-sm">
+            {controlsPassing}{" "}
+            <span className="text-muted-foreground">
+              / {compliance.length} Controls are passing (
+              {((controlsPassing / compliance.length) * 100).toFixed(1)} %)
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
+      ) : (
+        <div className="mt-2">
+          <span className="text-sm">
+            <Badge variant={"outline"}>
+              <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
+              <span className="pl-2 text-base">
+                No compliance rules are activated
+              </span>
+            </Badge>
+          </span>
+        </div>
+      )}
     </div>
   );
 };
