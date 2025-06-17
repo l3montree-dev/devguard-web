@@ -205,14 +205,9 @@ const Main: FunctionComponent<Props> = ({
             <div className="flex flex-row items-center gap-4">
               {organizationSlug && (
                 <Link href={`/${organizationSlug!} f`}>
-                  {" "}
                   <EntityProviderImage provider={organizationSlug || ""} />
                 </Link>
               )}
-              {/* <Link href={`/${organizationSlug} f`}>
-                {/* bug here */}
-              {/* <EntityProviderImage provider={organizationSlug || ""} /> */}
-              {/* </Link> */}
               <div>
                 <OrganizationDropDown />
               </div>

@@ -42,9 +42,6 @@ export function NodeInputButton<T>({
 
     setValue(attributes.value).then(() => dispatchSubmit(e));
   };
-  {
-    console.log(node);
-  }
 
   if (node.meta.label?.text === "Add passkey") {
     return (
