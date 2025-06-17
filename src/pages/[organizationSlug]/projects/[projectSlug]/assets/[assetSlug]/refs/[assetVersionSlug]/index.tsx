@@ -128,6 +128,13 @@ const Index: FunctionComponent<Props> = ({
                     </span>
                   </Badge>
                 </div>
+              ) : failingControls.length === 0 ? (
+                <Badge variant={"outline"}>
+                  <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
+                  <span className="pl-2 text-base">
+                    No compliance rules are activated
+                  </span>
+                </Badge>
               ) : (
                 <div className="flex flex-row items-center gap-2">
                   <Badge variant={"success"}>
