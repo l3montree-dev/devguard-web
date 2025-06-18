@@ -28,7 +28,12 @@ export function NodeInputCheckbox<T>({
           disabled={attributes.disabled || disabled}
           name={attributes.name}
         />
-        <Label htmlFor={id}>{getNodeLabel(node)}</Label>
+        <Label htmlFor={id}>
+          {getNodeLabel(node)}
+          <a href="https://devguard.org/terms-of-use">
+            devguard.org/terms-of-use
+          </a>
+        </Label>
       </div>
     );
 }
