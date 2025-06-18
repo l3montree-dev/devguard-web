@@ -53,6 +53,7 @@ import MemberDialog from "@/components/MemberDialog";
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
+import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -233,6 +234,36 @@ const Home: FunctionComponent = () => {
               }
             />
           ))}
+          {activeOrg.jiraIntegrations.map((integration) => (
+            <ListItem
+              key={integration.id}
+              Title={
+                <>
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/jira-svgrepo-com.svg"
+                      alt="Jira"
+                      width={20}
+                      height={20}
+                      className="mr-2 inline-block"
+                    />
+                    {integration.name}
+                  </div>
+                </>
+              }
+              Description={
+                "DevGuard uses an Access-Token to access your repositories and interact with your code."
+              }
+              Button={
+                <AsyncButton
+                  variant={"destructiveOutline"}
+                  onClick={() => handleDelete(integration.id)}
+                >
+                  Delete
+                </AsyncButton>
+              }
+            />
+          ))}
           <hr />
           <ListItem
             Title={
@@ -293,6 +324,29 @@ const Home: FunctionComponent = () => {
                   <Button variant={"secondary"}>Integrate with GitLab</Button>
                 }
               ></GitLabIntegrationDialog>
+            }
+          />
+          <ListItem
+            Title={
+              <div className="flex flex-row items-center">
+                <Image
+                  src="/assets/jira-svgrepo-com.svg"
+                  alt="GitHub"
+                  width={18}
+                  height={18}
+                  className="mr-2 inline-block"
+                />
+                Integrate with Jira
+              </div>
+            }
+            Description="DevGuard uses a Jira API Token to access your Jira projects and interact with your issues. This allows DevGuard to create and manage issues in your Jira projects."
+            Button={
+              <JiraIntegrationDialog
+                onNewIntegration={handleNewGitLabIntegration}
+                Button={
+                  <Button variant={"secondary"}>Integrate with Jira</Button>
+                }
+              ></JiraIntegrationDialog>
             }
           />
         </Section>
