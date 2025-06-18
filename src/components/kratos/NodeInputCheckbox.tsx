@@ -15,8 +15,10 @@ export function NodeInputCheckbox<T>({
   // Render only if it's the confirmedTerms checkbox and disabled is true
   if (
     attributes.name === "traits.confirmedTerms" &&
-    attributes.value === false
+    attributes.value === true
   ) {
+    null;
+  } else
     return (
       <div className="flex items-center space-x-2">
         <Checkbox
@@ -29,7 +31,4 @@ export function NodeInputCheckbox<T>({
         <Label htmlFor={id}>{getNodeLabel(node)}</Label>
       </div>
     );
-  }
-
-  return null;
 }
