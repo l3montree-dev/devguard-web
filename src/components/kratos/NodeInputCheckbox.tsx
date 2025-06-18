@@ -12,7 +12,7 @@ export function NodeInputCheckbox<T>({
 }: NodeInputProps) {
   const id = useId();
 
-  // Render only if it's the confirmedTerms checkbox and disabled is true
+  // Render only if it's the confirmedTerms checkbox and value is true, this looks weird because in the registration the key "value" is not actually given
   if (
     attributes.name === "traits.confirmedTerms" &&
     attributes.value === true

@@ -1,3 +1,4 @@
+
 {
   "name": "devguard-web",
   "version": "0.6.0",
@@ -14,7 +15,6 @@
     "@headlessui/react": "^2.2.3",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.0.1",
-    "@lexical/react": "^0.32.1",
     "@mdxeditor/editor": "^3.32.3",
     "@ory/client": "^1.20.11",
     "@ory/integrations": "git+https://github.com/l3montree-dev/integrations.git#cad56746374fadcba6ba3ce9387e06b494c9f100",
@@ -59,7 +59,6 @@
     "eslint-config-next": "15.3.2",
     "focus-visible": "^5.2.1",
     "funnel-graph-js": "^1.4.2",
-    "lexical": "^0.32.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",
     "meshline": "^3.3.1",
