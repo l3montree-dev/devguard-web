@@ -44,6 +44,7 @@ import Markdown from "react-markdown";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
+import rehypeExternalLinks from "rehype-external-links";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -102,6 +103,10 @@ export default function RiskAssessmentFeed({
         {events.map((event, index) => {
           const user = findUser(event.userId, org, currentUser);
           const msg = eventMessages(event);
+
+          {
+            console.log(msg);
+          }
 
           return (
             <li
@@ -173,7 +178,13 @@ export default function RiskAssessmentFeed({
 
                       {Boolean(msg) && (
                         <div className="mdx-editor-content w-full rounded p-2 text-foreground">
-                          <Markdown>{msg}</Markdown>
+                          <Markdown
+                            rehypePlugins={[
+                              [rehypeExternalLinks, { target: "_blank" }],
+                            ]}
+                          >
+                            {msg}
+                          </Markdown>
                         </div>
                       )}
                     </div>
