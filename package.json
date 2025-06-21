@@ -70,6 +70,7 @@
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
     "recharts": "^2.15.3",
+    "rehype-external-links": "^3.0.0",
     "sass": "^1.89.0",
     "sharp": "^0.34.1",
     "sonner": "^2.0.3",
