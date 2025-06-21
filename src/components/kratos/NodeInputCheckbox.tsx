@@ -17,7 +17,7 @@ export function NodeInputCheckbox<T>({
     attributes.name === "traits.confirmedTerms" &&
     attributes.value === true
   ) {
-    null;
+    return null;
   } else
     return (
       <div className="flex items-center space-x-2">
