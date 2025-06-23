@@ -15,7 +15,7 @@
     "@headlessui/react": "^2.2.3",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.0.1",
-    "@mdxeditor/editor": "^3.32.3",
+    "@mdxeditor/editor": "^3.37.0",
     "@ory/client": "^1.20.11",
     "@ory/integrations": "git+https://github.com/l3montree-dev/integrations.git#cad56746374fadcba6ba3ce9387e06b494c9f100",
     "@radix-ui/react-alert-dialog": "^1.1.13",
