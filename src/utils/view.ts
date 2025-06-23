@@ -20,6 +20,7 @@ import {
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
+import { console } from "inspector";
 
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
@@ -195,18 +196,24 @@ export const getParentRepositoryIdAndName = (
 export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
   asset?: AssetDTO,
   project?: ProjectDTO,
-): "gitlab" | "github" | undefined => {
+): "gitlab" | "github" | "jira" | undefined => {
   if (asset && asset.repositoryId) {
     return asset.repositoryId.startsWith("gitlab:") ? "gitlab" : "github";
   }
   if (asset?.externalEntityProviderId) {
     return externalProviderIdToIntegrationName(asset.externalEntityProviderId);
   }
-  return getParentRepositoryIdAndName(project).parentRepositoryId?.startsWith(
-    "gitlab:",
-  )
-    ? "gitlab"
-    : "github";
+
+  const parentRepoID = getParentRepositoryIdAndName(project).parentRepositoryId;
+  console.log("parentRepoID", parentRepoID);
+  if (parentRepoID?.startsWith("gitlab:")) {
+    return "gitlab";
+  } else if (parentRepoID?.startsWith("github:")) {
+    return "github";
+  } else if (parentRepoID?.startsWith("jira:")) {
+    return "jira";
+  }
+  return undefined;
 };
 
 export const defaultScanner =

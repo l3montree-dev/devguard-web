@@ -642,6 +642,33 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </AsyncButton>
                               )}
 
+                            {vuln.ticketId === null &&
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "jira" && (
+                                <AsyncButton
+                                  variant={"secondary"}
+                                  onClick={() =>
+                                    handleSubmit({
+                                      status: "mitigate",
+                                      justification,
+                                    })
+                                  }
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <GitProviderIcon
+                                        externalEntityProviderIdOrRepositoryId={
+                                          asset.externalEntityProviderId ??
+                                          "official"
+                                        }
+                                      />
+                                      Create GitLab Ticket
+                                    </div>
+                                  </div>
+                                </AsyncButton>
+                              )}
                             <AsyncButton
                               onClick={() =>
                                 handleSubmit({
