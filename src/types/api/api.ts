@@ -170,7 +170,7 @@ export interface BaseVulnDTO {
 }
 export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;
-  cveId: string | null;
+  cveID: string | null;
   priority: number | null; // will be null, if not prioritized yet.
   rawRiskAssessment: number;
   riskRecalculatedAt: string;
@@ -211,7 +211,7 @@ interface BaseVulnEventDTO {
   vulnerabilityName: string | null;
   assetVersionName: string;
   assetVersionSlug: string;
-  arbitraryJsonData: EventArbitraryJsonData;
+  arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
 }
@@ -238,19 +238,19 @@ export interface FixedEventDTO extends BaseVulnEventDTO {
 
 export interface DetectedEventDTO extends BaseVulnEventDTO {
   type: "detected";
-  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
+  arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface AddedScannerEventDTO extends BaseVulnEventDTO {
   type: "addedScanner";
-  arbitraryJsonData: EventArbitraryJsonData & {
+  arbitraryJSONData: EventArbitraryJsonData & {
     scannerIds: string;
   };
 }
 
 export interface RemovedScannerEventDTO extends BaseVulnEventDTO {
   type: "removedScanner";
-  arbitraryJsonData: EventArbitraryJsonData & {
+  arbitraryJSONData: EventArbitraryJsonData & {
     scannerIds: string;
   };
 }
@@ -265,7 +265,7 @@ export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
 
 export interface MitigateEventDTO extends BaseVulnEventDTO {
   type: "mitigate";
-  arbitraryJsonData: EventArbitraryJsonData & {
+  arbitraryJSONData: EventArbitraryJsonData & {
     ticketUrl: string;
     ticketId: string;
   };
@@ -277,7 +277,7 @@ export interface MarkedForTransferEventDTO extends BaseVulnEventDTO {
 
 export interface RiskAssessmentUpdatedEventDTO extends BaseVulnEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJsonData: EventArbitraryJsonData & RiskCalculationReport;
+  arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface CommentEventDTO extends BaseVulnEventDTO {

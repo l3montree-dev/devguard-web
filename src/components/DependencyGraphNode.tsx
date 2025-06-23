@@ -107,7 +107,7 @@ export const DependencyGraphNode: FunctionComponent<
               className="!text-foreground hover:no-underline"
               href={router.asPath.split("?")[0] + `/../vulns/${vuln.id}`}
             >
-              {vuln.cveId}
+              {vuln.cveID}
             </Link>
           </DropdownMenuItem>
         ))}

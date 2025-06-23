@@ -26,9 +26,9 @@ export const eventMessages = (event: VulnEventDTO) => {
     case "mitigate":
       return (
         "Everything after this entry will be synced with the external system. The ticket can be found at [" +
-        event.arbitraryJsonData.ticketUrl +
+        event.arbitraryJSONData.ticketUrl +
         "](" +
-        event.arbitraryJsonData.ticketUrl +
+        event.arbitraryJSONData.ticketUrl +
         ")"
       );
   }
@@ -80,13 +80,13 @@ export const eventTypeMessages = (
         "detected " +
         flawName +
         " with scanner: " +
-        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
       );
 
     case "removedScanner":
       return (
         "removed scanner: " +
-        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
       );
     case "ticketClosed":
       return "closed the ticket for " + flawName;
@@ -103,31 +103,31 @@ export const eventTypeMessages = (
     case "comment":
       return "added a comment";
     case "detected":
-      if (event.arbitraryJsonData.risk === 0) {
+      if (event.arbitraryJSONData.risk === 0) {
         return "detected " + flawName;
       }
       return (
         "detected " +
         flawName +
         " with a risk of " +
-        event.arbitraryJsonData.risk +
+        event.arbitraryJSONData.risk +
         " "
       );
     case "falsePositive":
       return "marked " + flawName + " as false positive ";
     case "rawRiskAssessmentUpdated":
       if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
+        return "Updated the risk assessment to " + event.arbitraryJSONData.risk;
       }
-      const oldRisk = event.arbitraryJsonData.oldRisk;
+      const oldRisk = event.arbitraryJSONData.oldRisk;
       if (!oldRisk && oldRisk !== 0) {
-        return "updated the risk assessment to " + event.arbitraryJsonData.risk;
+        return "updated the risk assessment to " + event.arbitraryJSONData.risk;
       }
       return (
         "updated the risk assessment from " +
         oldRisk +
         " to " +
-        event.arbitraryJsonData.risk
+        event.arbitraryJSONData.risk
       );
   }
   return "";

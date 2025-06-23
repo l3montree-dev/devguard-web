@@ -357,7 +357,7 @@ export const getServerSideProps = middleware(
       apiClient(
         "/organizations/" +
           organizationSlug +
-          "/projects?parentId=" +
+          "/projects?parentID=" +
           project.id,
       ).then((r) => r.json()),
       // fetch the stats for all assets

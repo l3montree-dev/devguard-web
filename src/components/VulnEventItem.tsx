@@ -71,7 +71,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
             <div className="flex-1">
               <div className="w-full flex-1 overflow-hidden rounded border">
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/vulns/${event.vulnId}`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vulns/${event.vulnId}`}
                   className="!text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
                 >
                   <div className="w-full">
@@ -101,7 +101,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
         <div className="ml-10 mt-2 flex flex-row gap-2 text-xs font-normal text-muted-foreground">
           <FormatDate dateString={event.createdAt} />
           <div className="flex flex-row items-start gap-2">
-            {event.arbitraryJsonData.scannerIds?.split(" ").map((s) => (
+            {event.arbitraryJSONData.scannerIds?.split(" ").map((s) => (
               <Badge key={s} variant={"secondary"}>
                 {s.replace(defaultScanner, "")}
               </Badge>
@@ -121,8 +121,6 @@ const FoundIn: FunctionComponent<{
 }> = ({ event, flawName }) => {
   const title = eventTypeMessages(event, flawName);
   let found = <></>;
-
-  console.log("type " + event.vulnType);
 
   if (
     event.type === "detectedOnAnotherBranch" ||
