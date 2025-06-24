@@ -51,7 +51,8 @@ export type Methods =
   | "webauthn"
   | "link"
   | "lookup_secret"
-  | "passkey";
+  | "passkey"
+  | "sign_up";
 
 export type Props<T> = {
   // The flow

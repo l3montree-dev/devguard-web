@@ -214,6 +214,14 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  {
+    console.log(node);
+  }
+
+  {
+    console.log(node + "  sign up input");
+  }
+
   if ((node.meta.label?.context as any)?.provider_id === "official") {
     return (
       <div className="flex flex-row justify-end">
@@ -238,7 +246,7 @@ export function NodeInputSubmit<T>({
 
   const text = getNodeLabel(node);
   return (
-    <div className="flex flex-row justify-end">
+    <div className="flex justify-end">
       <Button
         variant={text.toLowerCase() === "back" ? "ghost" : "secondary"}
         name={attributes.name}

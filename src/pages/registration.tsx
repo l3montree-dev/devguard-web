@@ -205,7 +205,6 @@ const Registration: NextPage = () => {
                 </Link>
               </p>
             </div>
-
             <div className="mb-4 mt-10 pb-4 sm:mx-auto">
               {hasSignupWithPasskey && (
                 <div className={"mb-4"}>
@@ -216,34 +215,38 @@ const Registration: NextPage = () => {
                       flow={flow as LoginFlow}
                     />
                   </div>
-                  <Flow
-                    hideGlobalMessages
-                    only="password"
-                    onSubmit={onSubmit}
-                    flow={flow as LoginFlow}
-                  />
+                  <div className="flex flex-row">
+                    <Flow
+                      hideGlobalMessages
+                      only="passkey"
+                      onSubmit={onSubmit}
+                      flow={flow as LoginFlow}
+                    />
+                    <Flow
+                      hideGlobalMessages
+                      only="profile"
+                      onSubmit={onSubmit}
+                      flow={flow as LoginFlow}
+                    />
+                  </div>
                 </div>
               )}
-              <Flow
-                hideGlobalMessages
-                only="profile"
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
-            </div>
-            <div>
-              <Flow
-                only="oidc"
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
+
+              <div>
+                <Flow
+                  only="oidc"
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  flow={flow as LoginFlow}
+                />
+              </div>
             </div>
             <div className="mt-4">
               <Messages messages={flow?.ui.messages} />
             </div>
           </div>
         </div>
+
         <ThreeJSFeatureScreen />
       </div>
     </>
