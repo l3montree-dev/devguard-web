@@ -683,7 +683,6 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             </tbody>
           </table>
         </div>
-        {console.log(components)}
         <CustomPagination {...components} />
       </Section>
 
