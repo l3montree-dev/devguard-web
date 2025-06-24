@@ -1,4 +1,3 @@
-
 {
   "name": "devguard-web",
   "version": "0.6.0",
@@ -17,6 +16,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@mdxeditor/editor": "^3.37.0",
     "@ory/client": "^1.20.11",
+    "@ory/elements-react": "^1.0.0-rc.5",
     "@ory/integrations": "git+https://github.com/l3montree-dev/integrations.git#cad56746374fadcba6ba3ce9387e06b494c9f100",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-avatar": "^1.1.9",
@@ -65,8 +65,8 @@
     "next": "15.3.2",
     "next-themes": "^0.4.6",
     "ogl": "^1.0.11",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.56.4",
     "react-markdown": "^10.1.0",

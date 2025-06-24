@@ -28,7 +28,12 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import { PolicyEvaluation, ProjectDTO } from "../../types/api/api";
+import {
+  ComponentPaged,
+  Paged,
+  PolicyEvaluation,
+  ProjectDTO,
+} from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -62,9 +67,11 @@ import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
 import { useParams } from "next/navigation";
+import CustomPagination from "@/components/common/CustomPagination";
 
 interface Props {
   oauth2Error?: boolean;
+  components: Paged<ComponentPaged>;
   projects: Array<
     ProjectDTO & {
       stats: {
@@ -76,7 +83,11 @@ interface Props {
   >;
 }
 
-const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
+const Home: FunctionComponent<Props> = ({
+  components,
+  projects,
+  oauth2Error,
+}) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
@@ -170,101 +181,106 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               }
             />
           ) : (
-            <Section
-              primaryHeadline
-              Button={
-                !activeOrg.externalEntityProviderId && (
-                  <Button onClick={() => setOpen(true)}>New Project</Button>
-                )
-              }
-              description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
-              forceVertical
-              title="Projects"
-            >
-              <div className="flex flex-col gap-2">
-                {projects.map((project) => (
-                  <Link
-                    key={project.id}
-                    href={`/${activeOrg.slug}/projects/${project.slug}`}
-                    className="flex flex-col gap-2 hover:no-underline"
-                  >
-                    <ListItem
-                      reactOnHover
-                      Title={
-                        <div className="flex flex-row items-center gap-2">
-                          <span>{project.name}</span>
-                        </div>
-                      }
-                      Description={
-                        <div className="flex flex-col">
-                          <span>{project.description}</span>
-                          {(project.stats.totalAssets > 0 ||
-                            project.type !== "default") && (
-                            <div className="flex mt-4 flex-row items-center gap-2">
-                              {project.type !== "default" && (
-                                <ProjectBadge type={project.type} />
-                              )}
-                              {project.stats.totalAssets > 0 && (
-                                <>
-                                  {" "}
-                                  <Badge
-                                    variant={
-                                      project.stats.compliantAssets ===
-                                      project.stats.totalAssets
-                                        ? "success"
-                                        : "secondary"
-                                    }
-                                    className=""
-                                  >
-                                    {project.stats.compliantAssets}/
-                                    {project.stats.totalAssets} assets compliant
-                                  </Badge>
-                                  <Badge
-                                    variant={
-                                      project.stats
-                                        .passingControlsPercentage === 1
-                                        ? "success"
-                                        : "secondary"
-                                    }
-                                    className=""
-                                  >
-                                    {Math.round(
-                                      project.stats.passingControlsPercentage *
-                                        100,
-                                    )}
-                                    % controls passing
-                                  </Badge>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      }
-                      Button={
-                        <DropdownMenu>
-                          <DropdownMenuTrigger
-                            className={buttonVariants({
-                              variant: "outline",
-                              size: "icon",
-                            })}
-                          >
-                            <EllipsisVerticalIcon className="h-5 w-5" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <Link
-                              className="!text-foreground hover:no-underline"
-                              href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+            <>
+              <Section
+                primaryHeadline
+                Button={
+                  !activeOrg.externalEntityProviderId && (
+                    <Button onClick={() => setOpen(true)}>New Project</Button>
+                  )
+                }
+                description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+                forceVertical
+                title="Projects"
+              >
+                <div className="flex flex-col gap-2">
+                  {projects.map((project) => (
+                    <Link
+                      key={project.id}
+                      href={`/${activeOrg.slug}/projects/${project.slug}`}
+                      className="flex flex-col gap-2 hover:no-underline"
+                    >
+                      <ListItem
+                        reactOnHover
+                        Title={
+                          <div className="flex flex-row items-center gap-2">
+                            <span>{project.name}</span>
+                          </div>
+                        }
+                        Description={
+                          <div className="flex flex-col">
+                            <span>{project.description}</span>
+                            {(project.stats.totalAssets > 0 ||
+                              project.type !== "default") && (
+                              <div className="flex mt-4 flex-row items-center gap-2">
+                                {project.type !== "default" && (
+                                  <ProjectBadge type={project.type} />
+                                )}
+                                {project.stats.totalAssets > 0 && (
+                                  <>
+                                    {" "}
+                                    <Badge
+                                      variant={
+                                        project.stats.compliantAssets ===
+                                        project.stats.totalAssets
+                                          ? "success"
+                                          : "secondary"
+                                      }
+                                      className=""
+                                    >
+                                      {project.stats.compliantAssets}/
+                                      {project.stats.totalAssets} assets
+                                      compliant
+                                    </Badge>
+                                    <Badge
+                                      variant={
+                                        project.stats
+                                          .passingControlsPercentage === 1
+                                          ? "success"
+                                          : "secondary"
+                                      }
+                                      className=""
+                                    >
+                                      {Math.round(
+                                        project.stats
+                                          .passingControlsPercentage * 100,
+                                      )}
+                                      % controls passing
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        }
+                        Button={
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              className={buttonVariants({
+                                variant: "outline",
+                                size: "icon",
+                              })}
                             >
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                            </Link>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      }
-                    />
-                  </Link>
-                ))}
-              </div>
-            </Section>
+                              <EllipsisVerticalIcon className="h-5 w-5" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <Link
+                                className="!text-foreground hover:no-underline"
+                                href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                              >
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                              </Link>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        }
+                      />
+                    </Link>
+                  ))}
+                </div>
+              </Section>
+              {console.log("asdfasdfasdf" + components)}
+              <CustomPagination page={1} pageSize={2} data={[]} total={24} />
+            </>
           )}
         </div>
       )}
