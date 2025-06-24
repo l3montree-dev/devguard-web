@@ -32,7 +32,6 @@ export const Message = ({ message }: MessageProps) => {
         <div className="flex flex-row gap-4">
           <p className="flex-1" data-testid={`ui/message/${message.id}`}>
             {message.text}
-            <div className="mr-2 inline-block w-10"></div>
           </p>
         </div>
       </Callout>
