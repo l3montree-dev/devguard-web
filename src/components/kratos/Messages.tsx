@@ -64,22 +64,24 @@ const messageType2Intent = {
 };
 
 export const Message = ({ message }: MessageProps) => {
-  const error = message.id === 1010016;
-  console.log("error", error);
-  if (error)
-    return (
-      <Callout intent="success">
+  //To style a message, go to the devtool of you browser, then go to network and check flows, there then compare the message id and create a switch statement like below
+  switch (message.id) {
+    case 1010016:
+      return (
+        <Callout intent="danger">
+          <p className="text-sm" data-testid={`ui/message/${message.id}`}>
+            {message.text}
+          </p>
+        </Callout>
+      );
+
+    default:
+      return (
         <p className="text-sm" data-testid={`ui/message/${message.id}`}>
           {message.text}
         </p>
-      </Callout>
-    );
-
-  return (
-    <p className="text-sm" data-testid={`ui/message/${message.id}`}>
-      {message.text}
-    </p>
-  );
+      );
+  }
 };
 
 interface MessagesProps {
@@ -87,18 +89,6 @@ interface MessagesProps {
 }
 
 export const Messages = ({ messages }: MessagesProps) => {
-  messages?.map((message) => {
-    switch (message.id) {
-      case 1010016:
-        console.log("teststst!!!!!!!!!!!!");
-        return (
-          <>
-            <Message key={message.id} message={message} />
-          </>
-        );
-    }
-  });
-
   if (!messages) {
     // No messages? Do nothing.
     return null;
