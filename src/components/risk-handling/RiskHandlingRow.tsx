@@ -57,7 +57,7 @@ const VulnWithCveTableRow = ({
             <ScannerBadge scannerID={scannerID} key={key} />
           ))}
       </td>
-      <td className="p-4">{vuln.cveId}</td>
+      <td className="p-4">{vuln.cveID}</td>
       <td className="p-4">
         <div className="flex flex-row">
           <Severity risk={vuln.rawRiskAssessment} />

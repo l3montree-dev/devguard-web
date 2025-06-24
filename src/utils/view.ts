@@ -26,9 +26,9 @@ export const eventMessages = (event: VulnEventDTO) => {
     case "mitigate":
       return (
         "Everything after this entry will be synced with the external system. The ticket can be found at [" +
-        event.arbitraryJsonData.ticketUrl +
+        event.arbitraryJSONData.ticketUrl +
         "](" +
-        event.arbitraryJsonData.ticketUrl +
+        event.arbitraryJSONData.ticketUrl +
         ")"
       );
   }
@@ -54,7 +54,7 @@ export const vexOptionMessages: Record<string, string> = {
     "The vulnerable code exists but is never executed.",
   vulnerable_code_cannot_be_controlled_by_adversary:
     "The attacker cannot control the vulnerable code.",
-  inline_mitigations_already_exis:
+  inline_mitigations_already_exist:
     "Built-in defenses prevent known exploitation paths.",
 };
 
@@ -80,13 +80,13 @@ export const eventTypeMessages = (
         "detected " +
         flawName +
         " with scanner: " +
-        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
       );
 
     case "removedScanner":
       return (
         "removed scanner: " +
-        event.arbitraryJsonData.scannerIds.replace(defaultScanner, "")
+        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
       );
     case "ticketClosed":
       return "closed the ticket for " + flawName;
@@ -103,47 +103,48 @@ export const eventTypeMessages = (
     case "comment":
       return "added a comment";
     case "detected":
-      if (event.arbitraryJsonData.risk === 0) {
+      if (event.arbitraryJSONData.risk === 0) {
         return "detected " + flawName;
       }
       return (
         "detected " +
         flawName +
         " with a risk of " +
-        event.arbitraryJsonData.risk
+        event.arbitraryJSONData.risk +
+        " "
       );
     case "falsePositive":
       return "marked " + flawName + " as false positive ";
     case "rawRiskAssessmentUpdated":
       if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJsonData.risk;
+        return "Updated the risk assessment to " + event.arbitraryJSONData.risk;
       }
-      const oldRisk = event.arbitraryJsonData.oldRisk;
+      const oldRisk = event.arbitraryJSONData.oldRisk;
       if (!oldRisk && oldRisk !== 0) {
-        return "updated the risk assessment to " + event.arbitraryJsonData.risk;
+        return "updated the risk assessment to " + event.arbitraryJSONData.risk;
       }
       return (
         "updated the risk assessment from " +
         oldRisk +
         " to " +
-        event.arbitraryJsonData.risk
+        event.arbitraryJSONData.risk
       );
   }
   return "";
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600 text-white",
-  fixed: "bg-green-600 text-white",
-  detected: "bg-red-600 text-white",
-  falsePositive: "bg-purple-600 text-white",
+  accepted: "bg-purple-600 text-black",
+  fixed: "bg-green-600 text-black",
+  detected: "bg-red-600 text-black",
+  falsePositive: "bg-purple-600 text-black",
   mitigate: "bg-green-600 text-black",
-  markedForTransfer: "bg-blue-600 text-white",
+  markedForTransfer: "bg-blue-600 text-black",
   rawRiskAssessmentUpdated: "bg-secondary",
-  reopened: "bg-red-600 text-white",
+  reopened: "bg-red-600 text-black",
   comment: "bg-secondary",
-  ticketClosed: "bg-red-600 text-white",
-  ticketDeleted: "bg-red-600 text-white",
+  ticketClosed: "bg-red-600 text-black",
+  ticketDeleted: "bg-red-600 text-black",
   addedScanner: "bg-secondary",
   removedScanner: "bg-secondary",
   detectedOnAnotherBranch: "bg-secondary",

@@ -202,8 +202,8 @@ const Main: FunctionComponent<Props> = ({
         >
           <div className="mx-auto w-full max-w-screen-2xl">
             <div className="flex flex-row items-center gap-4">
-              <Link href={`/${organizationSlug}`}>
-                <EntityProviderImage provider={organizationSlug || ""} />
+              <Link href={`/${activeOrg?.slug}`}>
+                <EntityProviderImage provider={activeOrg?.slug || ""} />
               </Link>
               <div>
                 <OrganizationDropDown />

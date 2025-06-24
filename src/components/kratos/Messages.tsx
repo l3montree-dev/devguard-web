@@ -27,9 +27,15 @@ const messageType2Intent = {
 };
 export const Message = ({ message }: MessageProps) => {
   return (
-    <p className="text-sm" data-testid={`ui/message/${message.id}`}>
-      {message.text}
-    </p>
+    <>
+      <Callout intent="danger">
+        <div className="flex flex-row gap-4">
+          <p className="flex-1" data-testid={`ui/message/${message.id}`}>
+            {message.text}
+          </p>
+        </div>
+      </Callout>
+    </>
   );
 };
 

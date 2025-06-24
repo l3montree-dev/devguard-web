@@ -98,6 +98,7 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
+
   if ((node.meta.label?.context as any)?.provider_id === "official") {
     // render the google node
     return (
@@ -121,8 +122,99 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if (attributes.name === "link" && attributes.value === "official") {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="OpenCode Logo "
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign In with openCode
+        </Button>
+      </div>
+    );
+  }
+
+  if (attributes.name === "unlink" && attributes.value === "opencode") {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="OpenCode Logo "
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign out of openCode
+        </Button>
+      </div>
+    );
+  }
+
+  if (attributes.name === "unlink" && attributes.value === "opencode") {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="OpenCode Logo "
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign out of openCode
+        </Button>
+      </div>
+    );
+  }
+
   if ((node.meta.label?.context as any)?.provider_id === "opencode") {
     // render the google node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="Google Logo"
+            className="-ml-4 mr-0"
+            width={40}
+            height={40}
+          />
+          Sign in with openCode
+        </Button>
+      </div>
+    );
+  }
+
+  if ((node.meta.label?.context as any)?.provider_id === "official") {
     return (
       <div className="flex flex-row justify-end">
         <Button

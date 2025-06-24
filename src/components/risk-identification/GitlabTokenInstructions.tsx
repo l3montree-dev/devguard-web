@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import React from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
@@ -22,11 +23,11 @@ import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
 import { ImageZoom } from "../common/Zoom";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import router from "next/router";
 import { toast } from "sonner";
+import { CrownIcon } from "lucide-react";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -113,7 +114,8 @@ export const GitlabTokenSlides = ({
     | "secret-scanning"
     | "iac"
     | "sast"
-    | "custom"
+    | "sbom"
+    | "sarif"
     | "devsecops"
     | "container-scanning"
     | "sca";
@@ -131,7 +133,7 @@ export const GitlabTokenSlides = ({
 
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
+
   const asset = useActiveAsset();
 
   return (
@@ -146,8 +148,15 @@ export const GitlabTokenSlides = ({
             For example, for the DevGuard project its following URL:
             https://gitlab.com/l3montree/example-project/-/settings/ci_cd
           </DialogDescription>
+          <Alert className="mt-5">
+            <CrownIcon />
+            <AlertTitle>
+              You have to be at least <span className="">maintainer</span> to
+              configure variables.
+            </AlertTitle>
+          </Alert>
         </DialogHeader>
-        <div className="mt-10">
+        <div className="mt-5">
           <div className="relative aspect-video w-full max-w-4xl">
             <ImageZoom
               alt="Open the CI/CD settings in GitLab"

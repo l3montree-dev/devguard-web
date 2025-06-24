@@ -91,16 +91,22 @@ const MembersTable: FunctionComponent<Props> = ({
                         <EllipsisVerticalIcon className="h-5 w-5" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => onChangeMemberRole(m.id, "admin")}
-                        >
-                          Make admin
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onChangeMemberRole(m.id, "member")}
-                        >
-                          Make member
-                        </DropdownMenuItem>
+                        {m.role === "member" && (
+                          <DropdownMenuItem
+                            onClick={() => onChangeMemberRole(m.id, "admin")}
+                          >
+                            Make admin
+                          </DropdownMenuItem>
+                        )}
+
+                        {m.role === "admin" && (
+                          <DropdownMenuItem
+                            onClick={() => onChangeMemberRole(m.id, "member")}
+                          >
+                            Make member
+                          </DropdownMenuItem>
+                        )}
+
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => onRemoveMember(m.id)}>
                           Remove

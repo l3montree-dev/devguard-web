@@ -104,7 +104,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
   return (
     <div
       style={{
-        height: 14 /*padding*/ + codeStr.split("\n").length * 20,
+        height: 14 /*padding*/ + codeStr?.split("\n").length * 20,
       }}
       className="relative w-full overflow-hidden rounded-lg border"
     >

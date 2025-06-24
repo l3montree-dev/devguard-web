@@ -9,7 +9,7 @@ import {
 
 import Markdown from "react-markdown";
 
-import { classNames } from "../utils/common";
+import { beautifyPurl, classNames } from "../utils/common";
 import FormatDate from "./risk-assessment/FormatDate";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -20,6 +20,7 @@ import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import EcosystemImage from "./common/EcosystemImage";
 
 interface Props {
   events: VulnEventDTO[];
@@ -70,7 +71,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
             <div className="flex-1">
               <div className="w-full flex-1 overflow-hidden rounded border">
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${assetVersion!.slug}/vulns/${event.vulnId}`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vulns/${event.vulnId}`}
                   className="!text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
                 >
                   <div className="w-full">
@@ -79,11 +80,10 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
                         findUser(event.userId, activeOrg, currentUser)
                           .displayName
                       }{" "}
-                      {eventTypeMessages(
-                        event,
-                        event.vulnerabilityName || "a vulnerability",
-                        events,
-                      )}
+                      <FoundIn
+                        event={event}
+                        flawName={event.vulnerabilityName || "a vulnerability"}
+                      />
                     </p>
                   </div>
 
@@ -101,7 +101,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
         <div className="ml-10 mt-2 flex flex-row gap-2 text-xs font-normal text-muted-foreground">
           <FormatDate dateString={event.createdAt} />
           <div className="flex flex-row items-start gap-2">
-            {event.arbitraryJsonData.scannerIds?.split(" ").map((s) => (
+            {event.arbitraryJSONData.scannerIds?.split(" ").map((s) => (
               <Badge key={s} variant={"secondary"}>
                 {s.replace(defaultScanner, "")}
               </Badge>
@@ -114,3 +114,42 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
 };
 
 export default VulnEventItem;
+
+const FoundIn: FunctionComponent<{
+  event: VulnEventDTO;
+  flawName: string;
+}> = ({ event, flawName }) => {
+  const title = eventTypeMessages(event, flawName);
+  let found = <></>;
+
+  if (
+    event.type === "detectedOnAnotherBranch" ||
+    event.type === "addedScanner" ||
+    event.type === "removedScanner" ||
+    event.type === "detected"
+  ) {
+    if (event.vulnType === "firstPartyVuln") {
+      found = (
+        <span className="text-muted-foreground">
+          {" in "}
+          <span>{` ${event.uri} file`}</span>
+        </span>
+      );
+    } else if (event.vulnType === "dependencyVuln") {
+      found = (
+        <span className="inline-flex items-center gap-2 text-muted-foreground">
+          {" in "}
+          <EcosystemImage packageName={event.packageName ?? ""} />
+          {beautifyPurl(event.packageName ?? "")}
+        </span>
+      );
+    }
+  }
+
+  return (
+    <span>
+      {title}
+      {found}
+    </span>
+  );
+};

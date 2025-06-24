@@ -30,7 +30,13 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FunctionComponent, ReactNode, useEffect, useState } from "react";
+import {
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
@@ -65,7 +71,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
-import { beautifyPurl, extractVersion } from "@/utils/common";
+import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
@@ -79,6 +85,7 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
+import CopyCode from "@/components/common/CopyCode";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -283,6 +290,101 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
+type MemoResult = {
+  globalUpdate: string;
+  ecosystemUpdate: string;
+};
+
+function Quickfix(props: { vuln: string; version?: string; package?: string }) {
+  const { globalUpdate, ecosystemUpdate } = useMemo<MemoResult>(() => {
+    switch (getEcosystem(props.vuln)) {
+      case "npm": {
+        return {
+          globalUpdate: `npm audit fix`,
+          ecosystemUpdate: `npm install ${props.package}@${props.version}`,
+        };
+      }
+      case "golang": {
+        return {
+          globalUpdate: `go get -u ./...`,
+          ecosystemUpdate: `go get ${props.package}@${props.version}`,
+        };
+      }
+      case "pypi": {
+        return {
+          globalUpdate: `pip install pip-audit 
+          pip-audit`,
+          ecosystemUpdate: `pip install ${props.package}@${props.version}`,
+        };
+      }
+      case "cargo": {
+        return {
+          globalUpdate: `cargo update`,
+          ecosystemUpdate: `# in Cargo.toml: ${props.package}="${props.version}"`,
+        };
+      }
+      case "nuget": {
+        return {
+          globalUpdate: `dotnet list package --vulnerable
+          dotnet outdated`,
+          ecosystemUpdate: `dotnet add package ${props.package} --version${props.version}`,
+        };
+      }
+      case "apk": {
+        return {
+          globalUpdate: `apk update && apk upgrade`,
+          ecosystemUpdate: `apk add ${props.package}=${props.version}`,
+        };
+      }
+      case "deb": {
+        return {
+          globalUpdate: `apt update && apt upgrade`,
+          ecosystemUpdate: `apt-get install -y ${props.package}=${props.version}`,
+        };
+      }
+      default:
+        return {
+          globalUpdate: ``,
+          ecosystemUpdate: ``,
+        };
+    }
+  }, []);
+
+  return (
+    <div className="relative">
+      <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
+      <div className="relative ">
+        <div className="rounded-lg ">
+          <div className="absolute -top-1 -right-1">
+            <span className="relative flex size-4 ">
+              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex size-4 rounded-full bg-green-500"></span>
+            </span>
+          </div>
+          <div className=" rounded-lg border bg-card p-4 border">
+            <div className="text-sm">
+              <div className="mb-2">
+                <span className="text-xs text-muted-foreground">
+                  Update all Dependencies
+                </span>
+
+                <CopyCode codeString={globalUpdate}></CopyCode>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground">
+                  {`Update only ${props.package} `}
+                </span>
+
+                <CopyCode codeString={ecosystemUpdate}></CopyCode>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
@@ -290,8 +392,6 @@ const Index: FunctionComponent<Props> = (props) => {
     setVuln(props.vuln);
   }, [props.vuln]);
   const cve = vuln.cve;
-
-  console.log(props);
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -406,7 +506,7 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">{vuln.cveId}</h1>
+              <h1 className="text-2xl font-semibold">{vuln.cveID}</h1>
               <p className="mt-4 text-muted-foreground">
                 {vuln.cve?.description}
               </p>
@@ -416,11 +516,11 @@ const Index: FunctionComponent<Props> = (props) => {
                     <Badge className="h-full" variant={"secondary"}>
                       {vuln.ticketId?.startsWith("github:") ? (
                         <Image
+                          height={15}
                           src="/assets/github.svg"
                           alt="GitHub Logo"
                           className="-ml-1 mr-2 dark:invert"
                           width={15}
-                          height={15}
                         />
                       ) : (
                         <div className="mr-2">
@@ -437,6 +537,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     </Badge>
                   </Link>
                 )}
+
                 <VulnState state={vuln.state} />
                 {cve && <Severity risk={vuln.rawRiskAssessment} />}
                 {vuln.scannerIds.split(" ").map((s) => (
@@ -446,8 +547,9 @@ const Index: FunctionComponent<Props> = (props) => {
               <div className="mb-16 mt-4">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
               </div>
+
               <RiskAssessmentFeed
-                vulnerabilityName={vuln.cveId ?? ""}
+                vulnerabilityName={vuln.cveID ?? ""}
                 events={vuln.events}
               />
               <div>
@@ -939,6 +1041,23 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </div>
                     </div>
+                    {vuln.componentFixedVersion !== null && (
+                      <>
+                        <Quickfix
+                          vuln={vuln.componentPurl}
+                          version={
+                            Boolean(vuln.componentFixedVersion)
+                              ? (vuln.componentFixedVersion as string)
+                              : ""
+                          }
+                          package={
+                            Boolean(vuln.componentPurl)
+                              ? (beautifyPurl(vuln.componentPurl) as string)
+                              : ""
+                          }
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               )}
