@@ -658,13 +658,14 @@ const Index: FunctionComponent<Props> = (props) => {
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
-                                      <GitProviderIcon
-                                        externalEntityProviderIdOrRepositoryId={
-                                          asset.externalEntityProviderId ??
-                                          "official"
-                                        }
+                                      <Image
+                                        alt="Jira Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2 dark:invert"
+                                        src={"/assets/jira.svg"}
                                       />
-                                      Create GitLab Ticket
+                                      Create Jira Ticket
                                     </div>
                                   </div>
                                 </AsyncButton>
