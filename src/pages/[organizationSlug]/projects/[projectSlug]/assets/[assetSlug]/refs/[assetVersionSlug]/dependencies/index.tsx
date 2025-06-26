@@ -13,7 +13,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, SetStateAction, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -48,7 +48,14 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { BadgeInfo, ChevronDownIcon, GitBranch } from "lucide-react";
+import {
+  BadgeInfo,
+  ChevronDownIcon,
+  FileCode,
+  FileTextIcon,
+  GitBranch,
+  PersonStandingIcon,
+} from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -85,8 +92,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
 import { Switch } from "../../../../../../../../../components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { GitBranchIcon } from "lucide-react";
+import Image from "next/image";
+import { Loader2Icon } from "lucide-react";
+import { DelayedDownloadButton } from "@/components/common/DelayedDownloadButton";
+import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -456,6 +475,8 @@ const columnsDef: ColumnDef<
 const Index: FunctionComponent<Props> = ({ components, licenses }) => {
   const assetMenu = useAssetMenu();
 
+  const [showSBOMModal, setShowSBOMModal] = useState(false);
+
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useRouter().asPath.split("?")[0];
 
@@ -504,31 +525,9 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
       <div className="flex flex-row items-start justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"secondary"}>Download SBOM</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../sbom.json`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-              </Link>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../sbom.xml`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>XML-Format</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
+            Download SBOM
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"secondary"}>Download VeX</Button>
@@ -696,6 +695,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           scoreCard={datasets.scoreCard}
         ></DependencyDialog>
       )}
+      <SbomDownloadModal
+        showSBOMModal={showSBOMModal}
+        setShowSBOMModal={setShowSBOMModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
     </Page>
   );
 };
