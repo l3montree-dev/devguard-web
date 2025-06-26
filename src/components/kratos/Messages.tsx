@@ -27,6 +27,9 @@ const messageType2Intent = {
 };
 export const Message = ({ message }: MessageProps) => {
   //to style a message, go to the devtool of you browser, then go to network and check flows, there then compare the message id and create a switch statement like below
+
+  // 1010016 = You tried to sign in with \"<useremail>\", but that email is already used by another account. Sign in to your account with one of the options below to add your account \"<useremail>\" at \"gitlab\" as another way to sign in.
+
   switch (message.id) {
     case 1010016:
       return (
