@@ -50,7 +50,16 @@ interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
+  queryIntervalEnd?: number;
   variant: "high" | "medium" | "low" | "critical";
+  filter:
+    | "isGreaterThan"
+    | "isLessThan"
+    | "isAfter"
+    | "isBefore"
+    | "like"
+    | "is"
+    | "between";
 }
 
 const SeverityCard: FunctionComponent<Props> = ({
@@ -58,6 +67,8 @@ const SeverityCard: FunctionComponent<Props> = ({
   amountByCVSS,
   variant,
   queryIntervalStart,
+  queryIntervalEnd,
+  filter,
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -72,7 +83,7 @@ const SeverityCard: FunctionComponent<Props> = ({
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
               new URLSearchParams({
-                "filterQuery[raw_risk_assessment][is greater than]":
+                [`filterQuery[raw_risk_assessment][${filter}][${queryIntervalEnd}]`]:
                   queryIntervalStart.toString(),
               })
             }

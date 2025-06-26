@@ -33,6 +33,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
           : {}),
       });
 
+    console.log("url", uri);
+
     const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
     if (!sbom.ok) {
       context.res.statusCode = sbom.status;

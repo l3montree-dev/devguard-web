@@ -259,24 +259,29 @@ const Index: FunctionComponent<Props> = ({
               queryIntervalStart={8}
               amountByRisk={riskDistribution.critical}
               amountByCVSS={cvssDistribution.critical}
+              filter="isGreaterThan"
             />
             <SeverityCard
               variant="high"
               queryIntervalStart={7}
               amountByRisk={riskDistribution.high}
               amountByCVSS={cvssDistribution.high}
+              filter="isGreaterThan"
             />
             <SeverityCard
               variant="medium"
               queryIntervalStart={4}
               amountByRisk={riskDistribution.medium}
               amountByCVSS={cvssDistribution.medium}
+              filter="isGreaterThan"
             />
             <SeverityCard
               variant="low"
               queryIntervalStart={0}
+              queryIntervalEnd={0}
               amountByRisk={riskDistribution.low}
               amountByCVSS={cvssDistribution.low}
+              filter="between"
             />
           </div>
           <div className="col-span-4 row-span-2 flex flex-col">

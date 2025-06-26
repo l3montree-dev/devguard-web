@@ -534,6 +534,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               <Button variant={"secondary"}>Download VeX</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              {console.log(pathname)}
               <Link
                 download
                 target="_blank"
