@@ -514,7 +514,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 {vuln.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
-                      {vuln.ticketId?.startsWith("github:") ? (
+                      {vuln.ticketID?.startsWith("github:") ? (
                         <Image
                           height={15}
                           src="/assets/github.svg"
@@ -581,7 +581,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-start gap-2 pt-2">
-                            {vuln.ticketId === null &&
+                            {vuln.ticketID === null &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
                                 project,
@@ -611,7 +611,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </AsyncButton>
                               )}
 
-                            {vuln.ticketId === null &&
+                            {vuln.ticketID === null &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
                                 project,

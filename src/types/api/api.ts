@@ -162,7 +162,7 @@ export interface BaseVulnDTO {
   updatedAt: string;
   state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
-  ticketId: string | null;
+  ticketID: string | null;
   ticketUrl: string | null;
   assetId: string;
   assetVersionName: string;
@@ -266,8 +266,8 @@ export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
 export interface MitigateEventDTO extends BaseVulnEventDTO {
   type: "mitigate";
   arbitraryJSONData: EventArbitraryJsonData & {
-    ticketUrl: string;
-    ticketId: string;
+    ticketURL: string;
+    ticketID: string;
   };
 }
 

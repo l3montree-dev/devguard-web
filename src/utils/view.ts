@@ -26,9 +26,9 @@ export const eventMessages = (event: VulnEventDTO) => {
     case "mitigate":
       return (
         "Everything after this entry will be synced with the external system. The ticket can be found at [" +
-        event.arbitraryJSONData.ticketUrl +
+        event.arbitraryJSONData.ticketURL +
         "](" +
-        event.arbitraryJSONData.ticketUrl +
+        event.arbitraryJSONData.ticketURL +
         ")"
       );
   }
