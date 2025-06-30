@@ -71,7 +71,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
             <div className="flex-1">
               <div className="w-full flex-1 overflow-hidden rounded border">
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vulns/${event.vulnId}`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/${event.vulnType === "dependencyVuln" ? "dependency-risks" : "code-risks"}/${event.vulnId}`}
                   className="!text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
                 >
                   <div className="w-full">
