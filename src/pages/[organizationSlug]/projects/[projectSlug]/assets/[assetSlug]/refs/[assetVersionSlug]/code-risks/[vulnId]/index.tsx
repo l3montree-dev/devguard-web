@@ -414,13 +414,15 @@ const Index: FunctionComponent<Props> = (props) => {
               <h3 className="mb-2 text-lg font-semibold">Rule Details</h3>
               <div className="text-sm text-muted-foreground">
                 <Markdown>{vuln.ruleDescription}</Markdown>
-                <Link
-                  href={vuln.ruleHelpUri}
-                  target="_blank"
-                  className="mt-2 inline-block text-sm text-muted-foreground"
-                >
-                  {vuln.ruleHelpUri}
-                </Link>
+                {vuln.ruleHelpUri && (
+                  <Link
+                    href={vuln.ruleHelpUri}
+                    target="_blank"
+                    className="mt-2 inline-block text-sm text-muted-foreground"
+                  >
+                    {vuln.ruleHelpUri}
+                  </Link>
+                )}
               </div>
             </div>
           </div>
