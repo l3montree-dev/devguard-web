@@ -40,13 +40,8 @@ import {
 } from "../../../../../../../../../components/ui/card";
 import ColoredBadge from "../../../../../../../../../components/common/ColoredBadge";
 import { violationLengthToLevel } from "../../../../../compliance";
-
-const MarkdownEditor = dynamic(
-  () => import("@/components/common/MarkdownEditor"),
-  {
-    ssr: false,
-  },
-);
+import usePersonalAccessToken from "../../../../../../../../../hooks/usePersonalAccessToken";
+import PatSection from "../../../../../../../../../components/risk-identification/PatSection";
 
 interface Props {
   policyDetails: PolicyEvaluation;
@@ -55,6 +50,7 @@ interface Props {
 const Index: FunctionComponent<Props> = (props) => {
   const assetMenu = useAssetMenu();
 
+  const pat = usePersonalAccessToken();
   return (
     <Page
       Menu={assetMenu}
@@ -133,7 +129,7 @@ const Index: FunctionComponent<Props> = (props) => {
                       an attestation and upload it to the container-registry as
                       well as to DevGuard{" "}
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --predicateType "${props.policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${props.policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
                     </div>
                   </div>
@@ -174,8 +170,14 @@ const Index: FunctionComponent<Props> = (props) => {
                     </span>
                     <div className="mt-2">
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --predicateType "${props.policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${props.policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
+                    </div>
+                    <div className="mt-10">
+                      <PatSection
+                        description="Personal access token to create attestations"
+                        {...pat}
+                      />
                     </div>
                   </div>
                 </CardContent>
