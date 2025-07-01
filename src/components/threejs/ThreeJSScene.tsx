@@ -35,6 +35,7 @@ function Side({ rotation = [0, 0, 0], bg = "#f0f0f0", children, index }) {
         rotation={rotation}
         geometry={nodes.Cube.geometry}
       >
+        <Edges color={"#62748e"} />
         <meshStandardMaterial
           aoMapIntensity={1}
           aoMap={nodes.Cube.material.aoMap}

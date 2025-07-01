@@ -393,8 +393,6 @@ const Index: FunctionComponent<Props> = (props) => {
   }, [props.vuln]);
   const cve = vuln.cve;
 
-  console.log(props);
-
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
 
@@ -508,7 +506,7 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">{vuln.cveId}</h1>
+              <h1 className="text-2xl font-semibold">{vuln.cveID}</h1>
               <p className="mt-4 text-muted-foreground">
                 {vuln.cve?.description}
               </p>
@@ -551,7 +549,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
 
               <RiskAssessmentFeed
-                vulnerabilityName={vuln.cveId ?? ""}
+                vulnerabilityName={vuln.cveID ?? ""}
                 events={vuln.events}
               />
               <div>
