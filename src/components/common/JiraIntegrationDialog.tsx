@@ -128,10 +128,8 @@ export const JiraIntegrationDialog: FunctionComponent<Props> = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    Ensure that you provide the full URL to your Jira instance,
-                    including the protocol (https://).
-                    <br />
-                    For example: <code>https://your-domain.atlassian.net</code>
+                    Ensure that you provide the email address associated with
+                    your Jira account.
                   </FormDescription>
                 </FormItem>
               )}
@@ -167,7 +165,12 @@ export const JiraIntegrationDialog: FunctionComponent<Props> = ({
                 <FormItem>
                   <FormLabel>Jira Access-Token</FormLabel>
                   <FormControl>
-                    <Input placeholder="xxxxxxxxxxxxxxx..." {...field} />
+                    <Input
+                      required
+                      autoComplete="off"
+                      placeholder="xxxxxxxxxxxxxxx..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     DevGuard uses this token to <strong>create issues</strong>{" "}

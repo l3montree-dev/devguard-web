@@ -660,8 +660,8 @@ const Index: FunctionComponent<Props> = (props) => {
                                         alt="Jira Logo"
                                         width={15}
                                         height={15}
-                                        className="mr-2 dark:invert"
-                                        src={"/assets/jira.svg"}
+                                        className="mr-2"
+                                        src={"/assets/jira-svgrepo-com.svg"}
                                       />
                                       Create Jira Ticket
                                     </div>
