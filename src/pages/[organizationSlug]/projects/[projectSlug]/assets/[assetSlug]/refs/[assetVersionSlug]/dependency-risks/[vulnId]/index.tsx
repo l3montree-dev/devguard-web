@@ -407,8 +407,6 @@ const Index: FunctionComponent<Props> = (props) => {
     Object.keys(vexOptionMessages)[2],
   );
 
-  const assetVersion = useStore((s) => s.assetVersion);
-
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
@@ -434,7 +432,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          assetVersion?.name +
+          vuln.assetVersionName +
           "/dependency-vulns/" +
           vuln.id +
           "/mitigate",
@@ -459,7 +457,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          assetVersion?.name +
+          vuln.assetVersionName +
           "/dependency-vulns/" +
           vuln.id,
         {
@@ -484,7 +482,10 @@ const Index: FunctionComponent<Props> = (props) => {
       ...prev,
       ...json,
       events: prev.events.concat([
-        { ...json.events.slice(-1)[0], assetVersionName: assetVersion?.name },
+        {
+          ...json.events.slice(-1)[0],
+          assetVersionName: vuln.assetVersionName,
+        },
       ]),
     }));
     setJustification("");

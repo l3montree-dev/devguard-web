@@ -105,7 +105,9 @@ export const DependencyGraphNode: FunctionComponent<
           <DropdownMenuItem key={vuln.id}>
             <Link
               className="!text-foreground hover:no-underline"
-              href={router.asPath.split("?")[0] + `/../vulns/${vuln.id}`}
+              href={
+                router.asPath.split("?")[0] + `/../dependency-risks/${vuln.id}`
+              }
             >
               {vuln.cveID}
             </Link>
