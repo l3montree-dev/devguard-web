@@ -528,7 +528,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             externalEntityProviderIdOrRepositoryId={
                               asset.externalEntityProviderId ??
                               asset.repositoryId ??
-                              "official"
+                              "gitlab"
                             }
                           />
                         </div>
@@ -601,11 +601,11 @@ const Index: FunctionComponent<Props> = (props) => {
                                         <GitProviderIcon
                                           externalEntityProviderIdOrRepositoryId={
                                             asset.externalEntityProviderId ??
-                                            "official"
+                                            "gitlab"
                                           }
                                         />
                                       </div>
-                                      Create GitLab Ticket
+                                      Create Ticket
                                     </div>
                                   </div>
                                 </AsyncButton>
