@@ -356,12 +356,6 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
       <div className="relative ">
         <div className="rounded-lg ">
-          <div className="absolute -top-1 -right-1">
-            <span className="relative flex size-4 ">
-              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex size-4 rounded-full bg-green-500"></span>
-            </span>
-          </div>
           <div className=" rounded-lg border bg-card p-4 border">
             <div className="text-sm">
               <div className="mb-2">
@@ -486,7 +480,7 @@ const Index: FunctionComponent<Props> = (props) => {
       events: prev.events.concat([
         {
           ...json.events.slice(-1)[0],
-          assetVersionName: vuln.assetVersionName,
+          assetVersionName: assetVersion?.name ?? "",
         },
       ]),
     }));

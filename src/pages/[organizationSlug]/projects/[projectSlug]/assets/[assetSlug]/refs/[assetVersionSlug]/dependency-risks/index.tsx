@@ -174,12 +174,6 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       return (
         <div>
           <div className="relative rounded-lg">
-            <div className="absolute -top-1 -right-1">
-              <span className="relative flex size-3 ">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
-              </span>
-            </div>
             <div className="rounded-lg border bg-card p-4 border  ">
               <span>
                 <span className="text-muted-foreground">Update to version</span>{" "}
