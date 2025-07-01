@@ -86,6 +86,7 @@ import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 import CopyCode from "@/components/common/CopyCode";
+import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -398,6 +399,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
+  const assetVersion = useActiveAssetVersion();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -432,7 +434,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          vuln.assetVersionName +
+          assetVersion?.name +
           "/dependency-vulns/" +
           vuln.id +
           "/mitigate",
@@ -457,7 +459,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          vuln.assetVersionName +
+          assetVersion?.name +
           "/dependency-vulns/" +
           vuln.id,
         {
