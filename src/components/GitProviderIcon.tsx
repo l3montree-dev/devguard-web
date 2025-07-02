@@ -7,7 +7,7 @@ interface Props {
 
 const GitProviderIcon = ({ externalEntityProviderIdOrRepositoryId }: Props) => {
   if (
-    externalEntityProviderIdOrRepositoryId === "official" ||
+    externalEntityProviderIdOrRepositoryId === "gitlab" ||
     externalEntityProviderIdOrRepositoryId?.startsWith("gitlab:")
   ) {
     return (

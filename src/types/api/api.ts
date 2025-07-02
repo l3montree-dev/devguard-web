@@ -83,7 +83,7 @@ export interface OrganizationDTO extends AppModelDTO {
 
   isPublic: boolean;
 
-  externalEntityProviderId?: "opencode" | "github" | "official";
+  externalEntityProviderId?: "opencode" | "github" | "gitlab";
 }
 
 export interface OrganizationDetailsDTO extends OrganizationDTO {
@@ -210,7 +210,6 @@ interface BaseVulnEventDTO {
   mechanicalJustification: string;
   vulnerabilityName: string | null;
   assetVersionName: string;
-  assetVersionSlug: string;
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;

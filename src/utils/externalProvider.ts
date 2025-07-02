@@ -1,5 +1,5 @@
 export const providerIdToBaseURL = (provider?: string) => {
-  if (provider === "official") {
+  if (provider === "gitlab") {
     return "https://gitlab.com";
   } else if (provider === "opencode") {
     return "https://gitlab.opencode.de";
@@ -10,7 +10,7 @@ export const providerIdToBaseURL = (provider?: string) => {
 export const externalProviderIdToIntegrationName = (
   provider?: string,
 ): "github" | "gitlab" | undefined => {
-  if (provider === "official") {
+  if (provider === "gitlab") {
     return "gitlab";
   } else if (provider === "opencode") {
     return "gitlab";

@@ -30,7 +30,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
-import { UserIcon } from "@heroicons/react/24/solid";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";

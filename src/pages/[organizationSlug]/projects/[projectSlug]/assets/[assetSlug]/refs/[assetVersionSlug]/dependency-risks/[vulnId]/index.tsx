@@ -86,6 +86,7 @@ import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 import CopyCode from "@/components/common/CopyCode";
+import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -355,12 +356,6 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
       <div className="relative ">
         <div className="rounded-lg ">
-          <div className="absolute -top-1 -right-1">
-            <span className="relative flex size-4 ">
-              <span className="absolute inline-flex h-full w-full  animate-ping rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex size-4 rounded-full bg-green-500"></span>
-            </span>
-          </div>
           <div className=" rounded-lg border bg-card p-4 border">
             <div className="text-sm">
               <div className="mb-2">
@@ -398,6 +393,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
+  const assetVersion = useActiveAssetVersion();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -406,8 +402,6 @@ const Index: FunctionComponent<Props> = (props) => {
   const [selectedOption, setSelectedOption] = useState<string>(
     Object.keys(vexOptionMessages)[2],
   );
-
-  const assetVersion = useStore((s) => s.assetVersion);
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -484,7 +478,10 @@ const Index: FunctionComponent<Props> = (props) => {
       ...prev,
       ...json,
       events: prev.events.concat([
-        { ...json.events.slice(-1)[0], assetVersionName: assetVersion?.name },
+        {
+          ...json.events.slice(-1)[0],
+          assetVersionName: assetVersion?.name ?? "",
+        },
       ]),
     }));
     setJustification("");
@@ -528,7 +525,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             externalEntityProviderIdOrRepositoryId={
                               asset.externalEntityProviderId ??
                               asset.repositoryId ??
-                              "official"
+                              "gitlab"
                             }
                           />
                         </div>
@@ -601,11 +598,11 @@ const Index: FunctionComponent<Props> = (props) => {
                                         <GitProviderIcon
                                           externalEntityProviderIdOrRepositoryId={
                                             asset.externalEntityProviderId ??
-                                            "official"
+                                            "gitlab"
                                           }
                                         />
                                       </div>
-                                      Create GitLab Ticket
+                                      Create Ticket
                                     </div>
                                   </div>
                                 </AsyncButton>

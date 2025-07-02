@@ -1,11 +1,7 @@
-import {
-  DiffSourceToggleWrapper,
-  MDXEditorMethods,
-  MDXEditorProps,
-} from "@mdxeditor/editor";
+import { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import styles from "../../styles/mdxeditor.module.scss";
 import { FunctionComponent, useEffect, useRef } from "react";
+import styles from "../../styles/mdxeditor.module.scss";
 
 import {
   BoldItalicUnderlineToggles,
@@ -14,7 +10,6 @@ import {
   MDXEditor,
   codeBlockPlugin,
   codeMirrorPlugin,
-  diffSourcePlugin,
   frontmatterPlugin,
   headingsPlugin,
   imagePlugin,
