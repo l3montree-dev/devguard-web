@@ -187,8 +187,6 @@ const Home: FunctionComponent = () => {
     }
   };
 
-  console.log("Active Org", activeOrg);
-
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
       <div className="flex flex-row justify-between">
