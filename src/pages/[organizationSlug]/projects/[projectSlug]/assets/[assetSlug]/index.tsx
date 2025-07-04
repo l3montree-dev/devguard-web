@@ -126,7 +126,6 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
         onOpenChange={setWebhookIsOpen}
-        apiUrl={apiUrl}
       />
     </Page>
   );

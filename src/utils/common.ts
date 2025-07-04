@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { State } from "@/types/common";
+import { ExternalTicketProvider, State } from "@/types/common";
 import { defaultScanner } from "./view";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
@@ -207,4 +207,19 @@ export const extractVersion = (purl: string) => {
   }
 
   return version;
+};
+
+export const providerNameToExternalTicketProvider = (
+  externalProviderId: string,
+): ExternalTicketProvider => {
+  switch (externalProviderId) {
+    case "gitlab":
+      return ExternalTicketProvider.GITLAB;
+    case "github":
+      return ExternalTicketProvider.GITHUB;
+    case "opencode":
+      return ExternalTicketProvider.OPENCODE;
+    default:
+      return ExternalTicketProvider.GITLAB;
+  }
 };

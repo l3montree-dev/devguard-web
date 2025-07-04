@@ -1,19 +1,13 @@
+import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
+import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
+import ListItem from "@/components/common/ListItem";
+import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -21,22 +15,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { classNames } from "@/utils/common";
-import { InfoIcon, Terminal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { encodeObjectBase64 } from "@/services/encodeService";
+import { OrganizationDetailsDTO } from "@/types/api/api";
+import { ExternalTicketProvider } from "@/types/common";
+import { providerNameToExternalTicketProvider } from "@/utils/common";
+import { values } from "lodash";
+import { InfoIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import ProviderSetup from "./ProviderSetup";
 
 interface StartSlideProps {
-  setSelectedScanner: (scanner: string) => void;
-  selectedScanner: string | undefined;
+  setSelectedProvider: (scanner: string) => void;
+  selectedProvider: string | undefined;
   api?: {
     scrollNext: () => void;
   };
+  provider?: ExternalTicketProvider;
+  activeOrg: OrganizationDetailsDTO;
 }
 
 export default function StartSlide({
-  setSelectedScanner,
-  selectedScanner,
+  setSelectedProvider,
+  selectedProvider,
+  provider,
+  activeOrg,
   api,
 }: StartSlideProps) {
+  const router = useRouter();
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -54,62 +63,55 @@ export default function StartSlide({
           <InfoIcon />
           <AlertTitle>About Ticket Integration</AlertTitle>
           <AlertDescription>
-            You can connect your repository at GitLab, openCode, GitHub or Jira
-            to DevGuard to enable ticket-based risk management. Whenever
-            DevGuard detects a new risk in your code, it will automatically
-            create a ticket in your issue tracker. In you issue tracker, you can
-            then work on the risk and even use slash commands to apply
-            mitigation strategies.
+            You can connect your repository at GitLab, openCode or GitHub to
+            DevGuard to enable ticket-based risk management. Whenever DevGuard
+            detects a new risk in your code, it will automatically create a
+            ticket in your issue tracker. In you issue tracker, you can then
+            work on the risk and even use slash commands to apply mitigation
+            strategies.
           </AlertDescription>
         </Alert>
-        <hr className="my-8" />
+        <hr className="my-4" />
       </DialogHeader>
-
-      <div>
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Theme" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Light</SelectItem>
-            <SelectItem value="dark">Dark</SelectItem>
-            <SelectItem value="system">System</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Card
-          onClick={() => setSelectedScanner("devsecops")}
-          className={classNames(
-            "col-span-2 cursor-pointer",
-            selectedScanner === "devsecops"
-              ? "border border-primary"
-              : "border border-transparent",
-          )}
-        >
-          <CardContent className="p-0">
-            <CardHeader>
-              <CardTitle className="text-lg leading-tight">
-                Integrate whole DevSecOps-Pipeline
-              </CardTitle>
-              <CardDescription>
-                Integrate a whole DevSecOps-Pipeline including dependency risk
-                identification. This is only possible through CI/CD Components
-                and GitHub-Actions.
-              </CardDescription>
-            </CardHeader>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button
-          disabled={selectedScanner === undefined}
-          onClick={() => api?.scrollNext()}
-        >
-          {selectedScanner === undefined ? "Select a scanner" : "Continue"}
-        </Button>
+      <div className="p-1">
+        <div className="">
+          <Select
+            value={providerNameToExternalTicketProvider(selectedProvider || "")}
+            onValueChange={(value) => {
+              setSelectedProvider(value);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Provider" />
+            </SelectTrigger>
+            <SelectContent>
+              {values(ExternalTicketProvider).map((provider) => (
+                <SelectItem
+                  key={provider}
+                  value={provider}
+                  onClick={() => setSelectedProvider(provider)}
+                >
+                  <ProviderTitleIcon provider={provider} />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="mt-6">
+          <h3 className="font-semibold mt-4 flex items-center">
+            <Badge className="mr-2" variant="secondary">
+              Step 1/2
+            </Badge>{" "}
+            Ensure that DevGuard can create tickets in your issue tracker
+          </h3>
+          <ProviderSetup
+            selectedProvider={providerNameToExternalTicketProvider(
+              selectedProvider || "",
+            )}
+            activeOrg={activeOrg}
+            api={api}
+          />
+        </div>
       </div>
     </CarouselItem>
   );

@@ -85,3 +85,9 @@ export type ZodConvert<T> = {
             ? z.ZodObject<ZodConvert<T[P]>>
             : never;
 };
+
+export enum ExternalTicketProvider {
+  GITHUB = "GitHub",
+  GITLAB = "GitLab",
+  OPENCODE = "openCode",
+}
