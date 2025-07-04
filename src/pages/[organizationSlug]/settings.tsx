@@ -40,7 +40,11 @@ import {
 } from "@/components/ui/form";
 import { withOrganization } from "@/decorators/withOrganization";
 import { browserApiClient } from "@/services/devGuardApi";
-import { GitLabIntegrationDTO, OrganizationDetailsDTO } from "@/types/api/api";
+import {
+  GitLabIntegrationDTO,
+  JiraIntegrationDTO,
+  OrganizationDetailsDTO,
+} from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import Link from "next/link";
@@ -53,6 +57,7 @@ import MemberDialog from "@/components/MemberDialog";
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
+import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -99,6 +104,13 @@ const Home: FunctionComponent = () => {
     });
   };
 
+  const handleNewJiraIntegration = (integration: JiraIntegrationDTO) => {
+    updateOrganization({
+      ...activeOrg,
+      jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+    });
+  };
+
   const handleChangeMemberRole = async (
     id: string,
     role: "admin" | "member",
@@ -141,7 +153,7 @@ const Home: FunctionComponent = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteGitLabIntegration = async (id: string) => {
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/integrations/gitlab/" + id,
       {
@@ -159,7 +171,21 @@ const Home: FunctionComponent = () => {
     }
   };
 
-  console.log("Active Org", activeOrg);
+  const handleDeleteJiraIntegration = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/integrations/jira/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateOrganization({
+        ...activeOrg,
+        jiraIntegrations: activeOrg.jiraIntegrations.filter((i) => i.id !== id),
+      });
+    }
+  };
 
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
@@ -226,7 +252,37 @@ const Home: FunctionComponent = () => {
               Button={
                 <AsyncButton
                   variant={"destructiveOutline"}
-                  onClick={() => handleDelete(integration.id)}
+                  onClick={() => handleDeleteGitLabIntegration(integration.id)}
+                >
+                  Delete
+                </AsyncButton>
+              }
+            />
+          ))}
+          {activeOrg.jiraIntegrations.map((integration) => (
+            <ListItem
+              key={integration.id}
+              Title={
+                <>
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/jira-svgrepo-com.svg"
+                      alt="Jira"
+                      width={20}
+                      height={20}
+                      className="mr-2 inline-block"
+                    />
+                    {integration.name}
+                  </div>
+                </>
+              }
+              Description={
+                "DevGuard uses an Access-Token to access your repositories and create issues."
+              }
+              Button={
+                <AsyncButton
+                  variant={"destructiveOutline"}
+                  onClick={() => handleDeleteJiraIntegration(integration.id)}
                 >
                   Delete
                 </AsyncButton>
@@ -293,6 +349,29 @@ const Home: FunctionComponent = () => {
                   <Button variant={"secondary"}>Integrate with GitLab</Button>
                 }
               ></GitLabIntegrationDialog>
+            }
+          />
+          <ListItem
+            Title={
+              <div className="flex flex-row items-center">
+                <Image
+                  src="/assets/jira-svgrepo-com.svg"
+                  alt="GitHub"
+                  width={18}
+                  height={18}
+                  className="mr-2 inline-block"
+                />
+                Integrate with Jira
+              </div>
+            }
+            Description="DevGuard uses a Jira API Token to access your Jira projects and interact with your issues. This allows DevGuard to create and manage issues in your Jira projects."
+            Button={
+              <JiraIntegrationDialog
+                onNewIntegration={handleNewJiraIntegration}
+                Button={
+                  <Button variant={"secondary"}>Integrate with Jira</Button>
+                }
+              ></JiraIntegrationDialog>
             }
           />
         </Section>

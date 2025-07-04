@@ -57,6 +57,14 @@ export interface GitLabIntegrationDTO {
   name: string;
 }
 
+export interface JiraIntegrationDTO {
+  id: string;
+  obfuscatedToken: string;
+  url: string;
+  name: string;
+  userEmail: string;
+}
+
 export interface OrganizationDTO extends AppModelDTO {
   name: string;
   contactPhoneNumber?: string;
@@ -80,6 +88,7 @@ export interface OrganizationDTO extends AppModelDTO {
   }>;
 
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
+  jiraIntegrations: Array<JiraIntegrationDTO>;
 
   isPublic: boolean;
 

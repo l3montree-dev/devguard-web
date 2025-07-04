@@ -195,18 +195,32 @@ export const getParentRepositoryIdAndName = (
 export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
   asset?: AssetDTO,
   project?: ProjectDTO,
-): "gitlab" | "github" | undefined => {
+): "gitlab" | "github" | "jira" | undefined => {
   if (asset && asset.repositoryId) {
-    return asset.repositoryId.startsWith("gitlab:") ? "gitlab" : "github";
+    const repoID = asset.repositoryId;
+
+    if (repoID?.startsWith("gitlab:")) {
+      return "gitlab";
+    } else if (repoID?.startsWith("github:")) {
+      return "github";
+    } else if (repoID?.startsWith("jira:")) {
+      return "jira";
+    }
   }
   if (asset?.externalEntityProviderId) {
     return externalProviderIdToIntegrationName(asset.externalEntityProviderId);
   }
-  return getParentRepositoryIdAndName(project).parentRepositoryId?.startsWith(
-    "gitlab:",
-  )
-    ? "gitlab"
-    : "github";
+
+  const parentRepoID = getParentRepositoryIdAndName(project).parentRepositoryId;
+
+  if (parentRepoID?.startsWith("gitlab:")) {
+    return "gitlab";
+  } else if (parentRepoID?.startsWith("github:")) {
+    return "github";
+  } else if (parentRepoID?.startsWith("jira:")) {
+    return "jira";
+  }
+  return undefined;
 };
 
 export const defaultScanner =
