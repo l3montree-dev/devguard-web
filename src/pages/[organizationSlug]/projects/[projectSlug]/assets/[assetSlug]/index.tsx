@@ -25,6 +25,7 @@ import { config } from "../../../../../../config";
 import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
+import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 
 interface Props {
   apiUrl: string;
@@ -34,6 +35,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
   const assetMenu = useAssetMenu();
   const [isOpen, setIsOpen] = useState(false);
   const [dependencyRiskIsOpen, setDependencyRiskIsOpen] = useState(false);
+  const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
   const autosetup = useAutosetup("full");
   return (
@@ -90,6 +92,24 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
             }
           />
         </div>
+        <div>
+          <ListItem
+            Title="Connect your code repository to DevGuard - Manage using Ticket-Integration"
+            Description={
+              "Lorem Ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            }
+            Button={
+              <div className="flex flex-row gap-2">
+                <Button
+                  onClick={() => setWebhookIsOpen(true)}
+                  variant={"secondary"}
+                >
+                  Setup Ticket-Integration
+                </Button>
+              </div>
+            }
+          />
+        </div>
       </Section>
       <DependencyRiskScannerDialog
         open={dependencyRiskIsOpen}
@@ -100,6 +120,12 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
       <CodeRiskScannerDialog
         open={isOpen}
         onOpenChange={setIsOpen}
+        apiUrl={apiUrl}
+      />
+
+      <WebhookSetupTicketIntegrationDialog
+        open={webhookIsOpen}
+        onOpenChange={setWebhookIsOpen}
         apiUrl={apiUrl}
       />
     </Page>
