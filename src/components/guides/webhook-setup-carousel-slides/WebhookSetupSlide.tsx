@@ -11,6 +11,8 @@ import { config } from "@/config";
 import { InputWithCustomButton } from "@/components/ui/input-with-custom-button";
 import { ImageZoom } from "@/components/common/Zoom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -60,7 +62,10 @@ export default function WebhookSetupSlide({
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          Connect with GitLab to allow DevGuard to create tickets
+          <Badge className="mr-2" variant="secondary">
+            Step 2/2
+          </Badge>{" "}
+          Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>
         <hr className="my-4" />
       </DialogHeader>
@@ -70,14 +75,15 @@ export default function WebhookSetupSlide({
         triggers like shown in the screenshot below. You must set a secret
         token.
       </p>
-      <div className="relative aspect-video w-full max-w-4xl">
-        <ImageZoom
-          src="/assets/gitlab-webhooks-combined.png"
-          alt="GitLab Webhooks"
-          className="rounded-md"
-          fill
-        />
-      </div>
+
+      <Image
+        src="/assets/gitlab-webhooks-combined.png"
+        alt="GitLab Webhooks"
+        className="rounded-md w-full h-auto"
+        width={1280}
+        height={720}
+      />
+
       <div className="p-1">
         <InputWithCustomButton
           label="Webhook URL"

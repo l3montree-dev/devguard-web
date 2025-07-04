@@ -8,6 +8,7 @@ import { useStore } from "@/zustand/globalStoreProvider";
 export interface GitLabIntegrationSetupSlideProps {
   api?: {
     scrollNext: () => void;
+    scrollPrev: () => void;
   };
 }
 
@@ -36,6 +37,7 @@ export default function GitLabIntegrationSetupSlide({
         <GitLabIntegrationForm
           onNewIntegration={handleNewGitLabIntegration}
           additionalOnClick={api?.scrollNext}
+          backButtonClick={api?.scrollPrev}
         />
       </div>
     </CarouselItem>

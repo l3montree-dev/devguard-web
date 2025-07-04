@@ -26,12 +26,14 @@ export interface GitLabIntegrationFormProps {
   onNewIntegration: (integration: GitLabIntegrationDTO) => void;
   setOpen?: (open: boolean) => void;
   additionalOnClick?: () => void;
+  backButtonClick?: () => void;
 }
 
 export default function GitLabIntegrationForm({
   onNewIntegration,
   setOpen,
   additionalOnClick,
+  backButtonClick,
 }: GitLabIntegrationFormProps) {
   const form = useForm<{ url: string; token: string; name: string }>();
   const activeOrg = useActiveOrg();
@@ -144,10 +146,17 @@ export default function GitLabIntegrationForm({
         />
         <div className="flex flex-row justify-end">
           <div className="flex flex-col items-end justify-end gap-2">
-            <Button disabled={isLoading} type="submit">
-              <Loader />
-              Test and Save
-            </Button>
+            <div className="flex flex-row gap-4">
+              {backButtonClick && (
+                <Button variant={"secondary"} onClick={backButtonClick}>
+                  Back
+                </Button>
+              )}
+              <Button disabled={isLoading} type="submit">
+                <Loader />
+                Test and Save
+              </Button>
+            </div>
             <small className="text-muted-foreground">
               Checks if the provided access token is valid and has at least
               Reporter-Access.
