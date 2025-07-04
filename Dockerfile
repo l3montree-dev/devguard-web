@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM node:22.14.0@sha256:c7fd844945a76eeaa83cb372e4d289b4a30b478a1c80e16c685b62c54156285b as build-env
+FROM node:24.3.0@sha256:8369522c586f6cafcf77e44630e7036e4972933892f8b45e42d9baeb012d521c as build-env
 LABEL maintainer="L3montree & DevGuard contributors"
 
 # Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 ARG VERSION
 ARG DEVGUARD_API_URL
+ARG NEXT_PUBLIC_ERROR_TRACKING_DSN
+ARG SENTRY_AUTH_TOKEN
 
 WORKDIR /usr/app/
 
@@ -29,6 +31,8 @@ EXPOSE 3000
 ENV NEXT_PUBLIC_ENVIRONMENT production
 ENV NEXT_PUBLIC_VERSION $VERSION
 ENV NEXT_PUBLIC_DEVGUARD_API_URL $DEVGUARD_API_URL
+ENV NEXT_PUBLIC_ERROR_TRACKING_DSN $NEXT_PUBLIC_ERROR_TRACKING_DSN
+ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
 
 COPY package-lock.json .
 COPY package.json .
@@ -46,7 +50,7 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM gcr.io/distroless/nodejs22-debian12:nonroot@sha256:578ac826dc647986c5b1cd4f6464842b15fc26becb16765b9f1fcc4d5e8294f7
+FROM gcr.io/distroless/nodejs24-debian12:nonroot@sha256:6946d10001ee9757788e8c4e6a0d58308f15f9af09a83a7feeb3dc1b3e1eae5a
 
 USER 53111
 
