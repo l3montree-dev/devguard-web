@@ -160,7 +160,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {assets.length === 0 && subprojects.length === 0 ? (
+        {assets.length === 0 && subprojects?.length === 0 ? (
           <EmptyParty
             description="No repositories or subprojects found"
             title="Your Repositories will show up here!"
@@ -213,7 +213,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                 : "Subprojects & Repositories"
             }
           >
-            {subprojects.map((subproject) => (
+            {subprojects?.map((subproject) => (
               <Link
                 key={subproject.id}
                 href={`/${activeOrg.slug}/projects/${subproject.slug}`}
@@ -385,14 +385,12 @@ export const getServerSideProps = middleware(
       ),
     ]);
 
-    // get the stats for all assets
-
     return {
       props: {
         initialZustand: {
           project,
         },
-        subprojects,
+        subprojects: subprojects.data,
         project,
         assets,
       },
