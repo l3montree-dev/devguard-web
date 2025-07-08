@@ -227,7 +227,9 @@ export const GitlabTokenSlides = ({
                   `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
                 );
               } else {
-                toast.error("Gitlab Pipeline has failed");
+                toast.error(
+                  "We did not receive any information from your pipeline yet. You can safely close the dialog and refresh the page yourself after the pipeline did finish.",
+                );
               }
             }}
           >
