@@ -31,6 +31,7 @@ import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
+  act,
   FunctionComponent,
   ReactNode,
   useEffect,
@@ -412,7 +413,7 @@ const Index: FunctionComponent<Props> = (props) => {
       return;
     }
 
-    if (!Boolean(data.justification)) {
+    if (!Boolean(data.justification) && data.status !== "falsePositive") {
       return toast("Please provide a justification", {
         description: "You need to provide a justification for your decision.",
       });
@@ -468,6 +469,26 @@ const Index: FunctionComponent<Props> = (props) => {
       json = await resp.json();
     }
 
+    if (data.status === "falsePositive") {
+      const resp = await browserApiClient(
+        "/api/v1/organizations/" + activeOrg.slug + "risk-sharing-space",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            assetId: vuln.assetId,
+            cveID: vuln.cveID,
+            organzationID: activeOrg.slug,
+            projectID: project.slug,
+          }),
+        },
+        "",
+      );
+      json = await resp.json();
+    }
+
     if (!json.events) {
       return toast("Failed to update vulnerability", {
         description: "Please try again later.",
@@ -493,6 +514,9 @@ const Index: FunctionComponent<Props> = (props) => {
     cvssVectorObj,
   );
 
+  {
+    console.log(vuln);
+  }
   return (
     <Page
       Menu={assetMenu}
@@ -648,6 +672,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             >
                               Accept risk
                             </AsyncButton>
+
                             <div className="flex flex-col items-center">
                               <div className="flex flex-row items-center">
                                 <AsyncButton
@@ -696,11 +721,18 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              <div className="flex-1 w-full">
-                                <span className=" text-left text-xs text-muted-foreground">
-                                  {"Mark as False Positive"}
-                                </span>
-                              </div>
+                            </div>
+                            <div className="flex-1 w-full ">
+                              <AsyncButton
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "falsePositive",
+                                  })
+                                }
+                                variant={"destructive"}
+                              >
+                                False Positive
+                              </AsyncButton>
                             </div>
 
                             <AsyncButton
