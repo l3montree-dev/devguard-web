@@ -734,18 +734,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </DropdownMenu>
                               </div>
                             </div>
-                            <div className="flex-1 w-full ">
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "falsePositive",
-                                  })
-                                }
-                                variant={"destructive"}
-                              >
-                                False Positive
-                              </AsyncButton>
-                            </div>
+                            <div className="flex-1 w-full "></div>
 
                             <AsyncButton
                               onClick={() =>
