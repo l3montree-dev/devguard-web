@@ -28,7 +28,7 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import { PolicyEvaluation, ProjectDTO } from "../../types/api/api";
+import { Paged, PolicyEvaluation, ProjectDTO } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -62,10 +62,13 @@ import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
 import { useParams } from "next/navigation";
+import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
+import CustomPagination from "@/components/common/CustomPagination";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   oauth2Error?: boolean;
-  projects: Array<
+  projects: Paged<
     ProjectDTO & {
       stats: {
         compliantAssets: number;
@@ -87,6 +90,24 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
   });
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const params = router.query;
+    if (e.target.value === "") {
+      delete params["search"];
+      router.push({
+        query: params,
+      });
+    } else if (e.target.value.length >= 3) {
+      router.push({
+        query: {
+          ...params,
+          search: e.target.value,
+          page: 1, // reset to first page on search
+        },
+      });
+    }
+  };
 
   const handleCreateProject = async (req: CreateProjectReq) => {
     const resp = await browserApiClient(
@@ -159,7 +180,12 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         />
       ) : (
         <div>
-          {projects.length === 0 ? (
+          <Input
+            onChange={handleSearch}
+            defaultValue={router.query.search as string}
+            placeholder="Search for projects"
+          />
+          {projects.data.length === 0 ? (
             <EmptyParty
               title="Here you will see all your projects"
               description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
@@ -182,7 +208,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               title="Projects"
             >
               <div className="flex flex-col gap-2">
-                {projects.map((project) => (
+                {projects.data.map((project) => (
                   <Link
                     key={project.id}
                     href={`/${activeOrg.slug}/projects/${project.slug}`}
@@ -266,6 +292,9 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               </div>
             </Section>
           )}
+          <div className="mt-4">
+            <CustomPagination {...projects} />
+          </div>
         </div>
       )}
     </Page>
@@ -289,19 +318,32 @@ export const getServerSideProps = middleware(
 
     const slug = context.params?.organizationSlug as string;
 
-    const resp = await apiClient("/organizations/" + slug + "/projects");
+    const filterQuery = buildFilterQuery(context);
+    const query = buildFilterSearchParams(context);
 
-    const projects = await resp.json();
+    query.set("page", (context.query.page || "1") as string);
+    query.set("pageSize", (context.query.pageSize || "5") as string);
+
+    Object.entries(filterQuery).forEach(([key, value]) => {
+      query.append(key, value as string);
+    });
+
+    const resp = await apiClient(
+      "/organizations/" + slug + "/projects/" + "?" + query.toString(),
+    );
+
+    const projectsPaged = await resp.json();
+
     // fetch all the project stats
     const projectsWithCompliance = await Promise.all(
-      projects.map(async (project: ProjectDTO) => {
+      projectsPaged.data?.map(async (project: ProjectDTO) => {
         const resp = await apiClient(
           `/organizations/${slug}/projects/${project.slug}/compliance`,
         );
 
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
-        const compliantAssets = stats.filter((asset) =>
+        const compliantAssets = stats?.filter((asset) =>
           asset.every((r) => r.compliant),
         );
 
@@ -320,9 +362,13 @@ export const getServerSideProps = middleware(
       }),
     );
 
+    projectsPaged.data = projectsWithCompliance;
+
+    console.log("Projects Paged:", projectsPaged);
+
     return {
       props: {
-        projects: projectsWithCompliance,
+        projects: projectsPaged,
       },
     };
   },
