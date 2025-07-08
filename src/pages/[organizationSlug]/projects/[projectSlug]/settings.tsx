@@ -77,7 +77,7 @@ const Index: FunctionComponent<Props> = () => {
     );
     if (resp.ok) {
       toast("Group deleted", {
-        description: "The project has been deleted",
+        description: "The group has been deleted",
       });
       router.push("/" + activeOrg.slug);
     } else {
@@ -150,7 +150,7 @@ const Index: FunctionComponent<Props> = () => {
     >
       <div>
         <div className="flex flex-row justify-between">
-          <h1 className="text-2xl font-semibold">Project Settings</h1>
+          <h1 className="text-2xl font-semibold">Group Settings</h1>
         </div>
 
         <Section title="Information">
