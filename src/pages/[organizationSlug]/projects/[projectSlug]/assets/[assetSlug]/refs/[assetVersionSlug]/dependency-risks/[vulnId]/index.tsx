@@ -94,6 +94,8 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
+import { ShieldAlert } from "lucide-react";
+import { MessageSquareWarning } from "lucide-react";
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
@@ -574,11 +576,23 @@ const Index: FunctionComponent<Props> = (props) => {
               <div>
                 <Card>
                   <CardHeader>
-                    <CardTitle>
-                      {vuln.state === "open"
-                        ? "Add a comment"
-                        : "Reopen this vulnerability"}
-                    </CardTitle>
+                    <div className="flex flex-row w-full  ">
+                      <CardTitle>
+                        {vuln.state === "open"
+                          ? "Add a comment"
+                          : "Reopen this vulnerability"}
+                      </CardTitle>
+                      <div className="ml-auto w-48 h-16  flex-end">
+                        <div className="flex flex-row justify-end">
+                          <span className=" text-left text-xs text-muted-foreground">
+                            {"Marked as False Positive:"}
+                          </span>
+                          <span className=" text-left text-xs ml-4 text-muted-foreground">
+                            {props.hints.falsePositive}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     <CardDescription></CardDescription>
                   </CardHeader>
                   <CardContent>
