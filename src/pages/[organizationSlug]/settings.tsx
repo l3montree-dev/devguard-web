@@ -333,35 +333,54 @@ const Home: FunctionComponent = () => {
             title="Visibility"
             description="Control the visibility of your organization and its projects. If a Organization is public, only the projects that are public will be visible to the public. Private projects are only visible to members of the organization."
           >
-            <DangerZone displayTitle={false}>
-              <FormField
-                name="isPublic"
-                render={({ field }) => (
-                  <FormItem>
-                    <ListItem
-                      Description={
-                        "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
-                      }
-                      Title="Public Organization"
-                      Button={
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      }
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-6 flex items-center justify-end gap-x-6">
-                <Button variant="destructive" type="submit">
-                  Save
-                </Button>
-              </div>
-            </DangerZone>
+            <div className="">
+              <DangerZone displayTitle={false}>
+                <FormField
+                  name="isPublic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <ListItem
+                        Description={
+                          "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
+                        }
+                        Title="Public Organization"
+                        Button={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-4">
+                  <ListItem
+                    Title="Share False Positives "
+                    Description={
+                      "Setting this to true will share the false positives with other groups in organization."
+                    }
+                    Button={
+                      <FormControl>
+                        <Switch
+                          checked={true}
+                          // checked={field.value}
+                          // onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    }
+                  />
+                </div>
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                  <Button variant="destructive" type="submit">
+                    Save
+                  </Button>
+                </div>
+              </DangerZone>
+            </div>
           </Section>
         </form>
       </Form>

@@ -97,6 +97,7 @@ const MarkdownEditor = dynamic(
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
+  hints: number;
 }
 
 const parseCvssVector = (vector: string) => {
@@ -514,9 +515,6 @@ const Index: FunctionComponent<Props> = (props) => {
     cvssVectorObj,
   );
 
-  {
-    console.log(vuln);
-  }
   return (
     <Page
       Menu={assetMenu}
@@ -1131,9 +1129,14 @@ export const getServerSideProps = middleware(
     }
     const detailedDependencyVulnDTO = await resp.json();
 
+    const hints = {
+      falsePositive: 3,
+    };
+
     return {
       props: {
         vuln: detailedDependencyVulnDTO,
+        hints,
       },
     };
   },
