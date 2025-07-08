@@ -76,7 +76,7 @@ const Index: FunctionComponent<Props> = () => {
       },
     );
     if (resp.ok) {
-      toast("Project deleted", {
+      toast("Group deleted", {
         description: "The project has been deleted",
       });
       router.push("/" + activeOrg.slug);
@@ -129,7 +129,7 @@ const Index: FunctionComponent<Props> = () => {
     }
 
     toast("Success", {
-      description: "Project updated",
+      description: "Group updated",
     });
     // check if the slug changed - if so, redirect to the new slug
     const newProject = await resp.json();
@@ -154,7 +154,7 @@ const Index: FunctionComponent<Props> = () => {
         </div>
 
         <Section title="Information">
-          <Label>Project ID</Label>
+          <Label>Group ID</Label>
           <CopyInput value={project?.id ?? ""} />
         </Section>
         <hr />

@@ -36,7 +36,7 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
   } else {
     return (
       <Badge className="!text-white" variant="outline">
-        {type === "default" ? "Project" : "Subproject"}
+        {type === "default" ? "Group" : "Subgroup"}
       </Badge>
     );
   }
