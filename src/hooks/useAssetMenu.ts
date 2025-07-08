@@ -127,7 +127,7 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "Code Risk",
+        title: "Code Risks",
         href:
           "/" +
           orgSlug +
