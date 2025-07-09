@@ -39,7 +39,7 @@ interface Props {
     badgeSecret: string;
     webhookSecret: string;
   };
-  apiBadgeUrl: string;
+  apiPublicUrl: string;
 }
 
 import { InputWithButton } from "@/components/ui/input-with-button";
@@ -61,7 +61,7 @@ const generateNewSecret = (): string => {
 const Index: FunctionComponent<Props> = ({
   repositories,
   secrets,
-  apiBadgeUrl,
+  apiPublicUrl,
 }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
@@ -74,6 +74,8 @@ const Index: FunctionComponent<Props> = ({
   const [webhookSecret, setWebhookSecret] = useState<string | null>(
     secrets.webhookSecret,
   );
+
+  const apiBadgeUrl = apiPublicUrl + "/api/v1/badges/";
 
   const [badgeURL, setBadgeURL] = useState<string>(
     apiBadgeUrl + "cvss/" + badgeSecret,
@@ -252,42 +254,46 @@ const Index: FunctionComponent<Props> = ({
         </Form>
       </div>
       <div>
-        <Section title="Secrets Management" description="Secrets management">
-          <div>
-            <div>
-              <InputWithButton
-                label="Badge Secret"
-                value={badgeSecret}
-                message="This secret is used to authenticate the badge requests."
-                onClick={() => {
-                  handleGenerateNewSecret("badge");
-                }}
-                SVG={<ArrowPathIcon />}
-              />
-            </div>
-
-            <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
-              <p className="text-sm text-muted-foreground">
-                You can use the following URL to display this badge in your
-                README or other documentation:
-              </p>
-              <code className="block text-sm bg-background p-2 rounded-md overflow-x-auto">
-                {badgeURL}
-              </code>
-
-              <img
-                src={badgeURL}
-                alt="CVSS Badge"
-                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-              />
-            </div>
+        <Section
+          title="Badge Management"
+          description="The provided URL can be used to display the CVSS badge in your README or other documentation."
+        >
+          <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+            <InputWithButton
+              label="Badge Secret"
+              value={badgeURL}
+              message="You can use the URL to display this badge in your
+                README or other documentation"
+              onClick={() => {
+                handleGenerateNewSecret("badge");
+              }}
+              SVG={<ArrowPathIcon />}
+              copyable
+            />
+            <img
+              src={badgeURL}
+              alt="CVSS Badge"
+              className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+            />
           </div>
+        </Section>
 
-          <div>
+        <Section
+          title="Webhook Management"
+          description="Provides a webhook URL and secret for this repository."
+        >
+          <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+            <InputWithButton
+              label="Webhook URL"
+              value={`${apiPublicUrl}/api/v1/webhook/`}
+              message="You can use the URL to send webhook requests to this endpoint."
+              copyable
+            />
+
             <InputWithButton
               label="Webhook Secret"
               value={webhookSecret ?? "No webhook secret set"}
-              message="This secret is used to authenticate the webhook requests."
+              message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
               onClick={() => {
                 handleGenerateNewSecret("webhook");
               }}
@@ -368,14 +374,12 @@ export const getServerSideProps = middleware(
 
     const secrets = await secretsResp.json();
 
-    const apiBadgeUrl = config.devguardApiUrlPublicInternet + "/api/v1/badges/";
-
     return {
       props: {
         asset,
         repositories: repos,
         secrets,
-        apiBadgeUrl,
+        apiPublicUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },
