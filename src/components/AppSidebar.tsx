@@ -93,9 +93,11 @@ export const OrganizationDropDown = () => {
                 text-white "
                 >
                   {activeOrg.name}{" "}
-                  <Badge className="!text-white ml-2" variant={"outline"}>
-                    Organization
-                  </Badge>
+                  {!activeOrg.externalEntityProviderId && (
+                    <Badge className="!text-white ml-2" variant={"outline"}>
+                      Organization
+                    </Badge>
+                  )}
                 </span>
               </Link>
             </div>
