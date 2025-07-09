@@ -35,7 +35,7 @@ export const useProjectMenu = () => {
     {
       title: project.externalEntityProviderId
         ? "Repositories"
-        : "Subprojects & Repositories",
+        : "Subgroups & Repositories",
       href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
     },

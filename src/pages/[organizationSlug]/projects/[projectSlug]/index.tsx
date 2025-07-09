@@ -72,10 +72,10 @@ interface Props {
       };
     }
   >;
-  subprojects: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
+  subgroups: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
-const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
+const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
   const [showModal, setShowModal] = useState(false);
 
   const router = useRouter();
@@ -160,9 +160,9 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {assets.length === 0 && subprojects.length === 0 ? (
+        {assets.length === 0 && subgroups.length === 0 ? (
           <EmptyParty
-            description="No repositories or subprojects found"
+            description="No repositories or subgroups found"
             title="Your Repositories will show up here!"
             Button={
               !project.externalEntityProviderId && (
@@ -171,7 +171,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
                   >
-                    Create new Subproject
+                    Create subgroup
                   </Button>
 
                   <Button onClick={() => setShowModal(true)}>
@@ -191,7 +191,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
                   >
-                    New subproject
+                    New Subgroup
                   </Button>
                   <Button
                     disabled={project.type !== "default"}
@@ -204,28 +204,28 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
             }
             primaryHeadline
             description={
-              "Repositories managed by the " + project.name + " project"
+              "Repositories managed by the " + project.name + " group"
             }
             forceVertical
             title={
               project.externalEntityProviderId
                 ? "Repositories"
-                : "Subprojects & Repositories"
+                : "Subgroups & Repositories"
             }
           >
-            {subprojects.map((subproject) => (
+            {subgroups.map((subgroup) => (
               <Link
-                key={subproject.id}
-                href={`/${activeOrg.slug}/projects/${subproject.slug}`}
+                key={subgroup.id}
+                href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
                 className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem
                   reactOnHover
                   Title={
                     <div className="flex flex-row gap-2">
-                      <span>{subproject.name}</span>
-                      <Badge variant={"outline"}>Subproject</Badge>
-                      {subproject.type === "kubernetesNamespace" && (
+                      <span>{subgroup.name}</span>
+                      <Badge variant={"outline"}>Subgroup</Badge>
+                      {subgroup.type === "kubernetesNamespace" && (
                         <Badge variant={"outline"}>
                           <Image
                             alt="Kubernetes logo"
@@ -239,7 +239,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                       )}
                     </div>
                   }
-                  Description={<div>{subproject.description}</div>}
+                  Description={<div>{subgroup.description}</div>}
                   Button={
                     <DropdownMenu>
                       <DropdownMenuTrigger
@@ -253,7 +253,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
                       <DropdownMenuContent>
                         <Link
                           className="!text-foreground hover:no-underline"
-                          href={`/${activeOrg.slug}/projects/${subproject.slug}/settings`}
+                          href={`/${activeOrg.slug}/projects/${subgroup.slug}/settings`}
                         >
                           <DropdownMenuItem>Edit</DropdownMenuItem>
                         </Link>
@@ -273,7 +273,7 @@ const Index: FunctionComponent<Props> = ({ project, subprojects, assets }) => {
       <Dialog open={showProjectModal}>
         <DialogContent setOpen={setShowProjectModal}>
           <DialogHeader>
-            <DialogTitle>Create new Project</DialogTitle>
+            <DialogTitle>Create new Group</DialogTitle>
             <DialogDescription>
               A project groups multiple software projects (repositories) inside
               a single enitity. Something like: frontend and backend
@@ -353,7 +353,7 @@ export const getServerSideProps = middleware(
     const { organizationSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
 
-    const [subprojects, assets] = await Promise.all([
+    const [subgroups, assets] = await Promise.all([
       apiClient(
         "/organizations/" +
           organizationSlug +
@@ -392,7 +392,7 @@ export const getServerSideProps = middleware(
         initialZustand: {
           project,
         },
-        subprojects,
+        subgroups,
         project,
         assets,
       },

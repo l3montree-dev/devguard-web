@@ -191,7 +191,7 @@ const AppSidebar = () => {
         </SidebarGroup>
         {contentTree && Boolean(currentUser) && (
           <SidebarGroup>
-            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupLabel>Groups</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {contentTree.map((item) => (

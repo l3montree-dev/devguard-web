@@ -113,7 +113,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
       <Dialog open={open}>
         <DialogContent setOpen={setOpen}>
           <DialogHeader>
-            <DialogTitle>Create new Project</DialogTitle>
+            <DialogTitle>Create new Group</DialogTitle>
             <DialogDescription>
               A project groups multiple software projects (repositories) inside
               a single enitity. Something like: frontend and backend
@@ -161,11 +161,11 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         <div>
           {projects.length === 0 ? (
             <EmptyParty
-              title="Here you will see all your projects"
+              title="Here you will see all your groups"
               description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
               Button={
                 !activeOrg.externalEntityProviderId && (
-                  <Button onClick={() => setOpen(true)}>New Project</Button>
+                  <Button onClick={() => setOpen(true)}>New Group</Button>
                 )
               }
             />
@@ -174,12 +174,12 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               primaryHeadline
               Button={
                 !activeOrg.externalEntityProviderId && (
-                  <Button onClick={() => setOpen(true)}>New Project</Button>
+                  <Button onClick={() => setOpen(true)}>New Group</Button>
                 )
               }
-              description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+              description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
               forceVertical
-              title="Projects"
+              title="Groups"
             >
               <div className="flex flex-col gap-2">
                 {projects.map((project) => (
