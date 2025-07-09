@@ -262,8 +262,8 @@ const Index: FunctionComponent<Props> = ({
             <InputWithButton
               label="Badge Secret"
               value={badgeURL}
-              message="You can use the URL to display this badge in your
-                README or other documentation"
+              message="You can use the URL to display this badge in your README or other documentation.
+              The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
               onClick={() => {
                 handleGenerateNewSecret("badge");
               }}
