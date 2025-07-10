@@ -264,11 +264,14 @@ const Index: FunctionComponent<Props> = ({
               value={badgeURL}
               message="You can use the URL to display this badge in your README or other documentation.
               The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
-              onClick={() => {
-                handleGenerateNewSecret("badge");
-              }}
-              SVG={<ArrowPathIcon />}
               copyable
+              update={{
+                update: () => handleGenerateNewSecret("badge"),
+                updateConfirmTitle:
+                  "Are you sure to generate a new badge secret?",
+                updateConfirmDescription:
+                  "This will generate a new badge secret. The badge URL will change and you need to update the badge URL in your documentation.",
+              }}
             />
             <img
               src={badgeURL}
@@ -294,10 +297,13 @@ const Index: FunctionComponent<Props> = ({
               label="Webhook Secret"
               value={webhookSecret ?? "No webhook secret set"}
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
-              onClick={() => {
-                handleGenerateNewSecret("webhook");
+              update={{
+                update: () => handleGenerateNewSecret("webhook"),
+                updateConfirmTitle:
+                  "Are you sure to generate a new webhook secret?",
+                updateConfirmDescription:
+                  "This will generate a new webhook secret. All existing webhook configurations will need to be updated with the new secret.",
               }}
-              SVG={<ArrowPathIcon />}
             />
           </div>
         </Section>

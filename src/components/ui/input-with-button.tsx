@@ -10,7 +10,8 @@ import { Input } from "./input";
 import { toast } from "sonner";
 
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
-
+import Alert from "../common/Alert";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 interface InputWithButtonProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -19,6 +20,11 @@ interface InputWithButtonProps
   onClick?: () => void;
   SVG?: React.ReactNode;
   copyable?: boolean;
+  update?: {
+    update: () => void;
+    updateConfirmTitle: string;
+    updateConfirmDescription: string;
+  };
 }
 
 const InputWithButton = (props: InputWithButtonProps) => {
@@ -47,6 +53,17 @@ const InputWithButton = (props: InputWithButtonProps) => {
                 <ClipboardDocumentIcon className="h-4 w-4" />
               </button>
             )}
+
+            {props.update && (
+              <Alert
+                title={props.update.updateConfirmTitle}
+                description={props.update.updateConfirmDescription}
+                onConfirm={() => props.update?.update()}
+              >
+                <ArrowPathIcon className="h-4 w-4" />
+              </Alert>
+            )}
+
             {props.SVG && (
               <button onClick={() => props.onClick && props.onClick()}>
                 <div className="h-4 w-4">{props.SVG}</div>
