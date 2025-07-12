@@ -23,3 +23,10 @@ export const buildFilterSearchParams = (context: GetServerSidePropsContext) => {
     ...filterQuery,
   });
 };
+
+export function urlToBaseURL(url: string): string {
+  const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
+  const formatedUrl = url.split(regex);
+
+  return formatedUrl[1];
+}

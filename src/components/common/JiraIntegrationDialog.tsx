@@ -1,4 +1,11 @@
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useLoader } from "@/hooks/useLoader";
+import { browserApiClient } from "@/services/devGuardApi";
+import { JiraIntegrationDTO } from "@/types/api/api";
 import React, { FunctionComponent, ReactNode } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,21 +22,8 @@ import {
   FormItem,
   FormLabel,
 } from "../ui/form";
-import { useForm, UseFormReturn } from "react-hook-form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useLoader } from "@/hooks/useLoader";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
-import { toast } from "sonner";
-
-export function urlToBaseURL(url: string): string {
-  const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
-  const formatedUrl = url.split(regex);
-
-  return formatedUrl[1];
-}
+import { urlToBaseURL } from "../../utils/url";
 
 interface Props {
   Button: ReactNode;

@@ -1,4 +1,4 @@
-import { urlToBaseURL } from "./GitLabIntegrationDialog";
+import { urlToBaseURL } from "../../utils/url";
 
 describe("url input tests, to check if format is correct", () => {
   it("should give formate urls and compare them if, they are equal ", () => {
