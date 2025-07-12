@@ -9,6 +9,7 @@ import { useActiveOrg } from "../hooks/useActiveOrg";
 import Link from "next/link";
 import { cn } from "../lib/utils";
 import Callout from "./common/Callout";
+import { useRouter } from "next/router";
 
 interface Props {
   parentRepositoryId?: string;
@@ -29,6 +30,12 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
   parentRepositoryName,
 }) => {
   const activeOrg = useActiveOrg();
+  const router = useRouter();
+
+  const hasIntegration =
+    activeOrg.gitLabIntegrations.length > 0 ||
+    activeOrg.githubAppInstallations.length > 0;
+
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
   const [editRepo, setEditRepo] = useState(!Boolean(repositoryId));
@@ -137,45 +144,71 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
           />
         </div>
       ) : repositories && editRepo ? (
-        <ListItem
-          Title={
-            <div className="flex flex-row gap-2">
-              <div className="flex-1">
-                <Combobox
-                  onValueChange={handleSearchRepos}
-                  placeholder="Search repository..."
-                  items={repos}
-                  loading={searchLoading}
-                  onSelect={(repoId: string) => {
-                    const repo = repos.find((r) => r.value === repoId);
-                    if (repo) {
-                      setSelectedRepo({ id: repo.value, name: repo.label });
+        <div>
+          <ListItem
+            Title={
+              <div className="flex flex-row gap-2">
+                <div
+                  className={`flex-1  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Combobox
+                    onValueChange={handleSearchRepos}
+                    placeholder="Search repository..."
+                    items={repos}
+                    loading={searchLoading}
+                    onSelect={(repoId: string) => {
+                      const repo = repos.find((r) => r.value === repoId);
+                      if (repo) {
+                        setSelectedRepo({ id: repo.value, name: repo.label });
+                      }
+                    }}
+                    value={selectedRepo?.id ?? undefined}
+                    emptyMessage="No repositories found"
+                  />
+                </div>
+                <Button
+                  onClick={async () => {
+                    if (selectedRepo) {
+                      await onUpdate({
+                        repositoryId: selectedRepo.id,
+                        repositoryName: selectedRepo.name,
+                      });
+                      setEditRepo(false);
                     }
                   }}
-                  value={selectedRepo?.id ?? undefined}
-                  emptyMessage="No repositories found"
-                />
+                  disabled={!Boolean(selectedRepo) || !hasIntegration}
+                  variant={hasIntegration ? "default" : "secondary"}
+                >
+                  Connect
+                </Button>
               </div>
-              <Button
-                onClick={async () => {
-                  if (selectedRepo) {
-                    await onUpdate({
-                      repositoryId: selectedRepo.id,
-                      repositoryName: selectedRepo.name,
-                    });
+            }
+            Description={
+              "Select a repository to connect this repository to. This will enable to open and handle issues in the target repository. The list contains all repositories of all GitHub App and GitLab integrations of this organization."
+            }
+          />
+          {!hasIntegration && (
+            <div>
+              <Callout intent="warning">
+                You need to install the DevGuard GitHub App or a GitLab
+                integration in the organization settings to connect a
+                repository.
+              </Callout>
+              <div className="flex flex-row justify-end">
+                <Button
+                  variant="default"
+                  className="mt-2"
+                  onClick={() => {
                     setEditRepo(false);
-                  }
-                }}
-                disabled={!Boolean(selectedRepo)}
-              >
-                Connect
-              </Button>
+                    router.replace(`/${activeOrg.slug}/settings`);
+                  }}
+                >
+                  Organization Settings
+                </Button>
+              </div>
             </div>
-          }
-          Description={
-            "Select a repository to connect this repository to. This list contains all repositories of all GitHub App Installations belonging to this organization."
-          }
-        />
+          )}
+        </div>
       ) : (
         <>
           <ListItem
