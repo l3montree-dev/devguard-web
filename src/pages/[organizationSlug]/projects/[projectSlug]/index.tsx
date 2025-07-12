@@ -110,6 +110,7 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
     );
     if (resp.ok) {
       const res: ProjectDTO = await resp.json();
+      setShowProjectModal(false);
       // navigate to the new application
       router.push(`/${activeOrg.slug}/projects/${res.slug}`);
     } else {
@@ -295,10 +296,6 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   isSubmitting={projectForm.formState.isSubmitting}
                   type="submit"
                   variant="default"
-                  onClick={() =>
-                    !projectForm.formState.isSubmitting &&
-                    setShowProjectModal(false)
-                  }
                 >
                   Create
                 </Button>
