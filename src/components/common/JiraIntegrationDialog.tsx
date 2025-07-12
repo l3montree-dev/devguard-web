@@ -1,7 +1,7 @@
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
-import { GitLabIntegrationDTO } from "@/types/api/api";
+import { JiraIntegrationDTO } from "@/types/api/api";
 import React, { FunctionComponent, ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,13 +27,18 @@ import { urlToBaseURL } from "../../utils/url";
 
 interface Props {
   Button: ReactNode;
-  onNewIntegration: (integration: GitLabIntegrationDTO) => void;
+  onNewIntegration: (integration: JiraIntegrationDTO) => void;
 }
-export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
+export const JiraIntegrationDialog: FunctionComponent<Props> = ({
   onNewIntegration,
   Button: Trigger,
 }) => {
-  const form = useForm<{ url: string; token: string; name: string }>();
+  const form = useForm<{
+    url: string;
+    token: string;
+    name: string;
+    userEmail: string;
+  }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
   const [open, setOpen] = React.useState(false);
@@ -42,9 +47,10 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
     url: string;
     token: string;
     name: string;
+    userEmail: string;
   }) => {
     const res = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/gitlab/test-and-save",
+      "/organizations/" + activeOrg.slug + "/integrations/jira/test-and-save",
       {
         method: "POST",
         body: JSON.stringify({
@@ -58,9 +64,7 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       onNewIntegration(integration);
       setOpen(false);
     } else {
-      toast.error(
-        "Your Gitlab token seems to be wrong, check if the token has at least reporter access or is pasted correctly",
-      );
+      toast.error("Your Jira token seems to be wrong");
     }
   };
 
@@ -69,10 +73,10 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Integrate with GitLab</DialogTitle>
+          <DialogTitle>Integrate with Jira</DialogTitle>
           <DialogDescription>
-            To integrate with GitLab a personal access token, a group access
-            token or a project access token is necessary.
+            To integrate with Jira, you need to provide your Personal Access
+            Token
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -91,7 +95,7 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="My GitLab Personal Access Token"
+                      placeholder="My Jira Personal Access Token"
                       autoComplete="url"
                       {...field}
                     />
@@ -104,13 +108,35 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
             />
             <FormField
               control={form.control}
+              name="userEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Jira User Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={"email@example.com"}
+                      autoComplete="email"
+                      type="email"
+                      required
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Ensure that you provide the email address associated with
+                    your Jira account.
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>GitLab URL</FormLabel>
+                  <FormLabel>Jira URL</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={"https://gitlab.com/"}
+                      placeholder={"https://your-domain.atlassian.net"}
                       autoComplete="url"
                       type="url"
                       required
@@ -118,11 +144,10 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    Ensure that you provide only the{" "}
-                    <strong>base URL of your GitLab instance </strong> (e.g.,
-                    https://gitlab.example.com) without any repository paths.
-                    Including the full URL with the repository path may result
-                    in an error.{" "}
+                    Ensure that you provide the full URL to your Jira instance,
+                    including the protocol (https://).
+                    <br />
+                    For example: <code>https://your-domain.atlassian.net</code>
                   </FormDescription>
                 </FormItem>
               )}
@@ -132,18 +157,18 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
               name="token"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>GitLab Access-Token</FormLabel>
+                  <FormLabel>Jira Access-Token</FormLabel>
                   <FormControl>
-                    <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
+                    <Input
+                      required
+                      autoComplete="off"
+                      placeholder="xxxxxxxxxxxxxxx..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     DevGuard uses this token to <strong>create issues</strong>{" "}
-                    in your repository. Thus the token needs to have{" "}
-                    <strong>at least reporter access</strong>.<br />
-                    There are features in DevGuard, that require higher access
-                    levels. For example, DevGuard can automatically create merge
-                    requests for you. In this case, the token needs to have{" "}
-                    <strong>developer access</strong>.
+                    in your repository.
                   </FormDescription>
                 </FormItem>
               )}
@@ -155,8 +180,7 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
                   Test and Save
                 </Button>
                 <small className="text-muted-foreground">
-                  Checks if the provided access token is valid and has at least
-                  Reporter-Access.
+                  Checks if the provided access token is valid.
                 </small>
               </div>
             </div>

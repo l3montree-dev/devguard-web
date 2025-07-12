@@ -43,6 +43,5 @@ export async function withProject(ctx: GetServerSidePropsContext) {
     assets: Array<AssetDTO>;
   } = await r.json();
 
-  console.log(project.assets.length);
   return project;
 }

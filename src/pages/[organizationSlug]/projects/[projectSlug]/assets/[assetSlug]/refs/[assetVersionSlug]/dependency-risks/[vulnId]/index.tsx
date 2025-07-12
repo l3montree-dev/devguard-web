@@ -637,6 +637,34 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </AsyncButton>
                               )}
 
+                            {vuln.ticketId === null &&
+                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              ) === "jira" && (
+                                <AsyncButton
+                                  variant={"secondary"}
+                                  onClick={() =>
+                                    handleSubmit({
+                                      status: "mitigate",
+                                      justification,
+                                    })
+                                  }
+                                >
+                                  <div className="flex flex-col">
+                                    <div className="flex">
+                                      <Image
+                                        alt="Jira Logo"
+                                        width={15}
+                                        height={15}
+                                        className="mr-2"
+                                        src={"/assets/jira-svgrepo-com.svg"}
+                                      />
+                                      Create Jira Ticket
+                                    </div>
+                                  </div>
+                                </AsyncButton>
+                              )}
                             <AsyncButton
                               onClick={() =>
                                 handleSubmit({
