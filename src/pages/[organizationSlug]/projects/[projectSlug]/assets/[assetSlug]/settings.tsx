@@ -71,7 +71,7 @@ const Index: FunctionComponent<Props> = ({
   const router = useRouter();
 
   const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
-  const [webhookSecret, setWebhookSecret] = useState<string | null>(
+  const [webhookSecret, setWebhookSecret] = useState<string>(
     secrets.webhookSecret,
   );
 
