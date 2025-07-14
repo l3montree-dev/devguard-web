@@ -29,7 +29,7 @@ export default function GitLabIntegrationSetupSlide({
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          Connect with GitLab to allow DevGuard to create tickets
+          Connect with GitLab/ openCode to allow DevGuard to create tickets
         </DialogTitle>
         <hr className="my-4" />
       </DialogHeader>

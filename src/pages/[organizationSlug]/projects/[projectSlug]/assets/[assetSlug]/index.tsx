@@ -26,6 +26,7 @@ import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
+import Image from "next/image";
 
 interface Props {
   apiUrl: string;
@@ -48,18 +49,21 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
       <Section
         primaryHeadline
         forceVertical
-        description="Start scanning your code for vulnerabilities, license issues and policy violations."
+        description="Start scanning your code for vulnerabilities, bad-practices, license issues, policy violations and more."
         title="Welcome to DevGuard 🚀"
       >
         {asset?.externalEntityProviderId &&
           externalProviderIdToIntegrationName(
             asset.externalEntityProviderId,
           ) === "gitlab" && (
-            <div className="mb-10">
-              <div className="">
-                <Autosetup {...autosetup} />
+            <>
+              <div className="mb-8">
+                <div className="">
+                  <Autosetup {...autosetup} />
+                </div>
               </div>
-            </div>
+              <hr className="mb-8" />
+            </>
           )}
         <div className="flex flex-col gap-4 z-10">
           <ListItem
@@ -94,7 +98,32 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
         </div>
         <div>
           <ListItem
-            Title="Connect your code repository to DevGuard - Manage using Ticket-Integration"
+            Title={
+              <span className="">
+                Connect your Issue Tracker to DevGuard{" "}
+                <Image
+                  src="/assets/provider-icons/gitlab.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-5 w-auto"
+                />
+                <Image
+                  src="/assets/provider-icons/opencode.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-4 w-auto"
+                />
+                <Image
+                  src="/assets/provider-icons/github.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-4 w-auto dark:invert"
+                />
+              </span>
+            }
             Description={
               "Lorem Ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
             }

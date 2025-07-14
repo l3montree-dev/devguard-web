@@ -162,19 +162,19 @@ export default function ProviderSetup({
           Title={
             <div className="flex flex-row items-center">
               <Image
-                src="/assets/gitlab.svg"
+                src="/assets/provider-icons/gitlab-opencode.svg"
                 alt="GitHub"
                 width={20}
                 height={20}
-                className="mr-2 inline-block"
+                className="mr-2 inline-block h-4 w-auto"
               />
-              Integrate with GitLab
+              Integrate with GitLab/ openCode
             </div>
           }
           Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
           Button={
             <Button variant={"default"} onClick={() => api?.scrollNext()}>
-              Integrate with GitLab
+              Setup integration
             </Button>
           }
         />

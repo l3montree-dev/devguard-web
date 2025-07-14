@@ -88,6 +88,5 @@ export type ZodConvert<T> = {
 
 export enum ExternalTicketProvider {
   GITHUB = "GitHub",
-  GITLAB = "GitLab",
-  OPENCODE = "openCode",
+  GITLAB = "GitLab/ openCode",
 }

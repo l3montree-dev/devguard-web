@@ -70,10 +70,10 @@ export default function WebhookSetupSlide({
         <hr className="my-4" />
       </DialogHeader>
       <p className="mb-4 text-sm">
-        Go to your GitLab project settings and add a webhook with the following
-        URL and secret. Ensure that you select the Issue and comment event
-        triggers like shown in the screenshot below. You must set a secret
-        token.
+        Go to your GitLab/ openCode project settings and add a webhook with the
+        following URL and secret (“Settings” → “Webhooks”). Ensure that you
+        select the Issue and comment event trigger checkboxes like shown in the
+        screenshot below. You must set a secret token.
       </p>
 
       <Image

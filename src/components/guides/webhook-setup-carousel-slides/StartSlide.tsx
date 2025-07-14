@@ -63,7 +63,7 @@ export default function StartSlide({
           <InfoIcon />
           <AlertTitle>About Ticket Integration</AlertTitle>
           <AlertDescription>
-            You can connect your repository at GitLab, openCode or GitHub to
+            You can connect your repository at GitLab, openCode or GitHub with
             DevGuard to enable ticket-based risk management. Whenever DevGuard
             detects a new risk in your code, it will automatically create a
             ticket in your issue tracker. In you issue tracker, you can then
@@ -81,7 +81,7 @@ export default function StartSlide({
               setSelectedProvider(value);
             }}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[220px]">
               <SelectValue placeholder="Select Provider" />
             </SelectTrigger>
             <SelectContent>

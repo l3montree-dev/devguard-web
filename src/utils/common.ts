@@ -218,7 +218,7 @@ export const providerNameToExternalTicketProvider = (
     case "github":
       return ExternalTicketProvider.GITHUB;
     case "opencode":
-      return ExternalTicketProvider.OPENCODE;
+      return ExternalTicketProvider.GITLAB;
     default:
       return ExternalTicketProvider.GITLAB;
   }

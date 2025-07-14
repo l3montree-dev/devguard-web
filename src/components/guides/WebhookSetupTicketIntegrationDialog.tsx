@@ -42,7 +42,7 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
             <StartSlide
               setSelectedProvider={setSelectedProvider}
               selectedProvider={selectedProvider}
-              provider={ExternalTicketProvider.OPENCODE}
+              provider={selectedProvider as ExternalTicketProvider}
               activeOrg={activeOrg}
               api={api}
             />

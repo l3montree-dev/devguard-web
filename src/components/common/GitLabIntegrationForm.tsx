@@ -62,7 +62,7 @@ export default function GitLabIntegrationForm({
       }
     } else {
       toast.error(
-        "Your Gitlab token seems to be wrong, check if the token has at least reporter access or is pasted correctly",
+        "Your Gitlab/ openCode token seems to be wrong, check if the token has at least reporter access or is pasted correctly",
       );
     }
   };
@@ -87,7 +87,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="My GitLab Personal Access Token"
+                  placeholder="My GitLab/ openCode Personal Access Token"
                   autoComplete="url"
                   {...field}
                 />
@@ -103,10 +103,12 @@ export default function GitLabIntegrationForm({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GitLab URL</FormLabel>
+              <FormLabel>GitLab/ openCode URL</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={"https://gitlab.com/"}
+                  placeholder={
+                    "https://gitlab.com/ or https://gitlab.opencode.de/"
+                  }
                   autoComplete="url"
                   type="url"
                   required
@@ -128,7 +130,7 @@ export default function GitLabIntegrationForm({
           name="token"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GitLab Access-Token</FormLabel>
+              <FormLabel>Access-Token</FormLabel>
               <FormControl>
                 <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
               </FormControl>
