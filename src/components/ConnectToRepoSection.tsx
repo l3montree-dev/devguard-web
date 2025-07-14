@@ -34,7 +34,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
 
   const hasIntegration =
     activeOrg.gitLabIntegrations.length > 0 ||
-    activeOrg.githubAppInstallations.length > 0;
+    activeOrg.githubAppInstallations.length > 0 ||
+    activeOrg.jiraIntegrations.length > 0;
 
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
@@ -184,13 +185,13 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
               </div>
             }
             Description={
-              "Select a repository to connect this repository to. This will enable to open and handle issues in the target repository. The list contains all repositories of all GitHub App and GitLab integrations of this organization."
+              "Select a repository to connect this repository to. This will enable to open and handle issues in the target repository. The list contains all repositories of all GitHub App, Gitlab and Jira integrations in this organization."
             }
           />
           {!hasIntegration && (
             <div>
               <Callout intent="warning">
-                You need to install the DevGuard GitHub App or a GitLab
+                You need to install the DevGuard GitHub App, a GitLab, or a Jira
                 integration in the organization settings to connect a
                 repository.
               </Callout>
