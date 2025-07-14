@@ -35,7 +35,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
@@ -54,6 +57,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 
 interface Props {
   apiUrl: string;
@@ -201,9 +206,12 @@ const Index: FunctionComponent<Props> = (props) => {
     columnsDef,
     data: props.vulns.data,
   });
+  const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
 
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = router.asPath.split("?")[0];
@@ -213,56 +221,10 @@ const Index: FunctionComponent<Props> = (props) => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"secondary"}>Download SBOM</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../sbom.json`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-              </Link>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../sbom.xml`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>XML-Format</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"secondary"}>Download VeX</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.json`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-              </Link>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.xml`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>XML-Format</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
+            Download SBOM
+          </Button>
+
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Dependency-Risks
           </Button>
@@ -417,6 +379,13 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       )}
+      <SbomDownloadModal
+        showSBOMModal={showSBOMModal}
+        setShowSBOMModal={setShowSBOMModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
       <DependencyRiskScannerDialog
         open={isOpen}
         onOpenChange={setIsOpen}

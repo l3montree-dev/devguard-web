@@ -40,7 +40,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
     <>
       <Section
         forceVertical={forceVerticalSections}
-        description="General Settings of the project"
+        description="General Settings of the group"
         title="General"
       >
         <FormField
@@ -52,7 +52,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               <FormControl>
                 <Input disabled={disabled} required={true} {...field} />
               </FormControl>
-              <FormDescription>The name of the project.</FormDescription>
+              <FormDescription>The name of the group.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -66,7 +66,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
               <FormControl>
                 <Input disabled={disabled} {...field} />
               </FormControl>
-              <FormDescription>The description of the project.</FormDescription>
+              <FormDescription>The description of the group.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -90,9 +90,9 @@ export const ProjectForm: FunctionComponent<Props> = ({
                     <div className={classNames(!org.isPublic && "opacity-50")}>
                       <ListItem
                         Description={
-                          "Setting this to true will make the project visible to the public. It allows creating public and private assets."
+                          "Setting this to true will make the group visible to the public. It allows creating public and private assets."
                         }
-                        Title="Public Project"
+                        Title="Public Group"
                         Button={
                           <FormControl>
                             <Switch
@@ -110,19 +110,19 @@ export const ProjectForm: FunctionComponent<Props> = ({
               />
               {!org.isPublic && (
                 <small>
-                  The organization is not public. You can not make the project
+                  The organization is not public. You can not make the group
                   public.
                 </small>
               )}
               {onConfirmDelete && (
                 <ListItem
-                  Title="Delete Project"
+                  Title="Delete Group"
                   Description={
-                    "This will delete the project and all of its data. This action cannot be undone."
+                    "This will delete the group and all of its data. This action cannot be undone."
                   }
                   Button={
                     <Alert
-                      title="Are you sure to delete this project?"
+                      title="Are you sure to delete this group?"
                       description="This action cannot be undone. All data associated with this repository will be deleted."
                       onConfirm={onConfirmDelete}
                     >

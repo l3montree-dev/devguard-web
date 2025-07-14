@@ -1,3 +1,4 @@
+import { GitLabIntegrationDTO } from "@/types/api/api";
 import React, { FunctionComponent, ReactNode } from "react";
 import {
   Dialog,
@@ -7,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { GitLabIntegrationDTO } from "@/types/api/api";
 import GitLabIntegrationForm from "./GitLabIntegrationForm";
 
 interface Props {

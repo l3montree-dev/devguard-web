@@ -21,7 +21,7 @@ const AcceptInvitation = () => {
   return (
     <>
       <Head>
-        <title>Invitation Failed</title>
+        <title>Invite User</title>
         <meta name="description" content="Invitation failed" />
       </Head>
       <div className="flex min-h-screen flex-1 flex-col justify-center bg-card px-6 py-32 max-sm:py-16 lg:px-8">

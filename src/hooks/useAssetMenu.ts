@@ -127,7 +127,7 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "Code Risk-Handling",
+        title: "Code Risks",
         href:
           "/" +
           orgSlug +
@@ -142,7 +142,7 @@ export const useAssetMenu = () => {
         isActive: router.pathname.includes("code-risks"),
       },
       {
-        title: "Dependency Risk-Handling",
+        title: "Dependency Risks",
         href:
           "/" +
           orgSlug +
