@@ -370,6 +370,7 @@ const Home: FunctionComponent = () => {
                           Button={
                             <FormControl>
                               <Switch
+                                defaultChecked
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />

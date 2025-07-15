@@ -60,7 +60,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withOrganization } from "@/decorators/withOrganization";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  InformationCircleIcon,
+  SquaresPlusIcon,
+} from "@heroicons/react/24/outline";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -94,8 +97,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-import { ShieldAlert } from "lucide-react";
-import { MessageSquareWarning } from "lucide-react";
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
@@ -584,12 +585,19 @@ const Index: FunctionComponent<Props> = (props) => {
                       </CardTitle>
                       <div className="ml-auto w-48 h-16  flex-end">
                         <div className="flex flex-row justify-end">
-                          <span className=" text-left text-xs text-muted-foreground">
-                            {"Marked as False Positive:"}
-                          </span>
-                          <span className=" text-left text-xs ml-4 text-muted-foreground">
-                            {props.hints.falsePositive}
-                          </span>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <SquaresPlusIcon className="w-8 h-8 animate-pulse color-primary" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <span className=" text-left text-xs text-muted-foreground">
+                                {"Marked as False Positive:"}
+                              </span>
+                              <span className=" text-left text-xs ml-4 text-muted-foreground"></span>
+
+                              {props.hints.falsePositive}
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     </div>
