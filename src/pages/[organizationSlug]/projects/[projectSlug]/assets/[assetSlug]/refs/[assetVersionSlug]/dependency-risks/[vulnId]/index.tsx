@@ -84,7 +84,7 @@ import {
 import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, PackageSearch } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
@@ -100,7 +100,6 @@ const MarkdownEditor = dynamic(
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
-  hints: number;
 }
 
 const parseCvssVector = (vector: string) => {
@@ -585,19 +584,21 @@ const Index: FunctionComponent<Props> = (props) => {
                       </CardTitle>
                       <div className="ml-auto w-48 h-16  flex-end">
                         <div className="flex flex-row justify-end">
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <SquaresPlusIcon className="w-8 h-8 animate-pulse color-primary" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <span className=" text-left text-xs text-muted-foreground">
-                                {"Marked as False Positive:"}
-                              </span>
-                              <span className=" text-left text-xs ml-4 text-muted-foreground"></span>
-
-                              {props.hints.falsePositive}
-                            </TooltipContent>
-                          </Tooltip>
+                          {props.hints.falsePositive && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <PackageSearch className="w-6 h-6 animate-pulse color-primary" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <span className=" text-left text-xs text-muted-foreground">
+                                  {
+                                    "This CVE has already been marked as a false positive in a different repository"
+                                  }
+                                </span>
+                                <span className=" text-left text-xs ml-4 text-muted-foreground"></span>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1131,7 +1132,7 @@ export const getServerSideProps = middleware(
       "/dependency-vulns/" +
       vulnId;
 
-    const [resp]: [Response] = await Promise.all([apiClient(uri)]);
+    const [resp]: [Response] = await Promise.all([apiClient(uri)]); //i think requesting a hint endpoint is valid here, since it offers a list and since only one item is in the list, its prob added for scalability.
 
     if (!resp.ok) {
       return {
@@ -1141,7 +1142,7 @@ export const getServerSideProps = middleware(
     const detailedDependencyVulnDTO = await resp.json();
 
     const hints = {
-      falsePositive: 3,
+      falsePositive: true,
     };
 
     return {

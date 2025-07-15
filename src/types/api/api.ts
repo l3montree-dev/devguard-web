@@ -82,6 +82,7 @@ export interface OrganizationDTO extends AppModelDTO {
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
 
   isPublic: boolean;
+  isSharing: boolean;
 
   externalEntityProviderId?: "opencode" | "github" | "gitlab";
 }
@@ -258,6 +259,10 @@ export interface DetectedOnAnotherBranchEventDTO extends BaseVulnEventDTO {
   type: "detectedOnAnotherBranch";
 }
 
+export interface HintsDTO extends FalsePositiveEventDTO {
+  falsepositive: boolean;
+}
+
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
   type: "falsePositive";
 }
@@ -297,7 +302,8 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
   | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO;
+  | DetectedOnAnotherBranchEventDTO
+  | HintsDTO;
 
 export interface CWE {
   cwe: string;
@@ -373,6 +379,10 @@ export interface DetailedDependencyVulnDTO extends VulnWithCVE {
 }
 
 export interface DetailedFirstPartyVulnDTO extends FirstPartyVuln {
+  events: VulnEventDTO[];
+}
+
+export interface Hints extends FirstPartyVuln {
   events: VulnEventDTO[];
 }
 
