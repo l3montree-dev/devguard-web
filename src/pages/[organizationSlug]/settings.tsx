@@ -358,20 +358,27 @@ const Home: FunctionComponent = () => {
                   )}
                 />
                 <div className="mt-4">
-                  <ListItem
-                    Title="Share False Positives "
-                    Description={
-                      "Setting this to true will share the false positives with other groups in organization."
-                    }
-                    Button={
-                      <FormControl>
-                        <Switch
-                          checked={true}
-                          // checked={field.value}
-                          // onCheckedChange={field.onChange}
+                  <FormField
+                    name="isSharing"
+                    render={({ field }) => (
+                      <FormItem>
+                        <ListItem
+                          Title="Share False Positives"
+                          Description={
+                            "Setting this to true will share the false positives with other groups in organization."
+                          }
+                          Button={
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          }
                         />
-                      </FormControl>
-                    }
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
                 <div className="mt-6 flex items-center justify-end gap-x-6">
