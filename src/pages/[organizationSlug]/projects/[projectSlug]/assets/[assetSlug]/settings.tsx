@@ -297,6 +297,7 @@ const Index: FunctionComponent<Props> = ({
               label="Webhook Secret"
               value={webhookSecret ?? "No webhook secret set"}
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
+              copyable
               update={{
                 update: () => handleGenerateNewSecret("webhook"),
                 updateConfirmTitle:
