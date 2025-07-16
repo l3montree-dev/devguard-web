@@ -45,6 +45,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
 import rehypeExternalLinks from "rehype-external-links";
+import remarkGfm from "remark-gfm";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -173,11 +174,12 @@ export default function RiskAssessmentFeed({
                       </div>
 
                       {Boolean(msg) && (
-                        <div className="mdx-editor-content w-full rounded p-2 text-foreground">
+                        <div className="mdx-editor-content p-2">
                           <Markdown
                             rehypePlugins={[
                               [rehypeExternalLinks, { target: "_blank" }],
                             ]}
+                            remarkPlugins={[remarkGfm]}
                           >
                             {msg}
                           </Markdown>
