@@ -298,6 +298,17 @@ export const getServerSideProps = middleware(
         const resp = await apiClient(
           `/organizations/${slug}/projects/${project.slug}/compliance`,
         );
+        // check if the response is ok
+        if (!resp.ok) {
+          return {
+            ...project,
+            stats: {
+              compliantAssets: 0,
+              totalAssets: 0,
+              passingControlsPercentage: 0,
+            },
+          };
+        }
 
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
