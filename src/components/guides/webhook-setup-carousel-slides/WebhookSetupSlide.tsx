@@ -33,9 +33,6 @@ export default function WebhookSetupSlide({
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
-
-  console.log(project.repositoryName);
-
   const handleGenerateNewSecret = async () => {
     const resp = await browserApiClient(
       `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
@@ -63,7 +60,7 @@ export default function WebhookSetupSlide({
       <DialogHeader>
         <DialogTitle>
           <Badge className="mr-2" variant="secondary">
-            Step 2/2
+            Step 3/3
           </Badge>{" "}
           Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>

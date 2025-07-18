@@ -10,17 +10,19 @@ import StartSlide from "./webhook-setup-carousel-slides/StartSlide";
 import { ExternalTicketProvider } from "@/types/common";
 import GitLabIntegrationSetupSlide from "./webhook-setup-carousel-slides/GitLabIntegrationSetupSlide";
 import WebhookSetupSlide from "./webhook-setup-carousel-slides/WebhookSetupSlide";
+import SelectRepoSlide from "./webhook-setup-carousel-slides/SelectRepoSlide";
 
 interface WebhookSetupTicketIntegrationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  repositories: Array<{ value: string; label: string }> | null;
 }
 
 const WebhookSetupTicketIntegrationDialog: FunctionComponent<
   WebhookSetupTicketIntegrationDialogProps
-> = ({ open, onOpenChange }) => {
+> = ({ open, onOpenChange, repositories }) => {
   const [api, setApi] = React.useState<CarouselApi>();
-  const asset = useActiveAsset();
+  const asset = useActiveAsset()!;
   const activeOrg = useActiveOrg();
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>(
     asset?.externalEntityProviderId || undefined,
@@ -47,6 +49,13 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
               api={api}
             />
             <GitLabIntegrationSetupSlide api={api} />
+            <SelectRepoSlide
+              activeOrg={activeOrg}
+              api={api}
+              repositories={repositories}
+              repositoryName={asset.repositoryName}
+              repositoryId={asset.repositoryId}
+            />
             <WebhookSetupSlide api={api} onOpenChange={onOpenChange} />
           </CarouselContent>
         </Carousel>

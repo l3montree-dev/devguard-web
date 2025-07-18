@@ -1,11 +1,7 @@
-import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
-import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
-import ListItem from "@/components/common/ListItem";
 import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -15,16 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { encodeObjectBase64 } from "@/services/encodeService";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
 import { providerNameToExternalTicketProvider } from "@/utils/common";
 import { values } from "lodash";
 import { InfoIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import ProviderSetup from "./ProviderSetup";
 
 interface StartSlideProps {
@@ -32,6 +23,7 @@ interface StartSlideProps {
   selectedProvider: string | undefined;
   api?: {
     scrollNext: () => void;
+    scrollTo: (index: number) => void;
   };
   provider?: ExternalTicketProvider;
   activeOrg: OrganizationDetailsDTO;
@@ -44,8 +36,6 @@ export default function StartSlide({
   activeOrg,
   api,
 }: StartSlideProps) {
-  const router = useRouter();
-
   return (
     <CarouselItem>
       <DialogHeader>
@@ -75,42 +65,46 @@ export default function StartSlide({
       </DialogHeader>
       <div className="p-1">
         <div className="">
-          <Select
-            value={providerNameToExternalTicketProvider(selectedProvider || "")}
-            onValueChange={(value) => {
-              setSelectedProvider(value);
-            }}
-          >
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Select Provider" />
-            </SelectTrigger>
-            <SelectContent>
-              {values(ExternalTicketProvider).map((provider) => (
-                <SelectItem
-                  key={provider}
-                  value={provider}
-                  onClick={() => setSelectedProvider(provider)}
-                >
-                  <ProviderTitleIcon provider={provider} />
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="mt-6">
-          <h3 className="font-semibold mt-4 flex items-center">
+          <h3 className="font-semibold flex items-center">
             <Badge className="mr-2" variant="secondary">
-              Step 1/2
+              Step 1/3
             </Badge>{" "}
-            Ensure that DevGuard can create tickets in your issue tracker
+            Ensure that DevGuard is connected to your issue tracker
           </h3>
-          <ProviderSetup
-            selectedProvider={providerNameToExternalTicketProvider(
-              selectedProvider || "",
-            )}
-            activeOrg={activeOrg}
-            api={api}
-          />
+          <div className="mt-8">
+            <Select
+              value={providerNameToExternalTicketProvider(
+                selectedProvider || "",
+              )}
+              onValueChange={(value) => {
+                setSelectedProvider(value);
+              }}
+            >
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Select Provider" />
+              </SelectTrigger>
+              <SelectContent>
+                {values(ExternalTicketProvider).map((provider) => (
+                  <SelectItem
+                    key={provider}
+                    value={provider}
+                    onClick={() => setSelectedProvider(provider)}
+                  >
+                    <ProviderTitleIcon provider={provider} />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="mt-6">
+            <ProviderSetup
+              selectedProvider={providerNameToExternalTicketProvider(
+                selectedProvider || "",
+              )}
+              activeOrg={activeOrg}
+              api={api}
+            />
+          </div>
         </div>
       </div>
     </CarouselItem>
