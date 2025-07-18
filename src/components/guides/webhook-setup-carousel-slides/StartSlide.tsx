@@ -12,30 +12,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { OrganizationDetailsDTO } from "@/types/api/api";
-import { ExternalTicketProvider } from "@/types/common";
-import { providerNameToExternalTicketProvider } from "@/utils/common";
-import { values } from "lodash";
+import {
+  ExternalTicketProvider,
+  ExternalTicketProviderNames,
+} from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "./ProviderSetup";
+import { useEffect } from "react";
 
 interface StartSlideProps {
-  setSelectedProvider: (scanner: string) => void;
-  selectedProvider: string | undefined;
+  setSelectedProvider: (provider: ExternalTicketProvider) => void;
   api?: {
     scrollNext: () => void;
     scrollTo: (index: number) => void;
+    reInit: () => void;
   };
-  provider?: ExternalTicketProvider;
+  provider: ExternalTicketProvider;
   activeOrg: OrganizationDetailsDTO;
 }
 
 export default function StartSlide({
   setSelectedProvider,
-  selectedProvider,
+
   provider,
   activeOrg,
   api,
 }: StartSlideProps) {
+  useEffect(() => {
+    api?.reInit();
+  }, [provider, api]);
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -71,26 +77,31 @@ export default function StartSlide({
             </Badge>{" "}
             Ensure that DevGuard is connected to your issue tracker
           </h3>
-          <div className="mt-8">
+          <div className="mt-4">
+            <p className="mb-4 text-sm text-muted-foreground">
+              First, select your issue tracker from the dropdown menu.
+            </p>
             <Select
-              value={providerNameToExternalTicketProvider(
-                selectedProvider || "",
-              )}
+              value={provider}
               onValueChange={(value) => {
-                setSelectedProvider(value);
+                setSelectedProvider(value as ExternalTicketProvider);
               }}
             >
               <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="Select Provider" />
               </SelectTrigger>
               <SelectContent>
-                {values(ExternalTicketProvider).map((provider) => (
+                {Object.keys(ExternalTicketProviderNames).map((provider) => (
                   <SelectItem
                     key={provider}
                     value={provider}
-                    onClick={() => setSelectedProvider(provider)}
+                    onClick={() =>
+                      setSelectedProvider(provider as ExternalTicketProvider)
+                    }
                   >
-                    <ProviderTitleIcon provider={provider} />
+                    <ProviderTitleIcon
+                      provider={provider as ExternalTicketProvider}
+                    />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -98,9 +109,7 @@ export default function StartSlide({
           </div>
           <div className="mt-6">
             <ProviderSetup
-              selectedProvider={providerNameToExternalTicketProvider(
-                selectedProvider || "",
-              )}
+              selectedProvider={provider}
               activeOrg={activeOrg}
               api={api}
             />

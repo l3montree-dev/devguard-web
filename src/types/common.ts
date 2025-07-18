@@ -86,7 +86,13 @@ export type ZodConvert<T> = {
             : never;
 };
 
-export enum ExternalTicketProvider {
-  GITHUB = "GitHub",
-  GITLAB = "GitLab/ openCode",
-}
+export type ExternalTicketProvider = "github" | "gitlab" | "jira" | "opencode";
+
+export const ExternalTicketProviderNames: {
+  [key in ExternalTicketProvider]: string;
+} = {
+  github: "GitHub",
+  gitlab: "GitLab",
+  jira: "Jira",
+  opencode: "openCode",
+};

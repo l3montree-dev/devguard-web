@@ -8,7 +8,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { Dialog, DialogContent } from "../ui/dialog";
 import StartSlide from "./webhook-setup-carousel-slides/StartSlide";
 import { ExternalTicketProvider } from "@/types/common";
-import GitLabIntegrationSetupSlide from "./webhook-setup-carousel-slides/GitLabIntegrationSetupSlide";
+import ProviderIntegrationSetupSlide from "./webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
 import WebhookSetupSlide from "./webhook-setup-carousel-slides/WebhookSetupSlide";
 import SelectRepoSlide from "./webhook-setup-carousel-slides/SelectRepoSlide";
 
@@ -24,9 +24,10 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
   const [api, setApi] = React.useState<CarouselApi>();
   const asset = useActiveAsset()!;
   const activeOrg = useActiveOrg();
-  const [selectedProvider, setSelectedProvider] = useState<string | undefined>(
-    asset?.externalEntityProviderId || undefined,
-  );
+  const [selectedProvider, setSelectedProvider] =
+    useState<ExternalTicketProvider>(
+      (asset?.externalEntityProviderId as ExternalTicketProvider) || "gitlab",
+    );
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -43,12 +44,14 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
           <CarouselContent>
             <StartSlide
               setSelectedProvider={setSelectedProvider}
-              selectedProvider={selectedProvider}
-              provider={selectedProvider as ExternalTicketProvider}
+              provider={selectedProvider}
               activeOrg={activeOrg}
               api={api}
             />
-            <GitLabIntegrationSetupSlide api={api} />
+            <ProviderIntegrationSetupSlide
+              api={api}
+              provider={selectedProvider}
+            />
             <SelectRepoSlide
               activeOrg={activeOrg}
               api={api}

@@ -7,7 +7,7 @@ export default function ProviderTitleIcon({
   provider: ExternalTicketProvider;
 }) {
   switch (provider) {
-    case ExternalTicketProvider.GITHUB:
+    case "github":
       return (
         <span className="inline-flex items-center gap-2">
           <Image
@@ -20,17 +20,43 @@ export default function ProviderTitleIcon({
           GitHub
         </span>
       );
-    case ExternalTicketProvider.GITLAB:
+    case "gitlab":
       return (
         <span className="inline-flex items-center gap-2">
           <Image
-            src="/assets/provider-icons/gitlab-opencode.svg"
+            src="/assets/provider-icons/gitlab.svg"
             alt="GitLab and openCode Icon"
             className="h-4 w-auto"
             width={16}
             height={16}
           />{" "}
-          GitLab/ openCode
+          GitLab
+        </span>
+      );
+    case "jira":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Image
+            src="/assets/provider-icons/jira.svg"
+            alt="Jira Icon"
+            className="h-4 w-auto"
+            width={16}
+            height={16}
+          />{" "}
+          Jira
+        </span>
+      );
+    case "opencode":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Image
+            src="/assets/provider-icons/opencode.svg"
+            alt="openCode Icon"
+            className="h-4 w-auto"
+            width={16}
+            height={16}
+          />{" "}
+          openCode
         </span>
       );
     default:

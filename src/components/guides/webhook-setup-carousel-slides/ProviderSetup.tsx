@@ -1,17 +1,14 @@
-import { ExternalTicketProvider } from "@/types/common";
-import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
-import Link from "next/link";
-import Image from "next/image";
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
-import { useRouter } from "next/router";
-import { encodeObjectBase64 } from "@/services/encodeService";
-import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
-import { InfoIcon } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
+import { OrganizationDetailsDTO } from "@/types/api/api";
+import { ExternalTicketProvider } from "@/types/common";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { InfoIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
@@ -58,7 +55,7 @@ export default function ProviderSetup({
         <InfoIcon className="h-4 w-4 mr-2" />
         {providerIntegrationPresent
           ? "You have already configured some provider(s). You can manage them below."
-          : "You have not configured any providers yet. Please connect one."}
+          : "You have not configured any providers yet. Please connect one by continuing the setup flow."}
       </p>
       {activeOrg.githubAppInstallations?.map((installation) => (
         <ListItem
@@ -123,78 +120,14 @@ export default function ProviderSetup({
       ))}
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
-          <Button variant={"secondary"}>
+          <Button onClick={() => api?.scrollNext()} variant={"secondary"}>
             Add another{" "}
-            {selectedProvider === ExternalTicketProvider.GITHUB
+            {selectedProvider === "github"
               ? "GitHub App"
               : "GitLab Integration"}
           </Button>
         </div>
       )}
-      {!providerIntegrationPresent &&
-        selectedProvider === ExternalTicketProvider.GITHUB && (
-          <ListItem
-            Title={
-              <div className="flex flex-row items-center">
-                <Image
-                  src="/assets/github.svg"
-                  alt="GitHub"
-                  width={20}
-                  height={20}
-                  className="mr-2 inline-block dark:invert"
-                />
-                Add a GitHub App
-              </div>
-            }
-            Description="DevGuard uses a GitHub App to access your repositories and interact with your code."
-            Button={
-              <GithubAppInstallationAlert
-                Button={
-                  <Link
-                    className={cn(
-                      buttonVariants({ variant: "default" }),
-                      "!text-black hover:no-underline",
-                    )}
-                    href={
-                      "https://github.com/apps/devguard-bot/installations/new?state=" +
-                      encodeObjectBase64({
-                        orgSlug: activeOrg.slug,
-                        redirectTo: router.asPath,
-                      })
-                    }
-                  >
-                    Install GitHub App
-                  </Link>
-                }
-              >
-                <Button variant={"secondary"}>Install GitHub App</Button>
-              </GithubAppInstallationAlert>
-            }
-          />
-        )}
-      {!providerIntegrationPresent &&
-        selectedProvider === ExternalTicketProvider.GITLAB && (
-          <ListItem
-            Title={
-              <div className="flex flex-row items-center">
-                <Image
-                  src="/assets/provider-icons/gitlab-opencode.svg"
-                  alt="GitHub"
-                  width={20}
-                  height={20}
-                  className="mr-2 inline-block h-4 w-auto"
-                />
-                Integrate with GitLab/ openCode
-              </div>
-            }
-            Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
-            Button={
-              <Button variant={"default"} onClick={() => api?.scrollNext()}>
-                Setup integration
-              </Button>
-            }
-          />
-        )}
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button
           disabled={selectedProvider === undefined}

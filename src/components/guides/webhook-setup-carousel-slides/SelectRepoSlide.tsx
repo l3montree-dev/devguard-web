@@ -18,6 +18,7 @@ interface StartSlideProps {
   api?: {
     scrollNext: () => void;
     scrollPrev: () => void;
+    scrollTo: (index: number) => void;
   };
   activeOrg: OrganizationDetailsDTO;
   repositories: Array<{ value: string; label: string }> | null;
@@ -160,6 +161,9 @@ export default function SelectRepoSlide({
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
+        <Button onClick={() => api?.scrollTo(0)} variant={"secondary"}>
+          Back
+        </Button>
         <Button
           disabled={!Boolean(selectedRepo) || !hasIntegration}
           onClick={() => api?.scrollNext()}
