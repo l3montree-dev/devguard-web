@@ -46,6 +46,15 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
     name: string;
   } | null>(repositoryId ? { id: repositoryId!, name: repositoryName! } : null);
 
+  let integration = "";
+  if (repositoryId?.startsWith("github:")) {
+    integration = "GitHub Repository";
+  } else if (repositoryId?.startsWith("gitlab:")) {
+    integration = "GitLab Repository";
+  } else if (repositoryId?.startsWith("jira:")) {
+    integration = "Jira Project";
+  }
+
   return (
     <Section
       title="Connect to a repository"
@@ -64,11 +73,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 {parentRepositoryName}
               </>
             }
-            Description={
-              "This repository is connected to a " +
-              (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
-              " repository "
-            }
+            Description={"This repository is connected to a " + integration}
             Button={
               <>
                 <Button
@@ -116,11 +121,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 {repositoryName}
               </>
             }
-            Description={
-              "This repository is connected to a " +
-              (repositoryId?.startsWith("github:") ? "GitHub" : "GitLab") +
-              " repository "
-            }
+            Description={"This repository is connected to a " + integration}
             Button={
               <>
                 <Button

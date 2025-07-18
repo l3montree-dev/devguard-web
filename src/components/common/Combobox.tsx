@@ -107,6 +107,12 @@ export function Combobox(props: Props) {
                       src="/assets/github.svg"
                       alt="GitHub"
                     />
+                  ) : item.value.startsWith("jira") ? (
+                    <img
+                      className="mr-2 inline-block h-4 w-4"
+                      src="/assets/jira-svgrepo-com.svg"
+                      alt="Jira"
+                    />
                   ) : null}
                   {item.label}
                 </CommandItem>
