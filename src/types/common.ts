@@ -85,3 +85,14 @@ export type ZodConvert<T> = {
             ? z.ZodObject<ZodConvert<T[P]>>
             : never;
 };
+
+export type ExternalTicketProvider = "github" | "gitlab" | "jira" | "opencode";
+
+export const ExternalTicketProviderNames: {
+  [key in ExternalTicketProvider]: string;
+} = {
+  github: "GitHub",
+  gitlab: "GitLab",
+  jira: "Jira",
+  opencode: "openCode",
+};

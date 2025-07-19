@@ -80,9 +80,13 @@ const Autosetup: FunctionComponent<Props> = ({
               <CardContent>
                 <CardDescription>
                   You can use the auto-setup feature to automatically add the
-                  DevGuard Pipeline to the GitLab CI/CD pipeline for the project{" "}
-                  <span>{asset?.repositoryName}</span>, create a Merge-Request
-                  and add any missing configuration variables and webhooks.
+                  DevGuard Pipeline to the GitLab/ openCode CI/CD pipeline of
+                  your project
+                  {asset?.repositoryName && (
+                    <span> {asset?.repositoryName}</span>
+                  )}
+                  . This will create a Merge-Request and add any missing
+                  configuration variables and webhooks.
                 </CardDescription>
               </CardContent>
               <CardFooter className="flex flex-col items-start justify-start gap-4">
