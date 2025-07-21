@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2023 Lars Hermges, l3montree GMBH (haftungsbeschraenkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -13,16 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import OrgRegisterForm from "@/components/OrgRegister";
-import Page from "@/components/Page";
-import { middleware } from "@/decorators/middleware";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "../decorators/withSession";
-import Lanyard from "@/components/misc/Lanyard";
 import Image from "next/image";
 import GradientText from "@/components/misc/GradientText";
 
-export default function NotSupported(props: any) {
+export default function NotSupported() {
   return (
     <div className="text-center">
       <div className="flex flex-col min-h-screen justify-center items-center">
@@ -45,6 +39,7 @@ export default function NotSupported(props: any) {
           alt="sad"
           width={50}
           height={50}
+          className="mt-4"
         ></Image>
       </div>
     </div>
