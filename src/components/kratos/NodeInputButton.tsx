@@ -66,6 +66,10 @@ export function NodeInputButton<T>({
     );
   }
 
+  if (attributes.meta.label?.text === "Sign Up with official") {
+    console.log("tzest");
+  }
+
   return (
     <div className="flex flex-row justify-end">
       <Button

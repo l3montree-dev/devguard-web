@@ -48,6 +48,7 @@ export const Message = ({ message }: MessageProps) => {
       );
   }
 };
+
 interface MessagesProps {
   messages?: Array<UiText>;
 }
