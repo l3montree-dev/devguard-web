@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Lars Hermges, l3montree GMBH (haftungsbeschraenkt)
+// Copyright (C) 2023 Lars Hermges, l3montree GMBH
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -35,12 +35,37 @@ export default function NotSupported() {
           No Mobile Support for Devguard
         </GradientText>
         <Image
-          src="/nosupport-gopher.png"
+          src="/assets/nosupport-gopher.png"
           alt="sad"
           width={50}
           height={50}
-          className="mt-4"
+          className="m-8"
         ></Image>
+        <div>
+          <div className="flex flex-row justify-around">
+            <div>
+              <a href="https://github.com/l3montree-dev/devguard">
+                <Image
+                  src="/assets/github.svg"
+                  alt="GitHub Logo"
+                  className="-ml-1 mr-2 dark:invert"
+                  width={40}
+                  height={40}
+                />
+              </a>
+            </div>
+            <div>
+              <a href="https://gitlab.com/l3montree/devguard">
+                <Image
+                  src="/assets/gitlab.svg"
+                  alt="GitHub Logo"
+                  width={40}
+                  height={40}
+                />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
