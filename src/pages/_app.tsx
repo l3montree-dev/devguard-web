@@ -19,6 +19,7 @@ import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
 import { StoreProvider } from "../zustand/globalStoreProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -41,6 +42,11 @@ export const merriweather = Merriweather({
 
 // @ts-ignore
 export default function App({ Component, pageProps }) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    window.innerWidth < 768 && setIsMobile(true);
+  }, []);
+
   return (
     <ThemeProvider
       attribute="class"
@@ -51,7 +57,7 @@ export default function App({ Component, pageProps }) {
       <TooltipProvider delayDuration={100}>
         <StoreProvider initialZustand={pageProps.initialZustand}>
           <div className="font-body">
-            <Component {...pageProps} />
+            {isMobile ? <div>tests</div> : <Component {...pageProps} />}
           </div>
         </StoreProvider>
       </TooltipProvider>
