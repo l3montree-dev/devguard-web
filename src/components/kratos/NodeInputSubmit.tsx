@@ -93,7 +93,7 @@ export function NodeInputSubmit<T>({
             width={20}
             height={20}
           />
-          {getNodeLabel(node)}
+          Sign in with GitHub
         </Button>
       </div>
     );
@@ -117,6 +117,29 @@ export function NodeInputSubmit<T>({
             height={24}
           />
           Sign in with GitLab
+        </Button>
+      </div>
+    );
+  }
+
+  if (attributes.name === "link" && attributes.value === "opencode") {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="OpenCode Logo "
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Link openCode
         </Button>
       </div>
     );
@@ -165,13 +188,99 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign out of openCode
+          Unlink OpenCode
         </Button>
       </div>
     );
   }
 
-  console.log(node);
+  if (node.meta.label?.text === "Link official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Link GitLab
+        </Button>
+      </div>
+    );
+  }
+
+  if (node.meta.label?.text === "Unlink official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Unlink GitLab
+        </Button>
+      </div>
+    );
+  }
+
+  if (node.meta.label?.text === "Sign in with official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign in with GitLab
+        </Button>
+      </div>
+    );
+  }
+  if (node.meta.label?.text === "Sign up with official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign in with GitLab
+        </Button>
+      </div>
+    );
+  }
+
   const text = getNodeLabel(node);
   return (
     <div className="flex flex-row justify-end">
