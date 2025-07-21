@@ -15,7 +15,7 @@
 
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, use, useEffect, useState } from "react";
 import Page from "../../components/Page";
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
@@ -58,6 +58,7 @@ import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDi
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -70,6 +71,12 @@ const Home: FunctionComponent = () => {
     defaultValues: activeOrg,
   });
 
+  const currentUserRole = useCurrentUserRole();
+  useEffect(() => {
+    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+      router.push("/" + activeOrg.slug);
+    }
+  }, []);
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
       method: "PATCH",

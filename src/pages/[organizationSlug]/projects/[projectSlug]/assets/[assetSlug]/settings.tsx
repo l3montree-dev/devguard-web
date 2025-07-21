@@ -24,7 +24,7 @@ import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
@@ -44,6 +44,7 @@ interface Props {
 
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -80,6 +81,20 @@ const Index: FunctionComponent<Props> = ({
   const [badgeURL, setBadgeURL] = useState<string>(
     apiBadgeUrl + "cvss/" + badgeSecret,
   );
+
+  const currentUserRole = useCurrentUserRole();
+  useEffect(() => {
+    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+      router.push(
+        "/" +
+          activeOrg.slug +
+          "/projects/" +
+          project!.slug +
+          "/assets/" +
+          asset.slug,
+      );
+    }
+  }, []);
 
   const form = useForm<AssetFormValues>({
     defaultValues: {

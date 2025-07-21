@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {
   asset: AssetDTO & {
@@ -32,7 +33,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
     () => asset.stats.compliance.filter((policy) => !policy.compliant),
     [asset.stats.compliance],
   );
-
+  const currentUserRole = useCurrentUserRole();
   return (
     <Link
       key={asset.id}
@@ -66,24 +67,28 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           </div>
         }
         Button={
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={buttonVariants({
-                variant: "outline",
-                size: "icon",
-              })}
-            >
-              <EllipsisVerticalIcon className="h-5 w-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                className="!text-foreground hover:no-underline"
-                href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
+          currentUserRole === "owner" || currentUserRole === "admin" ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={buttonVariants({
+                  variant: "outline",
+                  size: "icon",
+                })}
               >
-                <DropdownMenuItem>Edit</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <EllipsisVerticalIcon className="h-5 w-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <Link
+                  className="!text-foreground hover:no-underline"
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
+                >
+                  <DropdownMenuItem>Edit</DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <></>
+          )
         }
         Title={
           <div className="flex flex-row items-center gap-4">{asset.name}</div>

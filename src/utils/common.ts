@@ -208,3 +208,22 @@ export const extractVersion = (purl: string) => {
 
   return version;
 };
+
+export function allowedActionsCheck(
+  currentUserRole: string,
+  memberRole?: string,
+): boolean {
+  if (!memberRole) {
+    return false;
+  }
+
+  if (currentUserRole === "owner") {
+    return true;
+  }
+
+  if (currentUserRole === "admin" && memberRole !== "owner") {
+    return true;
+  }
+
+  return false;
+}

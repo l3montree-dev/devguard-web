@@ -62,6 +62,7 @@ import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
 import { useParams } from "next/navigation";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {
   oauth2Error?: boolean;
@@ -83,6 +84,8 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const { organizationSlug } = useParams<{
     organizationSlug: string;
   }>();
+
+  const currentUserRole = useCurrentUserRole();
 
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
@@ -165,7 +168,14 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
               Button={
                 !activeOrg.externalEntityProviderId && (
-                  <Button onClick={() => setOpen(true)}>New Group</Button>
+                  <Button
+                    disabled={
+                      currentUserRole !== "owner" && currentUserRole !== "admin"
+                    }
+                    onClick={() => setOpen(true)}
+                  >
+                    New Group
+                  </Button>
                 )
               }
             />
@@ -174,7 +184,14 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               primaryHeadline
               Button={
                 !activeOrg.externalEntityProviderId && (
-                  <Button onClick={() => setOpen(true)}>New Group</Button>
+                  <Button
+                    disabled={
+                      currentUserRole !== "admin" && currentUserRole !== "owner"
+                    }
+                    onClick={() => setOpen(true)}
+                  >
+                    New Group
+                  </Button>
                 )
               }
               description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
@@ -241,24 +258,29 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                         </div>
                       }
                       Button={
-                        <DropdownMenu>
-                          <DropdownMenuTrigger
-                            className={buttonVariants({
-                              variant: "outline",
-                              size: "icon",
-                            })}
-                          >
-                            <EllipsisVerticalIcon className="h-5 w-5" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <Link
-                              className="!text-foreground hover:no-underline"
-                              href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                        currentUserRole === "owner" ||
+                        currentUserRole === "admin" ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              className={buttonVariants({
+                                variant: "outline",
+                                size: "icon",
+                              })}
                             >
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                            </Link>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <EllipsisVerticalIcon className="h-5 w-5" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <Link
+                                className="!text-foreground hover:no-underline"
+                                href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                              >
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                              </Link>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <></>
+                        )
                       }
                     />
                   </Link>

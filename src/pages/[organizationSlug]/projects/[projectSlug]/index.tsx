@@ -52,6 +52,7 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {
   project: ProjectDTO & {
@@ -88,6 +89,7 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
     },
   });
 
+  const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
 
   const projectMenu = useProjectMenu();
@@ -180,14 +182,22 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
               !project.externalEntityProviderId && (
                 <div className="flex flex-row gap-2">
                   <Button
-                    disabled={project.type !== "default"}
+                    disabled={
+                      project.type !== "default" ||
+                      (currentUserRole !== "admin" &&
+                        currentUserRole !== "owner")
+                    }
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
                   >
                     New Subgroup
                   </Button>
                   <Button
-                    disabled={project.type !== "default"}
+                    disabled={
+                      project.type !== "default" ||
+                      (currentUserRole !== "admin" &&
+                        currentUserRole !== "owner")
+                    }
                     onClick={() => setShowModal(true)}
                   >
                     New Repository
@@ -234,24 +244,29 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   }
                   Description={<div>{subgroup.description}</div>}
                   Button={
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className={buttonVariants({
-                          variant: "outline",
-                          size: "icon",
-                        })}
-                      >
-                        <EllipsisVerticalIcon className="h-5 w-5" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <Link
-                          className="!text-foreground hover:no-underline"
-                          href={`/${activeOrg.slug}/projects/${subgroup.slug}/settings`}
+                    currentUserRole === "owner" ||
+                    currentUserRole === "admin" ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "icon",
+                          })}
                         >
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                        </Link>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <EllipsisVerticalIcon className="h-5 w-5" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <Link
+                            className="!text-foreground hover:no-underline"
+                            href={`/${activeOrg.slug}/projects/${subgroup.slug}/settings`}
+                          >
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <></>
+                    )
                   }
                 />
               </Link>
