@@ -20,17 +20,32 @@ import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "../decorators/withSession";
 import Lanyard from "@/components/misc/Lanyard";
 import Image from "next/image";
+import GradientText from "@/components/misc/GradientText";
 
 export default function NotSupported(props: any) {
   return (
-    <div>
-      <div>test</div>
-      <Image
-        src="/logo_inverse_icon.svg"
-        alt="DevGuard Logo"
-        width={30}
-        height={30}
-      />
+    <div className="text-center">
+      <div className="flex flex-col min-h-screen justify-center items-center">
+        <Image
+          src="/logo_inverse_icon.svg"
+          alt="DevGuard Logo"
+          width={80}
+          height={80}
+        />
+        <GradientText
+          colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
+          animationSpeed={5}
+          className=""
+        >
+          No Mobile Support for Devguard yet
+        </GradientText>
+      </div>
+      {/* <Image
+        src="/public/nosupport-gopher.png"
+        alt="sad gopher looking at phone"
+        width={20}
+        height={20}
+      ></Image> */}
     </div>
   );
 }
