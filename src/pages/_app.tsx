@@ -61,11 +61,7 @@ export default function App({ Component, pageProps }) {
       <TooltipProvider delayDuration={100}>
         <StoreProvider initialZustand={pageProps.initialZustand}>
           <div className="font-body">
-            {isMobile ? (
-              <NotSupported>NOT SUPPORTED</NotSupported>
-            ) : (
-              <Component {...pageProps} />
-            )}
+            {isMobile ? <NotSupported /> : <Component {...pageProps} />}
           </div>
         </StoreProvider>
       </TooltipProvider>
