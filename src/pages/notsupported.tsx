@@ -24,28 +24,34 @@ import GradientText from "@/components/misc/GradientText";
 
 export default function NotSupported(props: any) {
   return (
-    <div className="text-center">
-      <div className="flex flex-col min-h-screen justify-center items-center">
-        <Image
-          src="/logo_inverse_icon.svg"
-          alt="DevGuard Logo"
-          width={80}
-          height={80}
-        />
-        <GradientText
-          colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
-          animationSpeed={5}
-          className=""
-        >
-          No Mobile Support for Devguard yet
-        </GradientText>
+    <div>
+      <div className="text-center">
+        <div className="flex flex-col min-h-screen justify-center items-center">
+          <Image
+            src="/logo_inverse_icon.svg"
+            alt="DevGuard Logo"
+            width={80}
+            height={80}
+          />
+          <div>
+            <GradientText
+              colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
+              animationSpeed={5}
+              className=""
+            >
+              No Mobile Support for Devguard yet
+            </GradientText>
+          </div>
+        </div>
+        <div>
+          <Image
+            src="/nosupport-gopher.png"
+            alt="sad"
+            width={50}
+            height={50}
+          ></Image>
+        </div>
       </div>
-      {/* <Image
-        src="/public/nosupport-gopher.png"
-        alt="sad gopher looking at phone"
-        width={20}
-        height={20}
-      ></Image> */}
     </div>
   );
 }
