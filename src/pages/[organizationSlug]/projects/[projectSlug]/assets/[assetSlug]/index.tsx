@@ -132,7 +132,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
               </span>
             }
             Description={
-              "Lorem Ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+              "You can connect your Issue Tracker to DevGuard to automatically create issues for identified risks. You can handle findings directly from your issue tracker via slash commands. This way, you can easily track and mitigate vulnerabilities, bad-practices, license issues and more."
             }
             Button={
               <div className="flex flex-row gap-2">
