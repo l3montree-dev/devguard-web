@@ -29,11 +29,12 @@ interface StartSlideProps {
   };
   provider: ExternalTicketProvider;
   activeOrg: OrganizationDetailsDTO;
+  isLoadingRepositories: boolean;
 }
 
 export default function StartSlide({
   setSelectedProvider,
-
+  isLoadingRepositories,
   provider,
   activeOrg,
   api,
@@ -112,6 +113,7 @@ export default function StartSlide({
               selectedProvider={provider}
               activeOrg={activeOrg}
               api={api}
+              isLoadingRepositories={isLoadingRepositories}
             />
           </div>
         </div>

@@ -2,12 +2,11 @@ import { Badge } from "@/components/ui/badge";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OrganizationDetailsDTO } from "@/types/api/api";
-import { ExternalTicketProvider } from "@/types/common";
 import ListItem from "@/components/common/ListItem";
 import { Combobox } from "@/components/common/Combobox";
 import { Button } from "@/components/ui/button";
-import useRepositorySearch from "@/hooks/useRepositorySearch";
-import { useState } from "react";
+import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
+import { useEffect, useState } from "react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { AssetFormValues } from "@/components/asset/AssetForm";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -27,7 +26,6 @@ interface StartSlideProps {
 }
 
 export default function SelectRepoSlide({
-  repositories,
   repositoryName,
   repositoryId,
   activeOrg,
@@ -39,9 +37,6 @@ export default function SelectRepoSlide({
     activeOrg.jiraIntegrations.length > 0;
 
   const [editRepo, setEditRepo] = useState(!Boolean(repositoryId));
-
-  const { repos, searchLoading, handleSearchRepos } =
-    useRepositorySearch(repositories);
 
   const [selectedRepo, setSelectedRepo] = useState<{
     id: string;
@@ -82,9 +77,37 @@ export default function SelectRepoSlide({
     }
   };
 
-  console.log("Selected Repository:", selectedRepo);
+  const [repositories, setRepositories] = useState<
+    { value: string; label: string }[] | null
+  >(null);
 
-  console.log("repoSelectedAndSet:", repoSelectedAndSet);
+  const { handleSearchRepos } = useRepositorySearch(repositories);
+
+  const [isLoadingRepositories, setIsLoadingRepositories] = useState(false);
+
+  useEffect(() => {
+    const fetchRepositories = async () => {
+      setIsLoadingRepositories(true);
+      const [repoResp] = await Promise.all([
+        browserApiClient(
+          "/organizations/" + activeOrg.slug + "/integrations/repositories",
+        ),
+      ]);
+      if (repoResp.ok) {
+        const data = await repoResp.json();
+        setRepositories(convertRepos(data));
+      } else {
+        toast.error("Failed to fetch repositories. Please try again.");
+      }
+      setIsLoadingRepositories(false);
+    };
+    fetchRepositories();
+  }, [
+    activeOrg.gitLabIntegrations,
+    activeOrg.githubAppInstallations,
+    activeOrg.jiraIntegrations,
+    activeOrg.slug,
+  ]);
 
   return (
     <CarouselItem>
@@ -107,10 +130,10 @@ export default function SelectRepoSlide({
                 <Combobox
                   onValueChange={handleSearchRepos}
                   placeholder="Search repository..."
-                  items={repos}
-                  loading={searchLoading}
+                  items={repositories ?? []}
+                  loading={isLoadingRepositories}
                   onSelect={(repoId: string) => {
-                    const repo = repos.find((r) => r.value === repoId);
+                    const repo = repositories?.find((r) => r.value === repoId);
                     if (repo) {
                       setSelectedRepo({ id: repo.value, name: repo.label });
                     }

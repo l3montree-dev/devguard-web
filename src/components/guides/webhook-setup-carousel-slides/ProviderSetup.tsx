@@ -1,14 +1,15 @@
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
+import { useLoader } from "@/hooks/useLoader";
 import { cn } from "@/lib/utils";
 import { browserApiClient } from "@/services/devGuardApi";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
@@ -17,14 +18,15 @@ interface ProviderSetupProps {
     scrollNext: () => void;
     scrollTo: (index: number) => void;
   };
+  isLoadingRepositories: boolean;
 }
 
 export default function ProviderSetup({
   selectedProvider,
   activeOrg,
   api,
+  isLoadingRepositories,
 }: ProviderSetupProps) {
-  const router = useRouter();
   const updateOrganization = useStore((s) => s.updateOrganization);
 
   const handleDelete = async (id: string) => {
@@ -130,12 +132,12 @@ export default function ProviderSetup({
       )}
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button
-          disabled={selectedProvider === undefined}
+          disabled={selectedProvider === undefined || isLoadingRepositories}
           onClick={() => {
             providerIntegrationPresent ? api?.scrollTo(2) : api?.scrollNext();
           }}
         >
-          Continue
+          {isLoadingRepositories ? "Loading Repositories..." : "Continue"}
         </Button>
       </div>
     </div>

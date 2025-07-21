@@ -162,7 +162,6 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
         onOpenChange={setWebhookIsOpen}
-        repositories={repos}
       />
     </Page>
   );
@@ -199,24 +198,10 @@ export const getServerSideProps = middleware(
       };
     }
 
-    const apiClient = getApiClientFromContext(context);
-
-    const [repoResp] = await Promise.all([
-      apiClient(
-        "/organizations/" + organizationSlug + "/integrations/repositories",
-      ),
-    ]);
-
-    let repos: Array<{ value: string; label: string }> | null = null;
-    if (repoResp.ok) {
-      repos = convertRepos(await repoResp.json());
-    }
-
     // there is no ref at all
     return {
       props: {
         apiUrl: config.devguardApiUrlPublicInternet,
-        repositories: repos,
       },
     };
   },
