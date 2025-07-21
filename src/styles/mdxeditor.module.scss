@@ -19,6 +19,7 @@
     --baseBgActive: hsl(var(--card));
     --baseLine: hsl(var(--border));
     --baseBorder: transparent;
+    --baseBorder: hsl(var(--primary));
     --baseBorderHover: hsl(var(--ring));
     --baseSolid: hsl(var(--muted-foreground));
     --baseSolidHover: hsl(var(--muted));

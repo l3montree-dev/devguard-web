@@ -18,9 +18,7 @@ import ListItem from "../../../../components/common/ListItem";
 
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-import EmptyList from "@/components/common/EmptyList";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -35,19 +33,14 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { toast } from "sonner";
-import z from "zod";
 import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
-import CopyCode from "../../../../components/common/CopyCode";
+import EmptyParty from "../../../../components/common/EmptyParty";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import { ProjectForm } from "../../../../components/project/ProjectForm";
-import PatSection from "../../../../components/risk-identification/PatSection";
-import Steps from "../../../../components/risk-identification/Steps";
-import { config } from "../../../../config";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withProject } from "../../../../decorators/withProject";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import usePersonalAccessToken from "../../../../hooks/usePersonalAccessToken";
 import {
   browserApiClient,
   getApiClientFromContext,
@@ -59,7 +52,6 @@ import {
   ProjectDTO,
   RequirementsLevel,
 } from "../../../../types/api/api";
-import EmptyParty from "../../../../components/common/EmptyParty";
 
 interface Props {
   project: ProjectDTO & {
@@ -368,14 +360,22 @@ export const getServerSideProps = middleware(
             "/assets/" +
             asset.slug;
 
-          const compliance = (await apiClient(url + "/compliance").then((r) =>
-            r.json(),
-          )) as PolicyEvaluation[] | null;
+          const resp = await apiClient(url + "/compliance");
+          if (!resp.ok) {
+            return {
+              ...asset,
+              stats: {
+                compliance: [],
+              },
+            };
+          }
 
+          const compliance =
+            ((await resp.json()) as PolicyEvaluation[] | undefined) ?? [];
           return {
             ...asset,
             stats: {
-              compliance: compliance ?? [],
+              compliance: compliance,
             },
           };
         }),

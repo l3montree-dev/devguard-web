@@ -12,6 +12,7 @@ import {
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { Button } from "../components/ui/button";
 import { LogoutLink } from "../hooks/logoutLink";
+import Link from "next/link";
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();
@@ -32,24 +33,38 @@ const AcceptInvitation = () => {
 
           <CardContent>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Make sure, that you are logged in with the correct Account. The
-                invitation code is bound to a specific E-Mail Address.
-              </p>
               <div className="mt-2">
-                <p className="text-sm text-muted-foreground">
-                  Currently logged in as:
-                </p>
-                {user && (
+                {user ? (
                   <div>
+                    <p className="text-sm text-muted-foreground">
+                      Make sure, that you are logged in with the correct
+                      Account. The invitation code is bound to a specific E-Mail
+                      Address.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Currently logged in as:
+                    </p>
                     <span className="mt-2 block rounded-lg border bg-card p-1 px-2 text-sm">
                       {user ? user.traits.email : "Not logged in"}
                     </span>
+                    <div className="mt-4 flex flex-row justify-end">
+                      <Button onClick={handleLogout}>Logout</Button>
+                    </div>
+                  </div>
+                ) : (
+                  //redirect to login page if not logged in
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      You are not logged in. Please log in to accept the
+                      invitation.
+                    </p>
+                    <div className="mt-4 flex flex-row justify-end">
+                      <Link href="/login">
+                        <Button>Login</Button>
+                      </Link>
+                    </div>
                   </div>
                 )}
-              </div>
-              <div className="mt-4 flex flex-row justify-end">
-                <Button onClick={handleLogout}>Logout</Button>
               </div>
             </div>
           </CardContent>

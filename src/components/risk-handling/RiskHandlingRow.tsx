@@ -135,7 +135,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 >
                   <tr className="">
                     <th className="w-32 p-4">State</th>
-                    <th className="w-32 p-4">Scanner</th>
+                    <th className="w-32 p-4">Artifact</th>
                     <th className="w-40 p-4">CVE</th>
                     <th className="w-24 p-4">Risk</th>
                     <th className="w-24 p-4">CVSS</th>
