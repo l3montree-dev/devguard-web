@@ -165,7 +165,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Link openCode
+          Sign in with openCode
         </Button>
       </div>
     );
