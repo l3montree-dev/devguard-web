@@ -66,10 +66,6 @@ export function NodeInputButton<T>({
     );
   }
 
-  if (node.meta.label?.id === 1040002) {
-    console.log("tzest");
-  }
-
   return (
     <div className="flex flex-row justify-end">
       <Button
