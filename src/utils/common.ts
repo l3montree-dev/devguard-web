@@ -208,18 +208,3 @@ export const extractVersion = (purl: string) => {
 
   return version;
 };
-
-export const providerNameToExternalTicketProvider = (
-  externalProviderId: string,
-): ExternalTicketProvider => {
-  switch (externalProviderId) {
-    case "gitlab":
-      return ExternalTicketProvider.GITLAB;
-    case "github":
-      return ExternalTicketProvider.GITHUB;
-    case "opencode":
-      return ExternalTicketProvider.GITLAB;
-    default:
-      return ExternalTicketProvider.GITLAB;
-  }
-};
