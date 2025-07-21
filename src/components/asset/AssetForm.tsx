@@ -195,7 +195,7 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
       <FormItem>
         <ListItem
           Description={
-            "Enables automatic ticket creation for vulnerabilities exceeding the defined CVSS-BTE and Risk Value thresholds."
+            "Enables automatic ticket creation for vulnerabilities. Be aware that this will create tickets for all vulnerabilities that exceed the defined thresholds, which may result in a large number of tickets being created."
           }
           Title="Reporting range"
           Button={
