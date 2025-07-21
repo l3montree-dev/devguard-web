@@ -66,7 +66,7 @@ export function NodeInputButton<T>({
     );
   }
 
-  if (attributes.meta.label?.text === "Sign Up with official") {
+  if (node.meta.label?.id === 1040002) {
     console.log("tzest");
   }
 

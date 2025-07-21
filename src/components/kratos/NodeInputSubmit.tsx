@@ -122,6 +122,29 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if (attributes.name === "link" && attributes.value === "opencode") {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/logos/opencode.svg"
+            alt="OpenCode Logo "
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Link openCode
+        </Button>
+      </div>
+    );
+  }
+
   if (
     (attributes.name === "link" || attributes.name === "provider") &&
     attributes.value === "opencode"
@@ -142,7 +165,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign in with OpenCode
+          Link openCode
         </Button>
       </div>
     );
@@ -165,7 +188,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Sign out of OpenCode
+          Unlink OpenCode
         </Button>
       </div>
     );
@@ -193,6 +216,28 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if (node.meta.label?.text === "Unlink official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Unlink GitLab
+        </Button>
+      </div>
+    );
+  }
+
   if (node.meta.label?.text === "Sign in with official") {
     return (
       <div className="flex flex-row justify-end">
@@ -214,9 +259,26 @@ export function NodeInputSubmit<T>({
       </div>
     );
   }
-
-  if (node.meta.label?.text === "Sign Up with official") {
-    console.log("tzest");
+  if (node.meta.label?.text === "Sign up with official") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign in with GitLab
+        </Button>
+      </div>
+    );
   }
 
   const text = getNodeLabel(node);
