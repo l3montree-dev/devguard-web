@@ -27,14 +27,14 @@ export default function NotSupported() {
           width={80}
           height={80}
         />
-
         <GradientText
           colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
           animationSpeed={1}
           className="text-2xl"
         >
           No Mobile Support for Devguard
-        </GradientText>
+          <span className="text-xs">..yet</span>
+        </GradientText>{" "}
         <Image
           src="/assets/nosupport-gopher.png"
           alt="sad"
