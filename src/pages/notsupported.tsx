@@ -15,6 +15,7 @@
 
 import Image from "next/image";
 import GradientText from "@/components/misc/GradientText";
+import { Button } from "@/components/ui/button";
 
 export default function NotSupported() {
   return (
@@ -42,26 +43,15 @@ export default function NotSupported() {
           className="m-8"
         ></Image>
         <div>
-          <div className="flex flex-row justify-around">
-            <div>
-              <a href="https://github.com/l3montree-dev/devguard">
-                <Image
-                  src="/assets/github.svg"
-                  alt="GitHub Logo"
-                  className="-ml-1 mr-2 dark:invert"
-                  width={40}
-                  height={40}
-                />
+          <div className=" flex flex-row justify-content justify-between justify-center">
+            <div className="mr-2">
+              <a href="https://devguard.org">
+                <Button variant={"default"}>Devguard</Button>
               </a>
             </div>
-            <div>
-              <a href="https://gitlab.com/l3montree/devguard">
-                <Image
-                  src="/assets/gitlab.svg"
-                  alt="GitHub Logo"
-                  width={40}
-                  height={40}
-                />
+            <div className="ml-2">
+              <a href="https://github.com/l3montree-dev/devguard">
+                <Button variant={"secondary"}> Source Code</Button>
               </a>
             </div>
           </div>
