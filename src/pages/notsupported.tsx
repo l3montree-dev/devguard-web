@@ -17,13 +17,13 @@ import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { classNames } from "@/utils/common";
+import GradientText from "@/components/misc/GradientText";
 
 export default function NotSupported() {
   return (
@@ -39,14 +39,28 @@ export default function NotSupported() {
         <div className="mx-4">
           <Card className="">
             <CardHeader>
-              <CardTitle>No Mobile Support for Devguard</CardTitle>
+              <CardTitle>
+                No Mobile Support for{" "}
+                <GradientText
+                  colors={[
+                    "#FEFDF8",
+                    "#FDE9B5",
+                    "#FDD36F",
+                    "#FDDA83",
+                    "#FCBF29",
+                  ]}
+                  animationSpeed={1}
+                  className="text-2xl"
+                >
+                  Devguard
+                </GradientText>
+              </CardTitle>
               <CardDescription>
                 We are not sure if DevGuard on Mobile makes sense - if you are
                 interested in DevGuard Mobile Support give us a heads up on our
                 GitHub.
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
             <CardFooter>
               <div className="flex w-full flex-row justify-between space-x-4">
                 <a
@@ -56,6 +70,13 @@ export default function NotSupported() {
                   )}
                   href="https://devguard.org"
                 >
+                  <Image
+                    src="/logo_icon.svg"
+                    alt="DevGuard Logo"
+                    width={24}
+                    height={24}
+                    className=" mr-2"
+                  />
                   Devguard
                 </a>
                 <a
@@ -65,6 +86,13 @@ export default function NotSupported() {
                   )}
                   href="https://github.com/l3montree-dev/devguard"
                 >
+                  <Image
+                    src="/assets/github.svg"
+                    alt="GitHub Logo"
+                    className="mr-2 dark:invert"
+                    width={24}
+                    height={24}
+                  />
                   GitHub
                 </a>
               </div>
