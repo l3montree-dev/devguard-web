@@ -41,7 +41,6 @@ import { useRouter } from "next/router";
 import FileUpload from "./FileUpload";
 import PatSection from "./risk-identification/PatSection";
 import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface CodeRiskScannerDialogProps {
   open: boolean;
@@ -59,6 +58,7 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
   const [selectedScanner, setSelectedScanner] = React.useState<
     "secret-scanning" | "iac" | "sast" | "sarif" | "devsecops"
   >();
+
   const [selectedIntegration, setSelectedIntegration] = React.useState<
     "github" | "gitlab" | "docker" | "upload" | undefined
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
