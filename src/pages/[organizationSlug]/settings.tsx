@@ -424,16 +424,7 @@ const Home: FunctionComponent = () => {
           {activeOrg.webhooks?.map((installation) => (
             <ListItem
               key={installation.id}
-              Title={
-                <>
-                  {/*                   <img
-                    alt={installation.targetLogin}
-                    src={installation.targetAvatarUrl}
-                    className="mr-2 inline-block h-6 w-6 rounded-full"
-                  /> */}
-                  {installation.name}{" "}
-                </>
-              }
+              Title={installation.name}
               Description={installation.description}
               Button={
                 <WebhookIntegrationDialog
@@ -441,6 +432,7 @@ const Home: FunctionComponent = () => {
                   Button={<Button variant={"secondary"}>Edit Webhook</Button>}
                   initialValues={installation}
                   onDeleteWebhook={handleDeleteWebhook}
+                  projectWebhook={false}
                 ></WebhookIntegrationDialog>
               }
             />
@@ -449,22 +441,14 @@ const Home: FunctionComponent = () => {
           <hr />
           <ListItem
             Title={
-              <div className="flex flex-row items-center">
-                {/*                 <Image
-                  src="/assets/gitlab.svg"
-                  alt="GitHub"
-                  width={20}
-                  height={20}
-                  className="mr-2 inline-block"
-                /> */}
-                Add a Webhook
-              </div>
+              <div className="flex flex-row items-center">Add a Webhook</div>
             }
             Description="DevGuard uses webhooks to send notifications to your applications. You can use webhooks to receive notifications about events in DevGuard, such as new vulnerabilities, or SBOMs."
             Button={
               <WebhookIntegrationDialog
                 onNewIntegration={handleNewWebhookIntegration}
                 Button={<Button variant={"secondary"}>Add a Webhook</Button>}
+                projectWebhook={false}
               ></WebhookIntegrationDialog>
             }
           />

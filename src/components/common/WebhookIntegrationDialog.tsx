@@ -26,18 +26,21 @@ import { Input } from "../ui/input";
 import { urlToBaseURL } from "../../utils/url";
 import { Switch } from "../ui/switch";
 import { on } from "events";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 interface Props {
   Button: ReactNode;
   onNewIntegration: (integration: WebhookDTO) => void;
   initialValues?: WebhookDTO;
   onDeleteWebhook?: (id?: string) => Promise<void>;
+  projectWebhook: boolean;
 }
 export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   onNewIntegration,
   Button: Trigger,
   initialValues,
   onDeleteWebhook,
+  projectWebhook,
 }) => {
   const form = useForm<WebhookDTO>({
     defaultValues: initialValues || {
@@ -51,9 +54,22 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   });
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
+  const project = useActiveProject();
   const [open, setOpen] = React.useState(false);
 
   const method = initialValues ? "PUT" : "POST";
+
+  let url =
+    "/organizations/" + activeOrg.slug + "/integrations/webhook/test-and-save/";
+
+  if (projectWebhook) {
+    url =
+      "/organizations/" +
+      activeOrg.slug +
+      "/projects/" +
+      project.slug +
+      "/integrations/webhook/test-and-save/";
+  }
 
   const handleSubmit = async (params: {
     id?: string;
@@ -64,19 +80,13 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
     sbomEnabled: boolean;
     vulnEnabled: boolean;
   }) => {
-    const res = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/integrations/webhook/test-and-save/",
-      {
-        method: method,
-        body: JSON.stringify({
-          ...params,
-          id: initialValues?.id,
-          url: urlToBaseURL(params.url),
-        }),
-      },
-    );
+    const res = await browserApiClient(url, {
+      method: method,
+      body: JSON.stringify({
+        ...params,
+        id: initialValues?.id,
+      }),
+    });
     if (res.ok) {
       const integration = await res.json();
       onNewIntegration(integration);

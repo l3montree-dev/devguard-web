@@ -149,6 +149,8 @@ export interface ProjectDTO {
   repositoryId?: string;
   repositoryName?: string;
 
+  webhooks: Array<WebhookDTO>;
+
   members: Array<{
     id: string;
     name: string;
