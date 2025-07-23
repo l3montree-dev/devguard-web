@@ -14,7 +14,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Image from "next/image";
-import GradientText from "@/components/misc/GradientText";
 import { Button } from "@/components/ui/button";
 
 export default function NotSupported() {
@@ -27,22 +26,36 @@ export default function NotSupported() {
           width={50}
           height={50}
           className="m-8"
-        ></Image>
+        />
         <div className="">
-          <div className="max-w-80">
+          <div className="max-w-80 ">
             <div className="text-xl mb-4">No Mobile Support for Devguard</div>
-            <div className=" flex flex-row justify-content justify-between justify-center">
-              <div className="mr-2">
+            <div className=" flex flex-row justify-content justify-between justify-center space-x-4">
+              <div className="">
                 <a href="https://devguard.org">
                   <Button variant={"default"} className="text-xl">
-                    Devguard
+                    <Image
+                      src="/logo_icon.svg"
+                      alt="DevGuard Logo"
+                      width={30}
+                      height={30}
+                      className=" mr-2"
+                    />
+                    Documentation
                   </Button>
                 </a>
               </div>
-              <div className="ml-2">
+              <div className="">
                 <a href="https://github.com/l3montree-dev/devguard">
                   <Button variant={"secondary"} className="text-xl">
-                    Source Code
+                    <Image
+                      src="/assets/github.svg"
+                      alt="GitHub Logo"
+                      className="mr-2 dark:invert"
+                      width={30}
+                      height={30}
+                    />
+                    GitHub
                   </Button>
                 </a>
               </div>
