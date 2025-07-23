@@ -20,21 +20,7 @@ import { Button } from "@/components/ui/button";
 export default function NotSupported() {
   return (
     <div className="text-center">
-      <div className="flex flex-col min-h-screen justify-center items-center">
-        <Image
-          src="/logo_inverse_icon.svg"
-          alt="DevGuard Logo"
-          width={80}
-          height={80}
-        />
-        <GradientText
-          colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
-          animationSpeed={1}
-          className="text-2xl"
-        >
-          No Mobile Support for Devguard
-          <span className="text-xs">..yet</span>
-        </GradientText>{" "}
+      <div className="flex flex-col min-h-screen justify-center items-center max-w-">
         <Image
           src="/assets/nosupport-gopher.png"
           alt="sad"
@@ -42,17 +28,24 @@ export default function NotSupported() {
           height={50}
           className="m-8"
         ></Image>
-        <div>
-          <div className=" flex flex-row justify-content justify-between justify-center">
-            <div className="mr-2">
-              <a href="https://devguard.org">
-                <Button variant={"default"}>Devguard</Button>
-              </a>
-            </div>
-            <div className="ml-2">
-              <a href="https://github.com/l3montree-dev/devguard">
-                <Button variant={"secondary"}> Source Code</Button>
-              </a>
+        <div className="">
+          <div className="max-w-80">
+            <div className="text-xl mb-4">No Mobile Support for Devguard</div>
+            <div className=" flex flex-row justify-content justify-between justify-center">
+              <div className="mr-2">
+                <a href="https://devguard.org">
+                  <Button variant={"default"} className="text-xl">
+                    Devguard
+                  </Button>
+                </a>
+              </div>
+              <div className="ml-2">
+                <a href="https://github.com/l3montree-dev/devguard">
+                  <Button variant={"secondary"} className="text-xl">
+                    Source Code
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
         </div>
