@@ -59,10 +59,6 @@ const CodeRiskScannerDialog: FunctionComponent<CodeRiskScannerDialogProps> = ({
     "secret-scanning" | "iac" | "sast" | "sarif" | "devsecops"
   >();
 
-  const [selectedSetup, setSelectedSetup] = React.useState<
-    "auto-setup" | "custom-setup"
-  >();
-
   const [selectedIntegration, setSelectedIntegration] = React.useState<
     "github" | "gitlab" | "docker" | "upload" | undefined
   >(externalProviderIdToIntegrationName(asset?.externalEntityProviderId));
