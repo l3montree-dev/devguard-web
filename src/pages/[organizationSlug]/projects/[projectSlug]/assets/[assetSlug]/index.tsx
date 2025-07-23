@@ -25,17 +25,27 @@ import { config } from "../../../../../../config";
 import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
+import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
+import Image from "next/image";
+import { getApiClientFromContext } from "@/services/devGuardApi";
+import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 
 interface Props {
   apiUrl: string;
+  repositories: Array<{ value: string; label: string }> | null;
 }
 
-const Index: FunctionComponent<Props> = ({ apiUrl }) => {
+const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
   const assetMenu = useAssetMenu();
   const [isOpen, setIsOpen] = useState(false);
   const [dependencyRiskIsOpen, setDependencyRiskIsOpen] = useState(false);
+  const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
   const autosetup = useAutosetup("full");
+
+  const { repos, searchLoading, handleSearchRepos } =
+    useRepositorySearch(repositories);
+
   return (
     <Page
       Menu={assetMenu}
@@ -46,18 +56,21 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
       <Section
         primaryHeadline
         forceVertical
-        description="Start scanning your code for vulnerabilities, license issues and policy violations."
+        description="Start scanning your code for vulnerabilities, bad-practices, license issues, policy violations and more."
         title="Welcome to DevGuard 🚀"
       >
         {asset?.externalEntityProviderId &&
           externalProviderIdToIntegrationName(
             asset.externalEntityProviderId,
           ) === "gitlab" && (
-            <div className="mb-10">
-              <div className="">
-                <Autosetup {...autosetup} />
+            <>
+              <div className="mb-8">
+                <div className="">
+                  <Autosetup {...autosetup} />
+                </div>
               </div>
-            </div>
+              <hr className="mb-8" />
+            </>
           )}
         <div className="flex flex-col gap-4 z-10">
           <ListItem
@@ -69,7 +82,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
               <div className="flex flex-row gap-2">
                 <Button
                   onClick={() => setDependencyRiskIsOpen(true)}
-                  variant={"default"}
+                  variant={"secondary"}
                 >
                   Identify Dependency-Risks
                 </Button>
@@ -90,6 +103,49 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
             }
           />
         </div>
+        <div>
+          <ListItem
+            Title={
+              <span className="">
+                Connect your Issue Tracker to DevGuard{" "}
+                <Image
+                  src="/assets/provider-icons/gitlab.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-5 w-auto"
+                />
+                <Image
+                  src="/assets/provider-icons/opencode.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-4 w-auto"
+                />
+                <Image
+                  src="/assets/provider-icons/github.svg"
+                  width={50}
+                  height={50}
+                  alt="GitLab Logo"
+                  className="inline-block ml-2 h-4 w-auto dark:invert"
+                />
+              </span>
+            }
+            Description={
+              "You can connect your Issue Tracker to DevGuard to automatically create issues for identified risks. You can handle findings directly from your issue tracker via slash commands. This way, you can easily track and mitigate vulnerabilities, bad-practices, license issues and more."
+            }
+            Button={
+              <div className="flex flex-row gap-2">
+                <Button
+                  onClick={() => setWebhookIsOpen(true)}
+                  variant={"secondary"}
+                >
+                  Setup Ticket-Integration
+                </Button>
+              </div>
+            }
+          />
+        </div>
       </Section>
       <DependencyRiskScannerDialog
         open={dependencyRiskIsOpen}
@@ -101,6 +157,11 @@ const Index: FunctionComponent<Props> = ({ apiUrl }) => {
         open={isOpen}
         onOpenChange={setIsOpen}
         apiUrl={apiUrl}
+      />
+
+      <WebhookSetupTicketIntegrationDialog
+        open={webhookIsOpen}
+        onOpenChange={setWebhookIsOpen}
       />
     </Page>
   );
@@ -150,7 +211,6 @@ export const getServerSideProps = middleware(
     organization: withOrganization,
     project: withProject,
     asset: withAsset,
-
     contentTree: withContentTree,
   },
 );
