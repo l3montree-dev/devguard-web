@@ -14,12 +14,21 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { classNames } from "@/utils/common";
 
 export default function NotSupported() {
   return (
     <div className="text-center">
-      <div className="flex flex-col min-h-screen justify-center items-center max-w-">
+      <div className="flex flex-col min-h-screen justify-center items-center">
         <Image
           src="/assets/nosupport-gopher.png"
           alt="sad"
@@ -27,40 +36,40 @@ export default function NotSupported() {
           height={50}
           className="m-8"
         />
-        <div className="">
-          <div className="max-w-80 ">
-            <div className="text-xl mb-4">No Mobile Support for Devguard</div>
-            <div className=" flex flex-row justify-content justify-between justify-center space-x-4">
-              <div className="">
-                <a href="https://devguard.org">
-                  <Button variant={"default"} className="text-xl">
-                    <Image
-                      src="/logo_icon.svg"
-                      alt="DevGuard Logo"
-                      width={30}
-                      height={30}
-                      className=" mr-2"
-                    />
-                    Documentation
-                  </Button>
+        <div className="mx-4">
+          <Card className="">
+            <CardHeader>
+              <CardTitle>No Mobile Support for Devguard</CardTitle>
+              <CardDescription>
+                We are not sure if DevGuard on Mobile makes sense - if you are
+                interested in DevGuard Mobile Support give us a heads up on our
+                GitHub.
+              </CardDescription>
+            </CardHeader>
+            <CardContent></CardContent>
+            <CardFooter>
+              <div className="flex w-full flex-row justify-between space-x-4">
+                <a
+                  className={classNames(
+                    "!text-black flex-1",
+                    buttonVariants({ variant: "default" }),
+                  )}
+                  href="https://devguard.org"
+                >
+                  Devguard
+                </a>
+                <a
+                  className={classNames(
+                    "flex-1",
+                    buttonVariants({ variant: "secondary" }),
+                  )}
+                  href="https://github.com/l3montree-dev/devguard"
+                >
+                  GitHub
                 </a>
               </div>
-              <div className="">
-                <a href="https://github.com/l3montree-dev/devguard">
-                  <Button variant={"secondary"} className="text-xl">
-                    <Image
-                      src="/assets/github.svg"
-                      alt="GitHub Logo"
-                      className="mr-2 dark:invert"
-                      width={30}
-                      height={30}
-                    />
-                    GitHub
-                  </Button>
-                </a>
-              </div>
-            </div>
-          </div>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </div>
