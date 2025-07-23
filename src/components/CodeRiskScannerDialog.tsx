@@ -41,7 +41,6 @@ import { useRouter } from "next/router";
 import FileUpload from "./FileUpload";
 import PatSection from "./risk-identification/PatSection";
 import { externalProviderIdToIntegrationName } from "../utils/externalProvider";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface CodeRiskScannerDialogProps {
   open: boolean;

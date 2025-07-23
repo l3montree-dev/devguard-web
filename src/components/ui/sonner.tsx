@@ -23,7 +23,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       position="top-center"
       {...props}
-      duration={6000}
+      duration={4000}
     />
   );
 };
