@@ -47,7 +47,8 @@ import {
 } from "./ui/dialog";
 import { FlaskConical } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { SparklesIcon } from "@heroicons/react/20/solid";
+import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
+import { CubeIcon } from "@heroicons/react/24/outline";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -238,49 +239,94 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 </Button>
               </div>
             </CarouselItem>
-            {selectedScanner === "sbom" && selectedIntegration === "upload" ? (
-              <CarouselItem>
-                <DialogHeader>
-                  <DialogTitle>Bring your own Scanner</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
-                  You can either manually upload a SBOM-File or use our
-                  DevGuard-Scanner to do it in a automated way.
-                </DialogDescription>
+            <CarouselItem>
+                 <DialogHeader>
+                   <DialogTitle>
+                      What Scanner do you want to use?
+                   </DialogTitle>
+                 </DialogHeader>
+                 <div className="mt-10">
+                   <Card
+                     className={classNames(
+                       "cursor-pointer",
+                       selectedIntegration === "github"
+                         ? "border border-primary"
+                         : "border border-transparent",
+                     )}
+                     onClick={() => setSelectedIntegration("github")}
+                   >
+                     <CardHeader>
+                       <CardTitle className="text-lg flex flex-row items-center leading-tight">
+                         <Image
+                           src="/logo_icon.svg"
+                           alt="GitLab"
+                           width={20}
+                           height={20}
+                           className="inline-block mr-2"
+                         />
+                         Devguard Default
+                         </CardTitle>
+                       <CardDescription>
+                         Scanning in GitHub Actions using predefined workflows. All
+                         DevSecOps-Scanners as well as custom scanners are
+                         supported.
+                       </CardDescription>
+                     </CardHeader>
+                   </Card>
+                   <Card
+                     className={classNames(
+                       "cursor-pointer mt-2",
+                       selectedIntegration === "gitlab"
+                         ? "border border-primary"
+                         : "border border-transparent",
+                     )}
+                     onClick={() => setSelectedIntegration("gitlab")}
+                   >
+                     <CardHeader>
+                       <CardTitle className="text-lg items-center flex flex-row leading-tight">
 
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle className="text-lg">
-                      Upload a SBOM-File
-                    </CardTitle>
-                    <CardDescription>
-                      Upload a SBOM-File which is in CycloneDX 1.6 or higher
-                      format. This can be done manually or through the
-                      DevGuard-Scanner.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      <FileUpload
-                        files={fileName ? [fileName] : []}
-                        dropzone={dropzone}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-                <div className="flex mt-10 flex-row gap-2 justify-end">
-                  <Button
-                    variant={"secondary"}
-                    onClick={() => api?.scrollPrev()}
-                  >
-                    Back
-                  </Button>
-                  <AsyncButton disabled={!fileName} onClick={uploadSBOM}>
-                    Upload
-                  </AsyncButton>
-                </div>
-              </CarouselItem>
-            ) : (
+<CubeTransparentIcon
+                           width={20}
+                           height={20}
+                           className="inline-block mr-2"
+                         
+
+/>
+                         Own Scanner
+                       </CardTitle>
+                       <CardDescription>
+                         Scanning in GitLab CI/CD using predefined
+                         CI/CD-Components. All DevSecOps-Scanners as well as custom
+                         scanners are supported.
+                       </CardDescription>
+                     </CardHeader>
+                   </Card>
+                
+                 
+
+                 </div>
+                 <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
+                   <Button
+                     variant={"secondary"}
+                     onClick={() => {
+                       api?.scrollPrev();
+                       setSelectedIntegration(undefined);
+                     }}
+                   >
+                     Back to scanner selection
+                   </Button>
+                   <Button
+                     disabled={selectedIntegration === undefined}
+                     onClick={() => {
+                       api?.scrollNext();
+                     }}
+                   >
+                     {selectedIntegration === undefined
+                       ? "Select an integration"
+                       : "Continue"}
+                   </Button>
+                 </div>
+               </CarouselItem>
               <>
                 {selectedIntegration === "github" && (
                   <GithubTokenSlides
