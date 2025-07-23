@@ -1,4 +1,3 @@
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 import Image from "next/image";
@@ -46,6 +45,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import { FlaskConical } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { SparklesIcon } from "@heroicons/react/20/solid";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -61,6 +63,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
   const [selectedScanner, setSelectedScanner] = React.useState<
     "sca" | "container-scanning" | "sbom" | "devsecops" | undefined
   >();
+
+  const [selectedSetup, setSelectedSetup] = React.useState<
+    "auto-setup" | "custom-setup" | undefined
+  >();
+
   const asset = useActiveAsset();
 
   const [selectedIntegration, setSelectedIntegration] = React.useState<
@@ -162,253 +169,55 @@ const DependencyRiskScannerDialog: FunctionComponent<
           <CarouselContent>
             <CarouselItem>
               <DialogHeader>
-                <DialogTitle>
-                  What dependency risks would you like to identify?
-                </DialogTitle>
+                <DialogTitle>How do you want to Setup Devguard?</DialogTitle>
               </DialogHeader>
               <div className="mt-10">
                 <Card
-                  onClick={() => setSelectedScanner("devsecops")}
+                  onClick={() => setSelectedSetup("auto-setup")}
                   className={classNames(
                     "col-span-2 cursor-pointer",
-                    selectedScanner === "devsecops"
+                    selectedSetup === "auto-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
                 >
                   <CardContent className="p-0">
                     <CardHeader>
-                      <CardTitle className="text-lg leading-tight">
-                        Integrate whole DevSecOps-Pipeline
+                      <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                        <SparklesIcon className="inline-block mr-2 w-4 h-4" />
+                        Auto Setup
+                        <Badge className="scale-75 top-10"> Recommended</Badge>
                       </CardTitle>
                       <CardDescription>
-                        Integrate a whole DevSecOps-Pipeline including
-                        dependency risk identification. This is only possible
-                        through CI/CD Components and GitHub-Actions.
+                        We do the difficult part for you!
                       </CardDescription>
                     </CardHeader>
                   </CardContent>
                 </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedScanner === "sca"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectScanner("sca")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      <Image
-                        src="/assets/git.svg"
-                        alt="GitLab"
-                        width={20}
-                        height={20}
-                        className="inline-block mr-2"
-                      />
-                      Software-Composition-Analysis of a Repository
-                    </CardTitle>
-                    <CardDescription>
-                      Inspect your dependency tree for known vulnerabilities.
-                      You should always do this, even when distributing your
-                      software as a OCI-Image.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedScanner === "container-scanning"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectScanner("container-scanning")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg items-center flex flex-row leading-tight">
-                      <div className="w-5 h-5 mr-2">
-                        <Image
-                          src={"/assets/oci-icon-white.svg"}
-                          alt="GitLab"
-                          width={20}
-                          height={20}
-                          className="hidden dark:inline-block absolute"
-                        />
-                        <Image
-                          src={"/assets/oci-icon-pantone.svg"}
-                          alt="GitLab"
-                          width={20}
-                          height={20}
-                          className="inline-block dark:hidden absolute"
-                        />
-                      </div>
-                      Software-Composition-Analysis of an OCI-Image
-                    </CardTitle>
-                    <CardDescription>
-                      Scanning in GitLab CI/CD using predefined
-                      CI/CD-Components. All DevSecOps-Scanners as well as custom
-                      scanners are supported.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedScanner === "sbom"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectScanner("sbom")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      I bring my own Scanner
-                    </CardTitle>
-                    <CardDescription>
-                      You can integrate any scanner which is able to produce a
-                      SBOM-File (currently only CycloneDX 1.6 or higher is
-                      supported). You This can be done in any environment which
-                      is capable of running docker.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
               </div>
-              <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-                <Button
-                  disabled={selectedScanner === undefined}
-                  onClick={() => {
-                    api?.scrollNext();
-                  }}
-                >
-                  {selectedScanner === undefined
-                    ? "Select a scanner"
-                    : "Continue"}
-                </Button>
-              </div>
-            </CarouselItem>
+              <Card
+                className={classNames(
+                  "cursor-pointer mt-2   ",
+                  selectedSetup === "custom-setup"
+                    ? "border border-primary"
+                    : "border border-transparent",
+                )}
+                onClick={() => setSelectedSetup("custom-setup")}
+              >
+                <CardHeader>
+                  <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                    <FlaskConical className="inline-block mr-2" />
+                    Custom Setup
+                    <Badge variant={"outline"} className="scale-75">
+                      Expert
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    You can have <strong>full control</strong> over Devguard!
+                  </CardDescription>
+                </CardHeader>
+              </Card>
 
-            <CarouselItem>
-              <DialogHeader>
-                <DialogTitle>
-                  {selectedScanner === "sbom"
-                    ? "How would you like to upload your SBOM?"
-                    : "Where would you like to scan?"}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="mt-10">
-                <Card
-                  className={classNames(
-                    "cursor-pointer",
-                    selectedIntegration === "github"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectIntegration("github")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                      <Image
-                        src="/assets/github.svg"
-                        alt="GitLab"
-                        width={20}
-                        height={20}
-                        className="inline-block dark:invert mr-2"
-                      />
-                      GitHub Actions
-                    </CardTitle>
-                    <CardDescription>
-                      Scanning in GitHub Actions using predefined workflows. All
-                      DevSecOps-Scanners as well as custom scanners are
-                      supported.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-                <Card
-                  className={classNames(
-                    "cursor-pointer mt-2",
-                    selectedIntegration === "gitlab"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                  onClick={() => selectIntegration("gitlab")}
-                >
-                  <CardHeader>
-                    <CardTitle className="text-lg items-center flex flex-row leading-tight">
-                      <Image
-                        src="/assets/gitlab.svg"
-                        alt="GitLab"
-                        width={20}
-                        height={20}
-                        className="inline-block mr-2"
-                      />
-                      GitLab CI/CD
-                    </CardTitle>
-                    <CardDescription>
-                      Scanning in GitLab CI/CD using predefined
-                      CI/CD-Components. All DevSecOps-Scanners as well as custom
-                      scanners are supported.
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-                {selectedScanner !== "devsecops" && (
-                  <Card
-                    className={classNames(
-                      "cursor-pointer mt-2",
-                      selectedIntegration === "docker"
-                        ? "border border-primary"
-                        : "border border-transparent",
-                    )}
-                    onClick={() => selectIntegration("docker")}
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                        <Image
-                          src="/assets/docker.svg"
-                          alt="Docker"
-                          width={20}
-                          height={20}
-                          className="inline-block mr-2"
-                        />
-                        Docker Integration
-                      </CardTitle>
-                      <CardDescription>
-                        Use our docker image to run the scanner in any
-                        environment which is capable of running docker.
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                )}
-                {selectedScanner === "sbom" && (
-                  <Card
-                    className={classNames(
-                      "cursor-pointer mt-2",
-                      selectedIntegration === "upload"
-                        ? "border border-primary"
-                        : "border border-transparent",
-                    )}
-                    onClick={() => selectIntegration("upload")}
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                        <Image
-                          src="/assets/cyclonedx-logo.svg"
-                          alt="Upload"
-                          width={20}
-                          height={20}
-                          className="inline-block mr-2"
-                        />
-                        Upload SBOM-File
-                      </CardTitle>
-                      <CardDescription>
-                        Upload a SBOM-File which is in CycloneDX 1.6 or higher
-                        format. This can be done manually or through the
-                        DevGuard-Scanner.
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                )}
-              </div>
               <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
                 <Button
                   variant={"secondary"}
@@ -420,19 +229,19 @@ const DependencyRiskScannerDialog: FunctionComponent<
                   Back
                 </Button>
                 <Button
-                  disabled={selectedIntegration === undefined}
+                  disabled={selectedSetup === undefined}
                   onClick={() => {
                     api?.scrollNext();
                   }}
                 >
-                  {selectedIntegration === undefined
-                    ? "Select an integration"
+                  {selectedSetup === undefined
+                    ? "Select your Setup Route"
                     : "Continue"}
                 </Button>
               </div>
             </CarouselItem>
-            {selectedScanner === "sbom" && selectedIntegration === "upload" ? (
-              <CarouselItem>
+            {selectedSetup === "auto-setup" &&
+              (<CarouselItem>
                 <DialogHeader>
                   <DialogTitle>Bring your own Scanner</DialogTitle>
                 </DialogHeader>
@@ -472,115 +281,114 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     Upload
                   </AsyncButton>
                 </div>
-              </CarouselItem>
-            ) : (
-              <>
-                {selectedIntegration === "github" && (
-                  <GithubTokenSlides
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    scanner={selectedScanner}
-                    assetSlug={asset!.slug}
-                    onPatGenerate={async () => {
-                      await pat.onCreatePat({
-                        scopes: "scan",
-                        description: "GitHub Integration for DevGuard",
-                      });
-                      // put this on the next render tick
-                      setTimeout(() => api?.reInit(), 0);
-                    }}
-                    pat={pat.pat?.privKey}
-                    prev={api?.scrollPrev}
-                    next={api?.scrollNext}
-                  />
-                )}
-                {selectedIntegration === "gitlab" && (
-                  <GitlabTokenSlides
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    scanner={selectedScanner}
-                    assetSlug={asset!.slug}
-                    onPatGenerate={async () => {
-                      await pat.onCreatePat({
-                        scopes: "scan",
-                        description: "GitLab Integration for DevGuard",
-                      });
-                      // put this on the next render tick
-                      setTimeout(() => api?.reInit(), 0);
-                    }}
-                    pat={pat.pat?.privKey}
-                    prev={api?.scrollPrev}
-                    next={api?.scrollNext}
-                  />
-                )}
-                {selectedIntegration === "docker" && (
-                  <>
-                    <CarouselItem>
-                      <DialogHeader>
-                        <DialogTitle>Docker Integration</DialogTitle>
-                      </DialogHeader>
-                      <DialogDescription>
-                        Use our docker image to run the scanner in any
-                        environment which is capable of running docker.
-                      </DialogDescription>
-                      <div className="mt-10">
-                        <div className="mb-5">
-                          <PatSection
-                            {...pat}
-                            description="Docker Integration"
+              </CarouselItem>)(
+                <>
+                  {selectedIntegration === "github" && (
+                    <GithubTokenSlides
+                      apiUrl={apiUrl}
+                      orgSlug={activeOrg.slug}
+                      projectSlug={activeProject.slug}
+                      scanner={selectedScanner}
+                      assetSlug={asset!.slug}
+                      onPatGenerate={async () => {
+                        await pat.onCreatePat({
+                          scopes: "scan",
+                          description: "GitHub Integration for DevGuard",
+                        });
+                        // put this on the next render tick
+                        setTimeout(() => api?.reInit(), 0);
+                      }}
+                      pat={pat.pat?.privKey}
+                      prev={api?.scrollPrev}
+                      next={api?.scrollNext}
+                    />
+                  )}
+                  {selectedIntegration === "gitlab" && (
+                    <GitlabTokenSlides
+                      apiUrl={apiUrl}
+                      orgSlug={activeOrg.slug}
+                      projectSlug={activeProject.slug}
+                      scanner={selectedScanner}
+                      assetSlug={asset!.slug}
+                      onPatGenerate={async () => {
+                        await pat.onCreatePat({
+                          scopes: "scan",
+                          description: "GitLab Integration for DevGuard",
+                        });
+                        // put this on the next render tick
+                        setTimeout(() => api?.reInit(), 0);
+                      }}
+                      pat={pat.pat?.privKey}
+                      prev={api?.scrollPrev}
+                      next={api?.scrollNext}
+                    />
+                  )}
+                  {selectedIntegration === "docker" && (
+                    <>
+                      <CarouselItem>
+                        <DialogHeader>
+                          <DialogTitle>Docker Integration</DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription>
+                          Use our docker image to run the scanner in any
+                          environment which is capable of running docker.
+                        </DialogDescription>
+                        <div className="mt-10">
+                          <div className="mb-5">
+                            <PatSection
+                              {...pat}
+                              description="Docker Integration"
+                            />
+                          </div>
+                          <hr className="pb-5" />
+
+                          <CopyCode
+                            codeString={
+                              // @ts-ignore
+                              integrationSnippets({
+                                token: pat.pat?.privKey,
+                                orgSlug: activeOrg.slug,
+                                projectSlug: activeProject.slug,
+                                assetSlug: asset!.slug,
+                                apiUrl: apiUrl,
+                              })["Docker"][selectedScanner ?? "sbom"]
+                            }
                           />
                         </div>
-                        <hr className="pb-5" />
-
-                        <CopyCode
-                          codeString={
-                            // @ts-ignore
-                            integrationSnippets({
-                              token: pat.pat?.privKey,
-                              orgSlug: activeOrg.slug,
-                              projectSlug: activeProject.slug,
-                              assetSlug: asset!.slug,
-                              apiUrl: apiUrl,
-                            })["Docker"][selectedScanner ?? "sbom"]
-                          }
-                        />
-                      </div>
-                      <div className="flex mt-10 flex-row gap-2 justify-end">
-                        <Button
-                          variant={"secondary"}
-                          onClick={() => api?.scrollPrev()}
-                        >
-                          Back
-                        </Button>
-                        <Button
-                          onClick={async () => {
-                            const resp = await fetch(
-                              `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                              {
-                                method: "GET",
-                              },
-                            );
-                            if (resp.redirected) {
-                              router.push(
+                        <div className="flex mt-10 flex-row gap-2 justify-end">
+                          <Button
+                            variant={"secondary"}
+                            onClick={() => api?.scrollPrev()}
+                          >
+                            Back
+                          </Button>
+                          <Button
+                            onClick={async () => {
+                              const resp = await fetch(
                                 `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                                {
+                                  method: "GET",
+                                },
                               );
-                            } else {
-                              toast.error(
-                                "Scanner did not run in Repository yet",
-                              );
-                            }
-                          }}
-                        >
-                          Done!
-                        </Button>
-                      </div>
-                    </CarouselItem>
-                  </>
-                )}
-              </>
-            )}
+                              if (resp.redirected) {
+                                router.push(
+                                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                                );
+                              } else {
+                                toast.error(
+                                  "Scanner did not run in Repository yet",
+                                );
+                              }
+                            }}
+                          >
+                            Done!
+                          </Button>
+                        </div>
+                      </CarouselItem>
+                    </>
+                  )}
+                </>,
+              )}
           </CarouselContent>
         </Carousel>
       </DialogContent>
