@@ -40,7 +40,6 @@ export default function NotSupported() {
           <Card className="">
             <CardHeader>
               <CardTitle>
-                No Mobile Support for{" "}
                 <GradientText
                   colors={[
                     "#FEFDF8",
@@ -50,9 +49,8 @@ export default function NotSupported() {
                     "#FCBF29",
                   ]}
                   animationSpeed={1}
-                  className="text-2xl"
                 >
-                  Devguard
+                  No Mobile Support for Devguard
                 </GradientText>
               </CardTitle>
               <CardDescription>
