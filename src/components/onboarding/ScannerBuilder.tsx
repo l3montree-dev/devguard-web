@@ -57,13 +57,13 @@ export const ScannerBuilder = ({
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
 
-interface Config {
-  identifySecrets: boolean
-    SCA: boolean,
-    containerImage: boolean,
-    SAST: boolean,
-    IaC: boolean,
-}
+  interface Config {
+    identifySecrets: boolean;
+    SCA: boolean;
+    containerImage: boolean;
+    SAST: boolean;
+    IaC: boolean;
+  }
   const [config, setConfig] = useState<Partial<Config>>({
     identifySecrets: true,
     SCA: true,
@@ -94,7 +94,16 @@ interface Config {
               <div className="mr-2">Disable all</div>
               <Checkbox
                 defaultChecked={false}
-                onCheckedChange={() => }
+                onCheckedChange={() =>
+                  setConfig({
+                    identifySecrets: false,
+                    SCA: false,
+                    containerImage: false,
+                    SAST: false,
+                    IaC: false,
+                  })
+                }
+                // checked={}
               />
             </div>
 
@@ -112,15 +121,13 @@ interface Config {
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    onChange={() =>
+                    checked={config.identifySecrets}
+                    onCheckedChange={() =>
                       setConfig({
-                        identifySecrets: false,
+                        identifySecrets: !config.identifySecrets,
                       })
                     }
-                    checked={}
-                    onCheckedChange={}
                   />
-
                   <span> Identify leaked Secrets in your Code</span>
                   <p className="text-muted-foreground text-xs">
                     Tokens, Passwords, anything you the public should not know,
@@ -128,7 +135,15 @@ interface Config {
                   </p>
                 </div>
                 <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
+                  <Checkbox
+                    defaultChecked={true}
+                    checked={config.identifySecrets}
+                    onCheckedChange={() =>
+                      setConfig({
+                        identifySecrets: !config.identifySecrets,
+                      })
+                    }
+                  />
                   <span>
                     Scan your Dependencies for known Vulnerabilities (SCA)
                   </span>
@@ -138,7 +153,15 @@ interface Config {
                   </p>
                 </div>
                 <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
+                  <Checkbox
+                    defaultChecked={true}
+                    checked={config.identifySecrets}
+                    onCheckedChange={() =>
+                      setConfig({
+                        identifySecrets: !config.identifySecrets,
+                      })
+                    }
+                  />
                   <span>Build your Container Image</span>
                   <p className="text-muted-foreground text-xs">
                     By clicking this checkbox, you agree to the terms and
@@ -146,7 +169,15 @@ interface Config {
                   </p>
                 </div>
                 <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
+                  <Checkbox
+                    defaultChecked={true}
+                    checked={config.identifySecrets}
+                    onCheckedChange={() =>
+                      setConfig({
+                        identifySecrets: !config.identifySecrets,
+                      })
+                    }
+                  />
                   <span>Identify Bad Practices in Your Code (SAST)</span>
                   <p className="text-muted-foreground text-xs">
                     By clicking this checkbox, you agree to the terms and
@@ -154,7 +185,15 @@ interface Config {
                   </p>
                 </div>
                 <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
+                  <Checkbox
+                    defaultChecked={true}
+                    checked={config.identifySecrets}
+                    onCheckedChange={() =>
+                      setConfig({
+                        identifySecrets: !config.identifySecrets,
+                      })
+                    }
+                  />
                   <span>
                     Identify Flaws in your Infrastructure Configs (IaC)
                   </span>
@@ -169,20 +208,17 @@ interface Config {
           </div>
         </div>
 
-        {/* <div className="mt-10"></div> */}
-        <div className="flex mt-10 flex-row gap-2 justify-end">
-          {/* <Button variant={"secondary"} onClick={prev}>
-            Back
-          </Button> */}
-          {/* <Button onClick={next}>Continue</Button> */}
-        </div>
-
         <div className="mt-10 flex flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
             Back
           </Button>
-          <Button disabled={one === false} onClick={() => api?.scrollNext()}>
-            {one === true ? "Select Option" : "Continue"}
+          <Button
+            disabled={Object.values(config).every((v) => v === false)}
+            onClick={() => console.log(config)}
+          >
+            {Object.values(config).every((v) => v === false)
+              ? "Select Option"
+              : "Continue"}
           </Button>
         </div>
       </CarouselItem>
