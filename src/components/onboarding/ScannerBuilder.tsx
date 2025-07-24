@@ -92,14 +92,7 @@ export const ScannerBuilder = ({
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
             {/* border-yellow-300 bg-yellow-500/20 text-yellow-950
             dark:border-yellow-700 dark:text-yellow-100 */}
-            <Card
-              className={classNames(
-                "col-span-2 cursor-pointer",
-                one === true
-                  ? "border-yellow-300 bg-yellow-500/20 text-yellow-950 dark:border-yellow-700 dark:text-yellow-100"
-                  : "",
-              )}
-            >
+            <Card>
               <div className="flex flex-col space-y-4 ml-2">
                 <div className="space-x-2">
                   <Checkbox
@@ -115,32 +108,38 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox defaultChecked={true} />
                   <span>
-                    Connecting to APIs or databases in your customer networks
+                    Scan your Dependencies for known Vulnerabilities (SCA)
                   </span>
+                  <p className="text-muted-foreground text-xs">
+                    By clicking this checkbox, you agree to the terms and
+                    conditions
+                  </p>
                 </div>
                 <div className="space-x-2">
                   <Checkbox defaultChecked={true} />
-                  <span>test3</span>
+                  <span>Build your Container Image</span>
+                  <p className="text-muted-foreground text-xs">
+                    By clicking this checkbox, you agree to the terms and
+                    conditions
+                  </p>
                 </div>
                 <div className="space-x-2">
                   <Checkbox defaultChecked={true} />
-                  <span>test4</span>
+                  <span>Identify Bad Practices in Your Code (SAST)</span>
+                  <p className="text-muted-foreground text-xs">
+                    By clicking this checkbox, you agree to the terms and
+                    conditions
+                  </p>
                 </div>
                 <div className="space-x-2">
                   <Checkbox defaultChecked={true} />
-                  <span>test5</span>
-                </div>
-                <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
-                  <span>test6</span>
-                </div>
-                <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
-                  <span>test7</span>
-                </div>
-                <div className="space-x-2">
-                  <Checkbox defaultChecked={true} />
-                  <span>test8</span>
+                  <span>
+                    Identify Flaws in your Infrastructure Configs (IaC)
+                  </span>
+                  <p className="text-muted-foreground text-xs">
+                    By clicking this checkbox, you agree to the terms and
+                    conditions
+                  </p>
                 </div>
               </div>
             </Card>
