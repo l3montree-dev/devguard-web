@@ -218,6 +218,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       placeholder="the secret"
                       {...field}
                       copyable={true}
+                      mutable={true}
                       SVG={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
