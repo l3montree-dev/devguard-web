@@ -54,7 +54,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
 
 type SecretType = "badge" | "webhook";
 
-const generateNewSecret = (): string => {
+export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
