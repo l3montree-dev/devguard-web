@@ -43,8 +43,6 @@ const Index: FunctionComponent<Props> = () => {
   const updateProject = useStore((s) => s.updateProject);
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
 
-  console.log("project", project); // Debugging line, can be removed later
-
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     updateProject({
       ...project,
