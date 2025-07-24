@@ -33,7 +33,7 @@ import React, {
   useState,
 } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CarouselItem } from "../ui/carousel";
+import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 import { Checkbox } from "../ui/checkbox";
@@ -42,33 +42,36 @@ import { Label } from "../ui/label";
 import { Accordion } from "../ui/accordion";
 import Callout from "../common/Callout";
 import { classNames } from "@/utils/common";
+import { Form } from "react-hook-form";
+import { Button } from "../ui/button";
+import { setConfig } from "next/config";
+import { config } from "process";
 
 export const ScannerBuilder = ({
-  //   pat,
-  //   next,
-  //   prev,
   setup,
-  //   onPatGenerate,
-  //   apiUrl,
-  //   orgSlug,
-  //   projectSlug,
-  //   assetSlug,
 }: {
-  //   pat?: string;
   next?: () => void;
   prev?: () => void;
-  //   onPatGenerate: () => void;
+
   setup?: "own" | "auto-setup";
-  //   apiUrl: string;
-  //   orgSlug: string;
-  //   projectSlug: string;
-  //   assetSlug: string;
 }) => {
-  const [disableAll, setDisableAll] = useState(false);
-  const [one, setOne] = useState(true);
-  const [two, setTwo] = useState(true);
-  const [three, seThree] = useState(true);
-  const [four, setFour] = useState(true);
+  const [api, setApi] = React.useState<CarouselApi>();
+
+  const [config, setConfig] = useState({
+    identifySecrets: true,
+    SCA: true,
+    containerImage: true,
+    SAST: true,
+    IaC: true,
+  });
+
+  console.log(config);
+
+  useEffect(() => {
+    api?.reInit();
+  }, []);
+  // selectedScanner, selectedIntegration, pat.pat, api;
+
   return (
     <>
       <CarouselItem>
@@ -82,27 +85,44 @@ export const ScannerBuilder = ({
             max-w-4xl b"
           >
             <div className="flex w-full justify-end ">
-              <div>Disable all</div>
+              <div className="mr-2">Disable all</div>
               <Checkbox
                 defaultChecked={false}
                 onCheckedChange={() => setDisableAll(true)}
               />
             </div>
+
+            <Card
+              className=" border-yellow-300 bg-yellow-500/20 text-yellow-950
+            dark:border-yellow-700 dark:text-yellow-100 "
+            >
+              You are currently using the Full DevSecOps Pipeline
+            </Card>
+
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
-            {/* border-yellow-300 bg-yellow-500/20 text-yellow-950
-            dark:border-yellow-700 dark:text-yellow-100 */}
-            <Card>
+            <Card className="">
               <div className="flex flex-col space-y-4 ml-2">
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    onChange={() => setOne(true)}
+                    onChange={() =>
+                      setConfig({
+                        identifySecrets: false,
+                        SCA: false,
+                        containerImage: false,
+                        SAST: false,
+                        IaC: false,
+                      })
+                    }
+                    checked={}
+                    onCheckedChange={}
                   />
-                  <span>Identity Aware Proxy </span>
+
+                  <span> Identify leaked Secrets in your Code</span>
                   <p className="text-muted-foreground text-xs">
-                    By clicking this checkbox, you agree to the terms and
-                    conditions
+                    Tokens, Passwords, anything you the public should not know,
+                    will be scanned
                   </p>
                 </div>
                 <div className="space-x-2">
@@ -144,13 +164,6 @@ export const ScannerBuilder = ({
               </div>
             </Card>
             <Separator className="mt-4" orientation="horizontal" />
-            <div className="grid gap-2">
-              <Label htmlFor="terms-2">Accept terms and conditions</Label>
-              <p className="text-muted-foreground text-sm">
-                By clicking this checkbox, you agree to the terms and
-                conditions.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -160,6 +173,15 @@ export const ScannerBuilder = ({
             Back
           </Button> */}
           {/* <Button onClick={next}>Continue</Button> */}
+        </div>
+
+        <div className="mt-10 flex flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
+            Back
+          </Button>
+          <Button disabled={one === false} onClick={() => api?.scrollNext()}>
+            {one === true ? "Select Option" : "Continue"}
+          </Button>
         </div>
       </CarouselItem>
     </>
