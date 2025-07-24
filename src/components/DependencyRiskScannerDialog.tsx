@@ -48,7 +48,7 @@ import {
 import { FlaskConical } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
-import { CubeIcon } from "@heroicons/react/24/outline";
+import ScannerBuilder from "./onboarding/ScannerBuilder";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -61,13 +61,17 @@ const DependencyRiskScannerDialog: FunctionComponent<
 > = ({ open, apiUrl, onOpenChange }) => {
   const [api, setApi] = React.useState<CarouselApi>();
 
-  const [selectedScanner, setSelectedScanner] = React.useState<
+  const [selectedRoute, setSelectedRouter] = React.useState<
     "sca" | "container-scanning" | "sbom" | "devsecops" | undefined
   >();
   const asset = useActiveAsset();
 
   const [selectedSetup, setSelectedSetup] = React.useState<
     "auto-setup" | "custom-setup" | undefined
+  >();
+
+  const [selectedScanner, setSelectedScanner] = React.useState<
+    "own" | "devguard-select" | undefined
   >();
 
   const [selectedIntegration, setSelectedIntegration] = React.useState<
@@ -240,200 +244,223 @@ const DependencyRiskScannerDialog: FunctionComponent<
               </div>
             </CarouselItem>
             <CarouselItem>
-                 <DialogHeader>
-                   <DialogTitle>
-                      What Scanner do you want to use?
-                   </DialogTitle>
-                 </DialogHeader>
-                 <div className="mt-10">
-                   <Card
-                     className={classNames(
-                       "cursor-pointer",
-                       selectedIntegration === "github"
-                         ? "border border-primary"
-                         : "border border-transparent",
-                     )}
-                     onClick={() => setSelectedIntegration("github")}
-                   >
-                     <CardHeader>
-                       <CardTitle className="text-lg flex flex-row items-center leading-tight">
-                         <Image
-                           src="/logo_icon.svg"
-                           alt="GitLab"
-                           width={20}
-                           height={20}
-                           className="inline-block mr-2"
-                         />
-                         Devguard Default
-                         </CardTitle>
-                       <CardDescription>
-                         Scanning in GitHub Actions using predefined workflows. All
-                         DevSecOps-Scanners as well as custom scanners are
-                         supported.
-                       </CardDescription>
-                     </CardHeader>
-                   </Card>
-                   <Card
-                     className={classNames(
-                       "cursor-pointer mt-2",
-                       selectedIntegration === "gitlab"
-                         ? "border border-primary"
-                         : "border border-transparent",
-                     )}
-                     onClick={() => setSelectedIntegration("gitlab")}
-                   >
-                     <CardHeader>
-                       <CardTitle className="text-lg items-center flex flex-row leading-tight">
-
-<CubeTransparentIcon
-                           width={20}
-                           height={20}
-                           className="inline-block mr-2"
-                         
-
-/>
-                         Own Scanner
-                       </CardTitle>
-                       <CardDescription>
-                         Scanning in GitLab CI/CD using predefined
-                         CI/CD-Components. All DevSecOps-Scanners as well as custom
-                         scanners are supported.
-                       </CardDescription>
-                     </CardHeader>
-                   </Card>
-                
-                 
-
-                 </div>
-                 <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-                   <Button
-                     variant={"secondary"}
-                     onClick={() => {
-                       api?.scrollPrev();
-                       setSelectedIntegration(undefined);
-                     }}
-                   >
-                     Back to scanner selection
-                   </Button>
-                   <Button
-                     disabled={selectedIntegration === undefined}
-                     onClick={() => {
-                       api?.scrollNext();
-                     }}
-                   >
-                     {selectedIntegration === undefined
-                       ? "Select an integration"
-                       : "Continue"}
-                   </Button>
-                 </div>
-               </CarouselItem>
-              <>
-                {selectedIntegration === "github" && (
-                  <GithubTokenSlides
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    scanner={selectedScanner}
-                    assetSlug={asset!.slug}
-                    onPatGenerate={async () => {
-                      await pat.onCreatePat({
-                        scopes: "scan",
-                        description: "GitHub Integration for DevGuard",
-                      });
-                      // put this on the next render tick
-                      setTimeout(() => api?.reInit(), 0);
-                    }}
-                    pat={pat.pat?.privKey}
-                    prev={api?.scrollPrev}
-                    next={api?.scrollNext}
-                  />
-                )}
-                {selectedIntegration === "gitlab" && (
-                  <GitlabTokenSlides
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    scanner={selectedScanner}
-                    assetSlug={asset!.slug}
-                    onPatGenerate={async () => {
-                      await pat.onCreatePat({
-                        scopes: "scan",
-                        description: "GitLab Integration for DevGuard",
-                      });
-                      // put this on the next render tick
-                      setTimeout(() => api?.reInit(), 0);
-                    }}
-                    pat={pat.pat?.privKey}
-                    prev={api?.scrollPrev}
-                    next={api?.scrollNext}
-                  />
-                )}
-                {selectedIntegration === "docker" && (
-                  <>
-                    <CarouselItem>
-                      <DialogHeader>
-                        <DialogTitle>Docker Integration</DialogTitle>
-                      </DialogHeader>
-                      <DialogDescription>
-                        Use our docker image to run the scanner in any
-                        environment which is capable of running docker.
-                      </DialogDescription>
-                      <div className="mt-10">
-                        <div className="mb-5">
-                          <PatSection
-                            {...pat}
-                            description="Docker Integration"
-                          />
-                        </div>
-                        <hr className="pb-5" />
-
-                        <CopyCode
-                          codeString={
-                            // @ts-ignore
-                            integrationSnippets({
-                              token: pat.pat?.privKey,
-                              orgSlug: activeOrg.slug,
-                              projectSlug: activeProject.slug,
-                              assetSlug: asset!.slug,
-                              apiUrl: apiUrl,
-                            })["Docker"][selectedScanner ?? "sbom"]
-                          }
-                        />
+              <DialogHeader>
+                <DialogTitle>What Scanner do you want to use?</DialogTitle>
+              </DialogHeader>
+              <div className="mt-10">
+                <Card
+                  className={classNames(
+                    "cursor-pointer",
+                    selectedScanner === "devguard-select"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                  onClick={() => setSelectedScanner("devguard-select")}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg flex flex-row items-center leading-tight">
+                      <Image
+                        src="/logo_icon.svg"
+                        alt="GitLab"
+                        width={20}
+                        height={20}
+                        className="inline-block mr-2"
+                      />
+                      Devguard Default
+                      <Badge className="scale-75">Recommended</Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      Cherry pick exactly what you want!
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+                <Card
+                  className={classNames(
+                    "cursor-pointer mt-2",
+                    selectedScanner === "own"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                  onClick={() => setSelectedScanner("own")}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                      <CubeTransparentIcon
+                        width={20}
+                        height={20}
+                        className="inline-block mr-2"
+                      />
+                      Own Scanner
+                      <Badge variant={"outline"}>Expert</Badge>
+                    </CardTitle>
+                    <CardDescription>
+                      You already have a Scanner and want to just Upload your
+                      results
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
+              <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
+                <Button
+                  variant={"secondary"}
+                  onClick={() => {
+                    api?.scrollPrev();
+                    setSelectedScanner(undefined);
+                  }}
+                >
+                  Back to Route selection
+                </Button>
+                <Button
+                  disabled={selectScanner === undefined}
+                  onClick={() => {
+                    api?.scrollNext();
+                  }}
+                >
+                  {selectedIntegration === undefined
+                    ? "Select a Scanner"
+                    : "Continue"}
+                </Button>
+              </div>
+            </CarouselItem>
+            <>
+              {selectedScanner === "devguard-select" && (
+                <ScannerBuilder> </ScannerBuilder>
+              )}
+              {selectedIntegration === "docker" && (
+                <>
+                  <CarouselItem>
+                    <DialogHeader>
+                      <DialogTitle>Docker Integration</DialogTitle>
+                    </DialogHeader>
+                    <DialogDescription>
+                      Use our docker image to run the scanner in any environment
+                      which is capable of running docker.
+                    </DialogDescription>
+                    <div className="mt-10">
+                      <div className="mb-5">
+                        <PatSection {...pat} description="Docker Integration" />
                       </div>
-                      <div className="flex mt-10 flex-row gap-2 justify-end">
-                        <Button
-                          variant={"secondary"}
-                          onClick={() => api?.scrollPrev()}
-                        >
-                          Back
-                        </Button>
-                        <Button
-                          onClick={async () => {
-                            const resp = await fetch(
+                      <hr className="pb-5" />
+
+                      <CopyCode
+                        codeString={
+                          // @ts-ignore
+                          integrationSnippets({
+                            token: pat.pat?.privKey,
+                            orgSlug: activeOrg.slug,
+                            projectSlug: activeProject.slug,
+                            assetSlug: asset!.slug,
+                            apiUrl: apiUrl,
+                          })["Docker"][selectedScanner ?? "sbom"]
+                        }
+                      />
+                    </div>
+                    <div className="flex mt-10 flex-row gap-2 justify-end">
+                      <Button
+                        variant={"secondary"}
+                        onClick={() => api?.scrollPrev()}
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          const resp = await fetch(
+                            `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                            {
+                              method: "GET",
+                            },
+                          );
+                          if (resp.redirected) {
+                            router.push(
                               `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                              {
-                                method: "GET",
-                              },
                             );
-                            if (resp.redirected) {
-                              router.push(
-                                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                              );
-                            } else {
-                              toast.error(
-                                "Scanner did not run in Repository yet",
-                              );
-                            }
-                          }}
-                        >
-                          Done!
-                        </Button>
-                      </div>
-                    </CarouselItem>
-                  </>
-                )}
-              </>
-            )}
+                          } else {
+                            toast.error(
+                              "Scanner did not run in Repository yet",
+                            );
+                          }
+                        }}
+                      >
+                        Done!
+                      </Button>
+                      {selectedSetup === "auto-setup" && (
+                        <CarouselItem>
+                          <DialogHeader>
+                            <DialogTitle>asdfa?</DialogTitle>
+                          </DialogHeader>
+                          <div className="mt-10">
+                            <Card
+                              onClick={() => setSelectedSetup("auto-setup")}
+                              className={classNames(
+                                "col-span-2 cursor-pointer",
+                                selectedSetup === "auto-setup"
+                                  ? "border border-primary"
+                                  : "border border-transparent",
+                              )}
+                            >
+                              <CardContent className="p-0">
+                                <CardHeader>
+                                  <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                                    <SparklesIcon className="inline-block mr-2 w-4 h-4" />
+                                    Auto Setup
+                                    <Badge className="scale-75 top-10">
+                                      {" "}
+                                      Recommended
+                                    </Badge>
+                                  </CardTitle>
+                                  <CardDescription>
+                                    We do the difficult part for you!
+                                  </CardDescription>
+                                </CardHeader>
+                              </CardContent>
+                            </Card>
+                          </div>
+                          <Card
+                            className={classNames("cursor-pointer mt-2   ")}
+                            onClick={() => setSelectedSetup("custom-setup")}
+                          >
+                            <CardHeader>
+                              <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                                <FlaskConical className="inline-block mr-2" />
+                                Custom Setup
+                                <Badge variant={"outline"} className="scale-75">
+                                  Expert
+                                </Badge>
+                              </CardTitle>
+                              <CardDescription>
+                                You can have <strong>full control</strong> over
+                                Devguard!
+                              </CardDescription>
+                            </CardHeader>
+                          </Card>
+                          <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
+                            <Button
+                              variant={"secondary"}
+                              onClick={() => {
+                                api?.scrollPrev();
+                                setSelectedIntegration(undefined);
+                              }}
+                            >
+                              Back
+                            </Button>
+                            <Button
+                              disabled={selectedSetup === undefined}
+                              onClick={() => {
+                                api?.scrollNext();
+                              }}
+                            >
+                              {selectedSetup === undefined
+                                ? "Select an Setup Route"
+                                : "Continue"}
+                            </Button>
+                          </div>
+                        </CarouselItem>
+                      )}
+                    </div>
+                  </CarouselItem>
+                </>
+              )}
+            </>
           </CarouselContent>
         </Carousel>
       </DialogContent>

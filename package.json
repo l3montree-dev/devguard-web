@@ -17,6 +17,7 @@
     "@mdxeditor/editor": "^3.37.0",
     "@ory/client": "^1.20.11",
     "@ory/integrations": "git+https://github.com/l3montree-dev/integrations.git#cad56746374fadcba6ba3ce9387e06b494c9f100",
+    "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.2",
