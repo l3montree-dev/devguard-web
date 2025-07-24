@@ -22,7 +22,7 @@ const GitProviderIcon = ({ externalEntityProviderIdOrRepositoryId }: Props) => {
       <img
         src="/logos/opencode.svg"
         alt="OpenCode Logo"
-        className="h-4 w-4 scale- relative right-[1px]"
+        className="h-4 w-4 scale-150 relative right-[1px]"
       />
     );
   }
