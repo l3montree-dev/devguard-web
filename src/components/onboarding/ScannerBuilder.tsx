@@ -57,7 +57,14 @@ export const ScannerBuilder = ({
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
 
-  const [config, setConfig] = useState({
+interface Config {
+  identifySecrets: boolean
+    SCA: boolean,
+    containerImage: boolean,
+    SAST: boolean,
+    IaC: boolean,
+}
+  const [config, setConfig] = useState<Partial<Config>>({
     identifySecrets: true,
     SCA: true,
     containerImage: true,
@@ -65,10 +72,9 @@ export const ScannerBuilder = ({
     IaC: true,
   });
 
-  console.log(config);
-
   useEffect(() => {
     api?.reInit();
+    console.log(config);
   }, []);
   // selectedScanner, selectedIntegration, pat.pat, api;
 
@@ -88,7 +94,7 @@ export const ScannerBuilder = ({
               <div className="mr-2">Disable all</div>
               <Checkbox
                 defaultChecked={false}
-                onCheckedChange={() => setDisableAll(true)}
+                onCheckedChange={() => }
               />
             </div>
 
@@ -109,10 +115,6 @@ export const ScannerBuilder = ({
                     onChange={() =>
                       setConfig({
                         identifySecrets: false,
-                        SCA: false,
-                        containerImage: false,
-                        SAST: false,
-                        IaC: false,
                       })
                     }
                     checked={}
