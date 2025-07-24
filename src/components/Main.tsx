@@ -59,8 +59,8 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
       <Image
         src="/logos/opencode.svg"
         alt="OpenCode Logo"
-        width={30}
-        height={30}
+        width={20}
+        height={20}
         className="scale-175 relative right-[1px]"
       />
     );
