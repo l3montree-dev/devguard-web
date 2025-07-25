@@ -36,6 +36,7 @@ export enum UserRole {
   Owner = "owner",
   Admin = "admin",
   Member = "member",
+  Guest = "guest",
 }
 
 export enum RequirementsLevel {
