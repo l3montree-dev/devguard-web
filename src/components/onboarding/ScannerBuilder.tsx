@@ -47,6 +47,7 @@ import { Button } from "../ui/button";
 import { setConfig } from "next/config";
 import { config } from "process";
 import Image from "next/image";
+import { Switch } from "../ui/switch";
 
 interface Config {
   scanner: {
@@ -90,32 +91,42 @@ export const ScannerBuilder = ({
           <DialogTitle>What should your Scanner be able to do?</DialogTitle>
           <DialogDescription>Select exactly what you want</DialogDescription>
         </DialogHeader>
-        <div className="mt-10">
+        <div className="">
           <div
             className="relative aspect-video w-full
             max-w-4xl b"
           >
-            <div className="flex w-full justify-end ">
-              <div className="mr-2">Toggle All</div>
-              <Checkbox
-                defaultChecked={false}
-                onCheckedChange={() =>
-                  setConfig((prev) => ({
-                    scanner: {
-                      ...prev.scanner,
-                      identifySecrets: false,
-
-                      SCA: false,
-                      containerImage: false,
-                      SAST: false,
-                      IaC: false,
-                    },
-                  }))
-                }
-              />
+            <div className="mt-10 flex w-full justify-start ">
+              <Card className="h-auto w-48">
+                <div className="flex flex-grid space-x-4 m-2">
+                  <Switch
+                    className="mt-4"
+                    defaultChecked={true}
+                    onCheckedChange={() =>
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          identifySecrets: false,
+                          SCA: false,
+                          containerImage: false,
+                          SAST: false,
+                          IaC: false,
+                        },
+                      }))
+                    }
+                    // checked={}
+                  />{" "}
+                  <div className="flex flex-col">
+                    <div className=" text-sm"> Whole Pipeline</div>
+                    <p className="text-muted-foreground text-xs text-left">
+                      Enable this to use full Pipeline.
+                    </p>
+                  </div>
+                </div>
+              </Card>
             </div>
 
-            {Object.values(config.scanner).every((v) => v === true) && (
+            {/* {Object.values(config.scanner).every((v) => v === true) && (
               <Card
                 className=" border-yellow-300 bg-yellow-500/20 text-yellow-950
             dark:border-yellow-700 dark:text-yellow-100 "
@@ -129,7 +140,7 @@ export const ScannerBuilder = ({
                 />
                 You are currently using the Full DevSecOps Pipeline
               </Card>
-            )}
+            )} */}
 
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
@@ -246,7 +257,7 @@ export const ScannerBuilder = ({
           </Button>
           <Button
             disabled={Object.values(config.scanner).every((v) => v === false)}
-            onClick={() => console.log("config: + ", config)}
+            onClick={() => console.log("btölsjkföaldjs")}
           >
             {Object.values(config.scanner).every((v) => v === false)
               ? "Select Option"
