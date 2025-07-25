@@ -35,9 +35,7 @@ export const getCurrentUserRole = (
   project?: ProjectDTO,
 ): UserRole | null => {
   if (!currentUser) {
-    throw new Error(
-      "User is not even logged in and you are trying to get their role",
-    );
+    return UserRole.Guest;
   }
 
   if (project?.members && projectSlug) {
