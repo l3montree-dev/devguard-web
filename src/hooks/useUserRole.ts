@@ -7,25 +7,31 @@ import { useMemo } from "react";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUser } from "./useCurrentUser";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 
 export const useCurrentUserRole = () => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
 
+  const { projectSlug } = useParams<{
+    projectSlug: string;
+  }>();
+
   return useMemo(() => {
     return getCurrentUserRole(
       currentUser,
       activeOrg as OrganizationDetailsDTO,
+      projectSlug, // projectSlug from URL params
       project,
     );
-  }, [currentUser, project, activeOrg]);
+  }, [currentUser, project, activeOrg, projectSlug]);
 };
 
 export const getCurrentUserRole = (
   currentUser: User | undefined,
   org: OrganizationDetailsDTO,
+  projectSlug?: string | undefined,
   project?: ProjectDTO,
 ): UserRole | null => {
   if (!currentUser) {
@@ -34,7 +40,7 @@ export const getCurrentUserRole = (
     );
   }
 
-  if (project?.members) {
+  if (project?.members && projectSlug) {
     const projectMember = project.members.find(
       (member) => member.id === currentUser.id,
     );

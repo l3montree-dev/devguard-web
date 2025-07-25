@@ -217,6 +217,7 @@ export const getServerSideProps = middleware(
     const currentUserRole = getCurrentUserRole(
       session?.identity,
       organization!,
+      context.query.projectSlug as string,
       project,
     );
 
