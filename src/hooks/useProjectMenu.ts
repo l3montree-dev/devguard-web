@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUserRole } from "./useUserRole";
+import { UserRole } from "@/types/api/api";
 
 export const useProjectMenu = () => {
   const router = useRouter();
@@ -49,7 +50,10 @@ export const useProjectMenu = () => {
       Icon: ScaleIcon,
     });
 
-    if (currentUserRole === "owner" || currentUserRole === "admin") {
+    if (
+      currentUserRole === UserRole.Owner ||
+      currentUserRole === UserRole.Admin
+    ) {
       menu.push({
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",

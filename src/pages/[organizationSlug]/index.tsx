@@ -28,7 +28,7 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import { PolicyEvaluation, ProjectDTO } from "../../types/api/api";
+import { PolicyEvaluation, ProjectDTO, UserRole } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -170,7 +170,8 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                 !activeOrg.externalEntityProviderId && (
                   <Button
                     disabled={
-                      currentUserRole !== "owner" && currentUserRole !== "admin"
+                      currentUserRole !== UserRole.Owner &&
+                      currentUserRole !== UserRole.Admin
                     }
                     onClick={() => setOpen(true)}
                   >
@@ -186,7 +187,8 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                 !activeOrg.externalEntityProviderId && (
                   <Button
                     disabled={
-                      currentUserRole !== "admin" && currentUserRole !== "owner"
+                      currentUserRole !== UserRole.Owner &&
+                      currentUserRole !== UserRole.Admin
                     }
                     onClick={() => setOpen(true)}
                   >
@@ -258,8 +260,8 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                         </div>
                       }
                       Button={
-                        currentUserRole === "owner" ||
-                        currentUserRole === "admin" ? (
+                        currentUserRole === UserRole.Owner ||
+                        currentUserRole === UserRole.Admin ? (
                           <DropdownMenu>
                             <DropdownMenuTrigger
                               className={buttonVariants({

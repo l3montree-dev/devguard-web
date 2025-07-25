@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, use, useEffect, useState } from "react";
 import Page from "../../../../components/Page";
 
 import { middleware } from "@/decorators/middleware";
@@ -10,7 +10,7 @@ import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../services/devGuardApi";
-import { ProjectDTO } from "../../../../types/api/api";
+import { ProjectDTO, UserRole } from "../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -42,14 +42,17 @@ const Index: FunctionComponent<Props> = () => {
 
   const currentUserRole = useCurrentUserRole();
   useEffect(() => {
-    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
       router.push("/" + activeOrg.slug + "/projects/" + project?.slug);
     }
   }, []);
 
   const handleChangeMemberRole = async (
     id: string,
-    role: "admin" | "member",
+    role: UserRole.Admin | UserRole.Member,
   ) => {
     const resp = await browserApiClient(
       "/organizations/" +

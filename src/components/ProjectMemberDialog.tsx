@@ -22,6 +22,7 @@ import {
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { useStore } from "../zustand/globalStoreProvider";
+import { UserRole } from "@/types/api/api";
 
 interface Props {
   isOpen: boolean;
@@ -63,7 +64,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
             .filter((e) => selectedMembers.includes(e.id))
             .map((e) => ({
               ...e,
-              role: "member",
+              role: UserRole.Member,
             })),
         ),
       });

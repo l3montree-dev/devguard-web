@@ -27,6 +27,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { UserRole } from "@/types/api/api";
 
 interface Props {
   members: Array<{
@@ -36,7 +37,10 @@ interface Props {
     role?: string;
   }>;
   onRemoveMember: (id: string) => void;
-  onChangeMemberRole: (id: string, role: "admin" | "member") => void;
+  onChangeMemberRole: (
+    id: string,
+    role: UserRole.Admin | UserRole.Member,
+  ) => void;
 }
 const MembersTable: FunctionComponent<Props> = ({
   members,
@@ -104,20 +108,20 @@ const MembersTable: FunctionComponent<Props> = ({
                             <EllipsisVerticalIcon className="h-5 w-5" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            {m.role === "member" && (
+                            {m.role === UserRole.Member && (
                               <DropdownMenuItem
                                 onClick={() =>
-                                  onChangeMemberRole(m.id, "admin")
+                                  onChangeMemberRole(m.id, UserRole.Admin)
                                 }
                               >
                                 Make admin
                               </DropdownMenuItem>
                             )}
 
-                            {m.role === "admin" && (
+                            {m.role === UserRole.Admin && (
                               <DropdownMenuItem
                                 onClick={() =>
-                                  onChangeMemberRole(m.id, "member")
+                                  onChangeMemberRole(m.id, UserRole.Member)
                                 }
                               >
                                 Make member

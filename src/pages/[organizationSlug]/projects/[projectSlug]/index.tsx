@@ -51,6 +51,7 @@ import {
   PolicyEvaluation,
   ProjectDTO,
   RequirementsLevel,
+  UserRole,
 } from "../../../../types/api/api";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 
@@ -184,8 +185,8 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   <Button
                     disabled={
                       project.type !== "default" ||
-                      (currentUserRole !== "admin" &&
-                        currentUserRole !== "owner")
+                      (currentUserRole !== UserRole.Owner &&
+                        currentUserRole !== UserRole.Admin)
                     }
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
@@ -195,8 +196,8 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   <Button
                     disabled={
                       project.type !== "default" ||
-                      (currentUserRole !== "admin" &&
-                        currentUserRole !== "owner")
+                      (currentUserRole !== UserRole.Admin &&
+                        currentUserRole !== UserRole.Owner)
                     }
                     onClick={() => setShowModal(true)}
                   >
@@ -244,8 +245,8 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   }
                   Description={<div>{subgroup.description}</div>}
                   Button={
-                    currentUserRole === "owner" ||
-                    currentUserRole === "admin" ? (
+                    currentUserRole === UserRole.Owner ||
+                    currentUserRole === UserRole.Admin ? (
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           className={buttonVariants({

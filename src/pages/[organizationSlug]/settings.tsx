@@ -44,6 +44,7 @@ import {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
+  UserRole,
 } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
@@ -73,7 +74,10 @@ const Home: FunctionComponent = () => {
 
   const currentUserRole = useCurrentUserRole();
   useEffect(() => {
-    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
       router.push("/" + activeOrg.slug);
     }
   }, []);
@@ -120,7 +124,7 @@ const Home: FunctionComponent = () => {
 
   const handleChangeMemberRole = async (
     id: string,
-    role: "admin" | "member",
+    role: UserRole.Admin | UserRole.Member,
   ) => {
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/members/" + id,

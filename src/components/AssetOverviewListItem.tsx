@@ -7,7 +7,7 @@ import Link from "next/link";
 import { FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import { AssetDTO, PolicyEvaluation } from "../types/api/api";
+import { AssetDTO, PolicyEvaluation, UserRole } from "../types/api/api";
 import ListItem from "./common/ListItem";
 import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";
@@ -67,7 +67,8 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           </div>
         }
         Button={
-          currentUserRole === "owner" || currentUserRole === "admin" ? (
+          currentUserRole === UserRole.Owner ||
+          currentUserRole === UserRole.Admin ? (
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={buttonVariants({

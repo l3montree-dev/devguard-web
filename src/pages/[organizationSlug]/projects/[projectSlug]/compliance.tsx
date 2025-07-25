@@ -4,7 +4,7 @@ import { middleware } from "@/decorators/middleware";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
-import { Policy } from "@/types/api/api";
+import { Policy, UserRole } from "@/types/api/api";
 
 import React, { FunctionComponent, useState } from "react";
 
@@ -70,7 +70,8 @@ export const PolicyListItem = ({
                 checked={policy.enabled}
                 onCheckedChange={handlePolicyToggle}
                 disabled={
-                  currentUserRole !== "admin" && currentUserRole !== "owner"
+                  currentUserRole !== UserRole.Admin &&
+                  currentUserRole !== UserRole.Owner
                 }
               />
             </div>
@@ -202,7 +203,8 @@ const ComplianceIndex: FunctionComponent<Props> = ({
             title="Organization Compliance Controls"
             forceVertical
             Button={
-              currentUserRole === "admin" || currentUserRole === "owner" ? (
+              currentUserRole === UserRole.Admin ||
+              currentUserRole === UserRole.Owner ? (
                 <Link
                   className={buttonVariants({
                     variant: "outline",

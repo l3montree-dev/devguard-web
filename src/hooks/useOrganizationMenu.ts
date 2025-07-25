@@ -24,6 +24,7 @@ import { useCurrentUser } from "./useCurrentUser";
 import { ScaleIcon } from "lucide-react";
 import { useActiveOrg } from "./useActiveOrg";
 import { useCurrentUserRole } from "./useUserRole";
+import { UserRole } from "@/types/api/api";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
@@ -46,7 +47,10 @@ export const useOrganizationMenu = () => {
       Icon: ScaleIcon,
     });
 
-    if (currentUserRole === "owner" || currentUserRole === "admin") {
+    if (
+      currentUserRole === UserRole.Owner ||
+      currentUserRole === UserRole.Admin
+    ) {
       menu.push({
         title: "Settings",
         href: "/" + orgSlug + "/settings",

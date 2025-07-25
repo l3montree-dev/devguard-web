@@ -45,6 +45,7 @@ interface Props {
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { UserRole } from "@/types/api/api";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -84,7 +85,10 @@ const Index: FunctionComponent<Props> = ({
 
   const currentUserRole = useCurrentUserRole();
   useEffect(() => {
-    if (currentUserRole !== "owner" && currentUserRole !== "admin") {
+    if (
+      currentUserRole !== UserRole.Admin &&
+      currentUserRole !== UserRole.Owner
+    ) {
       router.push(
         "/" +
           activeOrg.slug +

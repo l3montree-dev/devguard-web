@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
+import { AssetDTO, AssetVersionDTO, UserRole } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
@@ -192,7 +192,7 @@ export const useAssetMenu = () => {
 
   if (
     loggedIn &&
-    (currentUserRole === "owner" || currentUserRole === "admin")
+    (currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin)
   ) {
     return menu.concat([
       {

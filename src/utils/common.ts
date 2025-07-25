@@ -15,6 +15,7 @@
 
 import { State } from "@/types/common";
 import { defaultScanner } from "./view";
+import { UserRole } from "@/types/api/api";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
@@ -217,11 +218,11 @@ export function allowedActionsCheck(
     return false;
   }
 
-  if (currentUserRole === "owner") {
+  if (currentUserRole === UserRole.Owner) {
     return true;
   }
 
-  if (currentUserRole === "admin" && memberRole !== "owner") {
+  if (currentUserRole === UserRole.Admin && memberRole === UserRole.Member) {
     return true;
   }
 
