@@ -144,9 +144,9 @@ const DependencyRiskScannerDialog: FunctionComponent<
     accept: { "application/json": [".json"] },
   });
 
-  const selectScanner = (scanner: "sca" | "container-scanning" | "sbom") => {
-    setSelectedScanner(scanner);
-  };
+  // const selectScanner = (scanner: "sca" | "container-scanning" | "sbom") => {
+  //   setSelectedScanner(scanner);
+  // };
 
   const selectIntegration = (
     integration: "github" | "gitlab" | "docker" | "upload",
@@ -311,7 +311,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                   Back to Route selection
                 </Button>
                 <Button
-                  disabled={selectScanner === undefined}
+                  // disabled={selectScanner === undefined}
                   onClick={() => {
                     api?.scrollNext();
                   }}
@@ -324,7 +324,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
             </CarouselItem>
             <>
               {selectedScanner === "devguard-select" && (
-                <ScannerBuilder> </ScannerBuilder>
+                <ScannerBuilder></ScannerBuilder>
               )}
               {selectedIntegration === "docker" && (
                 <>

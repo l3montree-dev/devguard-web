@@ -46,6 +46,17 @@ import { Form } from "react-hook-form";
 import { Button } from "../ui/button";
 import { setConfig } from "next/config";
 import { config } from "process";
+import Image from "next/image";
+
+interface Config {
+  scanner: {
+    identifySecrets: boolean;
+    SCA: boolean;
+    containerImage: boolean;
+    SAST: boolean;
+    IaC: boolean;
+  };
+}
 
 export const ScannerBuilder = ({
   setup,
@@ -57,26 +68,20 @@ export const ScannerBuilder = ({
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
 
-  interface Config {
-    identifySecrets: boolean;
-    SCA: boolean;
-    containerImage: boolean;
-    SAST: boolean;
-    IaC: boolean;
-  }
-  const [config, setConfig] = useState<Partial<Config>>({
-    identifySecrets: true,
-    SCA: true,
-    containerImage: true,
-    SAST: true,
-    IaC: true,
+  const [config, setConfig] = useState<Config>({
+    scanner: {
+      identifySecrets: true,
+      SCA: true,
+      containerImage: true,
+      SAST: true,
+      IaC: true,
+    },
   });
 
   useEffect(() => {
     api?.reInit();
-    console.log(config);
+    console.log("here is the config: ", config);
   }, []);
-  // selectedScanner, selectedIntegration, pat.pat, api;
 
   return (
     <>
@@ -95,24 +100,31 @@ export const ScannerBuilder = ({
               <Checkbox
                 defaultChecked={false}
                 onCheckedChange={() =>
-                  setConfig({
-                    identifySecrets: false,
-                    SCA: false,
-                    containerImage: false,
-                    SAST: false,
-                    IaC: false,
-                  })
+                  setConfig((prev) => ({
+                    scanner: {
+                      ...prev.scanner,
+                      identifySecrets: !prev.scanner.identifySecrets,
+                    },
+                  }))
                 }
-                // checked={}
               />
             </div>
 
-            <Card
-              className=" border-yellow-300 bg-yellow-500/20 text-yellow-950
+            {Object.values(config.scanner).every((v) => v === true) && (
+              <Card
+                className=" border-yellow-300 bg-yellow-500/20 text-yellow-950
             dark:border-yellow-700 dark:text-yellow-100 "
-            >
-              You are currently using the Full DevSecOps Pipeline
-            </Card>
+              >
+                <Image
+                  src="/logo_icon.svg"
+                  alt="Devguard"
+                  width={20}
+                  height={20}
+                  className="inline-block mr-2"
+                />
+                You are currently using the Full DevSecOps Pipeline
+              </Card>
+            )}
 
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
@@ -137,10 +149,11 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.identifySecrets}
+                    checked={config.SCA}
                     onCheckedChange={() =>
                       setConfig({
-                        identifySecrets: !config.identifySecrets,
+                        identifySecrets: !config.SCA,
+                        ...config,
                       })
                     }
                   />
@@ -155,10 +168,11 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.identifySecrets}
+                    checked={config.containerImage}
                     onCheckedChange={() =>
                       setConfig({
-                        identifySecrets: !config.identifySecrets,
+                        identifySecrets: !config.containerImage,
+                        ...config,
                       })
                     }
                   />
@@ -171,10 +185,11 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.identifySecrets}
+                    checked={config.SAST}
                     onCheckedChange={() =>
                       setConfig({
-                        identifySecrets: !config.identifySecrets,
+                        identifySecrets: !config.SAST,
+                        ...config,
                       })
                     }
                   />
@@ -187,10 +202,11 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.identifySecrets}
+                    checked={config.SAST}
                     onCheckedChange={() =>
                       setConfig({
-                        identifySecrets: !config.identifySecrets,
+                        identifySecrets: !config.SAST,
+                        ...config,
                       })
                     }
                   />
@@ -214,7 +230,7 @@ export const ScannerBuilder = ({
           </Button>
           <Button
             disabled={Object.values(config).every((v) => v === false)}
-            onClick={() => console.log(config)}
+            onClick={() => console.log("config: + ", config)}
           >
             {Object.values(config).every((v) => v === false)
               ? "Select Option"
