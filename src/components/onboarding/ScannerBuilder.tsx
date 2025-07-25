@@ -96,14 +96,19 @@ export const ScannerBuilder = ({
             max-w-4xl b"
           >
             <div className="flex w-full justify-end ">
-              <div className="mr-2">Disable all</div>
+              <div className="mr-2">Toggle All</div>
               <Checkbox
                 defaultChecked={false}
                 onCheckedChange={() =>
                   setConfig((prev) => ({
                     scanner: {
                       ...prev.scanner,
-                      identifySecrets: !prev.scanner.identifySecrets,
+                      identifySecrets: false,
+
+                      SCA: false,
+                      containerImage: false,
+                      SAST: false,
+                      IaC: false,
                     },
                   }))
                 }
@@ -133,11 +138,14 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.identifySecrets}
+                    checked={config.scanner.identifySecrets}
                     onCheckedChange={() =>
-                      setConfig({
-                        identifySecrets: !config.identifySecrets,
-                      })
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          identifySecrets: !prev.scanner.identifySecrets,
+                        },
+                      }))
                     }
                   />
                   <span> Identify leaked Secrets in your Code</span>
@@ -149,12 +157,14 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.SCA}
+                    checked={config.scanner.SCA}
                     onCheckedChange={() =>
-                      setConfig({
-                        identifySecrets: !config.SCA,
-                        ...config,
-                      })
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          SCA: !prev.scanner.SCA,
+                        },
+                      }))
                     }
                   />
                   <span>
@@ -168,12 +178,14 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.containerImage}
+                    checked={config.scanner.containerImage}
                     onCheckedChange={() =>
-                      setConfig({
-                        identifySecrets: !config.containerImage,
-                        ...config,
-                      })
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          containerImage: !prev.scanner.containerImage,
+                        },
+                      }))
                     }
                   />
                   <span>Build your Container Image</span>
@@ -185,12 +197,14 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.SAST}
+                    checked={config.scanner.SAST}
                     onCheckedChange={() =>
-                      setConfig({
-                        identifySecrets: !config.SAST,
-                        ...config,
-                      })
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          SAST: !prev.scanner.SAST,
+                        },
+                      }))
                     }
                   />
                   <span>Identify Bad Practices in Your Code (SAST)</span>
@@ -202,12 +216,14 @@ export const ScannerBuilder = ({
                 <div className="space-x-2">
                   <Checkbox
                     defaultChecked={true}
-                    checked={config.SAST}
+                    checked={config.scanner.IaC}
                     onCheckedChange={() =>
-                      setConfig({
-                        identifySecrets: !config.SAST,
-                        ...config,
-                      })
+                      setConfig((prev) => ({
+                        scanner: {
+                          ...prev.scanner,
+                          IaC: !prev.scanner.IaC,
+                        },
+                      }))
                     }
                   />
                   <span>
@@ -229,10 +245,10 @@ export const ScannerBuilder = ({
             Back
           </Button>
           <Button
-            disabled={Object.values(config).every((v) => v === false)}
+            disabled={Object.values(config.scanner).every((v) => v === false)}
             onClick={() => console.log("config: + ", config)}
           >
-            {Object.values(config).every((v) => v === false)
+            {Object.values(config.scanner).every((v) => v === false)
               ? "Select Option"
               : "Continue"}
           </Button>
