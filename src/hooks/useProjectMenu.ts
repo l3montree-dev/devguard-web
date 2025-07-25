@@ -22,12 +22,15 @@ import {
 import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
 import { useActiveProject } from "./useActiveProject";
+import { useCurrentUserRole } from "./useUserRole";
+import { UserRole } from "@/types/api/api";
 
 export const useProjectMenu = () => {
   const router = useRouter();
   const orgSlug = router.query.organizationSlug as string;
   const projectSlug = router.query.projectSlug as string;
   const project = useActiveProject();
+  const currentUserRole = useCurrentUserRole();
 
   const loggedIn = useCurrentUser();
 
@@ -41,18 +44,22 @@ export const useProjectMenu = () => {
     },
   ];
   if (loggedIn) {
-    return menu.concat([
-      {
-        title: "Compliance",
-        href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
-        Icon: ScaleIcon,
-      },
-      {
+    menu.push({
+      title: "Compliance",
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
+      Icon: ScaleIcon,
+    });
+
+    if (
+      currentUserRole === UserRole.Owner ||
+      currentUserRole === UserRole.Admin
+    ) {
+      menu.push({
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
         Icon: CogIcon,
-      },
-    ]);
+      });
+    }
   }
   return menu;
 };

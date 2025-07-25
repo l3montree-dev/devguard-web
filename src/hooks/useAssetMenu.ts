@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
+import { AssetDTO, AssetVersionDTO, UserRole } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
@@ -27,8 +27,13 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
 import { RocketLaunchIcon } from "@heroicons/react/20/solid";
+import { useCurrentUserRole } from "./useUserRole";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
+  if (!asset.refs || asset.refs.length === 0) {
+    return "";
+  }
+
   // if we know the default branch - get that one
   const defaultVersion = asset.refs.find((ref) => ref.defaultBranch);
   if (defaultVersion) {
@@ -71,6 +76,8 @@ export const useAssetMenu = () => {
   const assetVersion = useActiveAssetVersion();
   const activeAsset = useActiveAsset();
 
+  const currentUserRole = useCurrentUserRole();
+
   const assetVersionSlug = getAssetVersionSlug(activeAsset!, assetVersion);
 
   let menu: Array<{
@@ -85,7 +92,7 @@ export const useAssetMenu = () => {
     isActive: boolean;
   }> = [];
 
-  if ((activeAsset?.refs.length ?? 0) > 0) {
+  if ((activeAsset?.refs?.length ?? 0) > 0) {
     menu.unshift({
       title: "Compliance",
       href:
@@ -183,7 +190,10 @@ export const useAssetMenu = () => {
     });
   }
 
-  if (loggedIn) {
+  if (
+    loggedIn &&
+    (currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin)
+  ) {
     return menu.concat([
       {
         title: "Settings",
