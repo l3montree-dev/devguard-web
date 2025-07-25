@@ -211,8 +211,8 @@ export const extractVersion = (purl: string) => {
 };
 
 export function allowedActionsCheck(
-  currentUserRole: string,
-  memberRole?: string,
+  currentUserRole: UserRole | null,
+  memberRole?: UserRole | string,
 ): boolean {
   if (!memberRole) {
     return false;

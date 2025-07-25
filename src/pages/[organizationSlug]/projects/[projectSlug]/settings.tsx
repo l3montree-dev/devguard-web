@@ -30,7 +30,7 @@ import ProjectTitle from "../../../../components/common/ProjectTitle";
 import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {}
 
@@ -39,16 +39,6 @@ const Index: FunctionComponent<Props> = () => {
   const project = useActiveProject();
   const updateProject = useStore((s) => s.updateProject);
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
-
-  const currentUserRole = useCurrentUserRole();
-  useEffect(() => {
-    if (
-      currentUserRole !== UserRole.Owner &&
-      currentUserRole !== UserRole.Admin
-    ) {
-      router.push("/" + activeOrg.slug + "/projects/" + project?.slug);
-    }
-  }, []);
 
   const handleChangeMemberRole = async (
     id: string,
@@ -220,7 +210,27 @@ const Index: FunctionComponent<Props> = () => {
 };
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, session, project },
+  ) => {
+    const currentUserRole = getCurrentUserRole(
+      session?.identity,
+      organization!,
+      project,
+    );
+
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
+      return {
+        redirect: {
+          destination: "/" + context.query.organizationSlug,
+          permanent: false,
+        },
+      };
+    }
     return {
       props: {},
     };

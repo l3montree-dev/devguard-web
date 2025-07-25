@@ -83,23 +83,6 @@ const Index: FunctionComponent<Props> = ({
     apiBadgeUrl + "cvss/" + badgeSecret,
   );
 
-  const currentUserRole = useCurrentUserRole();
-  useEffect(() => {
-    if (
-      currentUserRole !== UserRole.Admin &&
-      currentUserRole !== UserRole.Owner
-    ) {
-      router.push(
-        "/" +
-          activeOrg.slug +
-          "/projects/" +
-          project!.slug +
-          "/assets/" +
-          asset.slug,
-      );
-    }
-  }, []);
-
   const form = useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
@@ -360,7 +343,10 @@ const Index: FunctionComponent<Props> = ({
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, session, project },
+  ) => {
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 

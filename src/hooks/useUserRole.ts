@@ -1,11 +1,13 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { OrganizationDetailsDTO, ProjectDTO, UserRole } from "@/types/api/api";
+import { User } from "@/types/auth";
 import { useMemo } from "react";
-import { useCurrentUser } from "./useCurrentUser";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
-import { UserRole } from "@/types/api/api";
+import { useCurrentUser } from "./useCurrentUser";
+import { useRouter } from "next/router";
 
 export const useCurrentUserRole = () => {
   const currentUser = useCurrentUser();
@@ -13,28 +15,42 @@ export const useCurrentUserRole = () => {
   const project = useActiveProject();
 
   return useMemo(() => {
-    if (!currentUser) {
-      return "";
-    }
+    return getCurrentUserRole(
+      currentUser,
+      activeOrg as OrganizationDetailsDTO,
+      project,
+    );
+  }, [currentUser, project, activeOrg]);
+};
 
-    if (project?.members) {
-      const projectMember = project.members.find(
-        (member) => member.id === currentUser.id,
-      );
-      if (projectMember) {
-        return projectMember.role || UserRole.Member;
-      }
-    }
+export const getCurrentUserRole = (
+  currentUser: User | undefined,
+  org: OrganizationDetailsDTO,
+  project?: ProjectDTO,
+): UserRole | null => {
+  if (!currentUser) {
+    throw new Error(
+      "User is not even logged in and you are trying to get their role",
+    );
+  }
 
-    if (activeOrg?.members) {
-      const orgMember = activeOrg.members.find(
-        (member) => member.id === currentUser.id,
-      );
-      if (orgMember) {
-        return orgMember.role || UserRole.Member;
-      }
+  if (project?.members) {
+    const projectMember = project.members.find(
+      (member) => member.id === currentUser.id,
+    );
+    if (projectMember) {
+      return projectMember.role || UserRole.Member;
     }
+  }
 
-    return UserRole.Member; // Default role if not found
-  }, [currentUser, project?.members, activeOrg?.members]);
+  if (org?.members) {
+    const orgMember = org.members.find(
+      (member) => member.id === currentUser.id,
+    );
+    if (orgMember) {
+      return orgMember.role || UserRole.Member;
+    }
+  }
+
+  return UserRole.Member; // Default role if not found
 };

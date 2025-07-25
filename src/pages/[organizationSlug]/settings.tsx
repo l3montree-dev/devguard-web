@@ -59,7 +59,7 @@ import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDi
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -72,15 +72,6 @@ const Home: FunctionComponent = () => {
     defaultValues: activeOrg,
   });
 
-  const currentUserRole = useCurrentUserRole();
-  useEffect(() => {
-    if (
-      currentUserRole !== UserRole.Owner &&
-      currentUserRole !== UserRole.Admin
-    ) {
-      router.push("/" + activeOrg.slug);
-    }
-  }, []);
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
       method: "PATCH",
@@ -462,7 +453,24 @@ const Home: FunctionComponent = () => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { organization, session }) => {
+    const currentUserRole = getCurrentUserRole(
+      session?.identity,
+      organization!,
+    );
+
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
+      return {
+        redirect: {
+          destination: "/" + context.query.organizationSlug,
+          permanent: false,
+        },
+      };
+    }
+
     return {
       props: {},
     };
