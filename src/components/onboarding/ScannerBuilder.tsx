@@ -77,13 +77,29 @@ export const ScannerBuilder = ({
     IaC: true,
   });
 
+  type gitInstance = "gitlab" | "github" | undefined;
+
+  const [gitInstance, setGitInstance] = useState<gitInstance>();
+
   const test = "abc";
   const test2 = "def";
 
   useEffect(() => {
     api?.reInit();
     setReady(true); //this is redundant rn, will change
-  }, [api]);
+  }, [api, config]);
+
+  function codeStringBuilder(config: Config, instance: gitInstance) {
+    Object.values(config).every((configSetting) =>
+      configSetting === true
+        ? console.log("blabla")
+        : console.log("i dont work"),
+    );
+
+    const codeString: string = "\ntest \ntest\n";
+
+    return codeString;
+  }
 
   return (
     <>
@@ -135,22 +151,6 @@ export const ScannerBuilder = ({
                 </div>
               </Card>
             </div>
-
-            {/* {Object.values(config.scanner).every((v) => v === true) && (
-              <Card
-                className=" border-yellow-300 bg-yellow-500/20 text-yellow-950
-            dark:border-yellow-700 dark:text-yellow-100 "
-              >
-                <Image
-                  src="/logo_icon.svg"
-                  alt="Devguard"
-                  width={20}
-                  height={20}
-                  className="inline-block mr-2"
-                />
-                You are currently using the Full DevSecOps Pipeline
-              </Card>
-            )} */}
 
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
@@ -281,7 +281,7 @@ export const ScannerBuilder = ({
             </DialogDescription>
           </DialogHeader>
 
-          <CopyCode codeString={test + "\n" + test2}></CopyCode>
+          <CopyCode codeString={codeStringBuilder(config, instance)}></CopyCode>
         </CarouselItem>
       )}
     </>
