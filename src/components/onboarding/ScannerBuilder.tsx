@@ -98,17 +98,28 @@ export const ScannerBuilder = ({
                   <Switch
                     className="mt-4"
                     defaultChecked={true}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        identifySecrets: false,
-                        SCA: false,
-                        containerImage: false,
-                        SAST: false,
-                        IaC: false,
-                      }))
-                    }
-                    // value={}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setConfig(() => ({
+                          ...config,
+                          identifySecrets: true,
+                          SCA: true,
+                          containerImage: true,
+                          SAST: true,
+                          IaC: true,
+                        }));
+                      } else {
+                        setConfig(() => ({
+                          ...config,
+                          identifySecrets: false,
+                          SCA: false,
+                          containerImage: false,
+                          SAST: false,
+                          IaC: false,
+                        }));
+                      }
+                    }}
+                    checked={Object.values(config).every((v) => v === true)}
                   />
                   <div className="flex flex-col">
                     <CardTitle className=" text-base">Whole Pipeline</CardTitle>
