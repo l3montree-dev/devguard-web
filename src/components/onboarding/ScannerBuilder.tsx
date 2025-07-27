@@ -47,6 +47,15 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { GitInstances } from "@/types/common";
+import ProviderTitleIcon from "../common/ProviderTitleIcon";
 
 interface Config {
   identifySecrets: boolean;
@@ -79,7 +88,7 @@ export const ScannerBuilder = ({
 
   type gitInstance = "gitlab" | "github" | undefined;
 
-  const [gitInstance, setGitInstance] = useState<gitInstance>();
+  const [gitInstance, setGitInstance] = useState<gitInstance>("gitlab");
 
   const test = "abc";
   const test2 = "def";
@@ -87,9 +96,9 @@ export const ScannerBuilder = ({
   useEffect(() => {
     api?.reInit();
     setReady(true); //this is redundant rn, will change
-  }, [api, config]);
+  }, [api, config, gitInstance]);
 
-  function codeStringBuilder(config: Config, instance: gitInstance) {
+  function codeStringBuilder(config: Config, provider: gitInstance) {
     Object.values(config).every((configSetting) =>
       configSetting === true
         ? console.log("blabla")
@@ -269,7 +278,7 @@ export const ScannerBuilder = ({
       </CarouselItem>
 
       {ready === true && (
-        <CarouselItem>
+        <CarouselItem className="h-128">
           <DialogHeader>
             <DialogTitle>
               Add the snippet to your GitHub Actions File
@@ -280,8 +289,30 @@ export const ScannerBuilder = ({
               file or add the code snippet to an existing workflow file.
             </DialogDescription>
           </DialogHeader>
-
-          <CopyCode codeString={codeStringBuilder(config, instance)}></CopyCode>
+          <Select
+            value={gitInstance}
+            onValueChange={(value) => {
+              setGitInstance(value as gitInstance);
+            }}
+          >
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Select Provider" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(GitInstances).map((provider) => (
+                <SelectItem
+                  key={provider}
+                  value={provider}
+                  onClick={() => setGitInstance(provider as GitInstances)}
+                >
+                  <ProviderTitleIcon provider={provider as GitInstances} />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <CopyCode
+            codeString={codeStringBuilder(config, gitInstance)}
+          ></CopyCode>
         </CarouselItem>
       )}
     </>

@@ -96,3 +96,12 @@ export const ExternalTicketProviderNames: {
   jira: "Jira",
   opencode: "openCode",
 };
+
+export type GitInstances = "github" | "gitlab";
+
+export const GitInstances: {
+  [key in GitInstances]: string;
+} = {
+  github: "GitHub",
+  gitlab: "GitLab",
+};
