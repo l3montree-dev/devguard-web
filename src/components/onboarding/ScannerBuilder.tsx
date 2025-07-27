@@ -46,6 +46,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
+import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 
 interface Config {
   identifySecrets: boolean;
@@ -56,14 +57,17 @@ interface Config {
 }
 
 export const ScannerBuilder = ({
+  api,
   setup,
+  next,
+  prev,
 }: {
   next?: () => void;
   prev?: () => void;
-
   setup?: "own" | "auto-setup";
+  api?: CarouselApi;
 }) => {
-  const [api, setApi] = React.useState<CarouselApi>();
+  const [ready, setReady] = useState(false);
 
   const [config, setConfig] = useState<Config>({
     identifySecrets: true,
@@ -73,12 +77,13 @@ export const ScannerBuilder = ({
     IaC: true,
   });
 
-  const [all, setAll] = useState(true);
+  const test = "abc";
+  const test2 = "def";
 
   useEffect(() => {
     api?.reInit();
-    console.log("here is the config: ", config);
-  }, []);
+    setReady(true); //this is redundant rn, will change
+  }, [api]);
 
   return (
     <>
@@ -247,12 +252,14 @@ export const ScannerBuilder = ({
         </div>
 
         <div className="mt-10 flex flex-row gap-2 justify-end">
-          <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
+          <Button variant={"secondary"} onClick={() => prev?.()}>
             Back
           </Button>
           <Button
             disabled={Object.values(config).every((v) => v === false)}
-            onClick={() => console.log("btölsjkföaldjs")}
+            onClick={() => {
+              next?.();
+            }}
           >
             {Object.values(config).every((v) => v === false)
               ? "Select Option"
@@ -260,6 +267,23 @@ export const ScannerBuilder = ({
           </Button>
         </div>
       </CarouselItem>
+
+      {ready === true && (
+        <CarouselItem>
+          <DialogHeader>
+            <DialogTitle>
+              Add the snippet to your GitHub Actions File
+            </DialogTitle>
+            <DialogDescription>
+              Create a new{" "}
+              <CopyCodeFragment codeString=".github/workflows/devsecops.yml" />{" "}
+              file or add the code snippet to an existing workflow file.
+            </DialogDescription>
+          </DialogHeader>
+
+          <CopyCode codeString={test + "\n" + test2}></CopyCode>
+        </CarouselItem>
+      )}
     </>
   );
 };
