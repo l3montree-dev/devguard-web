@@ -31,6 +31,14 @@ export interface Policy {
 export interface InviteRequest {
   email: string;
 }
+
+export enum UserRole {
+  Owner = "owner",
+  Admin = "admin",
+  Member = "member",
+  Guest = "guest",
+}
+
 export enum RequirementsLevel {
   Low = "low",
   Medium = "medium",
@@ -100,7 +108,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     id: string;
     name: string;
     avatarUrl?: string;
-    role?: "owner" | "member" | "admin";
+    role?: UserRole.Owner | UserRole.Admin | UserRole.Member;
   }>;
   oauth2Error?: boolean;
 }
@@ -141,7 +149,7 @@ export interface ProjectDTO {
     id: string;
     name: string;
     avatarUrl?: string;
-    role?: "member" | "admin";
+    role?: UserRole.Admin | UserRole.Member;
   }>;
 
   externalEntityId?: string;

@@ -72,7 +72,7 @@ export function useAutosetup(
     inviteDevguardBot: {
       status: "notStarted",
       message:
-        "DevGuard Bot is invited to the project (only required for GitLab)",
+        "DevGuard Bot is invited to the project (only required for GitLab/ openCode)",
     },
   });
 

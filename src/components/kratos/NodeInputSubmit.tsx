@@ -216,6 +216,28 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if (node.meta.label?.text === "Link gitlab") {
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Google Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Link GitLab
+        </Button>
+      </div>
+    );
+  }
+
   if (node.meta.label?.text === "Unlink official") {
     return (
       <div className="flex flex-row justify-end">

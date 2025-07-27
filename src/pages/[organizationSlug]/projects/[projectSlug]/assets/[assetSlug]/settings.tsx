@@ -24,7 +24,7 @@ import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
@@ -44,6 +44,8 @@ interface Props {
 
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { UserRole } from "@/types/api/api";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -341,7 +343,10 @@ const Index: FunctionComponent<Props> = ({
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, session, project },
+  ) => {
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug } = context.params!;
 

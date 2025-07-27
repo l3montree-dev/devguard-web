@@ -15,7 +15,7 @@
 
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, use, useEffect, useState } from "react";
 import Page from "../../components/Page";
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
@@ -44,6 +44,7 @@ import {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
+  UserRole,
 } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
@@ -58,6 +59,7 @@ import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDi
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -113,7 +115,7 @@ const Home: FunctionComponent = () => {
 
   const handleChangeMemberRole = async (
     id: string,
-    role: "admin" | "member",
+    role: UserRole.Admin | UserRole.Member,
   ) => {
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/members/" + id,
@@ -451,7 +453,24 @@ const Home: FunctionComponent = () => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { organization, session }) => {
+    const currentUserRole = getCurrentUserRole(
+      session?.identity,
+      organization!,
+    );
+
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
+      return {
+        redirect: {
+          destination: "/" + context.query.organizationSlug,
+          permanent: false,
+        },
+      };
+    }
+
     return {
       props: {},
     };

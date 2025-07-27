@@ -23,11 +23,14 @@ import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
 import { ScaleIcon } from "lucide-react";
 import { useActiveOrg } from "./useActiveOrg";
+import { useCurrentUserRole } from "./useUserRole";
+import { UserRole } from "@/types/api/api";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
   const orgSlug = router.query.organizationSlug as string;
   const loggedIn = useCurrentUser();
+  const currentUserRole = useCurrentUserRole();
   const org = useActiveOrg();
   const menu = [
     {
@@ -38,18 +41,24 @@ export const useOrganizationMenu = () => {
   ];
 
   if (loggedIn && !org.externalEntityProviderId) {
-    return menu.concat([
-      {
-        title: "Compliance",
-        href: "/" + orgSlug + "/compliance",
-        Icon: ScaleIcon,
-      },
-      {
+    menu.push({
+      title: "Compliance",
+      href: "/" + orgSlug + "/compliance",
+      Icon: ScaleIcon,
+    });
+
+    if (
+      currentUserRole === UserRole.Owner ||
+      currentUserRole === UserRole.Admin
+    ) {
+      menu.push({
         title: "Settings",
         href: "/" + orgSlug + "/settings",
         Icon: CogIcon,
-      },
-    ]);
+      });
+    }
+
+    return menu;
   }
   return menu;
 };

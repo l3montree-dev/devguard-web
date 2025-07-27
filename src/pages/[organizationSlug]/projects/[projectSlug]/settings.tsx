@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, use, useEffect, useState } from "react";
 import Page from "../../../../components/Page";
 
 import { middleware } from "@/decorators/middleware";
@@ -10,7 +10,7 @@ import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../services/devGuardApi";
-import { ProjectDTO } from "../../../../types/api/api";
+import { ProjectDTO, UserRole } from "../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,8 @@ import CopyInput from "../../../../components/common/CopyInput";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {}
 
@@ -40,7 +42,7 @@ const Index: FunctionComponent<Props> = () => {
 
   const handleChangeMemberRole = async (
     id: string,
-    role: "admin" | "member",
+    role: UserRole.Admin | UserRole.Member,
   ) => {
     const resp = await browserApiClient(
       "/organizations/" +
@@ -208,7 +210,28 @@ const Index: FunctionComponent<Props> = () => {
 };
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, session, project },
+  ) => {
+    const currentUserRole = getCurrentUserRole(
+      session?.identity,
+      organization!,
+      context.query.projectSlug as string,
+      project,
+    );
+
+    if (
+      currentUserRole !== UserRole.Owner &&
+      currentUserRole !== UserRole.Admin
+    ) {
+      return {
+        redirect: {
+          destination: "/" + context.query.organizationSlug,
+          permanent: false,
+        },
+      };
+    }
     return {
       props: {},
     };

@@ -4,7 +4,7 @@ import { middleware } from "@/decorators/middleware";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
-import { Policy } from "@/types/api/api";
+import { Policy, UserRole } from "@/types/api/api";
 
 import React, { FunctionComponent, useState } from "react";
 
@@ -25,6 +25,7 @@ import {
 } from "../../../../services/devGuardApi";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import { withProject } from "../../../../decorators/withProject";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {
   policies: Array<Policy & { enabled: boolean }>;
@@ -47,6 +48,7 @@ export const PolicyListItem = ({
   onDisablePolicy: (policy: Policy) => Promise<void>;
 }) => {
   const router = useRouter();
+  const currentUserRole = useCurrentUserRole();
   const [isOpen, setIsOpen] = useState(false);
   const handlePolicyToggle = async (enabled: boolean) => {
     if (enabled) {
@@ -67,6 +69,10 @@ export const PolicyListItem = ({
               <Switch
                 checked={policy.enabled}
                 onCheckedChange={handlePolicyToggle}
+                disabled={
+                  currentUserRole !== UserRole.Admin &&
+                  currentUserRole !== UserRole.Owner
+                }
               />
             </div>
           }
@@ -102,6 +108,8 @@ const ComplianceIndex: FunctionComponent<Props> = ({
   const [open, setOpen] = useState(false);
   const [policies, setPolicy] =
     useState<Array<Policy & { enabled: boolean }>>(propsPolicies);
+
+  const currentUserRole = useCurrentUserRole();
 
   const handleCreatePolicy = async (policy: Policy) => {
     const { organizationSlug } = router.query as {
@@ -195,14 +203,19 @@ const ComplianceIndex: FunctionComponent<Props> = ({
             title="Organization Compliance Controls"
             forceVertical
             Button={
-              <Link
-                className={buttonVariants({
-                  variant: "outline",
-                })}
-                href={`/${activeOrg.slug}/compliance/`}
-              >
-                Modify Policies
-              </Link>
+              currentUserRole === UserRole.Admin ||
+              currentUserRole === UserRole.Owner ? (
+                <Link
+                  className={buttonVariants({
+                    variant: "outline",
+                  })}
+                  href={`/${activeOrg.slug}/compliance/`}
+                >
+                  Modify Policies
+                </Link>
+              ) : (
+                <> </>
+              )
             }
           >
             {policies.map((policy) => (
