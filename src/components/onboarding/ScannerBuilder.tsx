@@ -51,17 +51,17 @@ import { integrationSnippets } from "../../integrationSnippets";
 import { classNames } from "@/utils/common";
 
 interface Config {
-  identifySecrets: boolean;
-  SCA: boolean;
-  containerImage: boolean;
-  SAST: boolean;
-  IaC: boolean;
+  "secret-scanning": boolean;
+  sca: boolean;
+  "container-scanning": boolean;
+  sast: boolean;
+  iac: boolean;
 }
 
 interface gitlabOptionsYaml {
-  identifySecrets: string;
+  "secret-scanning": string;
   SCA: string;
-  containerImage: string;
+  "container-scanning": string;
   SAST: string;
   IaC: string;
 }
@@ -89,26 +89,19 @@ export const ScannerBuilder = ({
   projectSlug: string;
   assetSlug: string;
 }) => {
-  const codeString = integrationSnippets({
-    orgSlug,
-    projectSlug,
-    assetSlug,
-    apiUrl,
-  })["Gitlab"][scanner ?? "devsecops"];
-
   const [ready, setReady] = useState(false);
 
   const [config, setConfig] = useState<Config>({
-    identifySecrets: true,
-    SCA: true,
-    containerImage: true,
-    SAST: true,
-    IaC: true,
+    "secret-scanning": true,
+    sca: true,
+    "container-scanning": true,
+    sast: true,
+    iac: true,
   });
 
-  type gitInstance = "gitlab" | "github" | undefined;
+  type gitInstance = "Gitlab" | "GitHub";
 
-  const [gitInstance, setGitInstance] = useState<gitInstance>("gitlab");
+  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
 
   useEffect(() => {
     api?.reInit();
@@ -131,275 +124,234 @@ include:
   }
 
   function codeStringBuilder(config: Config, gitInstance: gitInstance) {
-    console.log(config);
-    Object.entries(config).map(([selectedOption, selectedOptionValue]) => {
-      selectedOptionValue === "true" &&
-        generateCodeStringBuilder(gitInstance, selectedOption);
-    });
+    const codeString = Object.entries(config)
+      .filter(([_, selectedOptionValue]) => selectedOptionValue === "true")
+      .map(([selectedOption]) => {
+        return integrationSnippets({
+          orgSlug,
+          projectSlug,
+          assetSlug,
+          apiUrl,
+        })[gitInstance][selectedOption as keyof Config];
+      });
 
-    const codeString: string = "\ntest \ntest\n";
-    if (gitInstance === "github") {
-      codeString + "\n github \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    } else {
-      codeString + "\n github \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-    }
-    return codeString;
-  }
-
-  return (
-    <>
-      <CarouselItem>
-        <DialogHeader>
-          <DialogTitle>What should your Scanner be able to do?</DialogTitle>
-          <DialogDescription>Select exactly what you want</DialogDescription>
-        </DialogHeader>
-        <div className="">
-          <div
-            className="relative aspect-video w-full
+    return (
+      <>
+        <CarouselItem>
+          <DialogHeader>
+            <DialogTitle>What should your Scanner be able to do?</DialogTitle>
+            <DialogDescription>Select exactly what you want</DialogDescription>
+          </DialogHeader>
+          <div className="">
+            <div
+              className="relative aspect-video w-full
             max-w-4xl b"
-          >
-            <div className="mt-10 flex w-full justify-end ">
-              <Card className="h-auto w-48">
-                <div className="flex flex-grid space-x-4 m-2">
-                  <Switch
-                    className="mt-4"
-                    defaultChecked={true}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
+            >
+              <div className="mt-10 flex w-full justify-end ">
+                <Card className="h-auto w-48">
+                  <div className="flex flex-grid space-x-4 m-2">
+                    <Switch
+                      className="mt-4"
+                      defaultChecked={true}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setConfig(() => ({
+                            ...config,
+                            "secret-scanning": true,
+                            sca: true,
+                            "container-scanning": true,
+                            sast: true,
+                            iac: true,
+                          }));
+                        } else {
+                          setConfig(() => ({
+                            ...config,
+                            "secret-scanning": false,
+                            SCA: false,
+                            "container-scanning": false,
+                            sast: false,
+                            iac: false,
+                          }));
+                        }
+                      }}
+                      checked={Object.values(config).every((v) => v === true)}
+                    />
+                    <div className="flex flex-col">
+                      <CardTitle className=" text-base">
+                        Whole Pipeline
+                      </CardTitle>
+                      <CardDescription className="">
+                        Enable this to use full Pipeline.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <Separator className="mt-4" orientation="horizontal" />
+              <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
+              <Card className="">
+                <div className="align-middle flex flex-col space-y-4 ml-2">
+                  <div className="flex flex-row items-center space-x-2">
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={config["secret-scanning"]}
+                      onCheckedChange={() =>
                         setConfig(() => ({
                           ...config,
-                          identifySecrets: true,
-                          SCA: true,
-                          containerImage: true,
-                          SAST: true,
-                          IaC: true,
-                        }));
-                      } else {
-                        setConfig(() => ({
-                          ...config,
-                          identifySecrets: false,
-                          SCA: false,
-                          containerImage: false,
-                          SAST: false,
-                          IaC: false,
-                        }));
+                          "secret-scanning": !config["secret-scanning"],
+                        }))
                       }
-                    }}
-                    checked={Object.values(config).every((v) => v === true)}
-                  />
-                  <div className="flex flex-col">
-                    <CardTitle className=" text-base">Whole Pipeline</CardTitle>
-                    <CardDescription className="">
-                      Enable this to use full Pipeline.
-                    </CardDescription>
+                    />
+                    <div>
+                      <span> Identify leaked Secrets in your Code</span>
+                      <p className="text-muted-foreground text-xs">
+                        Tokens, Passwords, anything you the public should not
+                        know, will be scanned
+                      </p>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-2">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.sca}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            sca: !config.sca,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>
+                          Scan your Dependencies for known Vulnerabilities (SCA)
+                        </span>
+                        <p className="text-muted-foreground text-xs">
+                          Assess open-source and third-party dependencies,
+                          detect known vulnerabilities in dependencies
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-2">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config["container-scanning"]}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            containerImage: !config["container-scanning"],
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>Build your Container Image</span>
+                        <p className="text-muted-foreground text-xs">
+                          Scans container images for vulnerabilities and helps
+                          maintain environment
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-2">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.sast}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            sast: !config.sast,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>Identify Bad Practices in Your Code (SAST)</span>
+                        <p className="text-muted-foreground text-xs">
+                          Analyzes source code to find security vulnerabilities
+                          in the development process
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-2">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.iac}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            iac: !config.iac,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>
+                          Identify Flaws in your Infrastructure Configs (IaC)
+                        </span>
+                        <p className="text-muted-foreground text-xs">
+                          Detects misconfigurations and vulnerabilities in IaC
+                          templates
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Card>
-            </div>
+              <Separator className="mt-4" orientation="horizontal" />
+              <h3 className="mt-4 mb-2">What Git Instance are you using?</h3>
 
-            <Separator className="mt-4" orientation="horizontal" />
-            <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
-            <Card className="">
-              <div className="align-middle flex flex-col space-y-4 ml-2">
-                <div className="flex flex-row items-center space-x-2">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config.identifySecrets}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        identifySecrets: !config.identifySecrets,
-                      }))
-                    }
+              <div className="flex w-full">
+                <Button
+                  variant={"ghost"}
+                  className={classNames(
+                    "w-full",
+                    gitInstance === "GitHub"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                  onClick={() => setGitInstance("GitHub")}
+                >
+                  <Image
+                    src="/assets/github.svg"
+                    alt="GitHub Logo"
+                    className="mr-2 dark:invert"
+                    width={24}
+                    height={24}
                   />
-                  <div>
-                    <span> Identify leaked Secrets in your Code</span>
-                    <p className="text-muted-foreground text-xs">
-                      Tokens, Passwords, anything you the public should not
-                      know, will be scanned
-                    </p>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.SCA}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          SCA: !config.SCA,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>
-                        Scan your Dependencies for known Vulnerabilities (SCA)
-                      </span>
-                      <p className="text-muted-foreground text-xs">
-                        Assess open-source and third-party dependencies, detect
-                        known vulnerabilities in dependencies
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.containerImage}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          containerImage: !config.containerImage,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>Build your Container Image</span>
-                      <p className="text-muted-foreground text-xs">
-                        Scans container images for vulnerabilities and helps
-                        maintain environment
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.SAST}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          SAST: !config.SAST,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>Identify Bad Practices in Your Code (SAST)</span>
-                      <p className="text-muted-foreground text-xs">
-                        Analyzes source code to find security vulnerabilities in
-                        the development process
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.IaC}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          IaC: !config.IaC,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>
-                        Identify Flaws in your Infrastructure Configs (IaC)
-                      </span>
-                      <p className="text-muted-foreground text-xs">
-                        Detects misconfigurations and vulnerabilities in IaC
-                        templates
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-            <Separator className="mt-4" orientation="horizontal" />
-            <h3 className="mt-4 mb-2">What Git Instance are you using?</h3>
-
-            <div className="flex w-full">
-              <Button
-                variant={"ghost"}
-                className={classNames(
-                  "w-full",
-                  gitInstance === "github"
-                    ? "border border-primary"
-                    : "border border-transparent",
-                )}
-                onClick={() => setGitInstance("github")}
-              >
-                <Image
-                  src="/assets/github.svg"
-                  alt="GitHub Logo"
-                  className="mr-2 dark:invert"
-                  width={24}
-                  height={24}
-                />
-                GitHub
-              </Button>
-              {/* border dark:border-foreground/20 !text-foreground
+                  GitHub
+                </Button>
+                {/* border dark:border-foreground/20 !text-foreground
               hover:no-underline bg-transparent hover:bg-accent
               hover:text-accent-foreground */}
-              <Button
-                variant={"ghost"}
-                className={classNames(
-                  "w-full",
-                  gitInstance === "gitlab"
-                    ? "border border-primary"
-                    : "border border-transparent",
-                )}
-                onClick={() => {
-                  setGitInstance("gitlab");
-                }}
-              >
-                <Image
-                  src="/assets/gitlab.svg"
-                  alt="GitHub Logo"
-                  className="mr-2"
-                  width={24}
-                  height={24}
-                />
-                GitLab
-              </Button>
+                <Button
+                  variant={"ghost"}
+                  className={classNames(
+                    "w-full",
+                    gitInstance === "Gitlab"
+                      ? "border border-primary"
+                      : "border border-transparent",
+                  )}
+                  onClick={() => {
+                    setGitInstance("Gitlab");
+                  }}
+                >
+                  <Image
+                    src="/assets/gitlab.svg"
+                    alt="GitHub Logo"
+                    className="mr-2"
+                    width={24}
+                    height={24}
+                  />
+                  GitLab
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-10 flex flex-row gap-2 justify-end">
-          <Button variant={"secondary"} onClick={() => prev?.()}>
-            Back
-          </Button>
-          <Button
-            disabled={Object.values(config).every((v) => v === false)}
-            onClick={() => {
-              next?.();
-            }}
-          >
-            {Object.values(config).every((v) => v === false)
-              ? "Select Option"
-              : "Continue"}
-          </Button>
-        </div>
-      </CarouselItem>
-
-      {ready === true && (
-        <CarouselItem className="">
-          <DialogHeader>
-            {gitInstance === "github" && (
-              <DialogTitle>
-                Add the snippet to your GitHub Actions File
-              </DialogTitle>
-            )}
-            {gitInstance === "gitlab" && (
-              <DialogTitle>
-                Add the snippet to your GitLab CI/CD File
-              </DialogTitle>
-            )}
-            <DialogDescription>
-              Create a new
-              <CopyCodeFragment
-                codeString={`.${gitInstance}/workflows/devsecops.yml`}
-              />
-              file or add the code snippet to an existing workflow file.
-            </DialogDescription>
-          </DialogHeader>
-          <CopyCode codeString={codeString}></CopyCode>
           <div className="mt-10 flex flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => prev?.()}>
               Back
@@ -416,9 +368,48 @@ include:
             </Button>
           </div>
         </CarouselItem>
-      )}
-    </>
-  );
-};
 
+        {ready === true && (
+          <CarouselItem className="">
+            <DialogHeader>
+              {gitInstance === "GitHub" && (
+                <DialogTitle>
+                  Add the snippet to your GitHub Actions File
+                </DialogTitle>
+              )}
+              {gitInstance === "Gitlab" && (
+                <DialogTitle>
+                  Add the snippet to your GitLab CI/CD File
+                </DialogTitle>
+              )}
+              <DialogDescription>
+                Create a new
+                <CopyCodeFragment
+                  codeString={`.${gitInstance}/workflows/devsecops.yml`}
+                />
+                file or add the code snippet to an existing workflow file.
+              </DialogDescription>
+            </DialogHeader>
+            {/* <CopyCode codeString={codeString}></CopyCode> */}
+            <div className="mt-10 flex flex-row gap-2 justify-end">
+              <Button variant={"secondary"} onClick={() => prev?.()}>
+                Back
+              </Button>
+              <Button
+                disabled={Object.values(config).every((v) => v === false)}
+                onClick={() => {
+                  next?.();
+                }}
+              >
+                {Object.values(config).every((v) => v === false)
+                  ? "Select Option"
+                  : "Continue"}
+              </Button>
+            </div>
+          </CarouselItem>
+        )}
+      </>
+    );
+  }
+};
 export default ScannerBuilder;
