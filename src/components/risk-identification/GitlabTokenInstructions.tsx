@@ -28,6 +28,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import router from "next/router";
 import { toast } from "sonner";
 import { CrownIcon } from "lucide-react";
+import { GitInstances } from "@/types/common";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -203,7 +204,8 @@ export const GitlabTokenSlides = ({
         <DialogHeader>
           <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
           <DialogDescription>
-            Create a new <CopyCodeFragment codeString=".gitlab-ci.yml" /> file
+            Create a new{" "}
+            <CopyCodeFragment codeString={```.${GitInstances}-ci.yml```} /> file
             or add the code snippet to an existing CI/CD configuration file.
           </DialogDescription>
         </DialogHeader>

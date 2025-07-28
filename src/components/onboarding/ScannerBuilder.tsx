@@ -47,16 +47,7 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { GitInstances } from "@/types/common";
-import ProviderTitleIcon from "../common/ProviderTitleIcon";
-import { Outline } from "@react-three/postprocessing";
+import { integrationSnippets } from "../../integrationSnippets";
 import { classNames } from "@/utils/common";
 
 interface Config {
@@ -67,17 +58,44 @@ interface Config {
   IaC: boolean;
 }
 
+interface gitlabOptionsYaml {
+  identifySecrets: string;
+  SCA: string;
+  containerImage: string;
+  SAST: string;
+  IaC: string;
+}
+
 export const ScannerBuilder = ({
   api,
+  apiUrl,
   setup,
   next,
   prev,
+  pat,
+  onPatGenerate,
+  orgSlug,
+  projectSlug,
+  assetSlug,
 }: {
   next?: () => void;
   prev?: () => void;
   setup?: "own" | "auto-setup";
   api?: CarouselApi;
+  apiUrl: string;
+  pat?: string;
+  onPatGenerate: () => void;
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
 }) => {
+  const codeString = integrationSnippets({
+    orgSlug,
+    projectSlug,
+    assetSlug,
+    apiUrl,
+  })["Gitlab"][scanner ?? "devsecops"];
+
   const [ready, setReady] = useState(false);
 
   const [config, setConfig] = useState<Config>({
@@ -97,12 +115,27 @@ export const ScannerBuilder = ({
     setReady(true); //this is redundant rn, will change
   }, [api, config, gitInstance]);
 
+  function generateCodeStringBuilder(
+    gitInstance: gitInstance,
+    selectedOption: string,
+  ) {
+    const base = `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
+# stages:
+# - build
+# - test
+# - deploy
+
+include:
+
+`;
+  }
+
   function codeStringBuilder(config: Config, gitInstance: gitInstance) {
-    Object.values(config).every((configSetting) =>
-      configSetting === true
-        ? console.log("blabla")
-        : console.log("i dont work"),
-    );
+    console.log(config);
+    Object.entries(config).map(([selectedOption, selectedOptionValue]) => {
+      selectedOptionValue === "true" &&
+        generateCodeStringBuilder(gitInstance, selectedOption);
+    });
 
     const codeString: string = "\ntest \ntest\n";
     if (gitInstance === "github") {
@@ -346,25 +379,31 @@ export const ScannerBuilder = ({
       </CarouselItem>
 
       {ready === true && (
-        <CarouselItem className="h-128">
+        <CarouselItem className="">
           <DialogHeader>
-            <DialogTitle>
-              Add the snippet to your GitHub Actions File
-            </DialogTitle>
+            {gitInstance === "github" && (
+              <DialogTitle>
+                Add the snippet to your GitHub Actions File
+              </DialogTitle>
+            )}
+            {gitInstance === "gitlab" && (
+              <DialogTitle>
+                Add the snippet to your GitLab CI/CD File
+              </DialogTitle>
+            )}
             <DialogDescription>
-              Create a new{" "}
-              <CopyCodeFragment codeString=".github/workflows/devsecops.yml" />{" "}
+              Create a new
+              <CopyCodeFragment
+                codeString={`.${gitInstance}/workflows/devsecops.yml`}
+              />
               file or add the code snippet to an existing workflow file.
             </DialogDescription>
           </DialogHeader>
-          <CopyCode
-            codeString={codeStringBuilder(config, gitInstance)}
-          ></CopyCode>
+          <CopyCode codeString={codeString}></CopyCode>
           <div className="mt-10 flex flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => prev?.()}>
               Back
             </Button>
-            ,
             <Button
               disabled={Object.values(config).every((v) => v === false)}
               onClick={() => {

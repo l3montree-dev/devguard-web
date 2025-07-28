@@ -326,8 +326,19 @@ const DependencyRiskScannerDialog: FunctionComponent<
               {selectedScanner === "devguard-select" && (
                 <ScannerBuilder
                   api={api}
+                  apiUrl={apiUrl}
                   next={api?.scrollNext}
                   prev={api?.scrollPrev}
+                  onPatGenerate={() =>
+                    pat.onCreatePat({
+                      scopes: "auto-setup",
+                      description:
+                        "Automatically Generated Integration for DevGuard",
+                    })
+                  }
+                  orgSlug={activeOrg.slug}
+                  projectSlug={activeProject.slug}
+                  assetSlug={asset!.slug}
                 ></ScannerBuilder>
               )}
             </>

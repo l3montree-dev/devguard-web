@@ -7,13 +7,7 @@ const generateWorkflowSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
-) => `# .github/workflows/devsecops.yml
-
-# DevSecOps Workflow Definition. This workflow is triggered on every push to the repository
-name: DevSecOps Workflow
-on:
-    push:
-jobs:
+) => `
     ${jobName}:
         uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
         with:
@@ -29,12 +23,7 @@ const generateGitlabSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
-) => `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
-# stages:
-# - build
-# - test
-# - deploy
-
+) => `
 include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
