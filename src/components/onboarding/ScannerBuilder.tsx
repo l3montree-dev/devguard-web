@@ -25,7 +25,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+import Image from "next/image";
 import React, {
   FunctionComponent,
   PropsWithChildren,
@@ -56,6 +56,8 @@ import {
 } from "../ui/select";
 import { GitInstances } from "@/types/common";
 import ProviderTitleIcon from "../common/ProviderTitleIcon";
+import { Outline } from "@react-three/postprocessing";
+import { classNames } from "@/utils/common";
 
 interface Config {
   identifySecrets: boolean;
@@ -90,15 +92,12 @@ export const ScannerBuilder = ({
 
   const [gitInstance, setGitInstance] = useState<gitInstance>("gitlab");
 
-  const test = "abc";
-  const test2 = "def";
-
   useEffect(() => {
     api?.reInit();
     setReady(true); //this is redundant rn, will change
   }, [api, config, gitInstance]);
 
-  function codeStringBuilder(config: Config, provider: gitInstance) {
+  function codeStringBuilder(config: Config, gitInstance: gitInstance) {
     Object.values(config).every((configSetting) =>
       configSetting === true
         ? console.log("blabla")
@@ -106,7 +105,11 @@ export const ScannerBuilder = ({
     );
 
     const codeString: string = "\ntest \ntest\n";
-
+    if (gitInstance === "github") {
+      codeString + "\n github \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    } else {
+      codeString + "\n github \n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+    }
     return codeString;
   }
 
@@ -197,8 +200,8 @@ export const ScannerBuilder = ({
                     Scan your Dependencies for known Vulnerabilities (SCA)
                   </span>
                   <p className="text-muted-foreground text-xs">
-                    By clicking this checkbox, you agree to the terms and
-                    conditions
+                    Assess open-source and third-party dependencies, detect
+                    known vulnerabilities in dependencies
                   </p>
                 </div>
                 <div className="space-x-2">
@@ -214,8 +217,8 @@ export const ScannerBuilder = ({
                   />
                   <span>Build your Container Image</span>
                   <p className="text-muted-foreground text-xs">
-                    By clicking this checkbox, you agree to the terms and
-                    conditions
+                    Scans container images for vulnerabilities and helps
+                    maintain environment
                   </p>
                 </div>
                 <div className="space-x-2">
@@ -231,8 +234,8 @@ export const ScannerBuilder = ({
                   />
                   <span>Identify Bad Practices in Your Code (SAST)</span>
                   <p className="text-muted-foreground text-xs">
-                    By clicking this checkbox, you agree to the terms and
-                    conditions
+                    Analyzes source code to find security vulnerabilities in the
+                    development process
                   </p>
                 </div>
                 <div className="space-x-2">
@@ -250,13 +253,60 @@ export const ScannerBuilder = ({
                     Identify Flaws in your Infrastructure Configs (IaC)
                   </span>
                   <p className="text-muted-foreground text-xs">
-                    By clicking this checkbox, you agree to the terms and
-                    conditions
+                    Detects misconfigurations and vulnerabilities in IaC
+                    templates
                   </p>
                 </div>
               </div>
             </Card>
             <Separator className="mt-4" orientation="horizontal" />
+            <h3 className="mt-4 mb-2">What Git Instance are you using?</h3>
+
+            <div className="flex w-full">
+              <Button
+                variant={"ghost"}
+                className={classNames(
+                  "w-full",
+                  gitInstance === "github"
+                    ? "border border-primary"
+                    : "border border-transparent",
+                )}
+                onClick={() => setGitInstance("github")}
+              >
+                <Image
+                  src="/assets/github.svg"
+                  alt="GitHub Logo"
+                  className="mr-2 dark:invert"
+                  width={24}
+                  height={24}
+                />
+                GitHub
+              </Button>
+              {/* border dark:border-foreground/20 !text-foreground
+              hover:no-underline bg-transparent hover:bg-accent
+              hover:text-accent-foreground */}
+              <Button
+                variant={"ghost"}
+                className={classNames(
+                  "w-full",
+                  gitInstance === "gitlab"
+                    ? "border border-primary"
+                    : "border border-transparent",
+                )}
+                onClick={() => {
+                  setGitInstance("gitlab");
+                }}
+              >
+                <Image
+                  src="/assets/gitlab.svg"
+                  alt="GitHub Logo"
+                  className="mr-2"
+                  width={24}
+                  height={24}
+                />
+                GitLab
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -289,30 +339,24 @@ export const ScannerBuilder = ({
               file or add the code snippet to an existing workflow file.
             </DialogDescription>
           </DialogHeader>
-          <Select
-            value={gitInstance}
-            onValueChange={(value) => {
-              setGitInstance(value as gitInstance);
-            }}
-          >
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Select Provider" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(GitInstances).map((provider) => (
-                <SelectItem
-                  key={provider}
-                  value={provider}
-                  onClick={() => setGitInstance(provider as GitInstances)}
-                >
-                  <ProviderTitleIcon provider={provider as GitInstances} />
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <CopyCode
             codeString={codeStringBuilder(config, gitInstance)}
           ></CopyCode>
+          <div className="mt-10 flex flex-row gap-2 justify-end">
+            <Button variant={"secondary"} onClick={() => prev?.()}>
+              Back
+            </Button>
+            <Button
+              disabled={Object.values(config).every((v) => v === false)}
+              onClick={() => {
+                next?.();
+              }}
+            >
+              {Object.values(config).every((v) => v === false)
+                ? "Select Option"
+                : "Continue"}
+            </Button>
+          </div>
         </CarouselItem>
       )}
     </>
