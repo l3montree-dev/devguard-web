@@ -125,7 +125,7 @@ export const ScannerBuilder = ({
             className="relative aspect-video w-full
             max-w-4xl b"
           >
-            <div className="mt-10 flex w-full justify-start ">
+            <div className="mt-10 flex w-full justify-end ">
               <Card className="h-auto w-48">
                 <div className="flex flex-grid space-x-4 m-2">
                   <Switch
@@ -167,8 +167,8 @@ export const ScannerBuilder = ({
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
             <Card className="">
-              <div className="flex flex-col space-y-4 ml-2">
-                <div className="space-x-2">
+              <div className="align-middle flex flex-col space-y-4 ml-2">
+                <div className="flex flex-row items-center space-x-2">
                   <Checkbox
                     defaultChecked={true}
                     checked={config.identifySecrets}
@@ -179,83 +179,101 @@ export const ScannerBuilder = ({
                       }))
                     }
                   />
-                  <span> Identify leaked Secrets in your Code</span>
-                  <p className="text-muted-foreground text-xs">
-                    Tokens, Passwords, anything you the public should not know,
-                    will be scanned
-                  </p>
+                  <div>
+                    <span> Identify leaked Secrets in your Code</span>
+                    <p className="text-muted-foreground text-xs">
+                      Tokens, Passwords, anything you the public should not
+                      know, will be scanned
+                    </p>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config.SCA}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        SCA: !config.SCA,
-                      }))
-                    }
-                  />
-                  <span>
-                    Scan your Dependencies for known Vulnerabilities (SCA)
-                  </span>
-                  <p className="text-muted-foreground text-xs">
-                    Assess open-source and third-party dependencies, detect
-                    known vulnerabilities in dependencies
-                  </p>
+                <div className="align-middle flex flex-col space-y-4">
+                  <div className="flex flex-row items-center space-x-2">
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={config.SCA}
+                      onCheckedChange={() =>
+                        setConfig(() => ({
+                          ...config,
+                          SCA: !config.SCA,
+                        }))
+                      }
+                    />
+                    <div>
+                      <span>
+                        Scan your Dependencies for known Vulnerabilities (SCA)
+                      </span>
+                      <p className="text-muted-foreground text-xs">
+                        Assess open-source and third-party dependencies, detect
+                        known vulnerabilities in dependencies
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config.containerImage}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        containerImage: !config.containerImage,
-                      }))
-                    }
-                  />
-                  <span>Build your Container Image</span>
-                  <p className="text-muted-foreground text-xs">
-                    Scans container images for vulnerabilities and helps
-                    maintain environment
-                  </p>
+                <div className="align-middle flex flex-col space-y-4">
+                  <div className="flex flex-row items-center space-x-2">
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={config.containerImage}
+                      onCheckedChange={() =>
+                        setConfig(() => ({
+                          ...config,
+                          containerImage: !config.containerImage,
+                        }))
+                      }
+                    />
+                    <div>
+                      <span>Build your Container Image</span>
+                      <p className="text-muted-foreground text-xs">
+                        Scans container images for vulnerabilities and helps
+                        maintain environment
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config.SAST}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        SAST: !config.SAST,
-                      }))
-                    }
-                  />
-                  <span>Identify Bad Practices in Your Code (SAST)</span>
-                  <p className="text-muted-foreground text-xs">
-                    Analyzes source code to find security vulnerabilities in the
-                    development process
-                  </p>
+                <div className="align-middle flex flex-col space-y-4">
+                  <div className="flex flex-row items-center space-x-2">
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={config.SAST}
+                      onCheckedChange={() =>
+                        setConfig(() => ({
+                          ...config,
+                          SAST: !config.SAST,
+                        }))
+                      }
+                    />
+                    <div>
+                      <span>Identify Bad Practices in Your Code (SAST)</span>
+                      <p className="text-muted-foreground text-xs">
+                        Analyzes source code to find security vulnerabilities in
+                        the development process
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-x-2">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config.IaC}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        IaC: !config.IaC,
-                      }))
-                    }
-                  />
-                  <span>
-                    Identify Flaws in your Infrastructure Configs (IaC)
-                  </span>
-                  <p className="text-muted-foreground text-xs">
-                    Detects misconfigurations and vulnerabilities in IaC
-                    templates
-                  </p>
+                <div className="align-middle flex flex-col space-y-4">
+                  <div className="flex flex-row items-center space-x-2">
+                    <Checkbox
+                      defaultChecked={true}
+                      checked={config.IaC}
+                      onCheckedChange={() =>
+                        setConfig(() => ({
+                          ...config,
+                          IaC: !config.IaC,
+                        }))
+                      }
+                    />
+                    <div>
+                      <span>
+                        Identify Flaws in your Infrastructure Configs (IaC)
+                      </span>
+                      <p className="text-muted-foreground text-xs">
+                        Detects misconfigurations and vulnerabilities in IaC
+                        templates
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -346,6 +364,7 @@ export const ScannerBuilder = ({
             <Button variant={"secondary"} onClick={() => prev?.()}>
               Back
             </Button>
+            ,
             <Button
               disabled={Object.values(config).every((v) => v === false)}
               onClick={() => {
