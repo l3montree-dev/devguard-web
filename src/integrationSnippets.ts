@@ -24,7 +24,6 @@ const generateGitlabSnippet = (
   assetSlug: string,
   apiUrl: string,
 ) => `
-include:
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
     asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}

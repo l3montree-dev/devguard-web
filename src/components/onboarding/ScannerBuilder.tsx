@@ -110,7 +110,7 @@ export const ScannerBuilder = ({
   }, [api, config, gitInstance]);
 
   function codeStringBuilder() {
-    const base = gitInstance === "GitHub" ? "Github" : "Gitlab";
+    const base = gitInstance === "GitHub" ? "\njobs:" : "\ninclude:";
     const codeString = Object.entries(config)
       .filter(([_, selectedOptionValue]) => selectedOptionValue)
       .map(([selectedOption]) => {
@@ -123,7 +123,8 @@ export const ScannerBuilder = ({
       })
       .map((value) => value)
       .join("\n");
-    return codeString;
+
+    return base + codeString;
   }
 
   return (
@@ -387,7 +388,7 @@ export const ScannerBuilder = ({
           </DialogHeader>
           <CopyCode
             language="yaml"
-            codeString={`# .github/workflows/devsecops.yml ${codeStringBuilder()} `}
+            codeString={`# .${gitInstance}/workflows/devsecops.yml ${codeStringBuilder()} `}
           ></CopyCode>
           <div className="mt-10 flex flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => prev?.()}>
