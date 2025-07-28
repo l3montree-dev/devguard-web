@@ -49,6 +49,7 @@ import { Switch } from "../ui/switch";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { integrationSnippets } from "../../integrationSnippets";
 import { classNames } from "@/utils/common";
+import { concat } from "lodash";
 
 interface Config {
   "secret-scanning": boolean;
@@ -108,16 +109,22 @@ export const ScannerBuilder = ({
     setReady(true); //this is redundant rn, will change
   }, [api, config, gitInstance]);
 
-  const codeString = Object.entries(config)
-    .filter(([_, selectedOptionValue]) => selectedOptionValue)
-    .map(([selectedOption]) => {
-      return integrationSnippets({
-        orgSlug,
-        projectSlug,
-        assetSlug,
-        apiUrl,
-      })[gitInstance][selectedOption as keyof Config];
-    });
+  function codeStringBuilder() {
+    const base = gitInstance === "GitHub" ? "Github" : "Gitlab";
+    const codeString = Object.entries(config)
+      .filter(([_, selectedOptionValue]) => selectedOptionValue)
+      .map(([selectedOption]) => {
+        return integrationSnippets({
+          orgSlug,
+          projectSlug,
+          assetSlug,
+          apiUrl,
+        })[gitInstance][selectedOption as keyof Config];
+      })
+      .map((value) => value)
+      .join("");
+    return codeString;
+  }
 
   return (
     <>
@@ -151,14 +158,16 @@ export const ScannerBuilder = ({
                         setConfig(() => ({
                           ...config,
                           "secret-scanning": false,
-                          SCA: false,
+                          sca: false,
                           "container-scanning": false,
                           sast: false,
                           iac: false,
                         }));
                       }
                     }}
-                    checked={Object.values(config).every((v) => v === true)}
+                    checked={Object.values(config).every(
+                      (property) => property === true,
+                    )}
                   />
                   <div className="flex flex-col">
                     <CardTitle className=" text-base">Whole Pipeline</CardTitle>
@@ -224,7 +233,7 @@ export const ScannerBuilder = ({
                       onCheckedChange={() =>
                         setConfig(() => ({
                           ...config,
-                          containerImage: !config["container-scanning"],
+                          "container-scanning": !config["container-scanning"],
                         }))
                       }
                     />
@@ -372,7 +381,9 @@ export const ScannerBuilder = ({
               file or add the code snippet to an existing workflow file.
             </DialogDescription>
           </DialogHeader>
-          <CopyCode codeString={codeString[0]}></CopyCode>
+          <CopyCode
+            codeString={`# .github/workflows/devsecops.yml ${codeStringBuilder()} `}
+          ></CopyCode>
           <div className="mt-10 flex flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => prev?.()}>
               Back
