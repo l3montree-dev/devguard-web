@@ -547,13 +547,18 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface FirstPartyVuln extends BaseVulnDTO {
-  uri: string;
+interface snippetContents {
   startLine: number;
   endLine: number;
   startColumn: number;
   endColumn: number;
   snippet: string;
+}
+
+export interface FirstPartyVuln extends BaseVulnDTO {
+  uri: string;
+
+  snippetContents: snippetContents[];
 
   ruleHelp: string;
   ruleName: string;
