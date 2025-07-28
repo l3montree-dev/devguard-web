@@ -122,7 +122,7 @@ export const ScannerBuilder = ({
         })[gitInstance][selectedOption as keyof Config];
       })
       .map((value) => value)
-      .join("");
+      .join("\n");
     return codeString;
   }
 
@@ -138,11 +138,11 @@ export const ScannerBuilder = ({
             className="relative aspect-video w-full
             max-w-4xl b"
           >
-            <div className="mt-10 flex w-full justify-end ">
-              <Card className="h-auto w-48">
-                <div className="flex flex-grid space-x-4 m-2">
+            <div className="mt-10 flex w-full  ">
+              <Card className="h-auto w-full align-middle space-y-4">
+                <div className="flex flex-row  items-center space-x-4 m-2">
                   <Switch
-                    className="mt-4"
+                    className="items-center"
                     defaultChecked={true}
                     onCheckedChange={(checked) => {
                       if (checked) {
@@ -169,11 +169,15 @@ export const ScannerBuilder = ({
                       (property) => property === true,
                     )}
                   />
-                  <div className="flex flex-col">
-                    <CardTitle className=" text-base">Whole Pipeline</CardTitle>
-                    <CardDescription className="">
-                      Enable this to use full Pipeline.
-                    </CardDescription>
+                  <div>
+                    <div className="flex flex-col">
+                      <CardTitle className=" text-base">
+                        Whole Pipeline
+                      </CardTitle>
+                      <CardDescription className="">
+                        Enable this to use full Pipeline.
+                      </CardDescription>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -382,6 +386,7 @@ export const ScannerBuilder = ({
             </DialogDescription>
           </DialogHeader>
           <CopyCode
+            language="yaml"
             codeString={`# .github/workflows/devsecops.yml ${codeStringBuilder()} `}
           ></CopyCode>
           <div className="mt-10 flex flex-row gap-2 justify-end">
