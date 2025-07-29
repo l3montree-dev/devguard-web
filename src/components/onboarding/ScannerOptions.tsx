@@ -43,6 +43,7 @@ import GithubTokenInstructions, {
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
 import YamlGenerator from "./YamlGenerator";
+import { GitInstances } from "@/types/common";
 
 interface Config {
   "secret-scanning": boolean;
@@ -83,9 +84,9 @@ export const ScannerOptions = ({
     iac: true,
   });
 
-  type gitInstance = "gitlab" | "github";
+  type gitInstance = "Gitlab" | "GitHub";
 
-  const [gitInstance, setGitInstance] = useState<gitInstance>("gitlab");
+  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
 
   useEffect(() => {
     api?.reInit();
@@ -269,11 +270,11 @@ export const ScannerOptions = ({
                 variant={"ghost"}
                 className={classNames(
                   "w-full",
-                  gitInstance === "github"
+                  gitInstance === "GitHub"
                     ? "border border-primary"
                     : "border border-transparent",
                 )}
-                onClick={() => setGitInstance("github")}
+                onClick={() => setGitInstance("GitHub")}
               >
                 <Image
                   src="/assets/github.svg"
@@ -291,12 +292,12 @@ export const ScannerOptions = ({
                 variant={"ghost"}
                 className={classNames(
                   "w-full",
-                  gitInstance === "gitlab"
+                  gitInstance === "Gitlab"
                     ? "border border-primary"
                     : "border border-transparent",
                 )}
                 onClick={() => {
-                  setGitInstance("gitlab");
+                  setGitInstance("Gitlab");
                 }}
               >
                 <Image
@@ -328,7 +329,7 @@ export const ScannerOptions = ({
           </Button>
         </div>
       </CarouselItem>
-      {gitInstance === "github" && (
+      {gitInstance === "GitHub" && (
         <GithubTokenSlides
           gitInstances={gitInstance}
           api={api}
@@ -349,9 +350,9 @@ export const ScannerOptions = ({
           next={api?.scrollNext}
         />
       )}
-      {gitInstance === "gitlab" && (
+      {gitInstance === "Gitlab" && (
         <GitlabTokenSlides
-          gitInstances={gitInstance}
+          gitInstance={gitInstance}
           api={api}
           apiUrl={apiUrl}
           orgSlug={orgSlug}

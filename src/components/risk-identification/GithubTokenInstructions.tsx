@@ -107,7 +107,7 @@ export const GithubTokenSlides = ({
   orgSlug,
   projectSlug,
 }: {
-  gitInstances?: GitInstances;
+  gitInstances: GitInstances;
   pat?: string;
   next?: () => void;
   prev?: () => void;
@@ -202,7 +202,7 @@ export const GithubTokenSlides = ({
       {ready && (
         <CarouselItem>
           <YamlGenerator
-            gitInstances={gitInstances}
+            gitInstance={gitInstances}
             apiUrl={apiUrl}
             orgSlug={activeOrg.slug}
             projectSlug={activeProject.slug}

@@ -48,7 +48,6 @@ import {
 import { FlaskConical } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
-import ScannerBuilder from "./onboarding/ScannerBuilder";
 import ScannerOptions from "./onboarding/ScannerOptions";
 
 interface DependencyRiskScannerDialogProps {

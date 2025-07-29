@@ -97,13 +97,13 @@ export const ExternalTicketProviderNames: {
   opencode: "openCode",
 };
 
-export type GitInstances = "github" | "gitlab";
+export type GitInstances = "GitHub" | "Gitlab";
 
 export const GitInstances: {
   [key in GitInstances]: string;
 } = {
-  github: "github",
-  gitlab: "gitlab",
+  GitHub: "github",
+  Gitlab: "gitlab",
 };
 
 export interface Config {

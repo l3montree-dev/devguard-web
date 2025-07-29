@@ -68,8 +68,6 @@ export const YamlGenerator = ({
   projectSlug: string;
   assetSlug: string;
 }) => {
-  const [ready, setReady] = useState(false);
-
   const activeOrg = useActiveOrg();
 
   const activeProject = useActiveProject();
@@ -88,7 +86,7 @@ export const YamlGenerator = ({
   }, [api, config]);
 
   function codeStringBuilder() {
-    const base = gitInstance === "github" ? "\njobs:" : "\ninclude:";
+    const base = gitInstance === "GitHub" ? "\njobs:" : "\ninclude:";
     const codeString = Object.entries(config)
       .filter(([_, selectedOptionValue]) => selectedOptionValue)
       .map(([selectedOption]) => {
@@ -107,10 +105,10 @@ export const YamlGenerator = ({
   return (
     <CarouselItem className="">
       <DialogHeader>
-        {gitInstance === "github" && (
+        {gitInstance === "GitHub" && (
           <DialogTitle>Add the snippet to your GitHub Actions File</DialogTitle>
         )}
-        {gitInstance === "gitlab" && (
+        {gitInstance === "Gitlab" && (
           <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
         )}
         <DialogDescription>
@@ -123,7 +121,7 @@ export const YamlGenerator = ({
       </DialogHeader>
       <CopyCode
         language="yaml"
-        codeString={`# .${GitInstances}/workflows/devsecops.yml ${codeStringBuilder()} `}
+        codeString={`# .${gitInstance}/workflows/devsecops.yml ${codeStringBuilder()} `}
       ></CopyCode>
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button variant={"secondary"} onClick={() => prev?.()}>
