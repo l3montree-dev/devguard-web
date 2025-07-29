@@ -71,7 +71,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "own" | "devguard-select" | undefined
+    "custom-setup" | "auto-setup" | undefined
   >();
 
   const [selectedIntegration, setSelectedIntegration] = React.useState<
@@ -177,10 +177,10 @@ const DependencyRiskScannerDialog: FunctionComponent<
               </DialogHeader>
               <div className="mt-10">
                 <Card
-                  onClick={() => setSelectedSetup("auto-setup")}
+                  onClick={() => setSelectedScanner("auto-setup")}
                   className={classNames(
                     "col-span-2 cursor-pointer",
-                    selectedSetup === "auto-setup"
+                    selectedScanner === "auto-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
@@ -202,11 +202,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
               <Card
                 className={classNames(
                   "cursor-pointer mt-2   ",
-                  selectedSetup === "custom-setup"
+                  selectedScanner === "custom-setup"
                     ? "border border-primary"
                     : "border border-transparent",
                 )}
-                onClick={() => setSelectedSetup("custom-setup")}
+                onClick={() => setSelectedScanner("custom-setup")}
               >
                 <CardHeader>
                   <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -232,12 +232,15 @@ const DependencyRiskScannerDialog: FunctionComponent<
                   Back
                 </Button>
                 <Button
-                  disabled={selectedSetup === undefined}
+                  disabled={
+                    selectedScanner === undefined ||
+                    selectedScanner === "auto-setup"
+                  }
                   onClick={() => {
                     api?.scrollNext();
                   }}
                 >
-                  {selectedSetup === undefined
+                  {selectedScanner === undefined
                     ? "Select an Setup Route"
                     : "Continue"}
                 </Button>
@@ -251,11 +254,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 <Card
                   className={classNames(
                     "cursor-pointer",
-                    selectedScanner === "devguard-select"
+                    selectedSetup === "auto-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
-                  onClick={() => setSelectedScanner("devguard-select")}
+                  onClick={() => setSelectedSetup("auto-setup")}
                 >
                   <CardHeader>
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
@@ -277,11 +280,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 <Card
                   className={classNames(
                     "cursor-pointer mt-2",
-                    selectedScanner === "own"
+                    selectedSetup === "custom-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
-                  onClick={() => setSelectedScanner("own")}
+                  onClick={() => setSelectedSetup("custom-setup")}
                 >
                   <CardHeader>
                     <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -294,7 +297,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                       <Badge variant={"outline"}>Expert</Badge>
                     </CardTitle>
                     <CardDescription>
-                      You already have a Scanner and want to just Upload your
+                      You already hav e a Scanner and want to just Upload your
                       results
                     </CardDescription>
                   </CardHeader>
@@ -316,13 +319,13 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     api?.scrollNext();
                   }}
                 >
-                  {selectedIntegration === undefined
+                  {selectedSetup === undefined || selectedSetup === "auto-setup"
                     ? "Select a Scanner"
                     : "Continue"}
                 </Button>
               </div>
             </CarouselItem>
-            {selectedScanner === "devguard-select" && (
+            {selectedSetup === "auto-setup" && (
               <ScannerOptions
                 api={api}
                 apiUrl={apiUrl}

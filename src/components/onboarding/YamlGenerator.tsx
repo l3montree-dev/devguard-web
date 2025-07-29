@@ -42,6 +42,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "sonner";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import WebhookSetupTicketIntegrationDialog from "../guides/WebhookSetupTicketIntegrationDialog";
 
 export const YamlGenerator = ({
   api,
@@ -81,6 +82,8 @@ export const YamlGenerator = ({
     iac: true,
   });
 
+  const [webhookIsOpen, setWebhookIsOpen] = useState(false);
+
   useEffect(() => {
     api?.reInit(); //this is redundant rn, will change
   }, [api, config]);
@@ -103,58 +106,54 @@ export const YamlGenerator = ({
     return base + codeString;
   }
   return (
-    <CarouselItem className="">
-      <DialogHeader>
-        {gitInstance === "GitHub" && (
-          <DialogTitle>Add the snippet to your GitHub Actions File</DialogTitle>
-        )}
-        {gitInstance === "Gitlab" && (
-          <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
-        )}
-        <DialogDescription>
-          Create a new
-          <CopyCodeFragment
-            codeString={`.${gitInstance}/workflows/devsecops.yml`}
+    <>
+      <CarouselItem className="">
+        <DialogHeader>
+          {gitInstance === "GitHub" && (
+            <DialogTitle>
+              Add the snippet to your GitHub Actions File
+            </DialogTitle>
+          )}
+          {gitInstance === "Gitlab" && (
+            <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
+          )}
+          <DialogDescription>
+            Create a new
+            <CopyCodeFragment
+              codeString={`.${gitInstance.toLowerCase()}/workflows/devsecops.yml`}
+            />
+            file or add the code snippet to an existing workflow file.
+          </DialogDescription>
+        </DialogHeader>
+        <CopyCode
+          language="yaml"
+          codeString={`# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `}
+        ></CopyCode>
+        <div className="mt-10 flex flex-row gap-2 justify-end">
+          <Button variant={"secondary"} onClick={() => prev?.()}>
+            Back
+          </Button>
+          <Button
+            disabled={Object.values(config).every((v) => v === false)}
+            onClick={() => {
+              setWebhookIsOpen(true);
+            }}
+          >
+            {Object.values(config).every((v) => v === false)
+              ? "Select Option"
+              : "Continue"}
+          </Button>
+        </div>
+      </CarouselItem>
+      {webhookIsOpen && (
+        <CarouselItem>
+          <WebhookSetupTicketIntegrationDialog
+            open={webhookIsOpen}
+            onOpenChange={setWebhookIsOpen}
           />
-          file or add the code snippet to an existing workflow file.
-        </DialogDescription>
-      </DialogHeader>
-      <CopyCode
-        language="yaml"
-        codeString={`# .${gitInstance}/workflows/devsecops.yml ${codeStringBuilder()} `}
-      ></CopyCode>
-      <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => prev?.()}>
-          Back
-        </Button>
-        <Button
-          disabled={Object.values(config).every((v) => v === false)}
-          onClick={() => {
-            async () => {
-              const resp = await fetch(
-                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                {
-                  method: "GET",
-                },
-              );
-              if (resp.redirected) {
-                router.push(
-                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                );
-              } else {
-                toast.error(
-                  "We did not receive any information from your pipeline yet. You can safely close the dialog and refresh the page yourself after the pipeline did finish.",
-                );
-              }
-            };
-          }}
-        >
-          {Object.values(config).every((v) => v === false)
-            ? "Select Option"
-            : "Done!"}
-        </Button>
-      </div>
-    </CarouselItem>
+        </CarouselItem>
+      )}
+    </>
   );
 };
 
