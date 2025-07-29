@@ -11,11 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CarouselItem } from "../ui/carousel";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
@@ -27,6 +32,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
+import YamlGenerator from "../onboarding/YamlGenerator";
+import { GitInstances } from "@/types/common";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -90,44 +97,37 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
 };
 
 export const GithubTokenSlides = ({
+  gitInstances,
   pat,
   next,
   prev,
-  scanner,
   onPatGenerate,
   apiUrl,
+  api,
   orgSlug,
   projectSlug,
-  assetSlug,
 }: {
+  gitInstances?: GitInstances;
   pat?: string;
   next?: () => void;
   prev?: () => void;
   onPatGenerate: () => void;
-  scanner?:
-    | "secret-scanning"
-    | "iac"
-    | "sast"
-    | "sarif"
-    | "sbom"
-    | "devsecops"
-    | "container-scanning"
-    | "sca";
+  api?: CarouselApi;
   apiUrl: string;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
 }) => {
-  const codeString = integrationSnippets({
-    orgSlug,
-    projectSlug,
-    assetSlug,
-    apiUrl,
-  })["GitHub"][scanner ?? "devsecops"];
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const assetVersion = useActiveAssetVersion();
   const asset = useActiveAsset();
+
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    api?.reInit();
+  }, []);
 
   return (
     <>
@@ -145,7 +145,7 @@ export const GithubTokenSlides = ({
         <div className="mt-10">
           <div
             className="relative aspect-video w-full
-                max-w-4xl"
+            max-w-4xl"
           >
             <ImageZoom
               alt="Open the project settings in GitHub"
@@ -182,49 +182,39 @@ export const GithubTokenSlides = ({
           </Card>
         </div>
         <div className="flex mt-10 flex-row gap-2 justify-end">
-          <Button variant={"secondary"} onClick={prev}>
-            Back
-          </Button>
-          <Button onClick={next}>Continue</Button>
-        </div>
-      </CarouselItem>
-      <CarouselItem>
-        <DialogHeader>
-          <DialogTitle>Add the snippet to your GitHub Actions File</DialogTitle>
-          <DialogDescription>
-            Create a new{" "}
-            <CopyCodeFragment codeString=".github/workflows/devsecops.yml" />{" "}
-            file or add the code snippet to an existing workflow file.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="mt-10">
-          <CopyCode codeString={codeString} language="yaml" />
-        </div>
-        <div className="flex mt-10 flex-row gap-2 justify-end">
-          <Button variant={"secondary"} onClick={prev}>
+          <Button
+            variant={"secondary"}
+            onClick={prev}
+            disabled={pat === undefined}
+          >
             Back
           </Button>
           <Button
-            onClick={async () => {
-              const resp = await fetch(
-                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                {
-                  method: "GET",
-                },
-              );
-              if (resp.redirected) {
-                router.push(
-                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                );
-              } else {
-                toast.error("Github Pipeline has failed");
-              }
+            onClick={() => {
+              next?.();
+              setReady(true);
             }}
           >
-            Done!
+            Continue
           </Button>
         </div>
       </CarouselItem>
+      {ready && (
+        <CarouselItem>
+          <YamlGenerator
+            gitInstances={gitInstances}
+            apiUrl={apiUrl}
+            orgSlug={activeOrg.slug}
+            projectSlug={activeProject.slug}
+            assetSlug={asset!.slug}
+            onPatGenerate={onPatGenerate}
+            pat={pat}
+            prev={prev}
+            next={next}
+            api={api}
+          ></YamlGenerator>
+        </CarouselItem>
+      )}
     </>
   );
 };

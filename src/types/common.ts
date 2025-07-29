@@ -102,6 +102,14 @@ export type GitInstances = "github" | "gitlab";
 export const GitInstances: {
   [key in GitInstances]: string;
 } = {
-  github: "GitHub",
-  gitlab: "GitLab",
+  github: "github",
+  gitlab: "gitlab",
 };
+
+export interface Config {
+  "secret-scanning": boolean;
+  sca: boolean;
+  "container-scanning": boolean;
+  sast: boolean;
+  iac: boolean;
+}

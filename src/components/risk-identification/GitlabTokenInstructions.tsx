@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CarouselItem } from "../ui/carousel";
+import { CarouselApi, CarouselContent, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { integrationSnippets } from "../../integrationSnippets";
@@ -28,6 +28,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import router from "next/router";
 import { toast } from "sonner";
 import { CrownIcon } from "lucide-react";
+import YamlGenerator from "../onboarding/YamlGenerator";
+import { GitInstances } from "@/types/common";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -97,9 +99,10 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
 
 export const GitlabTokenSlides = ({
   pat,
+  gitInstance,
   next,
   prev,
-  scanner,
+  api,
   onPatGenerate,
   apiUrl,
   orgSlug,
@@ -110,31 +113,18 @@ export const GitlabTokenSlides = ({
   next?: () => void;
   prev?: () => void;
   onPatGenerate: () => void;
-  scanner?:
-    | "secret-scanning"
-    | "iac"
-    | "sast"
-    | "sbom"
-    | "sarif"
-    | "devsecops"
-    | "container-scanning"
-    | "sca";
+  api?: CarouselApi;
   apiUrl: string;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  gitInstance: GitInstances;
 }) => {
-  const codeString = integrationSnippets({
-    orgSlug,
-    projectSlug,
-    assetSlug,
-    apiUrl,
-  })["Gitlab"][scanner ?? "devsecops"];
+  const [ready, setReady] = useState(true);
 
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-
-  const asset = useActiveAsset();
+  useEffect(() => {
+    api?.reInit();
+  }, [api]);
 
   return (
     <>
@@ -196,47 +186,32 @@ export const GitlabTokenSlides = ({
           <Button variant={"secondary"} onClick={prev}>
             Back
           </Button>
-          <Button onClick={next}>Continue</Button>
-        </div>
-      </CarouselItem>
-      <CarouselItem>
-        <DialogHeader>
-          <DialogTitle>Add the snippet to your GitLab CI/CD File</DialogTitle>
-          <DialogDescription>
-            Create a new <CopyCodeFragment codeString=".gitlab-ci.yml" /> file
-            or add the code snippet to an existing CI/CD configuration file.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="mt-10">
-          <CopyCode codeString={codeString} language="yaml" />
-        </div>
-        <div className="flex mt-10 flex-row gap-2 justify-end">
-          <Button variant={"secondary"} onClick={prev}>
-            Back
-          </Button>
           <Button
-            onClick={async () => {
-              const resp = await fetch(
-                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                {
-                  method: "GET",
-                },
-              );
-              if (resp.redirected) {
-                router.push(
-                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-                );
-              } else {
-                toast.error(
-                  "We did not receive any information from your pipeline yet. You can safely close the dialog and refresh the page yourself after the pipeline did finish.",
-                );
-              }
+            onClick={() => {
+              next?.();
+              setReady(true);
             }}
           >
-            Done!
+            Continue
           </Button>
         </div>
       </CarouselItem>
+      {ready && (
+        <CarouselItem>
+          <YamlGenerator
+            gitInstance={gitInstance}
+            apiUrl={apiUrl}
+            orgSlug={orgSlug}
+            projectSlug={projectSlug}
+            assetSlug={assetSlug}
+            onPatGenerate={onPatGenerate}
+            pat={pat}
+            prev={prev}
+            next={next}
+            api={api}
+          ></YamlGenerator>
+        </CarouselItem>
+      )}
     </>
   );
 };

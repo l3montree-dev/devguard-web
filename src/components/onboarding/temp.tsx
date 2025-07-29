@@ -480,6 +480,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     apiUrl={apiUrl}
                     orgSlug={activeOrg.slug}
                     projectSlug={activeProject.slug}
+                    scanner={selectedScanner}
                     assetSlug={asset!.slug}
                     onPatGenerate={async () => {
                       await pat.onCreatePat({
@@ -499,6 +500,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     apiUrl={apiUrl}
                     orgSlug={activeOrg.slug}
                     projectSlug={activeProject.slug}
+                    scanner={selectedScanner}
                     assetSlug={asset!.slug}
                     onPatGenerate={async () => {
                       await pat.onCreatePat({
@@ -511,7 +513,6 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     pat={pat.pat?.privKey}
                     prev={api?.scrollPrev}
                     next={api?.scrollNext}
-                    gitInstances={"github"}
                   />
                 )}
                 {selectedIntegration === "docker" && (

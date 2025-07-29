@@ -26,7 +26,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { CarouselApi, CarouselItem } from "../ui/carousel";
+import { Carousel, CarouselApi, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 import { Checkbox } from "../ui/checkbox";
@@ -37,7 +37,12 @@ import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { integrationSnippets } from "../../integrationSnippets";
 import { classNames } from "@/utils/common";
 import { concat } from "lodash";
-import { GitInstances } from "@/types/common";
+import GithubTokenInstructions, {
+  GithubTokenSlides,
+} from "../risk-identification/GithubTokenInstructions";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
+import YamlGenerator from "./YamlGenerator";
 
 interface Config {
   "secret-scanning": boolean;
@@ -47,22 +52,12 @@ interface Config {
   iac: boolean;
 }
 
-interface gitlabOptionsYaml {
-  "secret-scanning": string;
-  SCA: string;
-  "container-scanning": string;
-  SAST: string;
-  IaC: string;
-}
-
-export const ScannerBuilder = ({
+export const ScannerOptions = ({
   api,
   apiUrl,
   setup,
   next,
   prev,
-  pat,
-  onPatGenerate,
   orgSlug,
   projectSlug,
   assetSlug,
@@ -72,12 +67,14 @@ export const ScannerBuilder = ({
   setup?: "own" | "auto-setup";
   api?: CarouselApi;
   apiUrl: string;
-  pat?: string;
-  onPatGenerate: () => void;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
 }) => {
+  const [ready, setReady] = useState(false);
+
+  const pat = usePersonalAccessToken();
+
   const [config, setConfig] = useState<Config>({
     "secret-scanning": true,
     sca: true,
@@ -86,31 +83,13 @@ export const ScannerBuilder = ({
     iac: true,
   });
 
-  type gitInstance = "Gitlab" | "GitHub";
+  type gitInstance = "gitlab" | "github";
 
-  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
+  const [gitInstance, setGitInstance] = useState<gitInstance>("gitlab");
 
   useEffect(() => {
     api?.reInit();
   }, [api, config, gitInstance]);
-
-  function codeStringBuilder() {
-    const base = gitInstance === "GitHub" ? "\njobs:" : "\ninclude:";
-    const codeString = Object.entries(config)
-      .filter(([_, selectedOptionValue]) => selectedOptionValue)
-      .map(([selectedOption]) => {
-        return integrationSnippets({
-          orgSlug,
-          projectSlug,
-          assetSlug,
-          apiUrl,
-        })[GitInstances][selectedOption as keyof Config];
-      })
-      .map((value) => value)
-      .join("\n");
-
-    return base + codeString;
-  }
 
   return (
     <>
@@ -290,11 +269,11 @@ export const ScannerBuilder = ({
                 variant={"ghost"}
                 className={classNames(
                   "w-full",
-                  gitInstance === "GitHub"
+                  gitInstance === "github"
                     ? "border border-primary"
                     : "border border-transparent",
                 )}
-                onClick={() => setGitInstance("GitHub")}
+                onClick={() => setGitInstance("github")}
               >
                 <Image
                   src="/assets/github.svg"
@@ -312,12 +291,12 @@ export const ScannerBuilder = ({
                 variant={"ghost"}
                 className={classNames(
                   "w-full",
-                  gitInstance === "Gitlab"
+                  gitInstance === "gitlab"
                     ? "border border-primary"
                     : "border border-transparent",
                 )}
                 onClick={() => {
-                  setGitInstance("Gitlab");
+                  setGitInstance("gitlab");
                 }}
               >
                 <Image
@@ -349,51 +328,49 @@ export const ScannerBuilder = ({
           </Button>
         </div>
       </CarouselItem>
-
-      {config !== undefined && (
-        <CarouselItem className="">
-          <DialogHeader>
-            {gitInstance === "GitHub" && (
-              <DialogTitle>
-                Add the snippet to your GitHub Actions File
-              </DialogTitle>
-            )}
-            {gitInstance === "Gitlab" && (
-              <DialogTitle>
-                Add the snippet to your GitLab CI/CD File
-              </DialogTitle>
-            )}
-            <DialogDescription>
-              Create a new
-              <CopyCodeFragment
-                codeString={`.${gitInstance}/workflows/devsecops.yml`}
-              />
-              file or add the code snippet to an existing workflow file.
-            </DialogDescription>
-          </DialogHeader>
-          <CopyCode
-            language="yaml"
-            codeString={`# .${gitInstance}/workflows/devsecops.yml ${codeStringBuilder()} `}
-          ></CopyCode>
-          <div className="mt-10 flex flex-row gap-2 justify-end">
-            <Button variant={"secondary"} onClick={() => prev?.()}>
-              Back
-            </Button>
-            <Button
-              disabled={Object.values(config).every((v) => v === false)}
-              onClick={() => {
-                next?.();
-              }}
-            >
-              {Object.values(config).every((v) => v === false)
-                ? "Select Option"
-                : "Continue"}
-            </Button>
-          </div>
-        </CarouselItem>
+      {gitInstance === "github" && (
+        <GithubTokenSlides
+          gitInstances={gitInstance}
+          api={api}
+          apiUrl={apiUrl}
+          orgSlug={orgSlug}
+          projectSlug={projectSlug}
+          assetSlug={assetSlug}
+          onPatGenerate={async () => {
+            await pat.onCreatePat({
+              scopes: "scan",
+              description: "GitHub Integration for DevGuard",
+            });
+            // put this on the next render tick
+            setTimeout(() => api?.reInit(), 0);
+          }}
+          pat={pat.pat?.privKey}
+          prev={api?.scrollPrev}
+          next={api?.scrollNext}
+        />
+      )}
+      {gitInstance === "gitlab" && (
+        <GitlabTokenSlides
+          gitInstances={gitInstance}
+          api={api}
+          apiUrl={apiUrl}
+          orgSlug={orgSlug}
+          projectSlug={projectSlug}
+          assetSlug={assetSlug}
+          onPatGenerate={async () => {
+            await pat.onCreatePat({
+              scopes: "scan",
+              description: "GitHub Integration for DevGuard",
+            });
+            // put this on the next render tick
+            setTimeout(() => api?.reInit(), 0);
+          }}
+          pat={pat.pat?.privKey}
+          prev={api?.scrollPrev}
+          next={api?.scrollNext}
+        />
       )}
     </>
   );
 };
-
-export default ScannerBuilder;
+export default ScannerOptions;

@@ -49,6 +49,7 @@ import { FlaskConical } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
 import ScannerBuilder from "./onboarding/ScannerBuilder";
+import ScannerOptions from "./onboarding/ScannerOptions";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -322,26 +323,17 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 </Button>
               </div>
             </CarouselItem>
-            <>
-              {selectedScanner === "devguard-select" && (
-                <ScannerBuilder
-                  api={api}
-                  apiUrl={apiUrl}
-                  next={api?.scrollNext}
-                  prev={api?.scrollPrev}
-                  onPatGenerate={() =>
-                    pat.onCreatePat({
-                      scopes: "auto-setup",
-                      description:
-                        "Automatically Generated Integration for DevGuard",
-                    })
-                  }
-                  orgSlug={activeOrg.slug}
-                  projectSlug={activeProject.slug}
-                  assetSlug={asset!.slug}
-                ></ScannerBuilder>
-              )}
-            </>
+            {selectedScanner === "devguard-select" && (
+              <ScannerOptions
+                api={api}
+                apiUrl={apiUrl}
+                next={api?.scrollNext}
+                prev={api?.scrollPrev}
+                orgSlug={activeOrg.slug}
+                projectSlug={activeProject.slug}
+                assetSlug={asset!.slug}
+              ></ScannerOptions>
+            )}
           </CarouselContent>
         </Carousel>
       </DialogContent>
