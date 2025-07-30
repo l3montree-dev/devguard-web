@@ -67,7 +67,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
   const asset = useActiveAsset();
 
   const [selectedSetup, setSelectedSetup] = React.useState<
-    "auto-setup" | "custom-setup" | undefined
+    "cherry-pick-setup" | "own-setup" | undefined
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
@@ -223,15 +223,6 @@ const DependencyRiskScannerDialog: FunctionComponent<
               </Card>
               <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
                 <Button
-                  variant={"secondary"}
-                  onClick={() => {
-                    api?.scrollPrev();
-                    setSelectedIntegration(undefined);
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
                   disabled={
                     selectedScanner === undefined ||
                     selectedScanner === "auto-setup"
@@ -254,11 +245,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 <Card
                   className={classNames(
                     "cursor-pointer",
-                    selectedSetup === "auto-setup"
+                    selectedSetup === "cherry-pick-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
-                  onClick={() => setSelectedSetup("auto-setup")}
+                  onClick={() => setSelectedSetup("cherry-pick-setup")}
                 >
                   <CardHeader>
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
@@ -280,11 +271,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 <Card
                   className={classNames(
                     "cursor-pointer mt-2",
-                    selectedSetup === "custom-setup"
+                    selectedSetup === "own-setup"
                       ? "border border-primary"
                       : "border border-transparent",
                   )}
-                  onClick={() => setSelectedSetup("custom-setup")}
+                  onClick={() => setSelectedSetup("own-setup")}
                 >
                   <CardHeader>
                     <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -319,13 +310,14 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     api?.scrollNext();
                   }}
                 >
-                  {selectedSetup === undefined || selectedSetup === "auto-setup"
+                  {selectedSetup === undefined ||
+                  selectedScanner === "auto-setup"
                     ? "Select a Scanner"
                     : "Continue"}
                 </Button>
               </div>
             </CarouselItem>
-            {selectedSetup === "auto-setup" && (
+            {selectedSetup === "cherry-pick-setup" && (
               <ScannerOptions
                 api={api}
                 apiUrl={apiUrl}
@@ -336,6 +328,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 assetSlug={asset!.slug}
               ></ScannerOptions>
             )}
+            {selectedSetup === "own-setup"}
           </CarouselContent>
         </Carousel>
       </DialogContent>

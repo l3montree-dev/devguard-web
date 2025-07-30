@@ -46,6 +46,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import { Config } from "@/types/common";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
