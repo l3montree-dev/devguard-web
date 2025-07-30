@@ -454,6 +454,11 @@ export default Home;
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { organization, session }) => {
+    if (organization && "oauth2Error" in organization) {
+      return {
+        props: {},
+      };
+    }
     const currentUserRole = getCurrentUserRole(
       session?.identity,
       organization!,
