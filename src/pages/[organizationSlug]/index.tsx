@@ -17,7 +17,7 @@ import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../components/Page";
 
@@ -72,6 +72,7 @@ import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
 import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   oauth2Error?: boolean;
@@ -93,6 +94,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const { organizationSlug } = useParams<{
     organizationSlug: string;
   }>();
+  const [syncRunning, setSyncRunning] = useState(false);
 
   const currentUserRole = useCurrentUserRole();
 
@@ -122,6 +124,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   );
 
   const handleTriggerSync = async () => {
+    setSyncRunning(true);
     const resp = await browserApiClient(
       `/organizations/${activeOrg.slug}/trigger-sync`,
     );
@@ -132,6 +135,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
     } else {
       toast.error("Failed to trigger sync. Please try again later.");
     }
+    setSyncRunning(false);
   };
 
   const handleCreateProject = async (req: CreateProjectReq) => {
@@ -151,6 +155,25 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
       });
     }
   };
+
+  useEffect(() => {
+    // trigger a sync on page load - if the org has an external entity provider
+    if (activeOrg.externalEntityProviderId) {
+      // check in localStorage if the sync was already triggered
+      const lastSync = localStorage.getItem(`lastSync-${activeOrg.slug}`);
+      if (
+        !lastSync ||
+        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
+      ) {
+        // if not, trigger sync
+        localStorage.setItem(
+          `lastSync-${activeOrg.slug}`,
+          new Date().toISOString(),
+        );
+        handleTriggerSync();
+      }
+    }
+  }, [activeOrg.externalEntityProviderId]);
 
   const orgMenu = useOrganizationMenu();
 
@@ -205,32 +228,58 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         />
       ) : (
         <div>
+          <div className="flex mb-4 flex-row items-center justify-end gap-2">
+            <Button
+              size={"sm"}
+              variant={"outline"}
+              onClick={handleTriggerSync}
+              disabled={syncRunning}
+            >
+              {syncRunning ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Sync running</span>
+                </span>
+              ) : (
+                <span>
+                  Trigger sync with {activeOrg.externalEntityProviderId}
+                </span>
+              )}
+            </Button>
+          </div>
           {projects.data.length === 0 ? (
-            <EmptyParty
-              title="Here you will see all your groups"
-              description={
-                activeOrg.externalEntityProviderId
-                  ? `Your groups are getting automatically synced from ${activeOrg.externalEntityProviderId}. The process might take some time. If you have the feeling that you are missing some of your groups, go ahead and click the 'Trigger sync'-Button.`
-                  : "Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-              }
-              Button={
-                activeOrg.externalEntityProviderId ? (
-                  <AsyncButton onClick={handleTriggerSync}>
-                    Trigger sync with {activeOrg.externalEntityProviderId}
-                  </AsyncButton>
-                ) : (
-                  <Button
-                    disabled={
-                      currentUserRole !== UserRole.Owner &&
-                      currentUserRole !== UserRole.Admin
-                    }
-                    onClick={() => setOpen(true)}
-                  >
-                    New Group
-                  </Button>
-                )
-              }
-            />
+            <div>
+              <Input
+                onChange={handleSearch}
+                defaultValue={router.query.search as string}
+                placeholder="Search for projects"
+              />
+              <EmptyParty
+                title="Here you will see all your groups"
+                description={
+                  activeOrg.externalEntityProviderId
+                    ? `Your groups are getting automatically synced from ${activeOrg.externalEntityProviderId}. The process might take some time. If you have the feeling that you are missing some of your groups, go ahead and click the 'Trigger sync'-Button.`
+                    : "Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
+                }
+                Button={
+                  activeOrg.externalEntityProviderId ? (
+                    <AsyncButton onClick={handleTriggerSync}>
+                      Trigger sync with {activeOrg.externalEntityProviderId}
+                    </AsyncButton>
+                  ) : (
+                    <Button
+                      disabled={
+                        currentUserRole !== UserRole.Owner &&
+                        currentUserRole !== UserRole.Admin
+                      }
+                      onClick={() => setOpen(true)}
+                    >
+                      New Group
+                    </Button>
+                  )
+                }
+              />
+            </div>
           ) : (
             <Section
               primaryHeadline
@@ -430,7 +479,9 @@ export const getServerSideProps = middleware(
       }),
     );
 
-    projectsPaged.data = projectsWithCompliance;
+    projectsPaged.data = projectsWithCompliance.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
 
     return {
       props: {
