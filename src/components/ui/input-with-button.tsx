@@ -4,14 +4,14 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { Label } from "./label";
-import { Button } from "./button";
-import { Input } from "./input";
 import { toast } from "sonner";
+import { Label } from "./label";
 
-import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  ClipboardDocumentIcon,
+} from "@heroicons/react/24/outline";
 import Alert from "../common/Alert";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
 interface InputWithButtonProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -63,7 +63,11 @@ const InputWithButton = (props: InputWithButtonProps) => {
           />
           <div className="flex flex-row items-center gap-2">
             {copyable && (
-              <button type="button" onClick={handleCopy}>
+              <button
+                className="cursor-pointer opacity-75 transition-all hover:opacity-100"
+                type="button"
+                onClick={handleCopy}
+              >
                 <ClipboardDocumentIcon className="h-4 w-4" />
               </button>
             )}
@@ -79,7 +83,11 @@ const InputWithButton = (props: InputWithButtonProps) => {
             )}
 
             {SVG && (
-              <button type="button" onClick={() => onClick && onClick()}>
+              <button
+                className="cursor-pointer opacity-75 transition-all hover:opacity-100"
+                type="button"
+                onClick={() => onClick && onClick()}
+              >
                 <div className="h-4 w-4">{SVG}</div>
               </button>
             )}

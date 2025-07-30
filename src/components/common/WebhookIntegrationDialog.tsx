@@ -287,7 +287,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                 <div className="flex flex-row gap-2">
                   <Button disabled={isLoading} type="submit">
                     <Loader />
-                    {initialValues ? "Update Webhook" : "Test and Save"}
+                    {initialValues ? "Update Webhook" : "Save"}
                   </Button>
                   {initialValues && (
                     <AsyncButton
