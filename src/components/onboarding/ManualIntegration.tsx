@@ -39,26 +39,56 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useDropzone } from "react-dropzone";
 import { Hexagon } from "lucide-react";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { config } from "@/config";
 
-export const ManualUploadOptions = ({
+type Command = "container-scanning" | "sbom" | "sarif";
+
+export const ManualIntegration = ({
   api,
   apiUrl,
-  onOpenChange,
+  orgSlug,
+  projectSlug,
+  assetSlug,
 }: {
   api: CarouselApi;
-  onOpenChange: (open: boolean) => void;
   apiUrl: string;
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
 }) => {
-  const [gitInstance, setGitInstance] = useState<GitInstances>("Gitlab");
+  const generateDockerSnippet = (
+    command: string,
+    orgSlug: string,
+    projectSlug: string,
+    assetSlug: string,
+    apiUrl: string,
+    token?: string,
+  ) => {
+    let path = "/app";
+    if (command === "container-scanning") {
+      path = "/app/image.tar";
+    }
+
+    if (command === "sbom") {
+      path = "/app/<SBOM.json>";
+    }
+
+    if (command === "sarif") {
+      path = "/app/results.sarif";
+    }
+
+    if (apiUrl === "http://localhost:8080") {
+      apiUrl = "http://host.docker.internal:8080";
+    }
+    return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
+devguard-scanner ${command} \\
+    --path="${path}" \\
+    --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
+    --apiUrl="${apiUrl}" \\
+    --token="${token ? token : "TOKEN"}"`;
+  };
+
+  const [gitInstance, setGitInstance] = useState<GitInstances>();
   const [fileName, setFileName] = useState<string>();
   const fileContent = useRef<any>(undefined);
   const activeOrg = useActiveOrg();
@@ -86,8 +116,6 @@ export const ManualUploadOptions = ({
     router.push(
       `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
     );
-
-    onOpenChange(false);
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -118,6 +146,24 @@ export const ManualUploadOptions = ({
       reader.readAsText(file);
     });
   }, []);
+
+  const codeStringBuilder = (
+    command: Command,
+    orgSlug: string,
+    projectSlug: string,
+    assetSlug: string,
+    apiUrl: string,
+  ) => {
+    const codeString = generateDockerSnippet(
+      command,
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    );
+
+    return codeString;
+  };
 
   const dropzone = useDropzone({
     onDrop,
@@ -196,11 +242,12 @@ export const ManualUploadOptions = ({
               variant={"ghost"}
               className={classNames(
                 "w-full",
-                gitInstance === "Other"
-                  ? "border border-primary"
-                  : "border border-transparent",
+                // gitInstance === "Other"
+                //   ?
+                "border border-primary",
+                //   : "border border-transparent",
               )}
-              onClick={() => setGitInstance("Other")}
+              //   onClick={() => setGitInstance("Other")}
             >
               <Hexagon className="mr-2" width={24} height={24}></Hexagon>
               Other
@@ -209,25 +256,14 @@ export const ManualUploadOptions = ({
           <DropdownMenu></DropdownMenu>
           <CopyCode
             language="shell"
-            codeString={
-              "devguard-scanner sbom package-lock.json --apiUrl={insert api Url} --token={insert token}\n\n\n\n"
-            }
-          ></CopyCode>
-          <Select>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+            codeString={codeStringBuilder(
+              "sbom",
+              orgSlug,
+              projectSlug,
+              assetSlug,
+              apiUrl,
+            )}
+          />
           <div className="flex mt-4 flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
               Back
@@ -241,4 +277,4 @@ export const ManualUploadOptions = ({
     </>
   );
 };
-export default ManualUploadOptions;
+export default ManualIntegration;

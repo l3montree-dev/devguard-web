@@ -49,6 +49,7 @@ import { FlaskConical } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
 import ScannerOptions from "./onboarding/ScannerOptions";
+import ManualIntegration from "./onboarding/ManualIntegration";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -328,7 +329,15 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 assetSlug={asset!.slug}
               ></ScannerOptions>
             )}
-            {selectedSetup === "own-setup"}
+            {selectedSetup === "own-setup" && (
+              <ManualIntegration
+                orgSlug={activeOrg.slug}
+                projectSlug={activeProject.slug}
+                assetSlug={asset!.slug}
+                api={api}
+                apiUrl={apiUrl}
+              ></ManualIntegration>
+            )}
           </CarouselContent>
         </Carousel>
       </DialogContent>
