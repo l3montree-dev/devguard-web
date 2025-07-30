@@ -398,14 +398,12 @@ export const getServerSideProps = middleware(
       ),
     ]);
 
-    // get the stats for all assets
-
     return {
       props: {
         initialZustand: {
           project,
         },
-        subgroups,
+        subgroups: subgroups.data,
         project,
         assets,
       },
