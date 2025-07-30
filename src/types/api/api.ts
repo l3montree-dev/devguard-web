@@ -73,6 +73,16 @@ export interface JiraIntegrationDTO {
   userEmail: string;
 }
 
+export interface WebhookDTO {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  secret: string;
+  sbomEnabled: boolean;
+  vulnEnabled: boolean;
+}
+
 export interface OrganizationDTO extends AppModelDTO {
   name: string;
   contactPhoneNumber?: string;
@@ -97,6 +107,8 @@ export interface OrganizationDTO extends AppModelDTO {
 
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
   jiraIntegrations: Array<JiraIntegrationDTO>;
+
+  webhooks: Array<WebhookDTO>;
 
   isPublic: boolean;
 
@@ -144,6 +156,8 @@ export interface ProjectDTO {
 
   repositoryId?: string;
   repositoryName?: string;
+
+  webhooks: Array<WebhookDTO>;
 
   members: Array<{
     id: string;
