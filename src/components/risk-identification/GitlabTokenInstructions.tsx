@@ -29,7 +29,7 @@ import router from "next/router";
 import { toast } from "sonner";
 import { CrownIcon } from "lucide-react";
 import YamlGenerator from "../onboarding/YamlGenerator";
-import { GitInstances } from "@/types/common";
+import { Config, GitInstances } from "@/types/common";
 
 const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -108,6 +108,7 @@ export const GitlabTokenSlides = ({
   orgSlug,
   projectSlug,
   assetSlug,
+  config,
 }: {
   pat?: string;
   next?: () => void;
@@ -119,6 +120,7 @@ export const GitlabTokenSlides = ({
   projectSlug: string;
   assetSlug: string;
   gitInstance: GitInstances;
+  config: Config;
 }) => {
   const [ready, setReady] = useState(true);
 
@@ -209,6 +211,7 @@ export const GitlabTokenSlides = ({
             prev={prev}
             next={next}
             api={api}
+            config={config}
           ></YamlGenerator>
         </CarouselItem>
       )}

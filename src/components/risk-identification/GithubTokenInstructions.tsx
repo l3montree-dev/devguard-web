@@ -33,7 +33,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 import YamlGenerator from "../onboarding/YamlGenerator";
-import { GitInstances } from "@/types/common";
+import { Config, GitInstances } from "@/types/common";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -106,6 +106,7 @@ export const GithubTokenSlides = ({
   api,
   orgSlug,
   projectSlug,
+  config,
 }: {
   gitInstances: GitInstances;
   pat?: string;
@@ -117,6 +118,7 @@ export const GithubTokenSlides = ({
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  config: Config;
 }) => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
@@ -212,6 +214,7 @@ export const GithubTokenSlides = ({
             prev={prev}
             next={next}
             api={api}
+            config={config}
           ></YamlGenerator>
         </CarouselItem>
       )}

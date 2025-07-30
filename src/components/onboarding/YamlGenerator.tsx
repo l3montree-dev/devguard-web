@@ -56,6 +56,7 @@ export const YamlGenerator = ({
   orgSlug,
   projectSlug,
   assetSlug,
+  config,
 }: {
   gitInstance: GitInstances;
   next?: () => void;
@@ -68,19 +69,12 @@ export const YamlGenerator = ({
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  config: Config;
 }) => {
   const activeOrg = useActiveOrg();
 
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
-
-  const [config, setConfig] = useState<Config>({
-    "secret-scanning": true,
-    sca: true,
-    "container-scanning": true,
-    sast: true,
-    iac: true,
-  });
 
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
 
@@ -90,9 +84,11 @@ export const YamlGenerator = ({
 
   function codeStringBuilder() {
     const base = gitInstance === "GitHub" ? "\njobs:" : "\ninclude:";
+    console.log(config, gitInstance);
     const codeString = Object.entries(config)
       .filter(([_, selectedOptionValue]) => selectedOptionValue)
       .map(([selectedOption]) => {
+        console.log(selectedOption);
         return integrationSnippets({
           orgSlug,
           projectSlug,

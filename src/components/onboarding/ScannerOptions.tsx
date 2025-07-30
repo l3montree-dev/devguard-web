@@ -42,7 +42,6 @@ import GithubTokenInstructions, {
 } from "../risk-identification/GithubTokenInstructions";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
-import YamlGenerator from "./YamlGenerator";
 import { GitInstances } from "@/types/common";
 
 interface Config {
@@ -348,6 +347,7 @@ export const ScannerOptions = ({
           pat={pat.pat?.privKey}
           prev={api?.scrollPrev}
           next={api?.scrollNext}
+          config={config}
         />
       )}
       {gitInstance === "Gitlab" && (
@@ -369,6 +369,7 @@ export const ScannerOptions = ({
           pat={pat.pat?.privKey}
           prev={api?.scrollPrev}
           next={api?.scrollNext}
+          config={config}
         />
       )}
     </>

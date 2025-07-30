@@ -70,9 +70,16 @@ const DependencyRiskScannerDialog: FunctionComponent<
   const activeProject = useActiveProject();
 
   const pat = usePersonalAccessToken();
-
   const fileContent = useRef<any>(undefined);
   const [fileName, setFileName] = useState<string>();
+
+  const [config, setConfig] = useState<Config>({
+    "secret-scanning": true,
+    sca: true,
+    "container-scanning": true,
+    sast: true,
+    iac: true,
+  });
 
   const uploadSBOM = async () => {
     const formdata = new FormData();
@@ -492,6 +499,8 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     pat={pat.pat?.privKey}
                     prev={api?.scrollPrev}
                     next={api?.scrollNext}
+                    gitInstances={"GitHub"}
+                    config={config}
                   />
                 )}
                 {selectedIntegration === "gitlab" && (
@@ -511,7 +520,8 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     pat={pat.pat?.privKey}
                     prev={api?.scrollPrev}
                     next={api?.scrollNext}
-                    gitInstances={"github"}
+                    gitInstance={"GitHub"}
+                    config={config}
                   />
                 )}
                 {selectedIntegration === "docker" && (
