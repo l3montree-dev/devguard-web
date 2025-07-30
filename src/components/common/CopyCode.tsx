@@ -72,7 +72,6 @@ const CopyCode: FunctionComponent<Props> = (props) => {
     const matches = reg.exec(props.codeString);
 
     if (matches === null) {
-      console.log("No matches found", props.codeString, matches);
       return { codeStr: props.codeString, highlightLineNumbers: null };
     }
 
