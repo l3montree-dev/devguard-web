@@ -10,7 +10,12 @@ import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../services/devGuardApi";
-import { ProjectDTO, UserRole } from "../../../../types/api/api";
+import {
+  OrganizationDetailsDTO,
+  OrganizationDTO,
+  ProjectDTO,
+  UserRole,
+} from "../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -216,7 +221,7 @@ export const getServerSideProps = middleware(
   ) => {
     const currentUserRole = getCurrentUserRole(
       session?.identity,
-      organization!,
+      organization as OrganizationDetailsDTO,
       context.query.projectSlug as string,
       project,
     );
