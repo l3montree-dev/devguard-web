@@ -19,7 +19,7 @@ import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { AsyncButton, Button } from "../ui/button";
 import { classNames } from "@/utils/common";
 import { GitInstances } from "@/types/common";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CopyCode from "../common/CopyCode";
 import { Separator } from "../ui/separator";
 import {
@@ -38,7 +38,6 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useDropzone } from "react-dropzone";
 import { Hexagon } from "lucide-react";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { config } from "@/config";
 
 type Command = "container-scanning" | "sbom" | "sarif";
@@ -170,6 +169,10 @@ devguard-scanner ${command} \\
     accept: { "application/json": [".json"] },
   });
 
+  useEffect(() => {
+    api?.reInit(); //this is redundant rn, will change
+  }, [api, gitInstance]);
+
   return (
     <>
       <CarouselItem>
@@ -194,8 +197,9 @@ devguard-scanner ${command} \\
         </Card>
 
         <div>
-          <div className="m-4">
+          <div className="m-4 flex flex-col">
             <Separator className="mt-4" orientation="horizontal" />
+            <span className="">OR</span>
           </div>
           <div className="flex w-full mb-4">
             <Button
@@ -253,17 +257,27 @@ devguard-scanner ${command} \\
               Other
             </Button>
           </div>
-          <DropdownMenu></DropdownMenu>
-          <CopyCode
-            language="shell"
-            codeString={codeStringBuilder(
-              "sbom",
-              orgSlug,
-              projectSlug,
-              assetSlug,
-              apiUrl,
-            )}
-          />
+          {gitInstance !== undefined && (
+            <>
+              <CopyCode
+                language="shell"
+                codeString={codeStringBuilder(
+                  "sbom",
+                  orgSlug,
+                  projectSlug,
+                  assetSlug,
+                  apiUrl,
+                )}
+              />
+              <div>
+                https://gitlab.com/l3montree/devguard/-/blob/main/examples/sbom-gets-generated/.gitlab-ci.yml?ref_type=heads{" "}
+                if people want to use the devguard-scanner and upload their sbom
+                over the sbom flag, then they need to use artifacts, we def need
+                to show the example
+              </div>
+            </>
+          )}
+          <div></div>
           <div className="flex mt-4 flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
               Back
