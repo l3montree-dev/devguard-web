@@ -456,7 +456,7 @@ export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { organization, session }) => {
     const currentUserRole = getCurrentUserRole(
       session?.identity,
-      organization!,
+      organization as OrganizationDetailsDTO,
     );
 
     if (
