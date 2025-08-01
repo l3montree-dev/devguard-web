@@ -6,7 +6,7 @@ interface Props {
 }
 export default function FileUpload({ dropzone, files }: Props) {
   return (
-    <div className="border-dance group p-1 rounded">
+    <div className="border-muted-foreground border-2 border-dashed group p-1 rounded">
       <div
         {...dropzone.getRootProps()}
         className="flex h-20 bg-card cursor-pointer items-center justify-center rounded dash-border"

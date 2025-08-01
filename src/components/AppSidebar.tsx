@@ -81,7 +81,6 @@ export const OrganizationDropDown = () => {
     router.push(`/setup`);
   };
 
-  console.log(orgs);
   return (
     <>
       <div className="flex w-full flex-row gap-2 items-center justify-between">

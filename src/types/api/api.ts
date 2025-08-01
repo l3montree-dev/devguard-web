@@ -403,6 +403,14 @@ export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
 }
 
+export interface DependencyVulnHints {
+  amountOpen: number;
+  amountFixed: number;
+  amountAccepted: number;
+  amountFalsePositive: number;
+  amountMarkedForTransfer: number;
+}
+
 export interface DetailedFirstPartyVulnDTO extends FirstPartyVuln {
   events: VulnEventDTO[];
 }

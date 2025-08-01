@@ -14,6 +14,7 @@ import {
 } from "@/services/devGuardApi";
 import {
   AssetDTO,
+  DependencyVulnHints,
   DetailedDependencyVulnDTO,
   RequirementsLevel,
   VulnEventDTO,
@@ -59,7 +60,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { withOrganization } from "@/decorators/withOrganization";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import {
+  BugAntIcon,
+  InformationCircleIcon,
+  SpeakerXMarkIcon,
+  StopIcon,
+} from "@heroicons/react/24/outline";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -80,7 +86,7 @@ import {
 import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { ChevronDown } from "lucide-react";
+import { CheckCircleIcon, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
@@ -96,6 +102,7 @@ const MarkdownEditor = dynamic(
 
 interface Props {
   vuln: DetailedDependencyVulnDTO;
+  hints: DependencyVulnHints;
 }
 
 const parseCvssVector = (vector: string) => {
@@ -1086,6 +1093,66 @@ const Index: FunctionComponent<Props> = (props) => {
                   </div>
                 </div>
               )}
+              <div className="p-5">
+                <h3 className="mb-2 text-sm font-semibold">
+                  Management decisions across the organization
+                </h3>
+                <div className="flex flex-row justify-around mt-4">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant={"secondary"}>
+                        <BugAntIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                        {props.hints.amountOpen}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-screen-sm font-normal">
+                      This vulnerability is still open in{" "}
+                      {props.hints.amountOpen} projects, artifacts and assets.
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant={"secondary"}>
+                        <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                        {props.hints.amountFixed}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-screen-sm font-normal">
+                      This vulnerability has been fixed in{" "}
+                      {props.hints.amountFixed} projects, artifacts and assets.
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant={"secondary"}>
+                        <SpeakerXMarkIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                        {props.hints.amountAccepted}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-screen-sm font-normal">
+                      This vulnerability has been accepted in{" "}
+                      {props.hints.amountAccepted} projects, artifacts and
+                      assets.
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge variant={"secondary"}>
+                        <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                        {props.hints.amountFalsePositive}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-screen-sm font-normal">
+                      This vulnerability has been marked as false positive in{" "}
+                      {props.hints.amountFalsePositive} projects, artifacts and
+                      assets.
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1118,7 +1185,10 @@ export const getServerSideProps = middleware(
       "/dependency-vulns/" +
       vulnId;
 
-    const [resp]: [Response] = await Promise.all([apiClient(uri)]);
+    const [resp, hints]: [Response, Response] = await Promise.all([
+      apiClient(uri),
+      apiClient(uri + "/hints"),
+    ]);
 
     if (!resp.ok) {
       return {
@@ -1130,6 +1200,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vuln: detailedDependencyVulnDTO,
+        hints: await hints.json(),
       },
     };
   },
