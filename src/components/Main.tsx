@@ -273,7 +273,7 @@ const Main: FunctionComponent<Props> = ({
             </Link>
             <Link
               className="!text-muted-foreground"
-              href="https://l3montree.com/datenschutz"
+              href="https://devguard.org/privacy-policy"
             >
               Privacy
             </Link>
