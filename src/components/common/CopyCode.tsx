@@ -119,6 +119,9 @@ const CopyCode: FunctionComponent<Props> = (props) => {
           startingLineNumber={props.startingLineNumber}
           codeString={codeStr}
           language={props.language}
+          startingHighlightLineNumber={
+            highlightLineNumbers ? highlightLineNumbers[0] : null
+          }
         />
         {highlightLineNumbers && (
           <div
