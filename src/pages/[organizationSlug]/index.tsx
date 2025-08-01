@@ -228,25 +228,27 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         />
       ) : (
         <div>
-          <div className="flex mb-4 flex-row items-center justify-end gap-2">
-            <Button
-              size={"sm"}
-              variant={"outline"}
-              onClick={handleTriggerSync}
-              disabled={syncRunning}
-            >
-              {syncRunning ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Sync running</span>
-                </span>
-              ) : (
-                <span>
-                  Trigger sync with {activeOrg.externalEntityProviderId}
-                </span>
-              )}
-            </Button>
-          </div>
+          {activeOrg.externalEntityProviderId && (
+            <div className="flex mb-4 flex-row items-center justify-end gap-2">
+              <Button
+                size={"sm"}
+                variant={"outline"}
+                onClick={handleTriggerSync}
+                disabled={syncRunning}
+              >
+                {syncRunning ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Sync running</span>
+                  </span>
+                ) : (
+                  <span>
+                    Trigger sync with {activeOrg.externalEntityProviderId}
+                  </span>
+                )}
+              </Button>
+            </div>
+          )}
           {projects.data.length === 0 ? (
             <div>
               <Input
@@ -263,9 +265,18 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                 }
                 Button={
                   activeOrg.externalEntityProviderId ? (
-                    <AsyncButton onClick={handleTriggerSync}>
-                      Trigger sync with {activeOrg.externalEntityProviderId}
-                    </AsyncButton>
+                    <Button onClick={handleTriggerSync} disabled={syncRunning}>
+                      {syncRunning ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-sm">Sync running</span>
+                        </span>
+                      ) : (
+                        <span>
+                          Trigger sync with {activeOrg.externalEntityProviderId}
+                        </span>
+                      )}
+                    </Button>
                   ) : (
                     <Button
                       disabled={
