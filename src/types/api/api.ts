@@ -477,6 +477,8 @@ export interface AssetDTO {
 
   externalEntityId?: string;
   externalEntityProviderId?: string;
+
+  vulnAutoReopenAfterDays?: number;
 }
 
 export interface DependencyTreeNode {
