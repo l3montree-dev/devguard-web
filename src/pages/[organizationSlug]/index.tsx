@@ -17,7 +17,13 @@ import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../components/Page";
 
@@ -102,6 +108,8 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
     mode: "onBlur",
   });
 
+  const stillOnPage = useRef(true);
+
   const handleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       const params = router.query;
@@ -131,7 +139,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
     if (resp.ok) {
       toast.success("Sync triggered successfully!");
       // reload the page to show the updated projects
-      router.reload();
+      if (stillOnPage.current) router.reload();
     } else {
       toast.error("Failed to trigger sync. Please try again later.");
     }
@@ -173,6 +181,9 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         handleTriggerSync();
       }
     }
+    () => {
+      stillOnPage.current = false;
+    };
   }, [activeOrg.externalEntityProviderId]);
 
   const orgMenu = useOrganizationMenu();
