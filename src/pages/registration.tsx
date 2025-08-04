@@ -38,6 +38,13 @@ import {
 import { handleFlowError, ory } from "../services/ory";
 import { Messages } from "@/components/kratos/Messages";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -175,7 +182,7 @@ const Registration: NextPage = () => {
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-18">
+          <div className="w-full px-26">
             <div>
               <Image
                 className="hidden h-20 w-auto dark:block"
@@ -206,42 +213,60 @@ const Registration: NextPage = () => {
               </p>
             </div>
 
-            <div className="mb-4 mt-10 pb-4 sm:mx-auto">
-              {hasSignupWithPasskey && (
-                <div className={"mb-4"}>
-                  <div className="mb-4 border-b-2 pb-4">
-                    <Flow
-                      only="passkey"
-                      onSubmit={onSubmit}
-                      flow={flow as LoginFlow}
-                    />
-                  </div>
+            <Card className="mt-10">
+              <CardContent>
+                <div className="mt-6 mb-8 sm:mx-auto">
+                  {hasSignupWithPasskey && (
+                    <div className={"mb-4"}>
+                      <div className="mb-4 border-b-2 pb-4">
+                        <Flow
+                          only="passkey"
+                          onSubmit={onSubmit}
+                          flow={flow as LoginFlow}
+                        />
+                      </div>
+                      <Flow
+                        hideGlobalMessages
+                        only="password"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  )}
                   <Flow
                     hideGlobalMessages
-                    only="password"
+                    only="profile"
                     onSubmit={onSubmit}
                     flow={flow as LoginFlow}
                   />
                 </div>
-              )}
-              <Flow
-                hideGlobalMessages
-                only="profile"
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
-            </div>
-            <div>
-              <Flow
-                only="oidc"
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                flow={flow as LoginFlow}
-              />
-            </div>
-            <div className="mt-4">
-              <Messages messages={flow?.ui.messages} />
-            </div>
+                <div className="relative mt-6">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 flex items-center"
+                  >
+                    <div className="w-full border-t border-muted-foreground/50" />
+                  </div>
+                  <div className="relative flex justify-center text-sm/6 font-medium">
+                    <span className="px-6 text-muted-foreground bg-card">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <Flow
+                    className="flex flex-row flex-wrap gap-2 justify-center"
+                    only="oidc"
+                    hideGlobalMessages
+                    onSubmit={onSubmit}
+                    flow={flow as LoginFlow}
+                  />
+                </div>
+                <div className="mt-4">
+                  <Messages messages={flow?.ui.messages} />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
         <ThreeJSFeatureScreen />

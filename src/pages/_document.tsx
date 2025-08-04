@@ -26,7 +26,7 @@ export default function Document() {
         " " +
         inter.className
       }
-      lang="de"
+      lang="en"
     >
       <Head />
       <body

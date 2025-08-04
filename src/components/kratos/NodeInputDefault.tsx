@@ -17,6 +17,7 @@ import { Label } from "../ui/label";
 import { NodeInputProps } from "./helpers";
 import { Button } from "../ui/button";
 import { LucideEye, LucideEyeOff } from "lucide-react";
+import Callout from "../common/Callout";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
   const { node, attributes, value = "", setValue, disabled } = props;
@@ -51,6 +52,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           onChange={(e) => {
             setValue(e.target.value);
           }}
+          variant="onCard"
         />
 
         {attributes.type && attributes.type === "password" && (
@@ -81,13 +83,9 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
       </div>
       <>
         {node.messages.map(({ text, id }, k) => (
-          <span
-            key={`${id}-${k}`}
-            className="mt-2 block text-sm text-red-500"
-            data-testid={`ui/message/${id}`}
-          >
-            {text}
-          </span>
+          <Callout intent="warning" key={`${id}-${k}`}>
+            <span data-testid={`ui/message/${id}`}>{text}</span>
+          </Callout>
         ))}
       </>
     </div>

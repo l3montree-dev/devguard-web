@@ -25,11 +25,13 @@ import { Flow } from "../components/kratos/Flow";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
 import { handleFlowError, ory } from "../services/ory";
 import { Button } from "../components/ui/button";
+import Image from "next/image";
 
 const Recovery: NextPage = () => {
   const [flow, setFlow] = useState<RecoveryFlow>();
@@ -112,18 +114,28 @@ const Recovery: NextPage = () => {
         <title>Recover your account</title>
       </Head>
       <div className="flex min-h-screen flex-1 flex-col justify-center  px-6 py-32 max-sm:py-16 lg:px-8">
-        <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
+        <Card className="sm:mx-auto sm:w-full sm:max-w-lg">
           <CardHeader>
             <CardTitle>Recover your account</CardTitle>
+            <CardDescription>
+              Enter your email address to receive a recovery link.
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
+            <Image
+              src="/assets/gopher-lost-keys.png"
+              alt="A gopher that has lost its keys"
+              width={200}
+              height={200}
+              className="mx-auto mb-4 h-26 w-auto dark:block"
+            />
             <div className="sm:mx-auto sm:w-full sm:max-w-lg">
               <Flow onSubmit={onSubmit} flow={flow} />
             </div>
             <div className="mt-4 flex flex-row justify-end text-sm">
               <Link href="/">
-                <Button variant={"secondary"}>Go back</Button>
+                <Button variant={"outline"}>Go back</Button>
               </Link>
             </div>
           </CardContent>
