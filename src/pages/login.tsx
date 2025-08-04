@@ -265,6 +265,32 @@ const Login: NextPage = () => {
                             Need to recover your account?
                           </Link>
                         </p>
+                        {availableMethods.includes("oidc") && (
+                          <>
+                            <div className="relative mt-6">
+                              <div
+                                aria-hidden="true"
+                                className="absolute inset-0 flex items-center"
+                              >
+                                <div className="w-full border-t border-muted-foreground/50" />
+                              </div>
+                              <div className="relative flex justify-center text-sm/6 font-medium">
+                                <span className="px-6 text-muted-foreground bg-card">
+                                  Or continue with
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-6">
+                              <Flow
+                                className="flex flex-row flex-wrap gap-2 justify-center"
+                                only="oidc"
+                                hideGlobalMessages
+                                onSubmit={onSubmit}
+                                flow={flow as LoginFlow}
+                              />
+                            </div>
+                          </>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -298,6 +324,32 @@ const Login: NextPage = () => {
                             Need to recover your account?
                           </Link>
                         </p>
+                        {availableMethods.includes("oidc") && (
+                          <>
+                            <div className="relative mt-6">
+                              <div
+                                aria-hidden="true"
+                                className="absolute inset-0 flex items-center"
+                              >
+                                <div className="w-full border-t border-muted-foreground/50" />
+                              </div>
+                              <div className="relative flex justify-center text-sm/6 font-medium">
+                                <span className="px-6 text-muted-foreground bg-card">
+                                  Or continue with
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-6">
+                              <Flow
+                                className="flex flex-row flex-wrap gap-2 justify-center"
+                                only="oidc"
+                                hideGlobalMessages
+                                onSubmit={onSubmit}
+                                flow={flow as LoginFlow}
+                              />
+                            </div>
+                          </>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -311,32 +363,6 @@ const Login: NextPage = () => {
                 />
               )}
             </div>
-            {availableMethods.includes("oidc") && (
-              <>
-                <div className="relative mt-6">
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 flex items-center"
-                  >
-                    <div className="w-full border-t border-muted-foreground/50" />
-                  </div>
-                  <div className="relative flex justify-center text-sm/6 font-medium">
-                    <span className="px-6 text-muted-foreground bg-background">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <Flow
-                    className="flex flex-row flex-wrap gap-2 justify-center"
-                    only="oidc"
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    flow={flow as LoginFlow}
-                  />
-                </div>
-              </>
-            )}
             <div className="mt-8">
               <Messages messages={flow?.ui.messages} />
             </div>

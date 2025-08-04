@@ -45,6 +45,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { uniq } from "lodash";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -174,6 +175,10 @@ const Registration: NextPage = () => {
     );
   }, [flow]);
 
+  const availableMethods = useMemo(() => {
+    return uniq(flow?.ui.nodes.map((node) => node.group));
+  }, [flow?.ui.nodes]);
+
   return (
     <>
       <Head>
@@ -240,19 +245,21 @@ const Registration: NextPage = () => {
                     flow={flow as LoginFlow}
                   />
                 </div>
-                <div className="relative mt-6">
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 flex items-center"
-                  >
-                    <div className="w-full border-t border-muted-foreground/50" />
+                {availableMethods.includes("oidc") && (
+                  <div className="relative mt-6">
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 flex items-center"
+                    >
+                      <div className="w-full border-t border-muted-foreground/50" />
+                    </div>
+                    <div className="relative flex justify-center text-sm/6 font-medium">
+                      <span className="px-6 text-muted-foreground bg-card">
+                        Or continue with
+                      </span>
+                    </div>
                   </div>
-                  <div className="relative flex justify-center text-sm/6 font-medium">
-                    <span className="px-6 text-muted-foreground bg-card">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
+                )}
                 <div className="mt-6">
                   <Flow
                     className="flex flex-row flex-wrap gap-2 justify-center"
@@ -261,9 +268,6 @@ const Registration: NextPage = () => {
                     onSubmit={onSubmit}
                     flow={flow as LoginFlow}
                   />
-                </div>
-                <div className="mt-4">
-                  <Messages messages={flow?.ui.messages} />
                 </div>
               </CardContent>
             </Card>

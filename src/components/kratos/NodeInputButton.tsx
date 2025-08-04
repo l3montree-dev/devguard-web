@@ -77,7 +77,8 @@ export function NodeInputButton<T>({
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
-        {attributes.name === "passkey_login_trigger" && (
+        {(attributes.name === "passkey_login_trigger" ||
+          attributes.name === "passkey_register_trigger") && (
           <FingerPrintIcon
             className="mr-2 h-4 w-4 shrink-0"
             aria-hidden="true"
