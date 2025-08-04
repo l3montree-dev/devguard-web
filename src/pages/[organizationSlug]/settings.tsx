@@ -451,7 +451,7 @@ const Home: FunctionComponent = () => {
                 onNewIntegration={handleNewWebhookIntegration}
                 Button={<Button variant={"secondary"}>Add a Webhook</Button>}
                 projectWebhook={false}
-              ></WebhookIntegrationDialog>
+              />
             }
           />
         </Section>

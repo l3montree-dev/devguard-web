@@ -28,6 +28,15 @@ import {
 import { Input } from "../ui/input";
 import { InputWithButton } from "../ui/input-with-button";
 import { Switch } from "../ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "../ui/dropdown-menu";
+
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   Button: ReactNode;
@@ -74,6 +83,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const [open, setOpen] = React.useState(false);
+  const [testLoading, setTestLoading] = React.useState(false);
 
   const method = initialValues ? "PUT" : "POST";
 
@@ -123,6 +133,37 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
         "Something went wrong while testing the webhook. Please check the URL and token.",
       );
     }
+  };
+
+  const triggerTest = async (
+    type: "sampleSbom" | "sampleDependencyVulns" | "sampleFirstPartyVulns",
+  ) => {
+    setTestLoading(true);
+    const url = form.getValues("url");
+    const secret = form.getValues("secret");
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/integrations/webhook/test/",
+      {
+        body: JSON.stringify({
+          url,
+          secret,
+          payloadType: type,
+        }),
+        method: "POST",
+      },
+    );
+
+    setTestLoading(false);
+
+    if (!resp.ok) {
+      toast.error(
+        "Failed to send test payload. Please check the URL and secret.",
+      );
+
+      return resp;
+    }
+
+    toast.success("Test payload sent successfully!");
   };
 
   const handleGenerateNewSecret = () => {
@@ -282,6 +323,39 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
             <div className="flex flex-row justify-end">
               <div className="flex flex-col items-end justify-end gap-2">
                 <div className="flex flex-row gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <Button variant={"secondary"}>
+                        {testLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Send Test{" "}
+                        <ChevronDownIcon
+                          className="ml-2"
+                          width={16}
+                          height={16}
+                        />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() => triggerTest("sampleDependencyVulns")}
+                      >
+                        Dependency Risks
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => triggerTest("sampleSbom")}
+                      >
+                        Code-Risks
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => triggerTest("sampleSbom")}
+                      >
+                        SBOM
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <Button disabled={isLoading} type="submit">
                     <Loader />
                     {initialValues ? "Update Webhook" : "Save"}
