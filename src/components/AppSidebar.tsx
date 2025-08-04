@@ -13,18 +13,17 @@
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { OrganizationDetailsDTO } from "@/types/api/api";
+import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
-import {
-  BuildingOfficeIcon,
-  ChevronUpDownIcon,
-  CogIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon, CogIcon } from "@heroicons/react/24/outline";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { ChevronRight, PlusIcon, SidebarIcon } from "lucide-react";
+import { ChevronRight, Loader2, PlusIcon, SidebarIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { browserApiClient } from "../services/devGuardApi";
+import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";
 import {
   Collapsible,
@@ -56,17 +55,21 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "./ui/sidebar";
-import GitProviderIcon from "./GitProviderIcon";
+import { uniqBy } from "lodash";
+import { toast } from "sonner";
 
 export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
+  const [orgSyncRunning, setOrgSyncRunning] = useState(false);
 
+  const user = useCurrentUser();
   const router = useRouter();
   let activeOrg = useOrg();
   if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
   const updateOrganization = useStore((s) => s.updateOrganization);
+  const updateOrganizations = useStore((s) => s.updateOrganizations);
 
   const handleActiveOrgChange = (slug: string) => () => {
     // redirect to the new slug
@@ -76,6 +79,42 @@ export const OrganizationDropDown = () => {
       updateOrganization(org as OrganizationDetailsDTO);
     }
   };
+
+  useEffect(() => {
+    // trigger a sync on page load - if the org has an external entity provider
+    if (user) {
+      // check in localStorage if the sync was already triggered
+      const lastSync = localStorage.getItem(`lastSync-${user.id}`);
+      if (
+        !lastSync ||
+        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
+      ) {
+        setOrgSyncRunning(true);
+        // if not, trigger sync
+        localStorage.setItem(`lastSync-${user.id}`, new Date().toISOString());
+
+        browserApiClient("/trigger-sync/", {
+          method: "GET",
+        })
+          .then((response) => {
+            setOrgSyncRunning(false);
+
+            if (response.ok) {
+              toast.success("Organization synced successfully");
+              // if the response is ok, update the organizations
+              return response.json().then((data: Array<OrganizationDTO>) => {
+                updateOrganizations(uniqBy(data.concat(orgs), "id"));
+              });
+            }
+          })
+          .catch((err) => {
+            toast.error("Failed to sync organization");
+            console.error("Failed to trigger organization sync", err);
+            setOrgSyncRunning(false);
+          });
+      }
+    }
+  }, [user]);
 
   const handleNavigateToSetupOrg = () => {
     router.push(`/setup`);
@@ -112,6 +151,14 @@ export const OrganizationDropDown = () => {
               <DropdownMenuLabel className="text-xs text-muted-foreground">
                 Organizations
               </DropdownMenuLabel>
+              {orgSyncRunning && (
+                <DropdownMenuItem disabled>
+                  <div className="flex flex-row items-center gap-2">
+                    <span className="text-sm">Syncing...</span>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                </DropdownMenuItem>
+              )}
               {orgs.length !== 0 && (
                 <>
                   {orgs
