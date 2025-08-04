@@ -30,9 +30,22 @@ export function NodeInputCheckbox<T>({
         />
         <Label htmlFor={id}>
           {getNodeLabel(node)}
-          <a href="https://devguard.org/terms-of-use">
+          <a
+            href="https://devguard.org/terms-of-use"
+            target="_blank"
+            rel="noreferrer nooperner"
+          >
             devguard.org/terms-of-use
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://devguard.org/privacy-policy"
+            target="_blank"
+            rel="noreferrer nooperner"
+          >
+            privacy policy
           </a>
+          .
         </Label>
       </div>
     );

@@ -26,6 +26,7 @@ import { ory } from "../services/ory";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
 
 const Verification: NextPage = () => {
   const [flow, setFlow] = useState<VerificationFlow>();
@@ -128,22 +129,43 @@ const Verification: NextPage = () => {
         <title>Verify your account - Ory NextJS Integration Example</title>
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-col justify-center  px-6 py-32 max-sm:py-16 lg:px-8">
-        <Card className="bg-background sm:mx-auto sm:w-full sm:max-w-lg">
-          <CardHeader>
-            <CardTitle>Verify your E-Mail</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-              <Flow onSubmit={onSubmit} flow={flow} />
+      <div className="flex min-h-screen flex-1 flex-row">
+        <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
+          <div className="w-full px-26">
+            <div className="">
+              <Image
+                className="hidden h-14 w-auto dark:block"
+                src={"/logo_inverse_horizontal.svg"}
+                alt="DevGuard by l3montree Logo"
+                width={300}
+                height={300}
+              />
+              <Image
+                className="h-16 w-auto dark:hidden"
+                src={"/logo_horizontal.svg"}
+                alt="DevGuard by l3montree Logo"
+                width={300}
+                height={300}
+              />
+              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
+                Verify your E-Mail
+              </h2>
+              <Card className="mt-10 pt-6 sm:mx-auto sm:w-full sm:max-w-lg">
+                <CardContent>
+                  <div className="sm:mx-auto sm:w-full sm:max-w-lg">
+                    <Flow onSubmit={onSubmit} flow={flow} />
+                  </div>
+                  <div className="mt-4 flex flex-row justify-end text-sm">
+                    <Link href="/">
+                      <Button variant={"secondary"}>Go back</Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <div className="mt-4 flex flex-row justify-end text-sm">
-              <Link href="/">
-                <Button variant={"secondary"}>Go back</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <ThreeJSFeatureScreen />
       </div>
     </>
   );
