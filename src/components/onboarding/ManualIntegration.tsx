@@ -22,6 +22,8 @@ import {
 } from "@/services/devGuardApi";
 import { Separator } from "../ui/separator";
 import CopyCode from "../common/CopyCode";
+import Callout from "../common/Callout";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 type Command = "container-scanning" | "sbom" | "sarif";
 
@@ -46,6 +48,8 @@ const ManualIntegration = ({
 }) => {
   const [tab, setTab] = useState<"sbom" | "sarif">("sbom");
 
+  const [showCommands, setShowCommands] = useState(false);
+
   const trivySbomCommand =
     "trivy fs . --format cyclonedx --output trivy-results.json";
   const trivySarifCommand =
@@ -59,39 +63,7 @@ const ManualIntegration = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [tab, sbomFileName, sarifFileName, api]);
-
-  //   const generateDockerSnippet = (
-  //     command: string,
-  //     orgSlug: string,
-  //     projectSlug: string,
-  //     assetSlug: string,
-  //     apiUrl: string,
-  //     token?: string,
-  //   ) => {
-  //     let path = "/app";
-  //     if (command === "container-scanning") {
-  //       path = "/app/image.tar";
-  //     }
-
-  //     if (command === "sbom") {
-  //       path = "/app/<SBOM.json>";
-  //     }
-
-  //     if (command === "sarif") {
-  //       path = "/app/results.sarif";
-  //     }
-
-  //     if (apiUrl === "http://localhost:8080") {
-  //       apiUrl = "http://host.docker.internal:8080";
-  //     }
-  //     return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
-  // devguard-scanner ${command} \\
-  //     --path="${path}" \\
-  //     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
-  //     --apiUrl="${apiUrl}" \\
-  //     --token="${token ? token : "TOKEN"}"`;
-  //   };
+  }, [tab, sbomFileName, sarifFileName, api, showCommands]);
 
   const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -233,6 +205,23 @@ const ManualIntegration = ({
                 />
               </CardContent>
             </Card>
+
+            <div
+              className="mt-2 flex text-yellow-500 hover:text-primary-700 flex-row"
+              onClick={() => setShowCommands(true)}
+            >
+              <QuestionMarkCircleIcon className="flex w-4 m-2" />
+              <span className="flex text-sm  items-center select-none ">
+                How do I get an SBOM?
+              </span>
+            </div>
+
+            {showCommands === true && (
+              <>
+                <Separator className="m-6" orientation="horizontal" />
+                <CopyCode language="shell" codeString={trivySbomCommand} />
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="sarif" className="mt-6">
@@ -250,23 +239,24 @@ const ManualIntegration = ({
                 />
               </CardContent>
             </Card>
+            <div
+              className="mt-2 flex text-yellow-500 hover:text-primary-700 flex-row"
+              onClick={() => setShowCommands(true)}
+            >
+              <QuestionMarkCircleIcon className="flex w-4 m-2" />
+              <span className="flex text-sm  items-center select-none ">
+                How do I get an SARIF?
+              </span>
+            </div>
+            {showCommands === true && (
+              <>
+                <Separator className="m-6" orientation="horizontal" />
+                <CopyCode language="shell" codeString={trivySarifCommand} />
+              </>
+            )}
           </TabsContent>
         </Tabs>
 
-        {/* <Separator className="mt-6" orientation="horizontal" />
-
-        <div className="mt-6">
-          <CopyCode
-            language="shell"
-            codeString={generateDockerSnippet(
-              "sbom",
-              orgSlug,
-              projectSlug,
-              assetSlug,
-              apiUrl,
-            )}
-          /> */}
-        {/* </div> */}
         <div className="flex mt-6 flex-row gap-2 justify-end">
           <Button variant="secondary" onClick={() => prev?.()}>
             Back
