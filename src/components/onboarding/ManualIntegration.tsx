@@ -1,288 +1,278 @@
-// Copyright 2025 larshermges
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright (C) 2025 Lars Hermges, l3montree GmbH.  This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.",
 
-import Image from "next/image";
-
-import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { CarouselApi, CarouselItem } from "../ui/carousel";
-import { AsyncButton, Button } from "../ui/button";
-import { classNames } from "@/utils/common";
-
-import { useCallback, useEffect, useRef, useState } from "react";
-import CopyCode from "../common/CopyCode";
-import { Separator } from "../ui/separator";
+import React, { useCallback, useRef, useState, useEffect } from "react";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { config } from "@/config";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import FileUpload from "../FileUpload";
-import { multipartBrowserApiClient } from "@/services/devGuardApi";
-import router from "next/router";
-import { toast } from "sonner";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useDropzone } from "react-dropzone";
-import { Hexagon } from "lucide-react";
-import { config } from "@/config";
-import { Tab } from "@headlessui/react";
-import CustomTab from "../common/CustomTab";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import FileUpload from "@/components/FileUpload";
+
+import { CarouselItem, CarouselApi } from "@/components/ui/carousel";
+import {
+  multipartBrowserApiClient,
+  browserApiClient,
+} from "@/services/devGuardApi";
+import { Separator } from "../ui/separator";
+import CopyCode from "../common/CopyCode";
 
 type Command = "container-scanning" | "sbom" | "sarif";
 
-export type cicdIntegration = "GitHub" | "Gitlab";
-
-export const ManualIntegration = ({
+const ManualIntegration = ({
   api,
   apiUrl,
+  next,
+  prev,
   orgSlug,
   projectSlug,
   assetSlug,
+  sarifEndpoint = "/sarif-scan",
 }: {
-  api: CarouselApi;
+  api: CarouselApi | undefined;
   apiUrl: string;
+  next?: () => void;
+  prev?: () => void;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  sarifEndpoint?: string;
 }) => {
-  const generateDockerSnippet = (
-    command: string,
-    orgSlug: string,
-    projectSlug: string,
-    assetSlug: string,
-    apiUrl: string,
-    token?: string,
-  ) => {
-    let path = "/app";
-    if (command === "container-scanning") {
-      path = "/app/image.tar";
-    }
+  const [tab, setTab] = useState<"sbom" | "sarif">("sbom");
 
-    if (command === "sbom") {
-      path = "/app/<SBOM.json>";
-    }
+  const [sbomFileName, setSbomFileName] = useState<string | undefined>();
+  const sbomFileRef = useRef<File | undefined>(undefined);
 
-    if (command === "sarif") {
-      path = "/app/results.sarif";
-    }
+  const [sarifFileName, setSarifFileName] = useState<string | undefined>();
+  const sarifContentRef = useRef<string | undefined>(undefined);
 
-    if (apiUrl === "http://localhost:8080") {
-      apiUrl = "http://host.docker.internal:8080";
-    }
-    return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
-devguard-scanner ${command} \\
-    --path="${path}" \\
-    --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
-    --apiUrl="${apiUrl}" \\
-    --token="${token ? token : "TOKEN"}"`;
-  };
+  useEffect(() => {
+    api?.reInit();
+  }, [tab, sbomFileName, sarifFileName, api]);
 
-  const [cicdIntegration, setCicdIntegration] = useState<cicdIntegration>();
-  const [fileName, setFileName] = useState<string>();
-  const fileContent = useRef<any>(undefined);
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const asset = useActiveAsset();
+  //   const generateDockerSnippet = (
+  //     command: string,
+  //     orgSlug: string,
+  //     projectSlug: string,
+  //     assetSlug: string,
+  //     apiUrl: string,
+  //     token?: string,
+  //   ) => {
+  //     let path = "/app";
+  //     if (command === "container-scanning") {
+  //       path = "/app/image.tar";
+  //     }
 
-  const uploadSBOM = async () => {
-    const formdata = new FormData();
-    formdata.append("file", fileContent.current);
-    const resp = await multipartBrowserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/sbom-file`,
+  //     if (command === "sbom") {
+  //       path = "/app/<SBOM.json>";
+  //     }
 
-      {
-        method: "POST",
-        body: formdata,
-        headers: { "X-Scanner": "SBOM-File-Upload" },
-      },
-    );
-    if (resp.ok) {
-      toast.success("SBOM has successfully been send!");
-    } else {
-      toast.error("SBOM has not been send successfully");
-    }
+  //     if (command === "sarif") {
+  //       path = "/app/results.sarif";
+  //     }
 
-    router.push(
-      `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
-    );
-  };
+  //     if (apiUrl === "http://localhost:8080") {
+  //       apiUrl = "http://host.docker.internal:8080";
+  //     }
+  //     return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
+  // devguard-scanner ${command} \\
+  //     --path="${path}" \\
+  //     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
+  //     --apiUrl="${apiUrl}" \\
+  //     --token="${token ? token : "TOKEN"}"`;
+  //   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
-      reader.onabort = () => console.log("file reading was aborted");
-      reader.onerror = () => console.log("file reading has failed");
+      reader.onabort = () => console.log("SBOM file reading was aborted");
+      reader.onerror = () => console.log("SBOM file reading has failed");
       reader.onload = () => {
         try {
-          const readerContent = reader.result as string;
-          let sbomParsed;
-          sbomParsed = JSON.parse(readerContent);
-          if (sbomParsed.bomFormat === "CycloneDX") {
-            fileContent.current = file;
-            setFileName(file.name);
-          } else
+          const txt = reader.result as string;
+          const parsed = JSON.parse(txt);
+          if (parsed?.bomFormat === "CycloneDX") {
+            sbomFileRef.current = file;
+            setSbomFileName(file.name);
+          } else {
             toast.error(
-              "SBOM does not follow CycloneDX format or Version is <1.6",
+              "SBOM does not follow CycloneDX format or Version is < 1.6",
             );
-        } catch (e) {
+          }
+        } catch (_e) {
           toast.error(
             "JSON format is not recognized, make sure it is the proper format",
           );
           return;
         }
       };
-
       reader.readAsText(file);
     });
   }, []);
 
-  const codeStringBuilder = (
-    command: Command,
-    orgSlug: string,
-    projectSlug: string,
-    assetSlug: string,
-    apiUrl: string,
-  ) => {
-    const codeString = generateDockerSnippet(
-      command,
-      orgSlug,
-      projectSlug,
-      assetSlug,
-      apiUrl,
-    );
-
-    return codeString;
-  };
-
-  const dropzone = useDropzone({
-    onDrop,
+  const sbomDropzone = useDropzone({
+    onDrop: onDropSbom,
     accept: { "application/json": [".json"] },
   });
 
-  useEffect(() => {
-    api?.reInit(); //this is redundant rn, will change
-  }, [api, cicdIntegration]);
+  const onDropSarif = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onabort = () => console.log("SARIF file reading was aborted");
+      reader.onerror = () => console.log("SARIF file reading has failed");
+      reader.onload = () => {
+        sarifContentRef.current = reader.result as string;
+        setSarifFileName(file.name);
+      };
+      reader.readAsText(file);
+    });
+  }, []);
+
+  const sarifDropzone = useDropzone({
+    onDrop: onDropSarif,
+    accept: {
+      "application/json": [".json"],
+      "application/sarif+json": [".sarif"],
+      "text/plain": [".sarif"],
+    },
+  });
+
+  const uploadSBOM = async () => {
+    if (!sbomFileRef.current) return;
+    const formdata = new FormData();
+    formdata.append("file", sbomFileRef.current);
+
+    const resp = await multipartBrowserApiClient(
+      `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/sbom-file`,
+      {
+        method: "POST",
+        body: formdata,
+        headers: { "X-Scanner": "SBOM-File-Upload" },
+      },
+    );
+
+    if (resp.ok) {
+      toast.success("SBOM has successfully been sent!");
+
+      next?.();
+    } else {
+      toast.error("SBOM has not been sent successfully");
+    }
+  };
+
+  const uploadSARIF = async () => {
+    if (!sarifContentRef.current) return;
+
+    const resp = await browserApiClient(`${sarifEndpoint}`, {
+      method: "POST",
+      body: sarifContentRef.current,
+      headers: {
+        "X-Scanner": "SARIF-File-Upload",
+        "X-Asset-Name": `${orgSlug}/${projectSlug}/${assetSlug}`,
+      },
+    });
+
+    if (resp.ok) {
+      toast.success("SARIF report has successfully been sent!");
+      next?.();
+    } else {
+      toast.error("SARIF report has not been sent successfully");
+    }
+  };
+
+  const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
+  const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
 
   return (
-    <>
-      <CarouselItem>
-        <DialogHeader>
-          <DialogTitle>What should your Scanner be able to do?</DialogTitle>
-          <DialogDescription>Select exactly what you want</DialogDescription>
-        </DialogHeader>
-        <div className="mt-4 sm:mx-auto mt-8">
-          <Tabs>
+    <CarouselItem>
+      <div className="">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle className="text-lg">Manual Integration</CardTitle>
+          <CardDescription>
+            Upload either an SBOM (CycloneDX) or a SARIF report from your own
+            scanner.
+          </CardDescription>
+        </CardHeader>
+
+        <Tabs
+          value={tab}
+          onValueChange={(v) => setTab(v as "sbom" | "sarif")}
+          defaultValue="sbom"
+          className="w-full mt-4"
+        >
+          <div className="flex">
             <TabsList>
-              <TabsTrigger value="sbom">SBOM </TabsTrigger>
+              <TabsTrigger value="sbom">SBOM</TabsTrigger>
               <TabsTrigger value="sarif">SARIF</TabsTrigger>
             </TabsList>
-          </Tabs>
-        </div>
-        <Card className="mt-2">
-          <CardHeader>
-            <CardTitle className="text-lg"></CardTitle>
-            <CardDescription></CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <FileUpload
-                files={fileName ? [fileName] : []}
-                dropzone={dropzone}
-              />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <div>
-          <div className="m-4 w-full flex flex-row items-center gap-4">
-            <Separator className="flex-1" orientation="horizontal" />
-            <span className="text-sm text-muted-foreground">
-              Or add to CI/CD
-            </span>
-            <Separator className="flex-1" orientation="horizontal" />
-          </div>
-          {/* <div className="flex w-full mb-4">
-            <Button
-              variant={"ghost"}
-              className={classNames(
-                "w-full",
-                cicdIntegration === "GitHub"
-                  ? "border border-primary"
-                  : "border border-transparent",
-              )}
-              onClick={() => setCicdIntegration("GitHub")}
-            >
-              <Image
-                src="/assets/github.svg"
-                alt="GitHub Logo"
-                className="mr-2 dark:invert"
-                width={24}
-                height={24}
-              />
-              GitHub
-            </Button>
-            <Button
-              variant={"ghost"}
-              className={classNames(
-                "w-full",
-                cicdIntegration === "Gitlab"
-                  ? "border border-primary"
-                  : "border border-transparent",
-              )}
-              onClick={() => {
-                setCicdIntegration("Gitlab");
-              }}
-            >
-              <Image
-                src="/assets/gitlab.svg"
-                alt="GitHub Logo"
-                className="mr-2"
-                width={24}
-                height={24}
-              />
-              GitLab
-            </Button>
-          </div> */}
-          {/* {cicdIntegration === "Gitlab" && ( */}
-          <>
-            <CopyCode
-              language="shell"
-              codeString={codeStringBuilder(
-                "sbom",
-                orgSlug,
-                projectSlug,
-                assetSlug,
-                apiUrl,
-              )}
-            />
-          </>
-          {/* )} */}
-          <div className="flex mt-4 flex-row gap-2 justify-end">
-            <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
-              Back
-            </Button>
-            <AsyncButton disabled={!fileName} onClick={uploadSBOM}>
-              {fileName ? "Finish" : "Continue"}
-            </AsyncButton>
-          </div>
+          <TabsContent value="sbom" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-md">Upload SBOM</CardTitle>
+                <CardDescription>
+                  Upload a SBOM file in CycloneDX 1.6 or higher (JSON).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileUpload
+                  files={sbomFileName ? [sbomFileName] : []}
+                  dropzone={sbomDropzone}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="sarif" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-md">Upload SARIF</CardTitle>
+                <CardDescription>
+                  Upload a SARIF report from your scanner (.sarif or JSON).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileUpload
+                  files={sarifFileName ? [sarifFileName] : []}
+                  dropzone={sarifDropzone}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* <Separator className="mt-6" orientation="horizontal" />
+
+        <div className="mt-6">
+          <CopyCode
+            language="shell"
+            codeString={generateDockerSnippet(
+              "sbom",
+              orgSlug,
+              projectSlug,
+              assetSlug,
+              apiUrl,
+            )}
+          /> */}
+        {/* </div> */}
+        <div className="flex mt-6 flex-row gap-2 justify-end">
+          <Button variant="secondary" onClick={() => prev?.()}>
+            Back
+          </Button>
+          <Button disabled={isUploadDisabled} onClick={handleUpload}>
+            Upload
+          </Button>
         </div>
-      </CarouselItem>
-    </>
+      </div>
+    </CarouselItem>
   );
 };
+
 export default ManualIntegration;
