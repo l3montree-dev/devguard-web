@@ -18,7 +18,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { AsyncButton, Button } from "../ui/button";
 import { classNames } from "@/utils/common";
-import { GitInstances } from "@/types/common";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import CopyCode from "../common/CopyCode";
 import { Separator } from "../ui/separator";
@@ -41,6 +41,8 @@ import { Hexagon } from "lucide-react";
 import { config } from "@/config";
 
 type Command = "container-scanning" | "sbom" | "sarif";
+
+export type cicdIntegration = "GitHub" | "Gitlab" | "Other";
 
 export const ManualIntegration = ({
   api,
@@ -87,7 +89,7 @@ devguard-scanner ${command} \\
     --token="${token ? token : "TOKEN"}"`;
   };
 
-  const [gitInstance, setGitInstance] = useState<GitInstances>();
+  const [cicdIntegration, setCicdIntegration] = useState<cicdIntegration>();
   const [fileName, setFileName] = useState<string>();
   const fileContent = useRef<any>(undefined);
   const activeOrg = useActiveOrg();
@@ -171,7 +173,7 @@ devguard-scanner ${command} \\
 
   useEffect(() => {
     api?.reInit(); //this is redundant rn, will change
-  }, [api, gitInstance]);
+  }, [api, cicdIntegration]);
 
   return (
     <>
@@ -197,20 +199,23 @@ devguard-scanner ${command} \\
         </Card>
 
         <div>
-          <div className="m-4 flex flex-col">
-            <Separator className="mt-4" orientation="horizontal" />
-            <span className="">OR</span>
+          <div className="m-4 w-full flex flex-row items-center gap-4">
+            <Separator className="flex-1" orientation="horizontal" />
+            <span className="text-sm text-muted-foreground">
+              Or add to CI/CD
+            </span>
+            <Separator className="flex-1" orientation="horizontal" />
           </div>
           <div className="flex w-full mb-4">
             <Button
               variant={"ghost"}
               className={classNames(
                 "w-full",
-                gitInstance === "GitHub"
+                cicdIntegration === "GitHub"
                   ? "border border-primary"
                   : "border border-transparent",
               )}
-              onClick={() => setGitInstance("GitHub")}
+              onClick={() => setCicdIntegration("GitHub")}
             >
               <Image
                 src="/assets/github.svg"
@@ -225,12 +230,12 @@ devguard-scanner ${command} \\
               variant={"ghost"}
               className={classNames(
                 "w-full",
-                gitInstance === "Gitlab"
+                cicdIntegration === "Gitlab"
                   ? "border border-primary"
                   : "border border-transparent",
               )}
               onClick={() => {
-                setGitInstance("Gitlab");
+                setCicdIntegration("Gitlab");
               }}
             >
               <Image
@@ -246,18 +251,17 @@ devguard-scanner ${command} \\
               variant={"ghost"}
               className={classNames(
                 "w-full",
-                // gitInstance === "Other"
-                //   ?
-                "border border-primary",
-                //   : "border border-transparent",
+                cicdIntegration === "Other"
+                  ? "border border-primary"
+                  : "border border-transparent",
               )}
-              //   onClick={() => setGitInstance("Other")}
+              onClick={() => setCicdIntegration("Other")}
             >
               <Hexagon className="mr-2" width={24} height={24}></Hexagon>
               Other
             </Button>
           </div>
-          {gitInstance !== undefined && (
+          {cicdIntegration === "Other" && (
             <>
               <CopyCode
                 language="shell"
@@ -277,7 +281,6 @@ devguard-scanner ${command} \\
               </div>
             </>
           )}
-          <div></div>
           <div className="flex mt-4 flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
               Back
