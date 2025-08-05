@@ -46,7 +46,7 @@ export const AdditionalManualScannerOptions = ({
   next,
   prev,
   pat,
-  onPatGenerate,
+  //   onPatGenerate,
   orgSlug,
   projectSlug,
   assetSlug,
@@ -57,7 +57,7 @@ export const AdditionalManualScannerOptions = ({
   api?: CarouselApi;
   apiUrl: string;
   pat?: string;
-  onPatGenerate: () => void;
+  //   onPatGenerate: () => void;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
@@ -104,13 +104,13 @@ export const AdditionalManualScannerOptions = ({
             <div className="flex w-full">
               <Button>
                 <Image
-                  src="/assets/github.svg"
+                  src="/logo_icon.svg"
                   alt="Devguard Logo"
-                  className="mr-2 dark:invert"
-                  width={24}
-                  height={24}
+                  width={20}
+                  height={20}
+                  className="inline-block mr-2"
                 />
-                Devguard SBOM
+                Devguard
               </Button>
               {/* border dark:border-foreground/20 !text-foreground
               hover:no-underline bg-transparent hover:bg-accent

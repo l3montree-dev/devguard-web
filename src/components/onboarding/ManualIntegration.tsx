@@ -39,10 +39,13 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useDropzone } from "react-dropzone";
 import { Hexagon } from "lucide-react";
 import { config } from "@/config";
+import { Tab } from "@headlessui/react";
+import CustomTab from "../common/CustomTab";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 
 type Command = "container-scanning" | "sbom" | "sarif";
 
-export type cicdIntegration = "GitHub" | "Gitlab" | "Other";
+export type cicdIntegration = "GitHub" | "Gitlab";
 
 export const ManualIntegration = ({
   api,
@@ -182,11 +185,18 @@ devguard-scanner ${command} \\
           <DialogTitle>What should your Scanner be able to do?</DialogTitle>
           <DialogDescription>Select exactly what you want</DialogDescription>
         </DialogHeader>
-
-        <Card className="mt-6">
+        <div className="mt-4 sm:mx-auto mt-8">
+          <Tabs>
+            <TabsList>
+              <TabsTrigger value="sbom">SBOM </TabsTrigger>
+              <TabsTrigger value="sarif">SARIF</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        <Card className="mt-2">
           <CardHeader>
-            <CardTitle className="text-lg">Upload a SBOM / SARIF</CardTitle>
-            <CardDescription>Upload your SBOM / SARIF manually</CardDescription>
+            <CardTitle className="text-lg"></CardTitle>
+            <CardDescription></CardDescription>
           </CardHeader>
           <CardContent>
             <div>
@@ -206,7 +216,7 @@ devguard-scanner ${command} \\
             </span>
             <Separator className="flex-1" orientation="horizontal" />
           </div>
-          <div className="flex w-full mb-4">
+          {/* <div className="flex w-full mb-4">
             <Button
               variant={"ghost"}
               className={classNames(
@@ -247,40 +257,21 @@ devguard-scanner ${command} \\
               />
               GitLab
             </Button>
-            <Button
-              variant={"ghost"}
-              className={classNames(
-                "w-full",
-                cicdIntegration === "Other"
-                  ? "border border-primary"
-                  : "border border-transparent",
+          </div> */}
+          {/* {cicdIntegration === "Gitlab" && ( */}
+          <>
+            <CopyCode
+              language="shell"
+              codeString={codeStringBuilder(
+                "sbom",
+                orgSlug,
+                projectSlug,
+                assetSlug,
+                apiUrl,
               )}
-              onClick={() => setCicdIntegration("Other")}
-            >
-              <Hexagon className="mr-2" width={24} height={24}></Hexagon>
-              Other
-            </Button>
-          </div>
-          {cicdIntegration === "Other" && (
-            <>
-              <CopyCode
-                language="shell"
-                codeString={codeStringBuilder(
-                  "sbom",
-                  orgSlug,
-                  projectSlug,
-                  assetSlug,
-                  apiUrl,
-                )}
-              />
-              <div>
-                https://gitlab.com/l3montree/devguard/-/blob/main/examples/sbom-gets-generated/.gitlab-ci.yml?ref_type=heads{" "}
-                if people want to use the devguard-scanner and upload their sbom
-                over the sbom flag, then they need to use artifacts, we def need
-                to show the example
-              </div>
-            </>
-          )}
+            />
+          </>
+          {/* )} */}
           <div className="flex mt-4 flex-row gap-2 justify-end">
             <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
               Back

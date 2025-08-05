@@ -50,6 +50,7 @@ import { Badge } from "./ui/badge";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
 import ScannerOptions from "./onboarding/ScannerOptions";
 import ManualIntegration from "./onboarding/ManualIntegration";
+import AdditionalManualScannerOptions from "./onboarding/AdditionalManualScannerOptions";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -256,7 +257,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     <CardTitle className="text-lg flex flex-row items-center leading-tight">
                       <Image
                         src="/logo_icon.svg"
-                        alt="GitLab"
+                        alt="Devguard Logo"
                         width={20}
                         height={20}
                         className="inline-block mr-2"
@@ -331,11 +332,13 @@ const DependencyRiskScannerDialog: FunctionComponent<
             )}
             {selectedSetup === "own-setup" && (
               <ManualIntegration
+                api={api}
+                apiUrl={apiUrl}
+                next={api?.scrollNext}
+                prev={api?.scrollPrev}
                 orgSlug={activeOrg.slug}
                 projectSlug={activeProject.slug}
                 assetSlug={asset!.slug}
-                api={api}
-                apiUrl={apiUrl}
               ></ManualIntegration>
             )}
           </CarouselContent>
