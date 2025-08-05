@@ -216,18 +216,27 @@ const Index: FunctionComponent<Props> = (props) => {
                   ))}
                 </div>
               </div>
-              {vuln.snippet && (
-                <div className="mt-4 rounded-lg border bg-secondary">
-                  <div className="font-mono px-4 py-2 text-sm font-medium">
-                    {vuln.uri}
+              <div className="mt-4 rounded-lg border bg-secondary">
+                {vuln.snippetContents.map((snippet, idx) => (
+                  <div key={idx}>
+                    {idx === 0 && (
+                      <div className="font-mono px-4 py-2 text-sm font-medium">
+                        {vuln.uri}
+                      </div>
+                    )}
+                    <CopyCode
+                      highlightRegexPattern={highlightRegex}
+                      codeString={snippet.snippet}
+                      startingLineNumber={snippet.startLine}
+                    />
+                    {idx < vuln.snippetContents.length - 1 && (
+                      <div className="flex flex-row opacity-75 justify-center items-center w-full">
+                        ···
+                      </div>
+                    )}
                   </div>
-                  <CopyCode
-                    highlightRegexPattern={highlightRegex}
-                    codeString={vuln.snippet}
-                    startingLineNumber={vuln.startLine}
-                  />
-                </div>
-              )}
+                ))}
+              </div>
               <div className="mt-16">
                 <RiskAssessmentFeed
                   vulnerabilityName={

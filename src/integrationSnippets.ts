@@ -54,9 +54,8 @@ const generateDockerSnippet = (
   if (apiUrl === "http://localhost:8080") {
     apiUrl = "http://host.docker.internal:8080";
   }
-  return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard-scanner:${config.devguardScannerTag} \\
-devguard-scanner ${command} \\
-    --path="${path}" \\
+  return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard/scanner:${config.devguardScannerTag} \\
+devguard-scanner ${command} ${path} \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
     --token="${token ? token : "TOKEN"}"`;

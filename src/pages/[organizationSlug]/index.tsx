@@ -13,11 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../components/Page";
 
@@ -28,7 +34,12 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import { PolicyEvaluation, ProjectDTO, UserRole } from "../../types/api/api";
+import {
+  Paged,
+  PolicyEvaluation,
+  ProjectDTO,
+  UserRole,
+} from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -45,6 +56,7 @@ import { Form } from "@/components/ui/form";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "sonner";
 
+import CustomPagination from "@/components/common/CustomPagination";
 import EmptyList from "@/components/common/EmptyList";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Badge } from "@/components/ui/badge";
@@ -54,19 +66,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
-import { useParams } from "next/navigation";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
 
 interface Props {
   oauth2Error?: boolean;
-  projects: Array<
+  projects: Paged<
     ProjectDTO & {
       stats: {
         compliantAssets: number;
@@ -84,12 +100,51 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const { organizationSlug } = useParams<{
     organizationSlug: string;
   }>();
+  const [syncRunning, setSyncRunning] = useState(false);
 
   const currentUserRole = useCurrentUserRole();
 
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
   });
+
+  const stillOnPage = useRef(true);
+
+  const handleSearch = useCallback(
+    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+      const params = router.query;
+      if (e.target.value === "") {
+        delete params["search"];
+        router.push({
+          query: params,
+        });
+      } else if (e.target.value.length >= 3) {
+        router.push({
+          query: {
+            ...params,
+            search: e.target.value,
+            page: 1, // reset to first page on search
+          },
+        });
+      }
+    }, 500),
+    [],
+  );
+
+  const handleTriggerSync = async () => {
+    setSyncRunning(true);
+    const resp = await browserApiClient(
+      `/organizations/${activeOrg.slug}/trigger-sync`,
+    );
+    if (resp.ok) {
+      toast.success("Sync triggered successfully!");
+      // reload the page to show the updated projects
+      if (stillOnPage.current) router.reload();
+    } else {
+      toast.error("Failed to trigger sync. Please try again later.");
+    }
+    setSyncRunning(false);
+  };
 
   const handleCreateProject = async (req: CreateProjectReq) => {
     const resp = await browserApiClient(
@@ -108,6 +163,28 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
       });
     }
   };
+
+  useEffect(() => {
+    // trigger a sync on page load - if the org has an external entity provider
+    if (activeOrg.externalEntityProviderId) {
+      // check in localStorage if the sync was already triggered
+      const lastSync = localStorage.getItem(`lastSync-${activeOrg.slug}`);
+      if (
+        !lastSync ||
+        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
+      ) {
+        // if not, trigger sync
+        localStorage.setItem(
+          `lastSync-${activeOrg.slug}`,
+          new Date().toISOString(),
+        );
+        handleTriggerSync();
+      }
+    }
+    () => {
+      stillOnPage.current = false;
+    };
+  }, [activeOrg.externalEntityProviderId]);
 
   const orgMenu = useOrganizationMenu();
 
@@ -162,24 +239,69 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         />
       ) : (
         <div>
-          {projects.length === 0 ? (
-            <EmptyParty
-              title="Here you will see all your groups"
-              description="Projects are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
-              Button={
-                !activeOrg.externalEntityProviderId && (
-                  <Button
-                    disabled={
-                      currentUserRole !== UserRole.Owner &&
-                      currentUserRole !== UserRole.Admin
-                    }
-                    onClick={() => setOpen(true)}
-                  >
-                    New Group
-                  </Button>
-                )
-              }
-            />
+          {activeOrg.externalEntityProviderId && (
+            <div className="flex mb-4 flex-row items-center justify-end gap-2">
+              <Button
+                size={"sm"}
+                variant={"outline"}
+                onClick={handleTriggerSync}
+                disabled={syncRunning}
+              >
+                {syncRunning ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Sync running</span>
+                  </span>
+                ) : (
+                  <span>
+                    Trigger sync with {activeOrg.externalEntityProviderId}
+                  </span>
+                )}
+              </Button>
+            </div>
+          )}
+          {projects.data.length === 0 ? (
+            <div>
+              <Input
+                onChange={handleSearch}
+                defaultValue={router.query.search as string}
+                placeholder="Search for projects"
+              />
+              <EmptyParty
+                title="Here you will see all your groups"
+                description={
+                  activeOrg.externalEntityProviderId
+                    ? `Your groups are getting automatically synced from ${activeOrg.externalEntityProviderId}. The process might take some time. If you have the feeling that you are missing some of your groups, go ahead and click the 'Trigger sync'-Button.`
+                    : "Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend. It lets you structure your different teams and creates logical risk units."
+                }
+                Button={
+                  activeOrg.externalEntityProviderId ? (
+                    <Button onClick={handleTriggerSync} disabled={syncRunning}>
+                      {syncRunning ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-sm">Sync running</span>
+                        </span>
+                      ) : (
+                        <span>
+                          Trigger sync with {activeOrg.externalEntityProviderId}
+                        </span>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={
+                        currentUserRole !== UserRole.Owner &&
+                        currentUserRole !== UserRole.Admin
+                      }
+                      onClick={() => setOpen(true)}
+                    >
+                      New Group
+                    </Button>
+                  )
+                }
+              />
+            </div>
           ) : (
             <Section
               primaryHeadline
@@ -200,96 +322,107 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
               forceVertical
               title="Groups"
             >
-              <div className="flex flex-col gap-2">
-                {projects.map((project) => (
-                  <Link
-                    key={project.id}
-                    href={`/${activeOrg.slug}/projects/${project.slug}`}
-                    className="flex flex-col gap-2 hover:no-underline"
-                  >
-                    <ListItem
-                      reactOnHover
-                      Title={
-                        <div className="flex flex-row items-center gap-2">
-                          <span>{project.name}</span>
-                        </div>
-                      }
-                      Description={
-                        <div className="flex flex-col">
-                          <span>{project.description}</span>
-                          {(project.stats.totalAssets > 0 ||
-                            project.type !== "default") && (
-                            <div className="flex mt-4 flex-row items-center gap-2">
-                              {project.type !== "default" && (
-                                <ProjectBadge type={project.type} />
-                              )}
-                              {project.stats.totalAssets > 0 && (
-                                <>
-                                  {" "}
-                                  <Badge
-                                    variant={
-                                      project.stats.compliantAssets ===
-                                      project.stats.totalAssets
-                                        ? "success"
-                                        : "secondary"
-                                    }
-                                    className=""
-                                  >
-                                    {project.stats.compliantAssets}/
-                                    {project.stats.totalAssets} assets compliant
-                                  </Badge>
-                                  <Badge
-                                    variant={
-                                      project.stats
-                                        .passingControlsPercentage === 1
-                                        ? "success"
-                                        : "secondary"
-                                    }
-                                    className=""
-                                  >
-                                    {Math.round(
-                                      project.stats.passingControlsPercentage *
-                                        100,
-                                    )}
-                                    % controls passing
-                                  </Badge>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      }
-                      Button={
-                        currentUserRole === UserRole.Owner ||
-                        currentUserRole === UserRole.Admin ? (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger
-                              className={buttonVariants({
-                                variant: "outline",
-                                size: "icon",
-                              })}
-                            >
-                              <EllipsisVerticalIcon className="h-5 w-5" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <Link
-                                className="!text-foreground hover:no-underline"
-                                href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+              <div>
+                <Input
+                  onChange={handleSearch}
+                  defaultValue={router.query.search as string}
+                  placeholder="Search for projects"
+                />
+                <div className="flex mt-4 flex-col gap-2">
+                  {projects.data.map((project) => (
+                    <Link
+                      key={project.id}
+                      href={`/${activeOrg.slug}/projects/${project.slug}`}
+                      className="flex flex-col gap-2 hover:no-underline"
+                    >
+                      <ListItem
+                        reactOnHover
+                        Title={
+                          <div className="flex flex-row items-center gap-2">
+                            <span>{project.name}</span>
+                          </div>
+                        }
+                        Description={
+                          <div className="flex flex-col">
+                            <span>{project.description}</span>
+                            {(project.stats.totalAssets > 0 ||
+                              project.type !== "default") && (
+                              <div className="flex mt-4 flex-row items-center gap-2">
+                                {project.type !== "default" && (
+                                  <ProjectBadge type={project.type} />
+                                )}
+                                {project.stats.totalAssets > 0 && (
+                                  <>
+                                    {" "}
+                                    <Badge
+                                      variant={
+                                        project.stats.compliantAssets ===
+                                        project.stats.totalAssets
+                                          ? "success"
+                                          : "secondary"
+                                      }
+                                      className=""
+                                    >
+                                      {project.stats.compliantAssets}/
+                                      {project.stats.totalAssets} assets
+                                      compliant
+                                    </Badge>
+                                    <Badge
+                                      variant={
+                                        project.stats
+                                          .passingControlsPercentage === 1
+                                          ? "success"
+                                          : "secondary"
+                                      }
+                                      className=""
+                                    >
+                                      {Math.round(
+                                        project.stats
+                                          .passingControlsPercentage * 100,
+                                      )}
+                                      % controls passing
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        }
+                        Button={
+                          currentUserRole === UserRole.Owner ||
+                          currentUserRole === UserRole.Admin ? (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger
+                                className={buttonVariants({
+                                  variant: "outline",
+                                  size: "icon",
+                                })}
                               >
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                              </Link>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        ) : (
-                          <></>
-                        )
-                      }
-                    />
-                  </Link>
-                ))}
+                                <EllipsisVerticalIcon className="h-5 w-5" />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <Link
+                                  className="!text-foreground hover:no-underline"
+                                  href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
+                                >
+                                  <DropdownMenuItem>Edit</DropdownMenuItem>
+                                </Link>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ) : (
+                            <></>
+                          )
+                        }
+                      />
+                    </Link>
+                  ))}
+                </div>
               </div>
             </Section>
           )}
+          <div className="mt-4">
+            <CustomPagination {...projects} />
+          </div>
         </div>
       )}
     </Page>
@@ -313,12 +446,25 @@ export const getServerSideProps = middleware(
 
     const slug = context.params?.organizationSlug as string;
 
-    const resp = await apiClient("/organizations/" + slug + "/projects");
+    const filterQuery = buildFilterQuery(context);
+    const query = buildFilterSearchParams(context);
 
-    const projects = await resp.json();
+    query.set("page", (context.query.page || "1") as string);
+    query.set("pageSize", (context.query.pageSize || "20") as string);
+
+    Object.entries(filterQuery).forEach(([key, value]) => {
+      query.append(key, value as string);
+    });
+
+    const resp = await apiClient(
+      "/organizations/" + slug + "/projects/" + "?" + query.toString(),
+    );
+
+    const projectsPaged = await resp.json();
+
     // fetch all the project stats
     const projectsWithCompliance = await Promise.all(
-      projects.map(async (project: ProjectDTO) => {
+      projectsPaged.data?.map(async (project: ProjectDTO) => {
         const resp = await apiClient(
           `/organizations/${slug}/projects/${project.slug}/compliance`,
         );
@@ -336,7 +482,7 @@ export const getServerSideProps = middleware(
 
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 
-        const compliantAssets = stats.filter((asset) =>
+        const compliantAssets = stats?.filter((asset) =>
           asset.every((r) => r.compliant),
         );
 
@@ -355,9 +501,13 @@ export const getServerSideProps = middleware(
       }),
     );
 
+    projectsPaged.data = projectsWithCompliance.sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+
     return {
       props: {
-        projects: projectsWithCompliance,
+        projects: projectsPaged,
       },
     };
   },

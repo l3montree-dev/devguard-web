@@ -30,9 +30,6 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
     // get the organization
     const org = await devGuardApiClient("/organizations/" + organizationSlug);
 
-    // parse the organization
-    const organization: OrganizationDetailsDTO = await org.json();
-
     // if the organization slug starts with an @ it is actually an identity provider
     // there has to be a token in the backend - maybe the user just needs to reauthorize.
     if (!org.ok && (organizationSlug as string).startsWith("@")) {
@@ -45,8 +42,8 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
           },
         });
       }
+
       return {
-        ...organization,
         oauth2Error: true,
       };
     }
@@ -60,6 +57,8 @@ export async function withOrganization(ctx: GetServerSidePropsContext) {
         },
       });
     }
+    // parse the organization
+    const organization: OrganizationDetailsDTO = await org.json();
 
     return organization;
   } else {

@@ -62,6 +62,7 @@ export interface InitialState {
 
 export interface GlobalStoreActions {
   updateOrganization: (organization: OrganizationDetailsDTO) => void;
+  updateOrganizations: (organizations: OrganizationDTO[]) => void;
   updateAsset: (asset: AssetDTO) => void;
   updateAssetVersions: (assetVersion: AssetVersionDTO) => void;
   updateProject: (project: ProjectDTO) => void;
@@ -98,6 +99,9 @@ export const createGlobalStore = (
       },
       updateAssetVersions: (assetVersion: AssetVersionDTO) => {
         set({ assetVersion });
+      },
+      updateOrganizations: (organizations: OrganizationDTO[]) => {
+        set({ organizations });
       },
       setSidebarOpen: (open: boolean) => {
         set({

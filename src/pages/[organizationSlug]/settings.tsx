@@ -45,6 +45,7 @@ import {
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
   UserRole,
+  WebhookDTO,
 } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
@@ -59,7 +60,8 @@ import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDi
 import DangerZone from "@/components/common/DangerZone";
 import { Switch } from "@/components/ui/switch";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
-import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
+import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
+import { getCurrentUserRole } from "../../hooks/useUserRole";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -110,6 +112,22 @@ const Home: FunctionComponent = () => {
     updateOrganization({
       ...activeOrg,
       jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+    });
+  };
+
+  const handleNewWebhookIntegration = (integration: WebhookDTO) => {
+    updateOrganization({
+      ...activeOrg,
+      webhooks: activeOrg.webhooks.concat(integration),
+    });
+  };
+
+  const handleUpdateWebhookIntegration = (integration: WebhookDTO) => {
+    updateOrganization({
+      ...activeOrg,
+      webhooks: activeOrg.webhooks.map((w) =>
+        w.id === integration.id ? integration : w,
+      ),
     });
   };
 
@@ -186,6 +204,25 @@ const Home: FunctionComponent = () => {
         ...activeOrg,
         jiraIntegrations: activeOrg.jiraIntegrations.filter((i) => i.id !== id),
       });
+    }
+  };
+
+  const handleDeleteWebhook = async (id?: string) => {
+    if (!id) return;
+    const res = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/integrations/webhook/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+    if (res.ok) {
+      toast.success("Webhook deleted successfully");
+      updateOrganization({
+        ...activeOrg,
+        webhooks: activeOrg.webhooks.filter((w) => w.id !== id),
+      });
+    } else {
+      toast.error("Failed to delete webhook");
     }
   };
 
@@ -379,6 +416,47 @@ const Home: FunctionComponent = () => {
         </Section>
       </div>
       <hr />
+      <div>
+        <Section
+          description={
+            "Manage the webhooks that are used to connect DevGuard with your Applications."
+          }
+          title="Webhooks"
+        >
+          {activeOrg.webhooks?.map((installation) => (
+            <ListItem
+              key={installation.id}
+              Title={installation.name}
+              Description={installation.description}
+              Button={
+                <WebhookIntegrationDialog
+                  onNewIntegration={handleUpdateWebhookIntegration}
+                  Button={<Button variant={"secondary"}>Edit Webhook</Button>}
+                  initialValues={installation}
+                  onDeleteWebhook={handleDeleteWebhook}
+                  projectWebhook={false}
+                ></WebhookIntegrationDialog>
+              }
+            />
+          ))}
+
+          <hr />
+          <ListItem
+            Title={
+              <div className="flex flex-row items-center">Add a Webhook</div>
+            }
+            Description="DevGuard uses webhooks to send notifications to your applications. You can use webhooks to receive notifications about events in DevGuard, such as new vulnerabilities, or SBOMs."
+            Button={
+              <WebhookIntegrationDialog
+                onNewIntegration={handleNewWebhookIntegration}
+                Button={<Button variant={"secondary"}>Add a Webhook</Button>}
+                projectWebhook={false}
+              />
+            }
+          />
+        </Section>
+      </div>
+      <hr />
       <Section
         title="Member"
         description="Manage the members of your organization"
@@ -454,9 +532,14 @@ export default Home;
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { organization, session }) => {
+    if (organization && "oauth2Error" in organization) {
+      return {
+        props: {},
+      };
+    }
     const currentUserRole = getCurrentUserRole(
       session?.identity,
-      organization!,
+      organization as OrganizationDetailsDTO,
     );
 
     if (

@@ -24,7 +24,7 @@ import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ConnectToRepoSection from "../../../../../../components/ConnectToRepoSection";
@@ -43,9 +43,6 @@ interface Props {
 }
 
 import { InputWithButton } from "@/components/ui/input-with-button";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
-import { UserRole } from "@/types/api/api";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -56,7 +53,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
 
 type SecretType = "badge" | "webhook";
 
-const generateNewSecret = (): string => {
+export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
@@ -179,6 +176,9 @@ const Index: FunctionComponent<Props> = ({
           cvssAutomaticTicketThreshold: firstOrUndefined(
             data.cvssAutomaticTicketThreshold,
           ),
+          vulnAutoReopenAfterDays: data.vulnAutoReopenAfterDays
+            ? +data.vulnAutoReopenAfterDays
+            : undefined,
           riskAutomaticTicketThreshold: firstOrUndefined(
             data.riskAutomaticTicketThreshold,
           ),

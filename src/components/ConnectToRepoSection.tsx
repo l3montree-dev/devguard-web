@@ -190,7 +190,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             }
           />
           {!hasIntegration && (
-            <div>
+            <div className="mt-4">
               <Callout intent="warning">
                 You need to install the DevGuard GitHub App, a GitLab, or a Jira
                 integration in the organization settings to connect a

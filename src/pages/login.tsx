@@ -44,6 +44,14 @@ import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
 import dynamic from "next/dynamic";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const ThreeJSScene = dynamic(
   () => import("../components/threejs/ThreeJSScene"),
@@ -180,10 +188,10 @@ const Login: NextPage = () => {
       </Head>
       <div className="flex min-h-screen flex-1 flex-row">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-18">
+          <div className="w-full px-26">
             <div className="">
               <Image
-                className="hidden h-16 w-auto dark:block"
+                className="hidden h-14 w-auto dark:block"
                 src={"/logo_inverse_horizontal.svg"}
                 alt="DevGuard by l3montree Logo"
                 width={300}
@@ -219,60 +227,133 @@ const Login: NextPage = () => {
                 </p>
               )}
             </div>
-
-            <div className="mt-12">
-              <p className="text-sm font-semibold text-foreground">
-                How do you want to sign in?
-              </p>
-            </div>
-            <div className="mt-4 sm:mx-auto">
+            <div className="mt-4 sm:mx-auto mt-8">
               {flow?.requested_aal !== "aal2" ? (
-                <Tab.Group>
-                  <CustomTab>Passwordless</CustomTab>
-                  <CustomTab>Legacy Password login</CustomTab>
-                  <Tab.Panels className={"mt-8"}>
-                    <Tab.Panel>
-                      <Flow
-                        only="passkey"
-                        hideGlobalMessages
-                        onSubmit={onSubmit}
-                        flow={flow as LoginFlow}
-                      />
-                      {availableMethods.includes("oidc") && (
-                        <div className="mt-6 border-t pt-6">
-                          <Flow
-                            className="flex flex-wrap justify-end flex-row"
-                            only="oidc"
-                            hideGlobalMessages
-                            onSubmit={onSubmit}
-                            flow={flow as LoginFlow}
-                          />
-                        </div>
-                      )}
-                    </Tab.Panel>
-                    <Tab.Panel>
-                      <div className="my-4">
-                        <Callout intent="warning">
-                          <div className="flex flex-row gap-4">
-                            <p className="flex-1">
-                              Passwords are insecure by design. We recommend
-                              using a passwordless authentication methods.{" "}
-                              <div className="mr-2 inline-block w-10">
-                                <Carriage />
+                <Tabs defaultValue="passwordless">
+                  <TabsList>
+                    <TabsTrigger value="passwordless">
+                      Passwordless Login
+                    </TabsTrigger>
+                    <TabsTrigger value="password">
+                      Legacy Password Login
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="passwordless" className={"mt-6"}>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-md">
+                          Passwordless Login
+                        </CardTitle>
+                        <CardDescription>
+                          Use your passkey to sign in. If you do not have a
+                          passkey, you can use the legacy password login option.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Flow
+                          only="passkey"
+                          hideGlobalMessages
+                          onSubmit={onSubmit}
+                          flow={flow as LoginFlow}
+                        />
+                        <p className="mt-4 text-sm/6 text-muted-foreground flex justify-end">
+                          <Link
+                            href="/recovery"
+                            passHref
+                            className="font-semibold hover:underline"
+                          >
+                            Need to recover your account?
+                          </Link>
+                        </p>
+                        {availableMethods.includes("oidc") && (
+                          <>
+                            <div className="relative mt-6">
+                              <div
+                                aria-hidden="true"
+                                className="absolute inset-0 flex items-center"
+                              >
+                                <div className="w-full border-t border-muted-foreground/50" />
                               </div>
-                            </p>
+                              <div className="relative flex justify-center text-sm/6 font-medium">
+                                <span className="px-6 text-muted-foreground bg-card">
+                                  Or continue with
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-6">
+                              <Flow
+                                className="flex flex-row flex-wrap gap-2 justify-center"
+                                only="oidc"
+                                hideGlobalMessages
+                                onSubmit={onSubmit}
+                                flow={flow as LoginFlow}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="password" className={"mt-6"}>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-md">
+                          Legacy Password Login
+                        </CardTitle>
+                        <CardDescription>
+                          Passwords are insecure by design. We recommend using a
+                          passwordless authentication methods.{" "}
+                          <div className="mr-2 inline-block w-8">
+                            <Carriage />
                           </div>
-                        </Callout>
-                      </div>
-                      <Flow
-                        only="password"
-                        hideGlobalMessages
-                        onSubmit={onSubmit}
-                        flow={flow as LoginFlow}
-                      />
-                    </Tab.Panel>
-                  </Tab.Panels>
-                </Tab.Group>
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Flow
+                          only="password"
+                          hideGlobalMessages
+                          onSubmit={onSubmit}
+                          flow={flow as LoginFlow}
+                        />
+                        <p className="mt-4 text-sm/6 text-muted-foreground flex justify-end">
+                          <Link
+                            href="/recovery"
+                            passHref
+                            className="font-semibold hover:underline"
+                          >
+                            Need to recover your account?
+                          </Link>
+                        </p>
+                        {availableMethods.includes("oidc") && (
+                          <>
+                            <div className="relative mt-6">
+                              <div
+                                aria-hidden="true"
+                                className="absolute inset-0 flex items-center"
+                              >
+                                <div className="w-full border-t border-muted-foreground/50" />
+                              </div>
+                              <div className="relative flex justify-center text-sm/6 font-medium">
+                                <span className="px-6 text-muted-foreground bg-card">
+                                  Or continue with
+                                </span>
+                              </div>
+                            </div>
+                            <div className="mt-6">
+                              <Flow
+                                className="flex flex-row flex-wrap gap-2 justify-center"
+                                only="oidc"
+                                hideGlobalMessages
+                                onSubmit={onSubmit}
+                                flow={flow as LoginFlow}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               ) : (
                 <Flow
                   only="totp"
@@ -282,27 +363,11 @@ const Login: NextPage = () => {
                 />
               )}
             </div>
-            <div className="mt-4">
+            <div className="mt-8">
               <Messages messages={flow?.ui.messages} />
             </div>
-
-            {aal || refresh ? (
-              <a data-testid="logout-link" onClick={onLogout}>
-                Log out
-              </a>
-            ) : (
-              <p className="mt-8 text-sm/6 text-muted-foreground">
-                <Link
-                  href="/recovery"
-                  passHref
-                  className="font-semibold hover:underline"
-                >
-                  Need to recover your account?
-                </Link>
-              </p>
-            )}
-            <div className="mt-8">
-              <p className="text-sm/6 text-muted-foreground">
+            <div className="mt-12 flex flex-col items-center">
+              <p className="text-sm/6 text-muted-foreground text-center max-w-sm">
                 By using DevGuard you agree to our{" "}
                 <Link
                   href="https://devguard.org/terms-of-use"
@@ -312,9 +377,27 @@ const Login: NextPage = () => {
                   className="font-semibold hover:underline"
                 >
                   Terms of Use
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="https://devguard.org/privacy-policy"
+                  target="_blank"
+                  rel="noreferrer"
+                  passHref
+                  className="font-semibold hover:underline"
+                >
+                  Privacy Policy
                 </Link>
+                .
               </p>
             </div>
+
+            {aal ||
+              (refresh && (
+                <a data-testid="logout-link" onClick={onLogout}>
+                  Log out
+                </a>
+              ))}
           </div>
         </div>
         <ThreeJSFeatureScreen />

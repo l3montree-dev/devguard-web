@@ -160,6 +160,41 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
           </FormItem>
         )}
       />
+      <FormField
+        control={form.control}
+        name="vulnAutoReopenAfterDays"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              Automatically reopen accepted vulnerabilities after
+            </FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value?.toString()}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a time range" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="30">30 Days</SelectItem>
+                <SelectItem value="60">2 Months</SelectItem>
+                <SelectItem value="120">4 Months</SelectItem>
+                <SelectItem value="180">6 Months</SelectItem>
+                <SelectItem value="360">1 Year</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              Select the time period after which a vulnerability will be
+              automatically reopened if it was once accepted. PCI-DSS requires
+              vulnerabilities to be revalidated after 6 months, so this is a
+              good default.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

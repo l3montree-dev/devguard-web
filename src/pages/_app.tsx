@@ -49,8 +49,6 @@ export default function App({ Component, pageProps }) {
     window.innerWidth < 768 && setIsMobile(true);
   }, []);
 
-  console.log(pageProps);
-
   return (
     <ThemeProvider
       attribute="class"

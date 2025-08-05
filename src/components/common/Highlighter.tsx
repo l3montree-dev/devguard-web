@@ -28,12 +28,19 @@ const Highlighter: FunctionComponent<{
   codeString: string;
   language?: "yaml" | "shell" | "rego";
   startingLineNumber?: number;
+  startingHighlightLineNumber?: number | null;
 }> = (props) => {
+  let startLine = 1;
+  if (props.startingLineNumber && props.startingHighlightLineNumber) {
+    startLine =
+      props.startingLineNumber - props.startingHighlightLineNumber + 1;
+  }
+
   return (
     <div className="w-full bg-black">
       <SyntaxHighlighter
         showLineNumbers
-        startingLineNumber={props.startingLineNumber ?? 1}
+        startingLineNumber={startLine}
         lineNumberStyle={{ color: "rgba(255, 255, 255, 0.3)" }}
         language={props.language}
         style={docco}

@@ -37,8 +37,6 @@ export default function SbomDownloadModal({
 }: SbomDownloadModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log(pathname);
-
   const handleDownloadPdfSbom = async () => {
     setIsLoading(true);
     try {

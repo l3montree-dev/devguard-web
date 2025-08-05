@@ -73,6 +73,16 @@ export interface JiraIntegrationDTO {
   userEmail: string;
 }
 
+export interface WebhookDTO {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  secret: string;
+  sbomEnabled: boolean;
+  vulnEnabled: boolean;
+}
+
 export interface OrganizationDTO extends AppModelDTO {
   name: string;
   contactPhoneNumber?: string;
@@ -97,6 +107,8 @@ export interface OrganizationDTO extends AppModelDTO {
 
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
   jiraIntegrations: Array<JiraIntegrationDTO>;
+
+  webhooks: Array<WebhookDTO>;
 
   isPublic: boolean;
 
@@ -144,6 +156,8 @@ export interface ProjectDTO {
 
   repositoryId?: string;
   repositoryName?: string;
+
+  webhooks: Array<WebhookDTO>;
 
   members: Array<{
     id: string;
@@ -389,6 +403,14 @@ export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
 }
 
+export interface DependencyVulnHints {
+  amountOpen: number;
+  amountFixed: number;
+  amountAccepted: number;
+  amountFalsePositive: number;
+  amountMarkedForTransfer: number;
+}
+
 export interface DetailedFirstPartyVulnDTO extends FirstPartyVuln {
   events: VulnEventDTO[];
 }
@@ -455,6 +477,8 @@ export interface AssetDTO {
 
   externalEntityId?: string;
   externalEntityProviderId?: string;
+
+  vulnAutoReopenAfterDays?: number;
 }
 
 export interface DependencyTreeNode {
@@ -547,13 +571,18 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface FirstPartyVuln extends BaseVulnDTO {
-  uri: string;
+interface snippetContents {
   startLine: number;
   endLine: number;
   startColumn: number;
   endColumn: number;
   snippet: string;
+}
+
+export interface FirstPartyVuln extends BaseVulnDTO {
+  uri: string;
+
+  snippetContents: snippetContents[];
 
   ruleHelp: string;
   ruleName: string;

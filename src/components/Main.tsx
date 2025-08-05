@@ -61,7 +61,7 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
         alt="OpenCode Logo"
         width={30}
         height={30}
-        className="scale-175 relative right-[1px]"
+        className="relative right-[1px]"
       />
     );
   }
@@ -273,7 +273,7 @@ const Main: FunctionComponent<Props> = ({
             </Link>
             <Link
               className="!text-muted-foreground"
-              href="https://l3montree.com/datenschutz"
+              href="https://devguard.org/privacy-policy"
             >
               Privacy
             </Link>

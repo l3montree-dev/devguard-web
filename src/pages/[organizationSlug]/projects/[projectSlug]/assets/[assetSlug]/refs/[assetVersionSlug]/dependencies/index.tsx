@@ -315,7 +315,12 @@ const LicenseCall = (props: {
             setOpen(!open);
           }}
         >
-          <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          {props.license.licenseId === "loading" ? (
+            <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : (
+            <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
+          )}
+
           {licenseMap[license] || license}
           <ChevronDownIcon className={"ml-2 h-4 w-4 text-muted-foreground"} />
         </Badge>
@@ -746,8 +751,8 @@ export const getServerSideProps = middleware(
     components.data = components.data.map((component) => ({
       ...component,
       license: licenseMap[component.dependency.license ?? ""] ?? {
-        licenseId: "unknown",
-        name: "unknown",
+        licenseId: "loading",
+        name: "Loading",
         count: 0,
       },
     }));

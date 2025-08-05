@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, use, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import Page from "../../../../components/Page";
 
 import { middleware } from "@/decorators/middleware";
@@ -10,7 +10,12 @@ import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../services/devGuardApi";
-import { ProjectDTO, UserRole } from "../../../../types/api/api";
+import {
+  OrganizationDetailsDTO,
+  ProjectDTO,
+  UserRole,
+  WebhookDTO,
+} from "../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -19,7 +24,10 @@ import { withProject } from "@/decorators/withProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useStore } from "@/zustand/globalStoreProvider";
 
+import ListItem from "@/components/common/ListItem";
+import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
+import { getCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -29,8 +37,6 @@ import CopyInput from "../../../../components/common/CopyInput";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import Section from "../../../../components/common/Section";
 import { Label } from "../../../../components/ui/label";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
 
 interface Props {}
 
@@ -39,6 +45,46 @@ const Index: FunctionComponent<Props> = () => {
   const project = useActiveProject();
   const updateProject = useStore((s) => s.updateProject);
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
+
+  const handleNewWebhookIntegration = (integration: WebhookDTO) => {
+    updateProject({
+      ...project,
+      webhooks: project.webhooks.concat(integration),
+    });
+  };
+
+  const handleUpdateWebhookIntegration = (integration: WebhookDTO) => {
+    updateProject({
+      ...project,
+      webhooks: project.webhooks.map((w) =>
+        w.id === integration.id ? integration : w,
+      ),
+    });
+  };
+
+  const handleDeleteWebhook = async (id?: string) => {
+    if (!id) return;
+    const res = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/integrations/webhook/" +
+        id,
+      {
+        method: "DELETE",
+      },
+    );
+    if (res.ok) {
+      toast.success("Webhook deleted successfully");
+      updateProject({
+        ...project,
+        webhooks: project.webhooks.filter((w) => w.id !== id),
+      });
+    } else {
+      toast.error("Failed to delete webhook");
+    }
+  };
 
   const handleChangeMemberRole = async (
     id: string,
@@ -154,7 +200,47 @@ const Index: FunctionComponent<Props> = () => {
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold">Group Settings</h1>
         </div>
+        <div>
+          <Section
+            description={
+              "Manage the webhooks that are used to connect DevGuard with your Applications."
+            }
+            title="Webhooks"
+          >
+            {project.webhooks?.map((installation) => (
+              <ListItem
+                key={installation.id}
+                Title={installation.name}
+                Description={installation.description}
+                Button={
+                  <WebhookIntegrationDialog
+                    onNewIntegration={handleUpdateWebhookIntegration}
+                    Button={<Button variant={"secondary"}>Edit Webhook</Button>}
+                    initialValues={installation}
+                    onDeleteWebhook={handleDeleteWebhook}
+                    projectWebhook={true}
+                  ></WebhookIntegrationDialog>
+                }
+              />
+            ))}
 
+            <hr />
+            <ListItem
+              Title={
+                <div className="flex flex-row items-center">Add a Webhook</div>
+              }
+              Description="DevGuard uses webhooks to send notifications to your applications. You can use webhooks to receive notifications about events in DevGuard, such as new vulnerabilities, or SBOMs."
+              Button={
+                <WebhookIntegrationDialog
+                  onNewIntegration={handleNewWebhookIntegration}
+                  Button={<Button variant={"secondary"}>Add a Webhook</Button>}
+                  projectWebhook={true}
+                ></WebhookIntegrationDialog>
+              }
+            />
+          </Section>
+        </div>
+        <hr />
         <Section title="Information">
           <Label>Group ID</Label>
           <CopyInput value={project?.id ?? ""} />
@@ -214,9 +300,15 @@ export const getServerSideProps = middleware(
     context: GetServerSidePropsContext,
     { organization, session, project },
   ) => {
+    if (organization && "oauth2Error" in organization) {
+      return {
+        props: {},
+      };
+    }
+
     const currentUserRole = getCurrentUserRole(
       session?.identity,
-      organization!,
+      organization as OrganizationDetailsDTO,
       context.query.projectSlug as string,
       project,
     );
