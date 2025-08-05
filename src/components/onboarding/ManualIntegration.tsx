@@ -46,6 +46,11 @@ const ManualIntegration = ({
 }) => {
   const [tab, setTab] = useState<"sbom" | "sarif">("sbom");
 
+  const trivySbomCommand =
+    "trivy fs . --format cyclonedx --output trivy-results.json";
+  const trivySarifCommand =
+    "trivy fs . --sarif cyclonedx --output trivy-results.sarif";
+
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
   const sbomFileRef = useRef<File | undefined>(undefined);
 

@@ -25,6 +25,8 @@ import { GithubTokenSlides } from "./risk-identification/GithubTokenInstructions
 import { GitlabTokenSlides } from "./risk-identification/GitlabTokenInstructions";
 import PatSection from "./risk-identification/PatSection";
 import { AsyncButton, Button } from "./ui/button";
+import Autosetup from "./onboarding/Autosetup";
+
 import {
   Card,
   CardContent,
@@ -51,6 +53,7 @@ import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
 import ScannerOptions from "./onboarding/ScannerOptions";
 import ManualIntegration from "./onboarding/ManualIntegration";
 import AdditionalManualScannerOptions from "./onboarding/AdditionalManualScannerOptions";
+import { useAutosetup } from "@/hooks/useAutosetup";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
@@ -83,6 +86,8 @@ const DependencyRiskScannerDialog: FunctionComponent<
   const activeProject = useActiveProject();
 
   const pat = usePersonalAccessToken();
+
+  const autosetup = useAutosetup("full");
 
   const fileContent = useRef<any>(undefined);
   const [fileName, setFileName] = useState<string>();
@@ -225,10 +230,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
               </Card>
               <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
                 <Button
-                  disabled={
-                    selectedScanner === undefined ||
-                    selectedScanner === "auto-setup"
-                  }
+                  disabled={selectedScanner === undefined}
                   onClick={() => {
                     api?.scrollNext();
                   }}
@@ -239,6 +241,11 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 </Button>
               </div>
             </CarouselItem>
+
+            {selectedScanner === "auto-setup" && (
+              <Autosetup api={api} {...autosetup} />
+            )}
+
             <CarouselItem>
               <DialogHeader>
                 <DialogTitle>What Scanner do you want to use?</DialogTitle>
@@ -319,6 +326,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 </Button>
               </div>
             </CarouselItem>
+
             {selectedSetup === "cherry-pick-setup" && (
               <ScannerOptions
                 api={api}
