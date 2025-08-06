@@ -22,8 +22,9 @@ import {
 } from "@/services/devGuardApi";
 import { Separator } from "../ui/separator";
 import CopyCode from "../common/CopyCode";
-import Callout from "../common/Callout";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import router from "next/router";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 type Command = "container-scanning" | "sbom" | "sarif";
 
@@ -50,6 +51,9 @@ const ManualIntegration = ({
 
   const [showCommands, setShowCommands] = useState(false);
 
+  const activeAssetVersion = useActiveAssetVersion()!;
+  const assetVersion = useActiveAssetVersion();
+
   const trivySbomCommand =
     "trivy fs . --format cyclonedx --output trivy-results.json";
   const trivySarifCommand =
@@ -68,8 +72,6 @@ const ManualIntegration = ({
   const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
-      reader.onabort = () => console.log("SBOM file reading was aborted");
-      reader.onerror = () => console.log("SBOM file reading has failed");
       reader.onload = () => {
         try {
           const txt = reader.result as string;
@@ -101,8 +103,6 @@ const ManualIntegration = ({
   const onDropSarif = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
-      reader.onabort = () => console.log("SARIF file reading was aborted");
-      reader.onerror = () => console.log("SARIF file reading has failed");
       reader.onload = () => {
         sarifContentRef.current = reader.result as string;
         setSarifFileName(file.name);
@@ -136,16 +136,18 @@ const ManualIntegration = ({
 
     if (resp.ok) {
       toast.success("SBOM has successfully been sent!");
-
-      next?.();
     } else {
       toast.error("SBOM has not been sent successfully");
     }
+    router.push(
+      `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/main/dependency-risks/`,
+    );
   };
 
   const uploadSARIF = async () => {
     if (!sarifContentRef.current) return;
 
+    console.log(activeAssetVersion);
     const resp = await browserApiClient(`${sarifEndpoint}`, {
       method: "POST",
       body: sarifContentRef.current,
@@ -157,10 +159,12 @@ const ManualIntegration = ({
 
     if (resp.ok) {
       toast.success("SARIF report has successfully been sent!");
-      next?.();
     } else {
       toast.error("SARIF report has not been sent successfully");
     }
+    router.push(
+      `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/main/code-risks/`,
+    );
   };
 
   const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;

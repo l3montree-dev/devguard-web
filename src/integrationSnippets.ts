@@ -92,8 +92,8 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     iac: generateWorkflowSnippet(
-      "call-sast",
-      "sast.yml",
+      "iac",
+      "iac.yml",
       orgSlug,
       projectSlug,
       assetSlug,

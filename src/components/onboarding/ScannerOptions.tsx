@@ -13,36 +13,23 @@
 // limitations under the License.
 
 import Image from "next/image";
-import React, {
-  FunctionComponent,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Carousel, CarouselApi, CarouselItem } from "../ui/carousel";
+import React, { useEffect, useState } from "react";
+import { Card, CardDescription, CardTitle } from "../ui/card";
+import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import { integrationSnippets } from "../../integrationSnippets";
+
 import { classNames } from "@/utils/common";
-import { concat } from "lodash";
+
 import GithubTokenInstructions, {
   GithubTokenSlides,
 } from "../risk-identification/GithubTokenInstructions";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
-import { GitInstances } from "@/types/common";
 
 interface Config {
   "secret-scanning": boolean;

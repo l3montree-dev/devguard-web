@@ -83,12 +83,21 @@ export const YamlGenerator = ({
   }, [api, config]);
 
   function codeStringBuilder() {
-    const base = gitInstance === "GitHub" ? "\njobs:" : "\ninclude:";
-    console.log(config, gitInstance);
+    const base =
+      gitInstance === "GitHub"
+        ? `\nname: DevGuard DevSecOps
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  `
+        : "\ninclude:";
+
     const codeString = Object.entries(config)
       .filter(([_, selectedOptionValue]) => selectedOptionValue)
       .map(([selectedOption]) => {
-        console.log(selectedOption);
         return integrationSnippets({
           orgSlug,
           projectSlug,
