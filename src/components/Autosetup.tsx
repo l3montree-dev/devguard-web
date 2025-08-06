@@ -29,7 +29,6 @@ interface Props {
   };
   Loader: () => React.ReactNode;
   isLoading: boolean;
-  api: CarouselApi;
 }
 
 const Autosetup: FunctionComponent<Props> = ({
