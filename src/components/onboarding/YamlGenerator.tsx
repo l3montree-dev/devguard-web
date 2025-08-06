@@ -127,14 +127,22 @@ jobs:
           <DialogDescription>
             Create a new
             <CopyCodeFragment
-              codeString={`.${gitInstance.toLowerCase()}/workflows/devsecops.yml`}
+              codeString={
+                gitInstance === "GitHub"
+                  ? `.${gitInstance.toLowerCase()}/workflows/devsecops.yml`
+                  : `.gitlab-ci.yml`
+              }
             />
             file or add the code snippet to an existing workflow file.
           </DialogDescription>
         </DialogHeader>
         <CopyCode
           language="yaml"
-          codeString={`# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `}
+          codeString={
+            gitInstance === "GitHub"
+              ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
+              : `# .gitlab-ci.yml \n ${codeStringBuilder()}`
+          }
         ></CopyCode>
         <div className="mt-10 flex flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={() => prev?.()}>
