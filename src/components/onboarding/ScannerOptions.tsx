@@ -37,6 +37,7 @@ interface Config {
   "container-scanning": boolean;
   sast: boolean;
   iac: boolean;
+  build: boolean;
 }
 
 export const ScannerOptions = ({
@@ -68,6 +69,7 @@ export const ScannerOptions = ({
     "container-scanning": true,
     sast: true,
     iac: true,
+    build: true,
   });
 
   type gitInstance = "Gitlab" | "GitHub";
@@ -147,6 +149,7 @@ export const ScannerOptions = ({
                       setConfig(() => ({
                         ...config,
                         "secret-scanning": !config["secret-scanning"],
+                        build: !config.build,
                       }))
                     }
                   />

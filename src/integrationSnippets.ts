@@ -219,7 +219,16 @@ include:
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
+    build: generateGitlabSnippet(
+      "build",
+      "build.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
   },
+
   Docker: {
     iac: generateDockerSnippet(
       "iac",
