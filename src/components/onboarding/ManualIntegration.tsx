@@ -25,6 +25,7 @@ import CopyCode from "../common/CopyCode";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import router from "next/router";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import Link from "next/link";
 
 type Command = "container-scanning" | "sbom" | "sarif";
 
@@ -210,14 +211,15 @@ const ManualIntegration = ({
               </CardContent>
             </Card>
 
-            <div
-              className="mt-2 flex text-yellow-500 hover:text-primary-700 flex-row"
-              onClick={() => setShowCommands(true)}
-            >
+            <div className="mt-2 flex text-primary flex-row items-center">
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <span className="flex text-sm  items-center select-none ">
+              <Link
+                className="flex text-primary"
+                href="https://devguard.org/guides"
+                target="_blank"
+              >
                 How do I get an SBOM?
-              </span>
+              </Link>
             </div>
 
             {showCommands === true && (
