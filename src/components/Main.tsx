@@ -253,6 +253,7 @@ const Main: FunctionComponent<Props> = ({
             <Link
               className="!text-muted-foreground"
               target="_blank"
+              rel="noopener noreferrer"
               href="https://github.com/l3montree-dev/devguard"
             >
               GitHub
@@ -260,6 +261,7 @@ const Main: FunctionComponent<Props> = ({
             <Link
               className="!text-muted-foreground"
               target="_blank"
+              rel="noopener noreferrer"
               href="https://l3montree.com/impressum"
             >
               Imprint
@@ -267,6 +269,7 @@ const Main: FunctionComponent<Props> = ({
             <Link
               className="!text-muted-foreground"
               target="_blank"
+              rel="noopener noreferrer"
               href="https://devguard.org/terms-of-use"
             >
               Terms of Use
@@ -274,6 +277,8 @@ const Main: FunctionComponent<Props> = ({
             <Link
               className="!text-muted-foreground"
               href="https://devguard.org/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Privacy
             </Link>
