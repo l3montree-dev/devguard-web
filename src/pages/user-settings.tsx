@@ -242,18 +242,20 @@ const Settings: FunctionComponent<{
           description="Use a permanent address where you can receive mail."
           title="Profile Management & Security Settings"
         >
-          <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="col-span-full">
-              <SettingsCard only="profile" flow={flow}>
-                <Flow
-                  hideGlobalMessages
-                  onSubmit={onSubmit}
-                  only="profile"
-                  flow={flow}
-                />
-              </SettingsCard>
+          <Card className="p-6">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="col-span-full">
+                <SettingsCard only="profile" flow={flow}>
+                  <Flow
+                    hideGlobalMessages
+                    onSubmit={onSubmit}
+                    only="profile"
+                    flow={flow}
+                  />
+                </SettingsCard>
+              </div>
             </div>
-          </div>
+          </Card>
         </Section>
 
         <Section
@@ -261,14 +263,16 @@ const Settings: FunctionComponent<{
           title="Change Password"
           description="Update your password associated with your account."
         >
-          <SettingsCard only="password" flow={flow}>
-            <Flow
-              hideGlobalMessages
-              onSubmit={onSubmit}
-              only="password"
-              flow={flow}
-            />
-          </SettingsCard>
+          <Card className="p-6">
+            <SettingsCard only="password" flow={flow}>
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="password"
+                flow={flow}
+              />
+            </SettingsCard>
+          </Card>
         </Section>
 
         <Section
@@ -276,14 +280,14 @@ const Settings: FunctionComponent<{
           title="Manage Personal Access Tokens"
           description="Personal Access Tokens are needed to integrate scanners and other software which should be able to provide CVE findings to DevGuard"
         >
-          <Card className="bg-background">
+          <Card className="">
             <CardHeader>
               <CardTitle>Create Personal Access Token </CardTitle>
             </CardHeader>
             <form onSubmit={handleSubmit(handleCreatePat)}>
               <CardContent>
                 <Label htmlFor="description">Description</Label>
-                <Input {...register("description")} />
+                <Input variant="onCard" {...register("description")} />
 
                 <div className="mt-4">
                   <span>Select scopes</span>
@@ -386,13 +390,17 @@ const Settings: FunctionComponent<{
                 />
               ))}
           </div>
-          <Card className="bg-background">
+          <Card className="">
             <CardHeader>
               <CardTitle>Revoke access token</CardTitle>
             </CardHeader>
             <form onSubmit={handleRevokePat}>
               <CardContent>
-                <Input name="privkey" placeholder="Paste token here" />
+                <Input
+                  variant="onCard"
+                  name="privkey"
+                  placeholder="Paste token here"
+                />
               </CardContent>
               <CardFooter className="flex justify-end">
                 <Button type="submit" variant="destructiveOutline">
@@ -408,28 +416,32 @@ const Settings: FunctionComponent<{
           title="Manage Social Sign In"
           description="Update your linked social network accounts."
         >
-          <SettingsCard only="oidc" flow={flow}>
-            <Flow
-              hideGlobalMessages
-              onSubmit={onSubmit}
-              only="oidc"
-              flow={flow}
-            />
-          </SettingsCard>
+          <Card className="p-6">
+            <SettingsCard only="oidc" flow={flow}>
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="oidc"
+                flow={flow}
+              />
+            </SettingsCard>
+          </Card>
         </Section>
         <Section
           id="passkey"
           title="Manage Hardware Tokens and Biometrics"
           description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
         >
-          <SettingsCard only="passkey" flow={flow}>
-            <Flow
-              hideGlobalMessages
-              onSubmit={onSubmit}
-              only="passkey"
-              flow={flow}
-            />
-          </SettingsCard>
+          <Card className="p-6">
+            <SettingsCard only="passkey" flow={flow}>
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="passkey"
+                flow={flow}
+              />
+            </SettingsCard>
+          </Card>
         </Section>
 
         <Section
@@ -466,14 +478,16 @@ const Settings: FunctionComponent<{
             </>
           }
         >
-          <SettingsCard only="totp" flow={flow}>
-            <Flow
-              hideGlobalMessages
-              onSubmit={onSubmit}
-              only="totp"
-              flow={flow}
-            />
-          </SettingsCard>
+          <Card className="p-6">
+            <SettingsCard only="totp" flow={flow}>
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="totp"
+                flow={flow}
+              />
+            </SettingsCard>
+          </Card>
         </Section>
         <Section
           id="lookup_secret"
@@ -481,18 +495,34 @@ const Settings: FunctionComponent<{
           description="Recovery codes can be used in panic situations where you have lost
         access to your 2FA device."
         >
-          <SettingsCard only="lookup_secret" flow={flow}>
-            <Flow
-              hideGlobalMessages
-              onSubmit={onSubmit}
-              only="lookup_secret"
-              flow={flow}
-            />
-          </SettingsCard>
+          <Card className="p-6">
+            <SettingsCard only="lookup_secret" flow={flow}>
+              <Flow
+                hideGlobalMessages
+                onSubmit={onSubmit}
+                only="lookup_secret"
+                flow={flow}
+              />
+            </SettingsCard>
+          </Card>
+        </Section>
+
+        <Section
+          id="request-account-deletion"
+          title="Request Account Deletion"
+          description="If you want to delete your account, please click the button below and send a request to our support team to delete your account."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <Link href="mailto:community@devguard.org?subject=Request%20DevGuard%20Account%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20DevGuard%20Account.%20%0A%0AThank%20you.">
+                <Button variant="destructive">Request Account Deletion</Button>
+              </Link>
+            </div>
+          </Card>
         </Section>
 
         <div className="flex flex-row justify-end">
-          <Button variant={"secondary"} onClick={handleLogout}>
+          <Button variant={"destructiveOutline"} onClick={handleLogout}>
             Logout
           </Button>
         </div>
