@@ -85,14 +85,10 @@ export const YamlGenerator = ({
   function codeStringBuilder() {
     const base =
       gitInstance === "GitHub"
-        ? `\nname: DevGuard DevSecOps
-
+        ? `\n
+name: DevGuard DevSecOps
 on:
-  pull_request:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
 jobs:
   `
         : "\ninclude:";

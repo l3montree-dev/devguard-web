@@ -77,7 +77,7 @@ export const integrationSnippets = ({
   GitHub: {
     sca: generateWorkflowSnippet(
       "call-sca",
-      "sca.yml",
+      "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
       assetSlug,
