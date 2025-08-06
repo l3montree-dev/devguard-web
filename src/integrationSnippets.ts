@@ -84,7 +84,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     "container-scanning": generateWorkflowSnippet(
-      "call-container-scanning",
+      "sca",
       "container-scanning.yml",
       orgSlug,
       projectSlug,
@@ -156,7 +156,7 @@ export const integrationSnippets = ({
   Gitlab: {
     sca: generateGitlabSnippet(
       "call-sca",
-      "sca.yml",
+      "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
       assetSlug,

@@ -184,11 +184,7 @@ export const GithubTokenSlides = ({
           </Card>
         </div>
         <div className="flex mt-10 flex-row gap-2 justify-end">
-          <Button
-            variant={"secondary"}
-            onClick={prev}
-            disabled={pat === undefined}
-          >
+          <Button variant={"secondary"} onClick={() => prev?.()}>
             Back
           </Button>
           <Button
