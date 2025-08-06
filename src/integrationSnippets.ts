@@ -99,6 +99,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
+
     sast: generateWorkflowSnippet(
       "call-sast",
       "sast.yml",
@@ -172,7 +173,7 @@ export const integrationSnippets = ({
     ),
     iac: generateGitlabSnippet(
       "call-iac",
-      "iac.yml",
+      "infrastructure-as-code-scanning.yml",
       orgSlug,
       projectSlug,
       assetSlug,
