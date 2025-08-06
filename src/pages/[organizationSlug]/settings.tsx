@@ -62,6 +62,7 @@ import { Switch } from "@/components/ui/switch";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
+import { Card } from "@/components/ui/card";
 
 const Home: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -524,6 +525,31 @@ const Home: FunctionComponent = () => {
           </Section>
         </form>
       </Form>
+      <hr />
+      <Section
+        id="request-org-deletion"
+        title="Request Organization Deletion"
+        description="If you want to delete your organization, please click the button below and send a request to our support team to delete your organization."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link
+              href={
+                "mailto:community@devguard.org?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
+                "=" +
+                activeOrg.id +
+                "%0AName%3D" +
+                activeOrg.name +
+                "%20%0A%0AThank%20you."
+              }
+            >
+              <Button variant="destructive">
+                Request Organization Deletion
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
     </Page>
   );
 };
