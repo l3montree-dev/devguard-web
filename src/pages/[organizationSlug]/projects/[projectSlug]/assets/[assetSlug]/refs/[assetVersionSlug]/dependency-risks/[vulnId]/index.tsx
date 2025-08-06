@@ -435,7 +435,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          assetVersion?.name +
+          assetVersion?.slug +
           "/dependency-vulns/" +
           vuln.id +
           "/mitigate",
@@ -460,7 +460,7 @@ const Index: FunctionComponent<Props> = (props) => {
           "/assets/" +
           asset.slug +
           "/refs/" +
-          assetVersion?.name +
+          assetVersion?.slug +
           "/dependency-vulns/" +
           vuln.id,
         {

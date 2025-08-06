@@ -564,7 +564,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
               "!text-background",
             )}
             href={
-              `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.name}/dependencies/graph?` +
+              `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams({
                 scanner:
                   "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
