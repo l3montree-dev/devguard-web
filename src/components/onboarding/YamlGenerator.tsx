@@ -92,6 +92,8 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+jobs:
   `
         : "\ninclude:";
 
@@ -140,8 +142,22 @@ on:
           </Button>
           <Button
             disabled={Object.values(config).every((v) => v === false)}
-            onClick={() => {
-              setWebhookIsOpen(true);
+            onClick={async () => {
+              const resp = await fetch(
+                `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                {
+                  method: "GET",
+                },
+              );
+              if (resp.redirected) {
+                router.push(
+                  `/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}?path=/dependency-risks`,
+                );
+              } else {
+                toast.error(
+                  "We did not receive any information from your pipeline yet. You can safely close the dialog and refresh the page yourself after the pipeline did finish.",
+                );
+              }
             }}
           >
             {Object.values(config).every((v) => v === false)
@@ -150,14 +166,6 @@ on:
           </Button>
         </div>
       </CarouselItem>
-      {webhookIsOpen && (
-        <CarouselItem>
-          <WebhookSetupTicketIntegrationDialog
-            open={webhookIsOpen}
-            onOpenChange={setWebhookIsOpen}
-          />
-        </CarouselItem>
-      )}
     </>
   );
 };

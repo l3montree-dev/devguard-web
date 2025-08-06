@@ -112,9 +112,6 @@ export const AdditionalManualScannerOptions = ({
                 />
                 Devguard
               </Button>
-              {/* border dark:border-foreground/20 !text-foreground
-              hover:no-underline bg-transparent hover:bg-accent
-              hover:text-accent-foreground */}
               <Button
                 variant={"ghost"}
                 className={classNames(
