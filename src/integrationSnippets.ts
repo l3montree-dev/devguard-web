@@ -124,6 +124,16 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
+
+    build: generateWorkflowSnippet(
+      "build-image",
+      "build-image.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
+
     sarif: `jobs:
     code-risk-identification: # what you want to name the job
         steps:
