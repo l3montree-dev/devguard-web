@@ -28,6 +28,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { NodeInputProps } from "./helpers";
+import { Info, Loader, Loader2 } from "lucide-react";
 
 export function NodeInputSubmit<T>({
   node,
@@ -309,7 +310,24 @@ export function NodeInputSubmit<T>({
     node.meta.label?.type === "info" &&
     node.meta.label?.id === 1040001
   )
-    return <Card></Card>;
+    return (
+      <Card className="flex flex-col text-sm text-muted-foreground p-4 w-full">
+        <CardContent>
+          <div className="flex flex-row items-center space-x-4">
+            <Info className="w-4"></Info>
+            <span>Password must not be in databreach</span>
+          </div>
+          <div className="flex flex-row items-center space-x-4">
+            <Info className="w-4"></Info>
+            <span>Passwords must not resemble your email or name</span>
+          </div>
+          <div className="flex flex-row items-center space-x-4">
+            <Loader2 className="w-4" />
+            <span>Passwords must be longer than 8 characters</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
   const text = getNodeLabel(node);
   return (
     <div className="flex flex-row justify-end">

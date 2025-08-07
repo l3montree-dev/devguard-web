@@ -186,7 +186,7 @@ const Registration: NextPage = () => {
         <meta name="description" content="NextJS + React + Vercel + Ory" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
-        <div className="flex w-3/5 bg-background flex-col items-center justify-center ">
+        <div className="flex w-4/5 bg-background flex-col items-center justify-center ">
           <div className="w-full px-26">
             <div>
               <Image
