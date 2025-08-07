@@ -16,8 +16,9 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { NodeInputProps } from "./helpers";
 import { Button } from "../ui/button";
-import { LucideEye, LucideEyeOff } from "lucide-react";
+import { Check, Info, Loader2, LucideEye, LucideEyeOff } from "lucide-react";
 import Callout from "../common/Callout";
+import { Card } from "../ui/card";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
   const { node, attributes, value = "", setValue, disabled } = props;
@@ -51,6 +52,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           onClick={onClick}
           onChange={(e) => {
             setValue(e.target.value);
+            console.log(value);
           }}
           variant="onCard"
         />
@@ -80,6 +82,29 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
             </div>
           </div>
         )}
+        {attributes.autocomplete === "new-password" &&
+          attributes.type === "password" &&
+          attributes.name === "password" && (
+            <Card className="flex flex-col text-sm text-muted-foreground p-4 w-full">
+              <div className="flex flex-row items-center space-x-4">
+                <Info className="w-4"></Info>
+                <span>Password must not be in databreach</span>
+              </div>
+              <div className="flex flex-row items-center space-x-4">
+                <Info className="w-4"></Info>
+                <span>Passwords must not resemble your email or name</span>
+              </div>
+              <div className="flex flex-row items-center space-x-4">
+                {value.length < 8 || undefined ? (
+                  <Loader2 className="w-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 text-green-500" />
+                )}
+
+                <span>Passwords must be longer than 8 characters</span>
+              </div>
+            </Card>
+          )}
       </div>
       <>
         {node.messages.map(({ text, id }, k) => (
