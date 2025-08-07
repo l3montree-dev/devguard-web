@@ -92,9 +92,9 @@ export const ScannerOptions = ({
             className="relative aspect-video w-full
             max-w-4xl b"
           >
-            <div className="mt-10 flex w-full  ">
-              <Card className="h-auto w-full align-middle space-y-4">
-                <div className="flex flex-row  items-center space-x-4 m-2">
+            <div className="mt-10 flex w-full">
+              <Card className="h-auto w-full align-middle space-y-4 p-4">
+                <div className="flex flex-row  items-center space-x-4">
                   <Switch
                     className="items-center"
                     defaultChecked={true}
@@ -140,8 +140,8 @@ export const ScannerOptions = ({
             <Separator className="mt-4" orientation="horizontal" />
             <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
             <Card className="">
-              <div className="align-middle flex flex-col space-y-4 ml-2">
-                <div className="flex flex-row items-center space-x-2">
+              <div className="align-middle flex flex-col space-y-4 p-4">
+                <div className="flex flex-row items-center space-x-4">
                   <Checkbox
                     defaultChecked={true}
                     checked={config["secret-scanning"]}
@@ -162,7 +162,7 @@ export const ScannerOptions = ({
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
+                  <div className="flex flex-row items-center space-x-4">
                     <Checkbox
                       defaultChecked={true}
                       checked={config.sca}
@@ -185,7 +185,7 @@ export const ScannerOptions = ({
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
+                  <div className="flex flex-row items-center space-x-4">
                     <Checkbox
                       defaultChecked={true}
                       checked={config["container-scanning"]}
@@ -206,7 +206,7 @@ export const ScannerOptions = ({
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
+                  <div className="flex flex-row items-center space-x-4">
                     <Checkbox
                       defaultChecked={true}
                       checked={config.sast}
@@ -227,7 +227,7 @@ export const ScannerOptions = ({
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-2">
+                  <div className="flex flex-row items-center space-x-4">
                     <Checkbox
                       defaultChecked={true}
                       checked={config.iac}

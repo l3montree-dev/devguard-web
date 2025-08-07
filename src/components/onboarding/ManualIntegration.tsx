@@ -215,7 +215,7 @@ const ManualIntegration = ({
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
                 className="flex text-primary"
-                href="https://devguard.org/guides"
+                href="http://localhost:3001/guides/sboms#-how-to-create-a-sbom"
                 target="_blank"
               >
                 How do I get an SBOM?
