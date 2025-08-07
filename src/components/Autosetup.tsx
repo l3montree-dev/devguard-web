@@ -16,7 +16,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
-import { CarouselApi } from "./ui/carousel";
 
 interface Props {
   handleAutosetup: (pendingAutosetup: false) => Promise<void>;
