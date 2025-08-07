@@ -303,6 +303,13 @@ export function NodeInputSubmit<T>({
     );
   }
 
+  if (
+    node.group === "password" &&
+    node.meta.label?.text === "Sign up" &&
+    node.meta.label?.type === "info" &&
+    node.meta.label?.id === 1040001
+  )
+    return <Card></Card>;
   const text = getNodeLabel(node);
   return (
     <div className="flex flex-row justify-end">
