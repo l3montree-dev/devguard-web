@@ -82,30 +82,32 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
             </div>
           </div>
         )}
-        {attributes.autocomplete === "new-password" &&
-          attributes.type === "password" &&
-          attributes.name === "password" && (
-            <Card className="flex flex-col text-sm text-muted-foreground p-4 w-full">
-              <div className="flex flex-row items-center space-x-4">
-                <Info className="w-4"></Info>
-                <span>Password must not be in databreach</span>
-              </div>
-              <div className="flex flex-row items-center space-x-4">
-                <Info className="w-4"></Info>
-                <span>Passwords must not resemble your email or name</span>
-              </div>
-              <div className="flex flex-row items-center space-x-4">
-                {value.length < 8 || undefined ? (
-                  <Loader2 className="w-4 animate-spin" />
-                ) : (
-                  <Check className="w-4 text-green-500" />
-                )}
-
-                <span>Passwords must be longer than 8 characters</span>
-              </div>
-            </Card>
-          )}
       </div>
+      {attributes.autocomplete === "new-password" &&
+        attributes.type === "password" &&
+        attributes.name === "password" && (
+          <Card className="flex flex-col text-sm text-muted-foreground w-full p-4">
+            <div className="flex flex-row items-center space-x-4">
+              <Info className="w-4"></Info>
+              <span>Password must not be in databreach</span>
+            </div>
+            <div className="flex flex-row items-center space-x-4">
+              <Info className="w-4"></Info>
+              <span>Passwords must not resemble your email or name</span>
+            </div>
+            <div className="flex flex-row items-center space-x-4">
+              {value.length === undefined ? (
+                <Info className="w-4" />
+              ) : value.length < 8 ? (
+                <Loader2 className="w-4 animate-spin" />
+              ) : (
+                <Check className="w-4 text-green-500" />
+              )}
+
+              <span>Passwords must be longer than 8 characters</span>
+            </div>
+          </Card>
+        )}
       <>
         {node.messages.map(({ text, id }, k) => (
           <Callout intent="warning" key={`${id}-${k}`}>
