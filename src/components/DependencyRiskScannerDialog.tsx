@@ -197,7 +197,10 @@ const DependencyRiskScannerDialog: FunctionComponent<
                       <CardTitle className="text-lg items-center flex flex-row leading-tight">
                         <SparklesIcon className="inline-block mr-2 w-4 h-4" />
                         Auto Setup
-                        <Badge className="scale-75 top-10"> Recommended</Badge>
+                        <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                          {" "}
+                          Recommended
+                        </Badge>
                       </CardTitle>
                       <CardDescription>
                         We do the difficult part for you!
@@ -217,14 +220,15 @@ const DependencyRiskScannerDialog: FunctionComponent<
               >
                 <CardHeader>
                   <CardTitle className="text-lg items-center flex flex-row leading-tight">
-                    <FlaskConical className="inline-block mr-2" />
+                    <FlaskConical className="inline-block mr-2 w-4 h-4" />
                     Custom Setup
-                    <Badge variant={"outline"} className="scale-75">
+                    <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
                       Expert
                     </Badge>
                   </CardTitle>
                   <CardDescription>
-                    You can have <strong>full control</strong> over Devguard!
+                    Explicitly select which scans to integrate, or use your own
+                    scanner.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -267,13 +271,16 @@ const DependencyRiskScannerDialog: FunctionComponent<
                         alt="Devguard Logo"
                         width={20}
                         height={20}
-                        className="inline-block mr-2"
+                        className="inline-block mr-2 w-4 h-4"
                       />
-                      Devguard Default
-                      <Badge className="scale-75">Recommended</Badge>
+                      Devguard Default Tools
+                      <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                        Recommended
+                      </Badge>
                     </CardTitle>
                     <CardDescription>
-                      Cherry pick exactly what you want!
+                      From our curated list of scans and scanners, select the
+                      ones you want to use.
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -291,14 +298,16 @@ const DependencyRiskScannerDialog: FunctionComponent<
                       <CubeTransparentIcon
                         width={20}
                         height={20}
-                        className="inline-block mr-2"
+                        className="inline-block mr-2 w-4 h-4"
                       />
-                      Own Scanner
-                      <Badge variant={"outline"}>Expert</Badge>
+                      Use your own Scanner
+                      <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+                        Expert
+                      </Badge>
                     </CardTitle>
                     <CardDescription>
-                      You already hav e a Scanner and want to just Upload your
-                      results
+                      You already have a Scanner and want to just Upload your
+                      results...
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -311,7 +320,7 @@ const DependencyRiskScannerDialog: FunctionComponent<
                     setSelectedScanner(undefined);
                   }}
                 >
-                  Back to Route selection
+                  Back
                 </Button>
                 <Button
                   // disabled={selectScanner === undefined}

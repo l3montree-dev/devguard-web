@@ -74,17 +74,24 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
           )}
         <div className="flex flex-col gap-4 z-10">
           <ListItem
-            Title="Guide."
+            Title="Check your Code for Risks 🛡️ (Vulnerabilities, Bad Practices, Leaked Secrets, and more...)"
             Description={
-              "Your application consists of up to 90% of the code from libraries like debian, maven, npm, go etc. Let's check, if we can find any libraries which are infected."
+              "A typical applications code is made of 70-90% by dependencies (NPM, Go, maven, Debian, etc.). Let's check, if we can find any vulnerable dependencies. Another thing is your code — let's scan for any bad practices here, check that there are no secrets leaked, infrastructure is configured good and more."
             }
             Button={
               <div className="flex flex-row gap-2">
                 <Button
                   onClick={() => setDependencyRiskIsOpen(true)}
-                  variant={"secondary"}
+                  variant={
+                    asset?.externalEntityProviderId &&
+                    externalProviderIdToIntegrationName(
+                      asset.externalEntityProviderId,
+                    ) === "gitlab"
+                      ? "secondary"
+                      : "default"
+                  }
                 >
-                  Setup
+                  Setup Risk Scanning
                 </Button>
               </div>
             }

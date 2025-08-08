@@ -1,33 +1,17 @@
-// Copyright 2025 larshermges
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2025 L3montree GmbH.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Card, CardDescription, CardTitle } from "../ui/card";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-
 import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-
 import { classNames } from "@/utils/common";
-
-import GithubTokenInstructions, {
-  GithubTokenSlides,
-} from "../risk-identification/GithubTokenInstructions";
+import { GithubTokenSlides } from "../risk-identification/GithubTokenInstructions";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
 
@@ -80,12 +64,19 @@ export const ScannerOptions = ({
     api?.reInit();
   }, [api, config, gitInstance]);
 
+  console.log(config);
+
   return (
     <>
       <CarouselItem>
         <DialogHeader>
-          <DialogTitle>What should your Scanner be able to do?</DialogTitle>
-          <DialogDescription>Select exactly what you want</DialogDescription>
+          <DialogTitle>
+            Select the Scans you need from the DevGuard Default Tool Set
+          </DialogTitle>
+          <DialogDescription>
+            Choose from our curated list of scan and scanner setups to
+            integrate.
+          </DialogDescription>
         </DialogHeader>
         <div className="">
           <div
@@ -102,6 +93,7 @@ export const ScannerOptions = ({
                       if (checked) {
                         setConfig(() => ({
                           ...config,
+                          build: true,
                           "secret-scanning": true,
                           sca: true,
                           "container-scanning": true,
@@ -111,6 +103,7 @@ export const ScannerOptions = ({
                       } else {
                         setConfig(() => ({
                           ...config,
+                          build: false,
                           "secret-scanning": false,
                           sca: false,
                           "container-scanning": false,
@@ -149,15 +142,14 @@ export const ScannerOptions = ({
                       setConfig(() => ({
                         ...config,
                         "secret-scanning": !config["secret-scanning"],
-                        build: !config.build,
                       }))
                     }
                   />
                   <div>
-                    <span> Identify leaked Secrets in your Code</span>
+                    <span>Identify leaked Secrets in your Code</span>
                     <p className="text-muted-foreground text-xs">
-                      Tokens, Passwords, anything you the public should not
-                      know, will be scanned
+                      Detected leaked Tokens, Passwords, anything the public
+                      should not know
                     </p>
                   </div>
                 </div>
@@ -179,7 +171,8 @@ export const ScannerOptions = ({
                       </span>
                       <p className="text-muted-foreground text-xs">
                         Assess open-source and third-party dependencies, detect
-                        known vulnerabilities in dependencies
+                        known vulnerabilities in dependencies (known as Software
+                        Composition Analysis (SCA))
                       </p>
                     </div>
                   </div>
@@ -192,15 +185,16 @@ export const ScannerOptions = ({
                       onCheckedChange={() =>
                         setConfig(() => ({
                           ...config,
+                          build: !config.build,
                           "container-scanning": !config["container-scanning"],
                         }))
                       }
                     />
                     <div>
-                      <span>Build your Container Image</span>
+                      <span>Build & Scan your Container Image</span>
                       <p className="text-muted-foreground text-xs">
-                        Scans container images for vulnerabilities and helps
-                        maintain environment
+                        You have a Dockerfile in your Repo? Build it and scan
+                        your container image for known vulnerabilities.
                       </p>
                     </div>
                   </div>
@@ -220,8 +214,9 @@ export const ScannerOptions = ({
                     <div>
                       <span>Identify Bad Practices in Your Code (SAST)</span>
                       <p className="text-muted-foreground text-xs">
-                        Analyzes source code to find security vulnerabilities in
-                        the development process
+                        Analyzes your code to find bad practices and potential
+                        security vulnerabilities in your own code (known as
+                        Static Application Security Testing (SAST)).
                       </p>
                     </div>
                   </div>
@@ -243,8 +238,9 @@ export const ScannerOptions = ({
                         Identify Flaws in your Infrastructure Configs (IaC)
                       </span>
                       <p className="text-muted-foreground text-xs">
-                        Detects misconfigurations and vulnerabilities in IaC
-                        templates
+                        Detects misconfigurations and vulnerabilities in
+                        infrastructure as code (IaC) files, such as Dockerfiles,
+                        Kubernetes configs, Workflows, etc.
                       </p>
                     </div>
                   </div>

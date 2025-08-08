@@ -4,7 +4,6 @@ import React, { useCallback, useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { config } from "@/config";
 import {
   Card,
   CardContent,
@@ -20,14 +19,10 @@ import {
   multipartBrowserApiClient,
   browserApiClient,
 } from "@/services/devGuardApi";
-import { Separator } from "../ui/separator";
-import CopyCode from "../common/CopyCode";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import router from "next/router";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import Link from "next/link";
-
-type Command = "container-scanning" | "sbom" | "sarif";
 
 const ManualIntegration = ({
   api,
@@ -49,16 +44,7 @@ const ManualIntegration = ({
   sarifEndpoint?: string;
 }) => {
   const [tab, setTab] = useState<"sbom" | "sarif">("sbom");
-
-  const [showCommands, setShowCommands] = useState(false);
-
   const activeAssetVersion = useActiveAssetVersion()!;
-  const assetVersion = useActiveAssetVersion();
-
-  const trivySbomCommand =
-    "trivy fs . --format cyclonedx --output trivy-results.json";
-  const trivySarifCommand =
-    "trivy fs . --sarif cyclonedx --output trivy-results.sarif";
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
   const sbomFileRef = useRef<File | undefined>(undefined);
@@ -68,7 +54,7 @@ const ManualIntegration = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [tab, sbomFileName, sarifFileName, api, showCommands]);
+  }, [tab, sbomFileName, sarifFileName, api]);
 
   const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -214,20 +200,13 @@ const ManualIntegration = ({
             <div className="mt-2 flex text-primary flex-row items-center">
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
-                className="flex text-primary"
-                href="http://localhost:3001/guides/sboms#-how-to-create-a-sbom"
+                className="flex text-primary text-sm"
+                href="https://devguard.org/guides/explaining-sboms"
                 target="_blank"
               >
-                How do I get an SBOM?
+                How do I get a SBOM and upload it to DevGuard?
               </Link>
             </div>
-
-            {showCommands === true && (
-              <>
-                <Separator className="m-6" orientation="horizontal" />
-                <CopyCode language="shell" codeString={trivySbomCommand} />
-              </>
-            )}
           </TabsContent>
 
           <TabsContent value="sarif" className="mt-6">
@@ -245,21 +224,16 @@ const ManualIntegration = ({
                 />
               </CardContent>
             </Card>
-            <div
-              className="mt-2 flex text-yellow-500 hover:text-primary-700 flex-row"
-              onClick={() => setShowCommands(true)}
-            >
+            <div className="mt-2 flex text-primary flex-row items-center">
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <span className="flex text-sm  items-center select-none ">
-                How do I get an SARIF?
-              </span>
+              <Link
+                className="flex text-primary text-sm"
+                href="https://devguard.org/guides/explaining-sarif"
+                target="_blank"
+              >
+                How do I get a SARIF-Report and upload it to DevGuard?
+              </Link>
             </div>
-            {showCommands === true && (
-              <>
-                <Separator className="m-6" orientation="horizontal" />
-                <CopyCode language="shell" codeString={trivySarifCommand} />
-              </>
-            )}
           </TabsContent>
         </Tabs>
 

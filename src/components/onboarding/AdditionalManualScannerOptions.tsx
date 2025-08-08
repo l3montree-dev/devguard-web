@@ -1,43 +1,14 @@
-// Copyright 2025 larshermges
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2025 L3montree GmbH.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import Image from "next/image";
-import React, {
-  FunctionComponent,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import React, { useState } from "react";
+import { Card, CardDescription, CardTitle } from "../ui/card";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-
-import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { Switch } from "../ui/switch";
-import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import { integrationSnippets } from "../../integrationSnippets";
 import { classNames } from "@/utils/common";
-import { concat } from "lodash";
-import { GitInstances } from "@/types/common";
 
 export const AdditionalManualScannerOptions = ({
   api,
