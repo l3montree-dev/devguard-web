@@ -96,3 +96,20 @@ export const ExternalTicketProviderNames: {
   jira: "Jira",
   opencode: "openCode",
 };
+
+export type GitInstances = "GitHub" | "Gitlab";
+
+export const GitInstances: {
+  [key in GitInstances]: string;
+} = {
+  GitHub: "github",
+  Gitlab: "gitlab",
+};
+
+export interface Config {
+  "secret-scanning": boolean;
+  sca: boolean;
+  "container-scanning": boolean;
+  sast: boolean;
+  iac: boolean;
+}

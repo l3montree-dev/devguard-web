@@ -7,13 +7,7 @@ const generateWorkflowSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
-) => `# .github/workflows/devsecops.yml
-
-# DevSecOps Workflow Definition. This workflow is triggered on every push to the repository
-name: DevSecOps Workflow
-on:
-    push:
-jobs:
+) => `
     ${jobName}:
         uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
         with:
@@ -29,13 +23,7 @@ const generateGitlabSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
-) => `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
-# stages:
-# - build
-# - test
-# - deploy
-
-include:
+) => `
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
     asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
@@ -89,14 +77,14 @@ export const integrationSnippets = ({
   GitHub: {
     sca: generateWorkflowSnippet(
       "call-sca",
-      "sca.yml",
+      "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
     ),
     "container-scanning": generateWorkflowSnippet(
-      "call-container-scanning",
+      "sca",
       "container-scanning.yml",
       orgSlug,
       projectSlug,
@@ -104,13 +92,14 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     iac: generateWorkflowSnippet(
-      "call-sast",
-      "sast.yml",
+      "iac",
+      "iac.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
     ),
+
     sast: generateWorkflowSnippet(
       "call-sast",
       "sast.yml",
@@ -135,6 +124,16 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
     ),
+
+    build: generateWorkflowSnippet(
+      "build-image",
+      "build-image.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
+
     sarif: `jobs:
     code-risk-identification: # what you want to name the job
         steps:
@@ -168,7 +167,7 @@ export const integrationSnippets = ({
   Gitlab: {
     sca: generateGitlabSnippet(
       "call-sca",
-      "sca.yml",
+      "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
       assetSlug,
@@ -184,7 +183,7 @@ export const integrationSnippets = ({
     ),
     iac: generateGitlabSnippet(
       "call-iac",
-      "iac.yml",
+      "infrastructure-as-code-scanning.yml",
       orgSlug,
       projectSlug,
       assetSlug,
@@ -230,7 +229,16 @@ include:
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
+    build: generateGitlabSnippet(
+      "build",
+      "build.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+    ),
   },
+
   Docker: {
     iac: generateDockerSnippet(
       "iac",

@@ -74,30 +74,24 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
           )}
         <div className="flex flex-col gap-4 z-10">
           <ListItem
-            Title="Start by checking your dependencies for known vulnerabilities."
+            Title="Check your Code for Risks 🛡️ (Vulnerabilities, Bad Practices, Leaked Secrets, and more...)"
             Description={
-              "Your application consists of up to 90% of the code from libraries like debian, maven, npm, go etc. Let's check, if we can find any libraries which are infected."
+              "A typical applications code is made of 70-90% by dependencies (NPM, Go, maven, Debian, etc.). Let's check, if we can find any vulnerable dependencies. Another thing is your code — let's scan for any bad practices here, check that there are no secrets leaked, infrastructure is configured good and more."
             }
             Button={
               <div className="flex flex-row gap-2">
                 <Button
                   onClick={() => setDependencyRiskIsOpen(true)}
-                  variant={"secondary"}
+                  variant={
+                    asset?.externalEntityProviderId &&
+                    externalProviderIdToIntegrationName(
+                      asset.externalEntityProviderId,
+                    ) === "gitlab"
+                      ? "secondary"
+                      : "default"
+                  }
                 >
-                  Identify Dependency-Risks
-                </Button>
-              </div>
-            }
-          />
-          <ListItem
-            Title="Scan your own code for Bad-Practices, Secrets or Infrastructure-Configuration Issues."
-            Description={
-              "Your code is the most important part of your application. Let's check, if we can find any bad-practices, secrets or misconfigurations."
-            }
-            Button={
-              <div className="flex flex-row gap-2">
-                <Button onClick={() => setIsOpen(true)} variant={"secondary"}>
-                  Identify Code-Risks
+                  Setup Risk Scanning
                 </Button>
               </div>
             }

@@ -6,4 +6,6 @@
     },
     "editor.formatOnSave": false,
     "typescript.tsdk": "node_modules/typescript/lib",
+    "licenser.author": "L3montree GmbH and the DevGuard Contributors",
+    "licenser.useSPDXLicenseFormat": true,
 }
