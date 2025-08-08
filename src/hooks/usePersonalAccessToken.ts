@@ -12,14 +12,6 @@ export default function usePersonalAccessToken(
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
     Array<PersonalAccessTokenDTO | PatWithPrivKey>
   >(existingPats ?? []);
-  const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
-    await browserApiClient(`/pats/${pat.id}/`, {
-      method: "DELETE",
-    });
-    setPersonalAccessTokens(
-      personalAccessTokens.filter((p) => p.id !== pat.id),
-    );
-  };
 
   useEffect(() => {
     const pat = sessionStorage.getItem("pat");
@@ -32,6 +24,17 @@ export default function usePersonalAccessToken(
       setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
     });
   }, []);
+
+  const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
+    await browserApiClient(`/pats/${pat.id}/`, {
+      method: "DELETE",
+    });
+    setPersonalAccessTokens((prev) => prev.filter((p) => p.id !== pat.id));
+    const storedPat = sessionStorage.getItem("pat");
+    if (storedPat && JSON.parse(storedPat).id === pat.id) {
+      sessionStorage.removeItem("pat");
+    }
+  };
 
   const handleCreatePat = async (data: {
     description: string;

@@ -220,20 +220,6 @@ const Settings: FunctionComponent<{
     }
   }, [flow?.ui.messages]);
 
-  const handleRevokePat = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const privkey = formData.get("privkey") as string;
-    browserApiClient("/pats/revoke-by-private-key", {
-      method: "POST",
-      body: JSON.stringify({ privkey }),
-    }).then(() => {
-      toast("Token revoked", {
-        description: "Your token was successfully revoked",
-      });
-    });
-  };
-
   return (
     <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
@@ -330,31 +316,10 @@ const Settings: FunctionComponent<{
               </CardFooter>
             </form>
           </Card>
-          {personalAccessTokens.map((pat) =>
-            "privKey" in pat ? (
-              <React.Fragment key={pat.fingerprint}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{pat.description} </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <CopyCode
-                      codeString={pat.privKey}
-                      language="shell"
-                    ></CopyCode>
-                    <span className="mt-2 block text-sm text-destructive">
-                      Make sure to copy the token. You won&apos;t be able to see
-                      it ever again
-                    </span>
-                  </CardContent>
-                </Card>
-              </React.Fragment>
-            ) : null,
-          )}
 
           <div className="mb-6 flex flex-col gap-4">
             {personalAccessTokens
-              .filter((p) => "privKey" in p)
+              .filter((p) => "pubKey" in p)
               .map((pat) => (
                 <ListItem
                   key={pat.id}
@@ -370,6 +335,18 @@ const Settings: FunctionComponent<{
                         <DateString date={new Date(pat.lastUsedAt)} />
                       ) : (
                         "Never"
+                      )}
+                      {"privKey" in pat && (
+                        <>
+                          <CopyCode
+                            codeString={pat.privKey}
+                            language="shell"
+                          ></CopyCode>
+                          <span className="mt-2 block text-sm text-destructive">
+                            Make sure to copy the token. You won&apos;t be able
+                            to see it ever again
+                          </span>
+                        </>
                       )}
                     </>
                   }
@@ -390,25 +367,6 @@ const Settings: FunctionComponent<{
                 />
               ))}
           </div>
-          <Card className="">
-            <CardHeader>
-              <CardTitle>Revoke access token</CardTitle>
-            </CardHeader>
-            <form onSubmit={handleRevokePat}>
-              <CardContent>
-                <Input
-                  variant="onCard"
-                  name="privkey"
-                  placeholder="Paste token here"
-                />
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button type="submit" variant="destructiveOutline">
-                  Revoke
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
         </Section>
 
         <Section
