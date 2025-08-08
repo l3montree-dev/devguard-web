@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { Label } from "./label";
-import { Button } from "./button";
+import { Button, ButtonProps } from "./button";
 import { Input } from "./input";
 
 interface InputWithButtonProps
@@ -14,6 +14,7 @@ interface InputWithButtonProps
   value: string;
   onClick: () => void;
   buttonChildren?: React.ReactNode;
+  buttonVariant?: ButtonProps["variant"];
 }
 
 const InputWithCustomButton = (props: InputWithButtonProps) => {
@@ -29,7 +30,7 @@ const InputWithCustomButton = (props: InputWithButtonProps) => {
           <p className="w-full bg-transparent">{props.value ?? ""}</p>
           <Button
             onClick={() => props.onClick()}
-            variant={"secondary"}
+            variant={props.buttonVariant ?? "secondary"}
             className=""
           >
             {props.buttonChildren}
