@@ -13,10 +13,12 @@ import { ImageZoom } from "@/components/common/Zoom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 
 interface WebhookSetupSlideProps {
   api?: {
     scrollPrev: () => void;
+    scrollTo: (index: number) => void;
   };
   onOpenChange: (open: boolean) => void;
 }
@@ -33,6 +35,22 @@ export default function WebhookSetupSlide({
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
+
+  const isExternalEntityProvider =
+    asset?.externalEntityProviderId &&
+    // Integration for openCode and GitLab are the same
+    externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
+      "gitlab";
+
+  const isOpenCode = asset?.externalEntityProviderId === "opencode";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("devguard");
+    toast("Username copied to clipboard", {
+      description: "You can now paste it in your project.",
+    });
+  };
+
   const handleGenerateNewSecret = async () => {
     const resp = await browserApiClient(
       `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
@@ -60,7 +78,7 @@ export default function WebhookSetupSlide({
       <DialogHeader>
         <DialogTitle>
           <Badge className="mr-2" variant="secondary">
-            Step 3/3
+            Step {isExternalEntityProvider ? "2/2" : "3/3"}
           </Badge>{" "}
           Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>
@@ -95,6 +113,7 @@ export default function WebhookSetupSlide({
         />
         <div className="mt-4">
           <InputWithCustomButton
+            buttonVariant={!!webhookSecret ? "secondary" : "default"}
             label="Webhook Secret"
             value={webhookSecret ?? "No webhook secret set"}
             onClick={() => {
@@ -105,7 +124,12 @@ export default function WebhookSetupSlide({
         </div>
       </div>
       <div className="flex mt-10 flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
+        <Button
+          variant={"secondary"}
+          onClick={() =>
+            isExternalEntityProvider ? api?.scrollTo(0) : api?.scrollPrev()
+          }
+        >
           Back
         </Button>
         <Button
@@ -114,7 +138,7 @@ export default function WebhookSetupSlide({
             webhookSecret !== null && webhookSecret.length > 0 ? false : true
           }
         >
-          Done!
+          Finish!
         </Button>
       </div>
     </CarouselItem>

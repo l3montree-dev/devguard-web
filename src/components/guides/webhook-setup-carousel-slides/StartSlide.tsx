@@ -19,6 +19,12 @@ import {
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "./ProviderSetup";
 import { useEffect } from "react";
+import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { Card } from "@/components/ui/card";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
@@ -42,6 +48,22 @@ export default function StartSlide({
   useEffect(() => {
     api?.reInit();
   }, [provider, api]);
+
+  const asset = useActiveAsset();
+  const isExternalEntityProvider =
+    asset?.externalEntityProviderId &&
+    // Integration for openCode and GitLab are the same
+    externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
+      "gitlab";
+
+  const isOpenCode = asset?.externalEntityProviderId === "opencode";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(isOpenCode ? "devguard" : "devguard-bot");
+    toast("Username copied to clipboard", {
+      description: "You can now paste it in your project.",
+    });
+  };
 
   return (
     <CarouselItem>
@@ -71,52 +93,117 @@ export default function StartSlide({
         <hr className="my-4" />
       </DialogHeader>
       <div className="p-1">
-        <div className="">
-          <h3 className="font-semibold flex items-center">
-            <Badge className="mr-2" variant="secondary">
-              Step 1/3
-            </Badge>{" "}
-            Ensure that DevGuard is connected to your issue tracker
-          </h3>
-          <div className="mt-4">
-            <p className="mb-4 text-sm text-muted-foreground">
-              First, select your issue tracker from the dropdown menu.
-            </p>
-            <Select
-              value={provider}
-              onValueChange={(value) => {
-                setSelectedProvider(value as ExternalTicketProvider);
-              }}
-            >
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Select Provider" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(ExternalTicketProviderNames).map((provider) => (
-                  <SelectItem
-                    key={provider}
-                    value={provider}
-                    onClick={() =>
-                      setSelectedProvider(provider as ExternalTicketProvider)
-                    }
+        {isExternalEntityProvider ? (
+          <div className="">
+            <h3 className="font-semibold flex items-center">
+              <Badge className="mr-2" variant="secondary">
+                Step 1/2
+              </Badge>{" "}
+              Invite the DevGuard Bot to your{" "}
+              {isOpenCode ? "openCode" : "GitLab"} Project
+            </h3>
+            <div className="mt-4">
+              <p className="mb-4 text-sm text-muted-foreground">
+                To enable ticket creation in your{" "}
+                {isOpenCode ? "openCode" : "GitLab"} project, you need to invite
+                the DevGuard Bot user to your project. Simply by removing the
+                User from your project, you can revoke the access at any time.
+              </p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Please ensure that you grant the DevGuard Bot user
+                <span className="font-semibold text-primary">
+                  {" Reporter "}
+                </span>
+                permissions in your project.
+              </p>
+              {/* Copy element to copy the username */}
+              <Card className="flex items-center gap-4 p-4">
+                <div className="">
+                  <Image
+                    width={40}
+                    height={40}
+                    alt="DevGuard Bot Icon"
+                    src="/logo_icon.svg"
+                    className="size-10 rounded-full bg-muted-foreground outline -outline-offset-1 outline-background/5 p-1"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    DevGuard Bot
+                  </p>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {isOpenCode ? "@devguard" : "@devguard-bot"}
+                  </p>
+                </div>
+                <div className="">
+                  <button
+                    onClick={handleCopy}
+                    type="button"
+                    className="bg-secondary !text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <ProviderTitleIcon
-                      provider={provider as ExternalTicketProvider}
-                    />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                    Copy Username
+                  </button>
+                </div>
+              </Card>
+            </div>
+            <div className="mt-10 flex flex-row gap-2 justify-end">
+              <Button
+                onClick={() => {
+                  api?.scrollTo(3);
+                }}
+              >
+                Continue
+              </Button>
+            </div>
           </div>
-          <div className="mt-6">
-            <ProviderSetup
-              selectedProvider={provider}
-              activeOrg={activeOrg}
-              api={api}
-              isLoadingRepositories={isLoadingRepositories}
-            />
+        ) : (
+          <div className="">
+            <h3 className="font-semibold flex items-center">
+              <Badge className="mr-2" variant="secondary">
+                Step 1/3
+              </Badge>{" "}
+              Ensure that DevGuard is connected to your issue tracker
+            </h3>
+            <div className="mt-4">
+              <p className="mb-4 text-sm text-muted-foreground">
+                First, select your issue tracker from the dropdown menu.
+              </p>
+              <Select
+                value={provider}
+                onValueChange={(value) => {
+                  setSelectedProvider(value as ExternalTicketProvider);
+                }}
+              >
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue placeholder="Select Provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(ExternalTicketProviderNames).map((provider) => (
+                    <SelectItem
+                      key={provider}
+                      value={provider}
+                      onClick={() =>
+                        setSelectedProvider(provider as ExternalTicketProvider)
+                      }
+                    >
+                      <ProviderTitleIcon
+                        provider={provider as ExternalTicketProvider}
+                      />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mt-6">
+              <ProviderSetup
+                selectedProvider={provider}
+                activeOrg={activeOrg}
+                api={api}
+                isLoadingRepositories={isLoadingRepositories}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </CarouselItem>
   );
