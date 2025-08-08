@@ -183,10 +183,10 @@ const Registration: NextPage = () => {
     <>
       <Head>
         <title>Create your DevGuard account</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
+        <meta name="description" content="Create your DevGuard account" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
-        <div className="flex w-4/5 bg-background flex-col items-center justify-center ">
+        <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
           <div className="w-full px-26">
             <div>
               <Image
@@ -230,7 +230,6 @@ const Registration: NextPage = () => {
                           flow={flow as LoginFlow}
                         />
                       </div>
-                      <div></div>
                       <Flow
                         hideGlobalMessages
                         only="password"

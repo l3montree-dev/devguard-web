@@ -19,6 +19,7 @@ import { Button } from "../ui/button";
 import { Check, Info, Loader2, LucideEye, LucideEyeOff } from "lucide-react";
 import Callout from "../common/Callout";
 import { Card } from "../ui/card";
+import Link from "next/link";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
   const { node, attributes, value = "", setValue, disabled } = props;
@@ -52,7 +53,6 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           onClick={onClick}
           onChange={(e) => {
             setValue(e.target.value);
-            console.log(value);
           }}
           variant="onCard"
         />
@@ -86,25 +86,40 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
       {attributes.autocomplete === "new-password" &&
         attributes.type === "password" &&
         attributes.name === "password" && (
-          <Card className="flex flex-col text-sm text-muted-foreground w-full p-4">
-            <div className="flex flex-row items-center space-x-4">
-              <Info className="w-4"></Info>
-              <span>Password must not be in databreach</span>
+          <Card className="flex flex-col text-sm text-muted-foreground w-full px-4 py-2 bg-muted-foreground/5">
+            <div className="flex flex-row items-center space-x-4 py-2">
+              <div>
+                {value.length === undefined ? (
+                  <Info className="size-4" />
+                ) : value.length < 8 ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Check className="size-4 text-green-500" />
+                )}
+              </div>
+              <p>Passwords must be longer than 8 characters</p>
             </div>
-            <div className="flex flex-row items-center space-x-4">
-              <Info className="w-4"></Info>
-              <span>Passwords must not resemble your email or name</span>
+            <div className="flex items-center space-x-4 py-2">
+              <div>
+                <Info className="size-4" />
+              </div>
+              <p className="">
+                Note: Password must not be in databreach (check e.g. on{" "}
+                <Link
+                  href="https://haveibeenpwned.com/"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  haveibeenpwned.com
+                </Link>
+                )
+              </p>
             </div>
-            <div className="flex flex-row items-center space-x-4">
-              {value.length === undefined ? (
-                <Info className="w-4" />
-              ) : value.length < 8 ? (
-                <Loader2 className="w-4 animate-spin" />
-              ) : (
-                <Check className="w-4 text-green-500" />
-              )}
-
-              <span>Passwords must be longer than 8 characters</span>
+            <div className="flex flex-row items-center space-x-4 py-2">
+              <div>
+                <Info className="size-4" />
+              </div>
+              <p>Note: Passwords must not resemble your email or name</p>
             </div>
           </Card>
         )}
