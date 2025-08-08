@@ -28,6 +28,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { NodeInputProps } from "./helpers";
+import { Info, Loader, Loader2 } from "lucide-react";
 
 export function NodeInputSubmit<T>({
   node,

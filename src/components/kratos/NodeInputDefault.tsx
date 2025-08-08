@@ -16,8 +16,10 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { NodeInputProps } from "./helpers";
 import { Button } from "../ui/button";
-import { LucideEye, LucideEyeOff } from "lucide-react";
+import { Check, Info, Loader2, LucideEye, LucideEyeOff } from "lucide-react";
 import Callout from "../common/Callout";
+import { Card } from "../ui/card";
+import Link from "next/link";
 
 export function NodeInputDefault<T>(props: NodeInputProps) {
   const { node, attributes, value = "", setValue, disabled } = props;
@@ -81,6 +83,46 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
           </div>
         )}
       </div>
+      {attributes.autocomplete === "new-password" &&
+        attributes.type === "password" &&
+        attributes.name === "password" && (
+          <Card className="flex flex-col text-sm text-muted-foreground w-full px-4 py-2 bg-muted-foreground/5">
+            <div className="flex flex-row items-center space-x-4 py-2">
+              <div>
+                {value.length === undefined ? (
+                  <Info className="size-4" />
+                ) : value.length < 8 ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Check className="size-4 text-green-500" />
+                )}
+              </div>
+              <p>Passwords must be longer than 8 characters</p>
+            </div>
+            <div className="flex items-center space-x-4 py-2">
+              <div>
+                <Info className="size-4" />
+              </div>
+              <p className="">
+                Note: Password must not be in databreach (check e.g. on{" "}
+                <Link
+                  href="https://haveibeenpwned.com/"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  haveibeenpwned.com
+                </Link>
+                )
+              </p>
+            </div>
+            <div className="flex flex-row items-center space-x-4 py-2">
+              <div>
+                <Info className="size-4" />
+              </div>
+              <p>Note: Passwords must not resemble your email or name</p>
+            </div>
+          </Card>
+        )}
       <>
         {node.messages.map(({ text, id }, k) => (
           <Callout intent="warning" key={`${id}-${k}`}>

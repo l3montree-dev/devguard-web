@@ -183,7 +183,7 @@ const Registration: NextPage = () => {
     <>
       <Head>
         <title>Create your DevGuard account</title>
-        <meta name="description" content="NextJS + React + Vercel + Ory" />
+        <meta name="description" content="Create your DevGuard account" />
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
