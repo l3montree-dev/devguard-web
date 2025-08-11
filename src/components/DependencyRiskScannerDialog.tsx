@@ -153,10 +153,6 @@ const DependencyRiskScannerDialog: FunctionComponent<
     accept: { "application/json": [".json"] },
   });
 
-  // const selectScanner = (scanner: "sca" | "container-scanning" | "sbom") => {
-  //   setSelectedScanner(scanner);
-  // };
-
   const selectIntegration = (
     integration: "github" | "gitlab" | "docker" | "upload",
   ) => {
@@ -185,31 +181,33 @@ const DependencyRiskScannerDialog: FunctionComponent<
                 <DialogTitle>How do you want to Setup Devguard?</DialogTitle>
               </DialogHeader>
               <div className="mt-10">
-                <Card
-                  onClick={() => setSelectedScanner("auto-setup")}
-                  className={classNames(
-                    "col-span-2 cursor-pointer",
-                    selectedScanner === "auto-setup"
-                      ? "border border-primary"
-                      : "border border-transparent",
-                  )}
-                >
-                  <CardContent className="p-0">
-                    <CardHeader>
-                      <CardTitle className="text-lg items-center flex flex-row leading-tight">
-                        <SparklesIcon className="inline-block mr-2 w-4 h-4" />
-                        Auto Setup
-                        <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
-                          {" "}
-                          Recommended
-                        </Badge>
-                      </CardTitle>
-                      <CardDescription>
-                        We do the difficult part for you!
-                      </CardDescription>
-                    </CardHeader>
-                  </CardContent>
-                </Card>
+                {asset?.repositoryProvider === "gitlab" && (
+                  <Card
+                    onClick={() => setSelectedScanner("auto-setup")}
+                    className={classNames(
+                      "col-span-2 cursor-pointer",
+                      selectedScanner === "auto-setup"
+                        ? "border border-primary"
+                        : "border border-transparent",
+                    )}
+                  >
+                    <CardContent className="p-0">
+                      <CardHeader>
+                        <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                          <SparklesIcon className="inline-block mr-2 w-4 h-4" />
+                          Auto Setup
+                          <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                            {" "}
+                            Recommended
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription>
+                          We do the difficult part for you!
+                        </CardDescription>
+                      </CardHeader>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
               <Card
                 className={classNames(

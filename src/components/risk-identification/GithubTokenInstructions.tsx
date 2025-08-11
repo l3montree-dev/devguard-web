@@ -36,6 +36,7 @@ import YamlGenerator from "../onboarding/YamlGenerator";
 import { Config, GitInstances } from "@/types/common";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
+  const asset = useActiveAsset();
   return (
     <>
       <div className="mb-10">
@@ -200,7 +201,9 @@ export const GithubTokenSlides = ({
       {ready && (
         <CarouselItem>
           <YamlGenerator
-            gitInstance={gitInstances}
+            gitInstance={
+              asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
+            }
             apiUrl={apiUrl}
             orgSlug={activeOrg.slug}
             projectSlug={activeProject.slug}

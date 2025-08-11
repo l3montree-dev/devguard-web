@@ -14,6 +14,7 @@ import { classNames } from "@/utils/common";
 import { GithubTokenSlides } from "../risk-identification/GithubTokenInstructions";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 interface Config {
   "secret-scanning": boolean;
@@ -46,6 +47,8 @@ export const ScannerOptions = ({
   const [ready, setReady] = useState(false);
 
   const pat = usePersonalAccessToken();
+
+  const asset = useActiveAsset();
 
   const [config, setConfig] = useState<Config>({
     "secret-scanning": true,
@@ -247,52 +250,6 @@ export const ScannerOptions = ({
                 </div>
               </div>
             </Card>
-            <Separator className="mt-4" orientation="horizontal" />
-            <h3 className="mt-4 mb-2">What Git Instance are you using?</h3>
-
-            <div className="flex w-full">
-              <Button
-                variant={"ghost"}
-                className={classNames(
-                  "w-full",
-                  gitInstance === "GitHub"
-                    ? "border !border-primary"
-                    : "border !border-transparent",
-                )}
-                onClick={() => setGitInstance("GitHub")}
-              >
-                <Image
-                  src="/assets/github.svg"
-                  alt="GitHub Logo"
-                  className="mr-2 dark:invert"
-                  width={24}
-                  height={24}
-                />
-                GitHub
-              </Button>
-
-              <Button
-                variant={"ghost"}
-                className={classNames(
-                  "w-full",
-                  gitInstance === "Gitlab"
-                    ? "border !border-primary"
-                    : "border !border-transparent",
-                )}
-                onClick={() => {
-                  setGitInstance("Gitlab");
-                }}
-              >
-                <Image
-                  src="/assets/gitlab.svg"
-                  alt="GitHub Logo"
-                  className="mr-2"
-                  width={24}
-                  height={24}
-                />
-                GitLab
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -312,7 +269,7 @@ export const ScannerOptions = ({
           </Button>
         </div>
       </CarouselItem>
-      {gitInstance === "GitHub" && (
+      {asset?.repositoryProvider === "github" && (
         <GithubTokenSlides
           gitInstances={gitInstance}
           api={api}
@@ -334,7 +291,7 @@ export const ScannerOptions = ({
           config={config}
         />
       )}
-      {gitInstance === "Gitlab" && (
+      {asset?.repositoryProvider === "gitlab" && (
         <GitlabTokenSlides
           gitInstance={gitInstance}
           api={api}
