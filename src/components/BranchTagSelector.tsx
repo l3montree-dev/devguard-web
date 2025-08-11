@@ -2,7 +2,7 @@ import { AssetVersionDTO } from "@/types/api/api";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -26,11 +26,17 @@ export function BranchTagSelector({
   const items = view === "branches" ? branches : tags;
   const [selected, setSelected] = useState(
     items.find((i) => i.slug === (router.query.assetVersionSlug as string))
-      ?.name,
+      ?.name ||
+      branches?.[0]?.name ||
+      tags?.[0]?.name ||
+      "",
   );
   const [filter, setFilter] = useState("");
 
-  const filteredItems = items.filter((item) => item.name.includes(filter));
+  const filteredItems = useMemo(
+    () => items.filter((item) => item.name.includes(filter)),
+    [items, filter],
+  );
 
   return (
     <DropdownMenu>
@@ -70,25 +76,27 @@ export function BranchTagSelector({
         <DropdownMenuSeparator />
 
         {filteredItems.length > 0 ? (
-          filteredItems.map((item) => (
-            <DropdownMenuCheckboxItem
-              checked={selected === item.name}
-              key={item.slug}
-              onClick={() => {
-                router.push(
-                  {
-                    query: { ...router.query, assetVersionSlug: item.slug },
-                  },
-                  undefined,
-                  { shallow: false },
-                );
+          <div style={{ maxHeight: "480px", overflowY: "auto" }}>
+            {filteredItems.map((item) => (
+              <DropdownMenuCheckboxItem
+                checked={selected === item.name}
+                key={item.slug}
+                onClick={() => {
+                  router.push(
+                    {
+                      query: { ...router.query, assetVersionSlug: item.slug },
+                    },
+                    undefined,
+                    { shallow: false },
+                  );
 
-                setSelected(item.name);
-              }}
-            >
-              {item.name}
-            </DropdownMenuCheckboxItem>
-          ))
+                  setSelected(item.name);
+                }}
+              >
+                {item.name}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </div>
         ) : (
           <DropdownMenuItem disabled>No items found</DropdownMenuItem>
         )}
