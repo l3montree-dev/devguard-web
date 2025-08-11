@@ -224,7 +224,7 @@ const Index: FunctionComponent<Props> = (props) => {
                           i % 2 != 0 && "bg-card/50",
                           "hover:bg-gray-50 dark:hover:bg-card",
                         )}
-                        key={row.id}
+                        key={row.original.id}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td className="p-4" key={cell.id}>
