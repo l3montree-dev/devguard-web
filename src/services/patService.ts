@@ -21,6 +21,7 @@ const createPat = async (data: {
 
   return {
     ...pat,
+
     privKey: privateKey,
   };
 };
