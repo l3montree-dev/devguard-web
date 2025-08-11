@@ -54,11 +54,13 @@ import ScannerOptions from "./onboarding/ScannerOptions";
 import ManualIntegration from "./onboarding/ManualIntegration";
 import AdditionalManualScannerOptions from "./onboarding/AdditionalManualScannerOptions";
 import { useAutosetup } from "@/hooks/useAutosetup";
+import { AssetFormValues } from "./asset/AssetForm";
 
 interface DependencyRiskScannerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   apiUrl: string;
+  repositoryProvider: AssetFormValues;
 }
 
 const DependencyRiskScannerDialog: FunctionComponent<

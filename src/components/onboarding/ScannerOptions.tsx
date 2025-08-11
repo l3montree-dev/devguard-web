@@ -256,8 +256,8 @@ export const ScannerOptions = ({
                 className={classNames(
                   "w-full",
                   gitInstance === "GitHub"
-                    ? "border border-primary"
-                    : "border border-transparent",
+                    ? "border !border-primary"
+                    : "border !border-transparent",
                 )}
                 onClick={() => setGitInstance("GitHub")}
               >
@@ -270,16 +270,14 @@ export const ScannerOptions = ({
                 />
                 GitHub
               </Button>
-              {/* border dark:border-foreground/20 !text-foreground
-              hover:no-underline bg-transparent hover:bg-accent
-              hover:text-accent-foreground */}
+
               <Button
                 variant={"ghost"}
                 className={classNames(
                   "w-full",
                   gitInstance === "Gitlab"
-                    ? "border border-primary"
-                    : "border border-transparent",
+                    ? "border !border-primary"
+                    : "border !border-transparent",
                 )}
                 onClick={() => {
                   setGitInstance("Gitlab");

@@ -27,6 +27,7 @@ import { Modify } from "@/types/common";
 import React from "react";
 import { Button } from "../ui/button";
 import { classNames } from "@/utils/common";
+import Image from "next/image";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -39,16 +40,16 @@ export type AssetFormValues = Modify<
     cvssAutomaticTicketThreshold: number[];
     riskAutomaticTicketThreshold: number[];
     enableTicketRange: boolean;
-    repositoryProvider: string;
+    repositoryProvider: "gitlab" | "github";
   }
 >;
 export const AssetFormGeneral: FunctionComponent<Props> = ({
   form,
   disable,
 }) => {
-  type gitInstance = "Gitlab" | "GitHub";
+  type gitInstance = "gitlab" | "github";
 
-  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
+  const [gitInstance, setGitInstance] = useState<gitInstance>();
 
   return (
     <>
@@ -85,28 +86,48 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
       <div className="flex w-full">
         <Button
           variant={"outline"}
+          type="button"
           className={classNames(
             "w-full",
-            form.getValues("repositoryProvider") === "github"
-              ? "border border-primary"
-              : "border border-transparent",
+            gitInstance === "github"
+              ? "border !border-primary"
+              : "border !border-transparent",
           )}
-          onClick={() => form.setValue("repositoryProvider", "github")}
+          onClick={() => {
+            setGitInstance("github");
+            form.setValue("repositoryProvider", "github");
+          }}
         >
+          <Image
+            src="/assets/github.svg"
+            alt="GitHub Logo"
+            className="mr-2 dark:invert"
+            width={24}
+            height={24}
+          />
           GitHub
         </Button>
         <Button
           variant={"outline"}
+          type="button"
           className={classNames(
             "w-full",
-            form.getValues("repositoryProvider") === "gitlab"
-              ? "border border-primary"
-              : "border border-transparent",
+            gitInstance === "gitlab"
+              ? "border !border-primary"
+              : "border !border-transparent",
           )}
           onClick={() => {
+            setGitInstance("gitlab");
             form.setValue("repositoryProvider", "gitlab");
           }}
         >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="GitHub Logo"
+            className="mr-2"
+            width={24}
+            height={24}
+          />
           Gitlab
         </Button>
       </div>
@@ -349,7 +370,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const AssetSettingsForm: FunctionComponent<
+export const AssetSettingsForm: FunctionComponent<
   Props & {
     forceVerticalSections?: boolean;
     showReportingRange: boolean;
@@ -420,7 +441,8 @@ Security requirements are specific criteria or conditions that an application, s
           </Section>
         </>
       )}
-      <></>
     </>
   );
 };
+
+export default AssetSettingsForm;

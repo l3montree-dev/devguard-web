@@ -30,6 +30,8 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
+import { AssetFormValues } from "../asset/AssetForm";
+import { UseFormReturn } from "react-hook-form";
 
 interface Props {
   handleAutosetup: (pendingAutosetup: false) => Promise<void>;
