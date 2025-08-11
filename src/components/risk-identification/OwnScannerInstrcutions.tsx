@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -29,6 +29,9 @@ import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
+  useEffect(() => {
+    console.log(pat);
+  }, []);
   return (
     <>
       <div className="mb-10">

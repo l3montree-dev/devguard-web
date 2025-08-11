@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import {
   FormControl,
   FormDescription,
@@ -25,6 +25,8 @@ import { Slider } from "@/components/ui/slider";
 import { Modify } from "@/types/common";
 
 import React from "react";
+import { Button } from "../ui/button";
+import { classNames } from "@/utils/common";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -37,43 +39,80 @@ export type AssetFormValues = Modify<
     cvssAutomaticTicketThreshold: number[];
     riskAutomaticTicketThreshold: number[];
     enableTicketRange: boolean;
+    repositoryProvider: string;
   }
 >;
 export const AssetFormGeneral: FunctionComponent<Props> = ({
   form,
   disable,
-}) => (
-  <>
-    <FormField
-      name="name"
-      control={form.control}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Name</FormLabel>
-          <FormControl>
-            <Input disabled={disable} required={true} {...field} />
-          </FormControl>
-          <FormDescription>The name of the repository.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-    <FormField
-      name="description"
-      control={form.control}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Description</FormLabel>
-          <FormControl>
-            <Input disabled={disable} {...field} />
-          </FormControl>
-          <FormDescription>The description of the repository.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  </>
-);
+}) => {
+  type gitInstance = "Gitlab" | "GitHub";
+
+  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
+
+  return (
+    <>
+      <FormField
+        name="name"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Name</FormLabel>
+            <FormControl>
+              <Input disabled={disable} required={true} {...field} />
+            </FormControl>
+            <FormDescription>The name of the repository.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        name="description"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input disabled={disable} {...field} />
+            </FormControl>
+            <FormDescription>
+              The description of the repository.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <div className="flex w-full">
+        <Button
+          variant={"outline"}
+          className={classNames(
+            "w-full",
+            form.getValues("repositoryProvider") === "github"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => form.setValue("repositoryProvider", "github")}
+        >
+          GitHub
+        </Button>
+        <Button
+          variant={"outline"}
+          className={classNames(
+            "w-full",
+            form.getValues("repositoryProvider") === "gitlab"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => {
+            form.setValue("repositoryProvider", "gitlab");
+          }}
+        >
+          Gitlab
+        </Button>
+      </div>
+    </>
+  );
+};
 
 export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
   return (
@@ -385,5 +424,3 @@ Security requirements are specific criteria or conditions that an application, s
     </>
   );
 };
-
-export default AssetSettingsForm;
