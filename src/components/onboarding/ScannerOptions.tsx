@@ -1,20 +1,20 @@
 // Copyright 2025 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import { useEffect, useState } from "react";
+import { GithubTokenSlides } from "../risk-identification/GithubTokenInstructions";
+import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
+import { Button } from "../ui/button";
 import { Card, CardDescription, CardTitle } from "../ui/card";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
-import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Checkbox } from "../ui/checkbox";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
-import { classNames } from "@/utils/common";
-import { GithubTokenSlides } from "../risk-identification/GithubTokenInstructions";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
-import { GitlabTokenSlides } from "../risk-identification/GitlabTokenInstructions";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
+import Section from "../common/Section";
+import { AssetDTO } from "../../types/api/api";
 
 interface Config {
   "secret-scanning": boolean;
@@ -44,8 +44,6 @@ export const ScannerOptions = ({
   projectSlug: string;
   assetSlug: string;
 }) => {
-  const [ready, setReady] = useState(false);
-
   const pat = usePersonalAccessToken();
 
   const asset = useActiveAsset();
@@ -59,9 +57,8 @@ export const ScannerOptions = ({
     build: true,
   });
 
-  type gitInstance = "Gitlab" | "GitHub";
-
-  const [gitInstance, setGitInstance] = useState<gitInstance>("Gitlab");
+  const [gitInstance, setGitInstance] =
+    useState<AssetDTO["repositoryProvider"]>("gitlab");
 
   useEffect(() => {
     api?.reInit();
@@ -134,122 +131,123 @@ export const ScannerOptions = ({
             </div>
 
             <Separator className="mt-4" orientation="horizontal" />
-            <h3 className="mt-4 mb-2">What should Devguard do for you?</h3>
-            <Card className="">
-              <div className="align-middle flex flex-col space-y-4 p-4">
-                <div className="flex flex-row items-center space-x-4">
-                  <Checkbox
-                    defaultChecked={true}
-                    checked={config["secret-scanning"]}
-                    onCheckedChange={() =>
-                      setConfig(() => ({
-                        ...config,
-                        "secret-scanning": !config["secret-scanning"],
-                      }))
-                    }
-                  />
-                  <div>
-                    <span>Identify leaked Secrets in your Code</span>
-                    <p className="text-muted-foreground text-xs">
-                      Detected leaked Tokens, Passwords, anything the public
-                      should not know
-                    </p>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
+            <Section forceVertical title="What should DevGuard do?">
+              <Card className="">
+                <div className="align-middle flex flex-col space-y-4 p-4">
                   <div className="flex flex-row items-center space-x-4">
                     <Checkbox
                       defaultChecked={true}
-                      checked={config.sca}
+                      checked={config["secret-scanning"]}
                       onCheckedChange={() =>
                         setConfig(() => ({
                           ...config,
-                          sca: !config.sca,
+                          "secret-scanning": !config["secret-scanning"],
                         }))
                       }
                     />
                     <div>
-                      <span>
-                        Scan your Dependencies for known Vulnerabilities (SCA)
-                      </span>
+                      <span>Identify leaked Secrets in your Code</span>
                       <p className="text-muted-foreground text-xs">
-                        Assess open-source and third-party dependencies, detect
-                        known vulnerabilities in dependencies (known as Software
-                        Composition Analysis (SCA))
+                        Detected leaked Tokens, Passwords, anything the public
+                        should not know
                       </p>
                     </div>
                   </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-4">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config["container-scanning"]}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          build: !config.build,
-                          "container-scanning": !config["container-scanning"],
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>Build & Scan your Container Image</span>
-                      <p className="text-muted-foreground text-xs">
-                        You have a Dockerfile in your Repo? Build it and scan
-                        your container image for known vulnerabilities.
-                      </p>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-4">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.sca}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            sca: !config.sca,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>
+                          Scan your Dependencies for known Vulnerabilities (SCA)
+                        </span>
+                        <p className="text-muted-foreground text-xs">
+                          Assess open-source and third-party dependencies,
+                          detect known vulnerabilities in dependencies (known as
+                          Software Composition Analysis (SCA))
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-4">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config["container-scanning"]}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            build: !config.build,
+                            "container-scanning": !config["container-scanning"],
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>Build & Scan your Container Image</span>
+                        <p className="text-muted-foreground text-xs">
+                          You have a Dockerfile in your Repo? Build it and scan
+                          your container image for known vulnerabilities.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-4">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.sast}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            sast: !config.sast,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>Identify Bad Practices in Your Code (SAST)</span>
+                        <p className="text-muted-foreground text-xs">
+                          Analyzes your code to find bad practices and potential
+                          security vulnerabilities in your own code (known as
+                          Static Application Security Testing (SAST)).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="align-middle flex flex-col space-y-4">
+                    <div className="flex flex-row items-center space-x-4">
+                      <Checkbox
+                        defaultChecked={true}
+                        checked={config.iac}
+                        onCheckedChange={() =>
+                          setConfig(() => ({
+                            ...config,
+                            iac: !config.iac,
+                          }))
+                        }
+                      />
+                      <div>
+                        <span>
+                          Identify Flaws in your Infrastructure Configs (IaC)
+                        </span>
+                        <p className="text-muted-foreground text-xs">
+                          Detects misconfigurations and vulnerabilities in
+                          infrastructure as code (IaC) files, such as
+                          Dockerfiles, Kubernetes configs, Workflows, etc.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-4">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.sast}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          sast: !config.sast,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>Identify Bad Practices in Your Code (SAST)</span>
-                      <p className="text-muted-foreground text-xs">
-                        Analyzes your code to find bad practices and potential
-                        security vulnerabilities in your own code (known as
-                        Static Application Security Testing (SAST)).
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="align-middle flex flex-col space-y-4">
-                  <div className="flex flex-row items-center space-x-4">
-                    <Checkbox
-                      defaultChecked={true}
-                      checked={config.iac}
-                      onCheckedChange={() =>
-                        setConfig(() => ({
-                          ...config,
-                          iac: !config.iac,
-                        }))
-                      }
-                    />
-                    <div>
-                      <span>
-                        Identify Flaws in your Infrastructure Configs (IaC)
-                      </span>
-                      <p className="text-muted-foreground text-xs">
-                        Detects misconfigurations and vulnerabilities in
-                        infrastructure as code (IaC) files, such as Dockerfiles,
-                        Kubernetes configs, Workflows, etc.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </Section>
           </div>
         </div>
 
@@ -271,20 +269,11 @@ export const ScannerOptions = ({
       </CarouselItem>
       {asset?.repositoryProvider === "github" && (
         <GithubTokenSlides
-          gitInstances={gitInstance}
           api={api}
           apiUrl={apiUrl}
           orgSlug={orgSlug}
           projectSlug={projectSlug}
           assetSlug={assetSlug}
-          onPatGenerate={async () => {
-            await pat.onCreatePat({
-              scopes: "scan",
-              description: "GitHub Integration for DevGuard",
-            });
-            // put this on the next render tick
-            setTimeout(() => api?.reInit(), 0);
-          }}
           pat={pat.pat?.privKey}
           prev={api?.scrollPrev}
           next={api?.scrollNext}
@@ -293,20 +282,11 @@ export const ScannerOptions = ({
       )}
       {asset?.repositoryProvider === "gitlab" && (
         <GitlabTokenSlides
-          gitInstance={gitInstance}
           api={api}
           apiUrl={apiUrl}
           orgSlug={orgSlug}
           projectSlug={projectSlug}
           assetSlug={assetSlug}
-          onPatGenerate={async () => {
-            await pat.onCreatePat({
-              scopes: "scan",
-              description: "GitHub Integration for DevGuard",
-            });
-            // put this on the next render tick
-            setTimeout(() => api?.reInit(), 0);
-          }}
           pat={pat.pat?.privKey}
           prev={api?.scrollPrev}
           next={api?.scrollNext}

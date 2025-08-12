@@ -71,9 +71,9 @@ export default function GitLabIntegrationForm({
     <Form {...form}>
       <form
         className="flex flex-col gap-4"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          waitFor(form.handleSubmit(handleSubmit))();
+          await waitFor(form.handleSubmit(handleSubmit))();
           if (additionalOnClick) {
             additionalOnClick();
           }
@@ -150,7 +150,11 @@ export default function GitLabIntegrationForm({
           <div className="flex flex-col items-end justify-end gap-2">
             <div className="flex flex-row gap-4">
               {backButtonClick && (
-                <Button variant={"secondary"} onClick={backButtonClick}>
+                <Button
+                  type="button"
+                  variant={"secondary"}
+                  onClick={backButtonClick}
+                >
                   Back
                 </Button>
               )}

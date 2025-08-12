@@ -1,5 +1,4 @@
 import Page from "@/components/Page";
-
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -9,26 +8,21 @@ import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
-
 import { FunctionComponent, useState } from "react";
-
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { withContentTree } from "@/decorators/withContentTree";
-
+import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
+import useRepositorySearch from "@/hooks/useRepositorySearch";
+import Image from "next/image";
 import Autosetup from "../../../../../../components/Autosetup";
-import CodeRiskScannerDialog from "../../../../../../components/CodeRiskScannerDialog";
 import ListItem from "../../../../../../components/common/ListItem";
-import DependencyRiskScannerDialog from "../../../../../../components/DependencyRiskScannerDialog";
+import RiskScannerDialog from "../../../../../../components/RiskScannerDialog";
 import { Button } from "../../../../../../components/ui/button";
 import { config } from "../../../../../../config";
 import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
-import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
-import Image from "next/image";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 
 interface Props {
   apiUrl: string;
@@ -38,7 +32,7 @@ interface Props {
 const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
   const assetMenu = useAssetMenu();
   const [isOpen, setIsOpen] = useState(false);
-  const [dependencyRiskIsOpen, setDependencyRiskIsOpen] = useState(false);
+  const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
   const autosetup = useAutosetup("full");
@@ -81,7 +75,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
             Button={
               <div className="flex flex-row gap-2">
                 <Button
-                  onClick={() => setDependencyRiskIsOpen(true)}
+                  onClick={() => setRiskScanningOpen(true)}
                   variant={
                     asset?.externalEntityProviderId &&
                     externalProviderIdToIntegrationName(
@@ -141,18 +135,11 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
           />
         </div>
       </Section>
-      <DependencyRiskScannerDialog
-        open={dependencyRiskIsOpen}
-        onOpenChange={setDependencyRiskIsOpen}
+      <RiskScannerDialog
+        open={riskScanningIsOpen}
+        onOpenChange={setRiskScanningOpen}
         apiUrl={apiUrl}
       />
-
-      <CodeRiskScannerDialog
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        apiUrl={apiUrl}
-      />
-
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
         onOpenChange={setWebhookIsOpen}

@@ -1,28 +1,24 @@
 // Copyright 2025 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import React, { useEffect, useState } from "react";
-import { CarouselApi, CarouselItem } from "../ui/carousel";
-import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import { integrationSnippets } from "../../integrationSnippets";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { Config, GitInstances } from "@/types/common";
 import router from "next/router";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useEffect } from "react";
 import { toast } from "sonner";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { integrationSnippets } from "../../integrationSnippets";
+import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
+import { Button } from "../ui/button";
+import { CarouselApi, CarouselItem } from "../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const YamlGenerator = ({
   api,
   gitInstance,
   apiUrl,
-  setup,
-  next,
   prev,
-  pat,
-  onPatGenerate,
   orgSlug,
   projectSlug,
   assetSlug,
@@ -35,7 +31,6 @@ export const YamlGenerator = ({
   api: CarouselApi;
   apiUrl: string;
   pat?: string;
-  onPatGenerate: () => void;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
@@ -45,8 +40,6 @@ export const YamlGenerator = ({
 
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
-
-  const [webhookIsOpen, setWebhookIsOpen] = useState(false);
 
   useEffect(() => {
     api?.reInit(); //this is redundant rn, will change
@@ -102,14 +95,16 @@ jobs:
             file or add the code snippet to an existing workflow file.
           </DialogDescription>
         </DialogHeader>
-        <CopyCode
-          language="yaml"
-          codeString={
-            gitInstance === "GitHub"
-              ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
-              : `# .gitlab-ci.yml \n ${codeStringBuilder()}`
-          }
-        ></CopyCode>
+        <div className="mt-10">
+          <CopyCode
+            language="yaml"
+            codeString={
+              gitInstance === "GitHub"
+                ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
+                : `# .gitlab-ci.yml \n ${codeStringBuilder()}`
+            }
+          />
+        </div>
         <div className="mt-10 flex flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={() => prev?.()}>
             Back

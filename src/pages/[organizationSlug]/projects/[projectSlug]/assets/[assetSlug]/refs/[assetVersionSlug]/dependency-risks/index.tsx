@@ -43,7 +43,7 @@ import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
-import DependencyRiskScannerDialog from "../../../../../../../../../components/DependencyRiskScannerDialog";
+import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,

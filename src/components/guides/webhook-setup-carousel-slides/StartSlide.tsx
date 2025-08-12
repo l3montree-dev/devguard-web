@@ -2,7 +2,7 @@ import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CarouselItem } from "@/components/ui/carousel";
+import { CarouselApi, CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
@@ -25,16 +25,13 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useActiveOrg } from "../../../hooks/useActiveOrg";
 
 interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
-  api?: {
-    scrollNext: () => void;
-    scrollTo: (index: number) => void;
-    reInit: () => void;
-  };
+  api: CarouselApi;
   provider: ExternalTicketProvider;
-  activeOrg: OrganizationDetailsDTO;
+
   isLoadingRepositories: boolean;
 }
 
@@ -42,7 +39,7 @@ export default function StartSlide({
   setSelectedProvider,
   isLoadingRepositories,
   provider,
-  activeOrg,
+
   api,
 }: StartSlideProps) {
   useEffect(() => {
@@ -50,6 +47,7 @@ export default function StartSlide({
   }, [provider, api]);
 
   const asset = useActiveAsset();
+  const activeOrg = useActiveOrg();
   const isExternalEntityProvider =
     asset?.externalEntityProviderId &&
     // Integration for openCode and GitLab are the same
