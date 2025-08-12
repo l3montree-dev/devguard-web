@@ -41,6 +41,7 @@ export default function usePersonalAccessToken(
     scopes: string;
   }) => {
     const pat = await createPat(data);
+
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));
     newPatEventEmitter.emit("pat", pat);

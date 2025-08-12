@@ -101,7 +101,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           index % 2 != 0 && "bg-card/50",
           "hover:bg-gray-50 dark:hover:bg-card",
         )}
-        key={row.id}
+        key={row.original.packageName}
       >
         <td className="py-4 text-center align-baseline">
           {isOpen ? (

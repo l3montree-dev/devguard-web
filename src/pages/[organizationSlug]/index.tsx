@@ -181,7 +181,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
         handleTriggerSync();
       }
     }
-    () => {
+    return () => {
       stillOnPage.current = false;
     };
   }, [activeOrg.externalEntityProviderId]);

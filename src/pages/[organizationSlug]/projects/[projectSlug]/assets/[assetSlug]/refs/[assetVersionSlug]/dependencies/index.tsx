@@ -672,7 +672,7 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                   )}
-                  key={row.id}
+                  key={row.original.id}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td className="p-4" key={cell.id}>
