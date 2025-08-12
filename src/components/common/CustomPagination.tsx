@@ -4,6 +4,54 @@ import React, { FunctionComponent, useMemo } from "react";
 import { useRouter } from "next/router";
 import { Button } from "../ui/button";
 
+const getPaginationData = (currentPage: number, totalPages: number) => {
+  const showFirstPage = currentPage > 3;
+  const showLastPage = currentPage + 2 < totalPages;
+
+  const getPages = (): number[] => {
+    if (totalPages <= 3) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // If we're showing first page separately, don't include it in the main range
+    if (showFirstPage && showLastPage) {
+      return [currentPage - 1, currentPage, currentPage + 1];
+    }
+
+    // If we're showing first page separately but not last page
+    if (showFirstPage && !showLastPage) {
+      if (currentPage === totalPages) {
+        return [currentPage - 2, currentPage - 1, currentPage];
+      }
+      return [currentPage - 1, currentPage, currentPage + 1];
+    }
+
+    // If we're not showing first page separately but showing last page
+    if (!showFirstPage && showLastPage) {
+      if (currentPage === 1) {
+        return [currentPage, currentPage + 1, currentPage + 2];
+      }
+      return [currentPage - 1, currentPage, currentPage + 1];
+    }
+
+    // If we're not showing either first or last page separately
+    if (currentPage === 1) {
+      return [currentPage, currentPage + 1, currentPage + 2];
+    }
+    if (currentPage === totalPages) {
+      return [currentPage - 2, currentPage - 1, currentPage];
+    }
+
+    return [currentPage - 1, currentPage, currentPage + 1];
+  };
+
+  return {
+    pages: getPages(),
+    showFirstPage,
+    showLastPage,
+  };
+};
+
 interface Props extends Paged<any> {}
 const CustomPagination: FunctionComponent<Props> = ({
   page,
@@ -19,24 +67,16 @@ const CustomPagination: FunctionComponent<Props> = ({
       query: { ...router.query, page },
     });
   };
-  // check how many to the left and right of the current page
-  const renderFirstPage = page > 2;
-  const renderLastPage = page + 1 < pages;
 
-  const renderPages = useMemo(() => {
-    if (pages < 3) {
-      return Array.from({ length: pages }, (_, i) => i + 1);
-    }
-    if (page === 1) {
-      return [page, page + 1, page + 2];
-    }
-
-    if (page === pages) {
-      return [page - 2, page - 1, page];
-    }
-
-    return [page - 1, page, page + 1];
+  const paginationData = useMemo(() => {
+    return getPaginationData(page, pages);
   }, [page, pages]);
+
+  const {
+    pages: renderPages,
+    showFirstPage: renderFirstPage,
+    showLastPage: renderLastPage,
+  } = paginationData;
 
   return (
     <div>

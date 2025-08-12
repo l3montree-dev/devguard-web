@@ -21,6 +21,8 @@ import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import EcosystemImage from "./common/EcosystemImage";
+import { Tooltip, TooltipContent } from "./ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
   events: VulnEventDTO[];
@@ -100,11 +102,18 @@ const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
 
         <div className="ml-10 mt-2 flex flex-row gap-2 text-xs font-normal text-muted-foreground">
           <FormatDate dateString={event.createdAt} />
-          <div className="flex flex-row items-start gap-2">
+          <div className="flex flex-1 flex-row items-start gap-2">
             {event.arbitraryJSONData.scannerIds?.split(" ").map((s) => (
-              <Badge key={s} variant={"secondary"}>
-                {s.replace(defaultScanner, "")}
-              </Badge>
+              <Tooltip key={s}>
+                <TooltipTrigger asChild>
+                  <Badge className="line-clamp-1" variant={"secondary"}>
+                    {s.replace(defaultScanner, "")}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>{s}</span>
+                </TooltipContent>
+              </Tooltip>
             ))}
           </div>
         </div>

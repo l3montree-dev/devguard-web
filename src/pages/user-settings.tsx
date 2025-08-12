@@ -273,7 +273,11 @@ const Settings: FunctionComponent<{
             <form onSubmit={handleSubmit(handleCreatePat)}>
               <CardContent>
                 <Label htmlFor="description">Description</Label>
-                <Input variant="onCard" {...register("description")} />
+                <Input
+                  className="mt-2"
+                  variant="onCard"
+                  {...register("description")}
+                />
 
                 <div className="mt-4">
                   <span>Select scopes</span>
