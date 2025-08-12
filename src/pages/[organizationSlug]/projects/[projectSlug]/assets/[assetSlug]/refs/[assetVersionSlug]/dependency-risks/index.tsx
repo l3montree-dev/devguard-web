@@ -427,26 +427,20 @@ export const getServerSideProps = middleware(
       return maybeRedirect;
     }
 
-    const filterQuery = buildFilterQuery(context);
     const query = buildFilterSearchParams(context);
     // translate the state query param to a filter query
     const state = context.query.state;
     if (!Boolean(state) || state === "open") {
-      filterQuery["filterQuery[state][is]"] = "open";
+      query.append("filterQuery[state][is]", "open");
     } else {
-      filterQuery["filterQuery[state][is not]"] = "open";
+      query.append("filterQuery[state][is not]", "open");
     }
 
     const artifact = context.query.artifact;
-
     if (artifact) {
       const scannerID = getScannerIDFromArtifactName(artifact as string);
-      filterQuery["filterQuery[scanner_ids][any]"] = scannerID;
+      query.append("filterQuery[scanner_ids][any]", scannerID);
     }
-
-    Object.entries(filterQuery).forEach(([key, value]) => {
-      query.append(key, value as string);
-    });
 
     // check for page and page size query params
     // if they are there, append them to the uri
@@ -462,14 +456,17 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
     const vulns = await v.json();
 
-    const artifacts = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/dependency-vulns-artifacts/",
+    let artifactsData: string[] = [];
+    const artifactsResp = await apiClient(
+      uri + "refs/" + assetVersionSlug + "/dependency-vulns/artifacts/",
     );
-    const artifactsData = (await artifacts.json()) as string[];
+    if (artifactsResp.ok) {
+      artifactsData = await artifactsResp.json();
 
-    if (artifactsData && artifactsData.length > 0) {
-      for (let i = 0; i < artifactsData.length; i++) {
-        artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+      if (artifactsData && artifactsData.length > 0) {
+        for (let i = 0; i < artifactsData.length; i++) {
+          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+        }
       }
     }
 
@@ -492,7 +489,7 @@ export const getServerSideProps = middleware(
   },
 );
 
-function getArtifactNameFromScannerID(scannerID: string): string {
+export function getArtifactNameFromScannerID(scannerID: string): string {
   const scannerDefault =
     "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
   scannerID = scannerID.trim();
@@ -500,26 +497,34 @@ function getArtifactNameFromScannerID(scannerID: string): string {
     scannerID = scannerID.substring(scannerDefault.length);
   }
   if (scannerID === "") {
-    throw new Error("scannerID cannot be empty");
+    return "source-code"; // default to source code if empty
   }
   const parts = scannerID.split(":");
+  let artifactName = "";
   if (parts.length > 0) {
     switch (parts[0]) {
       case "sca":
-        return "source-code";
+        artifactName = "source-code";
+        break;
       case "container-scanning":
-        return "container";
+        artifactName = "container";
+        break;
       case "sbom":
-        return "sbom";
+        artifactName = "sbom";
+        break;
     }
+
+    if (parts.length > 1) {
+      artifactName += ":" + parts[1];
+    }
+
+    return artifactName;
   }
-  if (parts.length > 1) {
-    return parts[0] + ":" + parts[1];
-  }
+
   return parts[0];
 }
 
-function getScannerIDFromArtifactName(artifactName: string): string {
+export function getScannerIDFromArtifactName(artifactName: string): string {
   const scannerDefault =
     "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
   artifactName = artifactName.trim();
@@ -527,18 +532,24 @@ function getScannerIDFromArtifactName(artifactName: string): string {
     throw new Error("artifactName cannot be empty");
   }
   const parts = artifactName.split(":");
+  let scannerID = "";
   if (parts.length > 0) {
     switch (parts[0]) {
       case "source-code":
-        return scannerDefault + "sca";
+        scannerID = scannerDefault + "sca";
+        break;
       case "container":
-        return scannerDefault + "container-scanning";
+        scannerID = scannerDefault + "container-scanning";
+        break;
       case "sbom":
-        return scannerDefault + "sbom";
+        scannerID = scannerDefault + "sbom";
+        break;
     }
+    if (parts.length > 1) {
+      scannerID += ":" + parts[1];
+    }
+    return scannerID;
   }
-  if (parts.length > 1) {
-    return scannerDefault + parts[0] + ":" + parts[1];
-  }
+
   return scannerDefault + parts[0];
 }

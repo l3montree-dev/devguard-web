@@ -106,10 +106,17 @@ import Image from "next/image";
 import { Loader2Icon } from "lucide-react";
 import { DelayedDownloadButton } from "@/components/common/DelayedDownloadButton";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import {
+  getArtifactNameFromScannerID,
+  getScannerIDFromArtifactName,
+} from "../dependency-risks";
+import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { get } from "lodash";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
+  artifacts: string[];
 }
 
 const licenses = [
@@ -477,7 +484,11 @@ const columnsDef: ColumnDef<
   }),
 ];
 
-const Index: FunctionComponent<Props> = ({ components, licenses }) => {
+const Index: FunctionComponent<Props> = ({
+  components,
+  licenses,
+  artifacts,
+}) => {
   const assetMenu = useAssetMenu();
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
@@ -566,11 +577,13 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams({
-                scanner:
-                  "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
+                artifact: String(
+                  (router.query.artifact as string) || artifacts?.[0] || "",
+                ),
               }).toString()
             }
           >
+            <GitBranchIcon className="mr-2 h-4 w-4" />
             Open Dependency Graph
           </Link>
         </div>
@@ -630,11 +643,14 @@ const Index: FunctionComponent<Props> = ({ components, licenses }) => {
           </div>
         }
       >
-        <Input
-          onChange={handleSearch}
-          defaultValue={router.query.search as string}
-          placeholder="Search for dependencies or versions - just start typing..."
-        />
+        <div className="flex flex-row items-center justify-between gap-2">
+          <ArtifactSelector artifacts={artifacts} />
+          <Input
+            onChange={handleSearch}
+            defaultValue={router.query.search as string}
+            placeholder="Search for dependencies or versions - just start typing..."
+          />
+        </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">
@@ -730,7 +746,14 @@ export const getServerSideProps = middleware(
       assetVersionSlug +
       "/components";
 
-    const params = buildFilterSearchParams(context).toString();
+    const params = buildFilterSearchParams(context);
+
+    const artifact = context.query.artifact;
+    if (artifact) {
+      const scannerID = getScannerIDFromArtifactName(artifact as string);
+      params.append("filterQuery[scanner_ids][any]", scannerID);
+    }
+
     const [components, licenses] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
@@ -757,10 +780,33 @@ export const getServerSideProps = middleware(
       },
     }));
 
+    let artifactsData: string[] = [];
+    const artifactsResp = await apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/dependency-vulns/artifacts/",
+    );
+
+    if (artifactsResp.ok) {
+      artifactsData = await artifactsResp.json();
+      if (artifactsData && artifactsData.length > 0) {
+        for (let i = 0; i < artifactsData.length; i++) {
+          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+        }
+      }
+    }
+
     return {
       props: {
         components,
         licenses,
+        artifacts: artifactsData,
       },
     };
   },
