@@ -59,10 +59,12 @@ import {
 } from "@/components/ui/tooltip";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+import { ArtifactSelector } from "@/components/ArtifactSelector";
 
 interface Props {
   apiUrl: string;
   vulns: Paged<VulnByPackage>;
+  artifacts: any[];
 }
 
 const columnHelper = createColumnHelper<VulnByPackage>();
@@ -238,6 +240,7 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
+          <ArtifactSelector artifacts={props.artifacts} />
           <Tabs
             defaultValue={
               (router.query.state as string | undefined)
@@ -434,6 +437,13 @@ export const getServerSideProps = middleware(
       filterQuery["filterQuery[state][is not]"] = "open";
     }
 
+    const artifact = context.query.artifact;
+
+    if (artifact) {
+      const scannerID = getScannerIDFromArtifactName(artifact as string);
+      filterQuery["filterQuery[scanner_ids][any]"] = scannerID;
+    }
+
     Object.entries(filterQuery).forEach(([key, value]) => {
       query.append(key, value as string);
     });
@@ -450,13 +460,24 @@ export const getServerSideProps = middleware(
     );
 
     // fetch a personal access token from the user
-
     const vulns = await v.json();
+
+    const artifacts = await apiClient(
+      uri + "refs/" + assetVersionSlug + "/dependency-vulns-artifacts/",
+    );
+    const artifactsData = (await artifacts.json()) as string[];
+
+    if (artifactsData && artifactsData.length > 0) {
+      for (let i = 0; i < artifactsData.length; i++) {
+        artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+      }
+    }
 
     return {
       props: {
         vulns,
         apiUrl: config.devguardApiUrlPublicInternet,
+        artifacts: artifactsData,
       },
     };
   },
@@ -470,3 +491,54 @@ export const getServerSideProps = middleware(
     contentTree: withContentTree,
   },
 );
+
+function getArtifactNameFromScannerID(scannerID: string): string {
+  const scannerDefault =
+    "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
+  scannerID = scannerID.trim();
+  if (scannerID.startsWith(scannerDefault)) {
+    scannerID = scannerID.substring(scannerDefault.length);
+  }
+  if (scannerID === "") {
+    throw new Error("scannerID cannot be empty");
+  }
+  const parts = scannerID.split(":");
+  if (parts.length > 0) {
+    switch (parts[0]) {
+      case "sca":
+        return "source-code";
+      case "container-scanning":
+        return "container";
+      case "sbom":
+        return "sbom";
+    }
+  }
+  if (parts.length > 1) {
+    return parts[0] + ":" + parts[1];
+  }
+  return parts[0];
+}
+
+function getScannerIDFromArtifactName(artifactName: string): string {
+  const scannerDefault =
+    "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
+  artifactName = artifactName.trim();
+  if (artifactName === "") {
+    throw new Error("artifactName cannot be empty");
+  }
+  const parts = artifactName.split(":");
+  if (parts.length > 0) {
+    switch (parts[0]) {
+      case "source-code":
+        return scannerDefault + "sca";
+      case "container":
+        return scannerDefault + "container-scanning";
+      case "sbom":
+        return scannerDefault + "sbom";
+    }
+  }
+  if (parts.length > 1) {
+    return scannerDefault + parts[0] + ":" + parts[1];
+  }
+  return scannerDefault + parts[0];
+}
