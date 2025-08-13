@@ -22,13 +22,18 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          <div className="flex items-center h-4 w-full">
-            {selectedArtifact || "Select Artifact"}
+          <div className="flex w-52 items-center justify-between h-4">
+            <span className="text-ellipsis text-left block flex-1 overflow-hidden">
+              {selectedArtifact || "Select Artifact"}
+            </span>
             <CaretDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="z-50 w-56">
+      <DropdownMenuContent
+        align="start"
+        className="z-50 max-h-[500px] overflow-y-auto w-80"
+      >
         {artifacts.map((artifact) => (
           <DropdownMenuCheckboxItem
             key={artifact.id}

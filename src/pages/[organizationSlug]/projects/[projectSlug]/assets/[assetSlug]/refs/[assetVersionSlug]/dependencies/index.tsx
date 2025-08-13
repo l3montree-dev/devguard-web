@@ -13,7 +13,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, SetStateAction, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -48,14 +48,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import {
-  BadgeInfo,
-  ChevronDownIcon,
-  FileCode,
-  FileTextIcon,
-  GitBranch,
-  PersonStandingIcon,
-} from "lucide-react";
+import { BadgeInfo, ChevronDownIcon, GitBranch } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -83,35 +76,23 @@ import {
   Tooltip,
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
-import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
+import {
+  getArtifactNameFromScannerID,
+  getScannerIDFromArtifactName,
+  osiLicenseHexColors,
+} from "../../../../../../../../../utils/view";
 
+import { ArtifactSelector } from "@/components/ArtifactSelector";
+import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "../../../../../../../../../components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { GitBranchIcon } from "lucide-react";
-import Image from "next/image";
-import { Loader2Icon } from "lucide-react";
-import { DelayedDownloadButton } from "@/components/common/DelayedDownloadButton";
-import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
-import {
-  getArtifactNameFromScannerID,
-  getScannerIDFromArtifactName,
-} from "../dependency-risks";
-import { ArtifactSelector } from "@/components/ArtifactSelector";
-import { get } from "lodash";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;

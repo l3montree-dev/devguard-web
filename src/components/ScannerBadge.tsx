@@ -1,31 +1,19 @@
-import React, { FunctionComponent } from "react";
+import { FunctionComponent } from "react";
+import { getArtifactNameFromScannerID } from "../utils/view";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { defaultScanner } from "../utils/view";
 
 const ScannerBadge: FunctionComponent<{ scannerID: string }> = ({
   scannerID,
 }) => {
-  const scannerIDBlank = scannerID.replace(defaultScanner, "");
-  const parts = scannerIDBlank.split(":");
-  let artifactName = scannerIDBlank;
-  if (parts[0]) {
-    if (parts[0] === "sca") {
-      artifactName = "source-code";
-    } else if (parts[0] === "container-scanning") {
-      artifactName = "container";
-    } else if (parts[0] === "sbom") {
-      artifactName = "sbom";
-    }
-  }
-
-  if (parts[1]) {
-    artifactName += `:${parts[1]}`;
-  }
+  const artifactName = getArtifactNameFromScannerID(scannerID);
   return (
     <Tooltip>
       <TooltipTrigger>
-        <Badge variant={"secondary"} className="line-clamp-1 text-left">
+        <Badge
+          variant={"secondary"}
+          className="line-clamp-1 text-left max-w-52"
+        >
           {artifactName}
         </Badge>
       </TooltipTrigger>

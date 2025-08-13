@@ -12,7 +12,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 
@@ -21,6 +20,7 @@ import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 
+import { ArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -32,6 +32,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -40,26 +45,18 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
-import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
+import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
+import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
-import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+  getArtifactNameFromScannerID,
+  getScannerIDFromArtifactName,
+} from "../../../../../../../../../utils/view";
 
 interface Props {
   apiUrl: string;
@@ -106,10 +103,10 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       id: "packageName",
       cell: (row) => (
         <span className="flex flex-row gap-2">
-          <span className="flex h-5 w-5 flex-row items-center justify-center">
+          <div className="flex h-5 w-5 flex-row items-center justify-center">
             <EcosystemImage packageName={row.getValue()} />
-          </span>
-          {beautifyPurl(row.getValue())}
+          </div>
+          <div className="flex-1">{beautifyPurl(row.getValue())}</div>
         </span>
       ),
     }),
@@ -228,7 +225,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Button>
 
           <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Dependency-Risks
+            Identify Risks
           </Button>
         </div>
       </div>
@@ -435,10 +432,12 @@ export const getServerSideProps = middleware(
     } else {
       query.append("filterQuery[state][is not]", "open");
     }
+    console.log("query", query.toString());
 
     const artifact = context.query.artifact;
     if (artifact) {
       const scannerID = getScannerIDFromArtifactName(artifact as string);
+      console.log("scannerID", scannerID);
       query.append("filterQuery[scanner_ids][any]", scannerID);
     }
 
@@ -488,68 +487,3 @@ export const getServerSideProps = middleware(
     contentTree: withContentTree,
   },
 );
-
-export function getArtifactNameFromScannerID(scannerID: string): string {
-  const scannerDefault =
-    "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
-  scannerID = scannerID.trim();
-  if (scannerID.startsWith(scannerDefault)) {
-    scannerID = scannerID.substring(scannerDefault.length);
-  }
-  if (scannerID === "") {
-    return "source-code"; // default to source code if empty
-  }
-  const parts = scannerID.split(":");
-  let artifactName = "";
-  if (parts.length > 0) {
-    switch (parts[0]) {
-      case "sca":
-        artifactName = "source-code";
-        break;
-      case "container-scanning":
-        artifactName = "container";
-        break;
-      case "sbom":
-        artifactName = "sbom";
-        break;
-    }
-
-    if (parts.length > 1) {
-      artifactName += ":" + parts[1];
-    }
-
-    return artifactName;
-  }
-
-  return parts[0];
-}
-
-export function getScannerIDFromArtifactName(artifactName: string): string {
-  const scannerDefault =
-    "github.com/l3montree-dev/devguard/cmd/devguard-scanner/";
-  artifactName = artifactName.trim();
-  if (artifactName === "") {
-    throw new Error("artifactName cannot be empty");
-  }
-  const parts = artifactName.split(":");
-  let scannerID = "";
-  if (parts.length > 0) {
-    switch (parts[0]) {
-      case "source-code":
-        scannerID = scannerDefault + "sca";
-        break;
-      case "container":
-        scannerID = scannerDefault + "container-scanning";
-        break;
-      case "sbom":
-        scannerID = scannerDefault + "sbom";
-        break;
-    }
-    if (parts.length > 1) {
-      scannerID += ":" + parts[1];
-    }
-    return scannerID;
-  }
-
-  return scannerDefault + parts[0];
-}

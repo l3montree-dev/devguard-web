@@ -19,14 +19,7 @@ import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -46,16 +39,16 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
+
+import { ArtifactSelector } from "@/components/ArtifactSelector";
 import {
   getArtifactNameFromScannerID,
   getScannerIDFromArtifactName,
-} from "../dependency-risks";
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+} from "../../../../../../../../../utils/view";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };

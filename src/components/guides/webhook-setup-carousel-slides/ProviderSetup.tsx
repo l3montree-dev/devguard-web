@@ -47,7 +47,7 @@ export default function ProviderSetup({
     activeOrg.githubAppInstallations?.length > 0 ||
     activeOrg.gitLabIntegrations?.length > 0;
 
-  const currentSlide = (api as NonNullable<CarouselApi>).slidesInView()[0];
+  const currentSlide = api?.slidesInView()[0] ?? 0;
 
   return (
     <div>
