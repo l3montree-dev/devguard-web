@@ -1,25 +1,20 @@
-import { Badge } from "@/components/ui/badge";
-import { CarouselItem } from "@/components/ui/carousel";
-import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { OrganizationDetailsDTO } from "@/types/api/api";
-import ListItem from "@/components/common/ListItem";
-import { Combobox } from "@/components/common/Combobox";
-import { Button } from "@/components/ui/button";
-import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
-import { useEffect, useState } from "react";
-import { browserApiClient } from "@/services/devGuardApi";
 import { AssetFormValues } from "@/components/asset/AssetForm";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { toast } from "sonner";
+import { Combobox } from "@/components/common/Combobox";
+import ListItem from "@/components/common/ListItem";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CarouselApi, CarouselItem } from "@/components/ui/carousel";
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
+import { browserApiClient } from "@/services/devGuardApi";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useActiveOrg } from "../../../hooks/useActiveOrg";
 
 interface StartSlideProps {
-  api?: {
-    scrollNext: () => void;
-    scrollPrev: () => void;
-    scrollTo: (index: number) => void;
-  };
-  activeOrg: OrganizationDetailsDTO;
+  api?: CarouselApi;
   repositories: Array<{ value: string; label: string }> | null;
   repositoryName?: string;
   repositoryId?: string;
@@ -28,9 +23,9 @@ interface StartSlideProps {
 export default function SelectRepoSlide({
   repositoryName,
   repositoryId,
-  activeOrg,
   api,
 }: StartSlideProps) {
+  const activeOrg = useActiveOrg();
   const hasIntegration =
     activeOrg.gitLabIntegrations.length > 0 ||
     activeOrg.githubAppInstallations.length > 0 ||
@@ -109,6 +104,8 @@ export default function SelectRepoSlide({
     activeOrg.slug,
   ]);
 
+  const currentSlide = (api as NonNullable<typeof api>).slidesInView()[0];
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -118,9 +115,8 @@ export default function SelectRepoSlide({
           </Badge>{" "}
           Select your Repository to connect with DevGuard
         </DialogTitle>
-        <hr className="my-4" />
       </DialogHeader>
-      <div className="p-1">
+      <div className="p-1 mt-10">
         <ListItem
           Title={
             <div className="flex flex-row gap-2">
@@ -184,7 +180,10 @@ export default function SelectRepoSlide({
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button onClick={() => api?.scrollTo(0)} variant={"secondary"}>
+        <Button
+          onClick={() => api?.scrollTo(currentSlide - 2)}
+          variant={"secondary"}
+        >
           Back
         </Button>
         <Button

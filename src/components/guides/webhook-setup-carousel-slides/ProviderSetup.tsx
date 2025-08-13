@@ -1,23 +1,19 @@
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
-import { useLoader } from "@/hooks/useLoader";
 import { cn } from "@/lib/utils";
 import { browserApiClient } from "@/services/devGuardApi";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
 import { useStore } from "@/zustand/globalStoreProvider";
-import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { CarouselApi } from "../../ui/carousel";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
   activeOrg: OrganizationDetailsDTO;
-  api?: {
-    scrollNext: () => void;
-    scrollTo: (index: number) => void;
-  };
+  api: CarouselApi;
   isLoadingRepositories: boolean;
 }
 
@@ -50,6 +46,8 @@ export default function ProviderSetup({
   const providerIntegrationPresent =
     activeOrg.githubAppInstallations?.length > 0 ||
     activeOrg.gitLabIntegrations?.length > 0;
+
+  const currentSlide = (api as NonNullable<CarouselApi>).slidesInView()[0];
 
   return (
     <div>
@@ -122,7 +120,10 @@ export default function ProviderSetup({
       ))}
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
-          <Button onClick={() => api?.scrollNext()} variant={"secondary"}>
+          <Button
+            onClick={() => (api as NonNullable<CarouselApi>).scrollNext()}
+            variant={"secondary"}
+          >
             Add another{" "}
             {selectedProvider === "github"
               ? "GitHub App"
@@ -131,10 +132,17 @@ export default function ProviderSetup({
         </div>
       )}
       <div className="mt-10 flex flex-row gap-2 justify-end">
+        {currentSlide > 0 && (
+          <Button onClick={() => api!.scrollPrev()} variant={"secondary"}>
+            Back
+          </Button>
+        )}
         <Button
           disabled={selectedProvider === undefined || isLoadingRepositories}
           onClick={() => {
-            providerIntegrationPresent ? api?.scrollTo(2) : api?.scrollNext();
+            providerIntegrationPresent
+              ? (api as NonNullable<CarouselApi>).scrollTo(currentSlide + 2)
+              : (api as NonNullable<CarouselApi>).scrollNext();
           }}
         >
           {isLoadingRepositories ? "Loading Repositories..." : "Continue"}

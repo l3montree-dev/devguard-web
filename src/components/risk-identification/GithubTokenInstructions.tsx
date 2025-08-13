@@ -11,29 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from "../ui/carousel";
-import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { integrationSnippets } from "../../integrationSnippets";
-import { ImageZoom } from "../common/Zoom";
-import router from "next/router";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
-import YamlGenerator from "../onboarding/YamlGenerator";
-import { Config, GitInstances } from "@/types/common";
+import { Config } from "@/types/common";
+import { useEffect, useState } from "react";
+import CopyCode from "../common/CopyCode";
+import { ImageZoom } from "../common/Zoom";
+import YamlGenerator from "../guides/onboarding/YamlGenerator";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { CarouselApi, CarouselItem } from "../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import DevguardTokenCard from "./DevguardTokenCard";
 
 const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
   return (
@@ -97,22 +87,16 @@ const GithubTokenInstructions = ({ pat }: { pat?: string }) => {
 };
 
 export const GithubTokenSlides = ({
-  gitInstances,
   pat,
   next,
   prev,
-  onPatGenerate,
   apiUrl,
   api,
-  orgSlug,
-  projectSlug,
   config,
 }: {
-  gitInstances: GitInstances;
   pat?: string;
   next?: () => void;
   prev?: () => void;
-  onPatGenerate: () => void;
   api?: CarouselApi;
   apiUrl: string;
   orgSlug: string;
@@ -122,14 +106,9 @@ export const GithubTokenSlides = ({
 }) => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
-  const assetVersion = useActiveAssetVersion();
   const asset = useActiveAsset();
 
   const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    api?.reInit();
-  }, []);
 
   return (
     <>
@@ -159,29 +138,7 @@ export const GithubTokenSlides = ({
         </div>
 
         <div className="mt-10">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create a new secret</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <span className="mb-2 block text-sm font-semibold">Name</span>
-                <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
-              </div>
-              <div className="mb-4">
-                <span className="mb-2 block text-sm font-semibold">Secret</span>
-                <CopyCode
-                  language="shell"
-                  codeString={pat ?? "<PERSONAL ACCESS TOKEN>"}
-                />
-              </div>
-              <div className="flex flex-row justify-end">
-                <Button onClick={onPatGenerate} variant={"secondary"}>
-                  Generate personal access token
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DevguardTokenCard />
         </div>
         <div className="flex mt-10 flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={() => prev?.()}>
@@ -200,12 +157,13 @@ export const GithubTokenSlides = ({
       {ready && (
         <CarouselItem>
           <YamlGenerator
-            gitInstance={gitInstances}
+            gitInstance={
+              asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
+            }
             apiUrl={apiUrl}
             orgSlug={activeOrg.slug}
             projectSlug={activeProject.slug}
             assetSlug={asset!.slug}
-            onPatGenerate={onPatGenerate}
             pat={pat}
             prev={prev}
             next={next}

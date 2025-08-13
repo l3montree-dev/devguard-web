@@ -13,25 +13,21 @@
 // limitations under the License.
 
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import CopyCode, { CopyCodeFragment } from "../common/CopyCode";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { CarouselApi, CarouselContent, CarouselItem } from "../ui/carousel";
-import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { integrationSnippets } from "../../integrationSnippets";
-import { ImageZoom } from "../common/Zoom";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import router from "next/router";
-import { toast } from "sonner";
-import { CrownIcon } from "lucide-react";
-import YamlGenerator from "../onboarding/YamlGenerator";
 import { Config, GitInstances } from "@/types/common";
+import { CrownIcon } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import CopyCode from "../common/CopyCode";
+import { ImageZoom } from "../common/Zoom";
+import YamlGenerator from "../guides/onboarding/YamlGenerator";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CarouselApi, CarouselItem } from "../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import DevguardTokenCard from "./DevguardTokenCard";
 
-const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
+const GitlabTokenInstructions = () => {
   return (
     <>
       <div className="mb-10">
@@ -83,13 +79,7 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
               <span className="mb-2 block text-sm font-semibold">Key</span>
               <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
             </div>
-            <div className="mb-4">
-              <span className="mb-2 block text-sm font-semibold">Value</span>
-              <CopyCode
-                language="shell"
-                codeString={pat ?? "<PERSONAL ACCESS TOKEN>"}
-              />
-            </div>
+            <div className="mb-4"></div>
           </CardContent>
         </Card>
       </div>
@@ -99,11 +89,9 @@ const GitlabTokenInstructions = ({ pat }: { pat?: string }) => {
 
 export const GitlabTokenSlides = ({
   pat,
-  gitInstance,
   next,
   prev,
   api,
-  onPatGenerate,
   apiUrl,
   orgSlug,
   projectSlug,
@@ -113,16 +101,15 @@ export const GitlabTokenSlides = ({
   pat?: string;
   next?: () => void;
   prev?: () => void;
-  onPatGenerate: () => void;
   api?: CarouselApi;
   apiUrl: string;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
-  gitInstance: GitInstances;
   config: Config;
 }) => {
   const [ready, setReady] = useState(true);
+  const asset = useActiveAsset();
 
   useEffect(() => {
     api?.reInit();
@@ -160,29 +147,7 @@ export const GitlabTokenSlides = ({
         </div>
 
         <div className="mt-10">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create a new variable</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <span className="mb-2 block text-sm font-semibold">Key</span>
-                <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
-              </div>
-              <div className="mb-4">
-                <span className="mb-2 block text-sm font-semibold">Value</span>
-                <CopyCode
-                  language="shell"
-                  codeString={pat ?? "<PERSONAL ACCESS TOKEN>"}
-                />
-              </div>
-              <div className="flex flex-row justify-end">
-                <Button onClick={onPatGenerate} variant={"secondary"}>
-                  Generate personal access token
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DevguardTokenCard />
         </div>
         <div className="flex mt-10 flex-row gap-2 justify-end">
           <Button variant={"secondary"} onClick={prev}>
@@ -201,12 +166,13 @@ export const GitlabTokenSlides = ({
       {ready && (
         <CarouselItem>
           <YamlGenerator
-            gitInstance={gitInstance}
+            gitInstance={
+              asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
+            }
             apiUrl={apiUrl}
             orgSlug={orgSlug}
             projectSlug={projectSlug}
             assetSlug={assetSlug}
-            onPatGenerate={onPatGenerate}
             pat={pat}
             prev={prev}
             next={next}

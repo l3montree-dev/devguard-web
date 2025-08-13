@@ -479,6 +479,7 @@ export interface AssetDTO {
   externalEntityProviderId?: string;
 
   vulnAutoReopenAfterDays?: number;
+  repositoryProvider?: "github" | "gitlab";
 }
 
 export interface DependencyTreeNode {

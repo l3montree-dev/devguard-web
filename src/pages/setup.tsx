@@ -47,7 +47,7 @@ export default function SetupOrg() {
 }
 
 export const getServerSideProps = middleware(
-  async (ctx, { session }) => {
+  async (ctx, { session, organizations }) => {
     if (!session) {
       return {
         redirect: {

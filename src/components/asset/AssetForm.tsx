@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import {
   FormControl,
   FormDescription,
@@ -25,6 +25,10 @@ import { Slider } from "@/components/ui/slider";
 import { Modify } from "@/types/common";
 
 import React from "react";
+import { Button } from "../ui/button";
+import { classNames } from "@/utils/common";
+import Image from "next/image";
+import { Label } from "../ui/label";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -42,38 +46,90 @@ export type AssetFormValues = Modify<
 export const AssetFormGeneral: FunctionComponent<Props> = ({
   form,
   disable,
-}) => (
-  <>
-    <FormField
-      name="name"
-      control={form.control}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Name</FormLabel>
-          <FormControl>
-            <Input disabled={disable} required={true} {...field} />
-          </FormControl>
-          <FormDescription>The name of the repository.</FormDescription>
-          <FormMessage />
-        </FormItem>
+}) => {
+  const gitInstance = form.watch("repositoryProvider");
+  const externalEntityProviderId = form.watch("externalEntityProviderId");
+
+  return (
+    <>
+      <FormField
+        name="name"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Name</FormLabel>
+            <FormControl>
+              <Input disabled={disable} required={true} {...field} />
+            </FormControl>
+            <FormDescription>The name of the repository.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        name="description"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input disabled={disable} {...field} />
+            </FormControl>
+            <FormDescription>
+              The description of the repository.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <Label className="mt-4">Which Repository provider are you using?</Label>
+      {!externalEntityProviderId && (
+        <div className="flex gap-2 w-full">
+          <Button
+            variant={"secondary"}
+            type="button"
+            className={classNames(
+              "w-full",
+              gitInstance === "github" && "border !border-primary",
+            )}
+            onClick={() => {
+              form.setValue("repositoryProvider", "github");
+            }}
+          >
+            <Image
+              src="/assets/github.svg"
+              alt="GitHub Logo"
+              className="mr-2 dark:invert"
+              width={24}
+              height={24}
+            />
+            GitHub
+          </Button>
+          <Button
+            variant={"secondary"}
+            type="button"
+            className={classNames(
+              "w-full border",
+              gitInstance === "gitlab" && "!border-primary",
+            )}
+            onClick={() => {
+              form.setValue("repositoryProvider", "gitlab");
+            }}
+          >
+            <Image
+              src="/assets/gitlab.svg"
+              alt="GitHub Logo"
+              className="mr-2"
+              width={24}
+              height={24}
+            />
+            Gitlab
+          </Button>
+        </div>
       )}
-    />
-    <FormField
-      name="description"
-      control={form.control}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Description</FormLabel>
-          <FormControl>
-            <Input disabled={disable} {...field} />
-          </FormControl>
-          <FormDescription>The description of the repository.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  </>
-);
+    </>
+  );
+};
 
 export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
   return (
@@ -310,7 +366,7 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const AssetSettingsForm: FunctionComponent<
+export const AssetSettingsForm: FunctionComponent<
   Props & {
     forceVerticalSections?: boolean;
     showReportingRange: boolean;
@@ -381,7 +437,6 @@ Security requirements are specific criteria or conditions that an application, s
           </Section>
         </>
       )}
-      <></>
     </>
   );
 };

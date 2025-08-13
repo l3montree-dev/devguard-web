@@ -69,11 +69,13 @@ export function useAutosetup(
       status: "notStarted",
       message: "A merge request is created",
     },
-    inviteDevguardBot: {
-      status: "notStarted",
-      message:
-        "DevGuard Bot is invited to the project (only required for GitLab/ openCode)",
-    },
+    ...(asset?.externalEntityProviderId && {
+      inviteDevguardBot: {
+        status: "notStarted",
+        message:
+          "DevGuard Bot is invited to the project (only required for GitLab/ openCode)",
+      },
+    }),
   });
 
   const handleAutosetup = waitFor<boolean, void>((pendingAutosetup = false) => {

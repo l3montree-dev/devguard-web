@@ -38,8 +38,8 @@ import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
-import CodeRiskScannerDialog from "../../../../../../../../../components/CodeRiskScannerDialog";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
+import RiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
@@ -246,7 +246,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       )}
-      <CodeRiskScannerDialog
+      <RiskScannerDialog
         apiUrl={props.apiUrl}
         open={isOpen}
         onOpenChange={setIsOpen}

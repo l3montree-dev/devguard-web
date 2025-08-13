@@ -209,7 +209,7 @@ const Main: FunctionComponent<Props> = ({
                 <OrganizationDropDown />
               </div>
               <div className="flex w-full flex-row items-center justify-between">
-                <h1 className="font-display text-lg font-semibold leading-7 text-white">
+                <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-white">
                   {Title ?? title}
                 </h1>
                 <UserNav />

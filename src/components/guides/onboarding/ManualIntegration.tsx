@@ -1,28 +1,22 @@
 // Copyright (C) 2025 Lars Hermges, l3montree GmbH.  This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.",
 
-import React, { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import FileUpload from "@/components/FileUpload";
 
-import { CarouselItem, CarouselApi } from "@/components/ui/carousel";
-import {
-  multipartBrowserApiClient,
-  browserApiClient,
-} from "@/services/devGuardApi";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
-import router from "next/router";
+import { CarouselApi } from "@/components/ui/carousel";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
-import Link from "next/link";
+import {
+  browserApiClient,
+  multipartBrowserApiClient,
+} from "@/services/devGuardApi";
+import router from "next/router";
+import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
+import {
+  IntegrationMethodSelectionSlide,
+  AutomatedIntegrationSlide,
+  ManualIntegrationSlide,
+} from "./slides";
 
 const ManualIntegration = ({
   api,
@@ -51,6 +45,8 @@ const ManualIntegration = ({
 
   const [sarifFileName, setSarifFileName] = useState<string | undefined>();
   const sarifContentRef = useRef<string | undefined>(undefined);
+
+  const [variant, setVariant] = useState<"manual" | "auto">("auto");
 
   useEffect(() => {
     api?.reInit();
@@ -157,96 +153,42 @@ const ManualIntegration = ({
   const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
   const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
 
+  const pat = usePersonalAccessToken();
+
   return (
-    <CarouselItem>
-      <div className="">
-        <CardHeader className="px-0 pt-0">
-          <CardTitle className="text-lg">Manual Integration</CardTitle>
-          <CardDescription>
-            Upload either an SBOM (CycloneDX) or a SARIF report from your own
-            scanner.
-          </CardDescription>
-        </CardHeader>
-
-        <Tabs
-          value={tab}
-          onValueChange={(v) => setTab(v as "sbom" | "sarif")}
-          defaultValue="sbom"
-          className="w-full mt-4"
-        >
-          <div className="flex">
-            <TabsList>
-              <TabsTrigger value="sbom">SBOM</TabsTrigger>
-              <TabsTrigger value="sarif">SARIF</TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="sbom" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-md">Upload SBOM</CardTitle>
-                <CardDescription>
-                  Upload a SBOM file in CycloneDX 1.6 or higher (JSON).
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUpload
-                  files={sbomFileName ? [sbomFileName] : []}
-                  dropzone={sbomDropzone}
-                />
-              </CardContent>
-            </Card>
-
-            <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <Link
-                className="flex text-primary text-sm"
-                href="https://devguard.org/guides/explaining-sboms"
-                target="_blank"
-              >
-                How do I get a SBOM and upload it to DevGuard?
-              </Link>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="sarif" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-md">Upload SARIF</CardTitle>
-                <CardDescription>
-                  Upload a SARIF report from your scanner (.sarif or JSON).
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUpload
-                  files={sarifFileName ? [sarifFileName] : []}
-                  dropzone={sarifDropzone}
-                />
-              </CardContent>
-            </Card>
-            <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <Link
-                className="flex text-primary text-sm"
-                href="https://devguard.org/guides/explaining-sarif"
-                target="_blank"
-              >
-                How do I get a SARIF-Report and upload it to DevGuard?
-              </Link>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="flex mt-6 flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => prev?.()}>
-            Back
-          </Button>
-          <Button disabled={isUploadDisabled} onClick={handleUpload}>
-            Upload
-          </Button>
-        </div>
-      </div>
-    </CarouselItem>
+    <>
+      <IntegrationMethodSelectionSlide
+        variant={variant}
+        setVariant={setVariant}
+        next={next}
+        prev={prev}
+      />
+      {variant === "auto" && (
+        <AutomatedIntegrationSlide
+          pat={pat}
+          apiUrl={apiUrl}
+          orgSlug={orgSlug}
+          projectSlug={projectSlug}
+          assetSlug={assetSlug}
+          tab={tab}
+          setTab={setTab}
+          prev={prev}
+        />
+      )}
+      {variant === "manual" && (
+        <ManualIntegrationSlide
+          tab={tab}
+          setTab={setTab}
+          sbomFileName={sbomFileName}
+          sarifFileName={sarifFileName}
+          sbomDropzone={sbomDropzone}
+          sarifDropzone={sarifDropzone}
+          isUploadDisabled={isUploadDisabled}
+          handleUpload={handleUpload}
+          prev={prev}
+        />
+      )}
+    </>
   );
 };
 
