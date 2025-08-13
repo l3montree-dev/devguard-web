@@ -19,14 +19,7 @@ import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
@@ -46,16 +39,22 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
+import { ArtifactSelector } from "@/components/ArtifactSelector";
+import {
+  getArtifactNameFromScannerID,
+  getScannerIDFromArtifactName,
+} from "../../../../../../../../../utils/view";
+
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
   flaws: Array<VulnDTO>;
-}> = ({ graph, flaws }) => {
+  artifacts: string[];
+}> = ({ graph, flaws, artifacts }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
   const dimensions = useDimensions();
@@ -98,43 +97,7 @@ const DependencyGraphPage: FunctionComponent<{
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
-            <Tabs
-              defaultValue={
-                (router.query.scanner as string | undefined) ??
-                "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca"
-              }
-            >
-              <TabsList>
-                <TabsTrigger
-                  onClick={() =>
-                    router.push({
-                      query: {
-                        ...router.query,
-                        scanner:
-                          "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
-                      },
-                    })
-                  }
-                  value="github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca"
-                >
-                  Application
-                </TabsTrigger>
-                <TabsTrigger
-                  onClick={() =>
-                    router.push({
-                      query: {
-                        ...router.query,
-                        scanner:
-                          "github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning",
-                      },
-                    })
-                  }
-                  value="github.com/l3montree-dev/devguard/cmd/devguard-scanner/container-scanning"
-                >
-                  Container Image
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <ArtifactSelector artifacts={artifacts} />
           </div>
           <div className="flex flex-row items-center gap-4">
             {graph.root.risk !== 0 && (
@@ -278,10 +241,12 @@ export const getServerSideProps = middleware(
     // check for version query parameter
     const version = context.query.version as string | undefined;
 
-    //TODO: Fix this
-    const scanner = context.query.scanner;
-    if (!scanner) {
-      context.query.scanner = "sca";
+    let scanner = context.query.artifact;
+
+    if (scanner) {
+      scanner = getScannerIDFromArtifactName(scanner as string);
+    } else {
+      scanner = "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca";
     }
 
     const [resp, flawResp] = await Promise.all([
@@ -291,9 +256,7 @@ export const getServerSideProps = middleware(
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
             version: version,
-            scanner:
-              context.query.scanner ??
-              "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
+            scanner: scanner,
           }),
       ),
       apiClient(
@@ -301,9 +264,7 @@ export const getServerSideProps = middleware(
           "affected-components?" +
           toSearchParams({
             version: version,
-            scanner:
-              context.query.scanner ??
-              "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca",
+            scanner: scanner,
           }),
       ),
     ]);
@@ -348,10 +309,33 @@ export const getServerSideProps = middleware(
       });
     }
 
+    let artifactsData: string[] = [];
+    const artifactsResp = await apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/dependency-vulns/artifacts/",
+    );
+
+    if (artifactsResp.ok) {
+      artifactsData = await artifactsResp.json();
+      if (artifactsData && artifactsData.length > 0) {
+        for (let i = 0; i < artifactsData.length; i++) {
+          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+        }
+      }
+    }
+
     return {
       props: {
         graph: { root: converted },
         flaws,
+        artifacts: artifactsData,
       },
     };
   },

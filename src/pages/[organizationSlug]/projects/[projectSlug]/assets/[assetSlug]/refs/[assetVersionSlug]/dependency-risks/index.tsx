@@ -12,7 +12,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 
@@ -21,6 +20,7 @@ import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 
+import { ArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -32,6 +32,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
@@ -40,29 +45,23 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
-import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
+import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
+import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../components/ui/dropdown-menu";
 import { config } from "../../../../../../../../../config";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
-import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+  getArtifactNameFromScannerID,
+  getScannerIDFromArtifactName,
+} from "../../../../../../../../../utils/view";
 
 interface Props {
   apiUrl: string;
   vulns: Paged<VulnByPackage>;
+  artifacts: any[];
 }
 
 const columnHelper = createColumnHelper<VulnByPackage>();
@@ -104,10 +103,10 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       id: "packageName",
       cell: (row) => (
         <span className="flex flex-row gap-2">
-          <span className="flex h-5 w-5 flex-row items-center justify-center">
+          <div className="flex h-5 w-5 flex-row items-center justify-center">
             <EcosystemImage packageName={row.getValue()} />
-          </span>
-          {beautifyPurl(row.getValue())}
+          </div>
+          <div className="flex-1">{beautifyPurl(row.getValue())}</div>
         </span>
       ),
     }),
@@ -226,7 +225,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Button>
 
           <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Dependency-Risks
+            Identify Risks
           </Button>
         </div>
       </div>
@@ -238,6 +237,7 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
+          <ArtifactSelector artifacts={props.artifacts} />
           <Tabs
             defaultValue={
               (router.query.state as string | undefined)
@@ -424,19 +424,22 @@ export const getServerSideProps = middleware(
       return maybeRedirect;
     }
 
-    const filterQuery = buildFilterQuery(context);
     const query = buildFilterSearchParams(context);
     // translate the state query param to a filter query
     const state = context.query.state;
     if (!Boolean(state) || state === "open") {
-      filterQuery["filterQuery[state][is]"] = "open";
+      query.append("filterQuery[state][is]", "open");
     } else {
-      filterQuery["filterQuery[state][is not]"] = "open";
+      query.append("filterQuery[state][is not]", "open");
     }
+    console.log("query", query.toString());
 
-    Object.entries(filterQuery).forEach(([key, value]) => {
-      query.append(key, value as string);
-    });
+    const artifact = context.query.artifact;
+    if (artifact) {
+      const scannerID = getScannerIDFromArtifactName(artifact as string);
+      console.log("scannerID", scannerID);
+      query.append("filterQuery[scanner_ids][any]", scannerID);
+    }
 
     // check for page and page size query params
     // if they are there, append them to the uri
@@ -450,13 +453,27 @@ export const getServerSideProps = middleware(
     );
 
     // fetch a personal access token from the user
-
     const vulns = await v.json();
+
+    let artifactsData: string[] = [];
+    const artifactsResp = await apiClient(
+      uri + "refs/" + assetVersionSlug + "/dependency-vulns/artifacts/",
+    );
+    if (artifactsResp.ok) {
+      artifactsData = await artifactsResp.json();
+
+      if (artifactsData && artifactsData.length > 0) {
+        for (let i = 0; i < artifactsData.length; i++) {
+          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
+        }
+      }
+    }
 
     return {
       props: {
         vulns,
         apiUrl: config.devguardApiUrlPublicInternet,
+        artifacts: artifactsData,
       },
     };
   },

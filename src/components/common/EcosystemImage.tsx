@@ -16,8 +16,10 @@
 import React from "react";
 import Image from "next/image";
 import { classNames, getEcosystem } from "@/utils/common";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-const invertSvgOnDark = (ecosystem: string) => ["apk"].includes(ecosystem);
+const invertSvgOnDark = (ecosystem: string) =>
+  ["apk", "bitnami"].includes(ecosystem);
 
 const EcosystemImage = ({
   packageName,
@@ -32,31 +34,38 @@ const EcosystemImage = ({
       "npm",
       "apk",
       "pypi",
-      "Maven",
+      "maven",
       "crates.io",
       "Packagist",
       "RubyGems",
       "deb",
+      "bitnami",
       "NuGet",
     ].includes(getEcosystem(packageName))
   ) {
     return (
-      <Image
-        alt={"Logo von " + getEcosystem(packageName)}
-        width={size ?? 20}
-        height={size ?? 20}
-        className={classNames(
-          "inline-block",
-          invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
-        )}
-        src={
-          "/logos/" +
-          getEcosystem(packageName).toLowerCase() +
-          "-svgrepo-com.svg"
-        }
-      />
+      <Tooltip>
+        <TooltipTrigger>
+          <Image
+            alt={"Logo von " + getEcosystem(packageName)}
+            width={size ?? 20}
+            height={size ?? 20}
+            className={classNames(
+              "inline-block",
+              invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
+            )}
+            src={
+              "/logos/" +
+              getEcosystem(packageName).toLowerCase() +
+              "-svgrepo-com.svg"
+            }
+          />
+        </TooltipTrigger>
+        <TooltipContent>{getEcosystem(packageName)}</TooltipContent>
+      </Tooltip>
     );
   }
+  console.log(packageName);
   return null;
 };
 

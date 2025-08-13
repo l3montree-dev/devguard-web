@@ -65,7 +65,7 @@ const VulnWithCveTableRow = ({
       </td>
       <td className="p-4">
         <div className="flex justify-start flex-row">
-          <Severity risk={vuln.cve?.cvss ?? 0} />
+          <Severity gray risk={vuln.cve?.cvss ?? 0} />
         </div>
       </td>
       <td className="p-4">
@@ -137,8 +137,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     <th className="w-32 p-4">State</th>
                     <th className="w-32 p-4">Artifact</th>
                     <th className="w-40 p-4">CVE</th>
-                    <th className="w-24 p-4">Risk</th>
-                    <th className="w-24 p-4">CVSS</th>
+                    <th className="w-30 p-4">Risk</th>
+                    <th className="w-30 p-4">CVSS</th>
                     <th className="w-40 p-4">Fixed in Version</th>
                     <th className="w-full p-4">Description</th>
                   </tr>

@@ -104,7 +104,7 @@ export default function SelectRepoSlide({
     activeOrg.slug,
   ]);
 
-  const currentSlide = (api as NonNullable<typeof api>).slidesInView()[0];
+  const currentSlide = api?.slidesInView()[0] ?? 0;
 
   return (
     <CarouselItem>

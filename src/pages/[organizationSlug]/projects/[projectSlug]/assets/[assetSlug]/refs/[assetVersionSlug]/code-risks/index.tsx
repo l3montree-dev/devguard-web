@@ -106,7 +106,7 @@ const Index: FunctionComponent<Props> = (props) => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <Button onClick={() => setIsOpen(true)} variant="default">
-          Identify Code-Risks
+          Identify Risks
         </Button>
       </div>
       <Section
