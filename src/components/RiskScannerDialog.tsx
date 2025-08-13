@@ -7,14 +7,14 @@ import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
 import { classNames } from "../utils/common";
-import Autosetup from "./onboarding/Autosetup";
+import Autosetup from "./guides/onboarding/Autosetup";
 import { Button } from "./ui/button";
 
 import { useAutosetup } from "@/hooks/useAutosetup";
 import { CubeTransparentIcon, SparklesIcon } from "@heroicons/react/20/solid";
 import { FlaskConical } from "lucide-react";
-import ManualIntegration from "./onboarding/ManualIntegration";
-import ScannerOptions from "./onboarding/ScannerOptions";
+import ManualIntegration from "./guides/onboarding/ManualIntegration";
+import ScannerOptions from "./guides/onboarding/ScannerOptions";
 import { Badge } from "./ui/badge";
 import {
   Card,

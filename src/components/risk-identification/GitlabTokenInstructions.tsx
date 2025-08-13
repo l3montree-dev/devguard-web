@@ -20,7 +20,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import CopyCode from "../common/CopyCode";
 import { ImageZoom } from "../common/Zoom";
-import YamlGenerator from "../onboarding/YamlGenerator";
+import YamlGenerator from "../guides/onboarding/YamlGenerator";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { CarouselApi, CarouselItem } from "../ui/carousel";
