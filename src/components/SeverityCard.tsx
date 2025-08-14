@@ -50,7 +50,6 @@ interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
-  queryIntervalEnd?: number;
   variant: "high" | "medium" | "low" | "critical";
 }
 
@@ -59,7 +58,6 @@ const SeverityCard: FunctionComponent<Props> = ({
   amountByCVSS,
   variant,
   queryIntervalStart,
-  queryIntervalEnd,
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -68,29 +66,38 @@ const SeverityCard: FunctionComponent<Props> = ({
 
   const applySQLFilter = (
     variant: Props["variant"],
-    queryIntervalStart: Props["queryIntervalStart"],
-    queryIntervalEnd: Props["queryIntervalEnd"],
-  ) => {
+  ):
+    | {
+        "filterQuery[raw_risk_assessment][is less than]": string;
+      }
+    | {
+        "filterQuery[raw_risk_assessment][is less than]": string;
+        "filterQuery[raw_risk_assessment][is greater than]": string;
+      }
+    | {
+        "filterQuery[raw_risk_assessment][is greater than]": string;
+      } => {
     switch (variant) {
       case "low":
         return {
           "filterQuery[raw_risk_assessment][is less than]":
             queryIntervalStart.toString(),
         };
+
       case "medium":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]":
-            queryIntervalEnd.toString(),
+          "filterQuery[raw_risk_assessment][is less than]": "7",
         };
+
       case "high":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]":
-            queryIntervalEnd.toString(),
+          "filterQuery[raw_risk_assessment][is less than]": "8",
         };
+
       case "critical":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
@@ -107,9 +114,7 @@ const SeverityCard: FunctionComponent<Props> = ({
           <Link
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
-              new URLSearchParams(
-                applySQLFilter(variant, queryIntervalStart, queryIntervalEnd),
-              )
+              new URLSearchParams(applySQLFilter(variant))
             }
             className="text-xs !text-muted-foreground"
           >
