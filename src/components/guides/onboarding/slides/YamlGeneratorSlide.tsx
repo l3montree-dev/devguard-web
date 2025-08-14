@@ -56,7 +56,7 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
         \n
 name: DevGuard DevSecOps
 on:
-  push:^
+  push:
 jobs:
   `
         : "\ninclude:";
