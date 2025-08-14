@@ -63,6 +63,34 @@ const SeverityCard: FunctionComponent<Props> = ({
   const project = useActiveProject();
   const asset = useActiveAsset()!;
   const activeAssetVersion = useActiveAssetVersion()!;
+
+  const applySQLFilter = (variant: Props["variant"]) => {
+    switch (variant) {
+      case "low":
+        return {
+          "filterQuery[raw_risk_assessment][is less than]":
+            queryIntervalStart.toString(),
+        };
+      case "medium":
+        return {
+          "filterQuery[raw_risk_assessment][is greater than]":
+            queryIntervalStart.toString(),
+          "filterQuery[raw_risk_assessment][is less than]": "7",
+        };
+      case "high":
+        return {
+          "filterQuery[raw_risk_assessment][is greater than]":
+            queryIntervalStart.toString(),
+          "filterQuery[raw_risk_assessment][is less than]": "8",
+        };
+      case "critical":
+        return {
+          "filterQuery[raw_risk_assessment][is greater than]":
+            queryIntervalStart.toString(),
+        };
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -71,10 +99,7 @@ const SeverityCard: FunctionComponent<Props> = ({
           <Link
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
-              new URLSearchParams({
-                "filterQuery[raw_risk_assessment][is greater than]":
-                  queryIntervalStart.toString(),
-              })
+              new URLSearchParams(applySQLFilter(variant))
             }
             className="text-xs !text-muted-foreground"
           >

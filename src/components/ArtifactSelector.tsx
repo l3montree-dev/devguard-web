@@ -34,29 +34,30 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
         align="start"
         className="z-50 max-h-[500px] overflow-y-auto w-80"
       >
-        {artifacts.sort().map((artifact) => (
-          <DropdownMenuCheckboxItem
-            key={artifact.id}
-            checked={artifact === selectedArtifact}
-            onClick={() => {
-              //check if artifact is already selected
-              if (artifact === selectedArtifact) {
-                setSelectedArtifact("");
+        {selectedArtifact &&
+          artifacts.sort().map((artifact) => (
+            <DropdownMenuCheckboxItem
+              key={artifact.id}
+              checked={artifact === selectedArtifact}
+              onClick={() => {
+                //check if artifact is already selected
+                if (artifact === selectedArtifact) {
+                  setSelectedArtifact("");
+                  router.push({
+                    query: { ...router.query, artifact: "" },
+                  });
+                  return;
+                }
+                setSelectedArtifact(artifact);
                 router.push({
-                  query: { ...router.query, artifact: "" },
+                  query: { ...router.query, artifact: artifact },
                 });
-                return;
-              }
-              setSelectedArtifact(artifact);
-              router.push({
-                query: { ...router.query, artifact: artifact },
-              });
-            }}
-          >
-            {artifact}{" "}
-            <span className="text-xs text-gray-500">{artifact.value}</span>
-          </DropdownMenuCheckboxItem>
-        ))}
+              }}
+            >
+              {artifact}{" "}
+              <span className="text-xs text-gray-500">{artifact.value}</span>
+            </DropdownMenuCheckboxItem>
+          ))}
         <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
