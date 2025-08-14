@@ -1,6 +1,6 @@
 import { AssetVersionDTO } from "@/types/api/api";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { GitBranchIcon } from "lucide-react";
+import { GitBranchIcon, StarIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { Button } from "./ui/button";
@@ -33,10 +33,17 @@ export function BranchTagSelector({
   );
   const [filter, setFilter] = useState("");
 
-  const filteredItems = useMemo(
-    () => items.filter((item) => item.name.includes(filter)),
-    [items, filter],
-  );
+  const filteredItems = useMemo(() => {
+    items.sort((a, b) => a.name.localeCompare(b.name));
+    const defaultBranch = items.findIndex((branch) => branch.defaultBranch);
+
+    if (defaultBranch !== -1) {
+      const defaultBranchItem = items.splice(defaultBranch, 1)[0];
+      // add the default branch to the beginning of the list
+      items.unshift(defaultBranchItem);
+    }
+    return items.filter((item) => item.name.includes(filter));
+  }, [items, filter]);
 
   return (
     <DropdownMenu>
@@ -93,7 +100,12 @@ export function BranchTagSelector({
                   setSelected(item.name);
                 }}
               >
-                {item.name}
+                {item.name}{" "}
+                {item.defaultBranch && (
+                  <span className="text-muted-foreground ml-2">
+                    (default branch)
+                  </span>
+                )}
               </DropdownMenuCheckboxItem>
             ))}
           </div>

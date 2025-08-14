@@ -34,7 +34,7 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
         align="start"
         className="z-50 max-h-[500px] overflow-y-auto w-80"
       >
-        {artifacts.map((artifact) => (
+        {artifacts.sort().map((artifact) => (
           <DropdownMenuCheckboxItem
             key={artifact.id}
             checked={artifact === selectedArtifact}
