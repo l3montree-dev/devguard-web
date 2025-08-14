@@ -48,10 +48,15 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   function codeStringBuilder() {
     const base =
       gitInstance === "GitHub"
-        ? `\n
+        ? `
+        permissions:
+  contents: read
+  packages: write
+
+        \n
 name: DevGuard DevSecOps
 on:
-  push:
+  push:^
 jobs:
   `
         : "\ninclude:";
