@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/nextjs";
 // IF ERROR_TRACKING_DSN IS NOT SET, DO NOT INITIALIZE SENTRY
 if (!process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN) {
   console.warn(
-    "Sentry is not initialized because ERROR_TRACKING_DSN is not set.",
+    "Sentry is not initialized because NEXT_PUBLIC_ERROR_TRACKING_DSN is not set.",
   );
 } else {
   Sentry.init({
@@ -21,6 +21,9 @@ if (!process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN) {
     beforeSend(event) {
       if (event.request && event.request.cookies) {
         delete event.request.cookies;
+      }
+      if (event.request && event.request.headers) {
+        delete event.request.headers.cookie;
       }
       // remove user ip from event
       if (event.user && event.user.ip_address) {
