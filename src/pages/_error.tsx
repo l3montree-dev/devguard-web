@@ -11,7 +11,6 @@ CustomErrorComponent.getInitialProps = async (contextData: NextPageContext) => {
   // time to send the error before the lambda exits
   await Sentry.captureUnderscoreErrorException(contextData);
 
-  // This will contain the status code of the response
   return Error.getInitialProps(contextData);
 };
 
