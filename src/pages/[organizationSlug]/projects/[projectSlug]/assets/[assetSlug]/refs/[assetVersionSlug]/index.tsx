@@ -93,6 +93,8 @@ const Index: FunctionComponent<Props> = ({
     [licenses],
   );
 
+  console.log(riskDistribution);
+
   return (
     <Page
       Menu={assetMenu}
@@ -257,6 +259,7 @@ const Index: FunctionComponent<Props> = ({
             <SeverityCard
               variant="critical"
               queryIntervalStart={8}
+              queryIntervalEnd={10}
               amountByRisk={riskDistribution.critical}
               amountByCVSS={cvssDistribution.critical}
             />

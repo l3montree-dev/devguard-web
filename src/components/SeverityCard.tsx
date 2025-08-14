@@ -50,6 +50,7 @@ interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
+  queryIntervalEnd: number;
   variant: "high" | "medium" | "low" | "critical";
 }
 
@@ -58,6 +59,7 @@ const SeverityCard: FunctionComponent<Props> = ({
   amountByCVSS,
   variant,
   queryIntervalStart,
+  queryIntervalEnd,
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -81,21 +83,23 @@ const SeverityCard: FunctionComponent<Props> = ({
       case "low":
         return {
           "filterQuery[raw_risk_assessment][is less than]":
-            queryIntervalStart.toString(),
+            queryIntervalEnd.toString(),
         };
 
       case "medium":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]": "7",
+          "filterQuery[raw_risk_assessment][is less than]":
+            queryIntervalEnd.toString(),
         };
 
       case "high":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]": "8",
+          "filterQuery[raw_risk_assessment][is less than]":
+            queryIntervalEnd.toString(),
         };
 
       case "critical":
