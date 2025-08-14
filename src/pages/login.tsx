@@ -227,6 +227,9 @@ const Login: NextPage = () => {
                 </p>
               )}
             </div>
+            <div className="mt-8">
+              <Messages messages={flow?.ui.messages} />
+            </div>
             <div className="mt-4 sm:mx-auto mt-8">
               {flow?.requested_aal !== "aal2" ? (
                 <Tabs defaultValue="passwordless">
@@ -362,9 +365,6 @@ const Login: NextPage = () => {
                   flow={flow as LoginFlow}
                 />
               )}
-            </div>
-            <div className="mt-8">
-              <Messages messages={flow?.ui.messages} />
             </div>
             <div className="mt-12 flex flex-col items-center">
               <p className="text-sm/6 text-muted-foreground text-center max-w-sm">

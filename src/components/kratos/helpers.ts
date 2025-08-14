@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { UiNode, UiNodeInputAttributes } from "@ory/client";
+import { UiNode, UiNodeInputAttributes, UiText } from "@ory/client";
 import { FormEvent, MouseEvent, useEffect } from "react";
 
 export type ValueSetter = (
@@ -56,4 +56,24 @@ export const callWebauthnFunction = (functionBody: string) => {
   }, 100);
 
   return intervalHandle;
+};
+
+export const kratosMessageTypeToIntent = (
+  messages?: UiText[],
+): "info" | "success" | "danger" => {
+  // If there are no messages, its info
+  if (!messages) {
+    return "info";
+  }
+
+  // If there are messages, we need to find the most severe one
+  return messages.reduce<"info" | "success" | "danger">((acc, message) => {
+    if (message.type === "error") {
+      return "danger";
+    }
+    if (message.type === "success") {
+      return "success";
+    }
+    return acc;
+  }, "info");
 };
