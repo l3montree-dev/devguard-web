@@ -263,18 +263,21 @@ const Index: FunctionComponent<Props> = ({
             <SeverityCard
               variant="high"
               queryIntervalStart={7}
+              queryIntervalEnd={8}
               amountByRisk={riskDistribution.high}
               amountByCVSS={cvssDistribution.high}
             />
             <SeverityCard
               variant="medium"
               queryIntervalStart={4}
+              queryIntervalEnd={7}
               amountByRisk={riskDistribution.medium}
               amountByCVSS={cvssDistribution.medium}
             />
             <SeverityCard
               variant="low"
               queryIntervalStart={0}
+              queryIntervalEnd={3}
               amountByRisk={riskDistribution.low}
               amountByCVSS={cvssDistribution.low}
             />

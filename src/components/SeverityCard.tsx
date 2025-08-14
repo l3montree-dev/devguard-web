@@ -50,6 +50,7 @@ interface Props {
   amountByRisk: number;
   amountByCVSS: number;
   queryIntervalStart: number;
+  queryIntervalEnd?: number;
   variant: "high" | "medium" | "low" | "critical";
 }
 
@@ -58,13 +59,18 @@ const SeverityCard: FunctionComponent<Props> = ({
   amountByCVSS,
   variant,
   queryIntervalStart,
+  queryIntervalEnd,
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
   const activeAssetVersion = useActiveAssetVersion()!;
 
-  const applySQLFilter = (variant: Props["variant"]) => {
+  const applySQLFilter = (
+    variant: Props["variant"],
+    queryIntervalStart: Props["queryIntervalStart"],
+    queryIntervalEnd: Props["queryIntervalEnd"],
+  ) => {
     switch (variant) {
       case "low":
         return {
@@ -75,13 +81,15 @@ const SeverityCard: FunctionComponent<Props> = ({
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]": "7",
+          "filterQuery[raw_risk_assessment][is less than]":
+            queryIntervalEnd.toString(),
         };
       case "high":
         return {
           "filterQuery[raw_risk_assessment][is greater than]":
             queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]": "8",
+          "filterQuery[raw_risk_assessment][is less than]":
+            queryIntervalEnd.toString(),
         };
       case "critical":
         return {
@@ -99,7 +107,9 @@ const SeverityCard: FunctionComponent<Props> = ({
           <Link
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
-              new URLSearchParams(applySQLFilter(variant))
+              new URLSearchParams(
+                applySQLFilter(variant, queryIntervalStart, queryIntervalEnd),
+              )
             }
             className="text-xs !text-muted-foreground"
           >
