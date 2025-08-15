@@ -49,16 +49,16 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
     const base =
       gitInstance === "GitHub"
         ? `
-        permissions:
+name: DevGuard DevSecOps
+
+on:
+  push:
+
+permissions:
   contents: read
   packages: write
 
-        \n
-name: DevGuard DevSecOps
-on:
-  push:
-jobs:
-  `
+jobs:`
         : "\ninclude:";
 
     const codeString = Object.entries(config)
@@ -104,7 +104,7 @@ jobs:
           codeString={
             gitInstance === "GitHub"
               ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
-              : `# .gitlab-ci.yml \n ${codeStringBuilder()}`
+              : `# .gitlab-ci.yml \nstages:\n- build\n- test\n- deploy\n ${codeStringBuilder()}`
           }
         />
       </div>
