@@ -42,7 +42,8 @@ export const SetupMethodSelectionSlide: FunctionComponent<
         <DialogTitle>How do you want to Setup Devguard?</DialogTitle>
       </DialogHeader>
       <div className="mt-10">
-        {asset?.repositoryProvider === "gitlab" && (
+        {(asset?.repositoryProvider === "gitlab" ||
+          asset?.externalEntityId) && (
           <Card
             onClick={() => setSelectedScanner("auto-setup")}
             className={classNames(

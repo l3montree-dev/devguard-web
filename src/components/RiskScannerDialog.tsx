@@ -40,6 +40,7 @@ import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
 import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
+import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -223,6 +224,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       // we can skip setup method selection slide - and the whole autosetup slides
       return 6;
     }
+
     return 1;
   };
 
@@ -232,6 +234,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   };
 
   const getAutosetupSlideIndex = () => {
+    if (asset.externalEntityProviderId) {
+      return 14;
+    }
     // skip the gitlab integration slide if we have integrations, otherwise show it
     return activeOrg.gitLabIntegrations.length > 0 ? 3 : 2;
   };
@@ -400,6 +405,15 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
               api={api}
+            />
+            <ExternalEntityAutosetup
+              handleAutosetup={autosetup.handleAutosetup}
+              progress={autosetup.progress}
+              Loader={autosetup.Loader}
+              isReallyLoading={isReallyLoading}
+              api={api}
+              prevIndex={prevIndex}
+              onClose={() => onOpenChange(false)}
             />
           </CarouselContent>
         </Carousel>
