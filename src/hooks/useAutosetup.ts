@@ -94,17 +94,14 @@ export function useAutosetup(
     }
 
     return new Promise<void>(async (resolve) => {
-      // check if we already have a pat
-      let privKey = pat?.privKey;
-      if (!pat) {
-        // create a new one for autosetup
-        privKey = (
-          await onCreatePat({
-            description: "DevGuard Autosetup (used inside GitLab Pipeline)",
-            scopes: "scan",
-          })
-        ).privKey;
-      }
+      // create a new one for autosetup
+      const privKey = (
+        await onCreatePat({
+          description: "DevGuard Autosetup (used inside GitLab Pipeline)",
+          scopes: "scan",
+        })
+      ).privKey;
+
       // set the progress to pending
       setProgress((prev) => {
         for (const key in prev) {
