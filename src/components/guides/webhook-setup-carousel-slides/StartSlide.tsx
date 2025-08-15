@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { OrganizationDetailsDTO } from "@/types/api/api";
 import {
   ExternalTicketProvider,
   ExternalTicketProviderNames,
@@ -26,6 +25,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
+import { useTheme } from "next-themes";
 
 interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
@@ -63,15 +63,18 @@ export default function StartSlide({
     });
   };
 
+  const theme = useTheme();
+
+  const greadienColors =
+    theme.theme === "dark"
+      ? ["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]
+      : ["#000000", "#333333", "#666666", "#999999", "#CCCCCC"];
+
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <GradientText
-            colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
-            animationSpeed={5}
-            className=""
-          >
+          <GradientText colors={greadienColors} animationSpeed={5} className="">
             Let&apos;s get your Tickets in Sync with DevGuard
           </GradientText>
         </DialogTitle>
