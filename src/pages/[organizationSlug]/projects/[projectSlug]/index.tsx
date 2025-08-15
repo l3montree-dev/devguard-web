@@ -76,6 +76,7 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
   const activeOrg = useActiveOrg();
   const form = useForm<AssetFormValues>({
     defaultValues: {
+      repositoryProvider: "github",
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,

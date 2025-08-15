@@ -12,6 +12,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
+import { useStore } from "../../../zustand/globalStoreProvider";
 
 interface StartSlideProps {
   api?: {
@@ -50,6 +51,7 @@ export default function SelectRepoSlide({
 
   const asset = useActiveAsset()!;
   const project = useActiveProject();
+  const updateAsset = useStore((s) => s.updateAsset);
 
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,
@@ -74,6 +76,8 @@ export default function SelectRepoSlide({
       return;
     }
     if (resp.ok) {
+      const r = await resp.json();
+      updateAsset(r);
       toast.success("Repository connected successfully.");
     }
   };
@@ -185,7 +189,7 @@ export default function SelectRepoSlide({
           Back
         </Button>
         <Button
-          disabled={!Boolean(selectedRepo) || !hasIntegration}
+          disabled={!asset.repositoryId}
           onClick={() => api?.scrollTo(afterSuccessfulConnectionSlideIndex)}
         >
           Continue
