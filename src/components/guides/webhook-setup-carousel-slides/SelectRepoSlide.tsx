@@ -110,13 +110,10 @@ export default function SelectRepoSlide({
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <Badge className="mr-2" variant="secondary">
-            Step 2/3
-          </Badge>{" "}
           Select your Repository to connect with DevGuard
         </DialogTitle>
       </DialogHeader>
-      <div className="p-1 mt-10">
+      <div className="mt-10 px-1">
         <ListItem
           Title={
             <div className="flex flex-row gap-2">
@@ -167,7 +164,7 @@ export default function SelectRepoSlide({
                     }
                   }}
                   disabled={!Boolean(selectedRepo) || !hasIntegration}
-                  variant={hasIntegration ? "default" : "secondary"}
+                  variant="secondary"
                 >
                   Connect
                 </Button>

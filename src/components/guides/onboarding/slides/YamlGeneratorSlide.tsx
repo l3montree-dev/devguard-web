@@ -98,7 +98,7 @@ jobs:`
           file or add the code snippet to an existing workflow file.
         </DialogDescription>
       </DialogHeader>
-      <div className="mt-10">
+      <div className="mt-10 px-1">
         <CopyCode
           language="yaml"
           codeString={

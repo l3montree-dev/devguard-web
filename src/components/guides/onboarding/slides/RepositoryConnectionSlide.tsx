@@ -43,7 +43,7 @@ const RepositoryConnectionSlide: FunctionComponent<
           Enter the information below to connect your repository with DevGuard.
         </DialogDescription>
       </DialogHeader>
-      <div className="mt-4 px-1">
+      <div className="mt-10 px-1">
         {org.gitLabIntegrations.length > 0 && (
           <ProviderSetup
             selectedProvider={selectedProvider}

@@ -39,62 +39,64 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
       <DialogHeader>
         <DialogTitle>Would you like to do it manual or automatic?</DialogTitle>
       </DialogHeader>
-      <Card
-        className={classNames(
-          "cursor-pointer mt-10",
-          variant === "auto"
-            ? "border border-primary"
-            : "border border-transparent",
-        )}
-        onClick={() => setVariant("auto")}
-      >
-        <CardHeader>
-          <CardTitle className="text-lg items-center flex flex-row leading-tight">
-            <CommandLineIcon
-              width={20}
-              height={20}
-              className="inline-block mr-2 w-4 h-4"
-            />
-            <span>Automatically upload using a Command Line Tool</span>
-            <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
-              Recommended
-            </Badge>
-          </CardTitle>
-          <CardDescription>
-            You want to automate the process of uploading SBOMs or
-            SARIF-Reports? Maybe inside a CI/CD pipeline?
-          </CardDescription>
-        </CardHeader>
-      </Card>
-      <Card
-        className={classNames(
-          "cursor-pointer mt-2",
-          variant === "manual"
-            ? "border border-primary"
-            : "border border-transparent",
-        )}
-        onClick={() => setVariant("manual")}
-      >
-        <CardHeader>
-          <CardTitle className="text-lg items-center flex flex-row leading-tight">
-            <DocumentArrowUpIcon
-              width={20}
-              height={20}
-              className="inline-block mr-2 w-4 h-4"
-            />
-            Manually upload a SBOM or SARIF file using a Drag&apos;n Drop
-            interface
-          </CardTitle>
-          <CardDescription>
-            You got a SBOM or SARIF file and want to upload it to DevGuard?
-          </CardDescription>
-        </CardHeader>
-      </Card>
-      <div className="flex mt-8 flex-row gap-2 justify-end">
-        <Button variant="secondary" onClick={() => prev?.()}>
-          Back
-        </Button>
-        <Button onClick={() => next?.()}>Continue</Button>
+      <div className="mt-10 px-1">
+        <Card
+          className={classNames(
+            "cursor-pointer mt-6",
+            variant === "auto"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => setVariant("auto")}
+        >
+          <CardHeader>
+            <CardTitle className="text-lg items-center flex flex-row leading-tight">
+              <CommandLineIcon
+                width={20}
+                height={20}
+                className="inline-block mr-2 w-4 h-4"
+              />
+              <span>Automatically upload using a Command Line Tool</span>
+              <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                Recommended
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              You want to automate the process of uploading SBOMs or
+              SARIF-Reports? Maybe inside a CI/CD pipeline?
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <Card
+          className={classNames(
+            "cursor-pointer mt-2",
+            variant === "manual"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => setVariant("manual")}
+        >
+          <CardHeader>
+            <CardTitle className="text-lg items-center flex flex-row leading-tight">
+              <DocumentArrowUpIcon
+                width={20}
+                height={20}
+                className="inline-block mr-2 w-4 h-4"
+              />
+              Manually upload a SBOM or SARIF file using a Drag&apos;n Drop
+              interface
+            </CardTitle>
+            <CardDescription>
+              You got a SBOM or SARIF file and want to upload it to DevGuard?
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <div className="flex mt-8 flex-row gap-2 justify-end">
+          <Button variant="secondary" onClick={() => prev?.()}>
+            Back
+          </Button>
+          <Button onClick={() => next?.()}>Continue</Button>
+        </div>
       </div>
     </CarouselItem>
   );

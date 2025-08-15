@@ -46,7 +46,7 @@ const GitLabIntegrationSlide: FunctionComponent<
           requests.
         </DialogDescription>
       </DialogHeader>
-      <div className="mt-4 px-1">
+      <div className="mt-10 px-1">
         <GitLabIntegrationForm
           onNewIntegration={(integration: GitLabIntegrationDTO) => {
             updateOrg({
