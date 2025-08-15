@@ -45,6 +45,7 @@ import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
+import Callout from "../../../../../../../../../components/common/Callout";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
@@ -89,7 +90,7 @@ const DependencyGraphPage: FunctionComponent<{
         primaryHeadline
         forceVertical
         title="Dependency Graph"
-        description="This graph shows the dependencies of the asset. The risk of each dependency is calculated based on the risk of the affected package."
+        description="This graph shows the dependencies of the asset. The risk of each dependency is calculated based on the risk of the affected package and accumulated of the risk of the children. You can click on the nodes to see more details about the dependency and the vulnerabilities."
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
@@ -121,6 +122,7 @@ const DependencyGraphPage: FunctionComponent<{
             )}
           </div>
         </div>
+
         <div
           className={classNames(
             "h-screen w-full rounded-lg border bg-white dark:bg-black",
@@ -142,6 +144,7 @@ const DependencyGraphPage: FunctionComponent<{
               )}
             </Button>
           </div>
+
           <DependencyGraph
             flaws={flaws}
             width={dimensions.width - SIDEBAR_WIDTH}

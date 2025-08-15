@@ -107,7 +107,8 @@ export const DependencyGraphNode: FunctionComponent<
             <Link
               className="!text-foreground hover:no-underline"
               href={
-                router.asPath.split("?")[0] + `/../dependency-risks/${vuln.id}`
+                router.asPath.split("?")[0] +
+                `/../../dependency-risks/${vuln.id}`
               }
             >
               {vuln.cveID}

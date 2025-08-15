@@ -1034,7 +1034,9 @@ const Index: FunctionComponent<Props> = (props) => {
                         <p className="text-sm">
                           <span className="flex flex-row gap-2">
                             <EcosystemImage packageName={vuln.componentPurl} />{" "}
-                            {beautifyPurl(vuln.componentPurl)}
+                            <span className="flex-1">
+                              {beautifyPurl(vuln.componentPurl)}
+                            </span>
                           </span>
                         </p>
                         <div className="mt-4 text-sm">
