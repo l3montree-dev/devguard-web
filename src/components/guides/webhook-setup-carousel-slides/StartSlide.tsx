@@ -66,7 +66,7 @@ export default function StartSlide({
   const theme = useTheme();
 
   const greadienColors =
-    theme.theme === "dark"
+    theme.theme === "dark" || theme.resolvedTheme === "dark"
       ? ["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]
       : ["#000000", "#333333", "#666666", "#999999", "#CCCCCC"];
 

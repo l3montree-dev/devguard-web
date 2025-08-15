@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function InternalServerErrorPage() {
   return (
     <>
-      <main className="grid min-h-full place-items-center bg-[#0E1117] px-6 py-24 sm:py-32 lg:px-8">
+      <main className="grid min-h-full place-items-center bg-background px-6 py-24 sm:py-32 lg:px-8">
         <div className="text-center">
           <Image
             src="/assets/investigation-gopher.png"
@@ -20,7 +20,7 @@ export default function InternalServerErrorPage() {
           <h2 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Uuupss... Something went wrong!
           </h2>
-          <p className="mt-6 text-pretty text-gray-400 sm:text-xl/8">
+          <p className="mt-6 text-pretty text-muted-foreground sm:text-xl/8">
             Sorry, we couldn’t process your request at the moment. Please try
             again later.
           </p>
