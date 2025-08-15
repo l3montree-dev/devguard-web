@@ -27,6 +27,7 @@ export function NodeInputCheckbox<T>({
           onCheckedChange={(checked) => setValue(!!checked)}
           disabled={attributes.disabled || disabled}
           name={attributes.name}
+          required={attributes.required}
         />
         <Label htmlFor={id}>
           {getNodeLabel(node)}
