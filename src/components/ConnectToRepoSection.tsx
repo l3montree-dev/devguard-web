@@ -198,14 +198,14 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
               </Callout>
               <div className="flex flex-row justify-end">
                 <Button
-                  variant="default"
+                  variant="outline"
                   className="mt-2"
                   onClick={() => {
                     setEditRepo(false);
                     router.replace(`/${activeOrg.slug}/settings`);
                   }}
                 >
-                  Organization Settings
+                  Go to Organization Settings
                 </Button>
               </div>
             </div>

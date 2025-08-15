@@ -1,8 +1,8 @@
 import React from "react";
-import usePersonalAccessToken from "../../hooks/usePersonalAccessToken";
-import CopyCode from "../common/CopyCode";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { InputWithButton } from "../ui/input-with-button";
+import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import CopyCode from "./common/CopyCode";
+import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { InputWithButton } from "./ui/input-with-button";
 
 const DevguardTokenCard = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();

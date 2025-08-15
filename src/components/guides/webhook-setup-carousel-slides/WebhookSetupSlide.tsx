@@ -18,15 +18,16 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface WebhookSetupSlideProps {
   api?: {
-    scrollPrev: () => void;
     scrollTo: (index: number) => void;
   };
   onOpenChange: (open: boolean) => void;
+  prevIndex: number;
 }
 
 export default function WebhookSetupSlide({
   api,
   onOpenChange,
+  prevIndex,
 }: WebhookSetupSlideProps) {
   const generateNewSecret = (): string => {
     return crypto.randomUUID();
@@ -42,15 +43,6 @@ export default function WebhookSetupSlide({
     // Integration for openCode and GitLab are the same
     externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
       "gitlab";
-
-  const isOpenCode = asset?.externalEntityProviderId === "opencode";
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText("devguard");
-    toast("Username copied to clipboard", {
-      description: "You can now paste it in your project.",
-    });
-  };
 
   const handleGenerateNewSecret = async () => {
     const resp = await browserApiClient(
@@ -124,7 +116,9 @@ export default function WebhookSetupSlide({
         <Button
           variant={"secondary"}
           onClick={() =>
-            isExternalEntityProvider ? api?.scrollTo(0) : api?.scrollPrev()
+            isExternalEntityProvider
+              ? api?.scrollTo(0)
+              : api?.scrollTo(prevIndex)
           }
         >
           Back

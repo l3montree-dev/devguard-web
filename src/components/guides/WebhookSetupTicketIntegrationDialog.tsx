@@ -22,7 +22,6 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
 > = ({ open, onOpenChange }) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const asset = useActiveAsset()!;
-  const activeOrg = useActiveOrg();
 
   const {
     repositories,
@@ -47,19 +46,31 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
               setSelectedProvider={setSelectedProvider}
               provider={selectedProvider}
               api={api}
+              prevIndex={0}
+              selectRepoSlideIndex={2}
+              webhookSetupSlideIndex={3}
+              providerIntegrationSlideIndex={1}
               isLoadingRepositories={isLoadingRepositories}
             />
             <ProviderIntegrationSetupSlide
               api={api}
               provider={selectedProvider}
+              selectRepoSlideIndex={2}
+              prevIndex={0}
             />
             <SelectRepoSlide
               api={api}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
               repositories={repositories}
+              afterSuccessfulConnectionSlideIndex={3}
+              prevIndex={1}
             />
-            <WebhookSetupSlide api={api} onOpenChange={onOpenChange} />
+            <WebhookSetupSlide
+              api={api}
+              onOpenChange={onOpenChange}
+              prevIndex={2}
+            />
           </CarouselContent>
         </Carousel>
       </DialogContent>

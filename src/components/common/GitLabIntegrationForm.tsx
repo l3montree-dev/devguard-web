@@ -73,6 +73,7 @@ export default function GitLabIntegrationForm({
         className="flex flex-col gap-4"
         onSubmit={async (e) => {
           e.preventDefault();
+
           await waitFor(form.handleSubmit(handleSubmit))();
           if (additionalOnClick) {
             additionalOnClick();
