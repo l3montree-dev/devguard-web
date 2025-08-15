@@ -27,13 +27,13 @@ interface GitLabIntegrationSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
-  nextIndex: number;
+  selectRepoSlideIndex: number;
   prevIndex: number;
 }
 
 const GitLabIntegrationSlide: FunctionComponent<
   GitLabIntegrationSlideProps
-> = ({ org, updateOrg, api, nextIndex, prevIndex }) => {
+> = ({ org, updateOrg, api, prevIndex, selectRepoSlideIndex }) => {
   return (
     <CarouselItem>
       <DialogHeader className="mb-4">
@@ -54,7 +54,7 @@ const GitLabIntegrationSlide: FunctionComponent<
               gitLabIntegrations: [...org.gitLabIntegrations, integration],
             });
           }}
-          additionalOnClick={() => api?.scrollTo(nextIndex)}
+          additionalOnClick={() => api?.scrollTo(selectRepoSlideIndex)}
           backButtonClick={() => api?.scrollTo(prevIndex)}
         />
       </div>

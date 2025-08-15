@@ -29,12 +29,14 @@ interface IntegrationMethodSelectionSlideProps {
     scrollTo: (index: number) => void;
   };
   variant: "manual" | "auto";
+  prevIndex: number;
+  nextIndex: number;
   setVariant: (variant: "manual" | "auto") => void;
 }
 
 const IntegrationMethodSelectionSlide: FunctionComponent<
   IntegrationMethodSelectionSlideProps
-> = ({ api, variant, setVariant }) => {
+> = ({ api, variant, setVariant, prevIndex, nextIndex }) => {
   return (
     <CarouselItem>
       <div className="">
@@ -90,10 +92,10 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           </Card>
         </div>
         <div className="mt-10 flex flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => api?.scrollTo(2)}>
+          <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
             Back
           </Button>
-          <Button onClick={() => api?.scrollTo(4)}>Continue</Button>
+          <Button onClick={() => api?.scrollTo(nextIndex)}>Continue</Button>
         </div>
       </div>
     </CarouselItem>

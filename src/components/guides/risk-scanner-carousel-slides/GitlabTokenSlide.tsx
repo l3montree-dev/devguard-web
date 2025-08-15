@@ -13,17 +13,13 @@
 // limitations under the License.
 
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Config } from "@/types/common";
 import { CrownIcon } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import CopyCode from "../../common/CopyCode";
+import { ImageZoom } from "../../common/Zoom";
+import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import DevguardTokenCard from "../../risk-identification/DevguardTokenCard";
 
 interface GitlabTokenSlideProps {
   pat?: string;
@@ -34,96 +30,58 @@ interface GitlabTokenSlideProps {
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  yamlGeneratorSlideIndex: number;
   config: Config;
+  prevIndex: number;
 }
 
 const GitlabTokenSlide = ({
-  pat,
   api,
-  apiUrl,
-  orgSlug,
-  projectSlug,
-  assetSlug,
-  config,
+  prevIndex,
+  yamlGeneratorSlideIndex,
 }: GitlabTokenSlideProps) => {
-  const asset = useActiveAsset();
-  const [ready, setReady] = useState(false);
-
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          Navigate to your project Settings &gt; CI/CD &gt; Variables
+          Navigate to CI/CD Settings &gt; Variables &gt; Expand. Press the
+          button &quot;Add variable&quot;
         </DialogTitle>
         <DialogDescription>
-          You need to add the DevGuard token as a variable to your GitLab
-          project.
+          For example, for the DevGuard project its following URL:
+          https://gitlab.com/l3montree/example-project/-/settings/ci_cd
         </DialogDescription>
-      </DialogHeader>
-      <div className="mt-10">
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Open the CI/CD project settings in GitLab
-          </h3>
-          <small className="text-muted-foreground">
-            It looks something like this:
-            https://gitlab.com/l3montree/example-project/-/settings/ci_cd
-          </small>
-          <div className="relative mt-2 aspect-video w-full max-w-4xl">
-            <Image
-              alt="Open the project settings in Gitlab"
-              className="rounded-lg border object-fill"
-              src={"/assets/gitlab-project-settings.png"}
-              fill
-            />
-          </div>
-        </div>
-
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Expand the &quot;Variables&quot; section
-          </h3>
-          <small className="text-muted-foreground">
-            Expand the &quot;Variables&quot; section and click on &quot;Add
-            variable&quot;
-          </small>
-          <div className="relative mt-2 aspect-video w-full max-w-4xl">
-            <Image
-              alt="Navigate to Variables and choose actions"
-              className="rounded-lg border object-fill"
-              src={"/assets/gitlab-var-settings.png"}
-              fill
-            />
-          </div>
-        </div>
-
-        <DevguardTokenCard />
-
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Add a new variable called DEVGUARD_TOKEN
-          </h3>
-          <small className="text-muted-foreground">
-            Make sure to mark it as &quot;Masked&quot; and optionally
-            &quot;Protected&quot; if you want to use it only on protected
-            branches.
-          </small>
-        </div>
-
-        <Alert className="mb-4">
-          <CrownIcon className="h-4 w-4" />
+        <Alert className="mt-5">
+          <CrownIcon />
           <AlertTitle>
-            Make sure that the visibility of your project is set to
-            &quot;Private&quot; or higher.
+            You have to be at least <span className="">maintainer</span> to
+            configure variables.
           </AlertTitle>
         </Alert>
+      </DialogHeader>
+      <div className="mt-5">
+        <div className="relative aspect-video w-full max-w-4xl">
+          <ImageZoom
+            alt="Open the CI/CD settings in GitLab"
+            className="rounded-lg border object-fill"
+            src={"/assets/gitlab-secret.png"}
+            fill
+          />
+        </div>
       </div>
 
-      <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant="secondary" onClick={() => api?.scrollTo(3)}>
+      <div className="mt-10">
+        <DevguardTokenCard />
+      </div>
+      <div className="flex mt-10 flex-row gap-2 justify-end">
+        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
-        <Button disabled={!ready} onClick={() => api?.scrollTo(5)}>
+        <Button
+          onClick={() => {
+            api?.scrollTo(yamlGeneratorSlideIndex);
+          }}
+        >
           Continue
         </Button>
       </div>

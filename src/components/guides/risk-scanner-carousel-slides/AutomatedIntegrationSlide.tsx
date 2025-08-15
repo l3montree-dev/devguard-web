@@ -11,18 +11,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CheckIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
+import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
+import CopyCode from "../../common/CopyCode";
+import PatSection from "../../PatSection";
 import { Button } from "../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { Badge } from "../../ui/badge";
-import CopyCode from "../../common/CopyCode";
-import DevguardTokenCard from "../../risk-identification/DevguardTokenCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 
 interface AutomatedIntegrationSlideProps {
-  pat: any;
   api?: {
     scrollTo: (index: number) => void;
   };
@@ -30,21 +29,14 @@ interface AutomatedIntegrationSlideProps {
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
-  tab: "sbom" | "sarif";
-  setTab: (tab: "sbom" | "sarif") => void;
+  prevIndex: number;
+  onClose: () => void;
 }
 
 const AutomatedIntegrationSlide: FunctionComponent<
   AutomatedIntegrationSlideProps
-> = ({ pat, api, apiUrl, orgSlug, projectSlug, assetSlug, tab, setTab }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
+> = ({ api, apiUrl, orgSlug, projectSlug, assetSlug, prevIndex, onClose }) => {
+  const pat = usePersonalAccessToken();
   return (
     <CarouselItem>
       <DialogHeader>
@@ -57,84 +49,62 @@ const AutomatedIntegrationSlide: FunctionComponent<
         </DialogDescription>
       </DialogHeader>
 
-      <div className="mt-10 space-y-6">
-        <DevguardTokenCard />
-
-        <div>
-          <h3 className="mb-4 text-lg font-semibold">Choose your scan type</h3>
-          <div className="flex gap-2 mb-4">
-            <Button
-              variant={tab === "sbom" ? "default" : "outline"}
-              onClick={() => setTab("sbom")}
-              size="sm"
-            >
-              SBOM Scan
-            </Button>
-            <Button
-              variant={tab === "sarif" ? "default" : "outline"}
-              onClick={() => setTab("sarif")}
-              size="sm"
-            >
-              SARIF Report
-            </Button>
-          </div>
+      <Tabs defaultValue="sbom" className="w-full mt-10">
+        <div className="flex">
+          <TabsList>
+            <TabsTrigger value="sbom">SBOM</TabsTrigger>
+            <TabsTrigger value="sarif">SARIF</TabsTrigger>
+          </TabsList>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              CLI Command
-              <Badge variant="secondary">Copy & Paste</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Install DevGuard CLI</h4>
-                <CopyCode
-                  codeString="curl -sSL https://github.com/l3montree-dev/devguard-cli/releases/latest/download/install.sh | bash"
-                  language="shell"
-                />
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-2">
-                  {tab === "sbom" ? "Upload SBOM" : "Upload SARIF Report"}
-                </h4>
-                <CopyCode
-                  codeString={
-                    tab === "sbom"
-                      ? `devguard-cli sbom upload --token $DEVGUARD_TOKEN --asset ${orgSlug}/${projectSlug}/${assetSlug} --file ./sbom.json`
-                      : `devguard-cli sarif upload --token $DEVGUARD_TOKEN --asset ${orgSlug}/${projectSlug}/${assetSlug} --file ./report.sarif`
-                  }
-                  language="shell"
-                />
-              </div>
+        <TabsContent value="sbom" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-md">SBOM Command</CardTitle>
+              <CardDescription>
+                Use the devguard-scanner CLI tool to upload SBOM files
+                (CycloneDX format).
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 pt-0">
+              <CopyCode
+                language="shell"
+                codeString={`devguard-scanner sbom --token ${pat.pat ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} --path /path/to/sbom.json`}
+              />
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </TabsContent>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Environment Variable</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">
-              Set this environment variable in your CI/CD pipeline:
-            </p>
-            <CopyCode
-              codeString={`DEVGUARD_TOKEN=${pat?.pat?.privKey || "your-token-here"}`}
-              language="shell"
-            />
-          </CardContent>
-        </Card>
+        <TabsContent value="sarif" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-md">SARIF Command</CardTitle>
+              <CardDescription>
+                Use the devguard-scanner CLI tool to upload SARIF reports from
+                your security scanners.
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 pt-0">
+              <CopyCode
+                language="shell"
+                codeString={`devguard-scanner sarif --token ${pat.pat ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} --path /path/to/report.sarif`}
+              />
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <div className="mt-10">
+        <PatSection
+          {...pat}
+          description="Risk Identification using CLI Setup"
+        />
       </div>
-
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant="secondary" onClick={() => api?.scrollTo(3)}>
+        <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
-        <Button onClick={() => api?.scrollTo(0)}>Finish Setup</Button>
+        <Button onClick={onClose}>Finish Setup</Button>
       </div>
     </CarouselItem>
   );

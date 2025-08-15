@@ -39,6 +39,8 @@ interface ManualIntegrationSlideProps {
   sbomDropzone: any;
   sarifDropzone: any;
   isUploadDisabled: boolean;
+  prevIndex: number;
+  onClose: () => void;
   handleUpload: () => void;
 }
 
@@ -51,6 +53,7 @@ const ManualIntegrationSlide: FunctionComponent<
   sbomFileName,
   sarifFileName,
   sbomDropzone,
+  prevIndex,
   sarifDropzone,
   isUploadDisabled,
   handleUpload,
@@ -133,7 +136,7 @@ const ManualIntegrationSlide: FunctionComponent<
           </Tabs>
         </Section>
         <div className="flex mt-6 flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => api?.scrollTo(3)}>
+          <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
             Back
           </Button>
           <Button disabled={isUploadDisabled} onClick={handleUpload}>

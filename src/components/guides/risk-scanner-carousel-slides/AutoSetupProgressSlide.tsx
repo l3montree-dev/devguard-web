@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { FunctionComponent } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { CarouselApi, CarouselItem } from "../../ui/carousel";
-import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { Button } from "../../ui/button";
+import React, { FunctionComponent } from "react";
 import { AssetDTO } from "../../../types/api/api";
+import { Button } from "../../ui/button";
+import { CarouselItem } from "../../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 
 interface AutoSetupProgressSlideProps {
   asset: AssetDTO;
@@ -32,12 +32,12 @@ interface AutoSetupProgressSlideProps {
       url?: string;
     };
   };
+  onClose: () => void;
   Loader: () => React.ReactNode;
   isReallyLoading: boolean;
   api?: {
     scrollTo: (index: number) => void;
   };
-  nextIndex: number;
   prevIndex: number;
 }
 
@@ -49,8 +49,8 @@ const AutoSetupProgressSlide: FunctionComponent<
   progress,
   Loader,
   isReallyLoading,
+  onClose,
   api,
-  nextIndex,
   prevIndex,
 }) => {
   return (
@@ -139,6 +139,7 @@ const AutoSetupProgressSlide: FunctionComponent<
         >
           Back
         </Button>
+        <Button onClick={onClose}>Close</Button>
       </div>
     </CarouselItem>
   );

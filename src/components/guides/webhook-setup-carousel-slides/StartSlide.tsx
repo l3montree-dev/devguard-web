@@ -16,7 +16,7 @@ import {
   ExternalTicketProviderNames,
 } from "@/types/common";
 import { InfoIcon } from "lucide-react";
-import ProviderSetup from "./ProviderSetup";
+import ProviderSetup from "../ProviderSetup";
 import { useEffect } from "react";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -197,6 +197,7 @@ export default function StartSlide({
                 selectedProvider={provider}
                 activeOrg={activeOrg}
                 api={api}
+                prevIndex={0}
                 selectRepoSlideIndex={2}
                 providerIntegrationSlideIndex={1}
                 isLoadingRepositories={isLoadingRepositories}

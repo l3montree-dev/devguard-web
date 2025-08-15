@@ -56,20 +56,20 @@ const WebhookSetupTicketIntegrationDialog: FunctionComponent<
               api={api}
               provider={selectedProvider}
               selectRepoSlideIndex={2}
-              prevIndex={1}
+              prevIndex={0}
             />
             <SelectRepoSlide
               api={api}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
               repositories={repositories}
-              webhookSetupSlideIndex={3}
-              prevIndex={2}
+              afterSuccessfulConnectionSlideIndex={3}
+              prevIndex={1}
             />
             <WebhookSetupSlide
               api={api}
               onOpenChange={onOpenChange}
-              prevIndex={3}
+              prevIndex={2}
             />
           </CarouselContent>
         </Carousel>

@@ -19,6 +19,8 @@ interface SetupMethodSelectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
+  autosetupSlideIndex: number;
+  selectScannerSlideIndex: number;
   asset: AssetDTO | null;
   selectedScanner: "custom-setup" | "auto-setup" | undefined;
   setSelectedScanner: (scanner: "custom-setup" | "auto-setup") => void;
@@ -26,40 +28,46 @@ interface SetupMethodSelectionSlideProps {
 
 export const SetupMethodSelectionSlide: FunctionComponent<
   SetupMethodSelectionSlideProps
-> = ({ api, asset, selectedScanner, setSelectedScanner }) => {
+> = ({
+  api,
+  asset,
+  selectedScanner,
+  setSelectedScanner,
+  autosetupSlideIndex,
+  selectScannerSlideIndex,
+}) => {
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>How do you want to Setup Devguard?</DialogTitle>
       </DialogHeader>
       <div className="mt-10">
-        {asset?.repositoryProvider === "gitlab" ||
-          (asset?.repositoryProvider === undefined && (
-            <Card
-              onClick={() => setSelectedScanner("auto-setup")}
-              className={classNames(
-                "col-span-2 cursor-pointer",
-                selectedScanner === "auto-setup"
-                  ? "border border-primary"
-                  : "border border-transparent",
-              )}
-            >
-              <CardContent className="p-0">
-                <CardHeader>
-                  <CardTitle className="text-lg items-center flex flex-row leading-tight">
-                    <SparklesIcon className="inline-block mr-2 w-4 h-4" />
-                    Auto Setup
-                    <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
-                      Recommended
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription>
-                    We do the difficult part for you!
-                  </CardDescription>
-                </CardHeader>
-              </CardContent>
-            </Card>
-          ))}
+        {asset?.repositoryProvider === "gitlab" && (
+          <Card
+            onClick={() => setSelectedScanner("auto-setup")}
+            className={classNames(
+              "col-span-2 cursor-pointer",
+              selectedScanner === "auto-setup"
+                ? "border border-primary"
+                : "border border-transparent",
+            )}
+          >
+            <CardContent className="p-0">
+              <CardHeader>
+                <CardTitle className="text-lg items-center flex flex-row leading-tight">
+                  <SparklesIcon className="inline-block mr-2 w-4 h-4" />
+                  Auto Setup
+                  <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                    Recommended
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  We do the difficult part for you!
+                </CardDescription>
+              </CardHeader>
+            </CardContent>
+          </Card>
+        )}
       </div>
       <Card
         className={classNames(
@@ -87,7 +95,10 @@ export const SetupMethodSelectionSlide: FunctionComponent<
         <Button
           disabled={selectedScanner === undefined}
           onClick={() => {
-            const targetSlide = selectedScanner === "auto-setup" ? 1 : 2;
+            const targetSlide =
+              selectedScanner === "auto-setup"
+                ? autosetupSlideIndex
+                : selectScannerSlideIndex;
             api?.scrollTo(targetSlide);
           }}
         >

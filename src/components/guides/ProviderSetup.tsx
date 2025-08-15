@@ -17,6 +17,7 @@ interface ProviderSetupProps {
   };
   isLoadingRepositories: boolean;
   selectRepoSlideIndex: number;
+  prevIndex: number;
   providerIntegrationSlideIndex: number;
 }
 
@@ -25,6 +26,7 @@ export default function ProviderSetup({
   activeOrg,
   api,
   providerIntegrationSlideIndex,
+  prevIndex,
   selectRepoSlideIndex,
   isLoadingRepositories,
 }: ProviderSetupProps) {
@@ -135,6 +137,15 @@ export default function ProviderSetup({
         </div>
       )}
       <div className="mt-10 flex flex-row gap-2 justify-end">
+        <Button
+          variant={"secondary"}
+          onClick={() => {
+            api?.scrollTo(prevIndex);
+          }}
+        >
+          Back
+        </Button>
+
         <Button
           disabled={selectedProvider === undefined || isLoadingRepositories}
           onClick={() => {

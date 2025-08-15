@@ -20,7 +20,7 @@ interface StartSlideProps {
   repositories: Array<{ value: string; label: string }> | null;
   repositoryName?: string;
   repositoryId?: string;
-  webhookSetupSlideIndex: number;
+  afterSuccessfulConnectionSlideIndex: number;
   prevIndex: number;
 }
 
@@ -28,7 +28,7 @@ export default function SelectRepoSlide({
   repositoryName,
   repositoryId,
   api,
-  webhookSetupSlideIndex,
+  afterSuccessfulConnectionSlideIndex,
   prevIndex,
 }: StartSlideProps) {
   const activeOrg = useActiveOrg();
@@ -186,7 +186,7 @@ export default function SelectRepoSlide({
         </Button>
         <Button
           disabled={!Boolean(selectedRepo) || !hasIntegration}
-          onClick={() => api?.scrollTo(webhookSetupSlideIndex)}
+          onClick={() => api?.scrollTo(afterSuccessfulConnectionSlideIndex)}
         >
           Continue
         </Button>

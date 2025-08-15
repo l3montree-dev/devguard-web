@@ -30,7 +30,7 @@ import GitLabIntegrationSlide from "./guides/risk-scanner-carousel-slides/GitLab
 import GitlabTokenSlide from "./guides/risk-scanner-carousel-slides/GitlabTokenSlide";
 import IntegrationMethodSelectionSlide from "./guides/risk-scanner-carousel-slides/IntegrationMethodSelectionSlide";
 import ManualIntegrationSlide from "./guides/risk-scanner-carousel-slides/ManualIntegrationSlide";
-import RepositoryConnectionSlide from "./guides/risk-scanner-carousel-slides/RepositoryConnectionSlide";
+import ProviderSetupSlide from "./guides/risk-scanner-carousel-slides/RepositoryConnectionSlide";
 import ScannerOptionsSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerOptionsSelectionSlide";
 import ScannerSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerSelectionSlide";
 import { SetupMethodSelectionSlide } from "./guides/risk-scanner-carousel-slides/SetupMethodSelectionSlide";
@@ -38,6 +38,8 @@ import YamlGeneratorSlide from "./guides/risk-scanner-carousel-slides/YamlGenera
 import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSlide";
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
+import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
+import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -55,7 +57,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const asset = useActiveAsset()!;
 
   const [selectedSetup, setSelectedSetup] = React.useState<
-    "cherry-pick-setup" | "own-setup" | undefined
+    "devguard-tools" | "own-setup" | undefined
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
@@ -211,6 +213,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     api?.reInit();
   }, [selectedScanner, pat.pat, api]);
 
+  const hasIntegrations = activeOrg.gitLabIntegrations?.length > 0;
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -224,36 +227,43 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           setApi={setApi}
         >
           <CarouselContent>
-            <SetupMethodSelectionSlide
-              api={api}
-              asset={asset!}
-              selectedScanner={selectedScanner}
-              setSelectedScanner={setSelectedScanner}
-            />
-
+            {asset?.repositoryProvider === undefined && (
+              <UpdateRepositoryProviderSlide prevIndex={2} api={api} />
+            )}
+            {asset.repositoryProvider === "gitlab" && (
+              <SetupMethodSelectionSlide
+                api={api}
+                asset={asset!}
+                selectScannerSlideIndex={1} // both slides actually have the same index since we are adding slides dynamically
+                autosetupSlideIndex={hasIntegrations ? 2 : 1} // if we have integrations, present the user directly the provider setup slide. If no, present the gitlab integration slide and SKIP the provider setup slide
+                selectedScanner={selectedScanner}
+                setSelectedScanner={setSelectedScanner}
+              />
+            )}
             {selectedScanner === "auto-setup" && (
               <>
-                <RepositoryConnectionSlide
-                  selectedProvider={selectedProvider}
-                  api={api}
-                  nextIndex={2}
-                  prevIndex={1}
-                  org={activeOrg}
-                  isLoadingRepositories={isLoadingRepositories}
-                />
                 <GitLabIntegrationSlide
                   org={activeOrg}
                   updateOrg={updateOrg}
                   api={api}
-                  nextIndex={3}
-                  prevIndex={2}
+                  selectRepoSlideIndex={3}
+                  prevIndex={0}
+                />
+                <ProviderSetupSlide
+                  selectedProvider={selectedProvider}
+                  api={api}
+                  selectRepoSlideIndex={3}
+                  providerIntegrationSlideIndex={1}
+                  org={activeOrg}
+                  prevIndex={0}
+                  isLoadingRepositories={isLoadingRepositories}
                 />
                 <SelectRepoSlide
                   api={api}
                   repositoryName={asset.repositoryName}
                   repositoryId={asset.repositoryId}
                   repositories={repositories}
-                  webhookSetupSlideIndex={4}
+                  afterSuccessfulConnectionSlideIndex={4}
                   prevIndex={3}
                 />
                 <AutoSetupProgressSlide
@@ -263,7 +273,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                   Loader={autosetup.Loader}
                   isReallyLoading={isReallyLoading}
                   api={api}
-                  nextIndex={0}
+                  onClose={() => onOpenChange(false)}
                   prevIndex={4}
                 />
               </>
@@ -272,16 +282,18 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               selectedSetup={selectedSetup}
               setSelectedSetup={setSelectedSetup}
-              setSelectedScanner={setSelectedScanner}
-              selectedScanner={selectedScanner}
+              prevIndex={0}
+              nextIndex={2} // same for devguard-tools and own-setup
             />
 
-            {selectedSetup === "cherry-pick-setup" && (
+            {selectedSetup === "devguard-tools" && (
               <>
                 <ScannerOptionsSelectionSlide
                   config={config}
                   setConfig={setConfig}
                   api={api}
+                  tokenSlideIndex={3}
+                  prevIndex={1}
                 />
                 {asset?.repositoryProvider === "github" && (
                   <GithubTokenSlide
@@ -292,6 +304,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                     projectSlug={activeProject.slug}
                     assetSlug={asset!.slug}
                     config={config}
+                    yamlGeneratorSlideIndex={4}
+                    prevIndex={2}
                   />
                 )}
                 {asset?.repositoryProvider === "gitlab" && (
@@ -300,6 +314,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                     api={api}
                     apiUrl={apiUrl}
                     orgSlug={activeOrg.slug}
+                    yamlGeneratorSlideIndex={4}
+                    prevIndex={2}
                     projectSlug={activeProject.slug}
                     assetSlug={asset!.slug}
                     config={config}
@@ -317,6 +333,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                   activeOrg={activeOrg}
                   activeProject={activeProject}
                   asset={asset || null}
+                  onClose={() => onOpenChange(false)}
                   api={api}
                 />
               </>
@@ -327,16 +344,17 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                   variant={variant}
                   setVariant={setVariant}
                   api={api}
+                  nextIndex={3}
+                  prevIndex={1}
                 />
                 {variant === "auto" && (
                   <AutomatedIntegrationSlide
-                    pat={pat}
                     apiUrl={apiUrl}
                     orgSlug={activeOrg.slug}
                     projectSlug={activeProject.slug}
                     assetSlug={asset!.slug}
-                    tab={tab}
-                    setTab={setTab}
+                    prevIndex={2}
+                    onClose={() => onOpenChange(false)}
                     api={api}
                   />
                 )}
@@ -350,6 +368,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
                     sarifDropzone={sarifDropzone}
                     isUploadDisabled={isUploadDisabled}
                     handleUpload={handleUpload}
+                    prevIndex={2}
+                    onClose={() => onOpenChange(false)}
                     api={api}
                   />
                 )}

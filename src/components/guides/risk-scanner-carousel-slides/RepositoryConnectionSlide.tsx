@@ -17,7 +17,7 @@ import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { OrganizationDetailsDTO } from "../../../types/api/api";
 import { ExternalTicketProvider } from "../../../types/common";
-import ProviderSetup from "../webhook-setup-carousel-slides/ProviderSetup";
+import ProviderSetup from "../ProviderSetup";
 
 interface RepositoryConnectionSlideProps {
   selectedProvider: ExternalTicketProvider;
@@ -25,19 +25,19 @@ interface RepositoryConnectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
-  nextIndex: number;
-  prevIndex: number;
   isLoadingRepositories: boolean;
+  selectRepoSlideIndex: number;
+  providerIntegrationSlideIndex: number;
+  prevIndex: number;
 }
 
-const RepositoryConnectionSlide: FunctionComponent<
-  RepositoryConnectionSlideProps
-> = ({
+const ProviderSetupSlide: FunctionComponent<RepositoryConnectionSlideProps> = ({
   selectedProvider,
   org,
   api,
-  nextIndex,
   prevIndex,
+  selectRepoSlideIndex,
+  providerIntegrationSlideIndex,
   isLoadingRepositories,
 }) => {
   return (
@@ -51,19 +51,18 @@ const RepositoryConnectionSlide: FunctionComponent<
         </DialogDescription>
       </DialogHeader>
       <div className="mt-10 px-1">
-        {org.gitLabIntegrations.length > 0 && (
-          <ProviderSetup
-            selectedProvider={selectedProvider}
-            activeOrg={org}
-            api={api}
-            selectRepoSlideIndex={nextIndex}
-            providerIntegrationSlideIndex={prevIndex}
-            isLoadingRepositories={isLoadingRepositories}
-          />
-        )}
+        <ProviderSetup
+          selectedProvider={selectedProvider}
+          activeOrg={org}
+          api={api}
+          prevIndex={prevIndex}
+          selectRepoSlideIndex={selectRepoSlideIndex}
+          providerIntegrationSlideIndex={providerIntegrationSlideIndex}
+          isLoadingRepositories={isLoadingRepositories}
+        />
       </div>
     </CarouselItem>
   );
 };
 
-export default RepositoryConnectionSlide;
+export default ProviderSetupSlide;

@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { Config } from "@/types/common";
-import { useState } from "react";
+import { ImageZoom } from "../../common/Zoom";
+import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import CopyCode from "../../common/CopyCode";
-import { ImageZoom } from "../../common/Zoom";
-import DevguardTokenCard from "../../risk-identification/DevguardTokenCard";
 
 interface GithubTokenSlideProps {
   pat?: string;
@@ -34,23 +29,15 @@ interface GithubTokenSlideProps {
   projectSlug: string;
   assetSlug: string;
   config: Config;
+  yamlGeneratorSlideIndex: number;
+  prevIndex: number;
 }
 
 const GithubTokenSlide = ({
-  pat,
+  prevIndex,
   api,
-  apiUrl,
-  orgSlug,
-  projectSlug,
-  assetSlug,
-  config,
+  yamlGeneratorSlideIndex,
 }: GithubTokenSlideProps) => {
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const asset = useActiveAsset();
-
-  const [ready, setReady] = useState(false);
-
   return (
     <CarouselItem>
       <DialogHeader>
@@ -59,58 +46,36 @@ const GithubTokenSlide = ({
           the button &quot;New repository secret&quot;
         </DialogTitle>
         <DialogDescription>
-          You need to add the DevGuard token as a secret to your GitHub
-          repository.
+          For example, for the DevGuard project its following url:
+          https://github.com/l3montree-dev/devguard/settings/secrets/actions
         </DialogDescription>
       </DialogHeader>
       <div className="mt-10">
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Open the project settings in GitHub
-          </h3>
-          <small className="text-muted-foreground">
-            For example, for the DevGuard project its following url:
-            https://github.com/l3montree-dev/devguard/settings
-          </small>
-          <div className="relative aspect-video w-full max-w-4xl">
-            <ImageZoom
-              alt="Open the project settings in GitHub"
-              className="rounded-lg border object-fill"
-              src={"/assets/project-settings.png"}
-              fill
-            />
-          </div>
-        </div>
-
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Navigate to Secrets and Variables and choose actions
-          </h3>
-          <div className="relative aspect-video w-full max-w-4xl">
-            <ImageZoom
-              alt="Navigate to Secrets and Variables and choose actions"
-              className="rounded-lg border object-fill"
-              src={"/assets/repo-secret.png"}
-              fill
-            />
-          </div>
-        </div>
-
-        <DevguardTokenCard />
-
-        <div className="mb-10">
-          <h3 className="mb-4 mt-2 font-semibold">
-            Create a new repository secret called DEVGUARD_TOKEN
-          </h3>
-          <CopyCode codeString={pat || "Loading..."} />
+        <div
+          className="relative aspect-video w-full
+            max-w-4xl"
+        >
+          <ImageZoom
+            alt="Open the project settings in GitHub"
+            className="rounded-lg border object-fill"
+            src={"/assets/repo-secret.png"}
+            fill
+          />
         </div>
       </div>
 
-      <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant="secondary" onClick={() => api?.scrollTo(3)}>
+      <div className="mt-10">
+        <DevguardTokenCard />
+      </div>
+      <div className="flex mt-10 flex-row gap-2 justify-end">
+        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
-        <Button disabled={!ready} onClick={() => api?.scrollTo(5)}>
+        <Button
+          onClick={() => {
+            api?.scrollTo(yamlGeneratorSlideIndex);
+          }}
+        >
           Continue
         </Button>
       </div>

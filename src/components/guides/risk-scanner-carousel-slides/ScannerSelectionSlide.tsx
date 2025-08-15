@@ -16,20 +16,18 @@ interface ScannerSelectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
-  selectedSetup?: "cherry-pick-setup" | "own-setup";
-  setSelectedSetup: (setup: "cherry-pick-setup" | "own-setup") => void;
-  setSelectedScanner: (
-    scanner: "custom-setup" | "auto-setup" | undefined,
-  ) => void;
-  selectedScanner?: "custom-setup" | "auto-setup";
+  prevIndex: number;
+  selectedSetup?: "devguard-tools" | "own-setup";
+  nextIndex: number;
+  setSelectedSetup: (setup: "devguard-tools" | "own-setup") => void;
 }
 
 export default function ScannerSelectionSlide({
   api,
   selectedSetup,
   setSelectedSetup,
-  setSelectedScanner,
-  selectedScanner,
+  nextIndex,
+  prevIndex,
 }: ScannerSelectionSlideProps) {
   return (
     <CarouselItem>
@@ -40,11 +38,11 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer",
-            selectedSetup === "cherry-pick-setup"
+            selectedSetup === "devguard-tools"
               ? "border border-primary"
               : "border border-transparent",
           )}
-          onClick={() => setSelectedSetup("cherry-pick-setup")}
+          onClick={() => setSelectedSetup("devguard-tools")}
         >
           <CardHeader>
             <CardTitle className="text-lg flex flex-row items-center leading-tight">
@@ -97,8 +95,7 @@ export default function ScannerSelectionSlide({
         <Button
           variant={"secondary"}
           onClick={() => {
-            api?.scrollTo(0); // Back to SetupMethodSelectionSlide
-            setSelectedScanner(undefined);
+            api?.scrollTo(prevIndex); // Back to SetupMethodSelectionSlide
           }}
         >
           Back
@@ -106,7 +103,7 @@ export default function ScannerSelectionSlide({
         <Button
           disabled={selectedSetup === undefined}
           onClick={() => {
-            api?.scrollTo(3); // Forward to slide 3
+            api?.scrollTo(nextIndex); // Forward to slide 3
           }}
         >
           {selectedSetup === undefined ? "Select a Scanner" : "Continue"}
