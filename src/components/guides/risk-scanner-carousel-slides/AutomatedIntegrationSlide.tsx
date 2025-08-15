@@ -69,7 +69,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
             <div className="p-6 pt-0">
               <CopyCode
                 language="shell"
-                codeString={`devguard-scanner sbom --token ${pat.pat ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} --path /path/to/sbom.json`}
+                codeString={`devguard-scanner sbom --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/sbom.json`}
               />
             </div>
           </Card>
@@ -87,7 +87,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
             <div className="p-6 pt-0">
               <CopyCode
                 language="shell"
-                codeString={`devguard-scanner sarif --token ${pat.pat ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} --path /path/to/report.sarif`}
+                codeString={`devguard-scanner sarif --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/report.sarif`}
               />
             </div>
           </Card>

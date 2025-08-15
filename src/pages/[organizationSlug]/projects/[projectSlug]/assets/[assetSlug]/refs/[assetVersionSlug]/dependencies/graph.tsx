@@ -45,10 +45,6 @@ import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
-import {
-  getArtifactNameFromScannerID,
-  getScannerIDFromArtifactName,
-} from "../../../../../../../../../utils/view";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
@@ -243,12 +239,6 @@ export const getServerSideProps = middleware(
 
     let scanner = context.query.artifact;
 
-    if (scanner) {
-      scanner = getScannerIDFromArtifactName(scanner as string);
-    } else {
-      scanner = "github.com/l3montree-dev/devguard/cmd/devguard-scanner/sca";
-    }
-
     const [resp, flawResp] = await Promise.all([
       apiClient(
         uri +
@@ -324,11 +314,6 @@ export const getServerSideProps = middleware(
 
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();
-      if (artifactsData && artifactsData.length > 0) {
-        for (let i = 0; i < artifactsData.length; i++) {
-          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
-        }
-      }
     }
 
     return {

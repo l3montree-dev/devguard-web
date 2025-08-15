@@ -28,6 +28,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import FileUpload from "../../FileUpload";
 import Section from "../../common/Section";
 
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+
 interface ManualIntegrationSlideProps {
   api?: {
     scrollTo: (index: number) => void;
@@ -60,81 +62,84 @@ const ManualIntegrationSlide: FunctionComponent<
 }) => {
   return (
     <CarouselItem>
-      <div className="">
-        <Section
-          description="Upload an SBOM or SARIF file by using the dropzone below."
-          title="Manual integration"
-          forceVertical
+      <DialogHeader>
+        <DialogTitle className="flex flex-row gap-2">
+          Manual Integration
+        </DialogTitle>
+        <DialogDescription>
+          Upload an SBOM or SARIF file by using the dropzone below.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="mt-10 px-1">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => setTab(v as "sbom" | "sarif")}
+          defaultValue="sbom"
+          className="w-full"
         >
-          <Tabs
-            value={tab}
-            onValueChange={(v) => setTab(v as "sbom" | "sarif")}
-            defaultValue="sbom"
-            className="w-full"
-          >
-            <div className="flex">
-              <TabsList>
-                <TabsTrigger value="sbom">SBOM</TabsTrigger>
-                <TabsTrigger value="sarif">SARIF</TabsTrigger>
-              </TabsList>
+          <div className="flex">
+            <TabsList>
+              <TabsTrigger value="sbom">SBOM</TabsTrigger>
+              <TabsTrigger value="sarif">SARIF</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="sbom" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-md">Upload SBOM</CardTitle>
+                <CardDescription>
+                  Upload a SBOM file in CycloneDX 1.6 or higher (JSON).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileUpload
+                  files={sbomFileName ? [sbomFileName] : []}
+                  dropzone={sbomDropzone}
+                />
+              </CardContent>
+            </Card>
+
+            <div className="mt-2 flex text-primary flex-row items-center">
+              <QuestionMarkCircleIcon className="flex w-4 m-2" />
+              <Link
+                className="flex text-primary text-sm"
+                href="https://devguard.org/guides/explaining-sboms"
+                target="_blank"
+              >
+                How do I get a SBOM and upload it to DevGuard?
+              </Link>
             </div>
+          </TabsContent>
 
-            <TabsContent value="sbom" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-md">Upload SBOM</CardTitle>
-                  <CardDescription>
-                    Upload a SBOM file in CycloneDX 1.6 or higher (JSON).
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <FileUpload
-                    files={sbomFileName ? [sbomFileName] : []}
-                    dropzone={sbomDropzone}
-                  />
-                </CardContent>
-              </Card>
+          <TabsContent value="sarif" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-md">Upload SARIF</CardTitle>
+                <CardDescription>
+                  Upload a SARIF report from your scanner (.sarif or JSON).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileUpload
+                  files={sarifFileName ? [sarifFileName] : []}
+                  dropzone={sarifDropzone}
+                />
+              </CardContent>
+            </Card>
+            <div className="mt-2 flex text-primary flex-row items-center">
+              <QuestionMarkCircleIcon className="flex w-4 m-2" />
+              <Link
+                className="flex text-primary text-sm"
+                href="https://devguard.org/guides/explaining-sarif"
+                target="_blank"
+              >
+                How do I get a SARIF-Report and upload it to DevGuard?
+              </Link>
+            </div>
+          </TabsContent>
+        </Tabs>
 
-              <div className="mt-2 flex text-primary flex-row items-center">
-                <QuestionMarkCircleIcon className="flex w-4 m-2" />
-                <Link
-                  className="flex text-primary text-sm"
-                  href="https://devguard.org/guides/explaining-sboms"
-                  target="_blank"
-                >
-                  How do I get a SBOM and upload it to DevGuard?
-                </Link>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="sarif" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-md">Upload SARIF</CardTitle>
-                  <CardDescription>
-                    Upload a SARIF report from your scanner (.sarif or JSON).
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <FileUpload
-                    files={sarifFileName ? [sarifFileName] : []}
-                    dropzone={sarifDropzone}
-                  />
-                </CardContent>
-              </Card>
-              <div className="mt-2 flex text-primary flex-row items-center">
-                <QuestionMarkCircleIcon className="flex w-4 m-2" />
-                <Link
-                  className="flex text-primary text-sm"
-                  href="https://devguard.org/guides/explaining-sarif"
-                  target="_blank"
-                >
-                  How do I get a SARIF-Report and upload it to DevGuard?
-                </Link>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </Section>
         <div className="flex mt-6 flex-row gap-2 justify-end">
           <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
             Back

@@ -50,8 +50,8 @@ export const DependencyGraphNode: FunctionComponent<
     <div
       style={{
         maxWidth: props.data.nodeWidth,
-        //     borderColor: props.data.flaw !== undefined ? color : undefined,
-        //backgroundColor: props.data.flaw !== undefined ? color : "white",
+        borderColor: props.data.vuln !== undefined ? color : undefined,
+        // backgroundColor: props.data.vuln !== undefined ? color : "white",
       }}
       className={classNames(
         "relative rounded border bg-card p-3 text-xs text-card-foreground",
@@ -97,6 +97,7 @@ export const DependencyGraphNode: FunctionComponent<
   if (!props.data.vuln) {
     return Node;
   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>

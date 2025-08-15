@@ -144,7 +144,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       {
         method: "POST",
         body: formdata,
-        headers: { "X-Scanner": "SBOM-File-Upload" },
+        headers: { "X-Scanner": "website:sbom" },
       },
     );
 
@@ -156,6 +156,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     router.push(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/dependency-risks/`,
     );
+    onOpenChange(false);
   };
 
   const uploadSARIF = async () => {
@@ -165,7 +166,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       method: "POST",
       body: sarifContentRef.current,
       headers: {
-        "X-Scanner": "SARIF-File-Upload",
+        "X-Scanner": "website:sarif",
         "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
       },
     });
@@ -213,14 +214,16 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     api?.reInit();
   }, [selectedScanner, pat.pat, api]);
 
-  const hasIntegrations = activeOrg.gitLabIntegrations?.length > 0;
-
   const getStartIndex = () => {
     // display the update repository provider slide if asset is not connected already
     if (!asset.externalEntityId && !asset.repositoryProvider) {
       return 0; // start with the update repository provider slide
     }
-    return indexAfterUpdateRepoProvider(); // otherwise, skip to the next slide
+    if (asset.repositoryProvider === "github") {
+      // we can skip setup method selection slide - and the whole autosetup slides
+      return 6;
+    }
+    return 1;
   };
 
   const indexAfterUpdateRepoProvider = () => {
