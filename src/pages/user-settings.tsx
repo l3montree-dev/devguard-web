@@ -365,7 +365,7 @@ const Settings: FunctionComponent<{
                         </Button>
                       }
                     >
-                      <Button>Delete</Button>
+                      <Button variant={"destructiveOutline"}>Delete</Button>
                     </ConfirmTokenDeletion>
                   }
                 />

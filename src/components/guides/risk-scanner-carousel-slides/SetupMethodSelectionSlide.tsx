@@ -62,7 +62,8 @@ export const SetupMethodSelectionSlide: FunctionComponent<
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  We do the difficult part for you!
+                  We do the difficult part for you. But we need your
+                  permissions!
                 </CardDescription>
               </CardHeader>
             </CardContent>

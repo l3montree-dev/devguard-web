@@ -29,8 +29,8 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
     });
   };
   return (
-    <div className="inline-flex">
-      <div className="relative w-full overflow-hidden rounded-lg border px-1.5 py-0.5">
+    <span className="inline-flex">
+      <span className="relative w-full overflow-hidden rounded-lg border px-1.5 py-0.5">
         <button
           onClick={handleCopy}
           type="button"
@@ -38,9 +38,9 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
         >
           <CopyIcon className="w-3.5 h-3.5" />
         </button>
-        <div className="relative font-mono text-sm pr-6">{codeString}</div>
-      </div>
-    </div>
+        <span className="relative font-mono text-sm pr-6">{codeString}</span>
+      </span>
+    </span>
   );
 };
 
@@ -101,20 +101,20 @@ const CopyCode: FunctionComponent<Props> = (props) => {
   }, [props.codeString, props.highlightRegexPattern]);
 
   return (
-    <div
+    <span
       style={{
         height: 14 /*padding*/ + codeStr?.split("\n").length * 20,
       }}
-      className="relative w-full overflow-hidden rounded-lg border"
+      className="relative block w-full overflow-hidden rounded-lg border"
     >
-      <div className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-card" />
+      <span className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-card" />
       <button
         onClick={handleCopy}
         className="absolute cursor-pointer right-1 top-1 z-10 rounded-lg bg-gray-700 p-1 px-2 text-xs text-white transition-all opacity-75 hover:opacity-100"
       >
         Copy
       </button>
-      <div className="relative">
+      <span className="relative">
         <Highlighter
           startingLineNumber={props.startingLineNumber}
           codeString={codeStr}
@@ -124,8 +124,8 @@ const CopyCode: FunctionComponent<Props> = (props) => {
           }
         />
         {highlightLineNumbers && (
-          <div
-            className="absolute pointer-events-none left-0 right-0 top-0 z-10 w-full bg-white/10 bg-blend-darken"
+          <span
+            className="absolute block pointer-events-none left-0 right-0 top-0 z-10 w-full bg-white/10 bg-blend-darken"
             style={{
               top: `${7 + (highlightLineNumbers[0] - 1) * 20}px`,
               height:
@@ -133,8 +133,8 @@ const CopyCode: FunctionComponent<Props> = (props) => {
             }}
           />
         )}
-      </div>
-    </div>
+      </span>
+    </span>
   );
 };
 

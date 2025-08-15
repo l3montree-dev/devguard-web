@@ -214,6 +214,46 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   }, [selectedScanner, pat.pat, api]);
 
   const hasIntegrations = activeOrg.gitLabIntegrations?.length > 0;
+
+  const getStartIndex = () => {
+    // display the update repository provider slide if asset is not connected already
+    if (!asset.externalEntityId && !asset.repositoryProvider) {
+      return 0; // start with the update repository provider slide
+    }
+    return indexAfterUpdateRepoProvider(); // otherwise, skip to the next slide
+  };
+
+  const indexAfterUpdateRepoProvider = () => {
+    // if the asset is connected to a github repository, there is only a single method to setup: custom. There is no autosetup option at all. Therefore skip the setup method selection slide. We do not need to show the gitlab integration slide either - thus index 3.
+    return asset.repositoryProvider === "github" ? 3 : 1;
+  };
+
+  const getAutosetupSlideIndex = () => {
+    // skip the gitlab integration slide if we have integrations, otherwise show it
+    return activeOrg.gitLabIntegrations.length > 0 ? 3 : 2;
+  };
+
+  // save the slide history to make the back button implementation easier
+  const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
+
+  useEffect(() => {
+    if (api) {
+      api.on("settle", (...ev) => {
+        const currentSlide = api.slidesInView()[0];
+        // if the current slide is not in the history, update the history
+        setSlideHistory((prev) => {
+          // check if the previous slide is already in the history
+          if (prev.includes(currentSlide)) {
+            return prev.slice(0, prev.lastIndexOf(currentSlide) + 1);
+          }
+          return [...prev, currentSlide];
+        });
+      });
+    }
+  }, [api]);
+
+  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -221,160 +261,143 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           opts={{
             watchDrag: false,
             containScroll: false,
+            startIndex: getStartIndex(),
           }}
           className="w-full"
           plugins={[AutoHeight(), Fade()]}
           setApi={setApi}
         >
           <CarouselContent>
-            {asset?.repositoryProvider === undefined && (
-              <UpdateRepositoryProviderSlide prevIndex={2} api={api} />
-            )}
-            {asset.repositoryProvider === "gitlab" && (
-              <SetupMethodSelectionSlide
-                api={api}
-                asset={asset!}
-                selectScannerSlideIndex={1} // both slides actually have the same index since we are adding slides dynamically
-                autosetupSlideIndex={hasIntegrations ? 2 : 1} // if we have integrations, present the user directly the provider setup slide. If no, present the gitlab integration slide and SKIP the provider setup slide
-                selectedScanner={selectedScanner}
-                setSelectedScanner={setSelectedScanner}
-              />
-            )}
-            {selectedScanner === "auto-setup" && (
-              <>
-                <GitLabIntegrationSlide
-                  org={activeOrg}
-                  updateOrg={updateOrg}
-                  api={api}
-                  selectRepoSlideIndex={3}
-                  prevIndex={0}
-                />
-                <ProviderSetupSlide
-                  selectedProvider={selectedProvider}
-                  api={api}
-                  selectRepoSlideIndex={3}
-                  providerIntegrationSlideIndex={1}
-                  org={activeOrg}
-                  prevIndex={0}
-                  isLoadingRepositories={isLoadingRepositories}
-                />
-                <SelectRepoSlide
-                  api={api}
-                  repositoryName={asset.repositoryName}
-                  repositoryId={asset.repositoryId}
-                  repositories={repositories}
-                  afterSuccessfulConnectionSlideIndex={4}
-                  prevIndex={3}
-                />
-                <AutoSetupProgressSlide
-                  asset={asset!}
-                  handleAutosetup={autosetup.handleAutosetup}
-                  progress={autosetup.progress}
-                  Loader={autosetup.Loader}
-                  isReallyLoading={isReallyLoading}
-                  api={api}
-                  onClose={() => onOpenChange(false)}
-                  prevIndex={4}
-                />
-              </>
-            )}
+            {/** Only needed if asset is not connected already */}
+            <UpdateRepositoryProviderSlide
+              nextIndex={indexAfterUpdateRepoProvider()}
+              api={api}
+            />
+            <SetupMethodSelectionSlide
+              api={api}
+              asset={asset!}
+              selectScannerSlideIndex={6}
+              autosetupSlideIndex={getAutosetupSlideIndex()} // if we have integrations, present the user directly the provider setup slide. If no, present the gitlab integration slide and SKIP the provider setup slide
+              selectedScanner={selectedScanner}
+              setSelectedScanner={setSelectedScanner}
+            />
+            <GitLabIntegrationSlide
+              org={activeOrg}
+              updateOrg={updateOrg}
+              api={api}
+              selectRepoSlideIndex={4}
+              prevIndex={prevIndex}
+            />
+            <ProviderSetupSlide
+              selectedProvider={selectedProvider}
+              api={api}
+              selectRepoSlideIndex={4}
+              providerIntegrationSlideIndex={2}
+              org={activeOrg}
+              prevIndex={prevIndex}
+              isLoadingRepositories={isLoadingRepositories}
+            />
+            <SelectRepoSlide
+              api={api}
+              repositoryName={asset.repositoryName}
+              repositoryId={asset.repositoryId}
+              repositories={repositories}
+              afterSuccessfulConnectionSlideIndex={5}
+              prevIndex={prevIndex}
+            />
+            <AutoSetupProgressSlide
+              asset={asset!}
+              handleAutosetup={autosetup.handleAutosetup}
+              progress={autosetup.progress}
+              Loader={autosetup.Loader}
+              isReallyLoading={isReallyLoading}
+              api={api}
+              onClose={() => onOpenChange(false)}
+              prevIndex={prevIndex}
+            />
             <ScannerSelectionSlide
               api={api}
               selectedSetup={selectedSetup}
               setSelectedSetup={setSelectedSetup}
-              prevIndex={0}
-              nextIndex={2} // same for devguard-tools and own-setup
+              prevIndex={prevIndex}
+              devguardToolsSlideIndex={7}
+              customSetupSlideIndex={11}
             />
-
-            {selectedSetup === "devguard-tools" && (
-              <>
-                <ScannerOptionsSelectionSlide
-                  config={config}
-                  setConfig={setConfig}
-                  api={api}
-                  tokenSlideIndex={3}
-                  prevIndex={1}
-                />
-                {asset?.repositoryProvider === "github" && (
-                  <GithubTokenSlide
-                    pat={pat.pat?.privKey}
-                    api={api}
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    assetSlug={asset!.slug}
-                    config={config}
-                    yamlGeneratorSlideIndex={4}
-                    prevIndex={2}
-                  />
-                )}
-                {asset?.repositoryProvider === "gitlab" && (
-                  <GitlabTokenSlide
-                    pat={pat.pat?.privKey}
-                    api={api}
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    yamlGeneratorSlideIndex={4}
-                    prevIndex={2}
-                    projectSlug={activeProject.slug}
-                    assetSlug={asset!.slug}
-                    config={config}
-                  />
-                )}
-                <YamlGeneratorSlide
-                  gitInstance={
-                    asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
-                  }
-                  config={config}
-                  orgSlug={activeOrg.slug}
-                  projectSlug={activeProject.slug}
-                  assetSlug={asset!.slug}
-                  apiUrl={apiUrl}
-                  activeOrg={activeOrg}
-                  activeProject={activeProject}
-                  asset={asset || null}
-                  onClose={() => onOpenChange(false)}
-                  api={api}
-                />
-              </>
-            )}
-            {selectedSetup === "own-setup" && (
-              <>
-                <IntegrationMethodSelectionSlide
-                  variant={variant}
-                  setVariant={setVariant}
-                  api={api}
-                  nextIndex={3}
-                  prevIndex={1}
-                />
-                {variant === "auto" && (
-                  <AutomatedIntegrationSlide
-                    apiUrl={apiUrl}
-                    orgSlug={activeOrg.slug}
-                    projectSlug={activeProject.slug}
-                    assetSlug={asset!.slug}
-                    prevIndex={2}
-                    onClose={() => onOpenChange(false)}
-                    api={api}
-                  />
-                )}
-                {variant === "manual" && (
-                  <ManualIntegrationSlide
-                    tab={tab}
-                    setTab={setTab}
-                    sbomFileName={sbomFileName}
-                    sarifFileName={sarifFileName}
-                    sbomDropzone={sbomDropzone}
-                    sarifDropzone={sarifDropzone}
-                    isUploadDisabled={isUploadDisabled}
-                    handleUpload={handleUpload}
-                    prevIndex={2}
-                    onClose={() => onOpenChange(false)}
-                    api={api}
-                  />
-                )}
-              </>
-            )}
+            <ScannerOptionsSelectionSlide
+              config={config}
+              setConfig={setConfig}
+              api={api}
+              tokenSlideIndex={asset.repositoryProvider === "github" ? 8 : 9}
+              prevIndex={prevIndex}
+            />
+            <GithubTokenSlide
+              pat={pat.pat?.privKey}
+              api={api}
+              apiUrl={apiUrl}
+              orgSlug={activeOrg.slug}
+              projectSlug={activeProject.slug}
+              assetSlug={asset!.slug}
+              config={config}
+              yamlGeneratorSlideIndex={10}
+              prevIndex={prevIndex}
+            />
+            <GitlabTokenSlide
+              pat={pat.pat?.privKey}
+              api={api}
+              apiUrl={apiUrl}
+              orgSlug={activeOrg.slug}
+              yamlGeneratorSlideIndex={10}
+              prevIndex={prevIndex}
+              projectSlug={activeProject.slug}
+              assetSlug={asset!.slug}
+              config={config}
+            />
+            <YamlGeneratorSlide
+              gitInstance={
+                asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
+              }
+              config={config}
+              orgSlug={activeOrg.slug}
+              projectSlug={activeProject.slug}
+              assetSlug={asset!.slug}
+              apiUrl={apiUrl}
+              activeOrg={activeOrg}
+              activeProject={activeProject}
+              asset={asset || null}
+              onClose={() => onOpenChange(false)}
+              api={api}
+              prevIndex={prevIndex}
+            />
+            <IntegrationMethodSelectionSlide
+              variant={variant}
+              setVariant={setVariant}
+              api={api}
+              prevIndex={prevIndex}
+              cliSlideIndex={12}
+              fileUploadSlideIndex={13}
+            />
+            <AutomatedIntegrationSlide
+              apiUrl={apiUrl}
+              orgSlug={activeOrg.slug}
+              projectSlug={activeProject.slug}
+              assetSlug={asset!.slug}
+              prevIndex={prevIndex}
+              onClose={() => onOpenChange(false)}
+              api={api}
+            />
+            <ManualIntegrationSlide
+              tab={tab}
+              setTab={setTab}
+              sbomFileName={sbomFileName}
+              sarifFileName={sarifFileName}
+              sbomDropzone={sbomDropzone}
+              sarifDropzone={sarifDropzone}
+              isUploadDisabled={isUploadDisabled}
+              handleUpload={handleUpload}
+              prevIndex={prevIndex}
+              onClose={() => onOpenChange(false)}
+              api={api}
+            />
           </CarouselContent>
         </Carousel>
       </DialogContent>

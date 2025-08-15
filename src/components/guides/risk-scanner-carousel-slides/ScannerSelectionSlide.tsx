@@ -18,7 +18,8 @@ interface ScannerSelectionSlideProps {
   };
   prevIndex: number;
   selectedSetup?: "devguard-tools" | "own-setup";
-  nextIndex: number;
+  devguardToolsSlideIndex: number;
+  customSetupSlideIndex: number;
   setSelectedSetup: (setup: "devguard-tools" | "own-setup") => void;
 }
 
@@ -26,7 +27,8 @@ export default function ScannerSelectionSlide({
   api,
   selectedSetup,
   setSelectedSetup,
-  nextIndex,
+  devguardToolsSlideIndex,
+  customSetupSlideIndex,
   prevIndex,
 }: ScannerSelectionSlideProps) {
   return (
@@ -103,7 +105,11 @@ export default function ScannerSelectionSlide({
         <Button
           disabled={selectedSetup === undefined}
           onClick={() => {
-            api?.scrollTo(nextIndex); // Forward to slide 3
+            api?.scrollTo(
+              selectedSetup === "devguard-tools"
+                ? devguardToolsSlideIndex
+                : customSetupSlideIndex,
+            ); // Forward to slide 3
           }}
         >
           {selectedSetup === undefined ? "Select a Scanner" : "Continue"}

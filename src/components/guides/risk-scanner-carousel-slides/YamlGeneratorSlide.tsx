@@ -24,6 +24,7 @@ interface YamlGeneratorSlideProps {
   activeOrg: OrganizationDetailsDTO;
   activeProject: ProjectDTO | null;
   asset: AssetDTO | null;
+  prevIndex: number;
   api?: {
     scrollTo: (index: number) => void;
   };
@@ -37,6 +38,7 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   projectSlug,
   assetSlug,
   apiUrl,
+  prevIndex,
   api,
   onClose,
 }) => {
@@ -104,7 +106,7 @@ jobs:`
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => api?.scrollTo(4)}>
+        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
         <Button

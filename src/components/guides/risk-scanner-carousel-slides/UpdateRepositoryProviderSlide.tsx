@@ -15,13 +15,13 @@ import { useStore } from "../../../zustand/globalStoreProvider";
 import { AsyncButton, Button } from "../../ui/button";
 
 interface Props {
-  prevIndex: number;
   api?: {
     scrollTo: (index: number) => void;
   };
+  nextIndex: number;
 }
 
-const UpdateRepositoryProviderSlide = ({ prevIndex, api }: Props) => {
+const UpdateRepositoryProviderSlide = ({ api, nextIndex }: Props) => {
   const [selectedProvider, setSelectedProvider] = React.useState<
     AssetDTO["repositoryProvider"] | undefined
   >();
@@ -41,6 +41,8 @@ const UpdateRepositoryProviderSlide = ({ prevIndex, api }: Props) => {
     if (resp.ok) {
       const updatedAsset = await resp.json();
       updateAsset(updatedAsset); // this should move slides on its own - sideeffect
+      toast.success("Repository provider updated successfully");
+      api?.scrollTo(nextIndex); // scroll to next slide
     } else {
       toast.error("Failed to update repository provider");
     }
@@ -103,14 +105,6 @@ const UpdateRepositoryProviderSlide = ({ prevIndex, api }: Props) => {
         </Card>
       </div>
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-        <Button
-          variant={"secondary"}
-          onClick={() => {
-            api?.scrollTo(prevIndex); // Back to SetupMethodSelectionSlide
-          }}
-        >
-          Back
-        </Button>
         <AsyncButton
           disabled={selectedProvider === undefined}
           onClick={handleProviderUpdate}

@@ -30,13 +30,21 @@ interface IntegrationMethodSelectionSlideProps {
   };
   variant: "manual" | "auto";
   prevIndex: number;
-  nextIndex: number;
   setVariant: (variant: "manual" | "auto") => void;
+  cliSlideIndex: number;
+  fileUploadSlideIndex: number;
 }
 
 const IntegrationMethodSelectionSlide: FunctionComponent<
   IntegrationMethodSelectionSlideProps
-> = ({ api, variant, setVariant, prevIndex, nextIndex }) => {
+> = ({
+  api,
+  variant,
+  setVariant,
+  prevIndex,
+  cliSlideIndex,
+  fileUploadSlideIndex,
+}) => {
   return (
     <CarouselItem>
       <div className="">
@@ -95,7 +103,15 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
             Back
           </Button>
-          <Button onClick={() => api?.scrollTo(nextIndex)}>Continue</Button>
+          <Button
+            onClick={() =>
+              api?.scrollTo(
+                variant === "auto" ? cliSlideIndex : fileUploadSlideIndex,
+              )
+            }
+          >
+            Continue
+          </Button>
         </div>
       </div>
     </CarouselItem>
