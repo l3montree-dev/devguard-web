@@ -13,26 +13,33 @@
 // limitations under the License.
 
 import React, { FunctionComponent } from "react";
-import { CarouselApi, CarouselItem } from "../../../ui/carousel";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../../ui/dialog";
-import { OrganizationDetailsDTO } from "../../../../types/api/api";
-import { ExternalTicketProvider } from "../../../../types/common";
-import ProviderSetup from "../../webhook-setup-carousel-slides/ProviderSetup";
+import { CarouselItem } from "../../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { OrganizationDetailsDTO } from "../../../types/api/api";
+import { ExternalTicketProvider } from "../../../types/common";
+import ProviderSetup from "../webhook-setup-carousel-slides/ProviderSetup";
 
 interface RepositoryConnectionSlideProps {
   selectedProvider: ExternalTicketProvider;
   org: OrganizationDetailsDTO;
-  api: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
+  nextIndex: number;
+  prevIndex: number;
   isLoadingRepositories: boolean;
 }
 
 const RepositoryConnectionSlide: FunctionComponent<
   RepositoryConnectionSlideProps
-> = ({ selectedProvider, org, api, isLoadingRepositories }) => {
+> = ({
+  selectedProvider,
+  org,
+  api,
+  nextIndex,
+  prevIndex,
+  isLoadingRepositories,
+}) => {
   return (
     <CarouselItem>
       <DialogHeader>
@@ -49,6 +56,8 @@ const RepositoryConnectionSlide: FunctionComponent<
             selectedProvider={selectedProvider}
             activeOrg={org}
             api={api}
+            selectRepoSlideIndex={nextIndex}
+            providerIntegrationSlideIndex={prevIndex}
             isLoadingRepositories={isLoadingRepositories}
           />
         )}

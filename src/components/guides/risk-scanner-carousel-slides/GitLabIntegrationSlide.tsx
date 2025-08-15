@@ -13,27 +13,27 @@
 // limitations under the License.
 
 import React, { FunctionComponent } from "react";
-import { CarouselApi, CarouselItem } from "../../../ui/carousel";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../../ui/dialog";
+import { CarouselApi, CarouselItem } from "../../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import {
   OrganizationDetailsDTO,
   GitLabIntegrationDTO,
-} from "../../../../types/api/api";
-import GitLabIntegrationForm from "../../../common/GitLabIntegrationForm";
+} from "../../../types/api/api";
+import GitLabIntegrationForm from "../../common/GitLabIntegrationForm";
 
 interface GitLabIntegrationSlideProps {
   org: OrganizationDetailsDTO;
   updateOrg: (org: OrganizationDetailsDTO) => void;
-  api: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
+  nextIndex: number;
+  prevIndex: number;
 }
 
 const GitLabIntegrationSlide: FunctionComponent<
   GitLabIntegrationSlideProps
-> = ({ org, updateOrg, api }) => {
+> = ({ org, updateOrg, api, nextIndex, prevIndex }) => {
   return (
     <CarouselItem>
       <DialogHeader className="mb-4">
@@ -54,8 +54,8 @@ const GitLabIntegrationSlide: FunctionComponent<
               gitLabIntegrations: [...org.gitLabIntegrations, integration],
             });
           }}
-          additionalOnClick={api?.scrollNext}
-          backButtonClick={api?.scrollPrev}
+          additionalOnClick={() => api?.scrollTo(nextIndex)}
+          backButtonClick={() => api?.scrollTo(prevIndex)}
         />
       </div>
     </CarouselItem>

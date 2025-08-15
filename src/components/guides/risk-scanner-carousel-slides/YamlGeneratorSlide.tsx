@@ -4,21 +4,17 @@
 import React, { FunctionComponent } from "react";
 import router from "next/router";
 import { toast } from "sonner";
-import { CarouselItem } from "../../../ui/carousel";
-import { Button } from "../../../ui/button";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../../ui/dialog";
-import CopyCode, { CopyCodeFragment } from "../../../common/CopyCode";
-import { Config, GitInstances } from "../../../../types/common";
-import { integrationSnippets } from "../../../../integrationSnippets";
+import { CarouselItem } from "../../ui/carousel";
+import { Button } from "../../ui/button";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import CopyCode, { CopyCodeFragment } from "../../common/CopyCode";
+import { Config, GitInstances } from "../../../types/common";
+import { integrationSnippets } from "../../../integrationSnippets";
 import {
   AssetDTO,
   OrganizationDetailsDTO,
   ProjectDTO,
-} from "../../../../types/api/api";
+} from "../../../types/api/api";
 
 interface YamlGeneratorSlideProps {
   gitInstance: GitInstances;
@@ -30,7 +26,9 @@ interface YamlGeneratorSlideProps {
   activeOrg: OrganizationDetailsDTO;
   activeProject: ProjectDTO | null;
   asset: AssetDTO | null;
-  prev?: () => void;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
 }
 
 const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
@@ -43,7 +41,7 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   activeOrg,
   activeProject,
   asset,
-  prev,
+  api,
 }) => {
   function codeStringBuilder() {
     const base =
@@ -109,7 +107,7 @@ jobs:`
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => prev?.()}>
+        <Button variant={"secondary"} onClick={() => api?.scrollTo(4)}>
           Back
         </Button>
         <Button

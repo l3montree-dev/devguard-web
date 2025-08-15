@@ -14,16 +14,22 @@ import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 
 interface StartSlideProps {
-  api?: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
   repositories: Array<{ value: string; label: string }> | null;
   repositoryName?: string;
   repositoryId?: string;
+  webhookSetupSlideIndex: number;
+  prevIndex: number;
 }
 
 export default function SelectRepoSlide({
   repositoryName,
   repositoryId,
   api,
+  webhookSetupSlideIndex,
+  prevIndex,
 }: StartSlideProps) {
   const activeOrg = useActiveOrg();
   const hasIntegration =
@@ -104,8 +110,6 @@ export default function SelectRepoSlide({
     activeOrg.slug,
   ]);
 
-  const currentSlide = api?.slidesInView()[0] ?? 0;
-
   return (
     <CarouselItem>
       <DialogHeader>
@@ -177,15 +181,12 @@ export default function SelectRepoSlide({
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button
-          onClick={() => api?.scrollTo(currentSlide - 2)}
-          variant={"secondary"}
-        >
+        <Button onClick={() => api?.scrollTo(prevIndex)} variant={"secondary"}>
           Back
         </Button>
         <Button
           disabled={!Boolean(selectedRepo) || !hasIntegration}
-          onClick={() => api?.scrollNext()}
+          onClick={() => api?.scrollTo(webhookSetupSlideIndex)}
         >
           Continue
         </Button>

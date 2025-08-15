@@ -31,15 +31,19 @@ interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
   api: CarouselApi;
   provider: ExternalTicketProvider;
-
+  providerIntegrationSlideIndex: number;
+  prevIndex: number;
   isLoadingRepositories: boolean;
+  webhookSetupSlideIndex: number;
+  selectRepoSlideIndex: number;
 }
 
 export default function StartSlide({
   setSelectedProvider,
   isLoadingRepositories,
   provider,
-
+  webhookSetupSlideIndex,
+  providerIntegrationSlideIndex,
   api,
 }: StartSlideProps) {
   useEffect(() => {
@@ -146,7 +150,7 @@ export default function StartSlide({
             <div className="mt-10 flex flex-row gap-2 justify-end">
               <Button
                 onClick={() => {
-                  api?.scrollTo(3);
+                  api?.scrollTo(webhookSetupSlideIndex);
                 }}
               >
                 Continue
@@ -193,6 +197,8 @@ export default function StartSlide({
                 selectedProvider={provider}
                 activeOrg={activeOrg}
                 api={api}
+                selectRepoSlideIndex={2}
+                providerIntegrationSlideIndex={1}
                 isLoadingRepositories={isLoadingRepositories}
               />
             </div>

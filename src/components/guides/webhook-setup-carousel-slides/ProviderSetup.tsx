@@ -8,19 +8,24 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CarouselApi } from "../../ui/carousel";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
   activeOrg: OrganizationDetailsDTO;
-  api: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
   isLoadingRepositories: boolean;
+  selectRepoSlideIndex: number;
+  providerIntegrationSlideIndex: number;
 }
 
 export default function ProviderSetup({
   selectedProvider,
   activeOrg,
   api,
+  providerIntegrationSlideIndex,
+  selectRepoSlideIndex,
   isLoadingRepositories,
 }: ProviderSetupProps) {
   const updateOrganization = useStore((s) => s.updateOrganization);
@@ -46,8 +51,6 @@ export default function ProviderSetup({
   const providerIntegrationPresent =
     activeOrg.githubAppInstallations?.length > 0 ||
     activeOrg.gitLabIntegrations?.length > 0;
-
-  const currentSlide = api?.slidesInView()[0] ?? 0;
 
   return (
     <div>
@@ -121,7 +124,7 @@ export default function ProviderSetup({
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
           <Button
-            onClick={() => (api as NonNullable<CarouselApi>).scrollNext()}
+            onClick={() => api?.scrollTo(providerIntegrationSlideIndex)}
             variant={"secondary"}
           >
             Add another{" "}
@@ -132,17 +135,12 @@ export default function ProviderSetup({
         </div>
       )}
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        {currentSlide > 0 && (
-          <Button onClick={() => api!.scrollPrev()} variant={"secondary"}>
-            Back
-          </Button>
-        )}
         <Button
           disabled={selectedProvider === undefined || isLoadingRepositories}
           onClick={() => {
             providerIntegrationPresent
-              ? (api as NonNullable<CarouselApi>).scrollTo(currentSlide + 2)
-              : (api as NonNullable<CarouselApi>).scrollNext();
+              ? api?.scrollTo(selectRepoSlideIndex)
+              : api?.scrollTo(providerIntegrationSlideIndex);
           }}
         >
           {isLoadingRepositories ? "Loading Repositories..." : "Continue"}

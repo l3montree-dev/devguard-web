@@ -17,14 +17,10 @@ import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { CarouselApi, CarouselItem } from "../../../ui/carousel";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../../ui/dialog";
-import { Button } from "../../../ui/button";
-import { AssetDTO } from "../../../../types/api/api";
+import { CarouselApi, CarouselItem } from "../../ui/carousel";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { Button } from "../../ui/button";
+import { AssetDTO } from "../../../types/api/api";
 
 interface AutoSetupProgressSlideProps {
   asset: AssetDTO;
@@ -38,12 +34,25 @@ interface AutoSetupProgressSlideProps {
   };
   Loader: () => React.ReactNode;
   isReallyLoading: boolean;
-  api: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
+  nextIndex: number;
+  prevIndex: number;
 }
 
 const AutoSetupProgressSlide: FunctionComponent<
   AutoSetupProgressSlideProps
-> = ({ asset, handleAutosetup, progress, Loader, isReallyLoading, api }) => {
+> = ({
+  asset,
+  handleAutosetup,
+  progress,
+  Loader,
+  isReallyLoading,
+  api,
+  nextIndex,
+  prevIndex,
+}) => {
   return (
     <CarouselItem>
       <div className="">
@@ -125,7 +134,7 @@ const AutoSetupProgressSlide: FunctionComponent<
         <Button
           variant={"secondary"}
           onClick={() => {
-            api?.scrollPrev();
+            api?.scrollTo(prevIndex);
           }}
         >
           Back

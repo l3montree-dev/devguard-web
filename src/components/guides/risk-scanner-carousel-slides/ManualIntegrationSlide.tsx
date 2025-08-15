@@ -15,20 +15,23 @@
 import React, { FunctionComponent } from "react";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { CarouselItem } from "../../../ui/carousel";
-import { Button } from "../../../ui/button";
+import { CarouselItem } from "../../ui/carousel";
+import { Button } from "../../ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../ui/tabs";
-import FileUpload from "../../../FileUpload";
-import Section from "../../../common/Section";
+} from "../../ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import FileUpload from "../../FileUpload";
+import Section from "../../common/Section";
 
 interface ManualIntegrationSlideProps {
+  api?: {
+    scrollTo: (index: number) => void;
+  };
   tab: "sbom" | "sarif";
   setTab: (tab: "sbom" | "sarif") => void;
   sbomFileName?: string;
@@ -37,12 +40,12 @@ interface ManualIntegrationSlideProps {
   sarifDropzone: any;
   isUploadDisabled: boolean;
   handleUpload: () => void;
-  prev?: () => void;
 }
 
 const ManualIntegrationSlide: FunctionComponent<
   ManualIntegrationSlideProps
 > = ({
+  api,
   tab,
   setTab,
   sbomFileName,
@@ -51,7 +54,6 @@ const ManualIntegrationSlide: FunctionComponent<
   sarifDropzone,
   isUploadDisabled,
   handleUpload,
-  prev,
 }) => {
   return (
     <CarouselItem>
@@ -131,7 +133,7 @@ const ManualIntegrationSlide: FunctionComponent<
           </Tabs>
         </Section>
         <div className="flex mt-6 flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => prev?.()}>
+          <Button variant="secondary" onClick={() => api?.scrollTo(3)}>
             Back
           </Button>
           <Button disabled={isUploadDisabled} onClick={handleUpload}>
