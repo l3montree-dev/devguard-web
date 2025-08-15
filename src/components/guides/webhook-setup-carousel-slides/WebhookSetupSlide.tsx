@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -77,14 +78,10 @@ export default function WebhookSetupSlide({
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <Badge className="mr-2" variant="secondary">
-            Step {isExternalEntityProvider ? "2/2" : "3/3"}
-          </Badge>{" "}
           Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>
-        <hr className="my-4" />
       </DialogHeader>
-      <p className="mb-4 text-sm">
+      <p className="mb-4 mt-4 text-sm">
         Go to your GitLab/ openCode project settings and add a webhook with the
         following URL and secret (“Settings” → “Webhooks”). Ensure that you
         select the Issue and comment event trigger checkboxes like shown in the

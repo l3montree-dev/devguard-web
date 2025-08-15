@@ -93,10 +93,11 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
 
           <Separator className="mt-4" orientation="horizontal" />
           <Section forceVertical title="What should DevGuard do?">
-            <Card className="">
+            <Card>
               <div className="align-middle flex flex-col space-y-4 p-4">
                 <div className="flex flex-row items-center space-x-4">
                   <Checkbox
+                    id="secret-scanning"
                     defaultChecked={true}
                     checked={config["secret-scanning"]}
                     onCheckedChange={() =>
@@ -106,17 +107,18 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                       }))
                     }
                   />
-                  <div>
+                  <label htmlFor="secret-scanning" className="cursor-pointer">
                     <span>Identify leaked Secrets in your Code</span>
                     <p className="text-muted-foreground text-xs">
                       Detected leaked Tokens, Passwords, anything the public
                       should not know
                     </p>
-                  </div>
+                  </label>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
                   <div className="flex flex-row items-center space-x-4">
                     <Checkbox
+                      id="sca"
                       defaultChecked={true}
                       checked={config.sca}
                       onCheckedChange={() =>
@@ -126,7 +128,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         }))
                       }
                     />
-                    <div>
+                    <label htmlFor="sca" className="cursor-pointer">
                       <span>
                         Scan your Dependencies for known Vulnerabilities (SCA)
                       </span>
@@ -135,12 +137,13 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         known vulnerabilities in dependencies (known as Software
                         Composition Analysis (SCA))
                       </p>
-                    </div>
+                    </label>
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
                   <div className="flex flex-row items-center space-x-4">
                     <Checkbox
+                      id="container-scanning"
                       defaultChecked={true}
                       checked={config["container-scanning"]}
                       onCheckedChange={() =>
@@ -151,18 +154,22 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         }))
                       }
                     />
-                    <div>
+                    <label
+                      htmlFor="container-scanning"
+                      className="cursor-pointer"
+                    >
                       <span>Build & Scan your Container Image</span>
                       <p className="text-muted-foreground text-xs">
                         You have a Dockerfile in your Repo? Build it and scan
                         your container image for known vulnerabilities.
                       </p>
-                    </div>
+                    </label>
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
                   <div className="flex flex-row items-center space-x-4">
                     <Checkbox
+                      id="sast"
                       defaultChecked={true}
                       checked={config.sast}
                       onCheckedChange={() =>
@@ -172,19 +179,20 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         }))
                       }
                     />
-                    <div>
+                    <label htmlFor="sast" className="cursor-pointer">
                       <span>Identify Bad Practices in Your Code (SAST)</span>
                       <p className="text-muted-foreground text-xs">
                         Analyzes your code to find bad practices and potential
                         security vulnerabilities in your own code (known as
                         Static Application Security Testing (SAST)).
                       </p>
-                    </div>
+                    </label>
                   </div>
                 </div>
                 <div className="align-middle flex flex-col space-y-4">
                   <div className="flex flex-row items-center space-x-4">
                     <Checkbox
+                      id="iac"
                       defaultChecked={true}
                       checked={config.iac}
                       onCheckedChange={() =>
@@ -194,7 +202,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         }))
                       }
                     />
-                    <div>
+                    <label htmlFor="iac" className="cursor-pointer">
                       <span>
                         Identify Flaws in your Infrastructure Configs (IaC)
                       </span>
@@ -203,7 +211,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         infrastructure as code (IaC) files, such as Dockerfiles,
                         Kubernetes configs, Workflows, etc.
                       </p>
-                    </div>
+                    </label>
                   </div>
                 </div>
               </div>

@@ -1,23 +1,23 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useRouter } from "next/router";
-import { CaretDownIcon } from "@radix-ui/react-icons";
 
-export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
+export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
   const router = useRouter();
   const [selectedArtifact, setSelectedArtifact] = useState(
     (router.query.artifact as string) || "",
   );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -36,7 +36,7 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
       >
         {artifacts.sort().map((artifact) => (
           <DropdownMenuCheckboxItem
-            key={artifact.id}
+            key={artifact}
             checked={artifact === selectedArtifact}
             onClick={() => {
               //check if artifact is already selected
@@ -53,11 +53,9 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
               });
             }}
           >
-            {artifact}{" "}
-            <span className="text-xs text-gray-500">{artifact.value}</span>
+            {artifact === "" ? "Default" : artifact}
           </DropdownMenuCheckboxItem>
         ))}
-        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   );
