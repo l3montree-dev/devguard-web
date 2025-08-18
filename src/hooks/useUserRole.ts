@@ -38,6 +38,21 @@ export const getCurrentUserRole = (
     return UserRole.Guest;
   }
 
+  let isOrgAdmin = false;
+  if (org?.members) {
+    const orgMember = org.members.find(
+      (member) => member.id === currentUser.id,
+    );
+
+    if (orgMember.role === UserRole.Admin) {
+      return UserRole.Admin;
+    }
+
+    if (orgMember) {
+      return orgMember.role || UserRole.Member;
+    }
+  }
+
   if (project?.members && projectSlug) {
     const projectMember = project.members.find(
       (member) => member.id === currentUser.id,
@@ -47,14 +62,34 @@ export const getCurrentUserRole = (
     }
   }
 
+  return UserRole.Member; // Default role if not found
+};
+
+export const useOwnerID = (): string => {
+  const currentUser = useCurrentUser();
+  const org = useActiveOrg();
+  return useMemo(() => {
+    return getOwnerID(currentUser, org);
+  }, [currentUser, org]);
+};
+
+export const getOwnerID = (
+  currentUser: User | undefined,
+  org: OrganizationDetailsDTO,
+): string => {
+  if (!currentUser) {
+    return ""; // Return empty string if no user is logged in
+  }
+
   if (org?.members) {
     const orgMember = org.members.find(
       (member) => member.id === currentUser.id,
     );
     if (orgMember) {
-      return orgMember.role || UserRole.Member;
+      if (orgMember.role === UserRole.Owner) {
+        return orgMember.id; // Return the ID of the owner
+      }
     }
   }
-
-  return UserRole.Member; // Default role if not found
+  return "";
 };

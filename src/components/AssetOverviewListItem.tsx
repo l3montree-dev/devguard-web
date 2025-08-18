@@ -66,31 +66,6 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
             ) : null}
           </div>
         }
-        Button={
-          currentUserRole === UserRole.Owner ||
-          currentUserRole === UserRole.Admin ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "icon",
-                })}
-              >
-                <EllipsisVerticalIcon className="h-5 w-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Link
-                  className="!text-foreground hover:no-underline"
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
-                >
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <></>
-          )
-        }
         Title={
           <div className="flex flex-row items-center gap-4">{asset.name}</div>
         }

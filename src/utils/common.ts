@@ -212,17 +212,30 @@ export const extractVersion = (purl: string) => {
 
 export function allowedActionsCheck(
   currentUserRole: UserRole | null,
+  isCurrentUserOrgOwner: boolean,
+  isMemberOwner: boolean,
   memberRole?: UserRole | string,
 ): boolean {
+  console.log(
+    "isCurrentUserOwner",
+    isCurrentUserOrgOwner,
+    "isMemberOwner",
+    isMemberOwner,
+  );
+
   if (!memberRole) {
     return false;
   }
 
-  if (currentUserRole === UserRole.Owner) {
+  if (currentUserRole === UserRole.Owner || isCurrentUserOrgOwner) {
     return true;
   }
 
-  if (currentUserRole === UserRole.Admin && memberRole === UserRole.Member) {
+  if (isMemberOwner) {
+    return false;
+  }
+
+  if (currentUserRole === UserRole.Admin || memberRole === UserRole.Member) {
     return true;
   }
 

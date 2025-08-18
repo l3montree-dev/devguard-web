@@ -103,6 +103,9 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
   const [syncRunning, setSyncRunning] = useState(false);
 
   const currentUserRole = useCurrentUserRole();
+  console.log("currentUserRole", currentUserRole);
+
+  console.log("projects", projects.data.members);
 
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
@@ -388,31 +391,6 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                             )}
                           </div>
                         }
-                        Button={
-                          currentUserRole === UserRole.Owner ||
-                          currentUserRole === UserRole.Admin ? (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger
-                                className={buttonVariants({
-                                  variant: "outline",
-                                  size: "icon",
-                                })}
-                              >
-                                <EllipsisVerticalIcon className="h-5 w-5" />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <Link
-                                  className="!text-foreground hover:no-underline"
-                                  href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
-                                >
-                                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                                </Link>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          ) : (
-                            <></>
-                          )
-                        }
                       />
                     </Link>
                   ))}
@@ -456,11 +434,15 @@ export const getServerSideProps = middleware(
       query.append(key, value as string);
     });
 
-    const resp = await apiClient(
-      "/organizations/" + slug + "/projects/" + "?" + query.toString(),
-    );
+    const uri =
+      "/organizations/" + slug + "/projects/" + "?" + query.toString();
+
+    console.log("uri", uri);
+    const resp = await apiClient(uri);
 
     const projectsPaged = await resp.json();
+
+    console.log("projects111", projectsPaged.data.length);
 
     // fetch all the project stats
     const projectsWithCompliance = await Promise.all(
@@ -479,6 +461,8 @@ export const getServerSideProps = middleware(
             },
           };
         }
+
+        console.log("projects222", projectsPaged.data.length);
 
         const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
 

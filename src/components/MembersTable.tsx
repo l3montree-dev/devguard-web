@@ -26,7 +26,11 @@ import {
   DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import {
+  useCurrentUserOrgRole,
+  useCurrentUserRole,
+  useOwnerID,
+} from "@/hooks/useUserRole";
 import { UserRole } from "@/types/api/api";
 
 interface Props {
@@ -49,6 +53,9 @@ const MembersTable: FunctionComponent<Props> = ({
 }) => {
   const currentUser = useCurrentUser();
   const currentUserRole = useCurrentUserRole();
+  const orgOwnerID = useOwnerID();
+  console.log("orgOwnerID", orgOwnerID);
+  console.log("currentuserid ", currentUser?.id);
 
   return (
     <div>
@@ -93,7 +100,12 @@ const MembersTable: FunctionComponent<Props> = ({
                     </td>
                     <td className="p-4 text-right">
                       {currentUser?.id === m.id ||
-                      !allowedActionsCheck(currentUserRole, m.role) ? (
+                      !allowedActionsCheck(
+                        currentUserRole,
+                        currentUser?.id === orgOwnerID,
+                        m.id === orgOwnerID,
+                        m.role,
+                      ) ? (
                         <span className="text-muted-foreground">
                           No actions
                         </span>

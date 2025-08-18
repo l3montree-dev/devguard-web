@@ -245,31 +245,6 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                     </div>
                   }
                   Description={<div>{subgroup.description}</div>}
-                  Button={
-                    currentUserRole === UserRole.Owner ||
-                    currentUserRole === UserRole.Admin ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className={buttonVariants({
-                            variant: "outline",
-                            size: "icon",
-                          })}
-                        >
-                          <EllipsisVerticalIcon className="h-5 w-5" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <Link
-                            className="!text-foreground hover:no-underline"
-                            href={`/${activeOrg.slug}/projects/${subgroup.slug}/settings`}
-                          >
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                          </Link>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      <></>
-                    )
-                  }
                 />
               </Link>
             ))}
