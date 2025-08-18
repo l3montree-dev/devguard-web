@@ -7,7 +7,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center hover:no-underline justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:grayscale-[50%]",
+  "cursor-pointer inline-flex items-center hover:no-underline justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:grayscale-[50%]",
   {
     variants: {
       variant: {

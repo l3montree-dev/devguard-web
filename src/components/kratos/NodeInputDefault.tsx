@@ -39,6 +39,8 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
   const labelText =
     node.meta.label?.text === "ID" ? "E-Mail" : node.meta.label?.text;
 
+  console.log("Type:", attributes);
+
   // Render a generic text input field.
   return (
     <div className="relative grid w-full items-center gap-3">
@@ -46,7 +48,11 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
       <div className="relative ">
         <Input
           className="flex"
-          type={inputType}
+          type={
+            attributes.name === "identifier" && attributes.type === "text"
+              ? "email"
+              : inputType
+          }
           name={attributes.name}
           value={value}
           disabled={attributes.disabled || disabled}

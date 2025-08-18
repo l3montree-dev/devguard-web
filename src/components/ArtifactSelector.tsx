@@ -1,23 +1,23 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useRouter } from "next/router";
-import { CaretDownIcon } from "@radix-ui/react-icons";
 
-export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
+export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
   const router = useRouter();
   const [selectedArtifact, setSelectedArtifact] = useState(
     (router.query.artifact as string) || "",
   );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,31 +34,28 @@ export function ArtifactSelector({ artifacts }: { artifacts: any[] }) {
         align="start"
         className="z-50 max-h-[500px] overflow-y-auto w-80"
       >
-        {selectedArtifact &&
-          artifacts.sort().map((artifact) => (
-            <DropdownMenuCheckboxItem
-              key={artifact.id}
-              checked={artifact === selectedArtifact}
-              onClick={() => {
-                //check if artifact is already selected
-                if (artifact === selectedArtifact) {
-                  setSelectedArtifact("");
-                  router.push({
-                    query: { ...router.query, artifact: "" },
-                  });
-                  return;
-                }
-                setSelectedArtifact(artifact);
+        {artifacts.sort().map((artifact) => (
+          <DropdownMenuCheckboxItem
+            key={artifact}
+            checked={artifact === selectedArtifact}
+            onClick={() => {
+              //check if artifact is already selected
+              if (artifact === selectedArtifact) {
+                setSelectedArtifact("");
                 router.push({
-                  query: { ...router.query, artifact: artifact },
+                  query: { ...router.query, artifact: "" },
                 });
-              }}
-            >
-              {artifact}{" "}
-              <span className="text-xs text-gray-500">{artifact.value}</span>
-            </DropdownMenuCheckboxItem>
-          ))}
-        <DropdownMenuSeparator />
+                return;
+              }
+              setSelectedArtifact(artifact);
+              router.push({
+                query: { ...router.query, artifact: artifact },
+              });
+            }}
+          >
+            {artifact === "" ? "Default" : artifact}
+          </DropdownMenuCheckboxItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

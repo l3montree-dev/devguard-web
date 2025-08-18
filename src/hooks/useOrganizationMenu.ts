@@ -34,7 +34,7 @@ export const useOrganizationMenu = () => {
   const org = useActiveOrg();
   const menu = [
     {
-      title: "Projects",
+      title: "Groups",
       href: "/" + orgSlug,
       Icon: ListBulletIcon,
     },

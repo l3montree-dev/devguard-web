@@ -25,7 +25,7 @@ import ColoredBadge from "../../../../../../../../../components/common/ColoredBa
 import CopyCode, {
   CopyCodeFragment,
 } from "../../../../../../../../../components/common/CopyCode";
-import PatSection from "../../../../../../../../../components/risk-identification/PatSection";
+import PatSection from "../../../../../../../../../components/PatSection";
 import {
   Card,
   CardContent,

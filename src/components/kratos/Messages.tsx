@@ -15,6 +15,7 @@
 
 import { UiText } from "@ory/client";
 import Callout from "../common/Callout";
+import { kratosMessageTypeToIntent } from "./helpers";
 
 interface MessageProps {
   message: UiText;
@@ -42,9 +43,11 @@ export const Message = ({ message }: MessageProps) => {
 
     default:
       return (
-        <p className="text-sm" data-testid={`ui/message/${message.id}`}>
-          {message.text}
-        </p>
+        <Callout intent={kratosMessageTypeToIntent([message])}>
+          <p className="text-sm" data-testid={`ui/message/${message.id}`}>
+            {message.text}
+          </p>
+        </Callout>
       );
   }
 };

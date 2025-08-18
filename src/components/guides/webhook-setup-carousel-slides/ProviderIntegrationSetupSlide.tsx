@@ -9,20 +9,24 @@ import { encodeObjectBase64 } from "@/services/encodeService";
 import { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
 import { useStore } from "@/zustand/globalStoreProvider";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export interface ProviderIntegrationSetupSlideProps {
   api?: {
-    scrollNext: () => void;
-    scrollPrev: () => void;
+    scrollTo: (index: number) => void;
   };
   provider: ExternalTicketProvider;
+  prevIndex: number;
+  selectRepoSlideIndex: number;
 }
 
 export default function ProviderIntegrationSetupSlide({
   api,
   provider,
+  selectRepoSlideIndex,
+  prevIndex,
 }: ProviderIntegrationSetupSlideProps) {
   const activeOrg = useActiveOrg();
   const updateOrganization = useStore((s) => s.updateOrganization);
@@ -59,14 +63,13 @@ export default function ProviderIntegrationSetupSlide({
           Connect with {providerToBeautifulName[provider]} to allow DevGuard to
           create tickets
         </DialogTitle>
-        <hr className="my-4" />
       </DialogHeader>
-      <div className="p-1">
+      <div className="mt-10 px-1">
         {(provider === "gitlab" || provider === "opencode") && (
           <GitLabIntegrationForm
             onNewIntegration={handleNewGitLabIntegration}
-            additionalOnClick={api?.scrollNext}
-            backButtonClick={api?.scrollPrev}
+            additionalOnClick={() => api?.scrollTo(selectRepoSlideIndex)}
+            backButtonClick={() => api?.scrollTo(prevIndex)}
           />
         )}
         {provider === "github" && (
@@ -80,8 +83,8 @@ export default function ProviderIntegrationSetupSlide({
             </p>
             <Link
               className={cn(
-                buttonVariants({ variant: "default" }),
-                "!text-black hover:no-underline mt-6",
+                buttonVariants({ variant: "secondary" }),
+                "hover:no-underline mt-6",
               )}
               href={
                 "https://github.com/apps/devguard-bot/installations/new?state=" +
@@ -92,21 +95,33 @@ export default function ProviderIntegrationSetupSlide({
               }
               target="_blank"
             >
+              <Image
+                src="/assets/provider-icons/github.svg"
+                alt="GitHub Icon"
+                className="h-5 mr-2 w-5 dark:invert"
+                width={20}
+                height={20}
+              />
               Install GitHub App
             </Link>
             <div className="flex flex-row gap-4 justify-end mt-4">
-              <Button variant={"secondary"} onClick={() => api?.scrollPrev()}>
+              <Button
+                variant={"secondary"}
+                onClick={() => api?.scrollTo(prevIndex)}
+              >
                 Back
               </Button>
-              <Button onClick={() => api?.scrollNext()}>Next step</Button>
+              <Button onClick={() => api?.scrollTo(selectRepoSlideIndex)}>
+                Next step
+              </Button>
             </div>
           </div>
         )}
         {provider === "jira" && (
           <JiraIntegrationForm
             onNewIntegration={handleNewJiraIntegration}
-            additionalOnClick={api?.scrollNext}
-            backButtonClick={api?.scrollPrev}
+            additionalOnClick={() => api?.scrollTo(selectRepoSlideIndex)}
+            backButtonClick={() => api?.scrollTo(prevIndex)}
           />
         )}
       </div>

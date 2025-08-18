@@ -31,6 +31,7 @@ import { DependencyGraphNode } from "./DependencyGraphNode";
 import { beautifyPurl } from "@/utils/common";
 import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
+import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const addRecursive = (
   dagreGraph: graphlib.Graph,
@@ -144,7 +145,7 @@ const getLayoutedElements = (
       data: {
         label: el,
         risk: riskMap[el],
-        flaw: flawMap[el],
+        vuln: flawMap[el],
         nodeWidth,
         nodeHeight,
       },
@@ -163,9 +164,9 @@ const getLayoutedElements = (
       animated: false,
       style: {
         stroke:
-          /* riskMap[target] > 0
+          riskMap[target] > 0
             ? severityToColor(riskToSeverity(riskMap[target]))
-            : */ "#a1a1aa",
+            : "#a1a1aa",
       },
     };
   });

@@ -82,50 +82,55 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           </FormItem>
         )}
       />
-      <Label className="mt-4">Which Repository provider are you using?</Label>
       {!externalEntityProviderId && (
-        <div className="flex gap-2 w-full">
-          <Button
-            variant={"secondary"}
-            type="button"
-            className={classNames(
-              "w-full",
-              gitInstance === "github" && "border !border-primary",
-            )}
-            onClick={() => {
-              form.setValue("repositoryProvider", "github");
-            }}
-          >
-            <Image
-              src="/assets/github.svg"
-              alt="GitHub Logo"
-              className="mr-2 dark:invert"
-              width={24}
-              height={24}
-            />
-            GitHub
-          </Button>
-          <Button
-            variant={"secondary"}
-            type="button"
-            className={classNames(
-              "w-full border",
-              gitInstance === "gitlab" && "!border-primary",
-            )}
-            onClick={() => {
-              form.setValue("repositoryProvider", "gitlab");
-            }}
-          >
-            <Image
-              src="/assets/gitlab.svg"
-              alt="GitHub Logo"
-              className="mr-2"
-              width={24}
-              height={24}
-            />
-            Gitlab
-          </Button>
-        </div>
+        <>
+          <Label className="mt-4">
+            Which Repository provider are you using?
+          </Label>
+
+          <div className="flex gap-2 w-full">
+            <Button
+              variant={"secondary"}
+              type="button"
+              className={classNames(
+                "w-full",
+                gitInstance === "github" && "border !border-primary",
+              )}
+              onClick={() => {
+                form.setValue("repositoryProvider", "github");
+              }}
+            >
+              <Image
+                src="/assets/github.svg"
+                alt="GitHub Logo"
+                className="mr-2 dark:invert"
+                width={24}
+                height={24}
+              />
+              GitHub
+            </Button>
+            <Button
+              variant={"secondary"}
+              type="button"
+              className={classNames(
+                "w-full border",
+                gitInstance === "gitlab" && "!border-primary",
+              )}
+              onClick={() => {
+                form.setValue("repositoryProvider", "gitlab");
+              }}
+            >
+              <Image
+                src="/assets/gitlab.svg"
+                alt="GitHub Logo"
+                className="mr-2"
+                width={24}
+                height={24}
+              />
+              Gitlab
+            </Button>
+          </div>
+        </>
       )}
     </>
   );

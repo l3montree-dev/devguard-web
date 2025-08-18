@@ -76,7 +76,7 @@ export const integrationSnippets = ({
 }) => ({
   GitHub: {
     sca: generateWorkflowSnippet(
-      "call-sca",
+      "dependency-scanning",
       "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
@@ -84,7 +84,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     "container-scanning": generateWorkflowSnippet(
-      "sca",
+      "container-scanning",
       "container-scanning.yml",
       orgSlug,
       projectSlug,
@@ -92,7 +92,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     iac: generateWorkflowSnippet(
-      "iac",
+      "infrastructure-as-code-scanning",
       "iac.yml",
       orgSlug,
       projectSlug,
@@ -101,7 +101,7 @@ export const integrationSnippets = ({
     ),
 
     sast: generateWorkflowSnippet(
-      "call-sast",
+      "bad-practice-finder",
       "sast.yml",
       orgSlug,
       projectSlug,
@@ -117,7 +117,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     "secret-scanning": generateWorkflowSnippet(
-      "call-secret-scanning",
+      "find-leaked-secrets",
       "secret-scanning.yml",
       orgSlug,
       projectSlug,
@@ -166,7 +166,7 @@ export const integrationSnippets = ({
 
   Gitlab: {
     sca: generateGitlabSnippet(
-      "call-sca",
+      "dependency-scanning",
       "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
@@ -174,7 +174,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     "container-scanning": generateGitlabSnippet(
-      "call-container-scanning",
+      "container-scanning",
       "container-scanning.yml",
       orgSlug,
       projectSlug,
@@ -182,7 +182,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     iac: generateGitlabSnippet(
-      "call-iac",
+      "infrastructure-as-code-scanning",
       "infrastructure-as-code-scanning.yml",
       orgSlug,
       projectSlug,
@@ -190,7 +190,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     sast: generateGitlabSnippet(
-      "call-sast",
+      "bad-practice-finder",
       "sast.yml",
       orgSlug,
       projectSlug,
@@ -206,7 +206,7 @@ export const integrationSnippets = ({
       apiUrl,
     ),
     "secret-scanning": generateGitlabSnippet(
-      "call-secret-scanning",
+      "find-leaked-secrets",
       "secret-scanning.yml",
       orgSlug,
       projectSlug,

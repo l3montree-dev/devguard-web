@@ -58,6 +58,15 @@ import {
 import { uniqBy } from "lodash";
 import { toast } from "sonner";
 
+const activeOrgName = (name: string, slug: string) => {
+  if (slug === "@opencode") {
+    return "openCode";
+  }
+  if (slug === "@gitlab") {
+    return "GitLab";
+  }
+  return name;
+};
 export const OrganizationDropDown = () => {
   const orgs = useStore((s) => s.organizations);
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
@@ -131,7 +140,7 @@ export const OrganizationDropDown = () => {
                   className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold
                 text-white "
                 >
-                  {activeOrg.name}{" "}
+                  {activeOrgName(activeOrg.name, activeOrg.slug)}{" "}
                   {!activeOrg.externalEntityProviderId && (
                     <Badge className="!text-white ml-2" variant={"outline"}>
                       Organization

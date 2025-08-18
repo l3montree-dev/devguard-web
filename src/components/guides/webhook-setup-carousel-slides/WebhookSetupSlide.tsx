@@ -14,18 +14,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface WebhookSetupSlideProps {
   api?: {
-    scrollPrev: () => void;
     scrollTo: (index: number) => void;
   };
   onOpenChange: (open: boolean) => void;
+  prevIndex: number;
 }
 
 export default function WebhookSetupSlide({
   api,
   onOpenChange,
+  prevIndex,
 }: WebhookSetupSlideProps) {
   const generateNewSecret = (): string => {
     return crypto.randomUUID();
@@ -41,15 +43,6 @@ export default function WebhookSetupSlide({
     // Integration for openCode and GitLab are the same
     externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
       "gitlab";
-
-  const isOpenCode = asset?.externalEntityProviderId === "opencode";
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText("devguard");
-    toast("Username copied to clipboard", {
-      description: "You can now paste it in your project.",
-    });
-  };
 
   const handleGenerateNewSecret = async () => {
     const resp = await browserApiClient(
@@ -77,14 +70,10 @@ export default function WebhookSetupSlide({
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <Badge className="mr-2" variant="secondary">
-            Step {isExternalEntityProvider ? "2/2" : "3/3"}
-          </Badge>{" "}
           Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>
-        <hr className="my-4" />
       </DialogHeader>
-      <p className="mb-4 text-sm">
+      <p className="mb-4 mt-4 text-sm">
         Go to your GitLab/ openCode project settings and add a webhook with the
         following URL and secret (“Settings” → “Webhooks”). Ensure that you
         select the Issue and comment event trigger checkboxes like shown in the
@@ -127,7 +116,9 @@ export default function WebhookSetupSlide({
         <Button
           variant={"secondary"}
           onClick={() =>
-            isExternalEntityProvider ? api?.scrollTo(0) : api?.scrollPrev()
+            isExternalEntityProvider
+              ? api?.scrollTo(0)
+              : api?.scrollTo(prevIndex)
           }
         >
           Back

@@ -53,10 +53,6 @@ import DependencyRiskScannerDialog from "../../../../../../../../../components/R
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import {
-  getArtifactNameFromScannerID,
-  getScannerIDFromArtifactName,
-} from "../../../../../../../../../utils/view";
 
 interface Props {
   apiUrl: string;
@@ -436,9 +432,7 @@ export const getServerSideProps = middleware(
 
     const artifact = context.query.artifact;
     if (artifact) {
-      const scannerID = getScannerIDFromArtifactName(artifact as string);
-      console.log("scannerID", scannerID);
-      query.append("filterQuery[scanner_ids][any]", scannerID);
+      query.append("filterQuery[scanner_ids][any]", artifact as string);
     }
 
     // check for page and page size query params
@@ -461,12 +455,6 @@ export const getServerSideProps = middleware(
     );
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();
-
-      if (artifactsData && artifactsData.length > 0) {
-        for (let i = 0; i < artifactsData.length; i++) {
-          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
-        }
-      }
     }
 
     return {

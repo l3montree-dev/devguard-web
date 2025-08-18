@@ -11,13 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { OrganizationDetailsDTO } from "@/types/api/api";
 import {
   ExternalTicketProvider,
   ExternalTicketProviderNames,
 } from "@/types/common";
 import { InfoIcon } from "lucide-react";
-import ProviderSetup from "./ProviderSetup";
+import ProviderSetup from "../ProviderSetup";
 import { useEffect } from "react";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -26,20 +25,25 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
+import { useTheme } from "next-themes";
 
 interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
   api: CarouselApi;
   provider: ExternalTicketProvider;
-
+  providerIntegrationSlideIndex: number;
+  prevIndex: number;
   isLoadingRepositories: boolean;
+  webhookSetupSlideIndex: number;
+  selectRepoSlideIndex: number;
 }
 
 export default function StartSlide({
   setSelectedProvider,
   isLoadingRepositories,
   provider,
-
+  webhookSetupSlideIndex,
+  providerIntegrationSlideIndex,
   api,
 }: StartSlideProps) {
   useEffect(() => {
@@ -63,15 +67,18 @@ export default function StartSlide({
     });
   };
 
+  const theme = useTheme();
+
+  const greadienColors =
+    theme.theme === "dark" || theme.resolvedTheme === "dark"
+      ? ["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]
+      : ["#000000", "#333333", "#666666", "#999999", "#CCCCCC"];
+
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <GradientText
-            colors={["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]}
-            animationSpeed={5}
-            className=""
-          >
+          <GradientText colors={greadienColors} animationSpeed={5} className="">
             Let&apos;s get your Tickets in Sync with DevGuard
           </GradientText>
         </DialogTitle>
@@ -88,15 +95,11 @@ export default function StartSlide({
             strategies.
           </AlertDescription>
         </Alert>
-        <hr className="my-4" />
       </DialogHeader>
-      <div className="p-1">
+      <div className="mt-10 px-1">
         {isExternalEntityProvider ? (
           <div className="">
             <h3 className="font-semibold flex items-center">
-              <Badge className="mr-2" variant="secondary">
-                Step 1/2
-              </Badge>{" "}
               Invite the DevGuard Bot to your{" "}
               {isOpenCode ? "openCode" : "GitLab"} Project
             </h3>
@@ -147,7 +150,7 @@ export default function StartSlide({
             <div className="mt-10 flex flex-row gap-2 justify-end">
               <Button
                 onClick={() => {
-                  api?.scrollTo(3);
+                  api?.scrollTo(webhookSetupSlideIndex);
                 }}
               >
                 Continue
@@ -157,9 +160,6 @@ export default function StartSlide({
         ) : (
           <div className="">
             <h3 className="font-semibold flex items-center">
-              <Badge className="mr-2" variant="secondary">
-                Step 1/3
-              </Badge>{" "}
               Ensure that DevGuard is connected to your issue tracker
             </h3>
             <div className="mt-4">
@@ -197,6 +197,9 @@ export default function StartSlide({
                 selectedProvider={provider}
                 activeOrg={activeOrg}
                 api={api}
+                prevIndex={0}
+                selectRepoSlideIndex={2}
+                providerIntegrationSlideIndex={1}
                 isLoadingRepositories={isLoadingRepositories}
               />
             </div>
