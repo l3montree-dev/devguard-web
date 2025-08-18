@@ -20,7 +20,7 @@ import {
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { CodeIcon } from "lucide-react";
+import { CodeIcon, ScanText, TextSelect } from "lucide-react";
 import { useRouter } from "next/router";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
@@ -111,6 +111,40 @@ export const useAssetMenu = () => {
       ),
     });
 
+    // if ((activeAsset?.refs?.length ?? 0) > 0) {
+    //   menu.concat([{
+    //     title: "Compliance",
+    //     href:
+    //       "/" +
+    //       orgSlug +
+    //       "/projects/" +
+    //       projectSlug +
+    //       "/assets/" +
+    //       assetSlug +
+    //       "/refs/" +
+    //       assetVersionSlug +
+    //       "/compliance",
+    //     Icon: ScaleIcon,
+    //     isActive: router.pathname.startsWith(
+    //       "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/compliance",
+    //     ),
+    //   },{
+    //           title: "License Risks",
+    //     href:
+    //       "/" +
+    //       orgSlug +
+    //       "/projects/" +
+    //       projectSlug +
+    //       "/assets/" +
+    //       assetSlug +
+    //       "/refs/" +
+    //       assetVersionSlug +
+    //       "/compliance",
+    //     Icon: ScaleIcon,
+    //     isActive: router.pathname.startsWith(
+    //       "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/compliance",
+    //   }]);
+
     menu.unshift({
       title: "Overview",
       href:
@@ -133,6 +167,21 @@ export const useAssetMenu = () => {
     });
 
     menu = menu.concat([
+      {
+        title: "License Risks",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/license-risks",
+        Icon: ScanText,
+        isActive: router.pathname.includes("license-risks"),
+      },
       {
         title: "Code Risks",
         href:
