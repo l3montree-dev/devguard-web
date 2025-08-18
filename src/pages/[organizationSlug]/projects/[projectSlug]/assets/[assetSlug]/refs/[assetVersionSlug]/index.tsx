@@ -93,8 +93,6 @@ const Index: FunctionComponent<Props> = ({
     [licenses],
   );
 
-  console.log(riskDistribution);
-
   return (
     <Page
       Menu={assetMenu}
