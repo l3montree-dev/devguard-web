@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { PatWithPrivKey } from "../../types/api/api";
-import CopyCode from "../common/CopyCode";
-import Section from "../common/Section";
-import { Button } from "../ui/button";
+import { PatWithPrivKey } from "../types/api/api";
+import CopyCode from "./common/CopyCode";
+import Section from "./common/Section";
+import { Button } from "./ui/button";
 
 const PatSection = ({
   description,
@@ -43,7 +43,7 @@ const PatSection = ({
         <div>
           <div className="flex flex-wrap gap-2 justify-between">
             <Button
-              variant="default"
+              variant="outline"
               className=""
               onClick={() =>
                 onCreatePat({

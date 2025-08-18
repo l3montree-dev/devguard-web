@@ -2,18 +2,14 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import React, { FunctionComponent } from "react";
-import { CarouselItem } from "../../../ui/carousel";
-import { Button } from "../../../ui/button";
-import { Card, CardDescription, CardTitle } from "../../../ui/card";
-import { Checkbox } from "../../../ui/checkbox";
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../../ui/dialog";
-import { Separator } from "../../../ui/separator";
-import { Switch } from "../../../ui/switch";
-import Section from "../../../common/Section";
+import { CarouselItem } from "../../ui/carousel";
+import { Button } from "../../ui/button";
+import { Card, CardDescription, CardTitle } from "../../ui/card";
+import { Checkbox } from "../../ui/checkbox";
+import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { Separator } from "../../ui/separator";
+import { Switch } from "../../ui/switch";
+import Section from "../../common/Section";
 
 interface Config {
   "secret-scanning": boolean;
@@ -27,13 +23,16 @@ interface Config {
 interface ScannerOptionsSelectionSlideProps {
   config: Config;
   setConfig: React.Dispatch<React.SetStateAction<Config>>;
-  next?: () => void;
-  prev?: () => void;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
+  tokenSlideIndex: number;
+  prevIndex: number;
 }
 
 const ScannerOptionsSelectionSlide: FunctionComponent<
   ScannerOptionsSelectionSlideProps
-> = ({ config, setConfig, next, prev }) => {
+> = ({ config, setConfig, api, tokenSlideIndex, prevIndex }) => {
   return (
     <CarouselItem>
       <DialogHeader>
@@ -221,13 +220,13 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
       </div>
 
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => prev?.()}>
+        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
         <Button
           disabled={Object.values(config).every((v) => v === false)}
           onClick={() => {
-            next?.();
+            api?.scrollTo(tokenSlideIndex); // Go to token slide
           }}
         >
           {Object.values(config).every((v) => v === false)

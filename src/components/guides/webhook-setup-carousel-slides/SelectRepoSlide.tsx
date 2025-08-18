@@ -12,18 +12,25 @@ import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
+import { useStore } from "../../../zustand/globalStoreProvider";
 
 interface StartSlideProps {
-  api?: CarouselApi;
+  api?: {
+    scrollTo: (index: number) => void;
+  };
   repositories: Array<{ value: string; label: string }> | null;
   repositoryName?: string;
   repositoryId?: string;
+  afterSuccessfulConnectionSlideIndex: number;
+  prevIndex: number;
 }
 
 export default function SelectRepoSlide({
   repositoryName,
   repositoryId,
   api,
+  afterSuccessfulConnectionSlideIndex,
+  prevIndex,
 }: StartSlideProps) {
   const activeOrg = useActiveOrg();
   const hasIntegration =
@@ -44,6 +51,7 @@ export default function SelectRepoSlide({
 
   const asset = useActiveAsset()!;
   const project = useActiveProject();
+  const updateAsset = useStore((s) => s.updateAsset);
 
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,
@@ -68,6 +76,8 @@ export default function SelectRepoSlide({
       return;
     }
     if (resp.ok) {
+      const r = await resp.json();
+      updateAsset(r);
       toast.success("Repository connected successfully.");
     }
   };
@@ -103,8 +113,6 @@ export default function SelectRepoSlide({
     activeOrg.jiraIntegrations,
     activeOrg.slug,
   ]);
-
-  const currentSlide = api?.slidesInView()[0] ?? 0;
 
   return (
     <CarouselItem>
@@ -177,15 +185,12 @@ export default function SelectRepoSlide({
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button
-          onClick={() => api?.scrollTo(currentSlide - 2)}
-          variant={"secondary"}
-        >
+        <Button onClick={() => api?.scrollTo(prevIndex)} variant={"secondary"}>
           Back
         </Button>
         <Button
-          disabled={!Boolean(selectedRepo) || !hasIntegration}
-          onClick={() => api?.scrollNext()}
+          disabled={!asset.repositoryId}
+          onClick={() => api?.scrollTo(afterSuccessfulConnectionSlideIndex)}
         >
           Continue
         </Button>

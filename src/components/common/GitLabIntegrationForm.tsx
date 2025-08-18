@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { GitLabIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import { ImageZoom } from "./Zoom";
 
 export function urlToBaseURL(url: string): string {
   const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
@@ -73,6 +75,7 @@ export default function GitLabIntegrationForm({
         className="flex flex-col gap-4"
         onSubmit={async (e) => {
           e.preventDefault();
+
           await waitFor(form.handleSubmit(handleSubmit))();
           if (additionalOnClick) {
             additionalOnClick();
@@ -146,6 +149,13 @@ export default function GitLabIntegrationForm({
             </FormItem>
           )}
         />
+        <div className="w-full border rounded overflow-hidden relative h-[120px]">
+          <ImageZoom
+            src="/assets/gitlab-access-token-scopes.png"
+            alt="GitLab Scope selection"
+            fill
+          />
+        </div>
         <div className="flex flex-row justify-end">
           <div className="flex flex-col items-end justify-end gap-2">
             <div className="flex flex-row gap-4">

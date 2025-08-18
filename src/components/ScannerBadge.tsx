@@ -1,12 +1,12 @@
 import { FunctionComponent } from "react";
-import { getArtifactNameFromScannerID } from "../utils/view";
+
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const ScannerBadge: FunctionComponent<{ scannerID: string }> = ({
   scannerID,
 }) => {
-  const artifactName = getArtifactNameFromScannerID(scannerID);
+  const artifactName = scannerID;
   return (
     <Tooltip>
       <TooltipTrigger>

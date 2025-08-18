@@ -76,11 +76,6 @@ import {
   Tooltip,
   TooltipContent,
 } from "../../../../../../../../../components/ui/tooltip";
-import {
-  getArtifactNameFromScannerID,
-  getScannerIDFromArtifactName,
-  osiLicenseHexColors,
-} from "../../../../../../../../../utils/view";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
@@ -93,6 +88,7 @@ import {
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "../../../../../../../../../components/ui/switch";
+import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -731,8 +727,7 @@ export const getServerSideProps = middleware(
 
     const artifact = context.query.artifact;
     if (artifact) {
-      const scannerID = getScannerIDFromArtifactName(artifact as string);
-      params.append("filterQuery[scanner_ids][any]", scannerID);
+      params.append("filterQuery[scanner_ids][any]", artifact as string);
     }
 
     const [components, licenses] = await Promise.all([
@@ -776,11 +771,6 @@ export const getServerSideProps = middleware(
 
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();
-      if (artifactsData && artifactsData.length > 0) {
-        for (let i = 0; i < artifactsData.length; i++) {
-          artifactsData[i] = getArtifactNameFromScannerID(artifactsData[i]);
-        }
-      }
     }
 
     return {
