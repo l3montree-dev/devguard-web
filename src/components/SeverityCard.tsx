@@ -5,14 +5,15 @@ import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { classNames } from "../utils/common";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
-const variantColors = {
-  critical: "bg-red-700 text-white",
-  high: "bg-red-500 text-white",
-  medium: "bg-orange-500 text-white",
-  low: "bg-blue-500 text-white",
-};
+import { getSeverityClassNames } from "./common/Severity";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const SeverityStats = ({
   amountByRisk,
@@ -113,8 +114,20 @@ const SeverityCard: FunctionComponent<Props> = ({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="flex flex-row items-center justify-between capitalize">
-          {variant} severity
+        <CardTitle className="flex flex-row items-start justify-between">
+          <span>
+            <span className="text-5xl">{amountByRisk}</span>
+            <Tooltip>
+              <TooltipTrigger>
+                <span className="text-muted-foreground ml-2">
+                  ({amountByCVSS})
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                {amountByCVSS} {variant} severity vulnerabilities by CVSS.
+              </TooltipContent>
+            </Tooltip>
+          </span>
           <Link
             href={
               `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
@@ -125,13 +138,20 @@ const SeverityCard: FunctionComponent<Props> = ({
             See all
           </Link>
         </CardTitle>
+        <CardDescription>Amount of vulnerabilities by Risk</CardDescription>
       </CardHeader>
+
       <CardContent>
-        <SeverityStats
-          amountByRisk={amountByRisk}
-          amountByCVSS={amountByCVSS}
-          variant={variant}
-        />
+        <div className="mr-2 flex">
+          <span
+            className={classNames(
+              "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+              getSeverityClassNames(variant.toUpperCase(), false),
+            )}
+          >
+            {variant.toUpperCase()}
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,5 +1,11 @@
 import { FunctionComponent } from "react";
-import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
+import {
+  Label,
+  PolarRadiusAxis,
+  RadialBar,
+  RadialBarChart,
+  ReferenceLine,
+} from "recharts";
 
 import { ChartContainer } from "./ui/chart";
 import {
@@ -9,6 +15,8 @@ import {
   CardDescription,
   CardContent,
 } from "./ui/card";
+import { classNames } from "../utils/common";
+import { getSeverityClassNames } from "./common/Severity";
 
 function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
@@ -43,6 +51,7 @@ interface Props {
   avgFixingTime?: {
     averageFixingTimeSeconds: number;
   };
+  variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
 }
@@ -50,19 +59,24 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   avgFixingTime,
   title,
   description,
+  variant,
 }) => {
-  const seconds = avgFixingTime?.averageFixingTimeSeconds ?? 0;
-  const days = Math.round(seconds / 60 / 60 / 24);
+  const seconds = avgFixingTime?.averageFixingTimeSeconds
+    ? avgFixingTime.averageFixingTimeSeconds
+    : 0;
+  const hasData = seconds > 0;
 
   const { duration, type } = getHumanReadableDuration(seconds);
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="">{title}</CardTitle>
+        <CardDescription>
+          {description}. Target Line shows 30 days.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="-mb-20">
+        <div className="-mb-20 relative">
           <ChartContainer
             config={{
               should: { label: "Should", color: "var(--color-should)" },
@@ -86,6 +100,31 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
                 <Label
                   content={({ viewBox }) => {
                     if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      if (!hasData) {
+                        return (
+                          <text
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            textAnchor="middle"
+                          >
+                            <tspan
+                              x={viewBox.cx}
+                              y={(viewBox.cy || 0) - 8}
+                              className="fill-foreground text-6xl"
+                            >
+                              ∞
+                            </tspan>
+                            <tspan
+                              x={viewBox.cx}
+                              y={(viewBox.cy || 0) + 16}
+                              className="fill-muted-foreground text-sm"
+                            >
+                              No data yet
+                            </tspan>
+                          </text>
+                        );
+                      }
+
                       return (
                         <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
                           <tspan
@@ -109,18 +148,29 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
                 />
               </PolarRadiusAxis>
               <RadialBar
-                fill="hsl(var(--muted))"
+                fill="hsl(var(--foreground) / 0.2)"
                 dataKey="should"
-                className="stroke-transparent stroke-2"
+                className="stroke-transparent"
               />
               <RadialBar
                 dataKey="has"
                 cornerRadius={5}
-                fill="hsl(var(--chart-1))"
+                fill="hsl(var(--foreground) / 0.5)"
                 className="stroke-2"
               />
+              {/* Custom reference line */}
             </RadialBarChart>
           </ChartContainer>
+        </div>
+        <div className="flex">
+          <span
+            className={classNames(
+              "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+              getSeverityClassNames(variant.toUpperCase(), false),
+            )}
+          >
+            {variant.toUpperCase()}
+          </span>
         </div>
       </CardContent>
     </Card>

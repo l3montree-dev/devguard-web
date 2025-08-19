@@ -128,124 +128,39 @@ const Index: FunctionComponent<Props> = ({
         Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific repository poses to your organization."
         title="Overview"
       >
-        {" "}
         <div className="grid grid-cols-4 gap-4">
-          <Card>
-            <SeverityCard
-              variant="critical"
-              queryIntervalStart={8}
-              queryIntervalEnd={10}
-              amountByRisk={riskDistribution.critical}
-              amountByCVSS={cvssDistribution.critical}
-            />
-          </Card>
-
-          <Card>
-            <SeverityCard
-              variant="high"
-              queryIntervalStart={7}
-              queryIntervalEnd={8}
-              amountByRisk={riskDistribution.high}
-              amountByCVSS={cvssDistribution.high}
-            />
-          </Card>
-          <Card>
-            <SeverityCard
-              variant="medium"
-              queryIntervalStart={4}
-              queryIntervalEnd={7}
-              amountByRisk={riskDistribution.medium}
-              amountByCVSS={cvssDistribution.medium}
-            />
-          </Card>
-
-          <Card>
-            <SeverityCard
-              variant="low"
-              queryIntervalStart={0}
-              queryIntervalEnd={3}
-              amountByRisk={riskDistribution.low}
-              amountByCVSS={cvssDistribution.low}
-            />
-          </Card>
+          <SeverityCard
+            variant="critical"
+            queryIntervalStart={8}
+            queryIntervalEnd={10}
+            amountByRisk={riskDistribution.critical}
+            amountByCVSS={cvssDistribution.critical}
+          />
+          <SeverityCard
+            variant="high"
+            queryIntervalStart={7}
+            queryIntervalEnd={8}
+            amountByRisk={riskDistribution.high}
+            amountByCVSS={cvssDistribution.high}
+          />
+          <SeverityCard
+            variant="medium"
+            queryIntervalStart={4}
+            queryIntervalEnd={7}
+            amountByRisk={riskDistribution.medium}
+            amountByCVSS={cvssDistribution.medium}
+          />
+          <SeverityCard
+            variant="low"
+            queryIntervalStart={0}
+            queryIntervalEnd={3}
+            amountByRisk={riskDistribution.low}
+            amountByCVSS={cvssDistribution.low}
+          />
         </div>
-        <div className="flex flex-row gap-4">
-          <Card className=" flex flex-col bg-transparent">
-            <CardHeader>
-              <CardTitle className="relative w-full">
-                Activity Stream
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  See all
-                </Link>
-              </CardTitle>
-              <CardDescription>
-                Displays the last events that happened on the repository.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <ul
-                  className="relative flex flex-col gap-10 pb-10 text-foreground"
-                  role="list"
-                >
-                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-                  {events.data.map((event, index, events) => {
-                    return (
-                      <VulnEventItem
-                        key={event.id}
-                        event={event}
-                        index={index}
-                        events={events}
-                      />
-                    );
-                  })}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="col-span-4 row-span-1 flex flex-col ">
-            <VulnerableComponents data={componentRisk} />
-          </Card>
-        </div>
-        <RiskHistoryChart
-          data={[{ label: asset.name, history: riskHistory }]}
-        />
-        <div className="grid grid-cols-8 gap-4">
-          <div className="col-span-4 grid grid-cols-2 gap-4">
-            <Card>
-              <AverageFixingTimeChart
-                title="Critical severity"
-                description="Average fixing time for critical severity flaws"
-                avgFixingTime={avgCriticalFixingTime}
-              />
-            </Card>
-            <Card>
-              <AverageFixingTimeChart
-                title="High severity"
-                description="Average fixing time for high severity flaws"
-                avgFixingTime={avgHighFixingTime}
-              />
-            </Card>
-            <Card>
-              <AverageFixingTimeChart
-                title="Medium severity"
-                description="Average fixing time for medium severity flaws"
-                avgFixingTime={avgMediumFixingTime}
-              />
-            </Card>
-            <Card>
-              <AverageFixingTimeChart
-                title="Low severity"
-                description="Average fixing time for low severity flaws"
-                avgFixingTime={avgLowFixingTime}
-              />
-            </Card>
-          </div>
-          <div className="col-span-4 row-span-2 flex flex-col">
+        <div className="grid grid-cols-4 gap-4">
+          <VulnerableComponents data={componentRisk} />
+          <div className="col-span-2 flex flex-col">
             <Card>
               <CardHeader>
                 <CardTitle className="relative w-full">
@@ -263,7 +178,7 @@ const Index: FunctionComponent<Props> = ({
               </CardHeader>
               <CardContent>
                 <div className="flex  flex-col">
-                  {licenses.map((el, i, arr) => (
+                  {licenses.slice(0, 5).map((el, i, arr) => (
                     <div
                       className={
                         i === 0
@@ -299,6 +214,76 @@ const Index: FunctionComponent<Props> = ({
               </CardContent>
             </Card>
           </div>
+        </div>
+        <RiskHistoryChart
+          data={[{ label: asset.name, history: riskHistory }]}
+        />
+        <div className="grid grid-cols-8 gap-4">
+          <div className="col-span-4 grid grid-cols-2 gap-4">
+            <AverageFixingTimeChart
+              variant="critical"
+              title="Avg. remediation time"
+              description="Time for critical severity vulnerabilities"
+              avgFixingTime={avgCriticalFixingTime}
+            />
+
+            <AverageFixingTimeChart
+              variant="high"
+              title="Avg. remediation time"
+              description="Time for high severity vulnerabilities"
+              avgFixingTime={avgHighFixingTime}
+            />
+
+            <AverageFixingTimeChart
+              variant="medium"
+              title="Avg. remediation time"
+              description="Time for medium severity vulnerabilities"
+              avgFixingTime={avgMediumFixingTime}
+            />
+
+            <AverageFixingTimeChart
+              variant="low"
+              title="Avg. remediation time"
+              description="Time for low severity vulnerabilities"
+              avgFixingTime={avgLowFixingTime}
+            />
+          </div>
+          <Card className="col-span-4 flex flex-col">
+            <CardHeader>
+              <CardTitle className="relative w-full">
+                Activity Stream
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Displays the last events that happened on the repository.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <ul
+                  className="relative flex flex-col gap-10 pb-10 text-foreground"
+                  role="list"
+                >
+                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
+                  {events.data.map((event, index, events) => {
+                    return (
+                      <VulnEventItem
+                        key={event.id}
+                        event={event}
+                        index={index}
+                        events={events}
+                      />
+                    );
+                  })}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </Section>
     </Page>
