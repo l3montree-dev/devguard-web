@@ -31,60 +31,6 @@ type RiskHistoryEl = {
     }
 );
 
-// limitations under the License.
-export function padRiskHistory<T extends RiskHistoryEl>(
-  riskHistory: Array<T>,
-): Array<T> {
-  const lengths = riskHistory.map((r) => r.riskHistory.length);
-  const max = Math.max(...lengths);
-
-  // check if some array needs to be padded
-  riskHistory.forEach((r) => {
-    if (r.riskHistory.length === max) {
-      return r;
-    }
-    if (r.riskHistory.length === 0) {
-      return r;
-    }
-    // it is smaller - thus we need to prepend fake elements
-    let firstDay = new Date(r.riskHistory[0].day);
-    while (r.riskHistory.length < max) {
-      // decrement firstDay by 1 day
-      const clone = new Date(firstDay);
-      // decrement by 1 day
-      clone.setDate(clone.getDate() - 1);
-
-      r.riskHistory = [
-        {
-          day: clone.toUTCString(),
-          id: (r.project?.id ?? r.asset?.id) as string,
-          sumClosedRisk: 0,
-          sumOpenRisk: 0,
-          maxClosedRisk: 0,
-          maxOpenRisk: 0,
-          averageClosedRisk: 0,
-          averageOpenRisk: 0,
-          openVulns: 0,
-          fixedVulns: 0,
-          minClosedRisk: 0,
-          minOpenRisk: 0,
-        },
-        ...r.riskHistory,
-      ];
-
-      firstDay = clone;
-    }
-  });
-
-  riskHistory.sort(
-    (a, b) =>
-      (b.riskHistory[b.riskHistory.length - 1]?.sumOpenRisk ?? 0) -
-      (a.riskHistory[a.riskHistory.length - 1]?.sumOpenRisk ?? 0),
-  );
-
-  return riskHistory;
-}
-
 export const maybeGetRedirectDestination = (
   asset: AssetDTO,
   organizationSlug: string,
