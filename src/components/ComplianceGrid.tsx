@@ -1,11 +1,10 @@
-import React, { FunctionComponent, useMemo } from "react";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/router";
+import { FunctionComponent, useMemo } from "react";
 import { PolicyEvaluation } from "../types/api/api";
 import { classNames } from "../utils/common";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { Badge } from "./ui/badge";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;

@@ -142,6 +142,7 @@ export interface PatWithPrivKey extends PersonalAccessTokenDTO {
 }
 
 export interface ProjectDTO {
+  avatar?: string;
   name: string;
   description?: string;
   slug: string;
@@ -447,6 +448,7 @@ export interface AssetDTO {
   slug: string;
   id: string;
 
+  avatar?: string;
   refs: AssetVersionDTO[];
 
   confidentialityRequirement: RequirementsLevel;

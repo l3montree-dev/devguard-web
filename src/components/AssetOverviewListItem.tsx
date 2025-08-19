@@ -18,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import Markdown from "./common/Markdown";
+import Avatar from "./Avatar";
 
 interface Props {
   asset: AssetDTO & {
@@ -33,7 +35,7 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
     () => asset.stats.compliance.filter((policy) => !policy.compliant),
     [asset.stats.compliance],
   );
-  const currentUserRole = useCurrentUserRole();
+
   return (
     <Link
       key={asset.id}
@@ -43,7 +45,9 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
         reactOnHover
         Description={
           <div className="flex flex-col">
-            <span>{asset.description}</span>
+            <span>
+              <Markdown>{asset.description}</Markdown>
+            </span>
             {asset.stats.compliance.length > 0 ? (
               failingControls.length > 0 ? (
                 <div className="mt-4 flex flex-row items-center gap-2">
@@ -66,33 +70,11 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
             ) : null}
           </div>
         }
-        Button={
-          currentUserRole === UserRole.Owner ||
-          currentUserRole === UserRole.Admin ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "icon",
-                })}
-              >
-                <EllipsisVerticalIcon className="h-5 w-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Link
-                  className="!text-foreground hover:no-underline"
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/settings`}
-                >
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <></>
-          )
-        }
         Title={
-          <div className="flex flex-row items-center gap-4">{asset.name}</div>
+          <div className="flex flex-row items-center gap-2">
+            <Avatar avatar={asset.avatar} name={asset.name} />
+            {asset.name}
+          </div>
         }
       />
     </Link>

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
@@ -72,13 +72,16 @@ import { withOrganization } from "@/decorators/withOrganization";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+
 import EmptyParty from "../../components/common/EmptyParty";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
-import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
+import Markdown from "../../components/common/Markdown";
+import Avatar from "../../components/Avatar";
 
 interface Props {
   oauth2Error?: boolean;
@@ -339,12 +342,15 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                         reactOnHover
                         Title={
                           <div className="flex flex-row items-center gap-2">
+                            <Avatar {...project} />
                             <span>{project.name}</span>
                           </div>
                         }
                         Description={
                           <div className="flex flex-col">
-                            <span>{project.description}</span>
+                            <span>
+                              <Markdown>{project.description}</Markdown>
+                            </span>
                             {(project.stats.totalAssets > 0 ||
                               project.type !== "default") && (
                               <div className="flex mt-4 flex-row items-center gap-2">
@@ -353,7 +359,6 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                                 )}
                                 {project.stats.totalAssets > 0 && (
                                   <>
-                                    {" "}
                                     <Badge
                                       variant={
                                         project.stats.compliantAssets ===
