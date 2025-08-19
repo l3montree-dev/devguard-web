@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { wrapDocumentGetInitialPropsWithSentry } from "@sentry/nextjs/build/types/common";
 import { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
@@ -570,6 +571,13 @@ export interface VulnByPackage {
   vulnCount: number;
   avgRisk: number;
   vulns: VulnWithCVE[];
+}
+
+export interface licenseRisk {
+  packageName: string;
+  licenseName: string;
+  scannerID: string;
+  finalLicenseDecision: string;
 }
 
 interface snippetContents {
