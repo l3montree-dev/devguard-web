@@ -660,3 +660,24 @@ export interface Scorecard {
   commit: string;
   version: string;
 }
+
+export interface RiskHistory {
+  id: string;
+  day: string;
+  sumOpenRisk: number;
+  averageOpenRisk: number;
+  maxOpenRisk: number;
+  minOpenRisk: number;
+
+  sumClosedRisk: number;
+  averageClosedRisk: number;
+  maxClosedRisk: number;
+  minClosedRisk: number;
+
+  openFlaws: number;
+  fixedFlaws: number;
+}
+
+export interface AverageFixingTime {
+  averageFixingTimeSeconds: number;
+}

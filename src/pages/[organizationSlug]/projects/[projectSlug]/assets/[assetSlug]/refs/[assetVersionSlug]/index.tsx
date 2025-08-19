@@ -49,28 +49,48 @@ import {
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
+  AverageFixingTime,
+  ComponentRisk,
   LicenseResponse,
   Paged,
   PolicyEvaluation,
   RiskDistribution,
+  RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
 import ColoredBadge from "../../../../../../../../components/common/ColoredBadge";
 import { TriangleAlert } from "lucide-react";
 import { violationLengthToLevel } from "../../../../../../../../utils/view";
+import { url } from "inspector";
+import { promise } from "zod";
+import { RiskHistoryChart } from "@/components/RiskHistoryDiagram";
+import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
+import { VulnerableComponents } from "@/components/VulnerableComponents";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
+  componentRisk: ComponentRisk;
+  riskHistory: RiskHistory[];
   riskDistribution: RiskDistribution;
   cvssDistribution: RiskDistribution;
+  avgLowFixingTime: AverageFixingTime;
+  avgMediumFixingTime: AverageFixingTime;
+  avgHighFixingTime: AverageFixingTime;
+  avgCriticalFixingTime: AverageFixingTime;
   licenses: Array<LicenseResponse>;
   events: Paged<VulnEventDTO>;
 }
 
 const Index: FunctionComponent<Props> = ({
   compliance,
+  componentRisk,
+  riskHistory,
   riskDistribution,
   cvssDistribution,
+  avgLowFixingTime,
+  avgMediumFixingTime,
+  avgHighFixingTime,
+  avgCriticalFixingTime,
   licenses,
   events,
 }) => {
@@ -108,152 +128,9 @@ const Index: FunctionComponent<Props> = ({
         Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific repository poses to your organization."
         title="Overview"
       >
-        <div className="grid grid-cols-8 gap-4">
-          <Card className="col-span-4 row-span-1">
-            <CardHeader>
-              <CardTitle>Security Posture</CardTitle>
-              <CardDescription>
-                The security posture of the repository is determined by the
-                compliance of the repository with the security policies of the
-                organization.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {failingControls.length > 0 ? (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"danger"}>
-                    <ExclamationCircleIcon className="-ml-2 h-8 w-8 text-red-500" />
-                    <span className="pl-2 text-base">
-                      {failingControls.length} controls are failing
-                    </span>
-                  </Badge>
-                </div>
-              ) : compliance.length === 0 ? (
-                <Badge variant={"outline"}>
-                  <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
-                  <span className="pl-2 text-base">
-                    No compliance rules are activated
-                  </span>
-                </Badge>
-              ) : (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
-                    <span className="pl-2 text-base">
-                      All Controls are passing
-                    </span>
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="col-span-4 row-span-2">
-            <CardHeader>
-              <CardTitle>To-Do&apos;s</CardTitle>
-              <CardDescription>
-                Tasks that need to be completed before the repository is ready
-                for production, ordered by priority.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {failingControls.length > 0 ? (
-                <div className="flex flex-col">
-                  {failingControls.slice(0, 3).map((policy, i, arr) => (
-                    <div
-                      className={
-                        i === 0
-                          ? "border-b pb-4"
-                          : i === arr.length - 1
-                            ? "pt-4"
-                            : "border-b py-4"
-                      }
-                      key={policy.id}
-                    >
-                      <Link
-                        className="!text-foreground"
-                        href={router.asPath + "/compliance/" + policy.id}
-                      >
-                        <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
-                          {policy.title}
-                          {policy.compliant === null ? (
-                            <ColoredBadge variant="high">
-                              <TriangleAlert className="h-4 w-4 mr-1" />
-                              Could not evaluate control
-                            </ColoredBadge>
-                          ) : (
-                            <ColoredBadge
-                              variant={violationLengthToLevel(
-                                policy.violations?.length ?? 0,
-                              )}
-                            >
-                              {policy.violations?.length ?? 0} Violations
-                            </ColoredBadge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {policy.description}
-                        </p>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              ) : compliance.length === 0 ? (
-                <Badge variant={"outline"}>
-                  <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
-                  <span className="pl-2 text-base">
-                    No compliance rules are activated
-                  </span>
-                </Badge>
-              ) : (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
-                    <span className="pl-2 text-base">No tasks until ready</span>
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="col-span-4 row-span-1">
-            <CardHeader className="">
-              <CardTitle className="relative flex flex-row items-end gap-2">
-                <ScaleIcon className="h-6 w-6 text-muted-foreground" />
-                <div className="flex flex-row items-center gap-2">
-                  Compliance Controls
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <InformationCircleIcon className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <Link
-                        className="text-sm !text-muted-foreground"
-                        href={
-                          "https://github.com/l3montree-dev/attestation-compliance-policies"
-                        }
-                      >
-                        Based on a community driven mapping between technical
-                        checks and compliance controls
-                      </Link>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/compliance`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  Overview
-                </Link>
-              </CardTitle>
-              <CardDescription>
-                Displays the compliance of the repository with the security
-                policies of the repository.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ComplianceGrid compliance={compliance} />
-            </CardContent>
-          </Card>
-          <div className="col-span-4 grid grid-cols-2 gap-4">
+        {" "}
+        <div className="grid grid-cols-4 gap-4">
+          <Card>
             <SeverityCard
               variant="critical"
               queryIntervalStart={8}
@@ -261,6 +138,9 @@ const Index: FunctionComponent<Props> = ({
               amountByRisk={riskDistribution.critical}
               amountByCVSS={cvssDistribution.critical}
             />
+          </Card>
+
+          <Card>
             <SeverityCard
               variant="high"
               queryIntervalStart={7}
@@ -268,6 +148,8 @@ const Index: FunctionComponent<Props> = ({
               amountByRisk={riskDistribution.high}
               amountByCVSS={cvssDistribution.high}
             />
+          </Card>
+          <Card>
             <SeverityCard
               variant="medium"
               queryIntervalStart={4}
@@ -275,6 +157,9 @@ const Index: FunctionComponent<Props> = ({
               amountByRisk={riskDistribution.medium}
               amountByCVSS={cvssDistribution.medium}
             />
+          </Card>
+
+          <Card>
             <SeverityCard
               variant="low"
               queryIntervalStart={0}
@@ -282,6 +167,83 @@ const Index: FunctionComponent<Props> = ({
               amountByRisk={riskDistribution.low}
               amountByCVSS={cvssDistribution.low}
             />
+          </Card>
+        </div>
+        <div className="flex flex-row gap-4">
+          <Card className=" flex flex-col bg-transparent">
+            <CardHeader>
+              <CardTitle className="relative w-full">
+                Activity Stream
+                <Link
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
+                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                >
+                  See all
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                Displays the last events that happened on the repository.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <ul
+                  className="relative flex flex-col gap-10 pb-10 text-foreground"
+                  role="list"
+                >
+                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
+                  {events.data.map((event, index, events) => {
+                    return (
+                      <VulnEventItem
+                        key={event.id}
+                        event={event}
+                        index={index}
+                        events={events}
+                      />
+                    );
+                  })}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="col-span-4 row-span-1 flex flex-col ">
+            <VulnerableComponents data={componentRisk} />
+          </Card>
+        </div>
+        <RiskHistoryChart
+          data={[{ label: asset.name, history: riskHistory }]}
+        />
+        <div className="grid grid-cols-8 gap-4">
+          <div className="col-span-4 grid grid-cols-2 gap-4">
+            <Card>
+              <AverageFixingTimeChart
+                title="Critical severity"
+                description="Average fixing time for critical severity flaws"
+                avgFixingTime={avgCriticalFixingTime}
+              />
+            </Card>
+            <Card>
+              <AverageFixingTimeChart
+                title="High severity"
+                description="Average fixing time for high severity flaws"
+                avgFixingTime={avgHighFixingTime}
+              />
+            </Card>
+            <Card>
+              <AverageFixingTimeChart
+                title="Medium severity"
+                description="Average fixing time for medium severity flaws"
+                avgFixingTime={avgMediumFixingTime}
+              />
+            </Card>
+            <Card>
+              <AverageFixingTimeChart
+                title="Low severity"
+                description="Average fixing time for low severity flaws"
+                avgFixingTime={avgLowFixingTime}
+              />
+            </Card>
           </div>
           <div className="col-span-4 row-span-2 flex flex-col">
             <Card>
@@ -337,42 +299,6 @@ const Index: FunctionComponent<Props> = ({
               </CardContent>
             </Card>
           </div>
-          <Card className="col-span-4 row-span-1 flex flex-col bg-transparent">
-            <CardHeader>
-              <CardTitle className="relative w-full">
-                Activity Stream
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  See all
-                </Link>
-              </CardTitle>
-              <CardDescription>
-                Displays the last events that happened on the repository.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <ul
-                  className="relative flex flex-col gap-10 pb-10 text-foreground"
-                  role="list"
-                >
-                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-                  {events.data.map((event, index, events) => {
-                    return (
-                      <VulnEventItem
-                        key={event.id}
-                        event={event}
-                        index={index}
-                        events={events}
-                      />
-                    );
-                  })}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </Section>
     </Page>
@@ -387,21 +313,38 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const { compliance, riskDistribution, cvssDistribution, licenses, events } =
-      await fetchAssetStats({
-        organizationSlug: organizationSlug as string,
-        projectSlug: projectSlug as string,
-        assetSlug: assetSlug as string,
-        assetVersionSlug: assetVersionSlug as string,
-        apiClient,
-        context,
-      });
+    const {
+      compliance,
+      componentRisk,
+      riskHistory,
+      riskDistribution,
+      cvssDistribution,
+      avgLowFixingTime,
+      avgMediumFixingTime,
+      avgHighFixingTime,
+      avgCriticalFixingTime,
+      licenses,
+      events,
+    } = await fetchAssetStats({
+      organizationSlug: organizationSlug as string,
+      projectSlug: projectSlug as string,
+      assetSlug: assetSlug as string,
+      assetVersionSlug: assetVersionSlug as string,
+      apiClient,
+      context,
+    });
 
     return {
       props: {
         compliance,
+        componentRisk,
+        riskHistory,
         riskDistribution,
         cvssDistribution,
+        avgLowFixingTime,
+        avgMediumFixingTime,
+        avgHighFixingTime,
+        avgCriticalFixingTime,
         licenses,
         events,
       },
