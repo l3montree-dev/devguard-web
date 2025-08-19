@@ -18,7 +18,7 @@ import { FunctionComponent, useState } from "react";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { beautifyPurl, extractVersion } from "@/utils/common";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -302,20 +302,26 @@ const Index: FunctionComponent<Props> = (props) => {
                 </thead>
                 <tbody className="text-sm text-foreground">
                   {table.getRowModel().rows.map((row, i, arr) => (
-                    <tr key={row.original.packageName}>
-                      <td></td>
-                      <td>{row.original.scannerID}</td>
-                      <td>{row.original.licenseName}</td>
-                      <td>{row.original.packageName}</td>
-                      <td>{row.original.finalLicenseDecision}</td>
+                    <tr
+                      key={row.original.packageName}
+                      onClick={() =>
+                        console.log("row clicked:", row.original.packageName)
+                      }
+                      className={classNames(
+                        "relative cursor-pointer align-top transition-all",
+                        i === arr.length - 1 ? "" : "border-b",
+                        i % 2 !== 0 && "bg-card/50",
+                        "hover:bg-gray-50 dark:hover:bg-card",
+                      )}
+                    >
+                      <td className="py-4 text-center align-baseline"></td>
+                      <td className="p-4">{row.original.scannerID}</td>
+                      <td className="p-4">{row.original.licenseName}</td>
+                      <td className="p-4">{row.original.packageName}</td>
+                      <td className="p-4">
+                        {row.original.finalLicenseDecision}
+                      </td>
                     </tr>
-
-                    // <RiskHandlingRow
-                    //   row={row}
-                    //   index={i}
-                    //   arrLength={arr.length}
-                    //   key={row.original.packageName}
-                    // />
                   ))}
                 </tbody>
               </table>
@@ -355,7 +361,7 @@ export const getServerSideProps = middleware(
     const licenseRiskMocks = [
       {
         packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.2",
+        licenseName: "web-frontend@1.4.3",
         assetId: "asset-frontend-42",
         finalLicenseDecision: "OPEN",
         createdAt: "2025-08-16T10:15:00Z",
@@ -366,7 +372,7 @@ export const getServerSideProps = middleware(
 
       {
         packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.2",
+        licenseName: "web-frontend@1.4.4",
         assetId: "asset-frontend-42",
         finalLicenseDecision: "OPEN",
         createdAt: "2025-08-16T10:15:00Z",
@@ -376,7 +382,7 @@ export const getServerSideProps = middleware(
       },
       {
         packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.2",
+        licenseName: "web-frontend@1.4.5",
         assetId: "asset-frontend-42",
         finalLicenseDecision: "OPEN",
         createdAt: "2025-08-16T10:15:00Z",
