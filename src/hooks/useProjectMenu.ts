@@ -36,6 +36,14 @@ export const useProjectMenu = () => {
 
   const menu = [
     {
+      title: "Overview",
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
+      Icon: ChartBarSquareIcon,
+      isActive:
+        router.pathname ===
+        "/[organizationSlug]/projects/[projectSlug]/overview",
+    },
+    {
       title: project.externalEntityProviderId
         ? "Repositories"
         : "Subgroups & Repositories",

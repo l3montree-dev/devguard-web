@@ -64,8 +64,8 @@ const SeverityCard: FunctionComponent<Props> = ({
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
-  const asset = useActiveAsset()!;
-  const activeAssetVersion = useActiveAssetVersion()!;
+  const asset = useActiveAsset();
+  const activeAssetVersion = useActiveAssetVersion();
 
   const applySQLFilter = (
     variant: Props["variant"],
@@ -128,15 +128,17 @@ const SeverityCard: FunctionComponent<Props> = ({
               </TooltipContent>
             </Tooltip>
           </span>
-          <Link
-            href={
-              `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${activeAssetVersion.slug}/dependency-risks?` +
-              new URLSearchParams(applySQLFilter(variant))
-            }
-            className="text-xs !text-muted-foreground"
-          >
-            See all
-          </Link>
+          {asset && (
+            <Link
+              href={
+                `/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${activeAssetVersion?.slug}/dependency-risks?` +
+                new URLSearchParams(applySQLFilter(variant))
+              }
+              className="text-xs !text-muted-foreground"
+            >
+              See all
+            </Link>
+          )}
         </CardTitle>
         <CardDescription>Amount of vulnerabilities by Risk</CardDescription>
       </CardHeader>

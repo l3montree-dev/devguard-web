@@ -71,7 +71,6 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-4"></div>
       </CardContent>
     </Card>
   );

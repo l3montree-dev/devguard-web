@@ -676,8 +676,8 @@ export interface RiskHistory {
   maxClosedRisk: number;
   minClosedRisk: number;
 
-  openFlaws: number;
-  fixedFlaws: number;
+  openVulns: number;
+  fixedVulns: number;
 }
 
 export interface AverageFixingTime {

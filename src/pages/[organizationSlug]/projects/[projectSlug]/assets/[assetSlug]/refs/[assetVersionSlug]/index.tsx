@@ -31,21 +31,13 @@ import {
   CardTitle,
 } from "../../../../../../../../components/ui/card";
 
-import {
-  CheckBadgeIcon,
-  ExclamationCircleIcon,
-  ScaleIcon,
-} from "@heroicons/react/24/outline";
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
+import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
+import { RiskHistoryChart } from "@/components/RiskHistoryDiagram";
+import { VulnerableComponents } from "@/components/VulnerableComponents";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../../../../../../../components/ui/tooltip";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
@@ -58,14 +50,6 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import ColoredBadge from "../../../../../../../../components/common/ColoredBadge";
-import { TriangleAlert } from "lucide-react";
-import { violationLengthToLevel } from "../../../../../../../../utils/view";
-import { url } from "inspector";
-import { promise } from "zod";
-import { RiskHistoryChart } from "@/components/RiskHistoryDiagram";
-import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
-import { VulnerableComponents } from "@/components/VulnerableComponents";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -82,7 +66,6 @@ interface Props {
 }
 
 const Index: FunctionComponent<Props> = ({
-  compliance,
   componentRisk,
   riskHistory,
   riskDistribution,
@@ -103,16 +86,6 @@ const Index: FunctionComponent<Props> = ({
 
   const router = useRouter();
 
-  const failingControls = useMemo(
-    () => compliance.filter((policy) => policy.compliant !== true),
-    [compliance],
-  );
-
-  const totalDependencies = useMemo(
-    () => licenses.reduce((acc, license) => acc + license.count, 0),
-    [licenses],
-  );
-
   return (
     <Page
       Menu={assetMenu}
@@ -124,8 +97,7 @@ const Index: FunctionComponent<Props> = ({
       <Section
         primaryHeadline
         forceVertical
-        description="
-        Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific repository poses to your organization."
+        description="Have a look at the overall health of your repository."
         title="Overview"
       >
         <div className="grid grid-cols-4 gap-4">

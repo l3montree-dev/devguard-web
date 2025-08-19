@@ -428,7 +428,6 @@ export const getServerSideProps = middleware(
     } else {
       query.append("filterQuery[state][is not]", "open");
     }
-    console.log("query", query.toString());
 
     const artifact = context.query.artifact;
     if (artifact) {
