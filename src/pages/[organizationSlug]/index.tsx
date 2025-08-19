@@ -357,66 +357,9 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                                 {project.type !== "default" && (
                                   <ProjectBadge type={project.type} />
                                 )}
-                                {project.stats.totalAssets > 0 && (
-                                  <>
-                                    <Badge
-                                      variant={
-                                        project.stats.compliantAssets ===
-                                        project.stats.totalAssets
-                                          ? "success"
-                                          : "secondary"
-                                      }
-                                      className=""
-                                    >
-                                      {project.stats.compliantAssets}/
-                                      {project.stats.totalAssets} assets
-                                      compliant
-                                    </Badge>
-                                    <Badge
-                                      variant={
-                                        project.stats
-                                          .passingControlsPercentage === 1
-                                          ? "success"
-                                          : "secondary"
-                                      }
-                                      className=""
-                                    >
-                                      {Math.round(
-                                        project.stats
-                                          .passingControlsPercentage * 100,
-                                      )}
-                                      % controls passing
-                                    </Badge>
-                                  </>
-                                )}
                               </div>
                             )}
                           </div>
-                        }
-                        Button={
-                          currentUserRole === UserRole.Owner ||
-                          currentUserRole === UserRole.Admin ? (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger
-                                className={buttonVariants({
-                                  variant: "outline",
-                                  size: "icon",
-                                })}
-                              >
-                                <EllipsisVerticalIcon className="h-5 w-5" />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <Link
-                                  className="!text-foreground hover:no-underline"
-                                  href={`/${activeOrg.slug}/projects/${project.slug}/settings`}
-                                >
-                                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                                </Link>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          ) : (
-                            <></>
-                          )
                         }
                       />
                     </Link>
