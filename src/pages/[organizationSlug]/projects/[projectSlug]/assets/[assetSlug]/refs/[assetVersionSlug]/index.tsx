@@ -14,7 +14,8 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useState } from "react";
+// ...existing code...
+import { FunctionComponent, useMemo, useState, useEffect } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -22,6 +23,7 @@ import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import { useViewMode } from "@/hooks/useViewMode";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -79,7 +81,7 @@ const Index: FunctionComponent<Props> = ({
   licenses,
   events,
 }) => {
-  const [mode, setMode] = useState<"risk" | "cvss">("risk");
+  const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();

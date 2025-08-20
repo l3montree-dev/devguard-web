@@ -1,7 +1,8 @@
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useState, useEffect } from "react";
 import Page from "../../../../components/Page";
 import { middleware } from "@/decorators/middleware";
+import { useViewMode } from "@/hooks/useViewMode";
 import {
   Card,
   CardContent,
@@ -78,7 +79,7 @@ const Index: FunctionComponent<Props> = ({
   avgHighFixingTime,
   avgCriticalFixingTime,
 }) => {
-  const [mode, setMode] = useState<"risk" | "cvss">("risk");
+  const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
   const router = useRouter();
