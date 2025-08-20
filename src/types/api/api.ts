@@ -499,7 +499,17 @@ export interface AffectedPackage {
 }
 
 export interface ComponentRisk {
-  [component: string]: number;
+  [component: string]: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+
+    lowCvss: number;
+    mediumCvss: number;
+    highCvss: number;
+    criticalCvss: number;
+  };
 }
 
 export interface License {

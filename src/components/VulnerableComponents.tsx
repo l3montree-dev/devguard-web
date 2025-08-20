@@ -11,6 +11,9 @@ import { ComponentRisk } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";
 import EcosystemImage from "./common/EcosystemImage";
+import { useViewMode } from "../hooks/useViewMode";
+import { useCallback, useMemo } from "react";
+import CVERainbowBadge from "./CVERainbowBadge";
 
 export interface ChartConfig {
   [key: string]: {
@@ -19,13 +22,51 @@ export interface ChartConfig {
   };
 }
 
-export function VulnerableComponents({ data }: { data: ComponentRisk }) {
-  const d = Object.entries(data)
-    .toSorted((a, b) => b[1] - a[1])
-    .map(([componentName, risk]) => ({
-      componentName,
-      risk,
-    }));
+const sortRisk =
+  (viewMode: "risk" | "cvss") =>
+  (a: ComponentRisk[string], b: ComponentRisk[string]) => {
+    if (viewMode === "cvss") {
+      if (a.criticalCvss !== b.criticalCvss) {
+        return b.criticalCvss - a.criticalCvss;
+      }
+      if (a.highCvss !== b.highCvss) {
+        return b.highCvss - a.highCvss;
+      }
+      if (a.mediumCvss !== b.mediumCvss) {
+        return b.mediumCvss - a.mediumCvss;
+      }
+      return b.lowCvss - a.lowCvss;
+    }
+
+    // critical > high > medium > low
+    if (a.critical !== b.critical) {
+      return b.critical - a.critical;
+    }
+    if (a.high !== b.high) {
+      return b.high - a.high;
+    }
+    if (a.medium !== b.medium) {
+      return b.medium - a.medium;
+    }
+    return b.low - a.low;
+  };
+
+export function VulnerableComponents({
+  data,
+  mode,
+}: {
+  data: ComponentRisk;
+  mode: "risk" | "cvss";
+}) {
+  const d = useMemo(() => {
+    const sorter = sortRisk(mode);
+    return Object.entries(data)
+      .toSorted((a, b) => sorter(a[1], b[1]))
+      .map(([componentName, risk]) => ({
+        componentName,
+        risk,
+      }));
+  }, [mode, data]);
 
   return (
     <Card className="col-span-2">
@@ -58,9 +99,22 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
                     {beautifyPurl(item.componentName)}
                   </span>
                   <div className="flex flex-row flex-wrap gap-2">
-                    <Badge variant={"secondary"}>
-                      {item.risk.toFixed(2)} Risk
-                    </Badge>
+                    <CVERainbowBadge
+                      low={mode === "risk" ? item.risk.low : item.risk.lowCvss}
+                      medium={
+                        mode === "risk"
+                          ? item.risk.medium
+                          : item.risk.mediumCvss
+                      }
+                      high={
+                        mode === "risk" ? item.risk.high : item.risk.highCvss
+                      }
+                      critical={
+                        mode === "risk"
+                          ? item.risk.critical
+                          : item.risk.criticalCvss
+                      }
+                    />
                   </div>
                 </div>
 

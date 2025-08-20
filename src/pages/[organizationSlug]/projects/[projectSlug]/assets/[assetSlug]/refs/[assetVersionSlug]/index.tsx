@@ -166,7 +166,7 @@ const Index: FunctionComponent<Props> = ({
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
-              <VulnerableComponents data={componentRisk} />
+              <VulnerableComponents mode={mode} data={componentRisk} />
               <div className="col-span-2 flex flex-col">
                 <Card>
                   <CardHeader>
