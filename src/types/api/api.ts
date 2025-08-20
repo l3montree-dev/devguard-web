@@ -191,7 +191,13 @@ export interface BaseVulnDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
-  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
+  state:
+    | "open"
+    | "fixed"
+    | "accepted"
+    | "falsePositive"
+    | "markedForTransfer"
+    | "licenseRisk";
   priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;

@@ -164,11 +164,7 @@ const Index: FunctionComponent<Props> = (props) => {
   };
 
   return (
-    <Page
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-      title={vuln.ruleId ?? "Vuln Details"}
-    >
+    <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
@@ -176,11 +172,11 @@ const Index: FunctionComponent<Props> = (props) => {
               <h1 className="text-2xl font-semibold">
                 {emptyThenNull(vuln.ruleName) ??
                   emptyThenNull(vuln.ruleId) ??
-                  "Vuln Details"}
+                  "License Details"}
               </h1>
-              <div className="mt-4 text-muted-foreground">
+              {/* <div className="mt-4 text-muted-foreground">
                 <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
-              </div>
+              </div> */}
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
                 {vuln.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
@@ -208,7 +204,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     </Badge>
                   </Link>
                 )}
-                <VulnState state={vuln.state} />
+                <VulnState state={"licenseRisk"} />
 
                 <div className="flex flex-row gap-2">
                   {/* {vuln.scannerIds.split(" ").map((s) => (
@@ -218,39 +214,22 @@ const Index: FunctionComponent<Props> = (props) => {
                   ))} */}
                 </div>
               </div>
-              <div className="mt-4 rounded-lg border bg-secondary">
-                <div>
-                  <div className="mt-2">
-                    {/* <Combobox
-                      items={licenses}
-                      placeholder={getLicenseName(
-                        props.component.license,
-                        props.license.licenseId,
-                      )}
-                      emptyMessage={""}
-                      onSelect={(selectedLicense) =>
-                        handleLicenseUpdate(
-                          selectedLicense,
-                          activeOrg.id,
-                          props.dependencyPurl,
-                          "justification",
-                        )
-                      }
-                    /> */}
-
-                    <div className="m-6">
-                      <Combobox
-                        onSelect={function (value: string): void {
-                          throw new Error("Function not implemented.");
-                        }}
-                        items={licenses}
-                        placeholder={"d"}
-                        emptyMessage={"balablalb"}
-                      />
-                    </div>
-                  </div>
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle>Mitigate your License</CardTitle>
+                </CardHeader>
+                <div className="m-4">
+                  <Combobox
+                    onSelect={function (value: string): void {
+                      throw new Error("Function not implemented.");
+                    }}
+                    items={licenses}
+                    placeholder={"d"}
+                    emptyMessage={"balablalb"}
+                  />
                 </div>
-              </div>
+              </Card>
+
               <div className="mt-16">
                 {/* <RiskAssessmentFeed
                   vulnerabilityName={
@@ -463,8 +442,17 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
             </div>
             <div className="col-span-1">
-              <h3 className="mb-2 text-lg font-semibold">Rule Details</h3>
+              <h3 className="mb-2 text-lg font-semibold">License Details</h3>
               <div className="text-sm text-muted-foreground">
+                licenseName is not found in OSI Licenses{" "}
+                <a
+                  href={`https://opensource.org/licenses/`}
+                  target="_blank"
+                  className="text-sm font-semibold !text-muted-foreground underline"
+                >
+                  Open Source License
+                </a>{" "}
+                Mitigate your License
                 <Markdown>{vuln.ruleDescription}</Markdown>
                 {vuln.ruleHelpUri && (
                   <Link
@@ -513,11 +501,41 @@ export const getServerSideProps = middleware(
       apiClient(uri).then((r) => r.json()),
     ]);
 
+    const mockup = {
+      id: "idk",
+      scannerID: "2",
+      message: "idk",
+      assetVersionName: "burr",
+      assetID: "assetID",
+      state: "state",
+      createdAt: "createdAt",
+      ticketID: "ticketID",
+      ticketURL: "ticketURL",
+      manualTicektCreation: true,
+      finalLicenseDecision: "we good",
+      componentPurl: "componentPurl",
+    };
+
     return {
       props: {
-        vuln: resp,
+        vuln: mockup,
       },
     };
+
+    // This is what the Backend is returning when sending specific data
+    // ID                   string           `json:"id"`
+    // ScannerIDs           string           `json:"scannerIds"`
+    // Message              *string          `json:"message"`
+    // AssetVersionName     string           `json:"assetVersionName"`
+    // AssetID              string           `json:"assetId"`
+    // State                models.VulnState `json:"state"`
+    // CreatedAt            time.Time        `json:"createdAt"`
+    // TicketID             *string          `json:"ticketId"`
+    // TicketURL            *string          `json:"ticketUrl"`
+    // ManualTicketCreation bool             `json:"manualTicketCreation"`
+
+    // FinalLicenseDecision string `json:"finalLicenseDecision"`
+    // ComponentPurl        string `json:"componentPurl"`
   },
   {
     session: withSession,
