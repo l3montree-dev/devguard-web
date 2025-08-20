@@ -50,6 +50,8 @@ import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
+import { Combobox } from "@/components/common/Combobox";
+import { licenses } from "@/utils/common";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -209,43 +211,55 @@ const Index: FunctionComponent<Props> = (props) => {
                 <VulnState state={vuln.state} />
 
                 <div className="flex flex-row gap-2">
-                  {vuln.scannerIds.split(" ").map((s) => (
+                  {/* {vuln.scannerIds.split(" ").map((s) => (
                     <Badge key={s} variant={"secondary"}>
                       {s}
                     </Badge>
-                  ))}
+                  ))} */}
                 </div>
               </div>
               <div className="mt-4 rounded-lg border bg-secondary">
-                {vuln.snippetContents.map((snippet, idx) => (
-                  <div key={idx}>
-                    {idx === 0 && (
-                      <div className="font-mono px-4 py-2 text-sm font-medium">
-                        {vuln.uri}
-                      </div>
-                    )}
-                    <CopyCode
-                      highlightRegexPattern={highlightRegex}
-                      codeString={snippet.snippet}
-                      startingLineNumber={snippet.startLine}
-                    />
-                    {idx < vuln.snippetContents.length - 1 && (
-                      <div className="flex flex-row opacity-75 justify-center items-center w-full">
-                        ···
-                      </div>
-                    )}
+                <div>
+                  <div className="mt-2">
+                    {/* <Combobox
+                      items={licenses}
+                      placeholder={getLicenseName(
+                        props.component.license,
+                        props.license.licenseId,
+                      )}
+                      emptyMessage={""}
+                      onSelect={(selectedLicense) =>
+                        handleLicenseUpdate(
+                          selectedLicense,
+                          activeOrg.id,
+                          props.dependencyPurl,
+                          "justification",
+                        )
+                      }
+                    /> */}
+
+                    <div className="m-6">
+                      <Combobox
+                        onSelect={function (value: string): void {
+                          throw new Error("Function not implemented.");
+                        }}
+                        items={licenses}
+                        placeholder={"d"}
+                        emptyMessage={"balablalb"}
+                      />
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
               <div className="mt-16">
-                <RiskAssessmentFeed
+                {/* <RiskAssessmentFeed
                   vulnerabilityName={
                     emptyThenNull(vuln.ruleName) ??
                     emptyThenNull(vuln.ruleId) ??
                     ""
                   }
                   events={vuln.events}
-                />
+                /> */}
               </div>
               <div>
                 <Card>
@@ -473,12 +487,13 @@ const Index: FunctionComponent<Props> = (props) => {
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { assetVersion }) => {
     // fetch the project
+    console.log("here is the response: ");
     const {
       organizationSlug,
       projectSlug,
       assetSlug,
       assetVersionSlug,
-      vulnId,
+      scannerID,
     } = context.params!;
 
     const apiClient = getApiClientFromContext(context);
@@ -492,7 +507,7 @@ export const getServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/first-party-vulns/" +
-      vulnId;
+      scannerID;
 
     const [resp]: [DetailedDependencyVulnDTO] = await Promise.all([
       apiClient(uri).then((r) => r.json()),

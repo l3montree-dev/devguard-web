@@ -11,13 +11,12 @@ type Props = {
 
 export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
   const router = useRouter();
-  const q = router.query as Record<string, string>;
 
   return (
     <tr
       onClick={() =>
         router.push(
-          router.asPath.split("?")[0] + "/../license-risk/" + risk.scannerID,
+          router.asPath.split("?")[0] + "/../license-risks/" + risk.scannerID,
         )
       }
       className={classNames(
