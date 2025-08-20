@@ -14,7 +14,7 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -38,10 +38,11 @@ import {
 } from "../../../../../../../../components/ui/tabs";
 
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
-import { RiskHistoryChart } from "@/components/RiskHistoryDiagram";
 import { VulnerableComponents } from "@/components/VulnerableComponents";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
+import { RiskHistoryDistributionDiagram } from "../../../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
@@ -52,19 +53,14 @@ import {
   LicenseResponse,
   Paged,
   PolicyEvaluation,
-  RiskDistribution,
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import { OctagonAlertIcon } from "lucide-react";
-import { RiskHistoryDistributionDiagram } from "../../../../../../../../components/RiskHistoryDistributionDiagram";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
   componentRisk: ComponentRisk;
   riskHistory: RiskHistory[];
-  riskDistribution: RiskDistribution;
-  cvssDistribution: RiskDistribution;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
   avgHighFixingTime: AverageFixingTime;
@@ -76,8 +72,6 @@ interface Props {
 const Index: FunctionComponent<Props> = ({
   componentRisk,
   riskHistory,
-  riskDistribution,
-  cvssDistribution,
   avgLowFixingTime,
   avgMediumFixingTime,
   avgHighFixingTime,
@@ -130,8 +124,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"
-                    ? riskDistribution.critical
-                    : cvssDistribution.critical
+                    ? (riskHistory[riskHistory.length - 1]?.critical ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.criticalCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -141,8 +135,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={8}
                 currentAmount={
                   mode === "risk"
-                    ? riskDistribution.high
-                    : cvssDistribution.high
+                    ? (riskHistory[riskHistory.length - 1]?.high ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.highCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -152,8 +146,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={7}
                 currentAmount={
                   mode === "risk"
-                    ? riskDistribution.medium
-                    : cvssDistribution.medium
+                    ? (riskHistory[riskHistory.length - 1]?.medium ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.mediumCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -162,7 +156,9 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalStart={0}
                 queryIntervalEnd={3}
                 currentAmount={
-                  mode === "risk" ? riskDistribution.low : cvssDistribution.low
+                  mode === "risk"
+                    ? (riskHistory[riskHistory.length - 1]?.low ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.lowCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -326,8 +322,6 @@ export const getServerSideProps = middleware(
       compliance,
       componentRisk,
       riskHistory,
-      riskDistribution,
-      cvssDistribution,
       avgLowFixingTime,
       avgMediumFixingTime,
       avgHighFixingTime,
@@ -348,8 +342,6 @@ export const getServerSideProps = middleware(
         compliance,
         componentRisk,
         riskHistory,
-        riskDistribution,
-        cvssDistribution,
         avgLowFixingTime,
         avgMediumFixingTime,
         avgHighFixingTime,

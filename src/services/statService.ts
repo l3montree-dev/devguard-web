@@ -1,16 +1,14 @@
 import { GetServerSidePropsContext } from "next";
 import {
-  VulnEventDTO,
-  License,
+  AverageFixingTime,
+  ComponentRisk,
   LicenseResponse,
   Paged,
   PolicyEvaluation,
   RiskDistribution,
-  AverageFixingTime,
-  ComponentRisk,
+  VulnEventDTO,
 } from "../types/api/api";
 import { DevGuardApiClient } from "./devGuardApi";
-import { buildFilterSearchParams } from "@/utils/url";
 
 export const fetchAssetStats = async ({
   organizationSlug,
@@ -30,8 +28,6 @@ export const fetchAssetStats = async ({
   compliance: Array<PolicyEvaluation>;
   componentRisk: ComponentRisk;
   riskHistory: Array<RiskDistribution>;
-  riskDistribution: Array<RiskDistribution>;
-  cvssDistribution: Array<RiskDistribution>;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
   avgHighFixingTime: AverageFixingTime;
@@ -56,8 +52,6 @@ export const fetchAssetStats = async ({
     compliance,
     componentRisk,
     riskHistoryResp,
-    riskDistribution,
-    cvssDistribution,
     avgLowFixingTime,
     avgMediumFixingTime,
     avgHighFixingTime,
@@ -74,8 +68,6 @@ export const fetchAssetStats = async ({
         "&end=" +
         extractDateOnly(new Date()),
     ),
-    apiClient(url + "/stats/risk-distribution").then((r) => r.json()),
-    apiClient(url + "/stats/cvss-distribution").then((r) => r.json()),
     apiClient(url + "/stats/average-fixing-time?severity=low").then((r) =>
       r.json(),
     ),
@@ -104,8 +96,6 @@ export const fetchAssetStats = async ({
     compliance,
     componentRisk,
     riskHistory,
-    riskDistribution,
-    cvssDistribution,
     avgLowFixingTime,
     avgMediumFixingTime,
     avgHighFixingTime,

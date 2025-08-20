@@ -53,8 +53,6 @@ interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
-  cvssDistribution: RiskDistribution[] | null;
-  riskDistribution: RiskDistribution[] | null;
   riskHistory: Array<{
     history: RiskHistory[];
     label: string;
@@ -74,12 +72,10 @@ interface Props {
 
 const Index: FunctionComponent<Props> = ({
   project,
-  riskDistribution,
   riskHistory,
   avgLowFixingTime,
   avgMediumFixingTime,
   avgHighFixingTime,
-  cvssDistribution,
   avgCriticalFixingTime,
 }) => {
   const [mode, setMode] = useState<"risk" | "cvss">("risk");
@@ -136,14 +132,18 @@ const Index: FunctionComponent<Props> = ({
                 variant="critical"
                 currentAmount={
                   mode === "risk"
-                    ? (riskDistribution?.reduce(
-                        (acc, r) => acc + r.critical,
+                    ? riskHistory.reduce(
+                        (sum, r) =>
+                          sum +
+                          (r.history[r.history.length - 1]?.critical ?? 0),
                         0,
-                      ) ?? 0)
-                    : (cvssDistribution?.reduce(
-                        (acc, r) => acc + r.critical,
+                      )
+                    : riskHistory.reduce(
+                        (sum, r) =>
+                          sum +
+                          (r.history[r.history.length - 1]?.criticalCvss ?? 0),
                         0,
-                      ) ?? 0)
+                      )
                 }
                 queryIntervalStart={7}
                 queryIntervalEnd={10}
@@ -153,10 +153,17 @@ const Index: FunctionComponent<Props> = ({
                 variant="high"
                 currentAmount={
                   mode === "risk"
-                    ? (riskDistribution?.reduce((acc, r) => acc + r.high, 0) ??
-                      0)
-                    : (cvssDistribution?.reduce((acc, r) => acc + r.high, 0) ??
-                      0)
+                    ? riskHistory.reduce(
+                        (sum, r) =>
+                          sum + (r.history[r.history.length - 1]?.high ?? 0),
+                        0,
+                      )
+                    : riskHistory.reduce(
+                        (sum, r) =>
+                          sum +
+                          (r.history[r.history.length - 1]?.highCvss ?? 0),
+                        0,
+                      )
                 }
                 queryIntervalStart={4}
                 queryIntervalEnd={7}
@@ -166,14 +173,17 @@ const Index: FunctionComponent<Props> = ({
                 variant="medium"
                 currentAmount={
                   mode === "risk"
-                    ? (riskDistribution?.reduce(
-                        (acc, r) => acc + r.medium,
+                    ? riskHistory.reduce(
+                        (sum, r) =>
+                          sum + (r.history[r.history.length - 1]?.medium ?? 0),
                         0,
-                      ) ?? 0)
-                    : (cvssDistribution?.reduce(
-                        (acc, r) => acc + r.medium,
+                      )
+                    : riskHistory.reduce(
+                        (sum, r) =>
+                          sum +
+                          (r.history[r.history.length - 1]?.mediumCvss ?? 0),
                         0,
-                      ) ?? 0)
+                      )
                 }
                 queryIntervalStart={1}
                 queryIntervalEnd={4}
@@ -183,10 +193,16 @@ const Index: FunctionComponent<Props> = ({
                 variant="low"
                 currentAmount={
                   mode === "risk"
-                    ? (riskDistribution?.reduce((acc, r) => acc + r.low, 0) ??
-                      0)
-                    : (cvssDistribution?.reduce((acc, r) => acc + r.low, 0) ??
-                      0)
+                    ? riskHistory.reduce(
+                        (sum, r) =>
+                          sum + (r.history[r.history.length - 1]?.low ?? 0),
+                        0,
+                      )
+                    : riskHistory.reduce(
+                        (sum, r) =>
+                          sum + (r.history[r.history.length - 1]?.lowCvss ?? 0),
+                        0,
+                      )
                 }
                 queryIntervalStart={0}
                 queryIntervalEnd={1}
@@ -335,8 +351,6 @@ export const getServerSideProps = middleware(
       projectSlug +
       "/stats";
     const [
-      riskDistribution,
-      cvssDistribution,
       riskHistory,
       flawAggregationStateAndChange,
       avgLowFixingTime,
@@ -344,8 +358,6 @@ export const getServerSideProps = middleware(
       avgHighFixingTime,
       avgCriticalFixingTime,
     ] = await Promise.all([
-      apiClient(url + "/risk-distribution").then((r) => r.json()),
-      apiClient(url + "/cvss-distribution").then((r) => r.json()),
       apiClient(
         url +
           "/risk-history?start=" +
@@ -401,8 +413,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         project,
-        cvssDistribution,
-        riskDistribution,
+
         riskHistory: paddedRiskHistory.map((r) => ({
           avatar: "asset" in r ? r.asset.avatar : r.project.avatar,
           label: "asset" in r ? r.asset.name : r.project.name,
