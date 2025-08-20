@@ -27,8 +27,10 @@ import {
 
 export function RiskHistoryChart({
   data,
+  mode = "risk",
 }: {
   data: Array<{ label: string; history: RiskHistory[] }>;
+  mode?: "risk" | "cvss";
 }) {
   const reduced = useMemo(() => {
     if (data.length === 0) {
@@ -41,29 +43,42 @@ export function RiskHistoryChart({
       for (let j = 0; j < data[i].history.length; j++) {
         if (!Boolean(res[j])) {
           res[j] = {
-            [label]: data[i].history[j].sumOpenRisk,
+            [label]:
+              mode === "risk"
+                ? data[i].history[j].sumOpenRisk
+                : data[i].history[j].criticalCvss +
+                  data[i].history[j].highCvss +
+                  data[i].history[j].mediumCvss +
+                  data[i].history[j].lowCvss,
             day: data[i].history[j].day,
           };
         } else {
           res[j] = {
             ...res[j],
             day: data[i].history[j].day,
-            [label]: data[i].history[j].sumOpenRisk,
+            [label]:
+              mode === "risk"
+                ? data[i].history[j].sumOpenRisk
+                : data[i].history[j].criticalCvss +
+                  data[i].history[j].highCvss +
+                  data[i].history[j].mediumCvss +
+                  data[i].history[j].lowCvss,
           };
         }
       }
     }
     return res;
-  }, [data]);
+  }, [data, mode]);
 
   const amountOfElements = data.length;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Risk Trend</CardTitle>
+        <CardTitle>{mode === "risk" ? "Risk" : "CVSS"} Trend</CardTitle>
         <CardDescription>
-          The development of the overall risk value in the past months.
+          The development of the overall {mode === "risk" ? "risk" : "CVSS"}{" "}
+          value in the past months.
         </CardDescription>
       </CardHeader>
       <CardContent>

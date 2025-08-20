@@ -148,14 +148,14 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
                 />
               </PolarRadiusAxis>
               <RadialBar
-                fill="hsl(var(--foreground) / 0.2)"
+                fill="hsl(var(--muted-foreground) / 1)"
                 dataKey="should"
                 className="stroke-transparent"
               />
               <RadialBar
                 dataKey="has"
                 cornerRadius={5}
-                fill="hsl(var(--foreground) / 0.5)"
+                fill="hsl(var(--primary) / 1)"
                 className="stroke-2"
               />
               {/* Custom reference line */}

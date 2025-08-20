@@ -15,52 +15,20 @@ import {
 } from "./ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export const SeverityStats = ({
-  amountByRisk,
-  amountByCVSS,
-  variant,
-}: {
-  amountByRisk: number;
-  amountByCVSS: number;
-  variant: "high" | "medium" | "low" | "critical";
-}) => {
-  return (
-    <div className="flex flex-row items-center gap-2">
-      <div className="my-2">
-        <span
-          className={classNames(
-            "whitespace-nowrap rounded-lg bg-secondary px-2 text-4xl font-bold",
-            //variantColors[variant],
-          )}
-        >
-          {amountByRisk ?? 0}
-        </span>
-      </div>
-
-      <div className={classNames("text-xs text-muted-foreground")}>
-        <span>By Risk. By CVSS you would have</span>
-        <span className={classNames("inline px-1 font-bold")}>
-          {amountByCVSS ?? 0}
-        </span>
-        {variant} severity vulnerabilities
-      </div>
-    </div>
-  );
-};
 interface Props {
-  amountByRisk: number;
-  amountByCVSS: number;
+  currentAmount: number;
   queryIntervalStart: number;
   queryIntervalEnd: number;
   variant: "high" | "medium" | "low" | "critical";
+  mode?: "risk" | "cvss";
 }
 
 const SeverityCard: FunctionComponent<Props> = ({
-  amountByRisk,
-  amountByCVSS,
+  currentAmount,
   variant,
   queryIntervalStart,
   queryIntervalEnd,
+  mode = "risk",
 }) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -116,17 +84,7 @@ const SeverityCard: FunctionComponent<Props> = ({
       <CardHeader className="pb-2">
         <CardTitle className="flex flex-row items-start justify-between">
           <span>
-            <span className="text-5xl">{amountByRisk}</span>
-            <Tooltip>
-              <TooltipTrigger>
-                <span className="text-muted-foreground ml-2">
-                  ({amountByCVSS})
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                {amountByCVSS} {variant} severity vulnerabilities by CVSS.
-              </TooltipContent>
-            </Tooltip>
+            <span className="text-5xl">{currentAmount}</span>
           </span>
           {asset && (
             <Link
@@ -140,7 +98,9 @@ const SeverityCard: FunctionComponent<Props> = ({
             </Link>
           )}
         </CardTitle>
-        <CardDescription>Amount of vulnerabilities by Risk</CardDescription>
+        <CardDescription>
+          Amount of vulnerabilities by {mode === "risk" ? "Risk" : "CVSS"}
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
