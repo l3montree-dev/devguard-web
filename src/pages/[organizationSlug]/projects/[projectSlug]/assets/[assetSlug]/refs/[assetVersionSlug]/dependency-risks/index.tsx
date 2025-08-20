@@ -358,14 +358,14 @@ const Index: FunctionComponent<Props> = (props) => {
                   ))}
                 </thead>
                 <tbody className="text-sm text-foreground">
-                  {/* {table.getRowModel().rows.map((row, i, arr) => (
+                  {table.getRowModel().rows.map((row, i, arr) => (
                     <RiskHandlingRow
                       row={row}
                       index={i}
                       arrLength={arr.length}
                       key={row.original.packageName}
                     />
-                  ))} */}
+                  ))}
                 </tbody>
               </table>
             </div>
