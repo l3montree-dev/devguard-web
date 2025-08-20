@@ -46,6 +46,7 @@ export function RiskHistoryDistributionDiagram({
       let low = 0;
       for (let i = 0; i < data.length; i++) {
         const h = data[i].history[idx];
+        if (!h) continue; // Skip if no data for this day
         if (mode === "risk") {
           critical += h.critical || 0;
           high += h.high || 0;
