@@ -50,6 +50,7 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
+import { OctagonAlertIcon } from "lucide-react";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -166,10 +167,14 @@ const Index: FunctionComponent<Props> = ({
                           {el.license.licenseId}
                         </span>
                         <div className="flex flex-row flex-wrap gap-2">
-                          {el.license.isOsiApproved && (
+                          {el.license.isOsiApproved ? (
                             <Badge variant={"secondary"}>
                               <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
                               OSI Approved
+                            </Badge>
+                          ) : (
+                            <Badge variant={"secondary"}>
+                              <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
                             </Badge>
                           )}
                         </div>

@@ -541,6 +541,16 @@ export interface RiskHistory {
   maxClosedRisk: number;
   minClosedRisk: number;
 
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
+
   openVulns: number;
   fixedVulns: number;
 }

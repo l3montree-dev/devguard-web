@@ -46,11 +46,11 @@ export function VulnerableComponents({ data }: { data: ComponentRisk }) {
                   : i === arr.length - 1
                     ? "pt-4"
                     : "border-b py-4",
-                "flex flex-row gap-4",
+                "flex flex-row items-center gap-4",
               )}
             >
-              <div className="border border-foreground/20 rounded-lg bg-muted flex items-center justify-center w-11 h-11">
-                <EcosystemImage size={30} packageName={item.componentName} />
+              <div className="border border-foreground/20 rounded-lg bg-muted flex items-center justify-center w-8 h-8">
+                <EcosystemImage size={24} packageName={item.componentName} />
               </div>
               <div>
                 <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">

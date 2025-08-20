@@ -53,6 +53,13 @@ import DependencyRiskScannerDialog from "../../../../../../../../../components/R
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../../../../../../../components/ui/dropdown-menu";
+import Link from "next/link";
 
 interface Props {
   apiUrl: string;
@@ -219,6 +226,31 @@ const Index: FunctionComponent<Props> = (props) => {
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"secondary"}>Download VeX</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.json`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
+              </Link>
+              <Link
+                download
+                target="_blank"
+                prefetch={false}
+                href={pathname + `/../vex.xml`}
+                className="!text-foreground hover:no-underline"
+              >
+                <DropdownMenuItem>XML-Format</DropdownMenuItem>
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Risks

@@ -68,6 +68,16 @@ export function padRiskHistory<T extends RiskHistoryEl>(
           fixedVulns: 0,
           minClosedRisk: 0,
           minOpenRisk: 0,
+
+          low: 0,
+          medium: 0,
+          high: 0,
+          critical: 0,
+
+          lowCvss: 0,
+          mediumCvss: 0,
+          highCvss: 0,
+          criticalCvss: 0,
         },
         ...r.riskHistory,
       ];

@@ -44,6 +44,7 @@ import Section from "../../../../components/common/Section";
 import { RiskHistoryChart } from "../../../../components/RiskHistoryDiagram";
 import SeverityCard from "../../../../components/SeverityCard";
 import { Button } from "../../../../components/ui/button";
+import CVERainbowBadge from "../../../../components/CVERainbowBadge";
 
 interface Props {
   project: ProjectDTO & {
@@ -196,53 +197,57 @@ const Index: FunctionComponent<Props> = ({
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-2">
-                {riskHistory.slice(0, 7).map((r, i, arr) => (
-                  <Link
-                    href={
-                      r.type === "project"
-                        ? "/" + activeOrg.slug + "/projects/" + r.slug
-                        : "/" +
-                          activeOrg.slug +
-                          "/projects/" +
-                          activeProject?.slug +
-                          "/assets/" +
-                          r.slug
-                    }
-                    key={r.slug}
-                    className={classNames(
-                      i === 0
-                        ? "border-b pb-4"
-                        : i === arr.length - 1
-                          ? "pt-4"
-                          : "border-b py-4",
-                      "flex items-center flex-row gap-4",
-                    )}
-                  >
-                    <Avatar name={r.label} avatar={r.avatar} />
+                {riskHistory.slice(0, 7).map((r, i, arr) => {
+                  const riskHistoryLastElement =
+                    r.history[r.history.length - 1];
+                  return (
+                    <Link
+                      href={
+                        r.type === "project"
+                          ? "/" + activeOrg.slug + "/projects/" + r.slug
+                          : "/" +
+                            activeOrg.slug +
+                            "/projects/" +
+                            activeProject?.slug +
+                            "/assets/" +
+                            r.slug
+                      }
+                      key={r.slug}
+                      className={classNames(
+                        i === 0
+                          ? "border-b pb-4"
+                          : i === arr.length - 1
+                            ? "pt-4"
+                            : "border-b py-4",
+                        "flex items-center flex-row gap-4",
+                      )}
+                    >
+                      <Avatar name={r.label} avatar={r.avatar} />
 
-                    <div>
-                      <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                        <span className="capitalize text-foreground">
-                          {beautifyPurl(r.label)}
-                        </span>
-                        <div className="flex flex-row flex-wrap gap-2">
-                          <Badge variant={"secondary"}>
-                            {r.history[
-                              r.history.length - 1
-                            ]?.sumOpenRisk.toFixed(2) ?? "0.00"}{" "}
-                            Risk
-                          </Badge>
+                      <div>
+                        <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                          <span className="capitalize text-foreground">
+                            {beautifyPurl(r.label)}
+                          </span>
+                          <div className="flex flex-row flex-wrap gap-2">
+                            <CVERainbowBadge
+                              low={riskHistoryLastElement?.low ?? 0}
+                              medium={riskHistoryLastElement?.medium ?? 0}
+                              high={riskHistoryLastElement?.high ?? 0}
+                              critical={riskHistoryLastElement?.critical ?? 0}
+                            />
+                          </div>
                         </div>
-                      </div>
 
-                      <p className="text-sm text-muted-foreground">
-                        {r.description
-                          ? r.description
-                          : "No description available"}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                        <p className="text-sm text-muted-foreground">
+                          {r.description
+                            ? r.description
+                            : "No description available"}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
               <div className="flex items-center gap-4"></div>
             </CardContent>
