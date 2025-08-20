@@ -120,7 +120,7 @@ const Index: FunctionComponent<Props> = ({
             <div className="grid grid-cols-4 gap-4">
               <SeverityCard
                 variant="critical"
-                queryIntervalStart={8}
+                queryIntervalStart={9}
                 queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"

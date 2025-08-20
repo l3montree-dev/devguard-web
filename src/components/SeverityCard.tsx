@@ -37,43 +37,28 @@ const SeverityCard: FunctionComponent<Props> = ({
 
   const applySQLFilter = (
     variant: Props["variant"],
-  ):
-    | {
-        "filterQuery[raw_risk_assessment][is less than]": string;
-      }
-    | {
-        "filterQuery[raw_risk_assessment][is less than]": string;
-        "filterQuery[raw_risk_assessment][is greater than]": string;
-      }
-    | {
-        "filterQuery[raw_risk_assessment][is greater than]": string;
-      } => {
+  ): { [key: string]: string } => {
+    const property = mode === "risk" ? "raw_risk_assessment" : "CVE.cvss";
+
     switch (variant) {
       case "low":
         return {
-          "filterQuery[raw_risk_assessment][is less than]":
-            queryIntervalEnd.toString(),
-        };
-
-      case "medium":
-        return {
-          "filterQuery[raw_risk_assessment][is greater than]":
-            queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]":
+          [`filterQuery[${property}][is less than]`]:
             queryIntervalEnd.toString(),
         };
 
       case "high":
+      case "medium":
         return {
-          "filterQuery[raw_risk_assessment][is greater than]":
-            queryIntervalStart.toString(),
-          "filterQuery[raw_risk_assessment][is less than]":
+          [`filterQuery[${property}][is less than]`]:
             queryIntervalEnd.toString(),
+          [`filterQuery[${property}][is greater than]`]:
+            queryIntervalStart.toString(),
         };
 
       case "critical":
         return {
-          "filterQuery[raw_risk_assessment][is greater than]":
+          [`filterQuery[${property}][is greater than]`]:
             queryIntervalStart.toString(),
         };
     }
