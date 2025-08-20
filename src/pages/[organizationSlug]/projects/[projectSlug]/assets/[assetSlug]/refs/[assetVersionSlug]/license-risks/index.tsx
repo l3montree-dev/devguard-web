@@ -53,6 +53,7 @@ import DependencyRiskScannerDialog from "../../../../../../../../../components/R
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
 
 interface Props {
   apiUrl: string;
@@ -302,26 +303,12 @@ const Index: FunctionComponent<Props> = (props) => {
                 </thead>
                 <tbody className="text-sm text-foreground">
                   {table.getRowModel().rows.map((row, i, arr) => (
-                    <tr
-                      key={row.original.packageName}
-                      onClick={() =>
-                        console.log("row clicked:", row.original.packageName)
-                      }
-                      className={classNames(
-                        "relative cursor-pointer align-top transition-all",
-                        i === arr.length - 1 ? "" : "border-b",
-                        i % 2 !== 0 && "bg-card/50",
-                        "hover:bg-gray-50 dark:hover:bg-card",
-                      )}
-                    >
-                      <td className="py-4 text-center align-baseline"></td>
-                      <td className="p-4">{row.original.scannerID}</td>
-                      <td className="p-4">{row.original.licenseName}</td>
-                      <td className="p-4">{row.original.packageName}</td>
-                      <td className="p-4">
-                        {row.original.finalLicenseDecision}
-                      </td>
-                    </tr>
+                    <LicenseRiskRow
+                      key={row.original.scannerID}
+                      risk={row.original}
+                      index={i}
+                      arrLength={arr.length}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -449,8 +436,6 @@ export const getServerSideProps = middleware(
       page: 0,
       pageSize: 0,
     };
-
-    console.log(licenseMockPaged);
 
     return {
       props: {
