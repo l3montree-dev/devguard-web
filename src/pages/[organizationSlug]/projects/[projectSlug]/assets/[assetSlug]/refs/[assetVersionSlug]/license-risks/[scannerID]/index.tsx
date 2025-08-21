@@ -56,7 +56,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@radix-ui/react-tooltip";
+} from "@/components/ui/tooltip";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),

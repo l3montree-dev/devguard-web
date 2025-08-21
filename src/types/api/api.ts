@@ -250,6 +250,10 @@ export interface TicketClosedEventDTO extends BaseVulnEventDTO {
   type: "ticketClosed";
 }
 
+export interface LicenseRiskDTO extends BaseVulnEventDTO {
+  type: "licenseRisk";
+}
+
 export interface TickedDeletedEventDTO extends BaseVulnEventDTO {
   type: "ticketDeleted";
 }
@@ -328,7 +332,8 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
   | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO;
+  | DetectedOnAnotherBranchEventDTO
+  | LicenseRiskDTO;
 
 export interface CWE {
   cwe: string;
