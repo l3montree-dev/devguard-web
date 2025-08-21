@@ -5,17 +5,14 @@ import { withAsset } from "@/decorators/withAsset";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
+
 import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
-import {
-  DetailedDependencyVulnDTO,
-  DetailedFirstPartyVulnDTO,
+  DetailedLicenseRiskDTO,
+  LicenseRiskDTO,
   VulnEventDTO,
 } from "@/types/api/api";
-import Image from "next/image";
 
+import Image from "next/image";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -25,7 +22,6 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { FunctionComponent, useEffect, useState } from "react";
-import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,7 +32,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { withOrganization } from "@/decorators/withOrganization";
-
 import AssetTitle from "@/components/common/AssetTitle";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
@@ -46,12 +41,22 @@ import {
 } from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import CopyCode from "../../../../../../../../../../components/common/CopyCode";
 import VulnState from "../../../../../../../../../../components/common/VulnState";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import { Combobox } from "@/components/common/Combobox";
 import { licenses } from "@/utils/common";
+import { Check, ListRestart, Loader2, OctagonAlert } from "lucide-react";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "@/services/devGuardApi";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -61,24 +66,21 @@ const MarkdownEditor = dynamic(
 );
 
 interface Props {
-  vuln: DetailedFirstPartyVulnDTO;
+  vuln: DetailedLicenseRiskDTO;
 }
 
-const highlightRegex = new RegExp(/\+\+\+(.+)\+\+\+/, "gms");
-
 const Index: FunctionComponent<Props> = (props) => {
-  const [vuln, setVuln] = useState<DetailedFirstPartyVulnDTO>(props.vuln);
+  const [vuln, setVuln] = useState<DetailedLicenseRiskDTO>(props.vuln);
   useEffect(() => {
     setVuln(props.vuln);
   }, [props.vuln]);
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
-
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
-
   const assetVersion = useActiveAssetVersion();
+
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
@@ -87,6 +89,7 @@ const Index: FunctionComponent<Props> = (props) => {
     status?: VulnEventDTO["type"];
     justification?: string;
     mechanicalJustification?: string;
+    mitigatedLicense?: string;
   }) => {
     if (data.status === undefined) {
       return;
@@ -98,20 +101,11 @@ const Index: FunctionComponent<Props> = (props) => {
       });
     }
 
-    let json: any;
+    let json: DetailedLicenseRiskDTO;
+
     if (data.status === "mitigate") {
       const resp = await browserApiClient(
-        "/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset.slug +
-          "/refs/" +
-          assetVersion?.slug +
-          "/first-party-vulns/" +
-          vuln.id +
-          "/mitigate",
+        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.licenseRisk.id}/mitigate`,
         {
           method: "POST",
           headers: {
@@ -131,21 +125,25 @@ const Index: FunctionComponent<Props> = (props) => {
           asset.slug +
           "/refs/" +
           assetVersion?.slug +
-          "/first-party-vulns/" +
-          vuln.id,
+          "/license-risks/" +
+          vuln.licenseRisk.id,
+
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: data.status,
+            justification: data.justification,
+            mechanicalJustification: data.mechanicalJustification,
+            mitigatedLicense: data.mitigatedLicense,
+          }),
         },
       );
       json = await resp.json();
     }
 
-    if (!json.events) {
-      return toast("Failed to update vulnerability", {
+    if (!json?.events) {
+      return toast("Failed to update license risk", {
         description: "Please try again later.",
       });
     }
@@ -156,12 +154,35 @@ const Index: FunctionComponent<Props> = (props) => {
       events: prev.events.concat([
         {
           ...json.events.slice(-1)[0],
-          assetVersionName: assetVersion?.name,
         },
       ]),
     }));
     setJustification("");
   };
+
+  const isOpen =
+    (vuln.licenseRisk.finalLicenseDecision ?? "open").toLowerCase() === "open";
+
+  const [updatedLicense, setUpdatedLicense] = useState<string>(
+    vuln.licenseRisk.licenseName,
+  );
+
+  // const handleLicenseSelect = async (value: string) => {
+  //   setIsUpdatingLicense(true);
+  //   const req = await browserApiClient(
+  //     `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.licenseRisk.id}/final-license-decision`,
+  //     {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ license: value }),
+  //     },
+  //   );
+  //   if (!req.ok) {
+  //     toast("License did not updated");
+  //   } else {
+  //     toast("License updated");
+  //   }
+  // };
 
   return (
     <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
@@ -169,41 +190,26 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">
-                {emptyThenNull(vuln.ruleName) ??
-                  emptyThenNull(vuln.ruleId) ??
-                  "License Details"}
-              </h1>
-              {/* <div className="mt-4 text-muted-foreground">
-                <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
-              </div> */}
+              <h1 className="text-2xl font-semibold">License Details</h1>
+
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
-                {vuln.ticketUrl && (
-                  <Link href={vuln.ticketUrl} target="_blank">
+                {vuln.licenseRisk.ticketUrl && (
+                  <Link href={vuln.licenseRisk.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
-                      {vuln.ticketId?.startsWith("github:") ? (
-                        <Image
-                          src="/assets/github.svg"
-                          alt="GitHub Logo"
-                          className="-ml-1 mr-2 dark:invert"
-                          width={15}
-                          height={15}
+                      <div className="mr-2">
+                        <GitProviderIcon
+                          externalEntityProviderIdOrRepositoryId={
+                            asset.externalEntityProviderId ??
+                            asset.repositoryId ??
+                            "gitlab"
+                          }
                         />
-                      ) : (
-                        <div className="mr-2">
-                          <GitProviderIcon
-                            externalEntityProviderIdOrRepositoryId={
-                              asset.externalEntityProviderId ??
-                              asset.repositoryId ??
-                              "gitlab"
-                            }
-                          />
-                        </div>
-                      )}
-                      <span>{vuln.ticketUrl}</span>
+                      </div>
+                      <span>{vuln.licenseRisk.ticketUrl}</span>
                     </Badge>
                   </Link>
                 )}
+
                 <VulnState state={"licenseRisk"} />
 
                 <div className="flex flex-row gap-2">
@@ -214,44 +220,47 @@ const Index: FunctionComponent<Props> = (props) => {
                   ))} */}
                 </div>
               </div>
+
               <Card className="mt-4">
                 <CardHeader>
-                  <CardTitle>Mitigate your License</CardTitle>
+                  <div className="flex flex-row items-center">
+                    <CardTitle>Mitigate your License</CardTitle>
+                    <ListRestart className="ml-2" />
+                  </div>
                 </CardHeader>
                 <div className="m-4">
                   <Combobox
-                    onSelect={function (value: string): void {
-                      throw new Error("Function not implemented.");
-                    }}
+                    onSelect={setUpdatedLicense}
                     items={licenses}
-                    placeholder={"d"}
-                    emptyMessage={"balablalb"}
+                    placeholder={updatedLicense}
+                    emptyMessage={"No results"}
                   />
                 </div>
               </Card>
 
               <div className="mt-16">
-                {/* <RiskAssessmentFeed
+                <RiskAssessmentFeed
                   vulnerabilityName={
-                    emptyThenNull(vuln.ruleName) ??
-                    emptyThenNull(vuln.ruleId) ??
+                    emptyThenNull(vuln.licenseRisk.componentPurl) ??
+                    emptyThenNull(vuln.licenseRisk.assetVersionName) ??
                     ""
                   }
                   events={vuln.events}
-                /> */}
+                />
               </div>
+
               <div>
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {vuln.state === "open"
+                      {vuln.licenseRisk.finalLicenseDecision === "open"
                         ? "Add a comment"
                         : "Reopen this vulnerability"}
                     </CardTitle>
                     <CardDescription></CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {vuln.state === "open" ? (
+                    {isOpen ? (
                       <form
                         className="flex flex-col gap-4"
                         onSubmit={(e) => e.preventDefault()}
@@ -269,7 +278,7 @@ const Index: FunctionComponent<Props> = (props) => {
 
                         <div className="flex flex-row justify-end gap-1">
                           <div className="flex flex-row items-start gap-2">
-                            {vuln.ticketId === null &&
+                            {!vuln.licenseRisk.ticketId &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
                                 project,
@@ -280,6 +289,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
+                                      mitigatedLicense: updatedLicense,
                                     })
                                   }
                                 >
@@ -297,7 +307,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </AsyncButton>
                               )}
 
-                            {vuln.ticketId === null &&
+                            {!vuln.licenseRisk.ticketId &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
                                 project,
@@ -308,6 +318,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
+                                      mitigatedLicense: updatedLicense,
                                     })
                                   }
                                 >
@@ -326,7 +337,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 </AsyncButton>
                               )}
 
-                            {vuln.ticketId === null &&
+                            {!vuln.licenseRisk.ticketId &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
                                 project,
@@ -337,6 +348,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                     handleSubmit({
                                       status: "mitigate",
                                       justification,
+                                      mitigatedLicense: updatedLicense,
                                     })
                                   }
                                 >
@@ -360,6 +372,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 handleSubmit({
                                   status: "accepted",
                                   justification,
+                                  mitigatedLicense: updatedLicense,
                                 })
                               }
                               variant={"secondary"}
@@ -367,21 +380,13 @@ const Index: FunctionComponent<Props> = (props) => {
                               Accept risk
                             </AsyncButton>
                             <AsyncButton
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "falsePositive",
-                                  justification,
-                                })
-                              }
-                              variant={"secondary"}
-                            >
-                              False Positive
-                            </AsyncButton>
-                            <AsyncButton
+                              // disabled={isUpdatingLicense === false}
+                              // onMouseOver={() => toast("burr")}
                               onClick={() =>
                                 handleSubmit({
                                   status: "comment",
                                   justification,
+                                  mitigatedLicense: updatedLicense,
                                 })
                               }
                               variant={"default"}
@@ -394,9 +399,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     ) : (
                       <form
                         className="flex flex-col gap-4"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                        }}
+                        onSubmit={(e) => e.preventDefault()}
                       >
                         <div>
                           <label className="mb-2 block text-sm font-semibold">
@@ -410,8 +413,8 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <p className="text-sm text-muted-foreground">
-                          You can reopen this vuln, if you plan to mitigate the
-                          risk now, or accepted this vuln by accident.
+                          You can reopen this license risk if you plan to
+                          mitigate it now, or accepted it by accident.
                         </p>
                         <div className="flex flex-row justify-end">
                           <AsyncButton
@@ -419,6 +422,7 @@ const Index: FunctionComponent<Props> = (props) => {
                               handleSubmit({
                                 status: "reopened",
                                 justification,
+                                mitigatedLicense: updatedLicense,
                               })
                             }
                             variant={"secondary"}
@@ -429,11 +433,11 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
                       </form>
                     )}
-                    {vuln.ticketUrl && (
+                    {vuln.licenseRisk.ticketUrl && (
                       <small className="mt-2 block w-full text-right text-muted-foreground">
                         Comment will be synced with{" "}
-                        <Link href={vuln.ticketUrl} target="_blank">
-                          {vuln.ticketUrl}
+                        <Link href={vuln.licenseRisk.ticketUrl} target="_blank">
+                          {vuln.licenseRisk.ticketUrl}
                         </Link>
                       </small>
                     )}
@@ -441,28 +445,55 @@ const Index: FunctionComponent<Props> = (props) => {
                 </Card>
               </div>
             </div>
+
             <div className="col-span-1">
-              <h3 className="mb-2 text-lg font-semibold">License Details</h3>
+              <h3 className="mb-2 text-lg font-semibold">Package Details</h3>
               <div className="text-sm text-muted-foreground">
-                licenseName is not found in OSI Licenses{" "}
+                {`Package: ${vuln.licenseRisk.componentPurl}`}
+                <br />
+                <div className="flex flex-row items-center">
+                  {`License: ${updatedLicense ?? "unknown"}`}
+
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div>
+                        {updatedLicense === vuln.licenseRisk.licenseName ? (
+                          <OctagonAlert className="text-primary w-4 ml-2" />
+                        ) : updatedLicense !== vuln.licenseRisk.licenseName ? (
+                          <Loader2 className="size-4 animate-spin ml-2" />
+                        ) : (
+                          <Check className="size-4 text-green-500" />
+                        )}
+                      </div>
+
+                      {/* <OctagonAlert className="text-primary w-4 ml-2" /> */}
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      Make sure to check this license, it could be a risk
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+              <h3 className="mb-2 mt-4 text-lg font-semibold">Explanation</h3>
+              <div className="text-sm text-muted-foreground">
+                Your License is unknown and might create a compliance risk,
+                please review this license to avoid any license violations.
+              </div>
+              <div className="flex flex-row items-center mt-2">
+                <Image
+                  alt="OSI Logo"
+                  src="/assets/osi-keyhole.svg"
+                  width={24}
+                  height={24}
+                  className="mr-2"
+                ></Image>
                 <a
-                  href={`https://opensource.org/licenses/`}
+                  href="https://opensource.org/licenses/"
                   target="_blank"
                   className="text-sm font-semibold !text-muted-foreground underline"
                 >
-                  Open Source License
-                </a>{" "}
-                Mitigate your License
-                <Markdown>{vuln.ruleDescription}</Markdown>
-                {vuln.ruleHelpUri && (
-                  <Link
-                    href={vuln.ruleHelpUri}
-                    target="_blank"
-                    className="mt-2 inline-block text-sm text-muted-foreground"
-                  >
-                    {vuln.ruleHelpUri}
-                  </Link>
-                )}
+                  Open Source Licenses
+                </a>
               </div>
             </div>
           </div>
@@ -471,6 +502,8 @@ const Index: FunctionComponent<Props> = (props) => {
     </Page>
   );
 };
+
+export default Index;
 
 export const getServerSideProps = middleware(
   async (context: GetServerSidePropsContext, { assetVersion }) => {
@@ -497,45 +530,32 @@ export const getServerSideProps = middleware(
       "/first-party-vulns/" +
       scannerID;
 
-    const [resp]: [DetailedDependencyVulnDTO] = await Promise.all([
+    const [resp]: [LicenseRiskDTO] = await Promise.all([
       apiClient(uri).then((r) => r.json()),
     ]);
 
-    const mockup = {
-      id: "idk",
-      scannerID: "2",
-      message: "idk",
-      assetVersionName: "burr",
-      assetID: "assetID",
-      state: "state",
-      createdAt: "createdAt",
-      ticketID: "ticketID",
-      ticketURL: "ticketURL",
-      manualTicektCreation: true,
-      finalLicenseDecision: "we good",
-      componentPurl: "componentPurl",
+    const licenseRiskApiMocks: LicenseRiskDTO = {
+      id: "lr-1",
+      assetId: "asset-frontend-42",
+      assetVersionName: "web-frontend@1.4.3",
+      componentPurl: "pkg:npm/lodash@4.17.21",
+      licenseName: "unknown",
+      scannerIds: "scanner-ossindex,scanner-snyk",
+      finalLicenseDecision: "open",
+      createdAt: "2025-08-16T10:15:00Z",
+      manualTicketCreation: false,
+    };
+
+    const detail: DetailedLicenseRiskDTO = {
+      licenseRisk: licenseRiskApiMocks,
+      events: [],
     };
 
     return {
       props: {
-        vuln: mockup,
+        vuln: detail,
       },
     };
-
-    // This is what the Backend is returning when sending specific data
-    // ID                   string           `json:"id"`
-    // ScannerIDs           string           `json:"scannerIds"`
-    // Message              *string          `json:"message"`
-    // AssetVersionName     string           `json:"assetVersionName"`
-    // AssetID              string           `json:"assetId"`
-    // State                models.VulnState `json:"state"`
-    // CreatedAt            time.Time        `json:"createdAt"`
-    // TicketID             *string          `json:"ticketId"`
-    // TicketURL            *string          `json:"ticketUrl"`
-    // ManualTicketCreation bool             `json:"manualTicketCreation"`
-
-    // FinalLicenseDecision string `json:"finalLicenseDecision"`
-    // ComponentPurl        string `json:"componentPurl"`
   },
   {
     session: withSession,
@@ -547,5 +567,3 @@ export const getServerSideProps = middleware(
     assetVersion: withAssetVersion,
   },
 );
-
-export default Index;

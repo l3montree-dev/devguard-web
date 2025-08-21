@@ -5,7 +5,7 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnWithCVE, licenseRisk } from "@/types/api/api";
+import { Paged, VulnWithCVE, LicenseRiskRowDTO } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -57,11 +57,11 @@ import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
 
 interface Props {
   apiUrl: string;
-  vulns: Paged<licenseRisk>;
+  vulns: Paged<LicenseRiskRowDTO>;
   artifacts: any[];
 }
 
-const columnHelper = createColumnHelper<licenseRisk>();
+const columnHelper = createColumnHelper<LicenseRiskRowDTO>();
 
 const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   // order the vulns by fixedVersion
@@ -93,7 +93,7 @@ const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
   };
 };
 
-const columnsDef: ColumnDef<licenseRisk, any>[] = [
+const columnsDef: ColumnDef<LicenseRiskRowDTO, any>[] = [
   {
     ...columnHelper.accessor("packageName", {
       header: "Package",
@@ -347,6 +347,7 @@ export const getServerSideProps = middleware(
 
     const licenseRiskMocks = [
       {
+        id: "burr",
         packageName: "scanner-ossindex,scanner-snyk",
         licenseName: "web-frontend@1.4.3",
         assetId: "asset-frontend-42",
@@ -358,6 +359,7 @@ export const getServerSideProps = middleware(
       },
 
       {
+        id: "burr2",
         packageName: "scanner-ossindex,scanner-snyk",
         licenseName: "web-frontend@1.4.4",
         assetId: "asset-frontend-42",
@@ -368,6 +370,7 @@ export const getServerSideProps = middleware(
         scannerID: "idk2",
       },
       {
+        id: "bur3",
         packageName: "scanner-ossindex,scanner-snyk",
         licenseName: "web-frontend@1.4.5",
         assetId: "asset-frontend-42",
@@ -430,7 +433,7 @@ export const getServerSideProps = middleware(
       artifactsData = await artifactsResp.json();
     }
 
-    const licenseMockPaged: Paged<licenseRisk> = {
+    const licenseMockPaged: Paged<LicenseRiskRowDTO> = {
       data: licenseRiskMocks,
       total: 0,
       page: 0,

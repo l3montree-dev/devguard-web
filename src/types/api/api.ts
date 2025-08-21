@@ -578,7 +578,27 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface licenseRisk {
+export interface LicenseRiskDTO {
+  id: string;
+  assetId: string;
+  assetVersionName: string;
+  componentPurl: string;
+  licenseName: string;
+  scannerIds: string;
+  finalLicenseDecision: string;
+  createdAt: string;
+  ticketId?: string | null;
+  ticketUrl?: string | null;
+  manualTicketCreation?: boolean;
+}
+
+export interface DetailedLicenseRiskDTO {
+  licenseRisk: LicenseRiskDTO;
+  events: VulnEventDTO[];
+}
+
+export interface LicenseRiskRowDTO {
+  id: string;
   packageName: string;
   licenseName: string;
   scannerID: string;
