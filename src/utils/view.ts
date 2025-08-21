@@ -148,6 +148,7 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   addedScanner: "bg-secondary",
   removedScanner: "bg-secondary",
   detectedOnAnotherBranch: "bg-secondary",
+  licenseRisk: "bg-yellow-500",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

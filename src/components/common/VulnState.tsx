@@ -55,20 +55,6 @@ const VulnState: FunctionComponent<{ state: VulnDTO["state"] }> = ({
         </Badge>
       );
 
-    case "licenseRisk":
-      return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            defaultClasses,
-            "bg-secondary text-secondary-foreground",
-          )}
-        >
-          <Scale className="-ml-1 inline-block h-4 w-4" />
-          License Risk
-        </Badge>
-      );
-
     case "open":
     default:
       return (

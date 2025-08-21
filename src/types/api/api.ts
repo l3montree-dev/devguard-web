@@ -191,13 +191,7 @@ export interface BaseVulnDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
-  state:
-    | "open"
-    | "fixed"
-    | "accepted"
-    | "falsePositive"
-    | "markedForTransfer"
-    | "licenseRisk";
+  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
   priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
@@ -334,7 +328,8 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
   | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO;
+  | DetectedOnAnotherBranchEventDTO
+  | LicenseRiskDTO;
 
 export interface CWE {
   cwe: string;
@@ -578,7 +573,7 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface LicenseRiskDTO {
+export interface LicenseRiskDTO extends BaseVulnEventDTO {
   id: string;
   assetId: string;
   assetVersionName: string;
@@ -590,6 +585,8 @@ export interface LicenseRiskDTO {
   ticketId?: string | null;
   ticketUrl?: string | null;
   manualTicketCreation?: boolean;
+  vulns?: VulnWithCVE[];
+  type: "licenseRisk";
 }
 
 export interface DetailedLicenseRiskDTO {

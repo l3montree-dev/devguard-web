@@ -210,14 +210,14 @@ const Index: FunctionComponent<Props> = (props) => {
                   </Link>
                 )}
 
-                <VulnState state={"licenseRisk"} />
+                <VulnState state={"open"} />
 
                 <div className="flex flex-row gap-2">
-                  {/* {vuln.scannerIds.split(" ").map((s) => (
+                  {vuln.licenseRisk.scannerIds.split(" ").map((s) => (
                     <Badge key={s} variant={"secondary"}>
                       {s}
                     </Badge>
-                  ))} */}
+                  ))}
                 </div>
               </div>
 
@@ -544,6 +544,16 @@ export const getServerSideProps = middleware(
       finalLicenseDecision: "open",
       createdAt: "2025-08-16T10:15:00Z",
       manualTicketCreation: false,
+      type: "licenseRisk",
+      userId: "",
+      vulnId: "",
+      vulnType: "dependencyVuln",
+      justification: "",
+      mechanicalJustification: "",
+      vulnerabilityName: null,
+      arbitraryJSONData: { scannerIds: "bal" },
+      packageName: null,
+      uri: null,
     };
 
     const detail: DetailedLicenseRiskDTO = {
