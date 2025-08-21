@@ -544,21 +544,31 @@ export const getServerSideProps = middleware(
       finalLicenseDecision: "open",
       createdAt: "2025-08-16T10:15:00Z",
       manualTicketCreation: false,
-      type: "licenseRisk",
-      userId: "",
-      vulnId: "",
-      vulnType: "dependencyVuln",
-      justification: "",
-      mechanicalJustification: "",
-      vulnerabilityName: null,
-      arbitraryJSONData: { scannerIds: "bal" },
-      packageName: null,
-      uri: null,
     };
 
     const detail: DetailedLicenseRiskDTO = {
       licenseRisk: licenseRiskApiMocks,
-      events: [],
+      events: [
+        {
+          userId: "string",
+          createdAt: "string",
+          id: "string",
+          vulnId: "string",
+          vulnType: "dependencyVuln",
+          justification: "string",
+          mechanicalJustification: "string",
+          vulnerabilityName: "string",
+          assetVersionName: "string",
+          arbitraryJSONData: {
+            scannerIds: "bal",
+            ticketUrl: "string",
+            ticketId: "string",
+          },
+          packageName: "string",
+          uri: "string",
+          type: "mitigate",
+        },
+      ],
     };
 
     return {

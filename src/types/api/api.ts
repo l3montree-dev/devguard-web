@@ -328,8 +328,7 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
   | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO
-  | LicenseRiskDTO;
+  | DetectedOnAnotherBranchEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -573,7 +572,7 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface LicenseRiskDTO extends BaseVulnEventDTO {
+export interface LicenseRiskDTO {
   id: string;
   assetId: string;
   assetVersionName: string;
@@ -586,7 +585,6 @@ export interface LicenseRiskDTO extends BaseVulnEventDTO {
   ticketUrl?: string | null;
   manualTicketCreation?: boolean;
   vulns?: VulnWithCVE[];
-  type: "licenseRisk";
 }
 
 export interface DetailedLicenseRiskDTO {

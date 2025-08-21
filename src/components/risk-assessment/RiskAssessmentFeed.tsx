@@ -77,8 +77,8 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
       return <ChatBubbleOvalLeftEllipsisIcon className="h-4 w-4" />;
     case "detectedOnAnotherBranch":
       return <GitBranchIcon className="h-3.5 w-3.5" />;
-    case "licenseRisk":
-      return <Scale className="h-4 w-4" />;
+    // case "licenseRisk":
+    //   return <Scale className="h-4 w-4" />;
   }
 }
 
