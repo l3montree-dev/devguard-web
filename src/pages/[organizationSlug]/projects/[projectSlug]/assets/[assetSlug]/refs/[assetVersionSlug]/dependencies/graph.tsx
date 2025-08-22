@@ -312,7 +312,7 @@ export const getServerSideProps = middleware(
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/dependency-vulns/artifacts/",
+        "/artifacts/",
     );
 
     if (artifactsResp.ok) {

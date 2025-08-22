@@ -198,7 +198,12 @@ export interface BaseVulnDTO {
   ticketUrl: string | null;
   assetId: string;
   assetVersionName: string;
-  scannerIds: string;
+  scannerIds: string; // space separated list of scanner ids
+  artifacts: Array<{
+    artifactName: string;
+    assetId: string;
+    assetVersionName: string;
+  }>;
 }
 export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;

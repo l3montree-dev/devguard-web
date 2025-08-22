@@ -463,7 +463,10 @@ export const getServerSideProps = middleware(
 
     const artifact = context.query.artifact;
     if (artifact) {
-      query.append("filterQuery[scanner_ids][any]", artifact as string);
+      query.append(
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
 
     // check for page and page size query params
@@ -482,7 +485,7 @@ export const getServerSideProps = middleware(
 
     let artifactsData: string[] = [];
     const artifactsResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/dependency-vulns/artifacts/",
+      uri + "refs/" + assetVersionSlug + "/artifacts/",
     );
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();

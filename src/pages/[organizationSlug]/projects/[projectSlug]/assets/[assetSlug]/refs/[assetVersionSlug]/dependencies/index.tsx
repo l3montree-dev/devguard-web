@@ -712,6 +712,8 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
+    console.log("Fetching components for asset:");
+
     const url =
       "/organizations/" +
       organizationSlug +
@@ -727,9 +729,11 @@ export const getServerSideProps = middleware(
 
     const artifact = context.query.artifact;
     if (artifact) {
-      params.append("filterQuery[scanner_ids][any]", artifact as string);
+      params.append(
+        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
-
     const [components, licenses] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
@@ -738,6 +742,9 @@ export const getServerSideProps = middleware(
         (r) => r.json() as Promise<LicenseResponse[]>,
       ),
     ]);
+
+    console.log("Fetched components:", components);
+    console.log("Fetched licenses:", licenses);
 
     const licenseMap = licenses.reduce(
       (acc, curr) => ({
@@ -766,7 +773,7 @@ export const getServerSideProps = middleware(
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/dependency-vulns/artifacts/",
+        "/artifacts/",
     );
 
     if (artifactsResp.ok) {
