@@ -1,6 +1,6 @@
 import { classNames } from "../../utils/common";
 
-export const getClassNames = (severity: string, gray: boolean) => {
+export const getSeverityClassNames = (severity: string, gray: boolean) => {
   if (gray) {
     return "text-gray-700 bg-gray-500/20 dark:text-gray-200";
   } else
@@ -45,7 +45,7 @@ export const riskToSeverity = (risk: number) => {
 };
 
 const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
-  const cls = getClassNames(riskToSeverity(risk), Boolean(gray));
+  const cls = getSeverityClassNames(riskToSeverity(risk), Boolean(gray));
 
   return (
     <span

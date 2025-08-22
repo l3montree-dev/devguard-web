@@ -1,7 +1,7 @@
 import Page from "@/components/Page";
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
-import { Button } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { config } from "@/config";
 import { middleware } from "@/decorators/middleware";
@@ -250,7 +250,14 @@ const Index: FunctionComponent<Props> = ({
               }
             />
             <div className="mt-4 flex flex-row justify-end">
-              <Button>Update</Button>
+              <AsyncButton
+                type="button"
+                onClick={async () => {
+                  return await form.handleSubmit(handleUpdate)();
+                }}
+              >
+                Update
+              </AsyncButton>
             </div>
           </form>
         </Form>

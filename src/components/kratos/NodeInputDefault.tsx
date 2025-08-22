@@ -39,8 +39,6 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
   const labelText =
     node.meta.label?.text === "ID" ? "E-Mail" : node.meta.label?.text;
 
-  console.log("Type:", attributes);
-
   // Render a generic text input field.
   return (
     <div className="relative grid w-full items-center gap-3">

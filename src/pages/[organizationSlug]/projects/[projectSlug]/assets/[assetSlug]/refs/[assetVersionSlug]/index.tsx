@@ -14,7 +14,8 @@ import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo } from "react";
+// ...existing code...
+import { FunctionComponent, useMemo, useState, useEffect } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -22,6 +23,7 @@ import Section from "@/components/common/Section";
 import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import { useViewMode } from "@/hooks/useViewMode";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -30,68 +32,65 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../../../../../components/ui/card";
-
 import {
-  CheckBadgeIcon,
-  ExclamationCircleIcon,
-  ScaleIcon,
-} from "@heroicons/react/24/outline";
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../../../../../../components/ui/tabs";
+
+import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
+import { VulnerableComponents } from "@/components/VulnerableComponents";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
-import ComplianceGrid from "../../../../../../../../components/ComplianceGrid";
+import { RiskHistoryDistributionDiagram } from "../../../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../../../../../../../components/ui/tooltip";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
+  AverageFixingTime,
+  ComponentRisk,
   LicenseResponse,
   Paged,
   PolicyEvaluation,
-  RiskDistribution,
+  RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import ColoredBadge from "../../../../../../../../components/common/ColoredBadge";
-import { TriangleAlert } from "lucide-react";
-import { violationLengthToLevel } from "../../../../../../../../utils/view";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
-  riskDistribution: RiskDistribution;
-  cvssDistribution: RiskDistribution;
+  componentRisk: ComponentRisk;
+  riskHistory: RiskHistory[];
+  avgLowFixingTime: AverageFixingTime;
+  avgMediumFixingTime: AverageFixingTime;
+  avgHighFixingTime: AverageFixingTime;
+  avgCriticalFixingTime: AverageFixingTime;
   licenses: Array<LicenseResponse>;
   events: Paged<VulnEventDTO>;
 }
 
 const Index: FunctionComponent<Props> = ({
-  compliance,
-  riskDistribution,
-  cvssDistribution,
+  componentRisk,
+  riskHistory,
+  avgLowFixingTime,
+  avgMediumFixingTime,
+  avgHighFixingTime,
+  avgCriticalFixingTime,
   licenses,
   events,
 }) => {
+  const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
+  const activeProject = useActiveProject();
+  const activeAsset = useActiveAsset();
   const assetMenu = useAssetMenu();
-  const project = useActiveProject();
-  const asset = useActiveAsset()!;
-
+  const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
 
-  const router = useRouter();
-
-  const failingControls = useMemo(
-    () => compliance.filter((policy) => policy.compliant !== true),
-    [compliance],
-  );
-
-  const totalDependencies = useMemo(
-    () => licenses.reduce((acc, license) => acc + license.count, 0),
-    [licenses],
-  );
+  const project = activeProject;
+  const asset = activeAsset;
 
   return (
     <Page
@@ -104,276 +103,210 @@ const Index: FunctionComponent<Props> = ({
       <Section
         primaryHeadline
         forceVertical
-        description="
-        Have a look at your secure software development lifecycle posture assessment and get an overview of the risks this specific repository poses to your organization."
+        description="Have a look at the overall health of your repository."
         title="Overview"
       >
-        <div className="grid grid-cols-8 gap-4">
-          <Card className="col-span-4 row-span-1">
-            <CardHeader>
-              <CardTitle>Security Posture</CardTitle>
-              <CardDescription>
-                The security posture of the repository is determined by the
-                compliance of the repository with the security policies of the
-                organization.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {failingControls.length > 0 ? (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"danger"}>
-                    <ExclamationCircleIcon className="-ml-2 h-8 w-8 text-red-500" />
-                    <span className="pl-2 text-base">
-                      {failingControls.length} controls are failing
-                    </span>
-                  </Badge>
-                </div>
-              ) : compliance.length === 0 ? (
-                <Badge variant={"outline"}>
-                  <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
-                  <span className="pl-2 text-base">
-                    No compliance rules are activated
-                  </span>
-                </Badge>
-              ) : (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
-                    <span className="pl-2 text-base">
-                      All Controls are passing
-                    </span>
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="col-span-4 row-span-2">
-            <CardHeader>
-              <CardTitle>To-Do&apos;s</CardTitle>
-              <CardDescription>
-                Tasks that need to be completed before the repository is ready
-                for production, ordered by priority.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {failingControls.length > 0 ? (
-                <div className="flex flex-col">
-                  {failingControls.slice(0, 3).map((policy, i, arr) => (
-                    <div
-                      className={
-                        i === 0
-                          ? "border-b pb-4"
-                          : i === arr.length - 1
-                            ? "pt-4"
-                            : "border-b py-4"
-                      }
-                      key={policy.id}
-                    >
+        <Tabs
+          value={mode}
+          onValueChange={(value) => setMode(value as "risk" | "cvss")}
+          className="w-full"
+        >
+          <div className="mb-4 flex">
+            <TabsList>
+              <TabsTrigger value="risk">Risk values</TabsTrigger>
+              <TabsTrigger value="cvss">CVSS values</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value={mode} className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              <SeverityCard
+                variant="critical"
+                queryIntervalStart={9}
+                queryIntervalEnd={10}
+                currentAmount={
+                  mode === "risk"
+                    ? (riskHistory[riskHistory.length - 1]?.critical ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.criticalCvss ?? 0)
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="high"
+                queryIntervalStart={7}
+                queryIntervalEnd={8}
+                currentAmount={
+                  mode === "risk"
+                    ? (riskHistory[riskHistory.length - 1]?.high ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.highCvss ?? 0)
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="medium"
+                queryIntervalStart={4}
+                queryIntervalEnd={7}
+                currentAmount={
+                  mode === "risk"
+                    ? (riskHistory[riskHistory.length - 1]?.medium ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.mediumCvss ?? 0)
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="low"
+                queryIntervalStart={0}
+                queryIntervalEnd={3}
+                currentAmount={
+                  mode === "risk"
+                    ? (riskHistory[riskHistory.length - 1]?.low ?? 0)
+                    : (riskHistory[riskHistory.length - 1]?.lowCvss ?? 0)
+                }
+                mode={mode}
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              <VulnerableComponents mode={mode} data={componentRisk} />
+              <div className="col-span-2 flex flex-col">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="relative w-full">
+                      Licenses
                       <Link
-                        className="!text-foreground"
-                        href={router.asPath + "/compliance/" + policy.id}
-                      >
-                        <div className="mb-2 flex flex-row items-center gap-2 text-sm font-semibold">
-                          {policy.title}
-                          {policy.compliant === null ? (
-                            <ColoredBadge variant="high">
-                              <TriangleAlert className="h-4 w-4 mr-1" />
-                              Could not evaluate control
-                            </ColoredBadge>
-                          ) : (
-                            <ColoredBadge
-                              variant={violationLengthToLevel(
-                                policy.violations?.length ?? 0,
-                              )}
-                            >
-                              {policy.violations?.length ?? 0} Violations
-                            </ColoredBadge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {policy.description}
-                        </p>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              ) : compliance.length === 0 ? (
-                <Badge variant={"outline"}>
-                  <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
-                  <span className="pl-2 text-base">
-                    No compliance rules are activated
-                  </span>
-                </Badge>
-              ) : (
-                <div className="flex flex-row items-center gap-2">
-                  <Badge variant={"success"}>
-                    <CheckBadgeIcon className="-ml-2 h-8 w-8 text-green-500" />
-                    <span className="pl-2 text-base">No tasks until ready</span>
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="col-span-4 row-span-1">
-            <CardHeader className="">
-              <CardTitle className="relative flex flex-row items-end gap-2">
-                <ScaleIcon className="h-6 w-6 text-muted-foreground" />
-                <div className="flex flex-row items-center gap-2">
-                  Compliance Controls
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <InformationCircleIcon className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <Link
-                        className="text-sm !text-muted-foreground"
                         href={
-                          "https://github.com/l3montree-dev/attestation-compliance-policies"
+                          asset
+                            ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`
+                            : "#"
                         }
+                        className="absolute right-0 top-0 text-xs !text-muted-foreground"
                       >
-                        Based on a community driven mapping between technical
-                        checks and compliance controls
+                        See all
                       </Link>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/compliance`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  Overview
-                </Link>
-              </CardTitle>
-              <CardDescription>
-                Displays the compliance of the repository with the security
-                policies of the repository.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ComplianceGrid compliance={compliance} />
-            </CardContent>
-          </Card>
-          <div className="col-span-4 grid grid-cols-2 gap-4">
-            <SeverityCard
-              variant="critical"
-              queryIntervalStart={8}
-              queryIntervalEnd={10}
-              amountByRisk={riskDistribution.critical}
-              amountByCVSS={cvssDistribution.critical}
-            />
-            <SeverityCard
-              variant="high"
-              queryIntervalStart={7}
-              queryIntervalEnd={8}
-              amountByRisk={riskDistribution.high}
-              amountByCVSS={cvssDistribution.high}
-            />
-            <SeverityCard
-              variant="medium"
-              queryIntervalStart={4}
-              queryIntervalEnd={7}
-              amountByRisk={riskDistribution.medium}
-              amountByCVSS={cvssDistribution.medium}
-            />
-            <SeverityCard
-              variant="low"
-              queryIntervalStart={0}
-              queryIntervalEnd={3}
-              amountByRisk={riskDistribution.low}
-              amountByCVSS={cvssDistribution.low}
-            />
-          </div>
-          <div className="col-span-4 row-span-2 flex flex-col">
-            <Card>
-              <CardHeader>
-                <CardTitle className="relative w-full">
-                  Licenses
-                  <Link
-                    href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`}
-                    className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                  >
-                    See all
-                  </Link>
-                </CardTitle>
-                <CardDescription className="text-left">
-                  Displays the distribution of dependency licenses
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex  flex-col">
-                  {licenses.map((el, i, arr) => (
-                    <div
-                      className={
-                        i === 0
-                          ? "border-b pb-4"
-                          : i === arr.length - 1
-                            ? "pt-4"
-                            : "border-b py-4"
-                      }
-                      key={el.license.licenseId}
-                    >
-                      <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                        <span className="capitalize">
-                          {el.license.licenseId}
-                        </span>
-                        <div className="flex flex-row flex-wrap gap-2">
-                          {el.license.isOsiApproved && (
-                            <Badge variant={"secondary"}>
-                              <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
-                              OSI Approved
-                            </Badge>
-                          )}
+                    </CardTitle>
+                    <CardDescription className="text-left">
+                      Displays the distribution of dependency licenses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex  flex-col">
+                      {licenses.slice(0, 5).map((el, i, arr) => (
+                        <div
+                          className={
+                            i === 0
+                              ? "border-b pb-4"
+                              : i === arr.length - 1
+                                ? "pt-4"
+                                : "border-b py-4"
+                          }
+                          key={el.license.licenseId}
+                        >
+                          <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                            <span className="capitalize">
+                              {el.license.licenseId}
+                            </span>
+                            <div className="flex flex-row flex-wrap gap-2">
+                              {el.license.isOsiApproved ? (
+                                <Badge variant={"secondary"}>
+                                  <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                                  OSI Approved
+                                </Badge>
+                              ) : (
+                                <Badge variant={"secondary"}>
+                                  <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {el.license.name
+                              ? el.license.name
+                              : "Unknown license information"}
+                            , {el.count} dependencies
+                          </p>
                         </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {el.license.name
-                          ? el.license.name
-                          : "Unknown license information"}
-                        , {el.count} dependencies
-                      </p>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <Card className="col-span-4 row-span-1 flex flex-col bg-transparent">
-            <CardHeader>
-              <CardTitle className="relative w-full">
-                Activity Stream
-                <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`}
-                  className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                >
-                  See all
-                </Link>
-              </CardTitle>
-              <CardDescription>
-                Displays the last events that happened on the repository.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <ul
-                  className="relative flex flex-col gap-10 pb-10 text-foreground"
-                  role="list"
-                >
-                  <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-                  {events.data.map((event, index, events) => {
-                    return (
-                      <VulnEventItem
-                        key={event.id}
-                        event={event}
-                        index={index}
-                        events={events}
-                      />
-                    );
-                  })}
-                </ul>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            <RiskHistoryDistributionDiagram
+              data={[{ label: asset?.name ?? "Asset", history: riskHistory }]}
+              mode={mode}
+            />
+            <div className="grid grid-cols-8 gap-4">
+              <div className="col-span-4 grid grid-cols-2 gap-4">
+                <AverageFixingTimeChart
+                  variant="critical"
+                  title="Avg. remediation time"
+                  description="Time for critical severity vulnerabilities"
+                  avgFixingTime={avgCriticalFixingTime}
+                />
+
+                <AverageFixingTimeChart
+                  variant="high"
+                  title="Avg. remediation time"
+                  description="Time for high severity vulnerabilities"
+                  avgFixingTime={avgHighFixingTime}
+                />
+
+                <AverageFixingTimeChart
+                  variant="medium"
+                  title="Avg. remediation time"
+                  description="Time for medium severity vulnerabilities"
+                  avgFixingTime={avgMediumFixingTime}
+                />
+
+                <AverageFixingTimeChart
+                  variant="low"
+                  title="Avg. remediation time"
+                  description="Time for low severity vulnerabilities"
+                  avgFixingTime={avgLowFixingTime}
+                />
+              </div>
+              <Card className="col-span-4 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="relative w-full">
+                    Activity Stream
+                    <Link
+                      href={
+                        asset
+                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`
+                          : "#"
+                      }
+                      className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                    >
+                      See all
+                    </Link>
+                  </CardTitle>
+                  <CardDescription>
+                    Displays the last events that happened on the repository.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div>
+                    <ul
+                      className="relative flex flex-col gap-10 pb-10 text-foreground"
+                      role="list"
+                    >
+                      <div className="absolute left-3 h-full border-l border-r bg-secondary" />
+                      {events.data.map((event, index, events) => {
+                        return (
+                          <VulnEventItem
+                            key={event.id}
+                            event={event}
+                            index={index}
+                            events={events}
+                          />
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </Section>
     </Page>
   );
@@ -387,21 +320,34 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const { compliance, riskDistribution, cvssDistribution, licenses, events } =
-      await fetchAssetStats({
-        organizationSlug: organizationSlug as string,
-        projectSlug: projectSlug as string,
-        assetSlug: assetSlug as string,
-        assetVersionSlug: assetVersionSlug as string,
-        apiClient,
-        context,
-      });
+    const {
+      compliance,
+      componentRisk,
+      riskHistory,
+      avgLowFixingTime,
+      avgMediumFixingTime,
+      avgHighFixingTime,
+      avgCriticalFixingTime,
+      licenses,
+      events,
+    } = await fetchAssetStats({
+      organizationSlug: organizationSlug as string,
+      projectSlug: projectSlug as string,
+      assetSlug: assetSlug as string,
+      assetVersionSlug: assetVersionSlug as string,
+      apiClient,
+      context,
+    });
 
     return {
       props: {
         compliance,
-        riskDistribution,
-        cvssDistribution,
+        componentRisk,
+        riskHistory,
+        avgLowFixingTime,
+        avgMediumFixingTime,
+        avgHighFixingTime,
+        avgCriticalFixingTime,
         licenses,
         events,
       },

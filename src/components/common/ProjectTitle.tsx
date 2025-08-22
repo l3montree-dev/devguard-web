@@ -58,7 +58,7 @@ export const ProjectElement = ({
           className="flex flex-row items-center gap-1 !text-white hover:no-underline"
           href={`/${activeOrg.slug}/projects/${project.slug}/`}
         >
-          {project.name}
+          {project.name.replace(project.parent.name + " /", "")}
           <ProjectBadge type={project.type} />
         </Link>
       </>

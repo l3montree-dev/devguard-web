@@ -142,6 +142,7 @@ export interface PatWithPrivKey extends PersonalAccessTokenDTO {
 }
 
 export interface ProjectDTO {
+  avatar?: string;
   name: string;
   description?: string;
   slug: string;
@@ -452,6 +453,7 @@ export interface AssetDTO {
   slug: string;
   id: string;
 
+  avatar?: string;
   refs: AssetVersionDTO[];
 
   confidentialityRequirement: RequirementsLevel;
@@ -502,7 +504,17 @@ export interface AffectedPackage {
 }
 
 export interface ComponentRisk {
-  [component: string]: number;
+  [component: string]: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+
+    lowCvss: number;
+    mediumCvss: number;
+    highCvss: number;
+    criticalCvss: number;
+  };
 }
 
 export interface License {
@@ -543,6 +555,16 @@ export interface RiskHistory {
   averageClosedRisk: number;
   maxClosedRisk: number;
   minClosedRisk: number;
+
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
 
   openVulns: number;
   fixedVulns: number;
@@ -692,4 +714,25 @@ export interface Repository {
 export interface Scorecard {
   commit: string;
   version: string;
+}
+
+export interface RiskHistory {
+  id: string;
+  day: string;
+  sumOpenRisk: number;
+  averageOpenRisk: number;
+  maxOpenRisk: number;
+  minOpenRisk: number;
+
+  sumClosedRisk: number;
+  averageClosedRisk: number;
+  maxClosedRisk: number;
+  minClosedRisk: number;
+
+  openVulns: number;
+  fixedVulns: number;
+}
+
+export interface AverageFixingTime {
+  averageFixingTimeSeconds: number;
 }

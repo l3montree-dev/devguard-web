@@ -65,7 +65,7 @@ const EcosystemImage = ({
       </Tooltip>
     );
   }
-  console.log(packageName);
+
   return null;
 };
 
