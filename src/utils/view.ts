@@ -134,21 +134,21 @@ export const eventTypeMessages = (
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600 text-black",
+  accepted: "bg-purple-600",
   fixed: "bg-green-600 text-black",
-  detected: "bg-red-600 text-black",
-  falsePositive: "bg-purple-600 text-black",
-  mitigate: "bg-green-600 text-black",
+  detected: "bg-red-600",
+  falsePositive: "bg-purple-600",
+  mitigate: "bg-green-600",
   markedForTransfer: "bg-blue-600 text-black",
   rawRiskAssessmentUpdated: "bg-secondary",
-  reopened: "bg-red-600 text-black",
+  reopened: "bg-red-600",
   comment: "bg-secondary",
   ticketClosed: "bg-red-600 text-black",
   ticketDeleted: "bg-red-600 text-black",
   addedScanner: "bg-secondary",
   removedScanner: "bg-secondary",
   detectedOnAnotherBranch: "bg-secondary",
-  licenseRisk: "bg-yellow-500",
+  licenseDecision: "bg-yellow-500 text-black",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

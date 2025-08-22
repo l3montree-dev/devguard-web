@@ -49,6 +49,8 @@ import remarkGfm from "remark-gfm";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
+    case "licenseDecision":
+      return <Scale className="h-4 w-4" />;
     case "addedScanner":
       return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "removedScanner":

@@ -5,7 +5,7 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnWithCVE, LicenseRiskRowDTO } from "@/types/api/api";
+import { LicenseRiskDTO, Paged } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -18,7 +18,7 @@ import { FunctionComponent, useState } from "react";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import { beautifyPurl } from "@/utils/common";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -27,8 +27,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
-import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import { Badge } from "@/components/ui/badge";
+import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -53,49 +52,18 @@ import DependencyRiskScannerDialog from "../../../../../../../../../components/R
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
 
 interface Props {
   apiUrl: string;
-  vulns: Paged<LicenseRiskRowDTO>;
+  vulns: Paged<LicenseRiskDTO>;
   artifacts: any[];
 }
 
-const columnHelper = createColumnHelper<LicenseRiskRowDTO>();
+const columnHelper = createColumnHelper<LicenseRiskDTO>();
 
-const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
-  // order the vulns by fixedVersion
-  const orderedVulns = vulns.sort((a, b) => {
-    if (a.componentFixedVersion && b.componentFixedVersion) {
-      return a.componentFixedVersion.localeCompare(b.componentFixedVersion);
-    }
-    return 0;
-  });
-
-  // remove all without fixed version
-  const filteredVulns = orderedVulns.filter(
-    (f) => f.componentFixedVersion !== null,
-  );
-
-  if (filteredVulns.length === 0) {
-    return null;
-  }
-  // aggregate the risk
-  const totalRisk = filteredVulns.reduce(
-    (acc, f) => acc + f.rawRiskAssessment,
-    0,
-  );
-
-  return {
-    version:
-      filteredVulns[filteredVulns.length - 1].componentFixedVersion ?? "",
-    riskReduction: totalRisk,
-  };
-};
-
-const columnsDef: ColumnDef<LicenseRiskRowDTO, any>[] = [
+const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
   {
-    ...columnHelper.accessor("packageName", {
+    ...columnHelper.accessor("componentPurl", {
       header: "Package",
       id: "packageName",
       cell: (row) => (
@@ -109,7 +77,7 @@ const columnsDef: ColumnDef<LicenseRiskRowDTO, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("licenseName", {
+    ...columnHelper.accessor("component.license", {
       header: "License",
       enableSorting: true,
       id: "licenseName",
@@ -117,8 +85,8 @@ const columnsDef: ColumnDef<LicenseRiskRowDTO, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("scannerID", {
-      header: "Scanner",
+    ...columnHelper.accessor("scannerIds", {
+      header: "Artifact",
       id: "scannerID",
       enableSorting: true,
       cell: (row) => (
@@ -130,7 +98,7 @@ const columnsDef: ColumnDef<LicenseRiskRowDTO, any>[] = [
   },
   {
     ...columnHelper.accessor("finalLicenseDecision", {
-      header: "Warning",
+      header: "Final License Decision",
       enableSorting: true,
       id: "finalLicenseDecision",
       cell: (row) => <div className="flex flex-row">{row.getValue()}</div>,
@@ -244,7 +212,6 @@ const Index: FunctionComponent<Props> = (props) => {
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
-                      <th className="w-6" />
                       {headerGroup.headers.map((header) => (
                         <th
                           className="w-40 cursor-pointer break-normal p-4 text-left"
@@ -256,22 +223,13 @@ const Index: FunctionComponent<Props> = (props) => {
                           key={header.id}
                         >
                           <div className="flex flex-row items-center gap-2">
-                            {header.isPlaceholder ? null : header.id ===
-                              "packageName" ? (
-                              <Badge className="">
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                              </Badge>
-                            ) : (
-                              <div>
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                              </div>
-                            )}
+                            <div>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </div>
+
                             {header.isPlaceholder ? null : header.id ===
                               "max_risk" ? (
                               <Tooltip>
@@ -304,7 +262,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 <tbody className="text-sm text-foreground">
                   {table.getRowModel().rows.map((row, i, arr) => (
                     <LicenseRiskRow
-                      key={row.original.scannerID}
+                      key={row.original.id}
                       risk={row.original}
                       index={i}
                       arrLength={arr.length}
@@ -345,43 +303,6 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    const licenseRiskMocks = [
-      {
-        id: "burr",
-        packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.3",
-        assetId: "asset-frontend-42",
-        finalLicenseDecision: "OPEN",
-        createdAt: "2025-08-16T10:15:00Z",
-        manualTicketCreation: false,
-        componentPurl: "pkg:npm/lodash@4.17.21",
-        scannerID: "idk1",
-      },
-
-      {
-        id: "burr2",
-        packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.4",
-        assetId: "asset-frontend-42",
-        finalLicenseDecision: "OPEN",
-        createdAt: "2025-08-16T10:15:00Z",
-        manualTicketCreation: false,
-        componentPurl: "pkg:npm/lodash@4.17.21",
-        scannerID: "idk2",
-      },
-      {
-        id: "bur3",
-        packageName: "scanner-ossindex,scanner-snyk",
-        licenseName: "web-frontend@1.4.5",
-        assetId: "asset-frontend-42",
-        finalLicenseDecision: "OPEN",
-        createdAt: "2025-08-16T10:15:00Z",
-        manualTicketCreation: false,
-        componentPurl: "pkg:npm/lodash@4.17.21",
-        scannerID: "idk3",
-      },
-    ];
-
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -409,7 +330,6 @@ export const getServerSideProps = middleware(
     } else {
       query.append("filterQuery[state][is not]", "open");
     }
-    console.log("query", query.toString());
 
     const artifact = context.query.artifact;
     if (artifact) {
@@ -419,7 +339,12 @@ export const getServerSideProps = middleware(
     // check for page and page size query params
     // if they are there, append them to the uri
     const v = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/" + "license-risks",
+      uri +
+        "refs/" +
+        assetVersionSlug +
+        "/" +
+        "license-risks?" +
+        query.toString(),
     );
 
     // fetch a personal access token from the user
@@ -433,16 +358,9 @@ export const getServerSideProps = middleware(
       artifactsData = await artifactsResp.json();
     }
 
-    const licenseMockPaged: Paged<LicenseRiskRowDTO> = {
-      data: licenseRiskMocks,
-      total: 0,
-      page: 0,
-      pageSize: 0,
-    };
-
     return {
       props: {
-        vulns: licenseMockPaged,
+        vulns,
         apiUrl: config.devguardApiUrlPublicInternet,
         artifacts: artifactsData,
       },

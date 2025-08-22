@@ -1,10 +1,13 @@
 // components/license-risk/LicenseRiskRow.tsx
 import { useRouter } from "next/router";
-import { licenseRisk } from "@/types/api/api";
-import { classNames } from "@/utils/common";
+import { beautifyPurl, classNames } from "@/utils/common";
+import { LicenseRiskDTO } from "../../types/api/api";
+import { defaultScanner } from "../../utils/view";
+import ScannerBadge from "../ScannerBadge";
+import EcosystemImage from "../common/EcosystemImage";
 
 type Props = {
-  risk: licenseRisk;
+  risk: LicenseRiskDTO;
   index: number;
   arrLength: number;
 };
@@ -16,7 +19,7 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
     <tr
       onClick={() =>
         router.push(
-          router.asPath.split("?")[0] + "/../license-risks/" + risk.scannerID,
+          router.asPath.split("?")[0] + "/../license-risks/" + risk.id,
         )
       }
       className={classNames(
@@ -26,10 +29,20 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         "hover:bg-gray-50 dark:hover:bg-card",
       )}
     >
-      <td className="py-4 text-center align-baseline"></td>
-      <td className="p-4">{risk.scannerID}</td>
-      <td className="p-4">{risk.licenseName}</td>
-      <td className="p-4">{risk.packageName}</td>
+      <td className="p-4 flex flex-row items-center gap-2">
+        <EcosystemImage packageName={risk.componentPurl} />{" "}
+        {beautifyPurl(risk.componentPurl)}
+      </td>
+
+      <td className="p-4">{risk.component.license}</td>
+      <td className="p-4">
+        {risk.scannerIds
+          .replaceAll(defaultScanner, "")
+          .split(" ")
+          .map((scannerID, key) => (
+            <ScannerBadge scannerID={scannerID} key={key} />
+          ))}
+      </td>
       <td className="p-4">{risk.finalLicenseDecision}</td>
     </tr>
   );

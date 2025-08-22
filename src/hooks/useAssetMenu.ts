@@ -134,21 +134,6 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "License Risks",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/license-risks",
-        Icon: ScanText,
-        isActive: router.pathname.includes("license-risks"),
-      },
-      {
         title: "Code Risks",
         href:
           "/" +
@@ -177,6 +162,21 @@ export const useAssetMenu = () => {
           "/dependency-risks",
         Icon: WrenchScrewdriverIcon,
         isActive: router.pathname.includes("dependency-risks"),
+      },
+      {
+        title: "License Risks",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/license-risks",
+        Icon: ScanText,
+        isActive: router.pathname.includes("license-risks"),
       },
       {
         title: "Dependencies",
