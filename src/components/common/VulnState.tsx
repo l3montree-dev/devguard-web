@@ -8,6 +8,7 @@ import {
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
 import { VulnDTO } from "../../types/api/api";
+import { Scale } from "lucide-react";
 
 const VulnState: FunctionComponent<{ state: VulnDTO["state"] }> = ({
   state,

@@ -37,7 +37,7 @@ import {
   StopIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { GitBranchIcon } from "lucide-react";
+import { GitBranchIcon, Scale } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Markdown from "react-markdown";
@@ -49,6 +49,8 @@ import remarkGfm from "remark-gfm";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
+    case "licenseDecision":
+      return <Scale className="h-4 w-4" />;
     case "addedScanner":
       return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "removedScanner":
@@ -77,6 +79,8 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
       return <ChatBubbleOvalLeftEllipsisIcon className="h-4 w-4" />;
     case "detectedOnAnotherBranch":
       return <GitBranchIcon className="h-3.5 w-3.5" />;
+    // case "licenseRisk":
+    //   return <Scale className="h-4 w-4" />;
   }
 }
 

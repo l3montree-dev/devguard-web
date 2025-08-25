@@ -20,7 +20,7 @@ import {
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { CodeIcon } from "lucide-react";
+import { CodeIcon, ScanText, TextSelect } from "lucide-react";
 import { useRouter } from "next/router";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
@@ -162,6 +162,21 @@ export const useAssetMenu = () => {
           "/dependency-risks",
         Icon: WrenchScrewdriverIcon,
         isActive: router.pathname.includes("dependency-risks"),
+      },
+      {
+        title: "License Risks",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/license-risks",
+        Icon: ScanText,
+        isActive: router.pathname.includes("license-risks"),
       },
       {
         title: "Dependencies",
