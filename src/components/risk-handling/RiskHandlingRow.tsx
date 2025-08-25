@@ -22,7 +22,7 @@ import { useRouter } from "next/router";
 import React, { FunctionComponent } from "react";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
-import ScannerBadge from "../ScannerBadge";
+import ArtifactBadge from "../ArtifactBadge";
 import { Badge } from "../ui/badge";
 
 interface Props {
@@ -50,12 +50,12 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
       <td className="p-4">
-        {vuln.scannerIds
-          .replaceAll(defaultScanner, "")
-          .split(" ")
-          .map((scannerID, key) => (
-            <ScannerBadge scannerID={scannerID} key={key} />
-          ))}
+        {vuln.artifacts.map((artifact) => (
+          <ArtifactBadge
+            key={vuln.id + artifact.artifactName}
+            artifactName={artifact.artifactName}
+          />
+        ))}
       </td>
       <td className="p-4">{vuln.cveID}</td>
       <td className="p-4">

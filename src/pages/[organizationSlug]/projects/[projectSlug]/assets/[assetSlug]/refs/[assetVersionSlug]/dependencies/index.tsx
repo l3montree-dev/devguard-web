@@ -322,7 +322,6 @@ const Index: FunctionComponent<Props> = ({
 
   const [datasets, setDatasets] = useState<{
     purl: string;
-    scannerId: string;
     scoreCard?: ScoreCard;
     project: Component["project"];
   }>();
@@ -338,7 +337,6 @@ const Index: FunctionComponent<Props> = ({
       purl: data.dependency.purl,
       scoreCard: data.dependency.project?.scoreCard,
       project: data.dependency.project,
-      scannerId: data.scannerIds.split(" ")[0],
     });
   }
 
@@ -526,7 +524,6 @@ const Index: FunctionComponent<Props> = ({
       {datasets && datasets.project && (
         <DependencyDialog
           open={true}
-          scannerId={datasets.scannerId}
           project={datasets.project} //undefined will make it go kaboom
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
@@ -567,9 +564,11 @@ export const getServerSideProps = middleware(
 
     const artifact = context.query.artifact;
     if (artifact) {
-      params.append("filterQuery[scanner_ids][any]", artifact as string);
+      params.append(
+        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
-
     const [components, licenses] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
@@ -608,7 +607,7 @@ export const getServerSideProps = middleware(
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/dependency-vulns/artifacts/",
+        "/artifacts/",
     );
 
     if (artifactsResp.ok) {

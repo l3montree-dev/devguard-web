@@ -14,9 +14,14 @@ import {
 
 export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
   const router = useRouter();
+
   const [selectedArtifact, setSelectedArtifact] = useState(
-    (router.query.artifact as string) || "",
+    (router.query.artifact as string) || artifacts[0] || "",
   );
+
+  // add selected artifact to the url query params as ?artifact=artifactName
+
+  router.query.artifact = selectedArtifact;
 
   return (
     <DropdownMenu>
