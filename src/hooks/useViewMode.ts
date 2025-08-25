@@ -13,7 +13,7 @@ export const useViewMode = (
 
   useEffect(() => {
     const storedMode = localStorage.getItem(storageKey) as ViewMode;
-    console.log(`useViewMode: Retrieved stored mode: ${storedMode}`);
+
     if (storedMode) {
       setMode(storedMode);
     }

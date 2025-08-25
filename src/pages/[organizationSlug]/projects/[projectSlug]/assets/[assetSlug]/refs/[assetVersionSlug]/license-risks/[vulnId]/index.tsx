@@ -524,8 +524,6 @@ export const getServerSideProps = middleware(
       apiClient(uri).then((r) => r.json()),
     ]);
 
-    console.log(resp);
-
     return {
       props: {
         vuln: resp,

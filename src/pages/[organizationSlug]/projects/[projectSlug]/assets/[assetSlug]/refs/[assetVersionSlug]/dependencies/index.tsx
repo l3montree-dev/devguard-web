@@ -128,7 +128,6 @@ const LicenseCall = (props: {
     useRouter().query;
   const [license, setLicense] = useState(props.license.licenseId);
 
-  console.log(props);
   const handleManuallyOverwriteLicenseChange = async (license: string) => {
     // delete the overwritten license
     const resp = await browserApiClient(
