@@ -71,6 +71,11 @@ export const eventTypeMessages = (
   events?: VulnEventDTO[],
 ) => {
   switch (event.type) {
+    case "licenseDecision":
+      return (
+        "made a license decision: " +
+        event.arbitraryJSONData.finalLicenseDecision
+      );
     case "detectedOnAnotherBranch":
       return (
         "detected " + flawName + " on another ref: " + event.assetVersionName

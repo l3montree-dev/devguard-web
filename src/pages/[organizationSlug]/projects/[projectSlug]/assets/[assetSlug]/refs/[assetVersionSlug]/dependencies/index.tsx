@@ -54,6 +54,7 @@ import DateString from "../../../../../../../../../components/common/DateString"
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import {
+  AsyncButton,
   Button,
   buttonVariants,
 } from "../../../../../../../../../components/ui/button";
@@ -123,57 +124,36 @@ const LicenseCall = (props: {
   justification: string;
 }) => {
   const [open, setOpen] = useState(false);
-  const activeOrg = useActiveOrg();
-  const [license, setLicense] = useState(
-    props.component.license ?? props.license.licenseId,
-  );
-  const [manuallyCorrectLicense, setManuallyCorrectLicense] = useState(
-    Boolean(props.component.isLicenseOverwritten),
-  );
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useRouter().query;
+  const [license, setLicense] = useState(props.license.licenseId);
 
-  const handleLicenseUpdate = async (
-    newlicense: string,
-    organizationId: string,
-    purl: string,
-    justification: string,
-  ) => {
+  console.log(props);
+  const handleManuallyOverwriteLicenseChange = async (license: string) => {
+    // delete the overwritten license
     const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/license-overwrite/",
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/license-risks/",
       {
-        method: "PUT",
+        method: "POST",
         body: JSON.stringify({
-          licenseId: newlicense,
-          organizationId: organizationId,
-          componentPurl: purl,
-          justification: "",
+          finalLicenseDecision: license,
+          componentPurl: props.dependencyPurl,
         }),
       },
     );
     if (!resp.ok) {
-      toast.error("Failed to change License");
-      return;
-    }
-    setLicense(newlicense);
-  };
-
-  const handleManuallyOverwriteLicenseChange = async (checked: boolean) => {
-    setManuallyCorrectLicense(checked);
-    if (!checked) {
-      // delete the overwritten license
-      const resp = await browserApiClient(
-        "/organizations/" +
-          activeOrg.slug +
-          "/license-overwrite/" +
-          encodeURIComponent(props.dependencyPurl),
-        {
-          method: "DELETE",
-        },
-      );
-      if (!resp.ok) {
-        toast.error("Failed to delete overwritten license");
-      } else {
-        toast.success("Successfully deleted overwritten license");
-      }
+      toast.error("Failed to correct license");
+    } else {
+      setLicense(license);
+      toast.success("Successfully corrected the license to " + license);
     }
   };
 
@@ -181,6 +161,7 @@ const LicenseCall = (props: {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Badge
+          className="whitespace-nowrap cursor-pointer"
           variant={"outline"}
           onClick={(e) => {
             e.stopPropagation();
@@ -201,25 +182,14 @@ const LicenseCall = (props: {
         <PopoverContent className="w-96">
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row capitalize items-center text-sm font-bold">
-              {(props.license.isOsiApproved || manuallyCorrectLicense) && (
+              {props.license.isOsiApproved && (
                 <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
               )}
               {licenseMap[license] || license}
             </span>
-            {manuallyCorrectLicense && (
-              <span className="flex absolute top-0 right-0 m-2 ">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <BadgeInfo className="flex w-5 h-5 absolute top-0 right-0 text-green-500"></BadgeInfo>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    This license was manually overwritten by a user.
-                  </TooltipContent>
-                </Tooltip>
-              </span>
-            )}
+
             <span className="text-sm text-muted-foreground">
-              {props.license.isOsiApproved || manuallyCorrectLicense
+              {props.license.isOsiApproved
                 ? "OSI Approved, "
                 : "Not OSI Approved, "}
               <a
@@ -237,31 +207,21 @@ const LicenseCall = (props: {
               <span className="text-sm mb-2 block text-muted-foreground">
                 Manually correct the license
               </span>
-              <Switch
-                onCheckedChange={handleManuallyOverwriteLicenseChange}
-                checked={manuallyCorrectLicense}
+            </div>
+
+            <div className="mt-2">
+              <Combobox
+                items={licenses}
+                placeholder={getLicenseName(
+                  props.component.license,
+                  props.license.licenseId,
+                )}
+                emptyMessage={""}
+                onSelect={(selectedLicense) =>
+                  handleManuallyOverwriteLicenseChange(selectedLicense)
+                }
               />
             </div>
-            {manuallyCorrectLicense && (
-              <div className="mt-2">
-                <Combobox
-                  items={licenses}
-                  placeholder={getLicenseName(
-                    props.component.license,
-                    props.license.licenseId,
-                  )}
-                  emptyMessage={""}
-                  onSelect={(selectedLicense) =>
-                    handleLicenseUpdate(
-                      selectedLicense,
-                      activeOrg.id,
-                      props.dependencyPurl,
-                      "justification",
-                    )
-                  }
-                />
-              </div>
-            )}
           </div>
         </PopoverContent>
       </div>
@@ -396,6 +356,21 @@ const Index: FunctionComponent<Props> = ({
       .sort(([_aLicense, a], [_bLicense, b]) => (b as number) - (a as number));
   }, [licenses]);
 
+  const handleLicenseRefresh = async () => {
+    const resp = await browserApiClient(
+      `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/components/licenses/refresh`,
+      {
+        method: "POST",
+      },
+    );
+    if (resp.ok) {
+      toast.success("License refresh triggered");
+      router.reload();
+    } else {
+      toast.error("Failed to trigger license refresh");
+    }
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -409,31 +384,9 @@ const Index: FunctionComponent<Props> = ({
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"secondary"}>Download VeX</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.json`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-              </Link>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.xml`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>XML-Format</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AsyncButton onClick={handleLicenseRefresh} variant={"secondary"}>
+            Trigger license refresh
+          </AsyncButton>
           <Link
             className={classNames(
               buttonVariants({ variant: "default" }),
@@ -630,14 +583,16 @@ export const getServerSideProps = middleware(
     const licenseMap = licenses.reduce(
       (acc, curr) => ({
         ...acc,
-        [curr.license.licenseId]: curr.license,
+        [curr.license.licenseId.toLowerCase()]: curr.license,
       }),
       {} as Record<string, License>,
     );
 
     components.data = components.data.map((component) => ({
       ...component,
-      license: licenseMap[component.dependency.license ?? ""] ?? {
+      license: licenseMap[
+        (component.dependency.license ?? "").toLowerCase()
+      ] ?? {
         licenseId: "loading",
         name: "Loading",
         count: 0,
