@@ -475,7 +475,6 @@ const Index: FunctionComponent<Props> = ({
 
   const [datasets, setDatasets] = useState<{
     purl: string;
-    scannerId: string;
     scoreCard?: ScoreCard;
     project: Component["project"];
   }>();
@@ -491,7 +490,6 @@ const Index: FunctionComponent<Props> = ({
       purl: data.dependency.purl,
       scoreCard: data.dependency.project?.scoreCard,
       project: data.dependency.project,
-      scannerId: data.scannerIds.split(" ")[0],
     });
   }
 
@@ -686,7 +684,6 @@ const Index: FunctionComponent<Props> = ({
       {datasets && datasets.project && (
         <DependencyDialog
           open={true}
-          scannerId={datasets.scannerId}
           project={datasets.project} //undefined will make it go kaboom
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
@@ -711,8 +708,6 @@ export const getServerSideProps = middleware(
       context.params!;
 
     const apiClient = getApiClientFromContext(context);
-
-    console.log("Fetching components for asset:");
 
     const url =
       "/organizations/" +
@@ -742,9 +737,6 @@ export const getServerSideProps = middleware(
         (r) => r.json() as Promise<LicenseResponse[]>,
       ),
     ]);
-
-    console.log("Fetched components:", components);
-    console.log("Fetched licenses:", licenses);
 
     const licenseMap = licenses.reduce(
       (acc, curr) => ({

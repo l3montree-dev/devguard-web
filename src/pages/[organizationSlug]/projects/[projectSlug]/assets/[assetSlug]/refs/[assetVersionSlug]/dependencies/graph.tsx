@@ -240,7 +240,7 @@ export const getServerSideProps = middleware(
     // check for version query parameter
     const version = context.query.version as string | undefined;
 
-    let scanner = context.query.artifact;
+    let artifactName = context.query.artifact;
 
     const [resp, flawResp] = await Promise.all([
       apiClient(
@@ -248,16 +248,14 @@ export const getServerSideProps = middleware(
           "dependency-graph?" +
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
-            version: version,
-            scanner: scanner,
+            "artifact-name": artifactName,
           }),
       ),
       apiClient(
         uri +
           "affected-components?" +
           toSearchParams({
-            version: version,
-            scanner: scanner,
+            "artifact-name": artifactName,
           }),
       ),
     ]);
