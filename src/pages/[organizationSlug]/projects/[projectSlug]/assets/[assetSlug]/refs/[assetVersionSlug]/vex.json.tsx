@@ -14,8 +14,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
-    // check for version query parameter
-    const version = context.query.version as string | undefined;
+
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -27,8 +26,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/artifacts/" +
-      context.query.artifact +
-      "/vex.json";
+      encodeURIComponent(context.query.artifact as string) +
+      "/vex.json/";
 
     const vex = await apiClient(uri);
     if (!vex.ok) {

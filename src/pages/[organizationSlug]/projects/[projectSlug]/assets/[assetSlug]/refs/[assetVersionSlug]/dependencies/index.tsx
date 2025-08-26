@@ -68,8 +68,9 @@ import { useRouter } from "next/router";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -305,6 +306,7 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
+  const [showVexModal, setShowVexModal] = useState(false);
 
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useRouter().asPath.split("?")[0];
@@ -369,6 +371,9 @@ const Index: FunctionComponent<Props> = ({
         <div className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
+          </Button>
+          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+            Download VeX
           </Button>
           <AsyncButton onClick={handleLicenseRefresh} variant={"secondary"}>
             Trigger license refresh
@@ -448,7 +453,9 @@ const Index: FunctionComponent<Props> = ({
         }
       >
         <div className="flex flex-row items-center justify-between gap-2">
-          <ArtifactSelector artifacts={artifacts.map((a) => a.artifactName)} />
+          <QueryArtifactSelector
+            artifacts={artifacts.map((a) => a.artifactName)}
+          />
           <Input
             onChange={handleSearch}
             defaultValue={router.query.search as string}
@@ -520,8 +527,17 @@ const Index: FunctionComponent<Props> = ({
         ></DependencyDialog>
       )}
       <SbomDownloadModal
+        artifacts={artifacts}
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
+      <VexDownloadModal
+        artifacts={artifacts}
+        showVexModal={showVexModal}
+        setShowVexModal={setShowVexModal}
         pathname={pathname}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
@@ -551,7 +567,7 @@ export const getServerSideProps = middleware(
 
     const params = buildFilterSearchParams(context);
 
-    const artifact = context.query.artifact;
+    const artifact = context.query.artifact as string;
     if (artifact) {
       params.append(
         "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",

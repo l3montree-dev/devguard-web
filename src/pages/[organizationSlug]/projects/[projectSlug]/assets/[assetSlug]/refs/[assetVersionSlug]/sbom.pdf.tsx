@@ -25,8 +25,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/artifacts/" +
-      context.query.artifact +
-      "/sbom.pdf";
+      encodeURIComponent(context.query.artifact as string) +
+      "/sbom.pdf/";
 
     const sbom = await apiClient(uri);
     if (!sbom.ok) {

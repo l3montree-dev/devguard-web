@@ -27,8 +27,8 @@ export const getServerSideProps: GetServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug +
       "/artifacts/" +
-      context.query.artifact +
-      "/openvex.json";
+      encodeURIComponent(context.query.artifact as string) +
+      "/openvex.json/";
 
     const vex = await apiClient(uri);
     if (!vex.ok) {

@@ -44,7 +44,7 @@ import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
@@ -93,7 +93,7 @@ const DependencyGraphPage: FunctionComponent<{
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
-            <ArtifactSelector
+            <QueryArtifactSelector
               artifacts={artifacts.map((a) => a.artifactName)}
             />
           </div>
@@ -228,7 +228,7 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    let artifactName = context.query.artifact;
+    let artifactName = encodeURIComponent(context.query.artifact as string);
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -241,27 +241,27 @@ export const getServerSideProps = middleware(
       "/artifacts/" +
       artifactName;
 
-    const [resp, flawResp] = await Promise.all([
+    const [resp, vulnResponse] = await Promise.all([
       apiClient(
         uri +
-          "/dependency-graph?" +
+          "/dependency-graph/?" +
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
           }),
       ),
-      apiClient(uri + "/affected-components"),
+      apiClient(uri + "/affected-components/"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [graph, flaws] = await Promise.all([
+    const [graph, vulns] = await Promise.all([
       resp.json() as Promise<{ root: DependencyTreeNode }>,
-      flawResp.json() as Promise<Array<VulnDTO>>,
+      vulnResponse.json() as Promise<Array<VulnDTO>>,
     ]);
 
     let converted = convertGraph(graph.root);
 
-    recursiveAddRisk(converted, flaws);
+    recursiveAddRisk(converted, vulns);
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
 
@@ -312,7 +312,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         graph: { root: converted },
-        flaws,
+        flaws: vulns,
         artifacts: artifactsData,
       },
     };

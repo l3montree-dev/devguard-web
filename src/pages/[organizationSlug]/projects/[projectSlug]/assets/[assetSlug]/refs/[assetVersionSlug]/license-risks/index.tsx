@@ -20,7 +20,7 @@ import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { beautifyPurl } from "@/utils/common";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -48,6 +48,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
@@ -114,6 +115,7 @@ const Index: FunctionComponent<Props> = (props) => {
   });
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
+  const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const assetMenu = useAssetMenu();
@@ -132,11 +134,24 @@ const Index: FunctionComponent<Props> = (props) => {
             Download SBOM
           </Button>
 
+          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+            Download VeX
+          </Button>
+
           <Button onClick={() => setIsOpen(true)} variant="default">
             License Risks
           </Button>
         </div>
       </div>
+
+      <VexDownloadModal
+        artifacts={props.artifacts}
+        showVexModal={showVexModal}
+        setShowVexModal={setShowVexModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
       <Section
         forceVertical
         primaryHeadline
@@ -145,7 +160,7 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
-          <ArtifactSelector
+          <QueryArtifactSelector
             artifacts={props.artifacts.map((a) => a.artifactName)}
           />
           <Tabs
@@ -283,6 +298,7 @@ const Index: FunctionComponent<Props> = (props) => {
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
         pathname={pathname}
+        artifacts={props.artifacts}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
       />
@@ -333,7 +349,7 @@ export const getServerSideProps = middleware(
       query.append("filterQuery[state][is not]", "open");
     }
 
-    const artifact = context.query.artifact;
+    const artifact = context.query.artifact as string;
 
     if (artifact) {
       query.append(
