@@ -26,14 +26,11 @@ export const getServerSideProps: GetServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/vex.json?" +
-      new URLSearchParams({
-        ...(context.query.scanner
-          ? { scanner: context.query.scanner as string }
-          : {}),
-      });
+      "/artifacts/" +
+      context.query.artifact +
+      "/vex.json";
 
-    const vex = await apiClient(uri + (version ? "?version=" + version : ""));
+    const vex = await apiClient(uri);
     if (!vex.ok) {
       context.res.statusCode = vex.status;
       context.res.setHeader("Content-Type", "application/json");

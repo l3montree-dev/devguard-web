@@ -5,7 +5,7 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { LicenseRiskDTO, Paged } from "@/types/api/api";
+import { ArtifactDTO, LicenseRiskDTO, Paged } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -56,7 +56,7 @@ import { maybeGetRedirectDestination } from "../../../../../../../../../utils/se
 interface Props {
   apiUrl: string;
   vulns: Paged<LicenseRiskDTO>;
-  artifacts: any[];
+  artifacts: ArtifactDTO[];
 }
 
 const columnHelper = createColumnHelper<LicenseRiskDTO>();
@@ -145,7 +145,9 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
-          <ArtifactSelector artifacts={props.artifacts} />
+          <ArtifactSelector
+            artifacts={props.artifacts.map((a) => a.artifactName)}
+          />
           <Tabs
             defaultValue={
               (router.query.state as string | undefined)
@@ -332,8 +334,12 @@ export const getServerSideProps = middleware(
     }
 
     const artifact = context.query.artifact;
+
     if (artifact) {
-      query.append("filterQuery[scanner_ids][any]", artifact as string);
+      query.append(
+        "filterQuery[artifact_license_risks.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
 
     // check for page and page size query params
@@ -350,9 +356,9 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
     const vulns = await v.json();
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/dependency-vulns/artifacts/",
+      uri + "refs/" + assetVersionSlug + "/artifacts/",
     );
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();

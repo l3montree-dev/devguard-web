@@ -1068,7 +1068,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                 router.asPath +
                                 "/../../dependencies/graph?pkg=" +
                                 vuln.componentPurl +
-                                "&artifact-name=" +
+                                "&artifact=" +
                                 vuln.artifacts[0].artifactName
                               }
                             >

@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { beautifyPurl, classNames } from "@/utils/common";
 import { LicenseRiskDTO } from "../../types/api/api";
 import { defaultScanner } from "../../utils/view";
-import ScannerBadge from "../ScannerBadge";
 import EcosystemImage from "../common/EcosystemImage";
+import ArtifactBadge from "../ArtifactBadge";
 
 type Props = {
   risk: LicenseRiskDTO;
@@ -36,12 +36,12 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
 
       <td className="p-4">{risk.component.license}</td>
       <td className="p-4">
-        {risk.scannerIds
-          .replaceAll(defaultScanner, "")
-          .split(" ")
-          .map((scannerID, key) => (
-            <ScannerBadge scannerID={scannerID} key={key} />
-          ))}
+        {risk.artifacts.map((artifact) => (
+          <ArtifactBadge
+            key={artifact.artifactName}
+            artifactName={artifact.artifactName}
+          />
+        ))}
       </td>
       <td className="p-4">{risk.finalLicenseDecision}</td>
     </tr>

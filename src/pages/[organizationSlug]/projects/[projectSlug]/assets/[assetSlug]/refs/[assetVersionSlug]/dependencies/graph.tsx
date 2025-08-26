@@ -31,7 +31,7 @@ import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
+import { ArtifactDTO, DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
 import {
@@ -45,12 +45,11 @@ import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
-import Callout from "../../../../../../../../../components/common/Callout";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
   flaws: Array<VulnDTO>;
-  artifacts: string[];
+  artifacts: ArtifactDTO[];
 }> = ({ graph, flaws, artifacts }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -94,7 +93,9 @@ const DependencyGraphPage: FunctionComponent<{
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
-            <ArtifactSelector artifacts={artifacts} />
+            <ArtifactSelector
+              artifacts={artifacts.map((a) => a.artifactName)}
+            />
           </div>
           <div className="flex flex-row items-center gap-4">
             {graph.root.risk !== 0 && (
@@ -226,6 +227,8 @@ export const getServerSideProps = middleware(
       context.params!;
 
     const apiClient = getApiClientFromContext(context);
+
+    let artifactName = context.query.artifact;
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -235,29 +238,18 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/";
-
-    // check for version query parameter
-    const version = context.query.version as string | undefined;
-
-    let artifactName = context.query.artifact;
+      "/artifacts/" +
+      artifactName;
 
     const [resp, flawResp] = await Promise.all([
       apiClient(
         uri +
-          "dependency-graph?" +
+          "/dependency-graph?" +
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
-            "artifact-name": artifactName,
           }),
       ),
-      apiClient(
-        uri +
-          "affected-components?" +
-          toSearchParams({
-            "artifact-name": artifactName,
-          }),
-      ),
+      apiClient(uri + "/affected-components"),
     ]);
 
     // fetch a personal access token from the user
@@ -300,7 +292,7 @@ export const getServerSideProps = middleware(
       });
     }
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       "/organizations/" +
         organizationSlug +

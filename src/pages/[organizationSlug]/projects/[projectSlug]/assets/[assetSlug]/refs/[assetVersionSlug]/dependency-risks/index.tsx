@@ -5,7 +5,12 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import {
+  ArtifactDTO,
+  Paged,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -64,7 +69,7 @@ import Link from "next/link";
 interface Props {
   apiUrl: string;
   vulns: Paged<VulnByPackage>;
-  artifacts: any[];
+  artifacts: ArtifactDTO[];
 }
 
 const columnHelper = createColumnHelper<VulnByPackage>();
@@ -265,7 +270,9 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
-          <ArtifactSelector artifacts={props.artifacts} />
+          <ArtifactSelector
+            artifacts={props.artifacts.map((a) => a.artifactName)}
+          />
           <Tabs
             defaultValue={
               (router.query.state as string | undefined)
@@ -483,7 +490,7 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
     const vulns = await v.json();
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       uri + "refs/" + assetVersionSlug + "/artifacts/",
     );

@@ -62,7 +62,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
   const handleGraphFetch = useCallback(
     async (data: string) => {
       const resp = await browserApiClient(
-        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?artifact-name=${artifactName}&purl=${encodeURIComponent(data)}`,
+        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?artifact=${artifactName}&purl=${encodeURIComponent(data)}`,
         {
           method: "GET",
         },

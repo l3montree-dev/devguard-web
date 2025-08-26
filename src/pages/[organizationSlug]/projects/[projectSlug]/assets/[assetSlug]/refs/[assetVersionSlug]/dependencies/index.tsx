@@ -28,6 +28,7 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import {
+  ArtifactDTO,
   Component,
   ComponentPaged,
   License,
@@ -48,7 +49,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { BadgeInfo, ChevronDownIcon, GitBranch } from "lucide-react";
+import { ChevronDownIcon, GitBranch } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -63,20 +64,9 @@ import { useActiveProject } from "../../../../../../../../../hooks/useActiveProj
 
 import Page from "@/components/Page";
 import { Combobox } from "@/components/common/Combobox";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useRouter } from "next/router";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-} from "../../../../../../../../../components/ui/tooltip";
 
 import { ArtifactSelector } from "@/components/ArtifactSelector";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
@@ -88,13 +78,12 @@ import {
 } from "@/components/ui/popover";
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { Switch } from "../../../../../../../../../components/ui/switch";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
-  artifacts: string[];
+  artifacts: ArtifactDTO[];
 }
 
 const licenseMap = licenses.reduce(
@@ -459,7 +448,7 @@ const Index: FunctionComponent<Props> = ({
         }
       >
         <div className="flex flex-row items-center justify-between gap-2">
-          <ArtifactSelector artifacts={artifacts} />
+          <ArtifactSelector artifacts={artifacts.map((a) => a.artifactName)} />
           <Input
             onChange={handleSearch}
             defaultValue={router.query.search as string}
@@ -597,7 +586,7 @@ export const getServerSideProps = middleware(
       },
     }));
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       "/organizations/" +
         organizationSlug +

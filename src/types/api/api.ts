@@ -199,11 +199,7 @@ export interface BaseVulnDTO {
   assetId: string;
   assetVersionName: string;
   scannerIds: string; // space separated list of scanner ids
-  artifacts: Array<{
-    artifactName: string;
-    assetId: string;
-    assetVersionName: string;
-  }>;
+  artifacts: ArtifactDTO[];
 }
 export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;
@@ -608,17 +604,7 @@ export interface VulnByPackage {
   vulns: VulnWithCVE[];
 }
 
-export interface LicenseRiskDTO {
-  id: string;
-  scannerIds: string;
-  message: null;
-  assetVersionName: string;
-  assetId: string;
-  state: string;
-  createdAt: string;
-  ticketId: string | null;
-  ticketUrl: string | null;
-  manualTicketCreation: boolean;
+export interface LicenseRiskDTO extends BaseVulnDTO {
   finalLicenseDecision?: string;
   componentPurl: string;
 
@@ -627,6 +613,12 @@ export interface LicenseRiskDTO {
     version: string;
     license: string;
   };
+}
+
+export interface ArtifactDTO {
+  artifactName: string;
+  assetId: string;
+  assetVersionName: string;
 }
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
