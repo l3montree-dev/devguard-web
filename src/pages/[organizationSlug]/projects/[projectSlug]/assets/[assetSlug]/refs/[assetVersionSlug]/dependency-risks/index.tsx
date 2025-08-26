@@ -233,32 +233,9 @@ const Index: FunctionComponent<Props> = (props) => {
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
           </Button>
-      <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-        <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>Download VeX</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.json`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>JSON-Format</DropdownMenuItem>
-              </Link>
-              <Link
-                download
-                target="_blank"
-                prefetch={false}
-                href={pathname + `/../vex.xml`}
-                className="!text-foreground hover:no-underline"
-              >
-                <DropdownMenuItem>XML-Format</DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+            Download VeX
+          </Button>
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Risks
           </Button>

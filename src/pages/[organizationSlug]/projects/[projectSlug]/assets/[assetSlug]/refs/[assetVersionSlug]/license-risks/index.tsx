@@ -133,11 +133,9 @@ const Index: FunctionComponent<Props> = (props) => {
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
           </Button>
-
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Download VeX
           </Button>
-
           <Button onClick={() => setIsOpen(true)} variant="default">
             License Risks
           </Button>
