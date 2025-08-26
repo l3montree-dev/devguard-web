@@ -320,6 +320,14 @@ export interface CommentEventDTO extends BaseVulnEventDTO {
   type: "comment";
 }
 
+export interface LicenseDecisionEventDTO extends BaseVulnEventDTO {
+  type: "licenseDecision";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    finalLicenseDecision?: string;
+    license?: string;
+  };
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -334,7 +342,8 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | AddedScannerEventDTO
   | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO;
+  | DetectedOnAnotherBranchEventDTO
+  | LicenseDecisionEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -597,6 +606,31 @@ export interface VulnByPackage {
   vulnCount: number;
   avgRisk: number;
   vulns: VulnWithCVE[];
+}
+
+export interface LicenseRiskDTO {
+  id: string;
+  scannerIds: string;
+  message: null;
+  assetVersionName: string;
+  assetId: string;
+  state: string;
+  createdAt: string;
+  ticketId: string | null;
+  ticketUrl: string | null;
+  manualTicketCreation: boolean;
+  finalLicenseDecision?: string;
+  componentPurl: string;
+
+  component: {
+    purl: string;
+    version: string;
+    license: string;
+  };
+}
+
+export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
+  events: VulnEventDTO[];
 }
 
 interface snippetContents {

@@ -231,7 +231,9 @@ const Index: FunctionComponent<Props> = ({ project, subgroups, assets }) => {
                   Title={
                     <div className="flex items-center flex-row gap-2">
                       <Avatar {...subgroup} />
-                      <span>{subgroup.name}</span>
+                      <span>
+                        {subgroup.name.replace(project.name + " /", "")}
+                      </span>
                       <Badge variant={"outline"}>Subgroup</Badge>
                       {subgroup.type === "kubernetesNamespace" && (
                         <Badge variant={"outline"}>

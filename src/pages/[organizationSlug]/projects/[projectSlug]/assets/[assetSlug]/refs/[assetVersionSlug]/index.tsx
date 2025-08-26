@@ -10,7 +10,10 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { getApiClientFromContext } from "@/services/devGuardApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
@@ -58,6 +61,8 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
+import { AsyncButton } from "../../../../../../../../components/ui/button";
+import { toast } from "sonner";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -92,6 +97,35 @@ const Index: FunctionComponent<Props> = ({
   const project = activeProject;
   const asset = activeAsset;
 
+  const downloadPdfReport = async () => {
+    try {
+      const response = await fetch(
+        `${router.asPath}/vulnerability-report.pdf`,
+        {
+          signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
+          method: "GET",
+        },
+      );
+      if (!response.ok) {
+        toast.error(
+          "Failed to download Vulnerability Report PDF. Please try again later.",
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // add download attribute to the link
+      link.download = `vulnerability-report.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error("Failed to download SBOM PDF. Please try again later.");
+    }
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -99,7 +133,12 @@ const Index: FunctionComponent<Props> = ({
       description="Overview of the repository"
       Title={<AssetTitle />}
     >
-      <BranchTagSelector branches={branches} tags={tags} />
+      <div className="flex flex-row items-center justify-between">
+        <BranchTagSelector branches={branches} tags={tags} />
+        <AsyncButton onClick={downloadPdfReport} variant={"secondary"}>
+          Download PDF-Report
+        </AsyncButton>
+      </div>
       <Section
         primaryHeadline
         forceVertical
