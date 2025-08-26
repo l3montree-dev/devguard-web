@@ -5,7 +5,12 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import {
+  ArtifactDTO,
+  Paged,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -20,7 +25,7 @@ import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -49,6 +54,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
@@ -64,7 +70,7 @@ import Link from "next/link";
 interface Props {
   apiUrl: string;
   vulns: Paged<VulnByPackage>;
-  artifacts: any[];
+  artifacts: ArtifactDTO[];
 }
 
 const columnHelper = createColumnHelper<VulnByPackage>();
@@ -209,6 +215,7 @@ const Index: FunctionComponent<Props> = (props) => {
     data: props.vulns.data,
   });
   const [showSBOMModal, setShowSBOMModal] = useState(false);
+  const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const assetMenu = useAssetMenu();
@@ -226,9 +233,9 @@ const Index: FunctionComponent<Props> = (props) => {
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
           </Button>
-          <DropdownMenu>
+      <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant={"secondary"}>Download VeX</Button>
+        <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>Download VeX</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <Link
@@ -257,6 +264,14 @@ const Index: FunctionComponent<Props> = (props) => {
           </Button>
         </div>
       </div>
+      <VexDownloadModal
+        artifacts={props.artifacts}
+        showVexModal={showVexModal}
+        setShowVexModal={setShowVexModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
       <Section
         forceVertical
         primaryHeadline
@@ -265,7 +280,9 @@ const Index: FunctionComponent<Props> = (props) => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">
-          <ArtifactSelector artifacts={props.artifacts} />
+          <QueryArtifactSelector
+            artifacts={props.artifacts.map((a) => a.artifactName)}
+          />
           <Tabs
             defaultValue={
               (router.query.state as string | undefined)
@@ -408,6 +425,7 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       )}
       <SbomDownloadModal
+        artifacts={props.artifacts}
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
         pathname={pathname}
@@ -461,9 +479,12 @@ export const getServerSideProps = middleware(
       query.append("filterQuery[state][is not]", "open");
     }
 
-    const artifact = context.query.artifact;
+    const artifact = context.query.artifact as string;
     if (artifact) {
-      query.append("filterQuery[scanner_ids][any]", artifact as string);
+      query.append(
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
 
     // check for page and page size query params
@@ -480,9 +501,9 @@ export const getServerSideProps = middleware(
     // fetch a personal access token from the user
     const vulns = await v.json();
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/dependency-vulns/artifacts/",
+      uri + "refs/" + assetVersionSlug + "/artifacts/",
     );
     if (artifactsResp.ok) {
       artifactsData = await artifactsResp.json();

@@ -28,6 +28,7 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import {
+  ArtifactDTO,
   Component,
   ComponentPaged,
   License,
@@ -48,7 +49,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { BadgeInfo, ChevronDownIcon, GitBranch } from "lucide-react";
+import { ChevronDownIcon, GitBranch } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -63,23 +64,13 @@ import { useActiveProject } from "../../../../../../../../../hooks/useActiveProj
 
 import Page from "@/components/Page";
 import { Combobox } from "@/components/common/Combobox";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useRouter } from "next/router";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-} from "../../../../../../../../../components/ui/tooltip";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -88,13 +79,12 @@ import {
 } from "@/components/ui/popover";
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
-import { Switch } from "../../../../../../../../../components/ui/switch";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
   licenses: LicenseResponse[];
-  artifacts: string[];
+  artifacts: ArtifactDTO[];
 }
 
 const licenseMap = licenses.reduce(
@@ -316,13 +306,13 @@ const Index: FunctionComponent<Props> = ({
   const assetMenu = useAssetMenu();
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
+  const [showVexModal, setShowVexModal] = useState(false);
 
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useRouter().asPath.split("?")[0];
 
   const [datasets, setDatasets] = useState<{
     purl: string;
-    scannerId: string;
     scoreCard?: ScoreCard;
     project: Component["project"];
   }>();
@@ -338,7 +328,6 @@ const Index: FunctionComponent<Props> = ({
       purl: data.dependency.purl,
       scoreCard: data.dependency.project?.scoreCard,
       project: data.dependency.project,
-      scannerId: data.scannerIds.split(" ")[0],
     });
   }
 
@@ -382,6 +371,9 @@ const Index: FunctionComponent<Props> = ({
         <div className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Download SBOM
+          </Button>
+          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+            Download VeX
           </Button>
           <AsyncButton onClick={handleLicenseRefresh} variant={"secondary"}>
             Trigger license refresh
@@ -461,7 +453,9 @@ const Index: FunctionComponent<Props> = ({
         }
       >
         <div className="flex flex-row items-center justify-between gap-2">
-          <ArtifactSelector artifacts={artifacts} />
+          <QueryArtifactSelector
+            artifacts={artifacts.map((a) => a.artifactName)}
+          />
           <Input
             onChange={handleSearch}
             defaultValue={router.query.search as string}
@@ -526,7 +520,6 @@ const Index: FunctionComponent<Props> = ({
       {datasets && datasets.project && (
         <DependencyDialog
           open={true}
-          scannerId={datasets.scannerId}
           project={datasets.project} //undefined will make it go kaboom
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
@@ -534,8 +527,17 @@ const Index: FunctionComponent<Props> = ({
         ></DependencyDialog>
       )}
       <SbomDownloadModal
+        artifacts={artifacts}
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
+        pathname={pathname}
+        assetName={asset?.name}
+        assetVersionName={assetVersion?.name}
+      />
+      <VexDownloadModal
+        artifacts={artifacts}
+        showVexModal={showVexModal}
+        setShowVexModal={setShowVexModal}
         pathname={pathname}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
@@ -565,11 +567,13 @@ export const getServerSideProps = middleware(
 
     const params = buildFilterSearchParams(context);
 
-    const artifact = context.query.artifact;
+    const artifact = context.query.artifact as string;
     if (artifact) {
-      params.append("filterQuery[scanner_ids][any]", artifact as string);
+      params.append(
+        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
+        artifact as string,
+      );
     }
-
     const [components, licenses] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
@@ -598,7 +602,7 @@ export const getServerSideProps = middleware(
       },
     }));
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       "/organizations/" +
         organizationSlug +
@@ -608,7 +612,7 @@ export const getServerSideProps = middleware(
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/dependency-vulns/artifacts/",
+        "/artifacts/",
     );
 
     if (artifactsResp.ok) {

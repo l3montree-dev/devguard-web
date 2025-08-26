@@ -31,13 +31,13 @@ import DateString from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   purl: string;
   scoreCard?: ScoreCard;
-  scannerId: string;
   project: Project;
 }
 
@@ -45,20 +45,24 @@ const DependencyDialog: FunctionComponent<Props> = ({
   open,
   setOpen,
   scoreCard,
-  scannerId,
   purl,
   project: componentProject,
 }) => {
+  const search = useSearchParams();
+
   const asset = useActiveAsset();
   const organization = useActiveOrg();
   const project = useActiveProject();
 
   const [graphData, setGraphData] = useState<any>(null);
 
+  //read artifactName from url query params
+  const artifactName = (search.get("artifact") as string) || "";
+
   const handleGraphFetch = useCallback(
     async (data: string) => {
       const resp = await browserApiClient(
-        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?scanner=${scannerId}&purl=${encodeURIComponent(data)}`,
+        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?artifact=${artifactName}&purl=${encodeURIComponent(data)}`,
         {
           method: "GET",
         },
@@ -71,7 +75,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
         toast.error("Could not fetch Graph Data from Endpoint");
       }
     },
-    [asset?.slug, organization.slug, project.slug, scannerId],
+    [asset?.slug, organization.slug, project.slug, artifactName],
   );
 
   useEffect(() => {

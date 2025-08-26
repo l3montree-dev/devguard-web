@@ -90,9 +90,9 @@ import { CheckCircleIcon, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
-import ScannerBadge from "../../../../../../../../../../components/ScannerBadge";
 import CopyCode from "@/components/common/CopyCode";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import ArtifactBadge from "../../../../../../../../../../components/ArtifactBadge";
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   {
@@ -544,8 +544,11 @@ const Index: FunctionComponent<Props> = (props) => {
 
                 <VulnState state={vuln.state} />
                 {cve && <Severity risk={vuln.rawRiskAssessment} />}
-                {vuln.scannerIds.split(" ").map((s) => (
-                  <ScannerBadge key={s} scannerID={s} />
+                {vuln.artifacts.map((a) => (
+                  <ArtifactBadge
+                    key={a.artifactName + vuln.id}
+                    artifactName={a.artifactName}
+                  />
                 ))}
               </div>
               <div className="mb-16 mt-4">
@@ -1065,8 +1068,8 @@ const Index: FunctionComponent<Props> = (props) => {
                                 router.asPath +
                                 "/../../dependencies/graph?pkg=" +
                                 vuln.componentPurl +
-                                "&scanner=" +
-                                vuln.scannerIds.split(" ")[0]
+                                "&artifact=" +
+                                vuln.artifacts[0].artifactName
                               }
                             >
                               Show in dependency graph

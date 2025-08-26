@@ -1,11 +1,18 @@
 import {
-  GitBranchIcon,
   FileCode,
   FileTextIcon,
-  PersonStandingIcon,
+  GitBranchIcon,
   Loader2Icon,
+  PersonStandingIcon,
 } from "lucide-react";
+import Image from "next/image";
+import { Dispatch, SetStateAction, useState } from "react";
+import { toast } from "sonner";
+import { ArtifactDTO } from "../../types/api/api";
+import { SimpleArtifactSelector, useSelectArtifact } from "../ArtifactSelector";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,44 +20,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import Image from "next/image";
-import { Badge } from "../ui/badge";
-import { Dispatch, SetStateAction, useState } from "react";
-import { toast } from "sonner";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import { ArtifactDTO } from "../../types/api/api";
-import {
-  QueryArtifactSelector,
-  SimpleArtifactSelector,
-  useSelectArtifact,
-} from "../ArtifactSelector";
 
-interface SbomDownloadModalProps {
-  showSBOMModal: boolean;
-  setShowSBOMModal: Dispatch<SetStateAction<boolean>>;
+interface VexDownloadModalProps {
+  showVexModal: boolean;
+  setShowVexModal: Dispatch<SetStateAction<boolean>>;
   assetName?: string;
   assetVersionName?: string;
   pathname: string;
   artifacts: Array<ArtifactDTO>;
 }
 
-export default function SbomDownloadModal({
-  showSBOMModal,
-  setShowSBOMModal,
+export default function VexDownloadModal({
+  showVexModal,
+  setShowVexModal,
   assetName,
   assetVersionName,
   pathname,
   artifacts,
-}: SbomDownloadModalProps) {
+}: VexDownloadModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleDownloadPdfSbom = async () => {
+  const handleDownloadPdfVex = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
         pathname +
-          `/../sbom.pdf?${new URLSearchParams({
+          `/../vulnerability-report.pdf?${new URLSearchParams({
             artifact: selectedArtifact || "",
           })}`,
         {
@@ -60,7 +55,7 @@ export default function SbomDownloadModal({
       );
       if (!response.ok) {
         setIsLoading(false);
-        toast.error("Failed to download SBOM PDF. Please try again later.");
+        toast.error("Failed to download VeX PDF. Please try again later.");
         return;
       }
       const blob = await response.blob();
@@ -74,7 +69,7 @@ export default function SbomDownloadModal({
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      toast.error("Failed to download SBOM PDF. Please try again later.");
+      toast.error("Failed to download VeX PDF. Please try again later.");
     }
   };
 
@@ -83,27 +78,26 @@ export default function SbomDownloadModal({
   );
 
   return (
-    <Dialog open={showSBOMModal}>
-      <DialogContent setOpen={setShowSBOMModal}>
+    <Dialog open={showVexModal}>
+      <DialogContent setOpen={setShowVexModal}>
         <DialogHeader>
           <DialogTitle>
-            Download SBOM for &quot;{assetName}&quot;{" "}
+            Download VeX for &quot;{assetName}&quot;{" "}
             <Badge variant={"outline"} className="ml-1">
               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
               {assetVersionName}
             </Badge>
           </DialogTitle>
           <DialogDescription>
-            You can download the SBOM in JSON, XML or accessible PDF/UA format.
-            The SBOM contains all components and their licenses used in this
-            asset version.
+            You can download the VeX (Vulnerability Exploitability eXchange) in
+            machine readable formats and an accessible PDF if available.
           </DialogDescription>
         </DialogHeader>
         <div>
           <hr />
           <h4 className="font-semibold mt-4">Artifact</h4>
           <p className="text-sm mb-4 text-muted-foreground">
-            Select the artifact for which you want to download the SBOM.
+            Select the artifact for which you want to download the VeX.
           </p>
           <SimpleArtifactSelector
             unassignPossible={false}
@@ -115,17 +109,22 @@ export default function SbomDownloadModal({
         <hr />
         <h4 className="font-semibold mt-4">Machine Readable Formats</h4>
         <p className="text-sm text-muted-foreground">
-          The SBOM is available in CycloneDX JSON and XML format. You can use
-          these formats to integrate with other tools or for further processing.
+          The VeX is available in JSON and XML formats. Use these formats to
+          integrate with other tools or for further processing.
         </p>
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
-            href={pathname + `/../sbom.json`}
+            href={
+              pathname +
+              `/../vex.json?${new URLSearchParams({
+                artifact: selectedArtifact as string,
+              })}`
+            }
             format={"json"}
             icon={
               <Image
                 src="/assets/cyclonedx-logo.svg"
-                alt="CycloneDX Logo"
+                alt="JSON Logo"
                 width={20}
                 height={20}
                 className="h-5 w-auto inline-block"
@@ -134,7 +133,12 @@ export default function SbomDownloadModal({
             label={"Download in JSON-Format"}
           />
           <DelayedDownloadButton
-            href={pathname + `/../sbom.xml`}
+            href={
+              pathname +
+              `/../vex.xml?${new URLSearchParams({
+                artifact: selectedArtifact as string,
+              })}`
+            }
             format={"xml"}
             icon={
               <FileCode className="h-5 w-auto inline-block text-green-500" />
@@ -150,35 +154,14 @@ export default function SbomDownloadModal({
           </span>
         </h4>
         <p className="text-sm text-muted-foreground">
-          The SBOM is also available in an accessible PDF/UA format. This format
-          is suitable for human consumption and can be used for reporting
-          purposes. Generation is based on the{" "}
-          <Link
-            href="https://opencode.de"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            openCode
-          </Link>
-          {" Community Project "}
-          <Link
-            href="https://gitlab.opencode.de/open-code/document-writing-tools"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Document Writing Tools
-          </Link>
-          .
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Please note that creating the accessible PDF/UA format can take some
-          time (<span className="font-bold">up to several minutes</span>), so
-          please be patient. The download will start automatically once the PDF
-          is ready.
+          An accessible Vulnerability Report PDF can be generated for the
+          artifact. Generation may take some time (
+          <strong>up to several minutes</strong>); the download will start
+          automatically once ready.
         </p>
 
         <Button
-          onClick={handleDownloadPdfSbom}
+          onClick={handleDownloadPdfVex}
           variant="secondary"
           disabled={isLoading}
         >
@@ -190,7 +173,7 @@ export default function SbomDownloadModal({
               <PersonStandingIcon className="h-5 w-auto inline-block text-purple-500 mr-2" />
             </>
           )}
-          Download in PDF/UA-Format
+          Download Vulnerability Report PDF
         </Button>
       </DialogContent>
     </Dialog>

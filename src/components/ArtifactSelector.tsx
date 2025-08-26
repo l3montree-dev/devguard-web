@@ -3,7 +3,7 @@
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -12,12 +12,25 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
+export function useSelectArtifact(artifacts: string[]) {
   const router = useRouter();
   const [selectedArtifact, setSelectedArtifact] = useState(
-    (router.query.artifact as string) || "",
+    (router.query.artifact as string) || artifacts[0] || undefined,
   );
 
+  return { selectedArtifact, setSelectedArtifact };
+}
+export function SimpleArtifactSelector({
+  artifacts,
+  onSelect,
+  selectedArtifact,
+  unassignPossible = true,
+}: {
+  artifacts: string[];
+  onSelect: (artifact: string | undefined) => void;
+  selectedArtifact?: string;
+  unassignPossible?: boolean;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,17 +53,11 @@ export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
             checked={artifact === selectedArtifact}
             onClick={() => {
               //check if artifact is already selected
-              if (artifact === selectedArtifact) {
-                setSelectedArtifact("");
-                router.push({
-                  query: { ...router.query, artifact: "" },
-                });
+              if (artifact === selectedArtifact && unassignPossible) {
+                onSelect(undefined);
                 return;
               }
-              setSelectedArtifact(artifact);
-              router.push({
-                query: { ...router.query, artifact: artifact },
-              });
+              onSelect(artifact);
             }}
           >
             {artifact === "" ? "Default" : artifact}
@@ -58,5 +65,32 @@ export function ArtifactSelector({ artifacts }: { artifacts: string[] }) {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function QueryArtifactSelector({ artifacts }: { artifacts: string[] }) {
+  const { selectedArtifact, setSelectedArtifact } =
+    useSelectArtifact(artifacts);
+  const router = useRouter();
+
+  // add selected artifact to the url query params as ?artifact=artifactName
+
+  useEffect(() => {
+    if (selectedArtifact !== router.query.artifact)
+      router.push({
+        query: { ...router.query, artifact: selectedArtifact },
+      });
+  }, [selectedArtifact, router]);
+
+  const handleSelect = (artifact?: string) => {
+    setSelectedArtifact(artifact);
+  };
+
+  return (
+    <SimpleArtifactSelector
+      artifacts={artifacts}
+      onSelect={handleSelect}
+      selectedArtifact={selectedArtifact || ""}
+    />
   );
 }

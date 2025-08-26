@@ -31,7 +31,7 @@ import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
+import { ArtifactDTO, DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
 import {
@@ -44,13 +44,12 @@ import { useRouter } from "next/router";
 import { FunctionComponent, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
 
-import { ArtifactSelector } from "@/components/ArtifactSelector";
-import Callout from "../../../../../../../../../components/common/Callout";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 
 const DependencyGraphPage: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
   flaws: Array<VulnDTO>;
-  artifacts: string[];
+  artifacts: ArtifactDTO[];
 }> = ({ graph, flaws, artifacts }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -94,7 +93,9 @@ const DependencyGraphPage: FunctionComponent<{
       >
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
-            <ArtifactSelector artifacts={artifacts} />
+            <QueryArtifactSelector
+              artifacts={artifacts.map((a) => a.artifactName)}
+            />
           </div>
           <div className="flex flex-row items-center gap-4">
             {graph.root.risk !== 0 && (
@@ -226,6 +227,8 @@ export const getServerSideProps = middleware(
       context.params!;
 
     const apiClient = getApiClientFromContext(context);
+
+    let artifactName = encodeURIComponent(context.query.artifact as string);
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -235,43 +238,30 @@ export const getServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/";
+      "/artifacts/" +
+      artifactName;
 
-    // check for version query parameter
-    const version = context.query.version as string | undefined;
-
-    let scanner = context.query.artifact;
-
-    const [resp, flawResp] = await Promise.all([
+    const [resp, vulnResponse] = await Promise.all([
       apiClient(
         uri +
-          "dependency-graph?" +
+          "/dependency-graph/?" +
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
-            version: version,
-            scanner: scanner,
           }),
       ),
-      apiClient(
-        uri +
-          "affected-components?" +
-          toSearchParams({
-            version: version,
-            scanner: scanner,
-          }),
-      ),
+      apiClient(uri + "/affected-components/"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [graph, flaws] = await Promise.all([
+    const [graph, vulns] = await Promise.all([
       resp.json() as Promise<{ root: DependencyTreeNode }>,
-      flawResp.json() as Promise<Array<VulnDTO>>,
+      vulnResponse.json() as Promise<Array<VulnDTO>>,
     ]);
 
     let converted = convertGraph(graph.root);
 
-    recursiveAddRisk(converted, flaws);
+    recursiveAddRisk(converted, vulns);
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
 
@@ -302,7 +292,7 @@ export const getServerSideProps = middleware(
       });
     }
 
-    let artifactsData: string[] = [];
+    let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       "/organizations/" +
         organizationSlug +
@@ -312,7 +302,7 @@ export const getServerSideProps = middleware(
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/dependency-vulns/artifacts/",
+        "/artifacts/",
     );
 
     if (artifactsResp.ok) {
@@ -322,7 +312,7 @@ export const getServerSideProps = middleware(
     return {
       props: {
         graph: { root: converted },
-        flaws,
+        flaws: vulns,
         artifacts: artifactsData,
       },
     };

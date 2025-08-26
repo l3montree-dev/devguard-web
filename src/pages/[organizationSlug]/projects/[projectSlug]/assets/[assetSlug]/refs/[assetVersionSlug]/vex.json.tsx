@@ -14,8 +14,7 @@ export const getServerSideProps: GetServerSideProps = middleware(
     // fetch the project
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
-    // check for version query parameter
-    const version = context.query.version as string | undefined;
+
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -26,14 +25,11 @@ export const getServerSideProps: GetServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/vex.json?" +
-      new URLSearchParams({
-        ...(context.query.scanner
-          ? { scanner: context.query.scanner as string }
-          : {}),
-      });
+      "/artifacts/" +
+      encodeURIComponent(context.query.artifact as string) +
+      "/vex.json/";
 
-    const vex = await apiClient(uri + (version ? "?version=" + version : ""));
+    const vex = await apiClient(uri);
     if (!vex.ok) {
       context.res.statusCode = vex.status;
       context.res.setHeader("Content-Type", "application/json");

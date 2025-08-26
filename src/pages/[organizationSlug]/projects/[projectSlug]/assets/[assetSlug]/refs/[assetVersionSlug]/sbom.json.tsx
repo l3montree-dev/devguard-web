@@ -15,7 +15,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
     // check for version query parameter
-    const version = context.query.version as string | undefined;
     const apiClient = getApiClientFromContext(context);
     const uri =
       "/organizations/" +
@@ -26,14 +25,11 @@ export const getServerSideProps: GetServerSideProps = middleware(
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/sbom.json?" +
-      new URLSearchParams({
-        ...(context.query.scanner
-          ? { scanner: context.query.scanner as string }
-          : {}),
-      });
+      "/artifacts/" +
+      encodeURIComponent(context.query.artifact as string) +
+      "/sbom.json/";
 
-    const sbom = await apiClient(uri + (version ? "?version=" + version : ""));
+    const sbom = await apiClient(uri);
     if (!sbom.ok) {
       context.res.statusCode = sbom.status;
       context.res.setHeader("Content-Type", "application/json");

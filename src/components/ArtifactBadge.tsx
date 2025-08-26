@@ -3,10 +3,9 @@ import { FunctionComponent } from "react";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-const ScannerBadge: FunctionComponent<{ scannerID: string }> = ({
-  scannerID,
+const ArtifactBadge: FunctionComponent<{ artifactName: string }> = ({
+  artifactName,
 }) => {
-  const artifactName = scannerID;
   return (
     <Tooltip>
       <TooltipTrigger>
@@ -22,4 +21,4 @@ const ScannerBadge: FunctionComponent<{ scannerID: string }> = ({
   );
 };
 
-export default ScannerBadge;
+export default ArtifactBadge;
