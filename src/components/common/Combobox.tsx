@@ -35,14 +35,18 @@ import { Loader2 } from "lucide-react";
 interface Props {
   onSelect: (value: string) => void;
   onValueChange?: (value: string) => Promise<void>; // should refetch the items
-  items: Array<{
-    value: string;
-    label: string;
-  }>;
+  items:
+    | Array<{
+        value: string;
+        label: string;
+      }>
+    | Array<{ value: string; Render: React.ReactNode; label: string }>;
   placeholder: string;
   emptyMessage: string;
   loading?: boolean;
   value?: string;
+  multiSelect?: boolean;
+  alwaysRenderPlaceholder?: boolean; // if true, the placeholder is always rendered even if a value is selected
 }
 
 export function Combobox(props: Props) {
@@ -60,7 +64,7 @@ export function Combobox(props: Props) {
           className="-my-0.5 h-11 w-full min-w-[300px] justify-between"
         >
           <span className="flex-1 overflow-hidden overflow-ellipsis text-left">
-            {value
+            {value && !Boolean(props.alwaysRenderPlaceholder)
               ? props.items.find((item) => item.value === value)?.label
               : props.placeholder}
           </span>
@@ -92,29 +96,37 @@ export function Combobox(props: Props) {
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
-                    setOpen(false);
+                    if (!Boolean(props.multiSelect)) {
+                      setOpen(false);
+                    }
                   }}
                 >
-                  {item.value.startsWith("gitlab") ? (
-                    <img
-                      className="mr-2 inline-block h-4 w-4"
-                      src="/assets/gitlab.svg"
-                      alt="GitLab"
-                    />
-                  ) : item.value.startsWith("github") ? (
-                    <img
-                      className="mr-2 inline-block h-4 w-4 dark:invert"
-                      src="/assets/github.svg"
-                      alt="GitHub"
-                    />
-                  ) : item.value.startsWith("jira") ? (
-                    <img
-                      className="mr-2 inline-block h-4 w-4"
-                      src="/assets/jira-svgrepo-com.svg"
-                      alt="Jira"
-                    />
-                  ) : null}
-                  {item.label}
+                  {"Render" in item ? (
+                    item.Render
+                  ) : (
+                    <>
+                      {item.value.startsWith("gitlab") ? (
+                        <img
+                          className="mr-2 inline-block h-4 w-4"
+                          src="/assets/gitlab.svg"
+                          alt="GitLab"
+                        />
+                      ) : item.value.startsWith("github") ? (
+                        <img
+                          className="mr-2 inline-block h-4 w-4 dark:invert"
+                          src="/assets/github.svg"
+                          alt="GitHub"
+                        />
+                      ) : item.value.startsWith("jira") ? (
+                        <img
+                          className="mr-2 inline-block h-4 w-4"
+                          src="/assets/jira-svgrepo-com.svg"
+                          alt="Jira"
+                        />
+                      ) : null}
+                      {item.label}
+                    </>
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>

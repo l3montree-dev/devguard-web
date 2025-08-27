@@ -18,12 +18,14 @@ import {
   CogIcon,
   ListBulletIcon,
   ScaleIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import { useCurrentUser } from "./useCurrentUser";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUserRole } from "./useUserRole";
 import { UserRole } from "@/types/api/api";
+import { ContainerIcon } from "lucide-react";
 
 export const useProjectMenu = () => {
   const router = useRouter();
@@ -42,6 +44,11 @@ export const useProjectMenu = () => {
       isActive:
         router.pathname ===
         "/[organizationSlug]/projects/[projectSlug]/overview",
+    },
+    {
+      title: "Releases",
+      href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
+      Icon: ContainerIcon,
     },
     {
       title: project.externalEntityProviderId
