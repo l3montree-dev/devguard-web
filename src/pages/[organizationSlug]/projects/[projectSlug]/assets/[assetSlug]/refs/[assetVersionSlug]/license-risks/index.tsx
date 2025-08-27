@@ -86,9 +86,9 @@ const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("scannerIds", {
+    ...columnHelper.accessor("artifacts", {
       header: "Artifact",
-      id: "scannerID",
+      id: "artifactName",
       enableSorting: true,
       cell: (row) => (
         <div className="flex flex-row">
