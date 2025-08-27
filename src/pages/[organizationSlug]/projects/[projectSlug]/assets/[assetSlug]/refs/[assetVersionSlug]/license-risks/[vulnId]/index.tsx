@@ -49,6 +49,7 @@ import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useAc
 
 import EcosystemImage from "../../../../../../../../../../components/common/EcosystemImage";
 import Callout from "../../../../../../../../../../components/common/Callout";
+import ArtifactBadge from "@/components/ArtifactBadge";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -189,13 +190,12 @@ const Index: FunctionComponent<Props> = (props) => {
 
                 <VulnState state={vuln.state as any} />
 
-                <div className="flex flex-row gap-2">
-                  {vuln.scannerIds.split(" ").map((s) => (
-                    <Badge key={s} variant={"secondary"}>
-                      {s}
-                    </Badge>
-                  ))}
-                </div>
+                {vuln.artifacts.map((artifact) => (
+                  <ArtifactBadge
+                    key={artifact.artifactName + vuln.id}
+                    artifactName={artifact.artifactName}
+                  ></ArtifactBadge>
+                ))}
               </div>
 
               <div className="text-sm mt-6 text-muted-foreground">
