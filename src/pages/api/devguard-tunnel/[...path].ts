@@ -48,7 +48,7 @@ export default async function handler(
     },
     credentials: "include",
     redirect: "manual",
-    // @ts-expect-error
+    // @ts-ignore
     body: discardBodyMethods.includes(req.method!) ? undefined : bytes,
   });
 
