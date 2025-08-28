@@ -11,7 +11,7 @@ interface Props {
 
 const CVERainbowBadge = (props: Props) => {
   return (
-    <div className="flex flex-row font-normal text-xs text-white rounded-full overflow-hidden items-center">
+    <div className="flex flex-row font-normal text-xs text-white rounded-full overflow-hidden whitespace-nowrap items-center">
       <span
         className={classNames(
           "inline-block px-1",

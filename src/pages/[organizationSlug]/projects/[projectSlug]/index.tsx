@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,22 +19,19 @@ import ListItem from "../../../../components/common/ListItem";
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 import Link from "next/link";
 import { toast } from "sonner";
 import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
+import Avatar from "../../../../components/Avatar";
 import EmptyParty from "../../../../components/common/EmptyParty";
+import Markdown from "../../../../components/common/Markdown";
 import ProjectTitle from "../../../../components/common/ProjectTitle";
 import { ProjectForm } from "../../../../components/project/ProjectForm";
 import { withOrgs } from "../../../../decorators/withOrgs";
@@ -50,12 +47,10 @@ import {
   EnvDTO,
   PolicyEvaluation,
   ProjectDTO,
+  ReleaseDTO,
   RequirementsLevel,
   UserRole,
 } from "../../../../types/api/api";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
-import Markdown from "../../../../components/common/Markdown";
-import Avatar from "../../../../components/Avatar";
 
 interface Props {
   project: ProjectDTO & {

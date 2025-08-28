@@ -13,9 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { RiskHistory } from "@/types/api/api";
-import { severityToColor } from "./common/Severity";
-import { useMemo } from "react";
+import { ReleaseRiskHistory } from "@/types/api/api";
 import {
   Area,
   AreaChart,
@@ -24,51 +22,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { severityToColor } from "./common/Severity";
 
 export function RiskHistoryDistributionDiagram({
   data,
   mode = "risk",
 }: {
-  data: Array<{ label: string; history: RiskHistory[] }>;
+  data: ReleaseRiskHistory[];
   mode?: "risk" | "cvss";
 }) {
-  // Aggregate risk levels for each day across all projects
-  const reduced = useMemo(() => {
-    if (data.length === 0) {
-      return [];
-    }
-    // Assume all projects have the same days in history
-    const days = data[0].history.map((h) => h.day);
-    return days.map((day, idx) => {
-      let critical = 0;
-      let high = 0;
-      let medium = 0;
-      let low = 0;
-      for (let i = 0; i < data.length; i++) {
-        const h = data[i].history[idx];
-        if (!h) continue; // Skip if no data for this day
-        if (mode === "risk") {
-          critical += h.critical || 0;
-          high += h.high || 0;
-          medium += h.medium || 0;
-          low += h.low || 0;
-        } else {
-          critical += h.criticalCvss || 0;
-          high += h.highCvss || 0;
-          medium += h.mediumCvss || 0;
-          low += h.lowCvss || 0;
-        }
-      }
-      return {
-        day,
-        critical,
-        high,
-        medium,
-        low,
-      };
-    });
-  }, [data, mode]);
-
   return (
     <Card>
       <CardHeader>
@@ -103,7 +65,7 @@ export function RiskHistoryDistributionDiagram({
               },
             }}
           >
-            <AreaChart accessibilityLayer data={reduced}>
+            <AreaChart accessibilityLayer data={data}>
               <ChartLegend content={<ChartLegendContent />} />
               <CartesianGrid vertical={false} />
               <XAxis

@@ -16,16 +16,16 @@ export const fetchAssetStats = async ({
   assetSlug,
   apiClient,
   assetVersionSlug,
-  context,
+  artifactName,
 }: {
+  artifactName: string;
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
   apiClient: DevGuardApiClient;
-  assetVersionSlug?: string;
+  assetVersionSlug: string;
   context: GetServerSidePropsContext;
 }): Promise<{
-  compliance: Array<PolicyEvaluation>;
   componentRisk: ComponentRisk;
   riskHistory: Array<RiskDistribution>;
   avgLowFixingTime: AverageFixingTime;
@@ -35,21 +35,19 @@ export const fetchAssetStats = async ({
   licenses: Array<LicenseResponse>;
   events: Paged<VulnEventDTO>;
 }> => {
-  let url =
+  const url =
     "/organizations/" +
     organizationSlug +
     "/projects/" +
     projectSlug +
     "/assets/" +
-    assetSlug;
-
-  if (assetVersionSlug) {
-    // we should fetch the stats of a specific asset version instead of the default one.
-    url += "/refs/" + assetVersionSlug;
-  }
+    assetSlug +
+    "/refs/" +
+    assetVersionSlug +
+    "/artifacts/" +
+    encodeURIComponent(artifactName);
 
   const [
-    compliance,
     componentRisk,
     riskHistoryResp,
     avgLowFixingTime,
@@ -59,41 +57,46 @@ export const fetchAssetStats = async ({
     licenses,
     events,
   ] = await Promise.all([
-    apiClient(url + "/compliance").then((r) => r.json()),
-    apiClient(url + "/stats/component-risk").then((r) => r.json()),
+    apiClient(url + "/stats/component-risk/").then((r) => r.json()),
     apiClient(
       url +
-        "/stats/risk-history?start=" +
+        "/stats/risk-history/?start=" +
         extractDateOnly(last3Month) +
         "&end=" +
         extractDateOnly(new Date()),
     ),
-    apiClient(url + "/stats/average-fixing-time?severity=low").then((r) =>
+    apiClient(url + "/stats/average-fixing-time/?severity=low").then((r) =>
       r.json(),
     ),
-    apiClient(url + "/stats/average-fixing-time?severity=medium").then((r) =>
+    apiClient(url + "/stats/average-fixing-time/?severity=medium").then((r) =>
       r.json(),
     ),
-    apiClient(url + "/stats/average-fixing-time?severity=high").then((r) =>
+    apiClient(url + "/stats/average-fixing-time/?severity=high").then((r) =>
       r.json(),
     ),
-    apiClient(url + "/stats/average-fixing-time?severity=critical").then((r) =>
+    apiClient(url + "/stats/average-fixing-time/?severity=critical").then((r) =>
       r.json(),
     ),
-    apiClient(url + "/components/licenses").then(
+    apiClient(url + "/components/licenses/").then(
       (r) => r.json() as Promise<LicenseResponse[]>,
     ),
-    apiClient(url + "/events/?pageSize=3").then((r) => r.json()),
+    apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/events/?pageSize=3",
+    ).then((r) => r.json()),
   ]);
-
-  // sort the licenses by count
-  licenses.sort((a, b) => b.count - a.count);
 
   // risk history is not paginated, so we can directly access the data
   const riskHistory: Array<RiskDistribution> = await riskHistoryResp.json();
 
   return {
-    compliance,
     componentRisk,
     riskHistory,
     avgLowFixingTime,

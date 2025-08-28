@@ -729,8 +729,48 @@ export interface RiskHistory {
 
   openVulns: number;
   fixedVulns: number;
+
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
+
+  artifactName?: string;
+  assetId?: string;
+  assetVersionName?: string;
 }
 
+export type ReleaseRiskHistory = Omit<
+  RiskHistory,
+  "artifactName" | "assetId" | "assetVersionName"
+>;
 export interface AverageFixingTime {
   averageFixingTimeSeconds: number;
+}
+
+export interface ReleaseItem {
+  id: string;
+  releaseId: string;
+  childReleaseId?: string;
+  childReleaseName?: string;
+  artifactName?: string;
+  artifactAssetVersionName?: string;
+  artifactAssetId?: string;
+}
+
+export interface ReleaseDTO {
+  id: string;
+  projectId: string;
+  items?: ReleaseItem[]; // will only be undefined if all child releases have been deleted
+  createdAt: string;
+  name: string;
+}
+
+export interface CandidatesDTO {
+  releases: ReleaseDTO[];
+  artifacts: Array<ArtifactDTO>;
 }

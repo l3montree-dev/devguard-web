@@ -77,16 +77,12 @@ export function VulnerableComponents({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col">
+        <div className="flex -mt-4 flex-col">
           {d.slice(0, 5).map((item, i, arr) => (
             <div
               key={item.componentName}
               className={classNames(
-                i === 0
-                  ? "border-b pb-4"
-                  : i === arr.length - 1
-                    ? "pt-4"
-                    : "border-b py-4",
+                i === arr.length - 1 ? "pt-4" : "border-b py-4",
                 "flex flex-row items-center gap-4",
               )}
             >

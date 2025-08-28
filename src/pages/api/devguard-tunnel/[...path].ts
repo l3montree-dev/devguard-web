@@ -48,7 +48,7 @@ export default async function handler(
     },
     credentials: "include",
     redirect: "manual",
-    // TODO: Remove body parser to avoid parsing and stringifying afterwards
+    // @ts-ignore
     body: discardBodyMethods.includes(req.method!) ? undefined : bytes,
   });
 

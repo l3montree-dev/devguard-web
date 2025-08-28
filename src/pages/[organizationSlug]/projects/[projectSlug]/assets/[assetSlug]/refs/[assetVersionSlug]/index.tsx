@@ -10,16 +10,14 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
+import { getApiClientFromContext } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
 // ...existing code...
-import { FunctionComponent, useMemo, useState, useEffect } from "react";
+import { FunctionComponent } from "react";
 
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
@@ -47,10 +45,14 @@ import { VulnerableComponents } from "@/components/VulnerableComponents";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
+import { AsyncButton } from "../../../../../../../../components/ui/button";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
+import { withArtifacts } from "../../../../../../../../decorators/withArtifacts";
+import { useArtifacts } from "../../../../../../../../hooks/useArtifacts";
 import { fetchAssetStats } from "../../../../../../../../services/statService";
 import {
   AverageFixingTime,
@@ -61,8 +63,6 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import { AsyncButton } from "../../../../../../../../components/ui/button";
-import { toast } from "sonner";
 
 interface Props {
   compliance: Array<PolicyEvaluation>;
@@ -91,6 +91,7 @@ const Index: FunctionComponent<Props> = ({
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
   const assetMenu = useAssetMenu();
+  const artifacts = useArtifacts() || [];
   const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -134,7 +135,13 @@ const Index: FunctionComponent<Props> = ({
       Title={<AssetTitle />}
     >
       <div className="flex flex-row items-center justify-between">
-        <BranchTagSelector branches={branches} tags={tags} />
+        <div className="flex items-center gap-2">
+          <BranchTagSelector branches={branches} tags={tags} />
+          <QueryArtifactSelector
+            unassignPossible={false}
+            artifacts={artifacts.map((a) => a.artifactName)}
+          />
+        </div>
         <AsyncButton onClick={downloadPdfReport} variant={"secondary"}>
           Download PDF-Report
         </AsyncButton>
@@ -227,15 +234,11 @@ const Index: FunctionComponent<Props> = ({
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex  flex-col">
+                    <div className="flex -mt-4 flex-col">
                       {licenses.slice(0, 5).map((el, i, arr) => (
                         <div
                           className={
-                            i === 0
-                              ? "border-b pb-4"
-                              : i === arr.length - 1
-                                ? "pt-4"
-                                : "border-b py-4"
+                            i === arr.length - 1 ? "pt-4" : "border-b py-4"
                           }
                           key={el.license.licenseId}
                         >
@@ -269,10 +272,7 @@ const Index: FunctionComponent<Props> = ({
                 </Card>
               </div>
             </div>
-            <RiskHistoryDistributionDiagram
-              data={[{ label: asset?.name ?? "Asset", history: riskHistory }]}
-              mode={mode}
-            />
+            <RiskHistoryDistributionDiagram data={riskHistory} mode={mode} />
             <div className="grid grid-cols-8 gap-4">
               <div className="col-span-4 grid grid-cols-2 gap-4">
                 <AverageFixingTimeChart
@@ -353,14 +353,15 @@ const Index: FunctionComponent<Props> = ({
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { artifacts }) => {
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
+
+    const artifact = artifacts[0];
 
     const apiClient = getApiClientFromContext(context);
 
     const {
-      compliance,
       componentRisk,
       riskHistory,
       avgLowFixingTime,
@@ -376,11 +377,11 @@ export const getServerSideProps = middleware(
       assetVersionSlug: assetVersionSlug as string,
       apiClient,
       context,
+      artifactName: artifact.artifactName,
     });
 
     return {
       props: {
-        compliance,
         componentRisk,
         riskHistory,
         avgLowFixingTime,
@@ -400,5 +401,6 @@ export const getServerSideProps = middleware(
     asset: withAsset,
     assetVersion: withAssetVersion,
     contentTree: withContentTree,
+    artifacts: withArtifacts,
   },
 );

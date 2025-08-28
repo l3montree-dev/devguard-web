@@ -12,23 +12,23 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import { HEADER_HEIGHT } from "@/const/viewConstants";
+import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
+import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect, useState } from "react";
-import AppSidebar, { OrganizationDropDown } from "./AppSidebar";
-import UserNav from "./navigation/UserNav";
-import { SidebarProvider } from "./ui/sidebar";
-import { useStore } from "@/zustand/globalStoreProvider";
-import useDimensions from "@/hooks/useDimensions";
-import { HEADER_HEIGHT } from "@/const/viewConstants";
+import React, { FunctionComponent, useEffect } from "react";
+import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import { useActiveAsset } from "../hooks/useActiveAsset";
-import GitProviderIcon from "./GitProviderIcon";
 import { providerIdToBaseURL } from "../utils/externalProvider";
-import { useParams } from "next/navigation";
+import { OrganizationDropDown } from "./OrganizationDropDown";
+import GitProviderIcon from "./GitProviderIcon";
+import UserNav from "./navigation/UserNav";
+import { SidebarProvider } from "./ui/sidebar";
 
 interface Props {
   title: string;
