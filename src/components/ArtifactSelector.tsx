@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ContainerIcon } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -11,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ContainerIcon } from "lucide-react";
 
 export function useSelectArtifact(artifacts: string[]) {
   const router = useRouter();
@@ -26,7 +26,6 @@ export function SimpleArtifactSelector({
   onSelect,
   selectedArtifact,
   isReleaseSelector = false,
-  unassignPossible = true,
 }: {
   artifacts: string[];
   onSelect: (artifact: string | undefined) => void;
@@ -59,8 +58,7 @@ export function SimpleArtifactSelector({
             checked={artifact === selectedArtifact}
             onClick={() => {
               //check if artifact is already selected
-              if (artifact === selectedArtifact && unassignPossible) {
-                onSelect(undefined);
+              if (artifact === selectedArtifact) {
                 return;
               }
               onSelect(artifact);
@@ -76,7 +74,6 @@ export function SimpleArtifactSelector({
 
 export function QueryArtifactSelector({
   artifacts,
-  unassignPossible,
   isReleaseSelector = false,
 }: {
   artifacts: string[];
@@ -102,7 +99,6 @@ export function QueryArtifactSelector({
 
   return (
     <SimpleArtifactSelector
-      unassignPossible={unassignPossible}
       artifacts={artifacts}
       onSelect={handleSelect}
       isReleaseSelector={isReleaseSelector}

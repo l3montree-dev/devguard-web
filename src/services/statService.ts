@@ -77,9 +77,18 @@ export const fetchAssetStats = async ({
     apiClient(url + "/stats/average-fixing-time/?severity=critical").then((r) =>
       r.json(),
     ),
-    apiClient(url + "/components/licenses/").then(
-      (r) => r.json() as Promise<LicenseResponse[]>,
-    ),
+    apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/components/licenses/?artifact=" +
+        encodeURIComponent(artifactName),
+    ).then((r) => r.json() as Promise<LicenseResponse[]>),
     apiClient(
       "/organizations/" +
         organizationSlug +

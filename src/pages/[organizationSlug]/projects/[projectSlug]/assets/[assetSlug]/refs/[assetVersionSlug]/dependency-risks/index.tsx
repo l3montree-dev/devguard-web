@@ -57,21 +57,14 @@ import SbomDownloadModal from "../../../../../../../../../components/dependencie
 import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { config } from "../../../../../../../../../config";
+import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../components/ui/dropdown-menu";
-import Link from "next/link";
-import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
+import { useArtifacts } from "../../../../../../../../../hooks/useArtifacts";
 
 interface Props {
   apiUrl: string;
   vulns: Paged<VulnByPackage>;
-  artifacts: ArtifactDTO[];
 }
 
 const columnHelper = createColumnHelper<VulnByPackage>();
@@ -226,6 +219,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = router.asPath.split("?")[0];
 
+  const artifacts = useArtifacts();
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
@@ -243,7 +237,7 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       </div>
       <VexDownloadModal
-        artifacts={props.artifacts}
+        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
         pathname={pathname}
@@ -259,7 +253,7 @@ const Index: FunctionComponent<Props> = (props) => {
       >
         <div className="relative flex flex-row gap-2">
           <QueryArtifactSelector
-            artifacts={(props.artifacts ?? []).map((a) => a.artifactName)}
+            artifacts={artifacts.map((a) => a.artifactName)}
           />
           <Tabs
             defaultValue={
@@ -403,7 +397,7 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       )}
       <SbomDownloadModal
-        artifacts={props.artifacts}
+        artifacts={artifacts}
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
         pathname={pathname}
@@ -478,14 +472,6 @@ export const getServerSideProps = middleware(
 
     // fetch a personal access token from the user
     const vulns = await v.json();
-
-    let artifactsData: ArtifactDTO[] = [];
-    const artifactsResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/artifacts/",
-    );
-    if (artifactsResp.ok) {
-      artifactsData = await artifactsResp.json();
-    }
 
     return {
       props: {
