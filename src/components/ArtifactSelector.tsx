@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { ContainerIcon } from "lucide-react";
 
 export function useSelectArtifact(artifacts: string[]) {
   const router = useRouter();
@@ -24,18 +25,23 @@ export function SimpleArtifactSelector({
   artifacts,
   onSelect,
   selectedArtifact,
+  isReleaseSelector = false,
   unassignPossible = true,
 }: {
   artifacts: string[];
   onSelect: (artifact: string | undefined) => void;
   selectedArtifact?: string;
   unassignPossible?: boolean;
+  isReleaseSelector?: boolean;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           <div className="flex w-52 items-center justify-between h-4">
+            {isReleaseSelector && (
+              <ContainerIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+            )}
             <span className="text-ellipsis text-left block flex-1 overflow-hidden">
               {selectedArtifact || "Select Artifact"}
             </span>
@@ -68,7 +74,15 @@ export function SimpleArtifactSelector({
   );
 }
 
-export function QueryArtifactSelector({ artifacts }: { artifacts: string[] }) {
+export function QueryArtifactSelector({
+  artifacts,
+  unassignPossible,
+  isReleaseSelector = false,
+}: {
+  artifacts: string[];
+  unassignPossible?: boolean;
+  isReleaseSelector?: boolean;
+}) {
   const { selectedArtifact, setSelectedArtifact } =
     useSelectArtifact(artifacts);
   const router = useRouter();
@@ -88,8 +102,10 @@ export function QueryArtifactSelector({ artifacts }: { artifacts: string[] }) {
 
   return (
     <SimpleArtifactSelector
+      unassignPossible={unassignPossible}
       artifacts={artifacts}
       onSelect={handleSelect}
+      isReleaseSelector={isReleaseSelector}
       selectedArtifact={selectedArtifact || ""}
     />
   );

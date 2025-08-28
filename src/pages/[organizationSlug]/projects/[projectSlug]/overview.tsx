@@ -1,8 +1,3 @@
-import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState, useEffect } from "react";
-import Page from "../../../../components/Page";
-import { middleware } from "@/decorators/middleware";
-import { useViewMode } from "@/hooks/useViewMode";
 import {
   Card,
   CardContent,
@@ -10,13 +5,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { middleware } from "@/decorators/middleware";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withProject } from "@/decorators/withProject";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import { useViewMode } from "@/hooks/useViewMode";
 import { beautifyPurl, classNames } from "@/utils/common";
-import Link from "next/link";
+import { GetServerSidePropsContext } from "next";
+import { FunctionComponent, useMemo } from "react";
+import Page from "../../../../components/Page";
 import { withOrgs } from "../../../../decorators/withOrgs";
 import { withSession } from "../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
@@ -24,16 +22,16 @@ import { getApiClientFromContext } from "../../../../services/devGuardApi";
 import {
   AssetDTO,
   AverageFixingTime,
-  DependencyCountByscanner,
+  Paged,
   ProjectDTO,
-  RiskDistribution,
+  ReleaseDTO,
+  ReleaseRiskHistory,
   RiskHistory,
-  VulnAggregationStateAndChange,
-  VulnCountByScanner,
 } from "../../../../types/api/api";
 
-import { padRiskHistory } from "@/utils/server";
+import { groupBy } from "lodash";
 import { useRouter } from "next/router";
+import { QueryArtifactSelector } from "../../../../components/ArtifactSelector";
 import Avatar from "../../../../components/Avatar";
 import AverageFixingTimeChart from "../../../../components/AverageFixingTimeChart";
 import EmptyParty from "../../../../components/common/EmptyParty";
@@ -49,22 +47,17 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../components/ui/tabs";
+import { normalizeContentTree } from "../../../../zustand/globalStore";
+import { useStore } from "../../../../zustand/globalStoreProvider";
 
 interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
-  riskHistory: Array<{
-    history: RiskHistory[];
-    label: string;
-    slug: string;
-    description: string;
-    type: "project" | "asset";
-    avatar: string;
-  }>;
-  flawCountByScanner: VulnCountByScanner;
-  dependencyCountByscanner: DependencyCountByscanner;
-  flawAggregationStateAndChange: VulnAggregationStateAndChange;
+  // risk history for each day - each asset - thus double array
+  riskHistory: Array<Array<RiskHistory>>;
+  reducedRiskHistory: Array<ReleaseRiskHistory>;
+  releases: Paged<ReleaseDTO>;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
   avgHighFixingTime: AverageFixingTime;
@@ -77,38 +70,51 @@ const Index: FunctionComponent<Props> = ({
   avgLowFixingTime,
   avgMediumFixingTime,
   avgHighFixingTime,
+  releases,
   avgCriticalFixingTime,
+  reducedRiskHistory,
 }) => {
   const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
   const router = useRouter();
-  const activeProject = useActiveProject();
+  const contentTree = useStore((state) => state.contentTree);
+  const normalizedContentTree = useMemo(() => {
+    return normalizeContentTree(contentTree || []);
+  }, [contentTree]);
 
-  if (riskHistory.length === 0) {
+  if (releases.data.length === 0) {
     return (
       <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
         <EmptyParty
-          title={"No data available for this project"}
+          title={"No data available for this group yet..."}
           Button={
             <Button
               onClick={() => {
                 router.push(
-                  `/${activeOrg.slug}/projects/${project.slug}/assets`,
+                  `/${activeOrg.slug}/projects/${project.slug}/releases`,
                 );
               }}
             >
-              Create new asset
+              Create new release
             </Button>
           }
-          description="Create an asset and start scanning it to see the data here."
+          description="Create a release to group multiple repository artifacts into their own release. This allows you to track and monitor your software over time."
         />
       </Page>
     );
   }
 
+  console.log(riskHistory);
+
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
+      <div className="mb-4">
+        <QueryArtifactSelector
+          artifacts={releases.data?.map((r) => r.name) || []}
+        />
+      </div>
+
       <Section
         primaryHeadline
         forceVertical
@@ -133,16 +139,12 @@ const Index: FunctionComponent<Props> = ({
                 variant="critical"
                 currentAmount={
                   mode === "risk"
-                    ? riskHistory.reduce(
-                        (sum, r) =>
-                          sum +
-                          (r.history[r.history.length - 1]?.critical ?? 0),
+                    ? riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.critical ?? 0),
                         0,
                       )
-                    : riskHistory.reduce(
-                        (sum, r) =>
-                          sum +
-                          (r.history[r.history.length - 1]?.criticalCvss ?? 0),
+                    : riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.criticalCvss ?? 0),
                         0,
                       )
                 }
@@ -154,15 +156,12 @@ const Index: FunctionComponent<Props> = ({
                 variant="high"
                 currentAmount={
                   mode === "risk"
-                    ? riskHistory.reduce(
-                        (sum, r) =>
-                          sum + (r.history[r.history.length - 1]?.high ?? 0),
+                    ? riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.high ?? 0),
                         0,
                       )
-                    : riskHistory.reduce(
-                        (sum, r) =>
-                          sum +
-                          (r.history[r.history.length - 1]?.highCvss ?? 0),
+                    : riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.highCvss ?? 0),
                         0,
                       )
                 }
@@ -174,15 +173,12 @@ const Index: FunctionComponent<Props> = ({
                 variant="medium"
                 currentAmount={
                   mode === "risk"
-                    ? riskHistory.reduce(
-                        (sum, r) =>
-                          sum + (r.history[r.history.length - 1]?.medium ?? 0),
+                    ? riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.medium ?? 0),
                         0,
                       )
-                    : riskHistory.reduce(
-                        (sum, r) =>
-                          sum +
-                          (r.history[r.history.length - 1]?.mediumCvss ?? 0),
+                    : riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.mediumCvss ?? 0),
                         0,
                       )
                 }
@@ -194,14 +190,12 @@ const Index: FunctionComponent<Props> = ({
                 variant="low"
                 currentAmount={
                   mode === "risk"
-                    ? riskHistory.reduce(
-                        (sum, r) =>
-                          sum + (r.history[r.history.length - 1]?.low ?? 0),
+                    ? riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.low ?? 0),
                         0,
                       )
-                    : riskHistory.reduce(
-                        (sum, r) =>
-                          sum + (r.history[r.history.length - 1]?.lowCvss ?? 0),
+                    : riskHistory[riskHistory.length - 1].reduce(
+                        (sum, r) => sum + (r?.lowCvss ?? 0),
                         0,
                       )
                 }
@@ -240,89 +234,91 @@ const Index: FunctionComponent<Props> = ({
 
               <Card className="col-span-2">
                 <CardHeader>
-                  <CardTitle>Vulnerable Repositories</CardTitle>
+                  <CardTitle>Vulnerable Artifacts</CardTitle>
                   <CardDescription>
-                    The most vulnerable assets in this project
+                    The most vulnerable artifacts in this release
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-2">
-                    {riskHistory.slice(0, 7).map((r, i, arr) => {
-                      const riskHistoryLastElement =
-                        r.history[r.history.length - 1];
-                      return (
-                        <Link
-                          href={
-                            r.type === "project"
-                              ? "/" + activeOrg.slug + "/projects/" + r.slug
-                              : "/" +
-                                activeOrg.slug +
-                                "/projects/" +
-                                activeProject?.slug +
-                                "/assets/" +
-                                r.slug
-                          }
-                          key={r.slug}
-                          className={classNames(
-                            i === 0
-                              ? "border-b pb-4"
-                              : i === arr.length - 1
-                                ? "pt-4"
-                                : "border-b py-4",
-                            "flex items-center flex-row gap-4",
-                          )}
-                        >
-                          <Avatar name={r.label} avatar={r.avatar} />
+                    {riskHistory.length > 0 &&
+                      riskHistory[riskHistory.length - 1]
+                        .slice(0, 7)
+                        .map((r, i, arr) => {
+                          const asset = normalizedContentTree[r.assetId || ""];
 
-                          <div>
-                            <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                              <span className="capitalize text-foreground">
-                                {beautifyPurl(r.label)}
-                              </span>
-                              <div className="flex flex-row flex-wrap gap-2">
-                                <CVERainbowBadge
-                                  low={
-                                    mode === "risk"
-                                      ? (riskHistoryLastElement?.low ?? 0)
-                                      : (riskHistoryLastElement?.lowCvss ?? 0)
+                          return (
+                            <div
+                              key={r.id}
+                              className={classNames(
+                                i === 0
+                                  ? "border-b pb-4"
+                                  : i === arr.length - 1
+                                    ? "pt-4"
+                                    : "border-b py-4",
+                                "flex items-center flex-row gap-4",
+                              )}
+                            >
+                              <div className="flex-1">
+                                <Avatar
+                                  name={
+                                    asset?.name
+                                      ? asset.name
+                                      : r.artifactName || ""
                                   }
-                                  medium={
-                                    mode === "risk"
-                                      ? (riskHistoryLastElement?.medium ?? 0)
-                                      : (riskHistoryLastElement?.mediumCvss ??
-                                        0)
-                                  }
-                                  high={
-                                    mode === "risk"
-                                      ? (riskHistoryLastElement?.high ?? 0)
-                                      : (riskHistoryLastElement?.highCvss ?? 0)
-                                  }
-                                  critical={
-                                    mode === "risk"
-                                      ? (riskHistoryLastElement?.critical ?? 0)
-                                      : (riskHistoryLastElement?.criticalCvss ??
-                                        0)
-                                  }
+                                  avatar={asset?.avatar}
                                 />
                               </div>
-                            </div>
+                              <div>
+                                <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                                  <span className="text-foreground">
+                                    {beautifyPurl(r.artifactName || "")}
+                                  </span>
+                                  <div className="flex whitespace-nowrap flex-row flex-wrap gap-2">
+                                    <CVERainbowBadge
+                                      low={
+                                        mode === "risk"
+                                          ? (r?.low ?? 0)
+                                          : (r?.lowCvss ?? 0)
+                                      }
+                                      medium={
+                                        mode === "risk"
+                                          ? (r?.medium ?? 0)
+                                          : (r?.mediumCvss ?? 0)
+                                      }
+                                      high={
+                                        mode === "risk"
+                                          ? (r?.high ?? 0)
+                                          : (r?.highCvss ?? 0)
+                                      }
+                                      critical={
+                                        mode === "risk"
+                                          ? (r?.critical ?? 0)
+                                          : (r?.criticalCvss ?? 0)
+                                      }
+                                    />
+                                  </div>
+                                </div>
 
-                            <p className="text-sm text-muted-foreground">
-                              {r.description
-                                ? r.description
-                                : "No description available"}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
+                                <p className="text-sm text-muted-foreground">
+                                  {asset?.description
+                                    ? asset.description
+                                    : "No description available"}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
                   </div>
                   <div className="flex items-center gap-4"></div>
                 </CardContent>
               </Card>
             </div>
             <div className="col-span-2">
-              <RiskHistoryDistributionDiagram data={riskHistory} mode={mode} />
+              <RiskHistoryDistributionDiagram
+                data={reducedRiskHistory}
+                mode={mode}
+              />
             </div>
           </TabsContent>
         </Tabs>
@@ -334,9 +330,43 @@ export default Index;
 
 const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 
+const reduceRiskHistories = (
+  histories: RiskHistory[][],
+): Array<ReleaseRiskHistory> => {
+  return histories.map((dayHistories) => {
+    return dayHistories.reduce(
+      (acc, curr) => {
+        acc.low += curr.low;
+        acc.medium += curr.medium;
+        acc.high += curr.high;
+        acc.critical += curr.critical;
+        acc.lowCvss += curr.lowCvss;
+        acc.mediumCvss += curr.mediumCvss;
+        acc.highCvss += curr.highCvss;
+        acc.criticalCvss += curr.criticalCvss;
+        return acc;
+      },
+      {
+        id: dayHistories[0]?.id || "",
+        day: dayHistories[0]?.day || new Date(),
+        assetId: dayHistories[0]?.assetId || "",
+        artifactName: dayHistories[0]?.artifactName || "",
+        low: 0,
+        medium: 0,
+        high: 0,
+        critical: 0,
+        lowCvss: 0,
+        mediumCvss: 0,
+        highCvss: 0,
+        criticalCvss: 0,
+      } as RiskHistory,
+    );
+  });
+};
+
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { project }) => {
-    const { organizationSlug, projectSlug } = context.params!;
+  async (context: GetServerSidePropsContext, { project, contentTree }) => {
+    let { organizationSlug, projectSlug, releaseId } = context.params!;
 
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -345,56 +375,79 @@ export const getServerSideProps = middleware(
     last3Month.setMonth(last3Month.getMonth() - 3);
 
     const apiClient = getApiClientFromContext(context);
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/stats";
-    const [
-      riskHistory,
-      flawAggregationStateAndChange,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-    ] = await Promise.all([
-      apiClient(
-        url +
-          "/risk-history?start=" +
-          extractDateOnly(last3Month) +
-          "&end=" +
-          extractDateOnly(new Date()),
-      ).then(
-        (r) =>
-          r.json() as Promise<
-            Array<
-              | { riskHistory: RiskHistory[]; asset: AssetDTO }
-              | {
-                  riskHistory: [];
-                  project: ProjectDTO;
-                }
-            >
-          >,
-      ),
-      apiClient(
-        url +
-          "/flaw-aggregation-state-and-change?compareTo=" +
-          lastMonth.toISOString().split("T")[0],
-      ).then((r) => r.json()),
-      apiClient(url + "/average-fixing-time?severity=low").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=high").then((r) =>
-        r.json(),
-      ),
-      apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
-        r.json(),
-      ),
-    ]);
+
+    const releasesResp = await apiClient(
+      `/organizations/${organizationSlug}/projects/${project.slug}/releases/`,
+    );
+    const releases = (
+      releasesResp.ok ? await releasesResp.json() : { data: [] }
+    ) as Paged<ReleaseDTO>;
+
+    if (
+      !releaseId ||
+      releases.data.findIndex((r) => r.id === releaseId) === -1
+    ) {
+      releaseId = releases.data.length > 0 ? releases.data[0].id : undefined;
+    }
+
+    let riskHistory: Array<any> = [];
+    let avgLowFixingTime: AverageFixingTime = { averageFixingTimeSeconds: 0 };
+    let avgMediumFixingTime: AverageFixingTime = {
+      averageFixingTimeSeconds: 0,
+    };
+    let avgHighFixingTime: AverageFixingTime = { averageFixingTimeSeconds: 0 };
+    let avgCriticalFixingTime: AverageFixingTime = {
+      averageFixingTimeSeconds: 0,
+    };
+
+    if (releaseId) {
+      const url =
+        "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/releases/" +
+        releaseId +
+        "/stats";
+      [
+        riskHistory,
+        avgLowFixingTime,
+        avgMediumFixingTime,
+        avgHighFixingTime,
+        avgCriticalFixingTime,
+      ] = await Promise.all([
+        apiClient(
+          url +
+            "/risk-history?start=" +
+            extractDateOnly(last3Month) +
+            "&end=" +
+            extractDateOnly(new Date()),
+        ).then(
+          (r) =>
+            r.json() as Promise<
+              Array<
+                | { riskHistory: RiskHistory[]; asset: AssetDTO }
+                | {
+                    riskHistory: [];
+                    project: ProjectDTO;
+                  }
+              >
+            >,
+        ),
+        apiClient(url + "/average-fixing-time?severity=low").then((r) =>
+          r.json(),
+        ),
+        apiClient(url + "/average-fixing-time?severity=medium").then((r) =>
+          r.json(),
+        ),
+        apiClient(url + "/average-fixing-time?severity=high").then((r) =>
+          r.json(),
+        ),
+        apiClient(url + "/average-fixing-time?severity=critical").then((r) =>
+          r.json(),
+        ),
+      ]);
+    }
 
     /*
     // check the longest array in the results
@@ -409,22 +462,20 @@ export const getServerSideProps = middleware(
 		}
 	}
     */
-    const paddedRiskHistory = padRiskHistory(riskHistory);
+    const groups = groupBy(riskHistory, "day");
+    const days = Object.keys(groups).sort();
+    const completeRiskHistory: RiskHistory[][] = days.map((day) => {
+      return groups[day];
+    });
+
+    // also fetch releases for artifact selector on project overview
 
     return {
       props: {
         project,
-
-        riskHistory: paddedRiskHistory.map((r) => ({
-          avatar: "asset" in r ? r.asset.avatar : r.project.avatar,
-          label: "asset" in r ? r.asset.name : r.project.name,
-          history: r.riskHistory,
-          type: "asset" in r ? "asset" : "project",
-          slug: "asset" in r ? r.asset.slug : r.project.slug,
-          description:
-            "asset" in r ? r.asset.description : r.project.description,
-        })),
-        flawAggregationStateAndChange,
+        releases,
+        riskHistory: completeRiskHistory,
+        reducedRiskHistory: reduceRiskHistories(completeRiskHistory),
         avgLowFixingTime,
         avgMediumFixingTime,
         avgHighFixingTime,

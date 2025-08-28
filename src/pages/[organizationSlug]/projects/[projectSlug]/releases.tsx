@@ -189,7 +189,7 @@ export const getServerSideProps = middleware(
     // if they are there, append them to the uri
     const [releasesResp, candidatesResp] = await Promise.all([
       apiClient(uri + "?" + query.toString()),
-      apiClient(uri + "/candidates/"),
+      apiClient(uri + "candidates/"),
     ]);
 
     // fetch a personal access token from the user

@@ -66,6 +66,7 @@ import {
   DropdownMenuTrigger,
 } from "../../../../../../../../../components/ui/dropdown-menu";
 import Link from "next/link";
+import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
 
 interface Props {
   apiUrl: string;
@@ -490,11 +491,11 @@ export const getServerSideProps = middleware(
       props: {
         vulns,
         apiUrl: config.devguardApiUrlPublicInternet,
-        artifacts: artifactsData,
       },
     };
   },
   {
+    artifacts: withArtifacts,
     session: withSession,
     organizations: withOrgs,
     organization: withOrganization,

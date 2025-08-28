@@ -729,8 +729,25 @@ export interface RiskHistory {
 
   openVulns: number;
   fixedVulns: number;
+
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
+
+  artifactName?: string;
+  assetId?: string;
+  assetVersionName?: string;
 }
 
+export type ReleaseRiskHistory = Omit<
+  RiskHistory,
+  "artifactName" | "assetId" | "assetVersionName"
+>;
 export interface AverageFixingTime {
   averageFixingTimeSeconds: number;
 }

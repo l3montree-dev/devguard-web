@@ -1,6 +1,7 @@
 import { Session } from "@ory/client";
 import { createStore } from "zustand";
 import {
+  ArtifactDTO,
   AssetDTO,
   AssetVersionDTO,
   OrganizationDetailsDTO,
@@ -9,43 +10,34 @@ import {
 } from "../types/api/api";
 import { User } from "../types/auth";
 
-export interface ContentTreeElement {
-  id: string;
-  title: string;
-  slug: string;
-  assets: Array<{ id: string; title: string; slug: string }>;
+export interface ContentTreeElement extends ProjectDTO {
+  assets: Array<AssetDTO>;
 }
 
 export const normalizeContentTree = (
   contentTree: Array<ContentTreeElement>,
 ) => {
   const assetMap: {
-    [key: string]: {
-      id: string;
-      title: string;
-      slug: string;
-      project: {
-        id: string;
-        title: string;
-        slug: string;
-      };
-    };
+    [key: string]:
+      | (AssetDTO & {
+          project: ProjectDTO;
+        })
+      | undefined;
   } = {};
 
   contentTree.forEach((element) => {
     element.assets.forEach((asset) => {
       assetMap[asset.id] = {
-        id: asset.id,
-        title: asset.title,
-        slug: asset.slug,
+        ...asset,
         project: {
-          id: element.id,
-          title: element.title,
-          slug: element.slug,
+          ...element,
+          // @ts-expect-error
+          assets: undefined, // remove assets to avoid circular reference
         },
       };
     });
   });
+  console.log("Normalized asset map:", assetMap);
 
   return assetMap;
 };
@@ -73,6 +65,7 @@ export interface GlobalStore extends InitialState, GlobalStoreActions {
   project?: ProjectDTO;
   asset?: AssetDTO;
   assetVersion?: AssetVersionDTO;
+  artifacts?: ArtifactDTO[];
 }
 export const createGlobalStore = (
   preloadedState: Partial<GlobalStore> & {
