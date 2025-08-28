@@ -105,8 +105,6 @@ const Index: FunctionComponent<Props> = ({
     );
   }
 
-  console.log(riskHistory);
-
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
       <div className="mb-4">
@@ -269,7 +267,7 @@ const Index: FunctionComponent<Props> = ({
                                   avatar={asset?.avatar}
                                 />
                               </div>
-                              <div>
+                              <div className="w-full">
                                 <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
                                   <span className="text-foreground">
                                     {beautifyPurl(r.artifactName || "")}
@@ -365,8 +363,9 @@ const reduceRiskHistories = (
 };
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { project, contentTree }) => {
-    let { organizationSlug, projectSlug, releaseId } = context.params!;
+  async (context: GetServerSidePropsContext, { project }) => {
+    let { organizationSlug, projectSlug } = context.params!;
+    const { artifact } = context.query;
 
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -383,11 +382,13 @@ export const getServerSideProps = middleware(
       releasesResp.ok ? await releasesResp.json() : { data: [] }
     ) as Paged<ReleaseDTO>;
 
-    if (
-      !releaseId ||
-      releases.data.findIndex((r) => r.id === releaseId) === -1
-    ) {
+    let releaseId;
+
+    const artifactIndex = releases.data.findIndex((r) => r.name === artifact);
+    if (!artifact || artifactIndex === -1) {
       releaseId = releases.data.length > 0 ? releases.data[0].id : undefined;
+    } else {
+      releaseId = releases.data[artifactIndex].id;
     }
 
     let riskHistory: Array<any> = [];
