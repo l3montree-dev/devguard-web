@@ -80,6 +80,7 @@ import {
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
+import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -548,7 +549,12 @@ const Index: FunctionComponent<Props> = ({
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
+  async (context: GetServerSidePropsContext, { artifacts }) => {
+    if (artifacts.length === 0) {
+      return {
+        notFound: true,
+      };
+    }
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
 
@@ -574,13 +580,16 @@ export const getServerSideProps = middleware(
         artifact as string,
       );
     }
+
     const [components, licenses] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
       >,
-      apiClient(url + "/licenses?" + params.toString()).then(
-        (r) => r.json() as Promise<LicenseResponse[]>,
-      ),
+      apiClient(
+        url +
+          "/licenses" +
+          (artifact ? "?artifact=" + encodeURIComponent(artifact) : ""),
+      ).then((r) => r.json() as Promise<LicenseResponse[]>),
     ]);
 
     const licenseMap = licenses.reduce(
@@ -635,8 +644,6 @@ export const getServerSideProps = middleware(
     asset: withAsset,
     assetVersion: withAssetVersion,
     contentTree: withContentTree,
+    artifacts: withArtifacts,
   },
 );
-function useAssetVersion() {
-  throw new Error("Function not implemented.");
-}
