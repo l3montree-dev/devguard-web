@@ -79,7 +79,7 @@ export default function SbomDownloadModal({
   };
 
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
-    artifacts.map((a) => a.artifactName),
+    (artifacts ?? []).map((a) => a.artifactName),
   );
 
   return (
@@ -107,7 +107,7 @@ export default function SbomDownloadModal({
           </p>
           <SimpleArtifactSelector
             unassignPossible={false}
-            artifacts={artifacts.map((a) => a.artifactName)}
+            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
             selectedArtifact={selectedArtifact}
             onSelect={setSelectedArtifact}
           />

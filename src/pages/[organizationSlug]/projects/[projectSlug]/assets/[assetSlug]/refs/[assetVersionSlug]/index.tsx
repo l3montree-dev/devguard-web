@@ -127,6 +127,10 @@ const Index: FunctionComponent<Props> = ({
     }
   };
 
+  const latest = riskHistory?.length
+    ? riskHistory[riskHistory.length - 1]
+    : null;
+
   return (
     <Page
       Menu={assetMenu}
@@ -139,7 +143,7 @@ const Index: FunctionComponent<Props> = ({
           <BranchTagSelector branches={branches} tags={tags} />
           <QueryArtifactSelector
             unassignPossible={false}
-            artifacts={artifacts.map((a) => a.artifactName)}
+            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
         </div>
         <AsyncButton onClick={downloadPdfReport} variant={"secondary"}>
@@ -172,8 +176,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"
-                    ? (riskHistory[riskHistory.length - 1]?.critical ?? 0)
-                    : (riskHistory[riskHistory.length - 1]?.criticalCvss ?? 0)
+                    ? (latest?.critical ?? 0)
+                    : (latest?.criticalCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -183,8 +187,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={8}
                 currentAmount={
                   mode === "risk"
-                    ? (riskHistory[riskHistory.length - 1]?.high ?? 0)
-                    : (riskHistory[riskHistory.length - 1]?.highCvss ?? 0)
+                    ? (latest?.high ?? 0)
+                    : (latest?.highCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -194,8 +198,8 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalEnd={7}
                 currentAmount={
                   mode === "risk"
-                    ? (riskHistory[riskHistory.length - 1]?.medium ?? 0)
-                    : (riskHistory[riskHistory.length - 1]?.mediumCvss ?? 0)
+                    ? (latest?.medium ?? 0)
+                    : (latest?.mediumCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -204,9 +208,7 @@ const Index: FunctionComponent<Props> = ({
                 queryIntervalStart={0}
                 queryIntervalEnd={3}
                 currentAmount={
-                  mode === "risk"
-                    ? (riskHistory[riskHistory.length - 1]?.low ?? 0)
-                    : (riskHistory[riskHistory.length - 1]?.lowCvss ?? 0)
+                  mode === "risk" ? (latest?.low ?? 0) : (latest?.lowCvss ?? 0)
                 }
                 mode={mode}
               />

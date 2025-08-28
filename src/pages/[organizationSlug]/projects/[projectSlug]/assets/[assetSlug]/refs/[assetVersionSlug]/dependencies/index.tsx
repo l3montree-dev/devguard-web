@@ -454,7 +454,7 @@ const Index: FunctionComponent<Props> = ({
       >
         <div className="flex flex-row items-center justify-between gap-2">
           <QueryArtifactSelector
-            artifacts={artifacts.map((a) => a.artifactName)}
+            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
           <Input
             onChange={handleSearch}

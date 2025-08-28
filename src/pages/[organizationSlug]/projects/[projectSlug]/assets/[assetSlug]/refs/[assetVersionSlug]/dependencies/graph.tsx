@@ -94,7 +94,7 @@ const DependencyGraphPage: FunctionComponent<{
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
             <QueryArtifactSelector
-              artifacts={artifacts.map((a) => a.artifactName)}
+              artifacts={(artifacts ?? []).map((a) => a.artifactName)}
             />
           </div>
           <div className="flex flex-row items-center gap-4">
