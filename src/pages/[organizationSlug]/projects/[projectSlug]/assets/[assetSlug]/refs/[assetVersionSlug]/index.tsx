@@ -59,13 +59,11 @@ import {
   ComponentRisk,
   LicenseResponse,
   Paged,
-  PolicyEvaluation,
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
 
 interface Props {
-  compliance: Array<PolicyEvaluation>;
   componentRisk: ComponentRisk;
   riskHistory: RiskHistory[];
   avgLowFixingTime: AverageFixingTime;
@@ -355,13 +353,41 @@ const Index: FunctionComponent<Props> = ({
 export default Index;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { artifacts }) => {
+  async (
+    context: GetServerSidePropsContext,
+    { artifacts },
+  ): Promise<{ props: Props }> => {
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
       context.params!;
+    const apiClient = getApiClientFromContext(context);
+
+    if (!artifacts || artifacts.length === 0) {
+      const events = await apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/events/?pageSize=3",
+      ).then((r) => r.json());
+      return {
+        props: {
+          componentRisk: {},
+          avgCriticalFixingTime: { averageFixingTimeSeconds: 0 },
+          avgHighFixingTime: { averageFixingTimeSeconds: 0 },
+          avgMediumFixingTime: { averageFixingTimeSeconds: 0 },
+          avgLowFixingTime: { averageFixingTimeSeconds: 0 },
+          events,
+          riskHistory: [],
+          licenses: [],
+        },
+      };
+    }
 
     const artifact = artifacts[0];
-
-    const apiClient = getApiClientFromContext(context);
 
     const {
       componentRisk,

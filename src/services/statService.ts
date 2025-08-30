@@ -6,6 +6,7 @@ import {
   Paged,
   PolicyEvaluation,
   RiskDistribution,
+  RiskHistory,
   VulnEventDTO,
 } from "../types/api/api";
 import { DevGuardApiClient } from "./devGuardApi";
@@ -27,7 +28,7 @@ export const fetchAssetStats = async ({
   context: GetServerSidePropsContext;
 }): Promise<{
   componentRisk: ComponentRisk;
-  riskHistory: Array<RiskDistribution>;
+  riskHistory: Array<RiskHistory>;
   avgLowFixingTime: AverageFixingTime;
   avgMediumFixingTime: AverageFixingTime;
   avgHighFixingTime: AverageFixingTime;
@@ -103,7 +104,7 @@ export const fetchAssetStats = async ({
   ]);
 
   // risk history is not paginated, so we can directly access the data
-  const riskHistory: Array<RiskDistribution> = await riskHistoryResp.json();
+  const riskHistory: Array<RiskHistory> = await riskHistoryResp.json();
 
   return {
     componentRisk,
