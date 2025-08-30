@@ -49,6 +49,11 @@ import {
 } from "../../../../components/ui/tabs";
 import { normalizeContentTree } from "../../../../zustand/globalStore";
 import { useStore } from "../../../../zustand/globalStoreProvider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../components/ui/tooltip";
 
 interface Props {
   project: ProjectDTO & {
@@ -268,10 +273,17 @@ const Index: FunctionComponent<Props> = ({
                                 />
                               </div>
                               <div className="w-full">
-                                <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                                  <span className="text-foreground">
-                                    {beautifyPurl(r.artifactName || "")}
-                                  </span>
+                                <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <span className="text-foreground text-left line-clamp-1">
+                                        {beautifyPurl(r.artifactName || "")}
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {r.artifactName}
+                                    </TooltipContent>
+                                  </Tooltip>
                                   <div className="flex whitespace-nowrap flex-row flex-wrap gap-2">
                                     <CVERainbowBadge
                                       low={

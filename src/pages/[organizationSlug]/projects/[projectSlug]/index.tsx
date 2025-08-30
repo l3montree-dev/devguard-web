@@ -19,7 +19,6 @@ import ListItem from "../../../../components/common/ListItem";
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import { middleware } from "@/decorators/middleware";
 
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import Section from "@/components/common/Section";
 import { Badge } from "@/components/ui/badge";
 import { withContentTree } from "@/decorators/withContentTree";
@@ -47,7 +46,6 @@ import {
   EnvDTO,
   PolicyEvaluation,
   ProjectDTO,
-  ReleaseDTO,
   RequirementsLevel,
   UserRole,
 } from "../../../../types/api/api";
