@@ -334,44 +334,13 @@ export const getServerSideProps = middleware(
     const { organizationSlug } = context.params!;
     const apiClient = getApiClientFromContext(context);
 
-    const [subgroups, assets] = await Promise.all([
+    const [subgroups] = await Promise.all([
       apiClient(
         "/organizations/" +
           organizationSlug +
           "/projects?parentId=" +
           project.id,
       ).then((r) => r.json()),
-      // fetch the stats for all assets
-      await Promise.all(
-        project.assets.map(async (asset) => {
-          let url =
-            "/organizations/" +
-            organizationSlug +
-            "/projects/" +
-            project.slug +
-            "/assets/" +
-            asset.slug;
-
-          const resp = await apiClient(url + "/compliance");
-          if (!resp.ok) {
-            return {
-              ...asset,
-              stats: {
-                compliance: [],
-              },
-            };
-          }
-
-          const compliance =
-            ((await resp.json()) as PolicyEvaluation[] | undefined) ?? [];
-          return {
-            ...asset,
-            stats: {
-              compliance: compliance,
-            },
-          };
-        }),
-      ),
     ]);
 
     return {
@@ -381,7 +350,7 @@ export const getServerSideProps = middleware(
         },
         subgroups: subgroups.data,
         project,
-        assets,
+        assets: project.assets,
       },
     };
   },

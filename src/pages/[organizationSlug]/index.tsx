@@ -34,12 +34,7 @@ import {
   browserApiClient,
   getApiClientFromContext,
 } from "../../services/devGuardApi";
-import {
-  Paged,
-  PolicyEvaluation,
-  ProjectDTO,
-  UserRole,
-} from "../../types/api/api";
+import { Paged, ProjectDTO, UserRole } from "../../types/api/api";
 import { CreateProjectReq } from "../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
@@ -59,41 +54,25 @@ import { toast } from "sonner";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyList from "@/components/common/EmptyList";
 import { ProjectForm } from "@/components/project/ProjectForm";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
+import Avatar from "../../components/Avatar";
 import EmptyParty from "../../components/common/EmptyParty";
+import Markdown from "../../components/common/Markdown";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
-import Markdown from "../../components/common/Markdown";
-import Avatar from "../../components/Avatar";
 
 interface Props {
   oauth2Error?: boolean;
-  projects: Paged<
-    ProjectDTO & {
-      stats: {
-        compliantAssets: number;
-        totalAssets: number;
-        passingControlsPercentage: number;
-      };
-    }
-  >;
+  projects: Paged<ProjectDTO>;
 }
 
 const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
@@ -351,12 +330,9 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                             <span>
                               <Markdown>{project.description}</Markdown>
                             </span>
-                            {(project.stats.totalAssets > 0 ||
-                              project.type !== "default") && (
+                            {project.type !== "default" && (
                               <div className="flex mt-4 flex-row items-center gap-2">
-                                {project.type !== "default" && (
-                                  <ProjectBadge type={project.type} />
-                                )}
+                                <ProjectBadge type={project.type} />
                               </div>
                             )}
                           </div>
@@ -408,48 +384,9 @@ export const getServerSideProps = middleware(
       "/organizations/" + slug + "/projects/" + "?" + query.toString(),
     );
 
-    const projectsPaged = await resp.json();
+    const projectsPaged: Paged<ProjectDTO> = await resp.json();
 
-    // fetch all the project stats
-    const projectsWithCompliance = await Promise.all(
-      projectsPaged.data?.map(async (project: ProjectDTO) => {
-        const resp = await apiClient(
-          `/organizations/${slug}/projects/${project.slug}/compliance`,
-        );
-        // check if the response is ok
-        if (!resp.ok) {
-          return {
-            ...project,
-            stats: {
-              compliantAssets: 0,
-              totalAssets: 0,
-              passingControlsPercentage: 0,
-            },
-          };
-        }
-
-        const stats = (await resp.json()) as Array<Array<PolicyEvaluation>>;
-
-        const compliantAssets = stats?.filter((asset) =>
-          asset.every((r) => r.compliant),
-        );
-
-        return {
-          ...project,
-          stats: {
-            compliantAssets: compliantAssets.length,
-            totalAssets: stats.length,
-            passingControlsPercentage:
-              stats.flat(1).length === 0
-                ? 1 // if no assets, we assume 100% compliance
-                : stats.flat(1).filter((r) => r.compliant).length /
-                  (stats.flat(1).length || 1),
-          },
-        };
-      }),
-    );
-
-    projectsPaged.data = projectsWithCompliance.sort((a, b) =>
+    projectsPaged.data = projectsPaged.data.sort((a, b) =>
       a.name.localeCompare(b.name),
     );
 
