@@ -120,7 +120,12 @@ export default function SbomDownloadModal({
         </p>
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
-            href={pathname + `/../sbom.json`}
+            href={
+              pathname +
+              `/../sbom.json?${new URLSearchParams({
+                artifact: selectedArtifact || "",
+              })}`
+            }
             format={"json"}
             icon={
               <Image
@@ -134,7 +139,12 @@ export default function SbomDownloadModal({
             label={"Download in JSON-Format"}
           />
           <DelayedDownloadButton
-            href={pathname + `/../sbom.xml`}
+            href={
+              pathname +
+              `/../sbom.xml?${new URLSearchParams({
+                artifact: selectedArtifact || "",
+              })}`
+            }
             format={"xml"}
             icon={
               <FileCode className="h-5 w-auto inline-block text-green-500" />
