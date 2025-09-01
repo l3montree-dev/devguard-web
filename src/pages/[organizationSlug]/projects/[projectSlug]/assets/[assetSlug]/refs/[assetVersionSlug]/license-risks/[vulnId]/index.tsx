@@ -266,7 +266,7 @@ const Index: FunctionComponent<Props> = (props) => {
                         </div>
 
                         <div className="flex flex-row justify-end gap-1">
-                          <div className="flex flex-row items-center gap-2">
+                          <div className="flex flex-wrap justify-end flex-row items-center gap-2">
                             {!vuln.ticketId &&
                               getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                 asset,
@@ -284,12 +284,14 @@ const Index: FunctionComponent<Props> = (props) => {
                                 >
                                   <div className="flex flex-col">
                                     <div className="flex">
-                                      <GitProviderIcon
-                                        externalEntityProviderIdOrRepositoryId={
-                                          asset.externalEntityProviderId ??
-                                          "gitlab"
-                                        }
-                                      />
+                                      <div className="mr-2">
+                                        <GitProviderIcon
+                                          externalEntityProviderIdOrRepositoryId={
+                                            asset.externalEntityProviderId ??
+                                            "gitlab"
+                                          }
+                                        />
+                                      </div>
                                       Create Ticket
                                     </div>
                                   </div>

@@ -99,7 +99,7 @@ export const fetchAssetStats = async ({
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/events/?pageSize=3",
+        "/events/?pageSize=4",
     ).then((r) => r.json()),
   ]);
 

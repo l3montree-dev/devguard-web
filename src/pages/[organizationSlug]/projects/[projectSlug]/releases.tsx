@@ -90,7 +90,7 @@ const Releases = (props: Props) => {
   };
 
   return (
-    <Page Menu={menu} Title={<ProjectTitle />} title="Compliance Controls">
+    <Page Menu={menu} Title={<ProjectTitle />} title="Releases">
       <div className="flex flex-row">
         <div className="flex-1">
           <Section
