@@ -74,6 +74,7 @@ export default function VexDownloadModal({
   };
 
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
+    false,
     (artifacts ?? []).map((a) => a.artifactName),
   );
 
