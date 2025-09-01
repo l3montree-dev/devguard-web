@@ -4,7 +4,7 @@
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ContainerIcon } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -13,10 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export function useSelectArtifact(artifacts: string[]) {
+export function useSelectArtifact(
+  unassignPossible: boolean,
+  artifacts: string[],
+) {
   const router = useRouter();
+
   const [selectedArtifact, setSelectedArtifact] = useState(
-    (router.query.artifact as string) || artifacts[0] || undefined,
+    (router.query.artifact as string) ||
+      (unassignPossible ? undefined : artifacts[0]),
   );
 
   return { selectedArtifact, setSelectedArtifact };
@@ -74,26 +79,29 @@ export function SimpleArtifactSelector({
 
 export function QueryArtifactSelector({
   artifacts,
+  unassignPossible = false,
   isReleaseSelector = false,
 }: {
   artifacts: string[];
   unassignPossible?: boolean;
   isReleaseSelector?: boolean;
 }) {
-  const { selectedArtifact, setSelectedArtifact } =
-    useSelectArtifact(artifacts);
+  const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
+    unassignPossible,
+    artifacts,
+  );
   const router = useRouter();
 
   // add selected artifact to the url query params as ?artifact=artifactName
 
-  useEffect(() => {
-    if (selectedArtifact !== router.query.artifact)
-      router.push({
-        query: { ...router.query, artifact: selectedArtifact },
-      });
-  }, [selectedArtifact, router]);
-
   const handleSelect = (artifact?: string) => {
+    // update the query
+    router.push({
+      query: {
+        ...router.query,
+        artifact: artifact || undefined,
+      },
+    });
     setSelectedArtifact(artifact);
   };
 
@@ -101,6 +109,7 @@ export function QueryArtifactSelector({
     <SimpleArtifactSelector
       artifacts={artifacts}
       onSelect={handleSelect}
+      unassignPossible={unassignPossible}
       isReleaseSelector={isReleaseSelector}
       selectedArtifact={selectedArtifact || ""}
     />
