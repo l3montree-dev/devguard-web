@@ -8,11 +8,7 @@ import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";
 
 interface Props {
-  asset: AssetDTO & {
-    stats: {
-      compliance: Array<PolicyEvaluation>;
-    };
-  };
+  asset: AssetDTO;
 }
 const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
   const activeOrg = useActiveOrg();

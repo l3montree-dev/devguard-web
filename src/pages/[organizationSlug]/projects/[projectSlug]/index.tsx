@@ -54,13 +54,7 @@ interface Props {
   project: ProjectDTO & {
     assets: Array<AssetDTO>;
   };
-  assets: Array<
-    AssetDTO & {
-      stats: {
-        compliance: Array<PolicyEvaluation>;
-      };
-    }
-  >;
+  assets: Array<AssetDTO>;
   subgroups: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
