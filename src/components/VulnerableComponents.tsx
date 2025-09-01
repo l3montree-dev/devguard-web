@@ -91,9 +91,7 @@ export function VulnerableComponents({
               </div>
               <div>
                 <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                  <span className="capitalize">
-                    {beautifyPurl(item.componentName)}
-                  </span>
+                  <span className="">{beautifyPurl(item.componentName)}</span>
                   <div className="flex flex-row flex-wrap gap-2">
                     <CVERainbowBadge
                       low={mode === "risk" ? item.risk.low : item.risk.lowCvss}
