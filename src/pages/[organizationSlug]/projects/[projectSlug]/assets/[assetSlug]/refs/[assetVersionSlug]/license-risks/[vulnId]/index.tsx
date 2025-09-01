@@ -357,29 +357,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   </div>
                                 </AsyncButton>
                               )}
-                            <div className="flex flex-row items-center gap-2 border border-muted rounded-md">
-                              <Combobox
-                                onSelect={setUpdatedLicense}
-                                items={licenses}
-                                placeholder={updatedLicense}
-                                emptyMessage={"No results"}
-                              />
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "licenseDecision",
-                                    justification,
-                                    license: updatedLicense,
-                                  })
-                                }
-                                disabled={
-                                  updatedLicense === vuln.component.license
-                                }
-                                variant="default"
-                              >
-                                Make final license decision
-                              </AsyncButton>
-                            </div>
+
                             <AsyncButton
                               onClick={() =>
                                 handleSubmit({
@@ -407,6 +385,30 @@ const Index: FunctionComponent<Props> = (props) => {
                               Comment
                             </AsyncButton>
                           </div>
+                        </div>
+                        <hr />
+                        <div className="flex justify-end flex-row items-center gap-2 border-muted rounded-md">
+                          <div>
+                            <Combobox
+                              onSelect={setUpdatedLicense}
+                              items={licenses}
+                              placeholder={updatedLicense}
+                              emptyMessage={"No results"}
+                            />
+                          </div>
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "licenseDecision",
+                                justification,
+                                license: updatedLicense,
+                              })
+                            }
+                            disabled={updatedLicense === vuln.component.license}
+                            variant="default"
+                          >
+                            Make final license decision
+                          </AsyncButton>
                         </div>
                       </form>
                     ) : (

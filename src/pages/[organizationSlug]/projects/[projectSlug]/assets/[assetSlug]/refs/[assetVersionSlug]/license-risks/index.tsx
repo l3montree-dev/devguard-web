@@ -129,17 +129,6 @@ const Index: FunctionComponent<Props> = (props) => {
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <div className="flex flex-row gap-2">
-          <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
-            Download SBOM
-          </Button>
-          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
-            Download VeX
-          </Button>
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            License Risks
-          </Button>
-        </div>
       </div>
 
       <VexDownloadModal

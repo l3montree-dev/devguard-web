@@ -336,9 +336,6 @@ export type VulnEventDTO =
   | CommentEventDTO
   | TicketClosedEventDTO
   | TickedDeletedEventDTO
-  | AddedScannerEventDTO
-  | RemovedScannerEventDTO
-  | DetectedOnAnotherBranchEventDTO
   | LicenseDecisionEventDTO;
 
 export interface CWE {
