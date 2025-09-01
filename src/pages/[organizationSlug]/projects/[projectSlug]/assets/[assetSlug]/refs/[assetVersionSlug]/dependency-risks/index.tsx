@@ -206,7 +206,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
   const { table, isLoading, handleSearch } = useTable({
     columnsDef,
-    data: props.vulns.data,
+    data: props.vulns?.data || [],
   });
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
@@ -304,7 +304,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       </Section>
-      {!props.vulns.data.length ? (
+      {!props.vulns?.data?.length ? (
         <div>
           <EmptyParty
             title="No matching results."
