@@ -15,7 +15,7 @@ import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
 // ...existing code...
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -96,10 +96,22 @@ const Index: FunctionComponent<Props> = ({
   const project = activeProject;
   const asset = activeAsset;
 
+  const selectedArtifact = router.query.artifact as string;
+
+  const pathname = useRouter().asPath.split("?")[0];
+
   const downloadPdfReport = async () => {
     try {
+      console.log(
+        "Downloading PDF report from:",
+        `${pathname}/vulnerability-report.pdf?${new URLSearchParams({
+          artifact: selectedArtifact || "",
+        })}`,
+      );
       const response = await fetch(
-        `${router.asPath}/vulnerability-report.pdf`,
+        `${pathname}/vulnerability-report.pdf?${new URLSearchParams({
+          artifact: selectedArtifact || "",
+        })}`,
         {
           signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
           method: "GET",
