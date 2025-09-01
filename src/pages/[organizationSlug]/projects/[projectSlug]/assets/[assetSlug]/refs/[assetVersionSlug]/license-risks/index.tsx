@@ -159,6 +159,7 @@ const Index: FunctionComponent<Props> = (props) => {
       >
         <div className="relative flex flex-row gap-2">
           <QueryArtifactSelector
+            unassignPossible
             artifacts={props.artifacts.map((a) => a.artifactName)}
           />
           <Tabs

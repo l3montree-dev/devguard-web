@@ -79,6 +79,7 @@ export default function SbomDownloadModal({
   };
 
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
+    false,
     (artifacts ?? []).map((a) => a.artifactName),
   );
 

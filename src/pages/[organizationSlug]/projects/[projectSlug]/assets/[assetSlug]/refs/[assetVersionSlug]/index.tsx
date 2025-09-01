@@ -140,7 +140,6 @@ const Index: FunctionComponent<Props> = ({
         <div className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
           <QueryArtifactSelector
-            unassignPossible={false}
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
         </div>
