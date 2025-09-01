@@ -344,12 +344,13 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
           ecosystemUpdate: `apk add ${props.package}=${props.version}`,
         };
       }
-      case "deb": {
+      // Ref: https://github.com/l3montree-dev/devguard/issues/1050
+      /*case "deb": {
         return {
           globalUpdate: `apt update && apt upgrade`,
           ecosystemUpdate: `apt-get install -y ${props.package}=${props.version}`,
         };
-      }
+      }*/
       default:
         return {
           globalUpdate: ``,
@@ -358,7 +359,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     }
   }, []);
 
-  return (
+  return globalUpdate === "" && ecosystemUpdate === "" ? null : (
     <div className="relative">
       <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
       <div className="relative ">
