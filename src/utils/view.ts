@@ -76,23 +76,6 @@ export const eventTypeMessages = (
         "made a license decision: " +
         event.arbitraryJSONData.finalLicenseDecision
       );
-    case "detectedOnAnotherBranch":
-      return (
-        "detected " + flawName + " on another ref: " + event.assetVersionName
-      );
-    case "addedScanner":
-      return (
-        "detected " +
-        flawName +
-        " with scanner: " +
-        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
-      );
-
-    case "removedScanner":
-      return (
-        "removed scanner: " +
-        event.arbitraryJSONData.scannerIds.replace(defaultScanner, "")
-      );
     case "ticketClosed":
       return "closed the ticket for " + flawName;
     case "ticketDeleted":
@@ -140,20 +123,17 @@ export const eventTypeMessages = (
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   accepted: "bg-purple-600",
-  fixed: "bg-green-600 text-black",
+  fixed: "bg-green-600",
   detected: "bg-red-600",
   falsePositive: "bg-purple-600",
   mitigate: "bg-green-600",
-  markedForTransfer: "bg-blue-600 text-black",
+  markedForTransfer: "bg-blue-600",
   rawRiskAssessmentUpdated: "bg-secondary",
   reopened: "bg-red-600",
   comment: "bg-secondary",
-  ticketClosed: "bg-red-600 text-black",
-  ticketDeleted: "bg-red-600 text-black",
-  addedScanner: "bg-secondary",
-  removedScanner: "bg-secondary",
-  detectedOnAnotherBranch: "bg-secondary",
-  licenseDecision: "bg-yellow-500 text-black",
+  ticketClosed: "bg-red-600",
+  ticketDeleted: "bg-red-600",
+  licenseDecision: "bg-yellow-500 !text-black",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

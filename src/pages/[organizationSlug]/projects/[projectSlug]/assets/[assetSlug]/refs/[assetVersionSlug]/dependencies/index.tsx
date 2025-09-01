@@ -159,7 +159,7 @@ const LicenseCall = (props: {
           }}
         >
           {props.license.licenseId === "loading" ? (
-            <Loader2Icon className="h-4 w-4 animate-spin text-muted-foreground" />
+            <Loader2Icon className="h-4 w-4 mr-1 animate-spin text-muted-foreground" />
           ) : (
             <ScaleIcon className={"mr-1 h-4 w-4 text-muted-foreground"} />
           )}
@@ -376,13 +376,11 @@ const Index: FunctionComponent<Props> = ({
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Download VeX
           </Button>
-          <AsyncButton onClick={handleLicenseRefresh} variant={"secondary"}>
-            Trigger license refresh
-          </AsyncButton>
+
           <Link
             className={classNames(
               buttonVariants({ variant: "default" }),
-              "!text-background",
+              "!text-black",
             )}
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
@@ -517,6 +515,11 @@ const Index: FunctionComponent<Props> = ({
           </table>
         </div>
         <CustomPagination {...components} />
+        <div className="flex flex-row justify-end">
+          <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
+            Refresh Licenses
+          </AsyncButton>
+        </div>
       </Section>
 
       {datasets && datasets.project && (
