@@ -237,9 +237,7 @@ export const getServerSideProps = middleware(
       "/assets/" +
       assetSlug +
       "/refs/" +
-      assetVersionSlug +
-      "/artifacts/" +
-      artifactName;
+      assetVersionSlug;
 
     const [resp, vulnResponse] = await Promise.all([
       apiClient(
