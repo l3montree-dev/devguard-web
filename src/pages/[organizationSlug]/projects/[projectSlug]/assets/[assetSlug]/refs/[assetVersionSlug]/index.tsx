@@ -62,6 +62,8 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
+import { reduceRiskHistories } from "../../../../overview";
+import { groupBy } from "lodash";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -102,12 +104,6 @@ const Index: FunctionComponent<Props> = ({
 
   const downloadPdfReport = async () => {
     try {
-      console.log(
-        "Downloading PDF report from:",
-        `${pathname}/vulnerability-report.pdf?${new URLSearchParams({
-          artifact: selectedArtifact || "",
-        })}`,
-      );
       const response = await fetch(
         `${pathname}/vulnerability-report.pdf?${new URLSearchParams({
           artifact: selectedArtifact || "",
@@ -151,9 +147,6 @@ const Index: FunctionComponent<Props> = ({
       <div className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
-          <QueryArtifactSelector
-            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-          />
         </div>
         <AsyncButton onClick={downloadPdfReport} variant={"secondary"}>
           Download PDF-Report
@@ -170,11 +163,17 @@ const Index: FunctionComponent<Props> = ({
           onValueChange={(value) => setMode(value as "risk" | "cvss")}
           className="w-full"
         >
-          <div className="mb-4 flex">
-            <TabsList>
-              <TabsTrigger value="risk">Risk values</TabsTrigger>
-              <TabsTrigger value="cvss">CVSS values</TabsTrigger>
-            </TabsList>
+          <div className="relative flex flex-row gap-4">
+            <QueryArtifactSelector
+              unassignPossible
+              artifacts={(artifacts ?? []).map((a) => a.artifactName)}
+            />
+            <div className="mb-4 flex">
+              <TabsList>
+                <TabsTrigger value="risk">Risk values</TabsTrigger>
+                <TabsTrigger value="cvss">CVSS values</TabsTrigger>
+              </TabsList>
+            </div>
           </div>
 
           <TabsContent value={mode} className="space-y-4">
@@ -246,7 +245,7 @@ const Index: FunctionComponent<Props> = ({
                   </CardHeader>
                   <CardContent>
                     <div className="flex -mt-4 flex-col">
-                      {licenses.slice(0, 5).map((el, i, arr) => (
+                      {(licenses || []).slice(0, 5).map((el, i, arr) => (
                         <div
                           className={
                             i === arr.length - 1 ? "pt-4" : "border-b py-4"
@@ -416,13 +415,22 @@ export const getServerSideProps = middleware(
       assetVersionSlug: assetVersionSlug as string,
       apiClient,
       context,
-      artifactName: artifact.artifactName,
+      // get artifact name from query params if available else undefined
+      artifactName: context.query.artifact
+        ? (context.query.artifact as string)
+        : undefined,
+    });
+
+    const groups = groupBy(riskHistory, "day");
+    const days = Object.keys(groups).sort();
+    const completeRiskHistory: RiskHistory[][] = days.map((day) => {
+      return groups[day];
     });
 
     return {
       props: {
         componentRisk,
-        riskHistory,
+        riskHistory: reduceRiskHistories(completeRiskHistory),
         avgLowFixingTime,
         avgMediumFixingTime,
         avgHighFixingTime,

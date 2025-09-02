@@ -340,7 +340,7 @@ export default Index;
 
 const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 
-const reduceRiskHistories = (
+export const reduceRiskHistories = (
   histories: RiskHistory[][],
 ): Array<ReleaseRiskHistory> => {
   return histories.map((dayHistories) => {

@@ -19,7 +19,7 @@ export const fetchAssetStats = async ({
   assetVersionSlug,
   artifactName,
 }: {
-  artifactName: string;
+  artifactName: string | undefined;
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
@@ -44,9 +44,18 @@ export const fetchAssetStats = async ({
     "/assets/" +
     assetSlug +
     "/refs/" +
-    assetVersionSlug +
-    "/artifacts/" +
-    encodeURIComponent(artifactName);
+    assetVersionSlug;
+
+  console.log("Fetching asset stats with artifactName:", artifactName);
+
+  const urlQueryAppendixForArtifact = artifactName
+    ? "?artifactName=" + encodeURIComponent(artifactName)
+    : "";
+  const urlAppendixForArtifact = artifactName
+    ? "&artifactName=" + encodeURIComponent(artifactName)
+    : "";
+
+  console.log("URL Appendix for Artifact:", urlAppendixForArtifact);
 
   const [
     componentRisk,
@@ -58,26 +67,35 @@ export const fetchAssetStats = async ({
     licenses,
     events,
   ] = await Promise.all([
-    apiClient(url + "/stats/component-risk/").then((r) => r.json()),
+    apiClient(
+      url + "/stats/component-risk/" + urlQueryAppendixForArtifact,
+    ).then((r) => r.json()),
     apiClient(
       url +
         "/stats/risk-history/?start=" +
         extractDateOnly(last3Month) +
         "&end=" +
-        extractDateOnly(new Date()),
+        extractDateOnly(new Date()) +
+        urlAppendixForArtifact,
     ),
-    apiClient(url + "/stats/average-fixing-time/?severity=low").then((r) =>
-      r.json(),
-    ),
-    apiClient(url + "/stats/average-fixing-time/?severity=medium").then((r) =>
-      r.json(),
-    ),
-    apiClient(url + "/stats/average-fixing-time/?severity=high").then((r) =>
-      r.json(),
-    ),
-    apiClient(url + "/stats/average-fixing-time/?severity=critical").then((r) =>
-      r.json(),
-    ),
+    apiClient(
+      url + "/stats/average-fixing-time/?severity=low" + urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=medium" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=high" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=critical" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
     apiClient(
       "/organizations/" +
         organizationSlug +
@@ -87,8 +105,8 @@ export const fetchAssetStats = async ({
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/components/licenses/?artifact=" +
-        encodeURIComponent(artifactName),
+        "/components/licenses/" +
+        urlQueryAppendixForArtifact,
     ).then((r) => r.json() as Promise<LicenseResponse[]>),
     apiClient(
       "/organizations/" +
@@ -99,12 +117,24 @@ export const fetchAssetStats = async ({
         assetSlug +
         "/refs/" +
         assetVersionSlug +
-        "/events/?pageSize=4",
+        "/events/?pageSize=4" +
+        urlAppendixForArtifact,
     ).then((r) => r.json()),
   ]);
 
   // risk history is not paginated, so we can directly access the data
   const riskHistory: Array<RiskHistory> = await riskHistoryResp.json();
+
+  console.log("Fetched asset stats:", {
+    componentRisk,
+    riskHistory,
+    avgLowFixingTime,
+    avgMediumFixingTime,
+    avgHighFixingTime,
+    avgCriticalFixingTime,
+    licenses,
+    events,
+  });
 
   return {
     componentRisk,
