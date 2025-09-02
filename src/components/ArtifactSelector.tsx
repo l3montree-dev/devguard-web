@@ -30,6 +30,7 @@ export function SimpleArtifactSelector({
   artifacts,
   onSelect,
   selectedArtifact,
+  unassignPossible = false,
   isReleaseSelector = false,
 }: {
   artifacts: string[];
@@ -57,6 +58,17 @@ export function SimpleArtifactSelector({
         align="start"
         className="z-50 max-h-[500px] overflow-y-auto w-80"
       >
+        {unassignPossible && (
+          <DropdownMenuCheckboxItem
+            key="unassign"
+            checked={!selectedArtifact}
+            onClick={() => {
+              onSelect(undefined);
+            }}
+          >
+            <span className="text-muted-foreground">Clear selection</span>
+          </DropdownMenuCheckboxItem>
+        )}
         {artifacts.sort().map((artifact) => (
           <DropdownMenuCheckboxItem
             key={artifact}
@@ -96,11 +108,17 @@ export function QueryArtifactSelector({
 
   const handleSelect = (artifact?: string) => {
     // update the query
+    const newQuery = { ...router.query };
+
+    if (artifact) {
+      newQuery.artifact = artifact;
+    } else {
+      // Remove the artifact parameter when clearing selection
+      delete newQuery.artifact;
+    }
+
     router.push({
-      query: {
-        ...router.query,
-        artifact: artifact || undefined,
-      },
+      query: newQuery,
     });
     setSelectedArtifact(artifact);
   };
@@ -111,7 +129,7 @@ export function QueryArtifactSelector({
       onSelect={handleSelect}
       unassignPossible={unassignPossible}
       isReleaseSelector={isReleaseSelector}
-      selectedArtifact={selectedArtifact || ""}
+      selectedArtifact={selectedArtifact}
     />
   );
 }

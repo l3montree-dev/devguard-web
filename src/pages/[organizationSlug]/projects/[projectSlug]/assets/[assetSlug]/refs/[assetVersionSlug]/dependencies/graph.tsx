@@ -64,24 +64,6 @@ const DependencyGraphPage: FunctionComponent<{
   const all = router.query.all === "1";
   const menu = useAssetMenu();
 
-  const addVersionAndscannerQueryParams = (link: string): string => {
-    const version = router.query.version as string | undefined;
-    const scanner = router.query.scanner as string | undefined;
-    if (version && scanner) {
-      return `${link}?version=${version}&scanner=${scanner}`;
-    }
-
-    if (version) {
-      return `${link}?version=${version}`;
-    }
-
-    if (scanner) {
-      return `${link}?scanner=${scanner}`;
-    }
-
-    return link;
-  };
-
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
       <BranchTagSelector branches={branches} tags={tags} />
@@ -94,6 +76,7 @@ const DependencyGraphPage: FunctionComponent<{
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-4">
             <QueryArtifactSelector
+              unassignPossible={true}
               artifacts={(artifacts ?? []).map((a) => a.artifactName)}
             />
           </div>
@@ -237,15 +220,14 @@ export const getServerSideProps = middleware(
       "/assets/" +
       assetSlug +
       "/refs/" +
-      assetVersionSlug +
-      "/artifacts/" +
-      artifactName;
+      assetVersionSlug;
 
     const [resp, vulnResponse] = await Promise.all([
       apiClient(
         uri +
           "/dependency-graph/?" +
           toSearchParams({
+            artifactName: context.query.artifact as string,
             all: context.query.all === "1" ? "1" : undefined,
           }),
       ),
