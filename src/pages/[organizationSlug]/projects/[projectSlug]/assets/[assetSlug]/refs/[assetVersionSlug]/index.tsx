@@ -144,13 +144,25 @@ const Index: FunctionComponent<Props> = ({
       description="Overview of the repository"
       Title={<AssetTitle />}
     >
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row items-start justify-between">
         <div className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
         </div>
-        <AsyncButton onClick={downloadPdfReport} variant={"secondary"}>
-          Download PDF-Report
-        </AsyncButton>
+
+        <div className="flex relative flex-col">
+          <AsyncButton
+            disabled={router.query.artifact === undefined}
+            onClick={downloadPdfReport}
+            variant={"secondary"}
+          >
+            Download PDF-Report
+          </AsyncButton>
+          {!Boolean(router.query.artifact) && (
+            <small className="mt-1 absolute right-0 text-right top-full w-52 text-muted-foreground">
+              Select an artifact to include it in the report.
+            </small>
+          )}
+        </div>
       </div>
       <Section
         primaryHeadline
@@ -396,8 +408,6 @@ export const getServerSideProps = middleware(
         },
       };
     }
-
-    const artifact = artifacts[0];
 
     const {
       componentRisk,

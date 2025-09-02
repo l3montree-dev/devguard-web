@@ -46,16 +46,12 @@ export const fetchAssetStats = async ({
     "/refs/" +
     assetVersionSlug;
 
-  console.log("Fetching asset stats with artifactName:", artifactName);
-
   const urlQueryAppendixForArtifact = artifactName
     ? "?artifactName=" + encodeURIComponent(artifactName)
     : "";
   const urlAppendixForArtifact = artifactName
     ? "&artifactName=" + encodeURIComponent(artifactName)
     : "";
-
-  console.log("URL Appendix for Artifact:", urlAppendixForArtifact);
 
   const [
     componentRisk,

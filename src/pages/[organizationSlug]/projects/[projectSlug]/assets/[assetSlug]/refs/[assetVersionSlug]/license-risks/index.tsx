@@ -28,7 +28,6 @@ import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
