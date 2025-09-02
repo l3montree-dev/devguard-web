@@ -245,6 +245,7 @@ export const getServerSideProps = middleware(
           "/dependency-graph/?" +
           toSearchParams({
             all: context.query.all === "1" ? "1" : undefined,
+            artifactName: artifactName,
           }),
       ),
       apiClient(uri + "/affected-components/"),

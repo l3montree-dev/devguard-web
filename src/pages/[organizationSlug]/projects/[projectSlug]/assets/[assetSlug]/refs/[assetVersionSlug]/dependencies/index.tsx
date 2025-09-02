@@ -632,6 +632,8 @@ export const getServerSideProps = middleware(
       artifactsData = await artifactsResp.json();
     }
 
+    console.log("asdf" + artifactsData);
+
     return {
       props: {
         components,
