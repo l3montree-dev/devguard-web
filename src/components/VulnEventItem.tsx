@@ -131,12 +131,7 @@ const FoundIn: FunctionComponent<{
   const title = eventTypeMessages(event, flawName);
   let found = <></>;
 
-  if (
-    event.type === "detectedOnAnotherBranch" ||
-    event.type === "addedScanner" ||
-    event.type === "removedScanner" ||
-    event.type === "detected"
-  ) {
+  if (event.type === "detected") {
     if (event.vulnType === "firstPartyVuln") {
       found = (
         <span className="text-muted-foreground">
