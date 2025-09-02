@@ -88,6 +88,62 @@ const Index: FunctionComponent<Props> = ({
     return normalizeContentTree(contentTree || []);
   }, [contentTree]);
 
+  const criticalAmount = useMemo(() => {
+    if (riskHistory.length === 0) return 0;
+    if (mode === "cvss") {
+      return riskHistory[riskHistory.length - 1].reduce(
+        (sum, r) => sum + (r?.criticalCvss ?? 0),
+        0,
+      );
+    }
+    return riskHistory[riskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.critical ?? 0),
+      0,
+    );
+  }, [riskHistory, mode]);
+
+  const highAmount = useMemo(() => {
+    if (riskHistory.length === 0) return 0;
+    if (mode === "cvss") {
+      return riskHistory[riskHistory.length - 1].reduce(
+        (sum, r) => sum + (r?.highCvss ?? 0),
+        0,
+      );
+    }
+    return riskHistory[riskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.high ?? 0),
+      0,
+    );
+  }, [riskHistory, mode]);
+
+  const mediumAmount = useMemo(() => {
+    if (riskHistory.length === 0) return 0;
+    if (mode === "cvss") {
+      return riskHistory[riskHistory.length - 1].reduce(
+        (sum, r) => sum + (r?.mediumCvss ?? 0),
+        0,
+      );
+    }
+    return riskHistory[riskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.medium ?? 0),
+      0,
+    );
+  }, [riskHistory, mode]);
+
+  const lowAmount = useMemo(() => {
+    if (riskHistory.length === 0) return 0;
+    if (mode === "cvss") {
+      return riskHistory[riskHistory.length - 1].reduce(
+        (sum, r) => sum + (r?.lowCvss ?? 0),
+        0,
+      );
+    }
+    return riskHistory[riskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.low ?? 0),
+      0,
+    );
+  }, [riskHistory, mode]);
+
   if (releases.data.length === 0) {
     return (
       <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
@@ -140,68 +196,28 @@ const Index: FunctionComponent<Props> = ({
             <div className="grid grid-cols-4 gap-4">
               <SeverityCard
                 variant="critical"
-                currentAmount={
-                  mode === "risk"
-                    ? riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.critical ?? 0),
-                        0,
-                      )
-                    : riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.criticalCvss ?? 0),
-                        0,
-                      )
-                }
+                currentAmount={criticalAmount}
                 queryIntervalStart={7}
                 queryIntervalEnd={10}
                 mode={mode}
               />
               <SeverityCard
                 variant="high"
-                currentAmount={
-                  mode === "risk"
-                    ? riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.high ?? 0),
-                        0,
-                      )
-                    : riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.highCvss ?? 0),
-                        0,
-                      )
-                }
+                currentAmount={highAmount}
                 queryIntervalStart={4}
                 queryIntervalEnd={7}
                 mode={mode}
               />
               <SeverityCard
                 variant="medium"
-                currentAmount={
-                  mode === "risk"
-                    ? riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.medium ?? 0),
-                        0,
-                      )
-                    : riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.mediumCvss ?? 0),
-                        0,
-                      )
-                }
+                currentAmount={mediumAmount}
                 queryIntervalStart={1}
                 queryIntervalEnd={4}
                 mode={mode}
               />
               <SeverityCard
                 variant="low"
-                currentAmount={
-                  mode === "risk"
-                    ? riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.low ?? 0),
-                        0,
-                      )
-                    : riskHistory[riskHistory.length - 1].reduce(
-                        (sum, r) => sum + (r?.lowCvss ?? 0),
-                        0,
-                      )
-                }
+                currentAmount={lowAmount}
                 queryIntervalStart={0}
                 queryIntervalEnd={1}
                 mode={mode}
