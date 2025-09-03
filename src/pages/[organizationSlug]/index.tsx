@@ -235,9 +235,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                     <span className="text-sm">Sync running</span>
                   </span>
                 ) : (
-                  <span>
-                    Trigger sync with {activeOrg.externalEntityProviderId}
-                  </span>
+                  <span>Sync with {activeOrg.externalEntityProviderId}</span>
                 )}
               </Button>
             </div>
@@ -266,7 +264,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                         </span>
                       ) : (
                         <span>
-                          Trigger sync with {activeOrg.externalEntityProviderId}
+                          Sync with {activeOrg.externalEntityProviderId}
                         </span>
                       )}
                     </Button>

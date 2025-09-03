@@ -384,11 +384,11 @@ const Index: FunctionComponent<Props> = ({
             )}
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
-              new URLSearchParams({
-                artifact: String(
-                  (router.query.artifact as string) || artifacts?.[0] || "",
-                ),
-              }).toString()
+              new URLSearchParams(
+                router.query.artifact && {
+                  artifact: router.query.artifact as string,
+                },
+              )
             }
           >
             <GitBranchIcon className="mr-2 h-4 w-4" />
