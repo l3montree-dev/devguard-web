@@ -598,6 +598,7 @@ const Index: FunctionComponent<Props> = (props) => {
               <RiskAssessmentFeed
                 vulnerabilityName={vuln.cveID ?? ""}
                 events={vuln.events}
+                page="dependency-risks"
               />
               <div>
                 <Card>

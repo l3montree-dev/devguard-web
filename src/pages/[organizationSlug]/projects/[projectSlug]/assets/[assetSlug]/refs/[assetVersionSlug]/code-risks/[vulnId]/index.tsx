@@ -245,6 +245,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     ""
                   }
                   events={vuln.events}
+                  page="code-risks"
                 />
               </div>
               <div>

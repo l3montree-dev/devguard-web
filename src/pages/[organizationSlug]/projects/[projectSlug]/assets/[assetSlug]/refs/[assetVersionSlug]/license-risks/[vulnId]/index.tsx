@@ -236,6 +236,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     emptyThenNull(vuln.componentPurl) ?? "Unknown"
                   }
                   events={vuln.events}
+                  page="license-risks"
                 />
               </div>
               <div>
