@@ -226,24 +226,28 @@ const Index: FunctionComponent<Props> = ({
             <div className="grid grid-cols-4 gap-4">
               <div className="grid grid-cols-2 col-span-2 gap-4">
                 <AverageFixingTimeChart
+                  mode={mode}
                   variant="critical"
                   title="Avg. remediation time"
                   description="Average fixing time for critical severity flaws"
                   avgFixingTime={avgCriticalFixingTime}
                 />
                 <AverageFixingTimeChart
+                  mode={mode}
                   title="Avg. remediation time"
                   variant="high"
                   description="Average fixing time for high severity flaws"
                   avgFixingTime={avgHighFixingTime}
                 />
                 <AverageFixingTimeChart
+                  mode={mode}
                   title="Avg. remediation time"
                   variant="medium"
                   description="Average fixing time for medium severity flaws"
                   avgFixingTime={avgMediumFixingTime}
                 />
                 <AverageFixingTimeChart
+                  mode={mode}
                   title="Avg. remediation time"
                   variant="low"
                   description="Average fixing time for low severity flaws"
@@ -420,13 +424,21 @@ export const getServerSideProps = middleware(
     }
 
     let riskHistory: Array<any> = [];
-    let avgLowFixingTime: AverageFixingTime = { averageFixingTimeSeconds: 0 };
+    let avgLowFixingTime: AverageFixingTime = {
+      averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
+    };
     let avgMediumFixingTime: AverageFixingTime = {
       averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
     };
-    let avgHighFixingTime: AverageFixingTime = { averageFixingTimeSeconds: 0 };
+    let avgHighFixingTime: AverageFixingTime = {
+      averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
+    };
     let avgCriticalFixingTime: AverageFixingTime = {
       averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
     };
 
     if (releaseId) {

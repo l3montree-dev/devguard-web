@@ -408,7 +408,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             disabled={updatedLicense === vuln.component.license}
                             variant="default"
                           >
-                            Make final license decision
+                            Make Corrected to License
                           </AsyncButton>
                         </div>
                       </form>

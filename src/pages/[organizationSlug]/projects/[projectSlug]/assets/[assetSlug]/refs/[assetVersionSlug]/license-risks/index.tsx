@@ -79,7 +79,7 @@ const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
   {
     ...columnHelper.accessor("component.license", {
       header: "License",
-      enableSorting: true,
+      enableSorting: false,
       id: "licenseName",
       cell: (row) => <div className="flex flex-row">{row.getValue()}</div>,
     }),
@@ -88,7 +88,7 @@ const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
     ...columnHelper.accessor("artifacts", {
       header: "Artifact",
       id: "artifactName",
-      enableSorting: true,
+      enableSorting: false,
       cell: (row) => (
         <div className="flex flex-row">
           <Severity gray risk={row.getValue()} />
@@ -98,10 +98,14 @@ const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
   },
   {
     ...columnHelper.accessor("finalLicenseDecision", {
-      header: "Final License Decision",
-      enableSorting: true,
+      header: "Corrected to License",
+      enableSorting: false,
       id: "finalLicenseDecision",
-      cell: (row) => <div className="flex flex-row">{row.getValue()}</div>,
+      cell: (row) => (
+        <div className="flex flex-row">
+          {Boolean(row.getValue()) ? row.getValue() : "Not yet corrected"}
+        </div>
+      ),
     }),
   },
 ];

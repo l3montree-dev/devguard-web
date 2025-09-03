@@ -17,6 +17,7 @@ import React from "react";
 import Image from "next/image";
 import { classNames, getEcosystem } from "@/utils/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 const invertSvgOnDark = (ecosystem: string) =>
   ["apk", "bitnami"].includes(ecosystem);
@@ -66,7 +67,11 @@ const EcosystemImage = ({
     );
   }
 
-  return null;
+  return (
+    <span className="italic rounded-full text-sm">
+      <QuestionMarkCircleIcon width={size ?? 20} height={size ?? 20} />
+    </span>
+  );
 };
 
 export default EcosystemImage;

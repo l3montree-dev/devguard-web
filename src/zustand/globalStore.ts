@@ -37,7 +37,6 @@ export const normalizeContentTree = (
       };
     });
   });
-  console.log("Normalized asset map:", assetMap);
 
   return assetMap;
 };

@@ -1,10 +1,9 @@
 // components/license-risk/LicenseRiskRow.tsx
-import { useRouter } from "next/router";
 import { beautifyPurl, classNames } from "@/utils/common";
+import { useRouter } from "next/router";
 import { LicenseRiskDTO } from "../../types/api/api";
-import { defaultScanner } from "../../utils/view";
-import EcosystemImage from "../common/EcosystemImage";
 import ArtifactBadge from "../ArtifactBadge";
+import EcosystemImage from "../common/EcosystemImage";
 
 type Props = {
   risk: LicenseRiskDTO;
@@ -43,7 +42,11 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
           />
         ))}
       </td>
-      <td className="p-4">{risk.finalLicenseDecision}</td>
+      <td className="p-4">
+        {risk.finalLicenseDecision ?? (
+          <span className="text-muted-foreground">Not yet corrected</span>
+        )}
+      </td>
     </tr>
   );
 }

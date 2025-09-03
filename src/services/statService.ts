@@ -121,17 +121,6 @@ export const fetchAssetStats = async ({
   // risk history is not paginated, so we can directly access the data
   const riskHistory: Array<RiskHistory> = await riskHistoryResp.json();
 
-  console.log("Fetched asset stats:", {
-    componentRisk,
-    riskHistory,
-    avgLowFixingTime,
-    avgMediumFixingTime,
-    avgHighFixingTime,
-    avgCriticalFixingTime,
-    licenses,
-    events,
-  });
-
   return {
     componentRisk,
     riskHistory,

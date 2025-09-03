@@ -17,6 +17,7 @@ import {
 } from "./ui/card";
 import { classNames } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
+import { AverageFixingTime } from "../types/api/api";
 
 function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
@@ -48,22 +49,24 @@ function getHumanReadableDuration(seconds: number) {
 }
 
 interface Props {
-  avgFixingTime?: {
-    averageFixingTimeSeconds: number;
-  };
+  avgFixingTime: AverageFixingTime;
   variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
+  mode: "risk" | "cvss";
 }
+
 const AverageFixingTimeChart: FunctionComponent<Props> = ({
   avgFixingTime,
   title,
   description,
   variant,
+  mode,
 }) => {
-  const seconds = avgFixingTime?.averageFixingTimeSeconds
-    ? avgFixingTime.averageFixingTimeSeconds
-    : 0;
+  const seconds =
+    mode === "cvss"
+      ? avgFixingTime.averageFixingTimeSecondsByCvss
+      : avgFixingTime.averageFixingTimeSeconds;
   const hasData = seconds > 0;
 
   const { duration, type } = getHumanReadableDuration(seconds);

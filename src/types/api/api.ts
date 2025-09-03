@@ -747,6 +747,7 @@ export type ReleaseRiskHistory = Omit<
 >;
 export interface AverageFixingTime {
   averageFixingTimeSeconds: number;
+  averageFixingTimeSecondsByCvss: number;
 }
 
 export interface ReleaseItem {

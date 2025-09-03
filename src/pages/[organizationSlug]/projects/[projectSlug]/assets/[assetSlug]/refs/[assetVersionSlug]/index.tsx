@@ -15,7 +15,7 @@ import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
 
 // ...existing code...
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent } from "react";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -43,6 +43,7 @@ import {
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { VulnerableComponents } from "@/components/VulnerableComponents";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { groupBy } from "lodash";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -63,7 +64,6 @@ import {
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
 import { reduceRiskHistories } from "../../../../overview";
-import { groupBy } from "lodash";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -298,6 +298,7 @@ const Index: FunctionComponent<Props> = ({
             <div className="grid grid-cols-8 gap-4">
               <div className="col-span-4 grid grid-cols-2 gap-4">
                 <AverageFixingTimeChart
+                  mode={mode}
                   variant="critical"
                   title="Avg. remediation time"
                   description="Time for critical severity vulnerabilities"
@@ -305,6 +306,7 @@ const Index: FunctionComponent<Props> = ({
                 />
 
                 <AverageFixingTimeChart
+                  mode={mode}
                   variant="high"
                   title="Avg. remediation time"
                   description="Time for high severity vulnerabilities"
@@ -312,6 +314,7 @@ const Index: FunctionComponent<Props> = ({
                 />
 
                 <AverageFixingTimeChart
+                  mode={mode}
                   variant="medium"
                   title="Avg. remediation time"
                   description="Time for medium severity vulnerabilities"
@@ -319,6 +322,7 @@ const Index: FunctionComponent<Props> = ({
                 />
 
                 <AverageFixingTimeChart
+                  mode={mode}
                   variant="low"
                   title="Avg. remediation time"
                   description="Time for low severity vulnerabilities"
@@ -398,10 +402,22 @@ export const getServerSideProps = middleware(
       return {
         props: {
           componentRisk: {},
-          avgCriticalFixingTime: { averageFixingTimeSeconds: 0 },
-          avgHighFixingTime: { averageFixingTimeSeconds: 0 },
-          avgMediumFixingTime: { averageFixingTimeSeconds: 0 },
-          avgLowFixingTime: { averageFixingTimeSeconds: 0 },
+          avgCriticalFixingTime: {
+            averageFixingTimeSeconds: 0,
+            averageFixingTimeSecondsByCvss: 0,
+          },
+          avgHighFixingTime: {
+            averageFixingTimeSeconds: 0,
+            averageFixingTimeSecondsByCvss: 0,
+          },
+          avgMediumFixingTime: {
+            averageFixingTimeSeconds: 0,
+            averageFixingTimeSecondsByCvss: 0,
+          },
+          avgLowFixingTime: {
+            averageFixingTimeSeconds: 0,
+            averageFixingTimeSecondsByCvss: 0,
+          },
           events,
           riskHistory: [],
           licenses: [],
@@ -436,6 +452,11 @@ export const getServerSideProps = middleware(
     const completeRiskHistory: RiskHistory[][] = days.map((day) => {
       return groups[day];
     });
+
+    console.log("avgCriticalFixingTime", avgCriticalFixingTime);
+    console.log("avgHighFixingTime", avgHighFixingTime);
+    console.log("avgMediumFixingTime", avgMediumFixingTime);
+    console.log("avgLowFixingTime", avgLowFixingTime);
 
     return {
       props: {
