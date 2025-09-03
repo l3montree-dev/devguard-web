@@ -529,7 +529,7 @@ const Index: FunctionComponent<Props> = ({
           setOpen={() => setDatasets(undefined)} //set dataset as undefined, so that it closes the dataset && condition and stops the
           purl={datasets.purl}
           scoreCard={datasets.scoreCard}
-        ></DependencyDialog>
+        />
       )}
       <SbomDownloadModal
         artifacts={artifacts}
@@ -585,7 +585,7 @@ export const getServerSideProps = middleware(
       );
     }
 
-    const [components, licenses] = await Promise.all([
+    const [components, licenses, artifactsData] = await Promise.all([
       apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
         Paged<ComponentPaged>
       >,
@@ -594,6 +594,17 @@ export const getServerSideProps = middleware(
           "/licenses" +
           (artifact ? "?artifact=" + encodeURIComponent(artifact) : ""),
       ).then((r) => r.json() as Promise<LicenseResponse[]>),
+      apiClient(
+        "/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/artifacts/",
+      ).then((r) => (!r.ok ? [] : (r.json() as Promise<ArtifactDTO[]>))),
     ]);
 
     const licenseMap = licenses.reduce(
@@ -614,23 +625,6 @@ export const getServerSideProps = middleware(
         count: 0,
       },
     }));
-
-    let artifactsData: ArtifactDTO[] = [];
-    const artifactsResp = await apiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/artifacts/",
-    );
-
-    if (artifactsResp.ok) {
-      artifactsData = await artifactsResp.json();
-    }
 
     return {
       props: {

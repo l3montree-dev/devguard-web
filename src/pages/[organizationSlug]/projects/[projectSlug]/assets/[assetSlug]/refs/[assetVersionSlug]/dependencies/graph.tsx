@@ -211,7 +211,6 @@ export const getServerSideProps = middleware(
 
     const apiClient = getApiClientFromContext(context);
 
-    let artifactName = encodeURIComponent(context.query.artifact as string);
     const uri =
       "/organizations/" +
       organizationSlug +
