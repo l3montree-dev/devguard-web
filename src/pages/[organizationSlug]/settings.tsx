@@ -63,8 +63,14 @@ import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
 import { Card } from "@/components/ui/card";
+import { config } from "@/config";
+import { string } from "zod";
 
-const Home: FunctionComponent = () => {
+interface HomeProps {
+  devguardGithubAppUrl: string;
+}
+
+const Home = ({ devguardGithubAppUrl }: HomeProps) => {
   const activeOrg = useActiveOrg();
   const orgMenu = useOrganizationMenu();
   const updateOrganization = useStore((s) => s.updateOrganization);
@@ -353,7 +359,7 @@ const Home: FunctionComponent = () => {
                       "!text-black hover:no-underline",
                     )}
                     href={
-                      "https://github.com/apps/devguard-bot/installations/new?state=" +
+                      `https://github.com/apps/${devguardGithubAppUrl}/installations/new?state=` +
                       encodeObjectBase64({
                         orgSlug: activeOrg.slug,
                         redirectTo: router.asPath,
@@ -580,8 +586,18 @@ export const getServerSideProps = middleware(
       };
     }
 
+    const api = config.devGuardApiUrl;
+    let devguardGithubAppUrl = "";
+    if (typeof api === "string" && api.includes("main")) {
+      devguardGithubAppUrl = "devguard-bot-dev";
+    } else if (typeof api === "string" && api.includes("app")) {
+      devguardGithubAppUrl = "devguard-bot";
+    }
+
     return {
-      props: {},
+      props: {
+        devguardGithubAppUrl,
+      },
     };
   },
   {
