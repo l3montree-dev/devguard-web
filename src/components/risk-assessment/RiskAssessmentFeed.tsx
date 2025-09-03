@@ -46,6 +46,7 @@ import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
 import rehypeExternalLinks from "rehype-external-links";
 import remarkGfm from "remark-gfm";
+import { useRouter } from "next/router";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -79,9 +80,11 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
 export default function RiskAssessmentFeed({
   events,
   vulnerabilityName,
+  page,
 }: {
   events: VulnEventDTO[];
   vulnerabilityName: string;
+  page: string;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -159,7 +162,7 @@ export default function RiskAssessmentFeed({
 
                         <div className="absolute right-2 top-2">
                           <Link
-                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionName}/dependency-risks/${event.vulnId}`}
+                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionName}/${page}/${event.vulnId}`}
                           >
                             <Badge variant={"outline"}>
                               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
