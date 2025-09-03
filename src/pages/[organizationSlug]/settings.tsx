@@ -588,9 +588,12 @@ export const getServerSideProps = middleware(
 
     const api = config.devGuardApiUrl;
     let devguardGithubAppUrl = "";
-    if (typeof api === "string" && api.includes("main")) {
+    if (typeof api === "string" && api.includes("https://main.devguard.org")) {
       devguardGithubAppUrl = "devguard-bot-dev";
-    } else if (typeof api === "string" && api.includes("app")) {
+    } else if (
+      typeof api === "string" &&
+      api.includes("https://app.devguard.org")
+    ) {
       devguardGithubAppUrl = "devguard-bot";
     }
 
