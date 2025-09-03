@@ -21,6 +21,7 @@ import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useLoader } from "./useLoader";
 import usePersonalAccessToken from "./usePersonalAccessToken";
+import { config } from "@/config";
 
 // limitations under the License.
 export function useAutosetup(
@@ -123,6 +124,7 @@ export function useAutosetup(
         body: JSON.stringify({
           devguardPrivateKey: privKey,
           devguardAssetName: `${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}`,
+          devguardApiUrl: config.devguardApiUrlPublicInternet,
         }),
       });
 
