@@ -69,6 +69,7 @@ import EmptyParty from "../../components/common/EmptyParty";
 import Markdown from "../../components/common/Markdown";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { classNames } from "../../utils/common";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 interface Props {
   oauth2Error?: boolean;
@@ -86,6 +87,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
 
   const currentUserRole = useCurrentUserRole();
 
+  const currentUser = useCurrentUser();
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
   });
@@ -359,8 +361,16 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { organization }) => {
+  async (context: GetServerSidePropsContext, { organization, session }) => {
     if (organization?.oauth2Error) {
+      if (!session) {
+        return {
+          redirect: {
+            destination: "/login",
+            permanent: false,
+          },
+        };
+      }
       return {
         props: {
           oauth2Error: true,
