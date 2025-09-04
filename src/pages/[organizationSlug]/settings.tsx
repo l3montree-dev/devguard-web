@@ -586,13 +586,16 @@ export const getServerSideProps = middleware(
       };
     }
 
-    const api = config.devGuardApiUrl;
+    const api = config.devguardApiUrlPublicInternet;
     let devguardGithubAppUrl = "";
-    if (typeof api === "string" && api.includes("https://main.devguard.org")) {
+    if (
+      typeof api === "string" &&
+      api.includes("https://api.main.devguard.org")
+    ) {
       devguardGithubAppUrl = "devguard-bot-dev";
     } else if (
       typeof api === "string" &&
-      api.includes("https://app.devguard.org")
+      api.includes("https://api.devguard.org")
     ) {
       devguardGithubAppUrl = "devguard-bot";
     }

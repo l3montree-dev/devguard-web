@@ -16,8 +16,7 @@ export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
   oryKratosUrl: process.env.ORY_KRATOS_URL,
   devguardApiUrlPublicInternet:
-    process.env.DEVGUARD_API_URL_PUBLIC_INTERNET ||
-    "https://api.main.devguard.org",
+    process.env.DEVGUARD_API_URL_PUBLIC_INTERNET || "https://api.devguard.org",
   devguardScannerTag: "main-latest",
   retryInterval: 3000,
 };

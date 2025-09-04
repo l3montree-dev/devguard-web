@@ -35,7 +35,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
-  const autosetup = useAutosetup("full");
+  const autosetup = useAutosetup(apiUrl, "full");
 
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
