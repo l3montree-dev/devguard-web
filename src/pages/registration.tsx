@@ -16,15 +16,16 @@
 import {
   LoginFlow,
   RegistrationFlow,
-  UiNodeGroupEnum,
   UiNodeScriptAttributes,
   UpdateRegistrationFlowBody,
 } from "@ory/client";
 
 import { Flow } from "@/components/kratos/Flow";
+import { Messages } from "@/components/kratos/Messages";
+import { Card, CardContent } from "@/components/ui/card";
 import { filterNodesByGroups } from "@ory/integrations/ui";
 import { AxiosError } from "axios";
-import type { NextPage } from "next";
+import { uniq } from "lodash";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -35,22 +36,17 @@ import {
   useMemo,
   useState,
 } from "react";
-import { handleFlowError, ory } from "../services/ory";
-import { Messages } from "@/components/kratos/Messages";
+import { toast } from "sonner";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { uniq } from "lodash";
+import { Checkbox } from "../components/ui/checkbox";
+import { handleFlowError, ory } from "../services/ory";
+import { Toaster } from "../components/ui/sonner";
 
 // Renders the registration page
-const Registration: NextPage = () => {
+const Registration = ({ oidcOnly }: { oidcOnly: boolean }) => {
   const router = useRouter();
 
+  const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
   const [flow, setFlow] = useState<RegistrationFlow>();
@@ -168,18 +164,10 @@ const Registration: NextPage = () => {
     };
   }, [flow?.ui.nodes]);
 
-  const hasSignupWithPasskey = useMemo(() => {
-    return (
-      (flow?.ui.nodes.filter((n) => n.group === UiNodeGroupEnum.Passkey)
-        .length ?? 0) > 0
-    );
-  }, [flow]);
-
   const availableMethods = useMemo(() => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
 
-  console.log(availableMethods);
   return (
     <>
       <Head>
@@ -188,7 +176,7 @@ const Registration: NextPage = () => {
       </Head>
       <div className="flex min-h-screen flex-1  flex-row bg-white ">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-26">
+          <div className="w-full px-8 xl:px-24">
             <div>
               <Image
                 className="hidden h-20 w-auto dark:block"
@@ -218,13 +206,30 @@ const Registration: NextPage = () => {
                 </Link>
               </p>
             </div>
+            {flow?.ui.messages && (
+              <div className="my-4">
+                <Messages messages={flow?.ui.messages} />
+              </div>
+            )}
 
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
+                  {!oidcOnly && !Boolean(router.query.flow) && (
+                    <div className="mb-6 border-b-2 pb-4">
+                      <Flow
+                        hideGlobalMessages
+                        only="profile"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  )}
+
                   {availableMethods.includes("passkey") && (
                     <div className="mb-6 border-b-2 pb-4">
                       <Flow
+                        hideGlobalMessages
                         only="passkey"
                         onSubmit={onSubmit}
                         flow={flow as LoginFlow}
@@ -241,13 +246,6 @@ const Registration: NextPage = () => {
                       />
                     </div>
                   )}
-
-                  <Flow
-                    hideGlobalMessages
-                    only="profile"
-                    onSubmit={onSubmit}
-                    flow={flow as LoginFlow}
-                  />
                 </div>
                 {availableMethods.includes("oidc") && (
                   <div className="mt-6">
@@ -255,19 +253,70 @@ const Registration: NextPage = () => {
                       className="flex flex-row flex-wrap gap-2 justify-center"
                       only="oidc"
                       hideGlobalMessages
-                      onSubmit={onSubmit}
+                      onSubmit={async (v) => {
+                        if (!oidcTermsOfUseAgreed) {
+                          toast.error(
+                            "You must agree to the terms of use and privacy policy to continue.",
+                          );
+                          return;
+                        }
+                        return onSubmit(v as any);
+                      }}
                       flow={flow as LoginFlow}
                     />
+                    <div className="flex items-start gap-2 mt-4 flex-row">
+                      <Checkbox
+                        onCheckedChange={(v) =>
+                          setOidcTermsOfUseAgreed(Boolean(v))
+                        }
+                      />
+                      <span className="text-sm leading-4  block font-medium">
+                        I agree to the terms of use{" "}
+                        <Link href={"https://devguard.org/terms-of-use"}>
+                          devguard.org/terms-of-use
+                        </Link>{" "}
+                        and{" "}
+                        <Link
+                          className="whitespace-nowrap"
+                          href={"https://devguard.org/privacy-policy"}
+                        >
+                          privacy policy
+                        </Link>
+                        .
+                      </span>
+                    </div>
                   </div>
                 )}
               </CardContent>
             </Card>
+            {!oidcOnly && Boolean(router.query.flow) && (
+              <div className="flex flex-row justify-end">
+                <span
+                  onClick={async () => {
+                    await router.push("/registration", { query: {} });
+                    setFlow(undefined);
+                  }}
+                  className="mt-4  cursor-pointer font-medium text-primary text-right block text-sm"
+                >
+                  Go back
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <ThreeJSFeatureScreen />
+        <Toaster />
       </div>
     </>
   );
 };
 
 export default Registration;
+
+export const getServerSideProps = async ({ query, req, res }: any) => {
+  return {
+    props: {
+      oidcOnly: process.env.OIDC_ONLY === "true" || false,
+    },
+  };
+};

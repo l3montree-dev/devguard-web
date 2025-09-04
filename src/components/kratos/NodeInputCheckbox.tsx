@@ -20,7 +20,7 @@ export function NodeInputCheckbox<T>({
     return null;
   } else
     return (
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-row gap-2 items-start">
         <Checkbox
           id={id}
           checked={attributes.value}
@@ -42,6 +42,7 @@ export function NodeInputCheckbox<T>({
           <a
             href="https://devguard.org/privacy-policy"
             target="_blank"
+            className="whitespace-nowrap "
             rel="noreferrer nooperner"
           >
             privacy policy

@@ -29,7 +29,7 @@ const AcceptInvitation = () => {
       </Head>
       <div className="flex min-h-screen flex-1 flex-row">
         <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-26">
+          <div className="w-full px-8 xl:px-24">
             <div className="">
               <Image
                 className="hidden h-14 w-auto dark:block"

@@ -232,10 +232,12 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                 {syncRunning ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm">Sync running</span>
+                    <span className="text-sm">Import of projects running</span>
                   </span>
                 ) : (
-                  <span>Sync with {activeOrg.externalEntityProviderId}</span>
+                  <span>
+                    Import projects from {activeOrg.externalEntityProviderId}
+                  </span>
                 )}
               </Button>
             </div>
@@ -260,11 +262,14 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
                       {syncRunning ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          <span className="text-sm">Sync running</span>
+                          <span className="text-sm">
+                            Import of projects running
+                          </span>
                         </span>
                       ) : (
                         <span>
-                          Sync with {activeOrg.externalEntityProviderId}
+                          Import projects from{" "}
+                          {activeOrg.externalEntityProviderId}
                         </span>
                       )}
                     </Button>

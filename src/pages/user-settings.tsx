@@ -37,6 +37,7 @@ import React, {
   FunctionComponent,
   ReactNode,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useForm } from "react-hook-form";
@@ -56,6 +57,7 @@ import {
 } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
+import { uniq } from "lodash";
 
 interface Props {
   flow?: SettingsFlow;
@@ -220,6 +222,10 @@ const Settings: FunctionComponent<{
     }
   }, [flow?.ui.messages]);
 
+  const availableMethods = useMemo(() => {
+    return uniq(flow?.ui.nodes.map((node) => node.group));
+  }, [flow?.ui.nodes]);
+
   return (
     <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
@@ -244,22 +250,24 @@ const Settings: FunctionComponent<{
           </Card>
         </Section>
 
-        <Section
-          id="password"
-          title="Change Password"
-          description="Update your password associated with your account."
-        >
-          <Card className="p-6">
-            <SettingsCard only="password" flow={flow}>
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="password"
-                flow={flow}
-              />
-            </SettingsCard>
-          </Card>
-        </Section>
+        {availableMethods.includes("password") && (
+          <Section
+            id="password"
+            title="Change Password"
+            description="Update your password associated with your account."
+          >
+            <Card className="p-6">
+              <SettingsCard only="password" flow={flow}>
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="password"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </Card>
+          </Section>
+        )}
 
         <Section
           id="pat"
@@ -373,101 +381,108 @@ const Settings: FunctionComponent<{
           </div>
         </Section>
 
-        <Section
-          id="oidc"
-          title="Manage Social Sign In"
-          description="Update your linked social network accounts."
-        >
-          <Card className="p-6">
-            <SettingsCard only="oidc" flow={flow}>
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="oidc"
-                flow={flow}
-              />
-            </SettingsCard>
-          </Card>
-        </Section>
-        <Section
-          id="passkey"
-          title="Manage Hardware Tokens and Biometrics"
-          description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
-        >
-          <Card className="p-6">
-            <SettingsCard only="passkey" flow={flow}>
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="passkey"
-                flow={flow}
-              />
-            </SettingsCard>
-          </Card>
-        </Section>
-
-        <Section
-          id="totp"
-          title="Manage 2FA TOTP Authenticator App"
-          description={
-            <>
-              Add a TOTP Authenticator App to your account to improve your
-              account security. Popular Authenticator Apps are{" "}
-              <Link
-                href="https://www.lastpass.com"
-                rel="noreferrer"
-                target="_blank"
-              >
-                LastPass
-              </Link>{" "}
-              and Google Authenticator (
-              <Link
-                href="https://apps.apple.com/us/app/google-authenticator/id388497605"
-                target="_blank"
-                rel="noreferrer"
-              >
-                iOS
-              </Link>
-              ,{" "}
-              <Link
-                href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Android
-              </Link>
-              ).
-            </>
-          }
-        >
-          <Card className="p-6">
-            <SettingsCard only="totp" flow={flow}>
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="totp"
-                flow={flow}
-              />
-            </SettingsCard>
-          </Card>
-        </Section>
-        <Section
-          id="lookup_secret"
-          title="Manage 2FA Backup Recovery Codes"
-          description="Recovery codes can be used in panic situations where you have lost
+        {availableMethods.includes("oidc") && (
+          <Section
+            id="oidc"
+            title="Manage Social Sign In"
+            description="Update your linked social network accounts."
+          >
+            <Card className="p-6">
+              <SettingsCard only="oidc" flow={flow}>
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="oidc"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </Card>
+          </Section>
+        )}
+        {availableMethods.includes("passkey") && (
+          <Section
+            id="passkey"
+            title="Manage Hardware Tokens and Biometrics"
+            description="Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID, TouchID) to enhance your account security."
+          >
+            <Card className="p-6">
+              <SettingsCard only="passkey" flow={flow}>
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="passkey"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </Card>
+          </Section>
+        )}
+        {availableMethods.includes("totp") && (
+          <Section
+            id="totp"
+            title="Manage 2FA TOTP Authenticator App"
+            description={
+              <>
+                Add a TOTP Authenticator App to your account to improve your
+                account security. Popular Authenticator Apps are{" "}
+                <Link
+                  href="https://www.lastpass.com"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  LastPass
+                </Link>{" "}
+                and Google Authenticator (
+                <Link
+                  href="https://apps.apple.com/us/app/google-authenticator/id388497605"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  iOS
+                </Link>
+                ,{" "}
+                <Link
+                  href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Android
+                </Link>
+                ).
+              </>
+            }
+          >
+            <Card className="p-6">
+              <SettingsCard only="totp" flow={flow}>
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="totp"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </Card>
+          </Section>
+        )}
+        {availableMethods.includes("lookup_secret") && (
+          <Section
+            id="lookup_secret"
+            title="Manage 2FA Backup Recovery Codes"
+            description="Recovery codes can be used in panic situations where you have lost
         access to your 2FA device."
-        >
-          <Card className="p-6">
-            <SettingsCard only="lookup_secret" flow={flow}>
-              <Flow
-                hideGlobalMessages
-                onSubmit={onSubmit}
-                only="lookup_secret"
-                flow={flow}
-              />
-            </SettingsCard>
-          </Card>
-        </Section>
+          >
+            <Card className="p-6">
+              <SettingsCard only="lookup_secret" flow={flow}>
+                <Flow
+                  hideGlobalMessages
+                  onSubmit={onSubmit}
+                  only="lookup_secret"
+                  flow={flow}
+                />
+              </SettingsCard>
+            </Card>
+          </Section>
+        )}
 
         <Section
           id="request-account-deletion"

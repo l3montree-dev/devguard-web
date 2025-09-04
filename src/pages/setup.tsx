@@ -30,7 +30,7 @@ export default function SetupOrg() {
               <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
             </div>
           </div>
-          <div className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-48">
+          <div className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
               <h2 className="text-3xl font-bold text-foreground">
                 Create your VIP-Area in the
