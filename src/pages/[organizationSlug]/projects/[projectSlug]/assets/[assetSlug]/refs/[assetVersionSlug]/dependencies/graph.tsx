@@ -30,7 +30,10 @@ import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
-import { getApiClientFromContext } from "@/services/devGuardApi";
+import {
+  browserApiClient,
+  getApiClientFromContext,
+} from "@/services/devGuardApi";
 import { ArtifactDTO, DependencyTreeNode, VulnDTO } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
@@ -41,16 +44,22 @@ import {
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
-import { FunctionComponent, useState } from "react";
-import { useAssetBranchesAndTags } from "../../../../../../../../../hooks/useActiveAssetVersion";
+import { FunctionComponent, useEffect, useState } from "react";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "../../../../../../../../../hooks/useActiveAssetVersion";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { context } from "@react-three/fiber";
 
 const DependencyGraphPage: FunctionComponent<{
-  graph: { root: ViewDependencyTreeNode };
   flaws: Array<VulnDTO>;
   artifacts: ArtifactDTO[];
-}> = ({ graph, flaws, artifacts }) => {
+}> = ({ flaws, artifacts }) => {
   const { branches, tags } = useAssetBranchesAndTags();
 
   const dimensions = useDimensions();
@@ -63,6 +72,67 @@ const DependencyGraphPage: FunctionComponent<{
 
   const all = router.query.all === "1";
   const menu = useAssetMenu();
+
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+
+  const asset = useActiveAsset()!;
+  const assetVersion = useActiveAssetVersion();
+
+  const [graph, setGraph] = useState<ViewDependencyTreeNode | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!activeOrg || !project || !asset || !assetVersion) return;
+      const resp = await browserApiClient(
+        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion.slug}/dependency-graph/?` +
+          toSearchParams({
+            artifactName: router.query.artifact as string,
+            all: router.query.all === "1" ? "1" : undefined,
+          }),
+        {
+          method: "GET",
+        },
+      );
+
+      if (resp.ok) {
+        const json = await resp.json();
+        let converted = convertGraph(json.root);
+        recursiveAddRisk(converted, flaws);
+        // we cannot return a circular data structure - remove the parent again
+        recursiveRemoveParent(converted);
+
+        // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
+        if (router.query.all !== "1") {
+          recursiveRemoveWithoutRisk(converted);
+        }
+
+        // the first childrens are the detection targets.
+        // they might start with the asset id itself.
+        // if there is only a first level child, which starts with the asset id, we can remove the root node
+        if (
+          converted.children.length === 1 &&
+          converted.children[0].name.startsWith(asset.id)
+        ) {
+          converted = {
+            ...converted.children[0],
+            name: converted.children[0].name.replace(asset.id + "/", ""),
+            parent: null,
+          };
+        } else {
+          // check if thats the case, if so, remove the assetId prefix
+          converted.children = converted.children.map((c) => {
+            if (c.name.startsWith(asset.id)) {
+              c.name = c.name.replace(asset.id + "/", "");
+            }
+            return c;
+          });
+        }
+        setGraph(converted);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
@@ -81,7 +151,7 @@ const DependencyGraphPage: FunctionComponent<{
             />
           </div>
           <div className="flex flex-row items-center gap-4">
-            {graph.root.risk !== 0 && (
+            {graph && graph.risk !== 0 && (
               <div className="flex flex-row items-center gap-4 whitespace-nowrap text-sm">
                 <label htmlFor="allDependencies">
                   Display all dependencies
@@ -89,7 +159,7 @@ const DependencyGraphPage: FunctionComponent<{
                 <Switch
                   id="allDependencies"
                   checked={all}
-                  onCheckedChange={(onlyRisk) => {
+                  onCheckedChange={() => {
                     router.push(
                       {
                         query: {
@@ -129,12 +199,14 @@ const DependencyGraphPage: FunctionComponent<{
             </Button>
           </div>
 
-          <DependencyGraph
-            flaws={flaws}
-            width={dimensions.width - SIDEBAR_WIDTH}
-            height={dimensions.height - HEADER_HEIGHT - 85}
-            graph={graph}
-          />
+          {graph && (
+            <DependencyGraph
+              flaws={flaws}
+              width={dimensions.width - SIDEBAR_WIDTH}
+              height={dimensions.height - HEADER_HEIGHT - 85}
+              graph={{ root: graph }}
+            />
+          )}
         </div>
       </Section>
     </Page>
@@ -221,58 +293,15 @@ export const getServerSideProps = middleware(
       "/refs/" +
       assetVersionSlug;
 
-    const [resp, vulnResponse] = await Promise.all([
-      apiClient(
-        uri +
-          "/dependency-graph/?" +
-          toSearchParams({
-            artifactName: context.query.artifact as string,
-            all: context.query.all === "1" ? "1" : undefined,
-          }),
-      ),
+    const [vulnResponse] = await Promise.all([
       apiClient(uri + "/affected-components/"),
     ]);
 
     // fetch a personal access token from the user
 
-    const [graph, vulns] = await Promise.all([
-      resp.json() as Promise<{ root: DependencyTreeNode }>,
+    const [vulns] = await Promise.all([
       vulnResponse.json() as Promise<Array<VulnDTO>>,
     ]);
-
-    let converted = convertGraph(graph.root);
-
-    recursiveAddRisk(converted, vulns);
-    // we cannot return a circular data structure - remove the parent again
-    recursiveRemoveParent(converted);
-
-    // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
-    if (context.query.all !== "1") {
-      recursiveRemoveWithoutRisk(converted);
-    }
-
-    // the first childrens are the detection targets.
-    // they might start with the asset id itself.
-    // if there is only a first level child, which starts with the asset id, we can remove the root node
-    if (
-      converted.children.length === 1 &&
-      converted.children[0].name.startsWith(asset.id)
-    ) {
-      converted = {
-        ...converted.children[0],
-        name: converted.children[0].name.replace(asset.id + "/", ""),
-        parent: null,
-      };
-    } else {
-      // check if thats the case, if so, remove the assetId prefix
-      converted.children = converted.children.map((c) => {
-        if (c.name.startsWith(asset.id)) {
-          c.name = c.name.replace(asset.id + "/", "");
-        }
-        return c;
-      });
-    }
-
     let artifactsData: ArtifactDTO[] = [];
     const artifactsResp = await apiClient(
       "/organizations/" +
@@ -292,7 +321,6 @@ export const getServerSideProps = middleware(
 
     return {
       props: {
-        graph: { root: converted },
         flaws: vulns,
         artifacts: artifactsData,
       },
