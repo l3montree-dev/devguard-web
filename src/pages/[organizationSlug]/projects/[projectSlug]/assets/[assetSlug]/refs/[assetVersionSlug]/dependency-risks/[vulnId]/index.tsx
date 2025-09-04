@@ -417,7 +417,7 @@ const Index: FunctionComponent<Props> = (props) => {
   useEffect(() => {
     (async () => {
       const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?purl=${encodeURIComponent(props.vuln.componentPurl)}`,
+        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(props.vuln.componentPurl)}`,
         {
           method: "GET",
         },
