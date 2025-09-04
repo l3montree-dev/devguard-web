@@ -31,6 +31,7 @@ export function RiskHistoryDistributionDiagram({
   data: ReleaseRiskHistory[];
   mode?: "risk" | "cvss";
 }) {
+  console.log(data);
   return (
     <Card>
       <CardHeader>
@@ -125,7 +126,7 @@ export function RiskHistoryDistributionDiagram({
               {["low", "medium", "high", "critical"].map((level) => (
                 <Area
                   key={level}
-                  dataKey={level}
+                  dataKey={mode === "risk" ? level : level + "Cvss"}
                   type="monotone"
                   stackId="1"
                   stroke={severityToColor(level.toUpperCase())}
