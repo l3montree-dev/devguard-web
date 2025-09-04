@@ -179,6 +179,7 @@ const Registration: NextPage = () => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
 
+  console.log(availableMethods);
   return (
     <>
       <Head>
@@ -220,16 +221,18 @@ const Registration: NextPage = () => {
 
             <Card className="mt-10">
               <CardContent>
-                <div className="mt-6 mb-8 sm:mx-auto">
-                  {hasSignupWithPasskey && (
-                    <div className={"mb-4"}>
-                      <div className="mb-4 border-b-2 pb-4">
-                        <Flow
-                          only="passkey"
-                          onSubmit={onSubmit}
-                          flow={flow as LoginFlow}
-                        />
-                      </div>
+                <div className="mt-6 sm:mx-auto">
+                  {availableMethods.includes("passkey") && (
+                    <div className="mb-6 border-b-2 pb-4">
+                      <Flow
+                        only="passkey"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  )}
+                  {availableMethods.includes("password") && (
+                    <div className={"mt-6"}>
                       <Flow
                         hideGlobalMessages
                         only="password"
@@ -238,6 +241,7 @@ const Registration: NextPage = () => {
                       />
                     </div>
                   )}
+
                   <Flow
                     hideGlobalMessages
                     only="profile"
@@ -246,29 +250,16 @@ const Registration: NextPage = () => {
                   />
                 </div>
                 {availableMethods.includes("oidc") && (
-                  <div className="relative mt-6">
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 flex items-center"
-                    >
-                      <div className="w-full border-t border-muted-foreground/50" />
-                    </div>
-                    <div className="relative flex justify-center text-sm/6 font-medium">
-                      <span className="px-6 text-muted-foreground bg-card">
-                        Or continue with
-                      </span>
-                    </div>
+                  <div className="mt-6">
+                    <Flow
+                      className="flex flex-row flex-wrap gap-2 justify-center"
+                      only="oidc"
+                      hideGlobalMessages
+                      onSubmit={onSubmit}
+                      flow={flow as LoginFlow}
+                    />
                   </div>
                 )}
-                <div className="mt-6">
-                  <Flow
-                    className="flex flex-row flex-wrap gap-2 justify-center"
-                    only="oidc"
-                    hideGlobalMessages
-                    onSubmit={onSubmit}
-                    flow={flow as LoginFlow}
-                  />
-                </div>
               </CardContent>
             </Card>
           </div>
