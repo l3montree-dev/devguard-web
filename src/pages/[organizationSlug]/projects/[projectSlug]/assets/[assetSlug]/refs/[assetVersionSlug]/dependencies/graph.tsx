@@ -55,6 +55,9 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { context } from "@react-three/fiber";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { set } from "lodash";
+import { Loader2Icon } from "lucide-react";
 
 const DependencyGraphPage: FunctionComponent<{
   flaws: Array<VulnDTO>;
@@ -65,7 +68,6 @@ const DependencyGraphPage: FunctionComponent<{
   const dimensions = useDimensions();
 
   const router = useRouter();
-  const pathname = usePathname();
 
   const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
     useState(false);
@@ -83,7 +85,9 @@ const DependencyGraphPage: FunctionComponent<{
 
   useEffect(() => {
     async function fetchData() {
-      if (!activeOrg || !project || !asset || !assetVersion) return;
+      if (!activeOrg || !project || !asset || !assetVersion) {
+        return;
+      }
       const resp = await browserApiClient(
         `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion.slug}/dependency-graph/?` +
           toSearchParams({
@@ -132,7 +136,7 @@ const DependencyGraphPage: FunctionComponent<{
       }
     }
     fetchData();
-  }, []);
+  }, [router.query, flaws, activeOrg, project, asset, assetVersion]);
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
@@ -199,13 +203,17 @@ const DependencyGraphPage: FunctionComponent<{
             </Button>
           </div>
 
-          {graph && (
+          {graph ? (
             <DependencyGraph
               flaws={flaws}
               width={dimensions.width - SIDEBAR_WIDTH}
               height={dimensions.height - HEADER_HEIGHT - 85}
               graph={{ root: graph }}
             />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <Loader2Icon className="animate-spin h-5 w-auto m-2" />
+            </div>
           )}
         </div>
       </Section>
@@ -333,5 +341,6 @@ export const getServerSideProps = middleware(
     project: withProject,
     asset: withAsset,
     contentTree: withContentTree,
+    assetVersion: withAssetVersion,
   },
 );
