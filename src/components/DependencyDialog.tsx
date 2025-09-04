@@ -32,6 +32,7 @@ import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 
 interface Props {
   open: boolean;
@@ -58,11 +59,12 @@ const DependencyDialog: FunctionComponent<Props> = ({
 
   //read artifactName from url query params
   const artifactName = (search.get("artifact") as string) || "";
+  const assetVersion = useActiveAssetVersion();
 
   const handleGraphFetch = useCallback(
     async (data: string) => {
       const resp = await browserApiClient(
-        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/main/path-to-component/?artifact=${artifactName}&purl=${encodeURIComponent(data)}`,
+        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?artifact=${artifactName}&purl=${encodeURIComponent(data)}`,
         {
           method: "GET",
         },
