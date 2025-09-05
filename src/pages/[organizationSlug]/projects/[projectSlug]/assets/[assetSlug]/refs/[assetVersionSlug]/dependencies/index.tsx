@@ -239,7 +239,7 @@ const columnsDef: ColumnDef<
   }),
   columnHelper.accessor("dependency.version", {
     header: "Version",
-    id: "Dependency.version",
+    id: "dependency.version",
     cell: (row) =>
       row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
   }),
@@ -247,6 +247,7 @@ const columnsDef: ColumnDef<
   columnHelper.accessor("license", {
     header: "License",
     id: "Dependency.license",
+    enableSorting: false,
     cell: (row) => (
       <LicenseCall
         dependencyPurl={row.row.original.dependencyPurl}
@@ -258,7 +259,7 @@ const columnsDef: ColumnDef<
   }),
   columnHelper.accessor("dependency.project.projectKey", {
     header: "Repository",
-    id: "Dependency__ComponentProject.project_key",
+    id: "dependency_project.project_key",
     cell: (row) =>
       row.row.original.dependency?.project && (
         <div>
@@ -281,14 +282,14 @@ const columnsDef: ColumnDef<
 
   columnHelper.accessor("dependency.project.scoreCardScore", {
     header: "OpenSSF Scorecard",
-    id: "Dependency__ComponentProject.score_card_score", // tight coupling with database and SQL-Query
+    id: "dependency_project.score_card_score", // tight coupling with database and SQL-Query
     cell: (row) => (
       <div>{row.getValue() && <OpenSsfScore score={row.getValue()} />}</div>
     ),
   }),
   columnHelper.accessor("dependency.published", {
     header: "Published",
-    id: "Dependency.published",
+    id: "dependency.published",
     cell: (row) =>
       row.getValue() && (
         <div className="flex flex-row items-center gap-2">
