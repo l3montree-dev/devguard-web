@@ -134,6 +134,21 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
+        title: "Artifacts",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/artifacts",
+        Icon: TextSelect,
+        isActive: router.pathname.includes("artifacts"),
+      },
+      {
         title: "Code Risks",
         href:
           "/" +

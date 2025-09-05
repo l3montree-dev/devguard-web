@@ -40,6 +40,10 @@ export default async function handler(
   // get the path from the url
   const { connection, origin, host, ...rest } = req.headers;
 
+  if (!url.pathname.endsWith("/")) {
+    url.pathname += "/";
+  }
+
   const resp = await fetch(url, {
     method: req.method,
     headers: {
