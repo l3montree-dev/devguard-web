@@ -16,31 +16,26 @@
 import { useOrg } from "@/hooks/useOrg";
 import { classNames } from "@/utils/common";
 
+import { LogoutLink } from "@/hooks/logoutLink";
 import {
-  BuildingOffice2Icon,
+  ArrowRightStartOnRectangleIcon,
   CogIcon,
   MoonIcon,
   SunIcon,
-  ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { PlusIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/compat/router";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useStore } from "../../zustand/globalStoreProvider";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import useOrganizations from "../../hooks/useOrganizations";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button, buttonVariants } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { OrganizationDetailsDTO } from "@/types/api/api";
-import { Arrow } from "@radix-ui/react-dropdown-menu";
-import { LogoutLink } from "@/hooks/logoutLink";
 
 interface Props {}
 
@@ -49,8 +44,8 @@ export default function UserNav() {
 
   const { setTheme } = useTheme();
 
-  const user = useStore((s) => s.session?.identity);
-  const orgs = useStore((s) => s.organizations);
+  const user = useCurrentUser();
+  const orgs = useOrganizations();
 
   const activeOrg = useOrg() ?? orgs[0];
   const handleLogout = LogoutLink();

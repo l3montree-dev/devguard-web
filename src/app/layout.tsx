@@ -1,0 +1,93 @@
+import "@/styles/tailwind.scss";
+import "focus-visible";
+
+import { ThemeProvider } from "next-themes";
+import { Inter, Lexend, Merriweather } from "next/font/google";
+import React from "react";
+import { withSession } from "../decorators/approuter/withSession";
+import { ClientContextWrapper } from "../context/ClientContextWrapper";
+import { SessionProvider } from "../context/SessionContext";
+import { withOrgs } from "../decorators/approuter/withOrgs";
+import { HttpError } from "../decorators/middleware";
+import { redirect } from "next/navigation";
+
+export const lexend = Lexend({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-lexend",
+});
+
+export const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+export const merriweather = Merriweather({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-merriweather",
+  weight: "700",
+});
+
+export default async function RootLayout({
+  // Layouts must accept a children prop.
+  // This will be populated with nested layouts or pages
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  try {
+    const [session, orgs] = await Promise.all([withSession(), withOrgs()]);
+
+    return (
+      <html
+        suppressHydrationWarning
+        className={
+          "h-full scroll-smooth antialiased " +
+          lexend.className +
+          " " +
+          inter.className
+        }
+        lang="en"
+      >
+        <body
+          suppressHydrationWarning
+          className={
+            "flex min-h-full flex-col " +
+            inter.variable +
+            " " +
+            lexend.variable +
+            " " +
+            merriweather.variable
+          }
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ClientContextWrapper
+              Provider={SessionProvider}
+              value={{
+                session,
+                organizations: orgs,
+              }}
+            >
+              {children}
+            </ClientContextWrapper>
+          </ThemeProvider>
+        </body>
+      </html>
+    );
+  } catch (error) {
+    if (
+      error instanceof HttpError &&
+      error.instructions &&
+      "redirect" in error.instructions
+    ) {
+      redirect(error.instructions.redirect.destination);
+    }
+  }
+}

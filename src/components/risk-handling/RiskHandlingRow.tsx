@@ -18,7 +18,7 @@ import { classNames } from "@/utils/common";
 import { defaultScanner } from "@/utils/view";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import React, { FunctionComponent } from "react";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";

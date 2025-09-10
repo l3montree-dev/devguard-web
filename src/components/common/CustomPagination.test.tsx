@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import CustomPagination from "./CustomPagination";
 
 // Mock Next.js router

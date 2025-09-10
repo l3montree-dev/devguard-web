@@ -64,7 +64,7 @@ import { useActiveProject } from "../../../../../../../../../hooks/useActiveProj
 
 import Page from "@/components/Page";
 import { Combobox } from "@/components/common/Combobox";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
 

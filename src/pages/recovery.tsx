@@ -19,7 +19,7 @@ import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect, useState } from "react";
 import { Flow } from "../components/kratos/Flow";
 import {

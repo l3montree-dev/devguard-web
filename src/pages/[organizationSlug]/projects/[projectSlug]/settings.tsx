@@ -28,7 +28,7 @@ import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
 import { getCurrentUserRole } from "@/hooks/useUserRole";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import MembersTable from "../../../../components/MembersTable";

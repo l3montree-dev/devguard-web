@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
 import {
   createContext,
@@ -50,16 +51,27 @@ export const StoreProvider: FunctionComponent<
   );
 };
 
-export function useStore(): GlobalStore;
-export function useStore<T>(selector: (s: GlobalStore) => T): T;
+export const NO_STORE_AVAILABLE = "NO_STORE_AVAILABLE" as const;
 
+export function useStore(): GlobalStore | typeof NO_STORE_AVAILABLE;
+export function useStore<T>(
+  selector: (s: GlobalStore) => T,
+): T | typeof NO_STORE_AVAILABLE;
 export function useStore<T>(
   selector: (s: GlobalStore) => T = (s) => s as T,
-): T {
-  const store = useContext(StoreContext);
-  if (!store) {
-    throw new Error("useStore must be used within a StoreProvider.");
+): T | typeof NO_STORE_AVAILABLE {
+  try {
+    const store = useContext(StoreContext);
+    if (!store) {
+      throw new Error("No store available");
+    }
+    // eslint-disable react-hooks/rules-of-hooks
+    return useZustandStore(store, selector);
+  } catch (e) {
+    return NO_STORE_AVAILABLE;
   }
+}
 
-  return useZustandStore(store, selector);
+export function noStoreAvailable(s: any): s is typeof NO_STORE_AVAILABLE {
+  return s === NO_STORE_AVAILABLE;
 }

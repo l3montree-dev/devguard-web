@@ -4,7 +4,7 @@ import { FlowError } from "@ory/client";
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 

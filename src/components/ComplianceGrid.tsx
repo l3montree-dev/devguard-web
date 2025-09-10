@@ -1,5 +1,5 @@
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { FunctionComponent, useMemo } from "react";
 import { PolicyEvaluation } from "../types/api/api";
 import { classNames } from "../utils/common";

@@ -17,7 +17,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { FunctionComponent, useState } from "react";
 
 import { withOrgs } from "@/decorators/withOrgs";

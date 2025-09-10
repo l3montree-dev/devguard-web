@@ -25,7 +25,7 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useViewMode } from "@/hooks/useViewMode";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import {
   Card,
   CardContent,

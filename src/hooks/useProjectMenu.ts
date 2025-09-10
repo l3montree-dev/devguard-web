@@ -20,7 +20,7 @@ import {
   ScaleIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useCurrentUser } from "./useCurrentUser";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUserRole } from "./useUserRole";
@@ -29,8 +29,8 @@ import { ContainerIcon } from "lucide-react";
 
 export const useProjectMenu = () => {
   const router = useRouter();
-  const orgSlug = router.query.organizationSlug as string;
-  const projectSlug = router.query.projectSlug as string;
+  const orgSlug = router?.query.organizationSlug as string;
+  const projectSlug = router?.query.projectSlug as string;
   const project = useActiveProject();
   const currentUserRole = useCurrentUserRole();
 
@@ -42,7 +42,7 @@ export const useProjectMenu = () => {
       href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
       Icon: ChartBarSquareIcon,
       isActive:
-        router.pathname ===
+        router?.pathname ===
         "/[organizationSlug]/projects/[projectSlug]/overview",
     },
     {

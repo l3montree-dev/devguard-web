@@ -117,7 +117,7 @@ const ProjectTitle = () => {
       <span className="flex flex-row gap-2 min-w-0 overflow-hidden">
         {hierarchy.map((proj, index) => (
           <ProjectElement
-            key={proj.slug}
+            key={proj.id}
             project={proj}
             activeOrg={activeOrg}
             isLast={index === hierarchy.length - 1}
@@ -136,7 +136,7 @@ const ProjectTitle = () => {
     <span className="flex flex-row gap-2 min-w-0 overflow-hidden">
       {firstTwo.map((proj, index) => (
         <ProjectElement
-          key={proj.slug}
+          key={proj.id}
           project={proj}
           activeOrg={activeOrg}
           isLast={false}
@@ -156,7 +156,7 @@ const ProjectTitle = () => {
         const hierarchyIndex = hierarchy.length - 2 + index;
         return (
           <ProjectElement
-            key={proj.slug}
+            key={proj.id}
             project={proj}
             activeOrg={activeOrg}
             isLast={index === lastTwo.length - 1}

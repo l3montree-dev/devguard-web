@@ -9,7 +9,7 @@ import { DialogHeader, DialogTitle } from "../../ui/dialog";
 import { AssetDTO } from "../../../types/api/api";
 import Image from "next/image";
 import { browserApiClient } from "../../../services/devGuardApi";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { toast } from "sonner";
 import { useStore } from "../../../zustand/globalStoreProvider";
 import { AsyncButton, Button } from "../../ui/button";

@@ -24,7 +24,7 @@ import {
 } from "@xyflow/react";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { DependencyGraphNode } from "./DependencyGraphNode";
 
 // or if you just want basic styles

@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "@/styles/tailwind.scss";
 import "focus-visible";
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
-import { StoreProvider } from "../zustand/globalStoreProvider";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
-import SetupOrg from "./notsupported";
+import { StoreProvider } from "../zustand/globalStoreProvider";
 import NotSupported from "./notsupported";
 
 export const lexend = Lexend({

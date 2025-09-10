@@ -10,7 +10,7 @@ import React, { FunctionComponent, useState } from "react";
 
 import { EllipsisVerticalIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { toast } from "sonner";
 import ListItem from "../../components/common/ListItem";
 import PolicyDialog from "../../components/PolicyDialog";

@@ -16,7 +16,7 @@
 import { Head, Html, Main, NextScript } from "next/document";
 
 import { inter, lexend, merriweather } from "@/pages/_app";
-const env = process.env.NODE_ENV;
+
 export default function Document() {
   return (
     <Html

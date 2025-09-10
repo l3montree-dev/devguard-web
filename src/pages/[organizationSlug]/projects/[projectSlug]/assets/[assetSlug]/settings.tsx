@@ -23,7 +23,7 @@ import {
 import { isNumber } from "@/utils/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

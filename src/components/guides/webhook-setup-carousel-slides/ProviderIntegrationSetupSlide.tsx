@@ -11,7 +11,7 @@ import { ExternalTicketProvider } from "@/types/common";
 import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 
 export interface ProviderIntegrationSetupSlideProps {
   api?: {

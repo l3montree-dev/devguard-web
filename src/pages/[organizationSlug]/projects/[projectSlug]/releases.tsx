@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import React from "react";
 import { toast } from "sonner";
 import Alert from "../../../../components/common/Alert";

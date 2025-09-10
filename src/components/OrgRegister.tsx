@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useForm } from "react-hook-form";
 import { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 

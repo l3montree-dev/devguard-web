@@ -4,7 +4,7 @@ import {
   sortingState2Query,
 } from "@/services/filter";
 import { SortingState } from "@tanstack/react-table";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect, useState } from "react";
 
 export default function useFilter() {

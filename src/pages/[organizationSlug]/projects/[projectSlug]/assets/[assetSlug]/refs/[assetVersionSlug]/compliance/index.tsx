@@ -15,7 +15,7 @@ import { FunctionComponent } from "react";
 
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import ColoredBadge from "../../../../../../../../../components/common/ColoredBadge";
 import ListItem from "../../../../../../../../../components/common/ListItem";
 import { withAssetVersion } from "../../../../../../../../../decorators/withAssetVersion";

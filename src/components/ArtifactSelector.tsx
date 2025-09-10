@@ -3,7 +3,7 @@
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ContainerIcon } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {

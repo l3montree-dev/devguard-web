@@ -18,7 +18,7 @@ import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { browserApiClient } from "../services/devGuardApi";
@@ -33,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import useOrganizations from "../hooks/useOrganizations";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -44,7 +45,8 @@ const activeOrgName = (name: string, slug: string) => {
   return name;
 };
 export const OrganizationDropDown = () => {
-  const orgs = useStore((s) => s.organizations);
+  const orgs = useOrganizations();
+
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
 
   const user = useCurrentUser();

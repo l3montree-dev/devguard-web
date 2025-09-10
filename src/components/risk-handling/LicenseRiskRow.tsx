@@ -1,6 +1,6 @@
 // components/license-risk/LicenseRiskRow.tsx
 import { beautifyPurl, classNames } from "@/utils/common";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { LicenseRiskDTO } from "../../types/api/api";
 import ArtifactBadge from "../ArtifactBadge";
 import EcosystemImage from "../common/EcosystemImage";

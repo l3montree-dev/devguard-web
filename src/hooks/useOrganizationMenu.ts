@@ -13,22 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  ChartBarSquareIcon,
-  CogIcon,
-  ListBulletIcon,
-} from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-
-import { useCurrentUser } from "./useCurrentUser";
+import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/compat/router";
+import { UserRole } from "@/types/api/api";
 import { ScaleIcon } from "lucide-react";
 import { useActiveOrg } from "./useActiveOrg";
+import { useCurrentUser } from "./useCurrentUser";
 import { useCurrentUserRole } from "./useUserRole";
-import { UserRole } from "@/types/api/api";
 
 export const useOrganizationMenu = () => {
   const router = useRouter();
-  const orgSlug = router.query.organizationSlug as string;
+  const orgSlug = router?.query.organizationSlug as string;
   const loggedIn = useCurrentUser();
   const currentUserRole = useCurrentUserRole();
   const org = useActiveOrg();

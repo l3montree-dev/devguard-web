@@ -21,7 +21,7 @@ import { useArtifacts } from "@/hooks/useArtifacts";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import { ArtifactDTO } from "@/types/api/api";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useState } from "react";
 import { toast } from "sonner";
 

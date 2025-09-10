@@ -32,8 +32,8 @@ import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { AxiosError } from "axios";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, {
+import { useRouter } from "next/compat/router";
+import {
   FunctionComponent,
   ReactNode,
   useEffect,
@@ -49,15 +49,12 @@ import { Flow, Methods } from "../components/kratos/Flow";
 import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
 import { Switch } from "@/components/ui/switch";
 import { withOrgs } from "@/decorators/withOrgs";
+import { uniq } from "lodash";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../services/devGuardApi";
+import { getApiClientFromContext } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
-import { uniq } from "lodash";
 
 interface Props {
   flow?: SettingsFlow;

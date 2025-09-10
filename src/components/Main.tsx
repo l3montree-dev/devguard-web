@@ -15,20 +15,18 @@
 import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
-import { useStore } from "@/zustand/globalStoreProvider";
+import { useRouter } from "next/compat/router";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRouter } from "next/router";
-import React, { FunctionComponent, useEffect } from "react";
+import React, { FunctionComponent } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { providerIdToBaseURL } from "../utils/externalProvider";
-import { OrganizationDropDown } from "./OrganizationDropDown";
 import GitProviderIcon from "./GitProviderIcon";
 import UserNav from "./navigation/UserNav";
-import { SidebarProvider } from "./ui/sidebar";
+import { OrganizationDropDown } from "./OrganizationDropDown";
 
 interface Props {
   title: string;
@@ -173,122 +171,104 @@ const Main: FunctionComponent<Props> = ({
   fullscreen,
 }) => {
   const router = useRouter();
-  const isSidebarOpen = useStore((s) => s.isSidebarOpen);
-  const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const dimensions = useDimensions();
   const activeOrg = useActiveOrg();
-  const { organizationSlug } = useParams<{ organizationSlug: string }>();
-  useEffect(() => {
-    // check local storage
-    const open = localStorage.getItem("sidebarOpen");
-    setSidebarOpen(open === "true");
-  }, []);
 
   return (
-    <SidebarProvider
-      onOpenChange={(o) => {
-        localStorage.setItem("sidebarOpen", o.toString());
-        setSidebarOpen(o);
-      }}
-      open={isSidebarOpen}
-    >
-      {/*<AppSidebar /> */}
-      <main className="flex-1 font-body">
-        <header
-          className={classNames(
-            "relative z-20 flex min-h-[109px] items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
-            Boolean(Menu) ? "pb-3" : "pb-5",
-          )}
-        >
-          <div className="mx-auto w-full max-w-screen-2xl">
-            <div className="flex flex-row items-center gap-4">
-              <Link href={`/${activeOrg?.slug}`}>
-                <EntityProviderImage provider={activeOrg?.slug || ""} />
-              </Link>
-              <div>
-                <OrganizationDropDown />
-              </div>
-              <div className="flex w-full flex-row items-center justify-between">
-                <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-white">
-                  {Title ?? title}
-                </h1>
-                <UserNav />
-              </div>
+    <main className="flex-1 font-body">
+      <header
+        className={classNames(
+          "relative z-20 flex min-h-[109px] items-center justify-between border-b bg-blue-950 px-4 pt-5 dark:bg-[#02040a] sm:px-6 lg:px-8",
+          Boolean(Menu) ? "pb-3" : "pb-5",
+        )}
+      >
+        <div className="mx-auto w-full max-w-screen-2xl">
+          <div className="flex flex-row items-center gap-4">
+            <Link href={`/${activeOrg?.slug}`}>
+              <EntityProviderImage provider={activeOrg?.slug || ""} />
+            </Link>
+            <div>
+              <OrganizationDropDown />
             </div>
-            {Menu !== undefined && (
-              <div className="flex flex-row items-end gap-6 text-sm">
-                {Menu.map((item) => (
-                  <Link
-                    className={classNames(
-                      "cursor:pointer relative hover:no-underline",
-                    )}
-                    key={item.title}
-                    href={item.href}
-                  >
-                    {(item.isActive || router.asPath == item.href) && (
-                      <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
-                    )}
-                    <div className="mt-4 flex flex-row items-center gap-1">
-                      <item.Icon className="h-5 w-5 text-gray-400" />
-                      <span className="text-white ">{item.title}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div className="flex w-full flex-row items-center justify-between">
+              <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-white">
+                {Title ?? title}
+              </h1>
+              <UserNav />
+            </div>
           </div>
-        </header>
-        <EntityProviderLinkBanner />
-        <div
-          style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
-          className={classNames(
-            !fullscreen &&
-              "mx-auto max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
+          {Menu !== undefined && (
+            <div className="flex flex-row items-end gap-6 text-sm">
+              {Menu.map((item) => (
+                <Link
+                  className={classNames(
+                    "cursor:pointer relative hover:no-underline",
+                  )}
+                  key={item.title}
+                  href={item.href}
+                >
+                  {(item.isActive || router?.asPath == item.href) && (
+                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
+                  )}
+                  <div className="mt-4 flex flex-row items-center gap-1">
+                    <item.Icon className="h-5 w-5 text-gray-400" />
+                    <span className="text-white ">{item.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
-        >
-          {children}
         </div>
-        <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8">
-          <div className="mb-2 flex flex-row gap-5">
-            <Link
-              className="!text-muted-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/l3montree-dev/devguard"
-            >
-              GitHub
-            </Link>
-            <Link
-              className="!text-muted-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://l3montree.com/impressum"
-            >
-              Imprint
-            </Link>
-            <Link
-              className="!text-muted-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://devguard.org/terms-of-use"
-            >
-              Terms of Use
-            </Link>
-            <Link
-              className="!text-muted-foreground"
-              href="https://devguard.org/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy
-            </Link>
-          </div>
-          Copyright © {new Date().getFullYear()} L3montree GmbH and the
-          DevGuard Contributors. All rights reserved. Version{" "}
-          {process.env.NEXT_PUBLIC_VERSION}
-        </footer>
-      </main>
-    </SidebarProvider>
+      </header>
+      <EntityProviderLinkBanner />
+      <div
+        style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
+        className={classNames(
+          !fullscreen && "mx-auto max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
+        )}
+      >
+        {children}
+      </div>
+      <footer className="mx-auto max-w-screen-xl px-6 pb-8 text-sm text-muted-foreground lg:px-8">
+        <div className="mb-2 flex flex-row gap-5">
+          <Link
+            className="!text-muted-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/l3montree-dev/devguard"
+          >
+            GitHub
+          </Link>
+          <Link
+            className="!text-muted-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://l3montree.com/impressum"
+          >
+            Imprint
+          </Link>
+          <Link
+            className="!text-muted-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://devguard.org/terms-of-use"
+          >
+            Terms of Use
+          </Link>
+          <Link
+            className="!text-muted-foreground"
+            href="https://devguard.org/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Privacy
+          </Link>
+        </div>
+        Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
+        Contributors. All rights reserved. Version{" "}
+        {process.env.NEXT_PUBLIC_VERSION}
+      </footer>
+    </main>
   );
 };
 export default Main;

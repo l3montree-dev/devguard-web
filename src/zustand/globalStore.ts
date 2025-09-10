@@ -61,7 +61,7 @@ export interface GlobalStoreActions {
 }
 
 export interface GlobalStore extends InitialState, GlobalStoreActions {
-  project?: ProjectDTO;
+  project?: ProjectDTO & { assets: AssetDTO[] };
   asset?: AssetDTO;
   assetVersion?: AssetVersionDTO;
   artifacts?: ArtifactDTO[];
@@ -83,7 +83,7 @@ export const createGlobalStore = (
       updateOrganization: (organization: OrganizationDetailsDTO) => {
         set({ organization });
       },
-      updateProject: (project: ProjectDTO) => {
+      updateProject: (project: ProjectDTO & { assets: AssetDTO[] }) => {
         set({ project });
       },
       updateAsset: (asset: AssetDTO) => {

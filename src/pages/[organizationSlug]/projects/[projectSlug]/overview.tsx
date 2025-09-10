@@ -30,7 +30,7 @@ import {
 } from "../../../../types/api/api";
 
 import { groupBy } from "lodash";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { QueryArtifactSelector } from "../../../../components/ArtifactSelector";
 import Avatar from "../../../../components/Avatar";
 import AverageFixingTimeChart from "../../../../components/AverageFixingTimeChart";

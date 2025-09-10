@@ -15,7 +15,7 @@
 
 import { middleware } from "@/decorators/middleware";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, use, useEffect, useState } from "react";
+import { useState } from "react";
 import Page from "../../components/Page";
 import { withOrgs } from "../../decorators/withOrgs";
 import { withSession } from "../../decorators/withSession";
@@ -29,8 +29,14 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
 
+import MemberDialog from "@/components/MemberDialog";
+import MembersTable from "@/components/MembersTable";
 import { OrgForm } from "@/components/OrgForm";
-import { Badge } from "@/components/ui/badge";
+import DangerZone from "@/components/common/DangerZone";
+import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
+import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
+import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -38,6 +44,9 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
+import { config } from "@/config";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
@@ -48,23 +57,12 @@ import {
   WebhookDTO,
 } from "@/types/api/api";
 import { useStore } from "@/zustand/globalStoreProvider";
+import { useRouter } from "next/compat/router";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { withContentTree } from "@/decorators/withContentTree";
-import MembersTable from "@/components/MembersTable";
-import MemberDialog from "@/components/MemberDialog";
-import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
-import DangerZone from "@/components/common/DangerZone";
-import { Switch } from "@/components/ui/switch";
-import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
-import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
-import { Card } from "@/components/ui/card";
-import { config } from "@/config";
-import { string } from "zod";
 
 interface HomeProps {
   devguardGithubAppUrl: string;

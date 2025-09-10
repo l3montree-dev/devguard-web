@@ -1,7 +1,7 @@
 import { AssetVersionDTO } from "@/types/api/api";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon, StarIcon } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import {

@@ -1,10 +1,16 @@
 import { OrganizationDetailsDTO } from "@/types/api/api";
-import { useStore } from "../zustand/globalStoreProvider";
+import { useOrganization } from "../context/OrganizationContext";
+import { noStoreAvailable, useStore } from "../zustand/globalStoreProvider";
 
 export function useActiveOrg(): OrganizationDetailsDTO {
-  return useStore((s) => {
+  const org = useStore((s) => {
     // should only be used in organization slug pages
     // an organization cant be undefined in this subrouter - see the applied middleware
     return s.organization;
   });
+  const contextOrg = useOrganization();
+  if (noStoreAvailable(org)) {
+    return contextOrg.organization;
+  }
+  return org;
 }

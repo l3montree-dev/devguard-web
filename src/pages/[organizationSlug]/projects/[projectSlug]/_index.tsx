@@ -10,7 +10,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import Page from "../../../../components/Page";

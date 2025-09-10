@@ -1,7 +1,7 @@
 import { Paged } from "@/types/api/api";
 import React, { FunctionComponent, useMemo } from "react";
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/compat/router";
 import { Button } from "../ui/button";
 
 const getPaginationData = (currentPage: number, totalPages: number) => {
