@@ -19,7 +19,7 @@ const truncateMiddle = (text: string, maxLength: number = 20): string => {
 export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
   if (type === "kubernetesNamespace") {
     return (
-      <Badge className=" !text-white" variant="outline">
+      <Badge className="!text-header-foreground" variant="outline">
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -32,7 +32,7 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else if (type === "kubernetesCluster") {
     return (
-      <Badge className=" !text-white" variant="outline">
+      <Badge className="!text-header-foreground" variant="outline">
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -45,7 +45,7 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else {
     return (
-      <Badge className="!text-white" variant="outline">
+      <Badge className="!text-header-foreground" variant="outline">
         {type === "default" ? "Group" : "Subgroup"}
       </Badge>
     );
@@ -92,7 +92,7 @@ export const ProjectElement = ({
   return (
     <>
       <Link
-        className="flex flex-row items-center gap-1 !text-white hover:no-underline min-w-0"
+        className="flex flex-row items-center gap-1 !text-header-foreground hover:no-underline min-w-0"
         href={`/${activeOrg.slug}/projects/${project.slug}/`}
         title={displayName}
       >

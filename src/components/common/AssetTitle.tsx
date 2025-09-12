@@ -18,12 +18,12 @@ const AssetTitle = () => {
       <ProjectTitle />
       <span className="opacity-75 flex-shrink-0">/</span>
       <Link
-        className="flex !text-white items-center gap-1 hover:no-underline min-w-0"
+        className="flex !text-header-foreground items-center gap-1 hover:no-underline min-w-0"
         href={`/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
         title={asset?.name}
       >
         <span className="truncate">{asset?.name}</span>
-        <Badge className="!text-white" variant="outline">
+        <Badge className="!text-header-foreground" variant="outline">
           Repository
         </Badge>
       </Link>
