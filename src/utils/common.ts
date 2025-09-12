@@ -234,6 +234,7 @@ export const licenses = [
   { value: "afl-3.0", label: "AFL-3.0" },
   { value: "apl-1.0", label: "APL-1.0" },
   { value: "apache-1.1", label: "Apache-1.1" },
+  { value: "apache-2.0", label: "Apache-2.0" },
   { value: "apsl-2.0", label: "APSL-2.0" },
   { value: "artistic-1.0-perl", label: "Artistic-1.0-Perl" },
   { value: "artistic-1.0", label: "Artistic-1.0" },
