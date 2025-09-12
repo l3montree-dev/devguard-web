@@ -58,18 +58,29 @@ permissions:
 jobs:`
         : "\ninclude:";
 
-    const codeString = Object.entries(config)
-      .filter(([_, selectedOptionValue]) => selectedOptionValue)
-      .map(([selectedOption]) => {
-        return integrationSnippets({
-          orgSlug,
-          projectSlug,
-          assetSlug,
-          apiUrl,
-        })[gitInstance][selectedOption as keyof Config];
-      })
-      .map((value) => value)
-      .join("\n");
+    let codeString = "";
+    if (Object.values(config).every((v) => v === true)) {
+      codeString = integrationSnippets({
+        orgSlug,
+        projectSlug,
+        assetSlug,
+        apiUrl,
+      })[gitInstance]["devsecops"];
+      return base + codeString;
+    } else {
+      codeString = Object.entries(config)
+        .filter(([_, selectedOptionValue]) => selectedOptionValue)
+        .map(([selectedOption]) => {
+          return integrationSnippets({
+            orgSlug,
+            projectSlug,
+            assetSlug,
+            apiUrl,
+          })[gitInstance][selectedOption as keyof Config];
+        })
+        .map((value) => value)
+        .join("\n");
+    }
 
     return base + codeString;
   }
