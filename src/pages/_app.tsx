@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "@/styles/tailwind.scss";
 import "focus-visible";
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
-import { StoreProvider } from "../zustand/globalStoreProvider";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
-import SetupOrg from "./notsupported";
+import { StoreProvider } from "../zustand/globalStoreProvider";
 import NotSupported from "./notsupported";
 
 export const lexend = Lexend({
@@ -47,6 +46,22 @@ export default function App({ Component, pageProps }) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     window.innerWidth < 768 && setIsMobile(true);
+
+    // check if there are theming options in local storage
+    const themeCssURL = localStorage.getItem("themeCssURL");
+    const themeJsURL = localStorage.getItem("themeJsURL");
+    if (themeCssURL) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = themeCssURL;
+      document.head.appendChild(link);
+    }
+    if (themeJsURL) {
+      const script = document.createElement("script");
+      script.src = themeJsURL;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   return (

@@ -51,6 +51,12 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 210 18% 84%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --header-background: 225 59%, 21.18%;
+    --header-foreground: 0 0% 100%;
+
+    --footer-background: 214 20% 98%;
+    --footer-foreground: 226 57% 0%;
   }
   
   .dark {
@@ -101,7 +107,12 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 215 22% 15%;
     --sidebar-ring: 215 22% 15%;
-  }  
+
+    --header-background: 225 66% 2%;
+    --header-foreground: 0 0% 100%;
+    --footer-background: 213 27% 7%;
+    --footer-foreground: 0 0% 98%;
+    }  
 }
 
 @layer base {

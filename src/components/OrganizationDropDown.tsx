@@ -112,13 +112,13 @@ export const OrganizationDropDown = () => {
           <div className="flex flex-row items-center gap-1 text-ellipsis">
             <div className="flex flex-col gap-0 ">
               <Link href={`/${activeOrg?.slug}`}>
-                <span
-                  className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold
-                text-white "
-                >
+                <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold text-header-foreground">
                   {activeOrgName(activeOrg.name, activeOrg.slug)}{" "}
                   {!activeOrg.externalEntityProviderId && (
-                    <Badge className="!text-white ml-2" variant={"outline"}>
+                    <Badge
+                      className="!text-header-foreground ml-2"
+                      variant={"outline"}
+                    >
                       Organization
                     </Badge>
                   )}
@@ -128,7 +128,7 @@ export const OrganizationDropDown = () => {
           </div>
         )}
         <DropdownMenu>
-          <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-white transition-all hover:bg-white/10">
+          <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-header-foreground transition-all hover:bg-white/10">
             <ChevronUpDownIcon className="block h-7 w-7 p-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
