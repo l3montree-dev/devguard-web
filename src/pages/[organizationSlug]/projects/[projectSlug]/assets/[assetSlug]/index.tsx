@@ -54,19 +54,20 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
         description="Start scanning your code for vulnerabilities, bad-practices, license issues, policy violations and more."
         title="Welcome to DevGuard 🚀"
       >
-        {asset?.externalEntityProviderId &&
+        {((asset?.externalEntityProviderId &&
           externalProviderIdToIntegrationName(
             asset.externalEntityProviderId,
-          ) === "gitlab" && (
-            <>
-              <div className="mb-8">
-                <div className="">
-                  <Autosetup {...autosetup} />
-                </div>
+          ) === "gitlab") ||
+          asset?.repositoryProvider === "gitlab") && (
+          <>
+            <div className="mb-8">
+              <div className="">
+                <Autosetup {...autosetup} />
               </div>
-              <hr className="mb-8" />
-            </>
-          )}
+            </div>
+            <hr className="mb-8" />
+          </>
+        )}
         <div className="flex flex-col gap-4 z-10">
           <ListItem
             Title="Check your Code for Risks 🛡️ (Vulnerabilities, Bad Practices, Leaked Secrets, and more...)"
