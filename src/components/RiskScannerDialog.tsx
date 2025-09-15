@@ -213,7 +213,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [selectedScanner, pat.pat, api]);
+  }, [selectedScanner, pat.pat, api, config]);
 
   const getStartIndex = () => {
     // display the update repository provider slide if asset is not connected already
