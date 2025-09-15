@@ -63,7 +63,7 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import { reduceRiskHistories } from "../../../../overview";
+import { reduceRiskHistories } from "../../../../_overview";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -452,11 +452,6 @@ export const getServerSideProps = middleware(
     const completeRiskHistory: RiskHistory[][] = days.map((day) => {
       return groups[day];
     });
-
-    console.log("avgCriticalFixingTime", avgCriticalFixingTime);
-    console.log("avgHighFixingTime", avgHighFixingTime);
-    console.log("avgMediumFixingTime", avgMediumFixingTime);
-    console.log("avgLowFixingTime", avgLowFixingTime);
 
     return {
       props: {

@@ -1,34 +1,29 @@
 "use client";
 
-import Err from "../../../../components/common/Err";
-import Loading from "../../../../components/common/Loading";
-import { useOrganization } from "../../../../context/OrganizationContext";
+import useSWR from "swr";
+import {
+  isOrganization,
+  useOrganization,
+} from "../../../../context/OrganizationContext";
 import { useProject } from "../../../../context/ProjectContext";
-import useApi from "../../../../hooks/useApi";
-import ProjectPage from "./ProjectPage";
+import { fetcher } from "../../../../hooks/useApi";
+import RepositoryPage from "./RepositoriesPage";
 
 export default function Page() {
-  const project = useProject();
+  const project = useProject()!;
   const organization = useOrganization();
 
-  const { data, isLoading, error } = useApi<any>(
-    `/organizations/${organization.organization.slug.replace("%40", "@")}/projects?parentId=${project?.id}`,
+  const { data } = useSWR<any>(
+    () =>
+      isOrganization(organization.organization)
+        ? `/organizations/${organization.organization.slug.replace("%40", "@")}/projects?parentId=${project?.id}`
+        : null,
+    fetcher,
+    { suspense: true },
   );
 
-  if (!project) {
-    return null;
-  }
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <Err />;
-  }
-
   return (
-    <ProjectPage
+    <RepositoryPage
       project={project}
       assets={project?.assets}
       subgroups={data.data || []}

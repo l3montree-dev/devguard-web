@@ -13,25 +13,25 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { UserRole } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
   ScaleIcon,
-  TagIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/compat/router";
-import { useCurrentUser } from "./useCurrentUser";
-import { useActiveProject } from "./useActiveProject";
-import { useCurrentUserRole } from "./useUserRole";
-import { UserRole } from "@/types/api/api";
 import { ContainerIcon } from "lucide-react";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
+import { useProject } from "../context/ProjectContext";
+import { useCurrentUser } from "./useCurrentUser";
+import { useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
-  const router = useRouter();
-  const orgSlug = router?.query.organizationSlug as string;
-  const projectSlug = router?.query.projectSlug as string;
-  const project = useActiveProject();
+  const params = useParams();
+  const project = useProject()!;
+  const pathname = usePathname();
+  const orgSlug = params?.organizationSlug as string;
+  const projectSlug = params?.projectSlug as string;
   const currentUserRole = useCurrentUserRole();
 
   const loggedIn = useCurrentUser();
@@ -42,8 +42,7 @@ export const useProjectMenu = () => {
       href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
       Icon: ChartBarSquareIcon,
       isActive:
-        router?.pathname ===
-        "/[organizationSlug]/projects/[projectSlug]/overview",
+        pathname === "/[organizationSlug]/projects/[projectSlug]/overview",
     },
     {
       title: "Releases",

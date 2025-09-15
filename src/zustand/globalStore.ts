@@ -25,6 +25,7 @@ export const normalizeContentTree = (
       | undefined;
   } = {};
 
+  console.log(contentTree);
   contentTree.forEach((element) => {
     element.assets.forEach((asset) => {
       assetMap[asset.id] = {

@@ -1,13 +1,22 @@
 "use client";
 
-import React from "react";
+import { createContext, useContext } from "react";
 import { OrganizationDetailsDTO } from "../types/api/api";
 import { ContentTreeElement } from "../zustand/globalStore";
 
-const OrganizationContext = React.createContext<{
+const OrganizationContext = createContext<{
   organization: OrganizationDetailsDTO | { oauth2Error: boolean } | null;
-  contentTree: ContentTreeElement;
+  contentTree: ContentTreeElement[];
 }>(null as any);
 
 export const OrganizationProvider = OrganizationContext.Provider;
-export const useOrganization = () => React.useContext(OrganizationContext);
+export const useOrganization = () => useContext(OrganizationContext);
+
+export const isOrganization = (
+  org: OrganizationDetailsDTO | { oauth2Error: boolean } | null,
+): org is OrganizationDetailsDTO => {
+  if (!org) return false;
+  // oauth2Error is only present in case of an error
+  if ("oauth2Error" in org) return false;
+  return true;
+};

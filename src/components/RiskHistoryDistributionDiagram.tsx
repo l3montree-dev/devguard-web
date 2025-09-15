@@ -31,7 +31,6 @@ export function RiskHistoryDistributionDiagram({
   data: ReleaseRiskHistory[];
   mode?: "risk" | "cvss";
 }) {
-  console.log(data);
   return (
     <Card>
       <CardHeader>

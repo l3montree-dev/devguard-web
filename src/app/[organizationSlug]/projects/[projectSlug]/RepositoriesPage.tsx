@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,7 +46,7 @@ interface Props {
   subgroups: Array<ProjectDTO & { assets: Array<AssetDTO> }>;
 }
 
-const ProjectPage: FunctionComponent<Props> = ({
+const RepositoryPage: FunctionComponent<Props> = ({
   project,
   subgroups,
   assets,
@@ -312,4 +312,4 @@ const ProjectPage: FunctionComponent<Props> = ({
   );
 };
 
-export default ProjectPage;
+export default RepositoryPage;
