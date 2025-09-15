@@ -15,7 +15,6 @@
 import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
-import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -24,10 +23,11 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
+import useConfig from "../hooks/useConfig";
 import { providerIdToBaseURL } from "../utils/externalProvider";
-import { OrganizationDropDown } from "./OrganizationDropDown";
 import GitProviderIcon from "./GitProviderIcon";
 import UserNav from "./navigation/UserNav";
+import { OrganizationDropDown } from "./OrganizationDropDown";
 import { SidebarProvider } from "./ui/sidebar";
 
 interface Props {
@@ -221,24 +221,16 @@ const Main: FunctionComponent<Props> = ({
   fullscreen,
 }) => {
   const router = useRouter();
-  const isSidebarOpen = useStore((s) => s.isSidebarOpen);
-  const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const dimensions = useDimensions();
   const activeOrg = useActiveOrg();
-  const { organizationSlug } = useParams<{ organizationSlug: string }>();
-  useEffect(() => {
-    // check local storage
-    const open = localStorage.getItem("sidebarOpen");
-    setSidebarOpen(open === "true");
-  }, []);
+  const themeConfig = useConfig();
 
   return (
     <SidebarProvider
       onOpenChange={(o) => {
-        localStorage.setItem("sidebarOpen", o.toString());
-        setSidebarOpen(o);
+        return;
       }}
-      open={isSidebarOpen}
+      open={false}
     >
       {/*<AppSidebar /> */}
       <main className="flex-1 font-body">
@@ -313,26 +305,26 @@ const Main: FunctionComponent<Props> = ({
                 className="!text-footer-foreground"
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://l3montree.com/impressum"
+                href={themeConfig.imprintLink}
               >
                 Imprint
               </Link>
-              <Link
+              <a
                 className="!text-footer-foreground"
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://devguard.org/terms-of-use"
+                href={themeConfig.termsOfUseLink}
               >
                 Terms of Use
-              </Link>
-              <Link
+              </a>
+              <a
                 className="!text-footer-foreground"
-                href="https://devguard.org/privacy-policy"
+                href={themeConfig.privacyPolicyLink}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Privacy
-              </Link>
+              </a>
             </div>
             Copyright © {new Date().getFullYear()} L3montree GmbH and the
             DevGuard Contributors. All rights reserved. Version{" "}

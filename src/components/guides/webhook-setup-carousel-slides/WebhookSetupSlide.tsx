@@ -1,20 +1,18 @@
+import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InputWithCustomButton } from "@/components/ui/input-with-custom-button";
+
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
-import { useStore } from "@/zustand/globalStoreProvider";
-import { useState } from "react";
-import { config } from "@/config";
-import { InputWithCustomButton } from "@/components/ui/input-with-custom-button";
-import { ImageZoom } from "@/components/common/Zoom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
-import { DialogDescription } from "@radix-ui/react-dialog";
+import { useStore } from "@/zustand/globalStoreProvider";
+import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
+import useConfig from "../../../hooks/useConfig";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -66,6 +64,9 @@ export default function WebhookSetupSlide({
       toast.error("Could not generate new secret");
     }
   };
+
+  const config = useConfig();
+
   return (
     <CarouselItem>
       <DialogHeader>

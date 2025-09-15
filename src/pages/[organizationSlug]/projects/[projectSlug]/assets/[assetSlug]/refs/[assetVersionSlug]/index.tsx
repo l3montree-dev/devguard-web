@@ -453,11 +453,6 @@ export const getServerSideProps = middleware(
       return groups[day];
     });
 
-    console.log("avgCriticalFixingTime", avgCriticalFixingTime);
-    console.log("avgHighFixingTime", avgHighFixingTime);
-    console.log("avgMediumFixingTime", avgMediumFixingTime);
-    console.log("avgLowFixingTime", avgLowFixingTime);
-
     return {
       props: {
         componentRisk,

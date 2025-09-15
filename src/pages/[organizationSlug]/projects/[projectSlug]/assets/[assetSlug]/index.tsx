@@ -1,41 +1,42 @@
+import AssetTitle from "@/components/common/AssetTitle";
+import Section from "@/components/common/Section";
+import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
+import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { withOrgs } from "@/decorators/withOrgs";
 import { withProject } from "@/decorators/withProject";
 import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useRepositorySearch from "@/hooks/useRepositorySearch";
 import "@xyflow/react/dist/style.css";
 import { GetServerSidePropsContext } from "next";
-import { FunctionComponent, useState } from "react";
-import AssetTitle from "@/components/common/AssetTitle";
-import Section from "@/components/common/Section";
-import { withContentTree } from "@/decorators/withContentTree";
-import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
-import useRepositorySearch from "@/hooks/useRepositorySearch";
 import Image from "next/image";
+import { FunctionComponent, useState } from "react";
 import Autosetup from "../../../../../../components/Autosetup";
 import ListItem from "../../../../../../components/common/ListItem";
 import RiskScannerDialog from "../../../../../../components/RiskScannerDialog";
 import { Button } from "../../../../../../components/ui/button";
-import { config } from "../../../../../../config";
+
 import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
+import useConfig from "../../../../../../hooks/useConfig";
 
 interface Props {
-  apiUrl: string;
   repositories: Array<{ value: string; label: string }> | null;
 }
 
-const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
+const Index: FunctionComponent<Props> = ({ repositories }) => {
   const assetMenu = useAssetMenu();
   const [isOpen, setIsOpen] = useState(false);
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
-  const autosetup = useAutosetup(apiUrl, "full");
+  const config = useConfig();
+  const autosetup = useAutosetup(config.devguardApiUrlPublicInternet, "full");
 
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
@@ -138,7 +139,7 @@ const Index: FunctionComponent<Props> = ({ apiUrl, repositories }) => {
       <RiskScannerDialog
         open={riskScanningIsOpen}
         onOpenChange={setRiskScanningOpen}
-        apiUrl={apiUrl}
+        apiUrl={config.devguardApiUrlPublicInternet}
       />
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
@@ -181,9 +182,7 @@ export const getServerSideProps = middleware(
 
     // there is no ref at all
     return {
-      props: {
-        apiUrl: config.devguardApiUrlPublicInternet,
-      },
+      props: {},
     };
   },
   {

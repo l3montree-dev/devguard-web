@@ -49,12 +49,11 @@ import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import { config } from "../../../../../../../../../config";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import useConfig from "../../../../../../../../../hooks/useConfig";
 
 interface Props {
-  apiUrl: string;
   vulns: Paged<LicenseRiskDTO>;
   artifacts: ArtifactDTO[];
 }
@@ -116,6 +115,7 @@ const Index: FunctionComponent<Props> = (props) => {
     columnsDef,
     data: props.vulns.data,
   });
+  const config = useConfig();
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
@@ -296,7 +296,7 @@ const Index: FunctionComponent<Props> = (props) => {
       <DependencyRiskScannerDialog
         open={isOpen}
         onOpenChange={setIsOpen}
-        apiUrl={props.apiUrl}
+        apiUrl={config.devguardApiUrlPublicInternet}
       />
     </Page>
   );
@@ -374,7 +374,6 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vulns,
-        apiUrl: config.devguardApiUrlPublicInternet,
         artifacts: artifactsData,
       },
     };

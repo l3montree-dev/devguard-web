@@ -1,4 +1,4 @@
-import { middleware } from "@/decorators/middleware";
+import { DEFAULT_DECORATORS, middleware } from "@/decorators/middleware";
 import { withSession } from "@/decorators/withSession";
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { GetServerSideProps } from "next";
@@ -103,7 +103,7 @@ const AcceptInvitation = () => {
 export default AcceptInvitation;
 
 export const getServerSideProps: GetServerSideProps = middleware(
-  async (context, { session }) => {
+  async (context) => {
     // make a request to accept that invitation
     const apiClient = getApiClientFromContext(context);
     const code = context.query.code as string;
@@ -134,10 +134,6 @@ export const getServerSideProps: GetServerSideProps = middleware(
         destination: `/${slug}`,
         permanent: false,
       },
-    };
-
-    return {
-      props: {},
     };
   },
   {

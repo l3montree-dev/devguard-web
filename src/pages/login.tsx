@@ -43,6 +43,8 @@ import PasswordLogin from "../components/login/PasswordLogin";
 import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
 import { LogoutLink } from "../hooks/logoutLink";
 import { handleFlowError, ory } from "../services/ory";
+import useConfig from "../hooks/useConfig";
+import { middleware } from "../decorators/middleware";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -180,6 +182,9 @@ const Login: NextPage = () => {
       }
     }
   }, [availableMethods]);
+
+  const themeConfig = useConfig();
+
   return (
     <>
       <Head>
@@ -284,25 +289,23 @@ const Login: NextPage = () => {
             <div className="mt-12 flex flex-col items-center">
               <p className="text-sm/6 text-muted-foreground text-center max-w-sm">
                 By using DevGuard you agree to our{" "}
-                <Link
-                  href="https://devguard.org/terms-of-use"
+                <a
+                  href={themeConfig.termsOfUseLink}
                   target="_blank"
                   rel="noreferrer"
-                  passHref
                   className="font-semibold hover:underline"
                 >
                   Terms of Use
-                </Link>{" "}
+                </a>{" "}
                 and{" "}
-                <Link
-                  href="https://devguard.org/privacy-policy"
+                <a
+                  href={themeConfig.privacyPolicyLink}
                   target="_blank"
                   rel="noreferrer"
-                  passHref
                   className="font-semibold hover:underline"
                 >
                   Privacy Policy
-                </Link>
+                </a>
                 .
               </p>
             </div>
@@ -322,3 +325,9 @@ const Login: NextPage = () => {
 };
 
 export default Login;
+
+export const getServerSideProps = middleware(() => {
+  return {
+    props: {},
+  };
+}, {});

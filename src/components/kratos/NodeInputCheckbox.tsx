@@ -3,6 +3,7 @@ import { NodeInputProps } from "./helpers";
 import { useId } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "@/components/ui/label";
+import useConfig from "../../hooks/useConfig";
 
 export function NodeInputCheckbox<T>({
   node,
@@ -11,7 +12,7 @@ export function NodeInputCheckbox<T>({
   disabled,
 }: NodeInputProps) {
   const id = useId();
-
+  const themeConfig = useConfig();
   // Render only if it's the confirmedTerms checkbox and value is true, this looks weird because in the registration the key "value" is not actually given
   if (
     attributes.name === "traits.confirmedTerms" &&
@@ -32,15 +33,15 @@ export function NodeInputCheckbox<T>({
         <Label htmlFor={id}>
           {getNodeLabel(node)}
           <a
-            href="https://devguard.org/terms-of-use"
+            href={themeConfig.termsOfUseLink}
             target="_blank"
             rel="noreferrer nooperner"
           >
-            devguard.org/terms-of-use
+            terms-of-use
           </a>{" "}
           and{" "}
           <a
-            href="https://devguard.org/privacy-policy"
+            href={themeConfig.privacyPolicyLink}
             target="_blank"
             className="whitespace-nowrap "
             rel="noreferrer nooperner"

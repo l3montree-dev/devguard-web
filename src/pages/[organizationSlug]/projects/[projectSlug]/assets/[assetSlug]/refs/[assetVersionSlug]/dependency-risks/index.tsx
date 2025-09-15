@@ -5,12 +5,7 @@ import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import {
-  ArtifactDTO,
-  Paged,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -56,14 +51,13 @@ import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import { config } from "../../../../../../../../../config";
 import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
-import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import { useArtifacts } from "../../../../../../../../../hooks/useArtifacts";
+import useConfig from "../../../../../../../../../hooks/useConfig";
+import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 
 interface Props {
-  apiUrl: string;
   vulns: Paged<VulnByPackage>;
 }
 
@@ -211,6 +205,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const config = useConfig();
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -408,7 +403,7 @@ const Index: FunctionComponent<Props> = (props) => {
       <DependencyRiskScannerDialog
         open={isOpen}
         onOpenChange={setIsOpen}
-        apiUrl={props.apiUrl}
+        apiUrl={config.devguardApiUrlPublicInternet}
       />
     </Page>
   );
@@ -477,7 +472,6 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vulns,
-        apiUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },

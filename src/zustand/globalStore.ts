@@ -9,6 +9,7 @@ import {
   ProjectDTO,
 } from "../types/api/api";
 import { User } from "../types/auth";
+import { config } from "../config";
 
 export interface ContentTreeElement extends ProjectDTO {
   assets: Array<AssetDTO>;
@@ -41,13 +42,16 @@ export const normalizeContentTree = (
   return assetMap;
 };
 
-export interface InitialState {
+export interface ThemeConfig {
+  config: typeof config;
+}
+
+export interface InitialState extends ThemeConfig {
   session: (Omit<Session, "identity"> & { identity: User }) | null;
   organizations: OrganizationDTO[];
   organization: OrganizationDetailsDTO;
   contentTree?: Array<ContentTreeElement>;
 
-  apiUrl: string;
   isSidebarOpen: boolean;
 }
 

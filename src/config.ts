@@ -19,4 +19,10 @@ export const config = {
     process.env.DEVGUARD_API_URL_PUBLIC_INTERNET || "https://api.devguard.org",
   devguardScannerTag: "main-latest",
   retryInterval: 3000,
+  oidcOnly: process.env.OIDC_ONLY === "true" || false,
+  privacyPolicyLink:
+    process.env.PRIVACY_POLICY_LINK || "https://devguard.org/privacy-policy",
+  termsOfUseLink:
+    process.env.TERMS_OF_USE_LINK || "https://devguard.org/terms-of-use",
+  imprintLink: process.env.IMPRINT_LINK || "https://devguard.org/imprint",
 };

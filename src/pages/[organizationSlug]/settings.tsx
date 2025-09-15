@@ -63,8 +63,6 @@ import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
 import { Card } from "@/components/ui/card";
-import { config } from "@/config";
-import { string } from "zod";
 
 interface HomeProps {
   devguardGithubAppUrl: string;
@@ -563,7 +561,10 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { organization, session }) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, config, session },
+  ) => {
     if (organization && "oauth2Error" in organization) {
       return {
         props: {},
