@@ -12,7 +12,7 @@ const generateWorkflowSnippet = (
         uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-            api-url: ${apiUrl}
+            api-url: "${apiUrl}"
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings
         ${jobName === "container-scanning" ? "needs: build-image" : ""}   `;
@@ -27,9 +27,9 @@ const generateGitlabSnippet = (
 ) => `
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
-    asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+    asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     token: "$DEVGUARD_TOKEN"
-    api_url: ${apiUrl}
+    api_url: "${apiUrl}"
     ${jobName === "container-scanning" ? "needs: build" : ""}   `;
 
 const generateDockerSnippet = (
@@ -147,7 +147,7 @@ export const integrationSnippets = ({
                   # Path to SARIF file relative to the root of the repository
                   sarif-file: ./results.sarif
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: ${apiUrl}
+                  api-url: "${apiUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create`,
     sbom: `jobs:
@@ -161,7 +161,7 @@ export const integrationSnippets = ({
                   # Path to SBOM file relative to the root of the repository
                   sbom-file: ./results.sbom
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: ${apiUrl}
+                  api-url: "${apiUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
   },
@@ -219,7 +219,7 @@ export const integrationSnippets = ({
 include:
     - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sarif.yml"
       inputs:
-          asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository`,
@@ -227,7 +227,7 @@ include:
 include:
     - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sbom.yml"
       inputs:
-          asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
