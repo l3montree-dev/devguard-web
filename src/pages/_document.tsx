@@ -61,6 +61,13 @@ MyDocument.getInitialProps = async (
   ctx: DocumentContext,
 ): Promise<DocumentInitialProps> => {
   const initialProps = await Document.getInitialProps(ctx);
+  if (process.env.THEME_JS_URL) {
+    console.log("Using THEME_JS_URL from env:", process.env.THEME_JS_URL);
+  }
+  if (process.env.THEME_CSS_URL) {
+    console.log("Using THEME_CSS_URL from env:", process.env.THEME_CSS_URL);
+  }
+
   return {
     ...initialProps,
     styles: (
@@ -69,7 +76,9 @@ MyDocument.getInitialProps = async (
         {process.env.THEME_CSS_URL && (
           <link rel="stylesheet" href={process.env.THEME_CSS_URL} />
         )}
-        {process.env.THEME_JS_URL && <Script src={process.env.THEME_JS_URL} />}
+        {process.env.THEME_JS_URL && (
+          <script async defer src={process.env.THEME_JS_URL} />
+        )}
       </>
     ),
   };
