@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
+import { classNames } from "@/utils/common";
 
 interface Props {
   onSelect: (value: string) => void;
@@ -92,7 +93,10 @@ export function Combobox(props: Props) {
                   key={item.value}
                   value={item.value}
                   keywords={[item.label]}
-                  className={value === item.value ? "bg-accent" : ""}
+                  className={classNames(
+                    value === item.value ? "bg-accent" : "",
+                    "text-ellipsis",
+                  )}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
                     props.onSelect(currentValue);
