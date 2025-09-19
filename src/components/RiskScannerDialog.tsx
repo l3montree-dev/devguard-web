@@ -46,11 +46,13 @@ interface RiskScannerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   apiUrl: string;
+  frontUrl: string;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   open,
   apiUrl,
+  frontUrl,
   onOpenChange,
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -369,6 +371,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               projectSlug={activeProject.slug}
               assetSlug={asset!.slug}
               apiUrl={apiUrl}
+              frontUrl={frontUrl}
               activeOrg={activeOrg}
               activeProject={activeProject}
               asset={asset || null}

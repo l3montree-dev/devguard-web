@@ -21,6 +21,7 @@ interface YamlGeneratorSlideProps {
   projectSlug: string;
   assetSlug: string;
   apiUrl: string;
+  frontUrl: string;
   activeOrg: OrganizationDetailsDTO;
   activeProject: ProjectDTO | null;
   asset: AssetDTO | null;
@@ -38,6 +39,7 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   projectSlug,
   assetSlug,
   apiUrl,
+  frontUrl,
   prevIndex,
   api,
   onClose,
@@ -65,6 +67,7 @@ jobs:`
         projectSlug,
         assetSlug,
         apiUrl,
+        frontUrl,
       })[gitInstance]["devsecops"];
       return base + codeString;
     } else {
@@ -76,6 +79,7 @@ jobs:`
             projectSlug,
             assetSlug,
             apiUrl,
+            frontUrl,
           })[gitInstance][selectedOption as keyof Config];
         })
         .map((value) => value)

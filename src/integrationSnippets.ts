@@ -7,12 +7,14 @@ const generateWorkflowSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontUrl: string,
 ) => `
     ${jobName}:
         uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
+            web-ui: "${frontUrl}"
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings
         ${jobName === "container-scanning" ? "needs: build-image" : ""}   `;
@@ -24,12 +26,14 @@ const generateGitlabSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontUrl: string,
 ) => `
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
     asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     token: "$DEVGUARD_TOKEN"
     api_url: "${apiUrl}"
+    web_ui: "${frontUrl}"
     ${jobName === "container-scanning" ? "needs: build" : ""}   `;
 
 const generateDockerSnippet = (
@@ -38,6 +42,7 @@ const generateDockerSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontUrl: string,
   token?: string,
 ) => {
   let path = "/app";
@@ -60,7 +65,8 @@ const generateDockerSnippet = (
 devguard-scanner ${command} ${path} \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
-    --token="${token ? token : "TOKEN"}"`;
+    --token="${token ? token : "TOKEN"}" \\
+    --webUI="${frontUrl}`;
 };
 
 export const integrationSnippets = ({
@@ -68,12 +74,14 @@ export const integrationSnippets = ({
   projectSlug,
   assetSlug,
   apiUrl,
+  frontUrl,
   token,
 }: {
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
   apiUrl: string;
+  frontUrl: string;
   token?: string;
 }) => ({
   GitHub: {
@@ -84,6 +92,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     "container-scanning": generateWorkflowSnippet(
       "container-scanning",
@@ -92,6 +101,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     iac: generateWorkflowSnippet(
       "infrastructure-as-code-scanning",
@@ -100,6 +110,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
 
     sast: generateWorkflowSnippet(
@@ -109,6 +120,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     devsecops: generateWorkflowSnippet(
       "call-devsecops",
@@ -117,6 +129,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     "secret-scanning": generateWorkflowSnippet(
       "find-leaked-secrets",
@@ -125,6 +138,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
 
     build: generateWorkflowSnippet(
@@ -134,6 +148,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
 
     sarif: `jobs:
@@ -174,6 +189,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     "container-scanning": generateGitlabSnippet(
       "container-scanning",
@@ -182,6 +198,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     iac: generateGitlabSnippet(
       "infrastructure-as-code-scanning",
@@ -190,6 +207,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     sast: generateGitlabSnippet(
       "bad-practice-finder",
@@ -198,6 +216,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     devsecops: generateGitlabSnippet(
       "call-devsecops",
@@ -206,6 +225,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     "secret-scanning": generateGitlabSnippet(
       "find-leaked-secrets",
@@ -214,6 +234,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
     sarif: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
@@ -238,6 +259,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
     ),
   },
 
@@ -248,6 +270,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     sast: generateDockerSnippet(
@@ -256,6 +279,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     "secret-scanning": generateDockerSnippet(
@@ -264,6 +288,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     sarif: generateDockerSnippet(
@@ -272,6 +297,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     sbom: generateDockerSnippet(
@@ -280,6 +306,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     "software-composition-analysis-from-repository": generateDockerSnippet(
@@ -288,6 +315,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     "container-scanning": generateDockerSnippet(
@@ -296,6 +324,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
     sca: generateDockerSnippet(
@@ -304,6 +333,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontUrl,
       token,
     ),
   },

@@ -297,6 +297,7 @@ const Index: FunctionComponent<Props> = (props) => {
         open={isOpen}
         onOpenChange={setIsOpen}
         apiUrl={config.devguardApiUrlPublicInternet}
+        frontUrl={config.frontUrl}
       />
     </Page>
   );
