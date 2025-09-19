@@ -78,7 +78,7 @@ export function Combobox(props: Props) {
       >
         <Command shouldFilter={props.onValueChange === undefined}>
           <CommandInput onValueChange={props.onValueChange} />
-          <CommandList className="">
+          <CommandList>
             {loading && (
               <CommandItem>
                 <div className="flex w-full flex-row items-center justify-center">
