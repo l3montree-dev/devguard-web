@@ -245,6 +245,7 @@ const Index: FunctionComponent<Props> = (props) => {
       )}
       <RiskScannerDialog
         apiUrl={config.devguardApiUrlPublicInternet}
+        frontendUrl={config.frontendUrl}
         open={isOpen}
         onOpenChange={setIsOpen}
       />

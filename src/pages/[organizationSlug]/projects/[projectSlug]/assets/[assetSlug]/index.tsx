@@ -141,6 +141,7 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
         open={riskScanningIsOpen}
         onOpenChange={setRiskScanningOpen}
         apiUrl={config.devguardApiUrlPublicInternet}
+        frontendUrl={config.frontendUrl}
       />
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
