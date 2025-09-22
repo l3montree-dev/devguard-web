@@ -193,7 +193,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const pat = usePersonalAccessToken();
   const [timedOut, setTimedOut] = React.useState(false);
 
-  const autosetup = useAutosetup(apiUrl, "full");
+  const autosetup = useAutosetup(open, apiUrl, "full");
 
   const { repositories, selectedProvider, isLoadingRepositories } =
     useRepositoryConnection();
