@@ -58,7 +58,7 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
           externalProviderIdToIntegrationName(
             asset.externalEntityProviderId,
           ) === "gitlab") ||
-          asset?.repositoryProvider === "gitlab") && (
+          (asset?.repositoryProvider === "gitlab" && asset?.repositoryId)) && (
           <>
             <div className="mb-8">
               <div className="">
