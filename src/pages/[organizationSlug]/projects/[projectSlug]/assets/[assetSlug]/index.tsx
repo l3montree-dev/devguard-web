@@ -31,15 +31,16 @@ interface Props {
 
 const Index: FunctionComponent<Props> = ({ repositories }) => {
   const assetMenu = useAssetMenu();
-  const [isOpen, setIsOpen] = useState(false);
+
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const asset = useActiveAsset();
   const config = useConfig();
-  const autosetup = useAutosetup(config.devguardApiUrlPublicInternet, "full");
-
-  const { repos, searchLoading, handleSearchRepos } =
-    useRepositorySearch(repositories);
+  const autosetup = useAutosetup(
+    !riskScanningIsOpen,
+    config.devguardApiUrlPublicInternet,
+    "full",
+  );
 
   return (
     <Page
