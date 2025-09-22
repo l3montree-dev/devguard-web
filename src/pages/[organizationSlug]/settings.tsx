@@ -63,6 +63,7 @@ import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
 import { Card } from "@/components/ui/card";
+import useConfig from "../../hooks/useConfig";
 
 interface HomeProps {
   devguardGithubAppUrl: string;
@@ -78,6 +79,8 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
   });
+
+  const config = useConfig();
 
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
@@ -539,7 +542,9 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
           <div className="flex justify-end">
             <Link
               href={
-                "mailto:community@devguard.org?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
+                "mailto:" +
+                config.accountDeletionMail +
+                "?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
                 "=" +
                 activeOrg.id +
                 "%0AName%3D" +

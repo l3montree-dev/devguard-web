@@ -58,6 +58,7 @@ import {
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
 import { uniq } from "lodash";
+import useConfig from "../hooks/useConfig";
 
 interface Props {
   flow?: SettingsFlow;
@@ -225,6 +226,8 @@ const Settings: FunctionComponent<{
   const availableMethods = useMemo(() => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
+
+  const config = useConfig();
 
   return (
     <Page title="Profile Management and Security Settings">
@@ -491,7 +494,13 @@ const Settings: FunctionComponent<{
         >
           <Card className="p-6">
             <div className="flex justify-end">
-              <Link href="mailto:community@devguard.org?subject=Request%20DevGuard%20Account%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20DevGuard%20Account.%20%0A%0AThank%20you.">
+              <Link
+                href={
+                  "mailto:" +
+                  config.accountDeletionMail +
+                  "?subject=Request%20DevGuard%20Account%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20DevGuard%20Account.%20%0A%0AThank%20you."
+                }
+              >
                 <Button variant="destructive">Request Account Deletion</Button>
               </Link>
             </div>
