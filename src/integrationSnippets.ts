@@ -14,7 +14,7 @@ const generateWorkflowSnippet = (
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
-            web-ui: "${frontendUrl}"
+            ${jobName === "build" ? "" : `web-ui: "${frontendUrl}"`}
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings
         ${jobName === "container-scanning" ? "needs: build-image" : ""}   `;
@@ -33,8 +33,7 @@ const generateGitlabSnippet = (
     asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     token: "$DEVGUARD_TOKEN"
     api_url: "${apiUrl}"
-    web_ui: "${frontendUrl}"
-    ${jobName === "container-scanning" ? "needs: build" : ""}   `;
+    ${jobName === "build" ? "" : `web_ui: "${frontendUrl}"`}   `;
 
 const generateDockerSnippet = (
   command: string,
