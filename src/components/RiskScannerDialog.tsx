@@ -47,12 +47,14 @@ interface RiskScannerDialogProps {
   onOpenChange: (open: boolean) => void;
   apiUrl: string;
   frontendUrl: string;
+  devguardCIComponentBase: string;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   open,
   apiUrl,
   frontendUrl,
+  devguardCIComponentBase,
   onOpenChange,
 }) => {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -372,6 +374,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               assetSlug={asset!.slug}
               apiUrl={apiUrl}
               frontendUrl={frontendUrl}
+              devguardCIComponentBase={devguardCIComponentBase}
               activeOrg={activeOrg}
               activeProject={activeProject}
               asset={asset || null}

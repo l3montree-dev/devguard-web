@@ -28,4 +28,7 @@ export const config = {
   frontendUrl: process.env.FRONTEND_URL || "https://app.devguard.org",
   accountDeletionMail:
     process.env.ACCOUNT_DELETION_MAIL || "community@devguard.org",
+  devguardCIComponentBase:
+    process.env.DEVGUARD_CI_COMPONENT_BASE ||
+    "https://gitlab.com/l3montree/devguard/-/raw/main",
 };
