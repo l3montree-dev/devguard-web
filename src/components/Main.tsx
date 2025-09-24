@@ -16,20 +16,15 @@ import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
 import { useRouter } from "next/compat/router";
-import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import React, { FunctionComponent, useEffect, useState } from "react";
-import { useActiveAsset } from "../hooks/useActiveAsset";
+import React, { FunctionComponent } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
-import { useActiveProject } from "../hooks/useActiveProject";
-import useConfig from "../hooks/useConfig";
-import { providerIdToBaseURL } from "../utils/externalProvider";
-import GitProviderIcon from "./GitProviderIcon";
-import UserNav from "./navigation/UserNav";
+
+import { useConfig } from "../context/ConfigContext";
 import { OrganizationDropDown } from "./OrganizationDropDown";
-import { SidebarProvider } from "./ui/sidebar";
-import { noStoreAvailable } from "../zustand/globalStoreProvider";
+import EntityProviderBanner from "./common/EntityProviderBanner";
+import EntityProviderImage from "./common/EntityProviderImage";
+import UserNav from "./navigation/UserNav";
 
 interface Props {
   title: string;
@@ -45,181 +40,6 @@ interface Props {
   fullscreen?: boolean;
 }
 
-function isLightColor(cssVariable: string) {
-  const color = getComputedStyle(document.documentElement)
-    .getPropertyValue(cssVariable)
-    .trim();
-
-  // Parse HSL format: "0 0% 0%" or "hsl(0, 0%, 0%)"
-  const hslMatch =
-    color.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/) ||
-    color.match(
-      /hsl\(\s*(\d+(?:\.\d+)?),?\s*(\d+(?:\.\d+)?)%,?\s*(\d+(?:\.\d+)?)%\s*\)/,
-    );
-
-  if (!hslMatch) return null;
-
-  const lightness = parseFloat(hslMatch[3]);
-
-  // Lightness > 50% is generally considered light
-  return lightness > 50;
-}
-
-const EntityProviderImage = ({ provider }: { provider: string }) => {
-  const [isLightForegroundColor, setLightForegroundColor] = useState(false);
-  useEffect(() => {
-    const isLight = isLightColor("--header-background");
-    if (isLight !== null) {
-      setLightForegroundColor(isLight);
-    }
-    // test again after 1 second - to catch late theme changes
-    setTimeout(() => {
-      const isLight = isLightColor("--header-background");
-      if (isLight !== null) {
-        setLightForegroundColor(isLight);
-      }
-    }, 1000);
-  }, []);
-  if (provider === "@official") {
-    return (
-      <Image
-        src="/assets/gitlab.svg"
-        alt="Official Logo"
-        width={30}
-        height={30}
-      />
-    );
-  } else if (provider === "@opencode") {
-    return (
-      <Image
-        src="/logos/opencode.svg"
-        alt="OpenCode Logo"
-        width={30}
-        height={30}
-        className="relative right-[1px]"
-      />
-    );
-  }
-  // check foreground color - if light, use inverse logo, else use normal logo
-
-  if (isLightForegroundColor) {
-    return (
-      <Image
-        src="/logo_icon.svg"
-        alt="DevGuard Logo"
-        width={30}
-        height={30}
-        className="relative right-[1px]"
-      />
-    );
-  }
-
-  return (
-    <Image
-      src="/logo_inverse_icon.svg"
-      alt="DevGuard Logo"
-      width={30}
-      height={30}
-    />
-  );
-};
-
-const slugToProvider = (slug: string | undefined) => {
-  return slug?.replace("@", "");
-};
-
-const EntityProviderLinkBanner = () => {
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const activeAsset = useActiveAsset();
-
-  const { organizationSlug, projectSlug, assetSlug } = useParams<{
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-  }>();
-
-  if (!activeOrg && !activeProject && !activeAsset) {
-    return null;
-  }
-
-  if (
-    assetSlug &&
-    activeAsset &&
-    !noStoreAvailable(activeAsset) &&
-    !noStoreAvailable(activeProject) &&
-    activeAsset.externalEntityProviderId
-  ) {
-    return (
-      <div>
-        <Link
-          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
-          href={
-            providerIdToBaseURL(activeAsset.externalEntityProviderId) +
-            `/-/p/` +
-            activeAsset.externalEntityId
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <GitProviderIcon
-            externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug,
-            )}
-          />
-          {activeProject?.name} / {activeAsset.name}
-        </Link>
-      </div>
-    );
-  }
-
-  if (projectSlug && activeProject && activeProject.externalEntityProviderId) {
-    return (
-      <div>
-        <Link
-          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
-          href={
-            providerIdToBaseURL(activeOrg.externalEntityProviderId) +
-            `/-/g/` +
-            activeProject.externalEntityId
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <GitProviderIcon
-            externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug,
-            )}
-          />
-          {activeProject.name}
-        </Link>
-      </div>
-    );
-  }
-
-  if (organizationSlug?.startsWith("@")) {
-    return (
-      <div>
-        <Link
-          className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
-          href={providerIdToBaseURL(organizationSlug?.replace("@", ""))}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <GitProviderIcon
-            externalEntityProviderIdOrRepositoryId={slugToProvider(
-              organizationSlug,
-            )}
-          />
-          {organizationSlug?.replace("@", "")}
-        </Link>
-      </div>
-    );
-  }
-
-  return <div></div>;
-};
-
 const Main: FunctionComponent<Props> = ({
   title,
   Title,
@@ -229,8 +49,8 @@ const Main: FunctionComponent<Props> = ({
 }) => {
   const router = useRouter();
   const dimensions = useDimensions();
-  const activeOrg = useActiveOrg();
   const themeConfig = useConfig();
+  const activeOrg = useActiveOrg();
 
   return (
     <main className="flex-1 font-body">
@@ -277,30 +97,8 @@ const Main: FunctionComponent<Props> = ({
             </div>
           )}
         </div>
-
-        {Menu !== undefined && (
-          <div className="flex flex-row items-end gap-6 text-sm">
-            {Menu.map((item) => (
-              <Link
-                className={classNames(
-                  "cursor:pointer relative hover:no-underline",
-                )}
-                key={item.title}
-                href={item.href}
-              >
-                {(item.isActive || router?.asPath == item.href) && (
-                  <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-amber-400" />
-                )}
-                <div className="mt-4 flex flex-row items-center gap-1">
-                  <item.Icon className="h-5 w-5 text-gray-400" />
-                  <span className="text-white ">{item.title}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
       </header>
-      <EntityProviderLinkBanner />
+      <EntityProviderBanner />
       <div
         style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
         className={classNames(

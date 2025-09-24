@@ -10,7 +10,7 @@ export function useActiveOrg(): OrganizationDetailsDTO {
   });
   const contextOrg = useOrganization();
   if (noStoreAvailable(org)) {
-    return contextOrg.organization;
+    return contextOrg.organization as OrganizationDetailsDTO;
   }
   return org;
 }

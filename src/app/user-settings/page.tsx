@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+"use client";
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import CopyCode from "@/components/common/CopyCode";
@@ -31,8 +31,8 @@ import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { AxiosError } from "axios";
-import { useRouter } from "next/compat/router";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FunctionComponent,
   ReactNode,
@@ -42,20 +42,23 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Page from "../components/Page";
-import Section from "../components/common/Section";
-import { Flow, Methods } from "../components/kratos/Flow";
+import Page from "../../components/Page";
+import Section from "../../components/common/Section";
+import { Flow, Methods } from "../../components/kratos/Flow";
 
 import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
 import { Switch } from "@/components/ui/switch";
 import { withOrgs } from "@/decorators/withOrgs";
 import { uniq } from "lodash";
-import { withSession } from "../decorators/withSession";
-import { LogoutLink } from "../hooks/logoutLink";
-import useConfig from "../hooks/useConfig";
-import { getApiClientFromContext } from "../services/devGuardApi";
-import { handleFlowError, ory } from "../services/ory";
-import { PersonalAccessTokenDTO } from "../types/api/api";
+import { withSession } from "../../decorators/withSession";
+import { LogoutLink } from "../../hooks/logoutLink";
+
+import { useConfig } from "../../context/ConfigContext";
+import { getApiClientFromContext } from "../../services/devGuardApi";
+import { handleFlowError, ory } from "../../services/ory";
+import { PersonalAccessTokenDTO } from "../../types/api/api";
+import useSWR from "swr";
+import { fetcher } from "../../hooks/useApi";
 
 interface Props {
   flow?: SettingsFlow;
@@ -81,14 +84,14 @@ function SettingsCard({
 
   return children;
 }
-const Settings: FunctionComponent<{
-  personalAccessTokens: Array<PersonalAccessTokenDTO>;
-}> = ({ personalAccessTokens: pats }) => {
+const Settings: FunctionComponent = () => {
   const [flow, setFlow] = useState<SettingsFlow>();
 
   // Get ?flow=... from the URL
   const router = useRouter();
-  const { flow: flowId, return_to: returnTo } = router.query;
+  const searchParams = useSearchParams();
+  const flowId = searchParams?.get("flow");
+  const returnTo = searchParams?.get("return_to");
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<{
     description: string;
@@ -102,12 +105,18 @@ const Settings: FunctionComponent<{
     },
   });
 
+  const { data: pats } = useSWR<Array<PersonalAccessTokenDTO>>(
+    "/pats/",
+    fetcher,
+    { fallbackData: [] },
+  );
+
   const { personalAccessTokens, onDeletePat, onCreatePat, pat } =
     usePersonalAccessToken(pats);
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (flow) {
       return;
     }
 
@@ -131,59 +140,58 @@ const Settings: FunctionComponent<{
         setFlow(data);
       })
       .catch(handleFlowError(router, "settings", setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+  }, [flowId, router, returnTo, flow]);
 
-  const onSubmit = (values: UpdateSettingsFlowBody) =>
+  const onSubmit = async (values: UpdateSettingsFlowBody) => {
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/user-settings?flow=${flow?.id}`, undefined, { shallow: true })
-      .then(() =>
-        ory
-          .updateSettingsFlow({
-            flow: String(flow?.id),
-            updateSettingsFlowBody: values,
-          })
-          .then(({ data }) => {
-            // The settings have been saved and the flow was updated. Let's show it to the user!
-            setFlow(data);
+      .push(`/user-settings?flow=${flow?.id}`);
+    ory
+      .updateSettingsFlow({
+        flow: String(flow?.id),
+        updateSettingsFlowBody: values,
+      })
+      .then(({ data }) => {
+        // The settings have been saved and the flow was updated. Let's show it to the user!
+        setFlow(data);
 
-            // continue_with is a list of actions that the user might need to take before the settings update is complete.
-            // It could, for example, contain a link to the verification form.
-            if (data.continue_with) {
-              for (const item of data.continue_with) {
-                switch (item.action) {
-                  case "show_verification_ui":
-                    console.debug(
-                      "Flow requires verification, redirecting to verification page",
-                    );
-                    router.push("/verification?flow=" + item.flow.id);
-                    return;
-                }
-              }
+        // continue_with is a list of actions that the user might need to take before the settings update is complete.
+        // It could, for example, contain a link to the verification form.
+        if (data.continue_with) {
+          for (const item of data.continue_with) {
+            switch (item.action) {
+              case "show_verification_ui":
+                console.debug(
+                  "Flow requires verification, redirecting to verification page",
+                );
+                router.push("/verification?flow=" + item.flow.id);
+                return;
             }
+          }
+        }
 
-            if (data.return_to) {
-              window.location.href = data.return_to;
-              return;
-            }
-          })
-          .catch(handleFlowError(router, "settings", setFlow))
-          .catch(async (err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              //@ts-expect-error
-              setFlow(err.response?.data);
-              toast.error("An error occured, your changes where not saved.", {
-                description: "Please check the form and try again.",
-              });
-              return;
-            }
+        if (data.return_to) {
+          window.location.href = data.return_to;
+          return;
+        }
+      })
+      .catch(handleFlowError(router, "settings", setFlow))
+      .catch(async (err: AxiosError) => {
+        // If the previous handler did not catch the error it's most likely a form validation error
+        if (err.response?.status === 400) {
+          // Yup, it is!
+          //@ts-expect-error
+          setFlow(err.response?.data);
+          toast.error("An error occured, your changes where not saved.", {
+            description: "Please check the form and try again.",
+          });
+          return;
+        }
 
-            return Promise.reject(err);
-          }),
-      );
+        return Promise.reject(err);
+      });
+  };
 
   const handleCreatePat = async (data: {
     description: string;
@@ -513,34 +521,5 @@ const Settings: FunctionComponent<{
     </Page>
   );
 };
-
-// just guard the page with the session decorator
-export const getServerSideProps = middleware(
-  async (ctx, { session }) => {
-    if (!session) {
-      return {
-        redirect: {
-          destination: `/login`,
-          permanent: false,
-        },
-      };
-    }
-    // get the personal access tokens from the user
-    const apiClient = getApiClientFromContext(ctx);
-
-    const personalAccessTokens: Array<PersonalAccessTokenDTO> = await apiClient(
-      "/pats/",
-    ).then((r) => r.json());
-    return {
-      props: {
-        personalAccessTokens,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-  },
-);
 
 export default Settings;

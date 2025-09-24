@@ -24,6 +24,7 @@ export async function withSession() {
   const c = await cookies();
   const requestedUrl = (await headers()).get("referer") || "/";
   const orySessionCookie = c.get("ory_kratos_session");
+
   if (!orySessionCookie) {
     return null;
   }
@@ -38,6 +39,8 @@ export async function withSession() {
       },
     );
 
+    console.log("Session data:", session);
+
     if (!session.data) {
       return null;
     }
@@ -45,6 +48,7 @@ export async function withSession() {
     // call the initial endpoint with the latest information available
     return session.data as { identity: User };
   } catch (e: unknown) {
+    console.error(e);
     if (isAxiosError(e)) {
       if (e.response?.status === 401) {
         return null;

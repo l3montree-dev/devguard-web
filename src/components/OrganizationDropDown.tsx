@@ -12,15 +12,15 @@
 // limitations under the License.
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useOrg } from "@/hooks/useOrg";
-import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
-import { useStore } from "@/zustand/globalStoreProvider";
+import { OrganizationDTO } from "@/types/api/api";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import useOrganizations from "../hooks/useOrganizations";
 import { browserApiClient } from "../services/devGuardApi";
 import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";
@@ -33,7 +33,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import useOrganizations from "../hooks/useOrganizations";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -55,15 +54,12 @@ export const OrganizationDropDown = () => {
   if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
-  const updateOrganization = useStore((s) => s.updateOrganization);
-  const updateOrganizations = useStore((s) => s.updateOrganizations);
 
   const handleActiveOrgChange = (slug: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.slug === slug);
     if (org) {
       router.push(`/${org.slug}`);
-      updateOrganization(org as OrganizationDetailsDTO);
     }
   };
 

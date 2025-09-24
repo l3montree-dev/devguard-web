@@ -10,6 +10,8 @@ import { SessionProvider } from "../context/SessionContext";
 import { withOrgs } from "../decorators/approuter/withOrgs";
 import { HttpError } from "../decorators/middleware";
 import { redirect } from "next/navigation";
+import { ConfigProvider } from "../context/ConfigContext";
+import { config } from "../config";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -68,14 +70,16 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ClientContextWrapper
-              Provider={SessionProvider}
-              value={{
-                session,
-                organizations: orgs,
-              }}
-            >
-              {children}
+            <ClientContextWrapper Provider={ConfigProvider} value={config}>
+              <ClientContextWrapper
+                Provider={SessionProvider}
+                value={{
+                  session,
+                  organizations: orgs,
+                }}
+              >
+                {children}
+              </ClientContextWrapper>
             </ClientContextWrapper>
           </ThemeProvider>
         </body>

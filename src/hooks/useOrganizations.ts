@@ -1,6 +1,6 @@
 import { useSession } from "../context/SessionContext";
 import { OrganizationDTO } from "../types/api/api";
-import { NO_STORE_AVAILABLE, useStore } from "../zustand/globalStoreProvider";
+import { noStoreAvailable, useStore } from "../zustand/globalStoreProvider";
 
 export default function useOrganizations(): OrganizationDTO[] {
   const orgs = useStore((s) => {
@@ -8,7 +8,7 @@ export default function useOrganizations(): OrganizationDTO[] {
   });
 
   const session = useSession();
-  if (orgs === NO_STORE_AVAILABLE) {
+  if (noStoreAvailable(orgs)) {
     return session.organizations;
   }
   return orgs;

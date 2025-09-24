@@ -2,9 +2,7 @@
 
 import { groupBy } from "lodash";
 import { useParams, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import useSWR from "swr";
-import Loading from "../../../../../components/common/Loading";
 import { fetcher } from "../../../../../hooks/useApi";
 import {
   AverageFixingTime,
@@ -122,19 +120,6 @@ const Page = () => {
     { suspense: true },
   );
 
-  /*
-    // check the longest array in the results
-	longest := 0
-	var firstDay *time.Time = nil
-	for _, r := range results {
-		if len(r.RiskHistory) > longest {
-			longest = len(r.RiskHistory)
-		}
-		if len(r.RiskHistory) > 0 && (firstDay == nil || r.RiskHistory[0].Day.Before(*firstDay)) {
-			firstDay = &r.RiskHistory[0].Day
-		}
-	}
-    */
   const groups = groupBy(riskHistory, "day");
   const days = Object.keys(groups).sort();
   const completeRiskHistory: RiskHistory[][] = days.map((day) => {
@@ -142,37 +127,35 @@ const Page = () => {
   });
 
   return (
-    <Suspense fallback={<Loading />}>
-      <OverviewPage
-        releases={releases ?? { data: [], total: 0, page: 1, pageSize: 25 }}
-        riskHistory={completeRiskHistory}
-        avgLowFixingTime={
-          avgLowFixingTime ?? {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          }
+    <OverviewPage
+      releases={releases ?? { data: [], total: 0, page: 1, pageSize: 25 }}
+      riskHistory={completeRiskHistory}
+      avgLowFixingTime={
+        avgLowFixingTime ?? {
+          averageFixingTimeSeconds: 0,
+          averageFixingTimeSecondsByCvss: 0,
         }
-        avgMediumFixingTime={
-          avgMediumFixingTime ?? {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          }
+      }
+      avgMediumFixingTime={
+        avgMediumFixingTime ?? {
+          averageFixingTimeSeconds: 0,
+          averageFixingTimeSecondsByCvss: 0,
         }
-        avgHighFixingTime={
-          avgHighFixingTime ?? {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          }
+      }
+      avgHighFixingTime={
+        avgHighFixingTime ?? {
+          averageFixingTimeSeconds: 0,
+          averageFixingTimeSecondsByCvss: 0,
         }
-        avgCriticalFixingTime={
-          avgCriticalFixingTime ?? {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          }
+      }
+      avgCriticalFixingTime={
+        avgCriticalFixingTime ?? {
+          averageFixingTimeSeconds: 0,
+          averageFixingTimeSecondsByCvss: 0,
         }
-        reducedRiskHistory={reduceRiskHistories(completeRiskHistory)}
-      />
-    </Suspense>
+      }
+      reducedRiskHistory={reduceRiskHistories(completeRiskHistory)}
+    />
   );
 };
 

@@ -12,32 +12,36 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
-import { VerificationFlow, UpdateVerificationFlowBody } from "@ory/client";
+import { UpdateVerificationFlowBody, VerificationFlow } from "@ory/client";
 
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
+import { useRouter, useSearchParams } from "next/navigation";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
 import { useEffect, useState } from "react";
-import { Flow } from "../components/kratos/Flow";
-import { ory } from "../services/ory";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { ory } from "../../services/ory";
+import { Flow } from "../../components/kratos/Flow";
 
 const Verification: NextPage = () => {
   const [flow, setFlow] = useState<VerificationFlow>();
 
   // Get ?flow=... from the URL
   const router = useRouter();
-  const { flow: flowId, return_to: returnTo } = router.query;
+  const searchParams = useSearchParams();
+  const flowId = searchParams?.get("flow");
+  const returnTo = searchParams?.get("return_to");
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (flow) {
       return;
     }
 
@@ -79,13 +83,13 @@ const Verification: NextPage = () => {
 
         throw err;
       });
-  }, [flowId, router, router.isReady, returnTo, flow]);
+  }, [flowId, router, returnTo, flow]);
 
   const onSubmit = async (values: UpdateVerificationFlowBody) => {
-    await router
+    router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // their data when they reload the page.
-      .push(`/verification?flow=${flow?.id}`, undefined, { shallow: true });
+      .push(`/verification?flow=${flow?.id}`);
 
     ory
       .updateVerificationFlow({
@@ -109,9 +113,7 @@ const Verification: NextPage = () => {
             router
               // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
               // their data when they reload the page.
-              .push(`/verification?flow=${newFlowID}`, undefined, {
-                shallow: true,
-              });
+              .push(`/verification?flow=${newFlowID}`);
 
             ory
               .getVerificationFlow({ id: newFlowID })
