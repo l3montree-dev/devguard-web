@@ -20,6 +20,7 @@ import {
   GetServerSidePropsResult,
   GetServerSideProps,
 } from "next";
+import withConfig from "./withConfig";
 
 type Extract<
   T extends ReadonlyArray<(ctx: GetServerSidePropsContext) => Promise<any>>,
@@ -33,12 +34,11 @@ type Extract<
 
 export type DecoratedGetServerSideProps<AdditionalData, Props = {}> = (
   ctx: GetServerSidePropsContext,
-  additionalData: AdditionalData,
+  additionalData: AdditionalData & { config: typeof config },
 ) => GetServerSidePropsResult<Props> | Promise<GetServerSidePropsResult<Props>>;
 
-const defaultParams = {
-  apiUrl:
-    config.devguardApiUrlPublicInternet ?? "https://api.main.devguard.org",
+export const DEFAULT_DECORATORS = {
+  config: withConfig,
 };
 
 export const middleware = <Additional extends Record<string, any>>(
@@ -53,14 +53,19 @@ export const middleware = <Additional extends Record<string, any>>(
     try {
       // @ts-ignore
       const returns = await Promise.all(
-        Object.values(decorators).map((fn) => fn(ctx)),
+        Object.values({ ...decorators, ...DEFAULT_DECORATORS }).map((fn) =>
+          fn(ctx),
+        ),
       );
       const params = Object.fromEntries(
-        Object.keys(decorators).map((key, i) => [key, returns[i]]),
+        Object.keys({ ...decorators, ...DEFAULT_DECORATORS }).map((key, i) => [
+          key,
+          returns[i],
+        ]),
       );
 
       const resp = await handler(ctx, params as any);
-      addToInitialZustand(resp, { ...(params as any), ...defaultParams });
+      addToInitialZustand(resp, { ...(params as any) });
       return resp;
     } catch (e) {
       // if a middleware function throws an error,

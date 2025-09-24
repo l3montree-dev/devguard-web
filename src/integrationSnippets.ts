@@ -7,12 +7,14 @@ const generateWorkflowSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontendUrl: string,
 ) => `
     ${jobName}:
         uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-            api-url: ${apiUrl}
+            api-url: "${apiUrl}"
+            ${jobName === "build-image" ? "" : `web-ui: "${frontendUrl}"`}
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
@@ -23,12 +25,14 @@ const generateGitlabSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontendUrl: string,
 ) => `
 - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
   inputs:
-    asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+    asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     token: "$DEVGUARD_TOKEN"
-    api_url: ${apiUrl}`;
+    api_url: "${apiUrl}"
+    ${jobName === "build" ? "" : `web_ui: "${frontendUrl}"`}   `;
 
 const generateDockerSnippet = (
   command: string,
@@ -36,6 +40,7 @@ const generateDockerSnippet = (
   projectSlug: string,
   assetSlug: string,
   apiUrl: string,
+  frontendUrl: string,
   token?: string,
 ) => {
   let path = "/app";
@@ -58,7 +63,8 @@ const generateDockerSnippet = (
 devguard-scanner ${command} ${path} \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
-    --token="${token ? token : "TOKEN"}"`;
+    --token="${token ? token : "TOKEN"}" \\
+    --webUI="${frontendUrl}`;
 };
 
 export const integrationSnippets = ({
@@ -66,12 +72,14 @@ export const integrationSnippets = ({
   projectSlug,
   assetSlug,
   apiUrl,
+  frontendUrl,
   token,
 }: {
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
   apiUrl: string;
+  frontendUrl: string;
   token?: string;
 }) => ({
   GitHub: {
@@ -82,6 +90,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     "container-scanning": generateWorkflowSnippet(
       "container-scanning",
@@ -90,6 +99,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     iac: generateWorkflowSnippet(
       "infrastructure-as-code-scanning",
@@ -98,6 +108,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
 
     sast: generateWorkflowSnippet(
@@ -107,6 +118,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     devsecops: generateWorkflowSnippet(
       "call-devsecops",
@@ -115,6 +127,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     "secret-scanning": generateWorkflowSnippet(
       "find-leaked-secrets",
@@ -123,6 +136,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
 
     build: generateWorkflowSnippet(
@@ -132,6 +146,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
 
     sarif: `jobs:
@@ -145,7 +160,7 @@ export const integrationSnippets = ({
                   # Path to SARIF file relative to the root of the repository
                   sarif-file: ./results.sarif
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: ${apiUrl}
+                  api-url: "${apiUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create`,
     sbom: `jobs:
@@ -159,7 +174,7 @@ export const integrationSnippets = ({
                   # Path to SBOM file relative to the root of the repository
                   sbom-file: ./results.sbom
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: ${apiUrl}
+                  api-url: "${apiUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
   },
@@ -172,6 +187,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     "container-scanning": generateGitlabSnippet(
       "container-scanning",
@@ -180,6 +196,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     iac: generateGitlabSnippet(
       "infrastructure-as-code-scanning",
@@ -188,6 +205,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     sast: generateGitlabSnippet(
       "bad-practice-finder",
@@ -196,6 +214,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     devsecops: generateGitlabSnippet(
       "call-devsecops",
@@ -204,6 +223,7 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     "secret-scanning": generateGitlabSnippet(
       "find-leaked-secrets",
@@ -212,12 +232,13 @@ export const integrationSnippets = ({
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
     sarif: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
     - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sarif.yml"
       inputs:
-          asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository`,
@@ -225,7 +246,7 @@ include:
 include:
     - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sbom.yml"
       inputs:
-          asset_name: ${orgSlug}/projects/${projectSlug}/assets/${assetSlug}
+          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
           sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
@@ -236,6 +257,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
     ),
   },
 
@@ -246,6 +268,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     sast: generateDockerSnippet(
@@ -254,6 +277,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     "secret-scanning": generateDockerSnippet(
@@ -262,6 +286,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     sarif: generateDockerSnippet(
@@ -270,6 +295,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     sbom: generateDockerSnippet(
@@ -278,6 +304,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     "software-composition-analysis-from-repository": generateDockerSnippet(
@@ -286,6 +313,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     "container-scanning": generateDockerSnippet(
@@ -294,6 +322,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
     sca: generateDockerSnippet(
@@ -302,6 +331,7 @@ include:
       projectSlug,
       assetSlug,
       apiUrl,
+      frontendUrl,
       token,
     ),
   },

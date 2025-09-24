@@ -41,13 +41,12 @@ import { Loader2 } from "lucide-react";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
 import RiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { config } from "../../../../../../../../../config";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import { defaultScanner } from "../../../../../../../../../utils/view";
+import useConfig from "../../../../../../../../../hooks/useConfig";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
-  apiUrl: string;
 }
 
 const columnHelper = createColumnHelper<FirstPartyVuln>();
@@ -87,8 +86,6 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
 ];
 
 const Index: FunctionComponent<Props> = (props) => {
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { table, isLoading, handleSearch } = useTable({
@@ -97,7 +94,7 @@ const Index: FunctionComponent<Props> = (props) => {
   });
 
   const assetMenu = useAssetMenu();
-  const asset = useActiveAsset();
+  const config = useConfig();
 
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -247,7 +244,8 @@ const Index: FunctionComponent<Props> = (props) => {
         </div>
       )}
       <RiskScannerDialog
-        apiUrl={props.apiUrl}
+        apiUrl={config.devguardApiUrlPublicInternet}
+        frontendUrl={config.frontendUrl}
         open={isOpen}
         onOpenChange={setIsOpen}
       />
@@ -314,7 +312,6 @@ export const getServerSideProps = middleware(
     return {
       props: {
         vulns,
-        apiUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },

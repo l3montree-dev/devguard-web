@@ -13,11 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { getApiClientFromContext } from "@/services/devGuardApi";
-import { GetServerSideProps } from "next";
-import React, { useEffect } from "react";
-import Image from "next/image";
 import { decodeObjectBase64 } from "@/services/encodeService";
-import { config } from "@/config";
+import { GetServerSideProps } from "next";
+import Image from "next/image";
 
 const gh = () => {
   return (

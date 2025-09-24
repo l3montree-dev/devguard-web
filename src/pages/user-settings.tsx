@@ -31,8 +31,8 @@ import { Label } from "@/components/ui/label";
 import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { AxiosError } from "axios";
-import Link from "next/link";
 import { useRouter } from "next/compat/router";
+import Link from "next/link";
 import {
   FunctionComponent,
   ReactNode,
@@ -52,6 +52,7 @@ import { withOrgs } from "@/decorators/withOrgs";
 import { uniq } from "lodash";
 import { withSession } from "../decorators/withSession";
 import { LogoutLink } from "../hooks/logoutLink";
+import useConfig from "../hooks/useConfig";
 import { getApiClientFromContext } from "../services/devGuardApi";
 import { handleFlowError, ory } from "../services/ory";
 import { PersonalAccessTokenDTO } from "../types/api/api";
@@ -222,6 +223,8 @@ const Settings: FunctionComponent<{
   const availableMethods = useMemo(() => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
+
+  const config = useConfig();
 
   return (
     <Page title="Profile Management and Security Settings">
@@ -488,7 +491,13 @@ const Settings: FunctionComponent<{
         >
           <Card className="p-6">
             <div className="flex justify-end">
-              <Link href="mailto:community@devguard.org?subject=Request%20DevGuard%20Account%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20DevGuard%20Account.%20%0A%0AThank%20you.">
+              <Link
+                href={
+                  "mailto:" +
+                  config.accountDeletionMail +
+                  "?subject=Request%20DevGuard%20Account%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20DevGuard%20Account.%20%0A%0AThank%20you."
+                }
+              >
                 <Button variant="destructive">Request Account Deletion</Button>
               </Link>
             </div>

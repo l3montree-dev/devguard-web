@@ -126,7 +126,7 @@ export default function SelectRepoSlide({
           Title={
             <div className="flex flex-row gap-2">
               <div
-                className={`flex-1  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
+                className={`flex-1 min-w-0  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
               >
                 <Combobox
                   onValueChange={handleSearchRepos}
@@ -143,40 +143,42 @@ export default function SelectRepoSlide({
                   emptyMessage="No repositories found"
                 />
               </div>
-              {repoSelectedAndSet ? (
-                <Button
-                  variant={"destructive"}
-                  onClick={async () => {
-                    if (selectedRepo) {
-                      await handleUpdateSelectedRepository({
-                        repositoryId: "",
-                        repositoryName: "",
-                      });
-                      setSelectedRepo(null);
-                      setRepoSelectedAndSet(false);
-                    }
-                  }}
-                >
-                  Disconnect
-                </Button>
-              ) : (
-                <Button
-                  onClick={async () => {
-                    if (selectedRepo) {
-                      await handleUpdateSelectedRepository({
-                        repositoryId: selectedRepo.id,
-                        repositoryName: selectedRepo.name,
-                      });
-                      setEditRepo(false);
-                      setRepoSelectedAndSet(true);
-                    }
-                  }}
-                  disabled={!Boolean(selectedRepo) || !hasIntegration}
-                  variant="secondary"
-                >
-                  Connect
-                </Button>
-              )}
+              <div className="flex-shrink-0">
+                {repoSelectedAndSet ? (
+                  <Button
+                    variant={"destructive"}
+                    onClick={async () => {
+                      if (selectedRepo) {
+                        await handleUpdateSelectedRepository({
+                          repositoryId: "",
+                          repositoryName: "",
+                        });
+                        setSelectedRepo(null);
+                        setRepoSelectedAndSet(false);
+                      }
+                    }}
+                  >
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={async () => {
+                      if (selectedRepo) {
+                        await handleUpdateSelectedRepository({
+                          repositoryId: selectedRepo.id,
+                          repositoryName: selectedRepo.name,
+                        });
+                        setEditRepo(false);
+                        setRepoSelectedAndSet(true);
+                      }
+                    }}
+                    disabled={!Boolean(selectedRepo) || !hasIntegration}
+                    variant="secondary"
+                  >
+                    Connect
+                  </Button>
+                )}
+              </div>
             </div>
           }
           Description={

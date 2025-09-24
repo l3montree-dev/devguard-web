@@ -24,6 +24,7 @@ import usePersonalAccessToken from "./usePersonalAccessToken";
 
 // limitations under the License.
 export function useAutosetup(
+  listenForChanges: boolean,
   devguardApiUrl: string,
   scanner:
     | "full"
@@ -153,10 +154,8 @@ export function useAutosetup(
             return { ...prev };
           });
         }
-        sessionStorage.removeItem("pending-autosetup");
         resolve();
       } else {
-        sessionStorage.removeItem("pending-autosetup");
         toast("Failed to setup GitLab integration");
       }
     });
@@ -166,10 +165,11 @@ export function useAutosetup(
 
   useEffect(() => {
     // check for pending autosetup - if so, we should be able to continue
-    if (sessionStorage.getItem("pending-autosetup")) {
+    if (listenForChanges && sessionStorage.getItem("pending-autosetup")) {
+      sessionStorage.removeItem("pending-autosetup");
       autosetupOnce(true);
     }
-  }, []);
+  }, [listenForChanges]);
 
   return {
     handleAutosetup,

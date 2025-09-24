@@ -13,35 +13,72 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Head, Html, Main, NextScript } from "next/document";
+import Document, {
+  DocumentContext,
+  DocumentInitialProps,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from "next/document";
 
 import { inter, lexend, merriweather } from "@/pages/_app";
 
-export default function Document() {
-  return (
-    <Html
-      className={
-        "h-full scroll-smooth antialiased " +
-        lexend.className +
-        " " +
-        inter.className
-      }
-      lang="en"
-    >
-      <Head />
-      <body
+class MyDocument extends Document {
+  render() {
+    return (
+      <Html
         className={
-          "flex min-h-full flex-col " +
-          inter.variable +
+          "h-full scroll-smooth antialiased " +
+          lexend.className +
           " " +
-          lexend.variable +
-          " " +
-          merriweather.variable
+          inter.className
         }
+        lang="en"
       >
-        <Main />
-        <NextScript />
-      </body>
-    </Html>
-  );
+        <Head />
+        <body
+          className={
+            "flex min-h-full flex-col " +
+            inter.variable +
+            " " +
+            lexend.variable +
+            " " +
+            merriweather.variable
+          }
+        >
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    );
+  }
 }
+
+export default MyDocument;
+MyDocument.getInitialProps = async (
+  ctx: DocumentContext,
+): Promise<DocumentInitialProps> => {
+  const initialProps = await Document.getInitialProps(ctx);
+  if (process.env.THEME_JS_URL) {
+    console.log("Using THEME_JS_URL from env:", process.env.THEME_JS_URL);
+  }
+  if (process.env.THEME_CSS_URL) {
+    console.log("Using THEME_CSS_URL from env:", process.env.THEME_CSS_URL);
+  }
+
+  return {
+    ...initialProps,
+    styles: (
+      <>
+        {initialProps.styles}
+        {process.env.THEME_CSS_URL && (
+          <link rel="stylesheet" href={process.env.THEME_CSS_URL} />
+        )}
+        {process.env.THEME_JS_URL && (
+          <script async defer src={process.env.THEME_JS_URL} />
+        )}
+      </>
+    ),
+  };
+};

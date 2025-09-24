@@ -41,11 +41,14 @@ import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
 import { Checkbox } from "../components/ui/checkbox";
 import { handleFlowError, ory } from "../services/ory";
 import { Toaster } from "../components/ui/sonner";
+import useConfig from "../hooks/useConfig";
+import { middleware } from "../decorators/middleware";
 
 // Renders the registration page
-const Registration = ({ oidcOnly }: { oidcOnly: boolean }) => {
+const Registration = () => {
   const router = useRouter();
 
+  const { oidcOnly, termsOfUseLink, privacyPolicyLink } = useConfig();
   const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
@@ -271,17 +274,18 @@ const Registration = ({ oidcOnly }: { oidcOnly: boolean }) => {
                         }
                       />
                       <span className="text-sm leading-4  block font-medium">
-                        I agree to the terms of use{" "}
-                        <Link href={"https://devguard.org/terms-of-use"}>
-                          devguard.org/terms-of-use
-                        </Link>{" "}
-                        and{" "}
-                        <Link
+                        I agree to the{" "}
+                        <a target="_blank" href={termsOfUseLink}>
+                          terms of use
+                        </a>{" "}
+                        and the{" "}
+                        <a
+                          target="_blank"
                           className="whitespace-nowrap"
-                          href={"https://devguard.org/privacy-policy"}
+                          href={privacyPolicyLink}
                         >
                           privacy policy
-                        </Link>
+                        </a>
                         .
                       </span>
                     </div>
@@ -313,10 +317,11 @@ const Registration = ({ oidcOnly }: { oidcOnly: boolean }) => {
 
 export default Registration;
 
-export const getServerSideProps = async ({ query, req, res }: any) => {
-  return {
-    props: {
-      oidcOnly: process.env.OIDC_ONLY === "true" || false,
-    },
-  };
-};
+export const getServerSideProps = middleware(
+  async ({ query, req, res }: any) => {
+    return {
+      props: {},
+    };
+  },
+  {},
+);

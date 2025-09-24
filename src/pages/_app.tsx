@@ -46,6 +46,22 @@ export default function App({ Component, pageProps }) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     window.innerWidth < 768 && setIsMobile(true);
+
+    // check if there are theming options in local storage
+    const themeCssURL = localStorage.getItem("themeCssURL");
+    const themeJsURL = localStorage.getItem("themeJsURL");
+    if (themeCssURL) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = themeCssURL;
+      document.head.appendChild(link);
+    }
+    if (themeJsURL) {
+      const script = document.createElement("script");
+      script.src = themeJsURL;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   return (

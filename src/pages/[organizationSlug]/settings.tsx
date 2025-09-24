@@ -45,7 +45,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { config } from "@/config";
 import { withContentTree } from "@/decorators/withContentTree";
 import { withOrganization } from "@/decorators/withOrganization";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -62,6 +61,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import useConfig from "../../hooks/useConfig";
 import { getCurrentUserRole } from "../../hooks/useUserRole";
 
 interface HomeProps {
@@ -78,6 +78,8 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
   });
+
+  const config = useConfig();
 
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
@@ -539,7 +541,9 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
           <div className="flex justify-end">
             <Link
               href={
-                "mailto:community@devguard.org?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
+                "mailto:" +
+                config.accountDeletionMail +
+                "?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
                 "=" +
                 activeOrg.id +
                 "%0AName%3D" +
@@ -561,7 +565,10 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
 export default Home;
 
 export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { organization, session }) => {
+  async (
+    context: GetServerSidePropsContext,
+    { organization, config, session },
+  ) => {
     if (organization && "oauth2Error" in organization) {
       return {
         props: {},

@@ -3,7 +3,6 @@ import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { config } from "@/config";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withContentTree } from "@/decorators/withContentTree";
@@ -39,10 +38,10 @@ interface Props {
     badgeSecret: string;
     webhookSecret: string;
   };
-  apiPublicUrl: string;
 }
 
 import { InputWithButton } from "@/components/ui/input-with-button";
+import useConfig from "../../../../../../hooks/useConfig";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -57,24 +56,21 @@ export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
-const Index: FunctionComponent<Props> = ({
-  repositories,
-  secrets,
-  apiPublicUrl,
-}) => {
+const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject();
   const asset = useActiveAsset()!;
   const updateAsset = useStore((s) => s.updateAsset);
   const router = useRouter();
+  const config = useConfig();
 
   const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
   const [webhookSecret, setWebhookSecret] = useState<string>(
     secrets.webhookSecret,
   );
 
-  const apiBadgeUrl = apiPublicUrl + "/api/v1/badges/";
+  const apiBadgeUrl = config.devguardApiUrlPublicInternet + "/api/v1/badges/";
 
   const [badgeURL, setBadgeURL] = useState<string>(
     apiBadgeUrl + "cvss/" + badgeSecret,
@@ -297,7 +293,7 @@ const Index: FunctionComponent<Props> = ({
           <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
             <InputWithButton
               label="Webhook URL"
-              value={`${apiPublicUrl}/api/v1/webhook/`}
+              value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}
               message="You can use the URL to send webhook requests to this endpoint."
               copyable
             />
@@ -398,7 +394,6 @@ export const getServerSideProps = middleware(
         asset,
         repositories: repos,
         secrets,
-        apiPublicUrl: config.devguardApiUrlPublicInternet,
       },
     };
   },
