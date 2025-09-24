@@ -37,8 +37,6 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-interface Props {}
-
 export default function UserNav() {
   const router = useRouter();
 

@@ -18,7 +18,7 @@ import { useSession } from "../context/SessionContext";
 
 export const useCurrentUser = () => {
   const user = useStore((s) => s.session?.identity);
-  const session = useSession();
+  const { session } = useSession();
 
   if (noStoreAvailable(user)) {
     return session?.identity;

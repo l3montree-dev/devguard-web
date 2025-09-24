@@ -32,14 +32,12 @@ export async function withSession() {
   try {
     const session = await ory.toSession(
       {
-        cookie: "ory_kratos_session=" + orySessionCookie + ";",
+        cookie: "ory_kratos_session=" + orySessionCookie.value + ";",
       },
       {
         baseURL: "http://localhost:3000",
       },
     );
-
-    console.log("Session data:", session);
 
     if (!session.data) {
       return null;
