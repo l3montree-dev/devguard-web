@@ -26,8 +26,9 @@ const generateGitlabSnippet = (
   assetSlug: string,
   apiUrl: string,
   frontendUrl: string,
+  devguardCIComponentBase: string,
 ) => `
-- remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/${workflowFile}"
+- remote: "${devguardCIComponentBase}/templates/${workflowFile}"
   inputs:
     asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     token: "$DEVGUARD_TOKEN"
@@ -73,6 +74,7 @@ export const integrationSnippets = ({
   assetSlug,
   apiUrl,
   frontendUrl,
+  devguardCIComponentBase,
   token,
 }: {
   orgSlug: string;
@@ -80,6 +82,7 @@ export const integrationSnippets = ({
   assetSlug: string;
   apiUrl: string;
   frontendUrl: string;
+  devguardCIComponentBase: string;
   token?: string;
 }) => ({
   GitHub: {
@@ -161,6 +164,7 @@ export const integrationSnippets = ({
                   sarif-file: ./results.sarif
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
                   api-url: "${apiUrl}"
+                  web-ui: "${frontendUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create`,
     sbom: `jobs:
@@ -175,6 +179,7 @@ export const integrationSnippets = ({
                   sbom-file: ./results.sbom
                   asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
                   api-url: "${apiUrl}"
+                  web-ui: "${frontendUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
   },
@@ -188,6 +193,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     "container-scanning": generateGitlabSnippet(
       "container-scanning",
@@ -197,6 +203,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     iac: generateGitlabSnippet(
       "infrastructure-as-code-scanning",
@@ -206,6 +213,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     sast: generateGitlabSnippet(
       "bad-practice-finder",
@@ -215,6 +223,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     devsecops: generateGitlabSnippet(
       "call-devsecops",
@@ -224,6 +233,7 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     "secret-scanning": generateGitlabSnippet(
       "find-leaked-secrets",
@@ -233,23 +243,28 @@ export const integrationSnippets = ({
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
     sarif: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
-    - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sarif.yml"
+    - remote: "${devguardCIComponentBase}/templates/upload-sarif.yml"
       inputs:
           asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
-          sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository`,
+          sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository
+          web_ui: ${frontendUrl}
+          `,
     sbom: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
 include:
-    - remote: "https://gitlab.com/l3montree/devguard/-/raw/main/templates/upload-sbom.yml"
+    - remote: "${devguardCIComponentBase}/templates/upload-sbom.yml"
       inputs:
           asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
           token: "$DEVGUARD_TOKEN"
           api_url: ${apiUrl}
-          sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository`,
+          sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository
+          web_ui: ${frontendUrl}
+          `,
     build: generateGitlabSnippet(
       "build",
       "build.yml",
@@ -258,6 +273,7 @@ include:
       assetSlug,
       apiUrl,
       frontendUrl,
+      devguardCIComponentBase,
     ),
   },
 

@@ -405,6 +405,7 @@ const Index: FunctionComponent<Props> = (props) => {
         onOpenChange={setIsOpen}
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
+        devguardCIComponentBase={config.devguardCIComponentBase}
       />
     </Page>
   );
