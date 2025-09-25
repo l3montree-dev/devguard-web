@@ -148,6 +148,32 @@ export function NodeInputSubmit<T>({
 
   if (
     (attributes.name === "link" || attributes.name === "provider") &&
+    attributes.value === "official"
+  ) {
+    // render the opencode unlink node
+    return (
+      <div className="flex flex-row justify-end">
+        <Button
+          variant={"secondary"}
+          name={attributes.name}
+          value={attributes.value || ""}
+          disabled={attributes.disabled || disabled}
+        >
+          <Image
+            src="/assets/gitlab.svg"
+            alt="Gitlab Logo"
+            className="mr-2 -ml-1"
+            width={24}
+            height={24}
+          />
+          Sign in with openCode
+        </Button>
+      </div>
+    );
+  }
+
+  if (
+    (attributes.name === "link" || attributes.name === "provider") &&
     attributes.value === "opencode"
   ) {
     // render the opencode unlink node
@@ -211,7 +237,7 @@ export function NodeInputSubmit<T>({
             width={24}
             height={24}
           />
-          Link GitLab
+          Link ^
         </Button>
       </div>
     );
