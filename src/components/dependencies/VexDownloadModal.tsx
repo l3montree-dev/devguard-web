@@ -150,7 +150,7 @@ export default function VexDownloadModal({
         <hr className="mt-6" />
         <h4 className="font-semibold mt-4">
           PDF/UA-Report{" "}
-          <span className="ml-2 inline-flex items-center rounded-full bg-purple-800/30 px-2 py-1 text-xs font-medium text-purple-300 ring-1 ring-inset ring-purple-600/50">
+          <span className="ml-2 inline-flex items-center rounded-full bg-purple-800/30 px-2 py-1 text-xs font-medium dark:text-purple-300 ring-1 ring-inset ring-purple-600/50 text-black-500">
             Beta
           </span>
         </h4>
