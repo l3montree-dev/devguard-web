@@ -1,3 +1,5 @@
+"use client";
+
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { middleware } from "@/decorators/middleware";
@@ -9,26 +11,31 @@ import { Policy } from "@/types/api/api";
 import React, { FunctionComponent, useState } from "react";
 
 import { EllipsisVerticalIcon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/compat/router";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import ListItem from "../../components/common/ListItem";
-import PolicyDialog from "../../components/PolicyDialog";
-import { Badge } from "../../components/ui/badge";
-import { Button, buttonVariants } from "../../components/ui/button";
+import ListItem from "../../../components/common/ListItem";
+import PolicyDialog from "../../../components/PolicyDialog";
+import { Badge } from "../../../components/ui/badge";
+import { Button, buttonVariants } from "../../../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
-import { withContentTree } from "../../decorators/withContentTree";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
-import { useOrganizationMenu } from "../../hooks/useOrganizationMenu";
+} from "../../../components/ui/dropdown-menu";
+import { withContentTree } from "../../../decorators/withContentTree";
+import { useOrganizationMenu } from "../../../hooks/useOrganizationMenu";
 import {
   browserApiClient,
   getApiClientFromContext,
-} from "../../services/devGuardApi";
+} from "../../../services/devGuardApi";
+import useSWR from "swr";
+import { fetcher } from "../../../hooks/useApi";
+import SkeletonListItems from "../../../components/common/SkeletonListItems";
+import Err from "../../../components/common/Err";
+import ListRenderer from "../../../components/common/ListRenderer";
+import { title } from "process";
 
 interface Props {
   policies: Policy[];
@@ -43,7 +50,6 @@ export const PolicyListItem = ({
   onPolicyUpdate: (policy: Policy) => Promise<void>;
   onPolicyDelete: (policy: Policy) => Promise<void>;
 }) => {
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const handlePolicyUpdate = async (newPolicy: Policy) => {
     await onPolicyUpdate({ ...newPolicy, id: policy.id });
@@ -106,84 +112,103 @@ export const PolicyListItem = ({
   );
 };
 
-const ComplianceIndex: FunctionComponent<Props> = ({
-  policies: propsPolicies,
-}) => {
-  const router = useRouter();
+const ComplianceIndex: FunctionComponent<Props> = () => {
   const menu = useOrganizationMenu();
-  const activeOrg = useActiveOrg();
   const [open, setOpen] = useState(false);
-  const [policies, setPolicy] = useState<Array<Policy>>(propsPolicies);
+  const { organizationSlug } = useParams() as {
+    organizationSlug: string;
+  };
+  const {
+    data: policies,
+    isLoading,
+    error,
+    mutate,
+  } = useSWR<Array<Policy>>(
+    "/organizations/" + organizationSlug + "/policies/",
+    fetcher,
+  );
 
   const handleCreatePolicy = async (policy: Policy) => {
-    const { organizationSlug } = router.query as {
-      organizationSlug: string;
-    };
+    mutate(
+      async (prev) => {
+        let url = "/organizations/" + organizationSlug + "/policies/";
 
-    let url = "/organizations/" + organizationSlug + "/policies/";
+        const resp = await browserApiClient(url, {
+          method: "POST",
+          body: JSON.stringify(policy),
+        });
 
-    const resp = await browserApiClient(url, {
-      method: "POST",
-      body: JSON.stringify(policy),
-    });
+        if (!resp.ok) {
+          toast.error("Failed to create policy");
+          return;
+        }
+        // update the policies
+        const newPolicy = await resp.json();
+        return [newPolicy, ...(prev || [])];
+      },
+      {
+        optimisticData: (prev) => [
+          { ...policy, id: Math.random().toString() },
+          ...(prev || []),
+        ],
+      },
+    );
 
-    if (!resp.ok) {
-      toast.error("Failed to create policy");
-      return;
-    }
-
-    // update the policies
-    const newPolicy = await resp.json();
-    setPolicy((prev) => [...prev, newPolicy]);
     toast.success("Policy created successfully");
     setOpen(false);
   };
 
   const handlePolicyUpdate = async (policy: Policy) => {
-    const { organizationSlug } = router.query as {
-      organizationSlug: string;
-    };
+    mutate(
+      async (prev) => {
+        let url =
+          "/organizations/" + organizationSlug + "/policies/" + policy.id;
 
-    let url = "/organizations/" + organizationSlug + "/policies/" + policy.id;
+        const resp = await browserApiClient(url, {
+          method: "PUT",
+          body: JSON.stringify(policy),
+        });
 
-    const resp = await browserApiClient(url, {
-      method: "PUT",
-      body: JSON.stringify(policy),
-    });
+        if (!resp.ok) {
+          toast.error("Failed to update policy");
+          return;
+        }
 
-    if (!resp.ok) {
-      toast.error("Failed to update policy");
-      return;
-    }
-
-    // update the policies
-    const newPolicy = await resp.json();
-
-    setPolicy((prev) =>
-      prev.map((p) => (p.id === newPolicy.id ? newPolicy : p)),
+        // update the policies
+        const newPolicy = await resp.json();
+        toast.success("Policy updated successfully");
+        return prev?.map((p) => (p.id === newPolicy.id ? newPolicy : p));
+      },
+      {
+        optimisticData: (prev) =>
+          prev?.map((p) => (p.id === policy.id ? policy : p)) || [],
+      },
     );
-    toast.success("Policy updated successfully");
   };
 
   const handlePolicyDelete = async (policy: Policy) => {
-    const { organizationSlug } = router.query as {
-      organizationSlug: string;
-    };
+    mutate(
+      async (prev) => {
+        let url =
+          "/organizations/" + organizationSlug + "/policies/" + policy.id;
 
-    let url = "/organizations/" + organizationSlug + "/policies/" + policy.id;
+        const resp = await browserApiClient(url, {
+          method: "DELETE",
+        });
 
-    const resp = await browserApiClient(url, {
-      method: "DELETE",
-    });
+        if (!resp.ok) {
+          toast.error("Failed to delete policy");
+          return;
+        }
 
-    if (!resp.ok) {
-      toast.error("Failed to delete policy");
-      return;
-    }
-
-    // update the policies
-    setPolicy((prev) => prev.filter((p) => p.id !== policy.id));
-    toast.success("Policy deleted successfully");
+        // update the policies
+        toast.success("Policy deleted successfully");
+        return prev?.filter((p) => p.id !== policy.id);
+      },
+      {
+        optimisticData: (prev) => prev?.filter((p) => p.id !== policy.id) || [],
+      },
+    );
   };
 
   return (
@@ -199,14 +224,19 @@ const ComplianceIndex: FunctionComponent<Props> = ({
               <Button onClick={() => setOpen(true)}>Upload new Policy</Button>
             }
           >
-            {policies.map((policy) => (
-              <PolicyListItem
-                onPolicyDelete={handlePolicyDelete}
-                onPolicyUpdate={handlePolicyUpdate}
-                key={policy.id}
-                policy={policy}
-              />
-            ))}
+            <ListRenderer
+              isLoading={isLoading}
+              error={error}
+              data={policies}
+              renderItem={(policy) => (
+                <PolicyListItem
+                  onPolicyDelete={handlePolicyDelete}
+                  onPolicyUpdate={handlePolicyUpdate}
+                  key={policy.id}
+                  policy={policy}
+                />
+              )}
+            />
           </Section>
         </div>
       </div>
@@ -223,27 +253,3 @@ const ComplianceIndex: FunctionComponent<Props> = ({
 };
 
 export default ComplianceIndex;
-
-export const getServerSideProps = middleware(
-  async (context) => {
-    const apiClient = getApiClientFromContext(context);
-    // fetch the compliance stats
-    const { organizationSlug } = context.query as {
-      organizationSlug: string;
-    };
-
-    let url = "/organizations/" + organizationSlug + "/policies/";
-
-    return {
-      props: {
-        policies: await apiClient(url).then((r) => r.json()),
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    contentTree: withContentTree,
-    organization: withOrganization,
-  },
-);

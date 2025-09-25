@@ -3,8 +3,7 @@ import React from "react";
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-
-const ThreeJSScene = dynamic(() => import("./ThreeJSScene"), { ssr: false });
+import ThreeJSScene from "./ThreeJSScene";
 
 const ThreeJSFeatureScreen = () => {
   return (

@@ -14,9 +14,10 @@ export const useCurrentUserRole = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
 
-  const { projectSlug } = useParams<{
-    projectSlug: string;
-  }>();
+  const { projectSlug } =
+    useParams<{
+      projectSlug: string;
+    }>() || {}; // projectSlug from URL params
 
   return useMemo(() => {
     return getCurrentUserRole(
@@ -32,7 +33,7 @@ export const getCurrentUserRole = (
   currentUser: User | undefined,
   org: OrganizationDetailsDTO,
   projectSlug?: string | undefined,
-  project?: ProjectDTO,
+  project?: ProjectDTO | null,
 ): UserRole | null => {
   if (!currentUser) {
     return UserRole.Guest;

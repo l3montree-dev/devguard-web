@@ -1,11 +1,17 @@
 "use client";
 
-import { ReactNode, ComponentType } from "react";
+import { ReactNode, ComponentType, useState } from "react";
+
+export type WithUpdater<T> = T & {
+  update: (newValue: T | ((prev: T) => T)) => void;
+};
+
+export type WithoutUpdater<T> = Omit<T, "update">;
 
 interface ClientContextWrapperProps<T = any> {
   children: ReactNode;
-  Provider: ComponentType<{ value: T; children: ReactNode }>;
-  value: T;
+  Provider: ComponentType<{ value: WithUpdater<T>; children: ReactNode }>;
+  value: Omit<T, "update">;
 }
 
 export function ClientContextWrapper<T>({
@@ -13,7 +19,19 @@ export function ClientContextWrapper<T>({
   Provider,
   value,
 }: ClientContextWrapperProps<T>) {
-  return <Provider value={value}>{children}</Provider>;
+  const [state, update] = useState(value);
+  return (
+    <Provider
+      value={
+        {
+          ...state,
+          update,
+        } as WithUpdater<T>
+      }
+    >
+      {children}
+    </Provider>
+  );
 }
 
 export type ProviderValue<T> =

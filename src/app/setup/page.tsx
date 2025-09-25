@@ -12,15 +12,18 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+"use client";
+import Lanyard from "@/components/misc/Lanyard";
 import OrgRegisterForm from "@/components/OrgRegister";
 import Page from "@/components/Page";
-import { middleware } from "@/decorators/middleware";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "../decorators/withSession";
-import Lanyard from "@/components/misc/Lanyard";
+import { useSession } from "../../context/SessionContext";
+import { redirect } from "next/navigation";
 
 export default function SetupOrg() {
+  const session = useSession();
+  if (session.session === null) {
+    redirect("/login");
+  }
   return (
     <Page title="Setup Your Organization">
       <div className="">
@@ -45,24 +48,3 @@ export default function SetupOrg() {
     </Page>
   );
 }
-
-export const getServerSideProps = middleware(
-  async (ctx, { session, organizations }) => {
-    if (!session) {
-      return {
-        redirect: {
-          destination: `/login`,
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: {},
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-  },
-);

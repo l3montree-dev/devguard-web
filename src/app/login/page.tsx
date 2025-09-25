@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
 import {
   LoginFlow,
@@ -28,23 +29,23 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import {
   HTMLAttributeReferrerPolicy,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { Flow } from "../components/kratos/Flow";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PasswordlessLogin from "../components/login/PasswordlessLogin";
-import PasswordLogin from "../components/login/PasswordLogin";
-import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
-import { LogoutLink } from "../hooks/logoutLink";
-import { handleFlowError, ory } from "../services/ory";
-import useConfig from "../hooks/useConfig";
-import { middleware } from "../decorators/middleware";
+import { useSearchParams } from "next/navigation";
+import { LogoutLink } from "../../hooks/logoutLink";
+import { handleFlowError, ory } from "../../services/ory";
+import { useConfig } from "../../context/ConfigContext";
+import PasswordlessLogin from "../../components/login/PasswordlessLogin";
+import PasswordLogin from "../../components/login/PasswordLogin";
+import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
+import { Flow } from "../../components/kratos/Flow";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -64,7 +65,12 @@ const Login: NextPage = () => {
     // AAL = Authorization Assurance Level. This implies that we want to upgrade the AAL, meaning that we want
     // to perform two-factor authentication/verification.
     aal,
-  } = router.query;
+  } = useSearchParams() as {
+    return_to?: string;
+    flow?: string;
+    refresh?: string;
+    aal?: string;
+  };
 
   // This might be confusing, but we want to show the user an option
   // to sign out if they are performing two-factor authentication!
@@ -72,7 +78,7 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (flow) {
       return;
     }
 
@@ -97,7 +103,7 @@ const Login: NextPage = () => {
         setFlow(data);
       })
       .catch(handleFlowError(router, "login", setFlow));
-  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow]);
+  }, [flowId, router, aal, refresh, returnTo, flow]);
 
   // Add the WebAuthn script to the DOM
   useEffect(() => {
@@ -133,39 +139,40 @@ const Login: NextPage = () => {
     };
   }, [flow?.ui.nodes]);
 
-  const onSubmit = (values: UpdateLoginFlowBody) =>
+  const onSubmit = async (values: UpdateLoginFlowBody) => {
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
-      .then(() =>
-        ory
-          .updateLoginFlow({
-            flow: String(flow?.id),
-            updateLoginFlowBody: values,
-          })
-          // We logged in successfully! Let's bring the user home.
-          .then(() => {
-            if (flow?.return_to) {
-              window.location.href = flow?.return_to;
-              return;
-            }
-            router.push("/");
-          })
-          .then(() => {})
-          .catch(handleFlowError(router, "login", setFlow))
-          .catch((err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              // @ts-expect-error
-              setFlow(err.response?.data);
-              return;
-            }
+      .push(`/login?flow=${flow?.id}`);
 
-            return Promise.reject(err);
-          }),
-      );
+    ory
+      .updateLoginFlow({
+        flow: String(flow?.id),
+        updateLoginFlowBody: values,
+      })
+      // We logged in successfully! Let's bring the user home.
+      .then(() => {
+        if (flow?.return_to) {
+          window.location.href = flow?.return_to;
+          return;
+        }
+        router.push("/");
+      })
+      .then(() => {})
+      .catch(handleFlowError(router, "login", setFlow))
+      .catch((err: AxiosError) => {
+        // If the previous handler did not catch the error it's most likely a form validation error
+        if (err.response?.status === 400) {
+          // Yup, it is!
+          // @ts-expect-error
+          setFlow(err.response?.data);
+          return;
+        }
+
+        return Promise.reject(err);
+      });
+  };
+
   const availableMethods = useMemo(() => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
@@ -325,9 +332,3 @@ const Login: NextPage = () => {
 };
 
 export default Login;
-
-export const getServerSideProps = middleware(() => {
-  return {
-    props: {},
-  };
-}, {});

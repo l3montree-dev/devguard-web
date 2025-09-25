@@ -12,14 +12,10 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
-import { middleware } from "@/decorators/middleware";
-import { GetServerSidePropsContext } from "next";
 import { useState } from "react";
-import Page from "../../components/Page";
-import { withOrgs } from "../../decorators/withOrgs";
-import { withSession } from "../../decorators/withSession";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
+import Page from "../../../components/Page";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
 import ListItem from "@/components/common/ListItem";
@@ -45,8 +41,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   GitLabIntegrationDTO,
@@ -55,31 +49,31 @@ import {
   UserRole,
   WebhookDTO,
 } from "@/types/api/api";
-import { useStore } from "@/zustand/globalStoreProvider";
-import { useRouter } from "next/compat/router";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import useConfig from "../../hooks/useConfig";
-import { getCurrentUserRole } from "../../hooks/useUserRole";
+import { useOrganization } from "../../../context/OrganizationContext";
+import { useConfig } from "../../../context/ConfigContext";
 
 interface HomeProps {
   devguardGithubAppUrl: string;
 }
 
 const Home = ({ devguardGithubAppUrl }: HomeProps) => {
-  const activeOrg = useActiveOrg();
+  const orgCtx = useOrganization();
+  const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
+  const updateOrgCtx = orgCtx?.update;
   const orgMenu = useOrganizationMenu();
-  const updateOrganization = useStore((s) => s.updateOrganization);
   const router = useRouter();
+  const pathName = usePathname();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
+  const config = useConfig();
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
   });
-
-  const config = useConfig();
 
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
     const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
@@ -95,46 +89,67 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     if (!resp.ok) {
       console.error("Failed to update organization");
     } else if (resp.ok) {
-      toast("Success", {
-        description: "Organization updated",
-      });
-
       const newOrg = await resp.json();
-      updateOrganization(newOrg);
 
       if (newOrg.slug !== activeOrg.slug) {
-        router.push("/" + newOrg.slug + "/settings");
+        toast("Success", {
+          description: "Organization updated - redirecting to new page...",
+        });
+
+        setTimeout(() => {
+          router.push("/" + newOrg.slug + "/settings");
+        }, 2000);
+      } else {
+        toast("Success", {
+          description: "Organization updated",
+        });
+        updateOrgCtx({
+          ...orgCtx,
+          organization: newOrg,
+        });
       }
     }
   };
 
   const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
+      },
     });
   };
 
   const handleNewJiraIntegration = (integration: JiraIntegrationDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+      },
     });
   };
 
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      webhooks: activeOrg.webhooks.concat(integration),
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        webhooks: activeOrg.webhooks.concat(integration),
+      },
     });
   };
 
   const handleUpdateWebhookIntegration = (integration: WebhookDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      webhooks: activeOrg.webhooks.map((w) =>
-        w.id === integration.id ? integration : w,
-      ),
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        webhooks: activeOrg.webhooks.map((w) =>
+          w.id === integration.id ? integration : w,
+        ),
+      },
     });
   };
 
@@ -151,11 +166,14 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     );
 
     if (resp.ok) {
-      updateOrganization({
-        ...activeOrg,
-        members: activeOrg.members.map((m) =>
-          m.id === id ? { ...m, role } : m,
-        ),
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          members: activeOrg.members.map((m) =>
+            m.id === id ? { ...m, role } : m,
+          ),
+        },
       });
     } else {
       toast.error("Failed to update member role");
@@ -171,9 +189,12 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     );
 
     if (resp.ok) {
-      updateOrganization({
-        ...activeOrg,
-        members: activeOrg.members.filter((m) => m.id !== id),
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          members: activeOrg.members.filter((m) => m.id !== id),
+        },
       });
     } else {
       toast.error("Failed to remove member");
@@ -189,11 +210,14 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     );
 
     if (resp.ok) {
-      updateOrganization({
-        ...activeOrg,
-        gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
-          (i) => i.id !== id,
-        ),
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
+            (i) => i.id !== id,
+          ),
+        },
       });
     }
   };
@@ -207,9 +231,14 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     );
 
     if (resp.ok) {
-      updateOrganization({
-        ...activeOrg,
-        jiraIntegrations: activeOrg.jiraIntegrations.filter((i) => i.id !== id),
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          jiraIntegrations: activeOrg.jiraIntegrations.filter(
+            (i) => i.id !== id,
+          ),
+        },
       });
     }
   };
@@ -224,9 +253,12 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     );
     if (res.ok) {
       toast.success("Webhook deleted successfully");
-      updateOrganization({
-        ...activeOrg,
-        webhooks: activeOrg.webhooks.filter((w) => w.id !== id),
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          webhooks: activeOrg.webhooks.filter((w) => w.id !== id),
+        },
       });
     } else {
       toast.error("Failed to delete webhook");
@@ -362,7 +394,7 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
                       `https://github.com/apps/${devguardGithubAppUrl}/installations/new?state=` +
                       encodeObjectBase64({
                         orgSlug: activeOrg.slug,
-                        redirectTo: router.asPath,
+                        redirectTo: pathName || "/",
                       })
                     }
                   >
@@ -487,7 +519,9 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <OrgForm forceVertical={false} />
             <div className="mt-6 flex items-center justify-end gap-x-6">
-              <Button type="submit">Save</Button>
+              <Button isSubmitting={form.formState.isSubmitting} type="submit">
+                Save
+              </Button>
             </div>
           </form>
         </Form>
@@ -523,7 +557,11 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
                 )}
               />
               <div className="mt-6 flex items-center justify-end gap-x-6">
-                <Button variant="destructive" type="submit">
+                <Button
+                  isSubmitting={form.formState.isSubmitting}
+                  variant="destructive"
+                  type="submit"
+                >
                   Save
                 </Button>
               </div>
@@ -563,58 +601,3 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
 };
 
 export default Home;
-
-export const getServerSideProps = middleware(
-  async (
-    context: GetServerSidePropsContext,
-    { organization, config, session },
-  ) => {
-    if (organization && "oauth2Error" in organization) {
-      return {
-        props: {},
-      };
-    }
-    const currentUserRole = getCurrentUserRole(
-      session?.identity,
-      organization as OrganizationDetailsDTO,
-    );
-
-    if (
-      currentUserRole !== UserRole.Owner &&
-      currentUserRole !== UserRole.Admin
-    ) {
-      return {
-        redirect: {
-          destination: "/" + context.query.organizationSlug,
-          permanent: false,
-        },
-      };
-    }
-
-    const api = config.devguardApiUrlPublicInternet;
-    let devguardGithubAppUrl = "";
-    if (
-      typeof api === "string" &&
-      api.includes("https://api.main.devguard.org")
-    ) {
-      devguardGithubAppUrl = "devguard-bot-dev";
-    } else if (
-      typeof api === "string" &&
-      api.includes("https://api.devguard.org")
-    ) {
-      devguardGithubAppUrl = "devguard-bot";
-    }
-
-    return {
-      props: {
-        devguardGithubAppUrl,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    contentTree: withContentTree,
-  },
-);

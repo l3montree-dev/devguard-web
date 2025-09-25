@@ -3,11 +3,18 @@
 import { createContext, useContext } from "react";
 import { OrganizationDetailsDTO } from "../types/api/api";
 import { ContentTreeElement } from "../zustand/globalStore";
+import { WithUpdater } from "./ClientContextWrapper";
 
-const OrganizationContext = createContext<{
-  organization: OrganizationDetailsDTO | { oauth2Error: boolean } | null;
-  contentTree: ContentTreeElement[];
-}>(null as any);
+const OrganizationContext = createContext<
+  WithUpdater<{
+    organization: OrganizationDetailsDTO | { oauth2Error: boolean } | null;
+    contentTree: ContentTreeElement[];
+  }>
+>({
+  organization: null,
+  contentTree: [],
+  update: () => {},
+});
 
 export const OrganizationProvider = OrganizationContext.Provider;
 export const useOrganization = () => useContext(OrganizationContext);

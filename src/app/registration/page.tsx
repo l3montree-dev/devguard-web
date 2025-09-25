@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+"use client";
 import {
   LoginFlow,
   RegistrationFlow,
@@ -29,24 +29,25 @@ import { uniq } from "lodash";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import {
   HTMLAttributeReferrerPolicy,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { toast } from "sonner";
-import ThreeJSFeatureScreen from "../components/threejs/ThreeJSFeatureScreen";
-import { Checkbox } from "../components/ui/checkbox";
-import { handleFlowError, ory } from "../services/ory";
-import { Toaster } from "../components/ui/sonner";
-import useConfig from "../hooks/useConfig";
-import { middleware } from "../decorators/middleware";
+import { toast, Toaster } from "sonner";
+import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
+import { useConfig } from "../../context/ConfigContext";
+import { useSearchParams } from "next/navigation";
+import { handleFlowError, ory } from "../../services/ory";
+import { Checkbox } from "../../components/ui/checkbox";
 
 // Renders the registration page
 const Registration = () => {
   const router = useRouter();
+
+  const query = useSearchParams();
 
   const { oidcOnly, termsOfUseLink, privacyPolicyLink } = useConfig();
   const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
@@ -55,12 +56,15 @@ const Registration = () => {
   const [flow, setFlow] = useState<RegistrationFlow>();
 
   // Get ?flow=... from the URL
-  const { flow: flowId, return_to: returnTo } = router.query;
+  const { flow: flowId, return_to: returnTo } = query as {
+    flow?: string;
+    return_to?: string;
+  };
 
   // In this effect we either initiate a new registration flow, or we fetch an existing registration flow.
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (flow) {
       return;
     }
 
@@ -85,13 +89,13 @@ const Registration = () => {
         setFlow(data);
       })
       .catch(handleFlowError(router, "registration", setFlow));
-  }, [flowId, router, router.isReady, returnTo, flow]);
+  }, [flowId, router, returnTo, flow]);
 
   const onSubmit = async (values: UpdateRegistrationFlowBody) => {
-    await router
+    router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/registration?flow=${flow?.id}`, undefined, { shallow: true });
+      .push(`/registration?flow=${flow?.id}`);
 
     ory
       .updateRegistrationFlow({
@@ -218,7 +222,7 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly && !Boolean(router.query.flow) && (
+                  {!oidcOnly && !Boolean(flow) && (
                     <div className="mb-6 border-b-2 pb-4">
                       <Flow
                         hideGlobalMessages
@@ -293,11 +297,11 @@ const Registration = () => {
                 )}
               </CardContent>
             </Card>
-            {!oidcOnly && Boolean(router.query.flow) && (
+            {!oidcOnly && Boolean(flow) && (
               <div className="flex flex-row justify-end">
                 <span
                   onClick={async () => {
-                    await router.push("/registration", { query: {} });
+                    router.push("/registration");
                     setFlow(undefined);
                   }}
                   className="mt-4  cursor-pointer font-medium text-primary text-right block text-sm"
@@ -316,12 +320,3 @@ const Registration = () => {
 };
 
 export default Registration;
-
-export const getServerSideProps = middleware(
-  async ({ query, req, res }: any) => {
-    return {
-      props: {},
-    };
-  },
-  {},
-);

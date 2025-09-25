@@ -1,3 +1,5 @@
+"use client";
+
 // Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
 //
 // This program is free software: you can redistribute it and/or modify
@@ -13,68 +15,295 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { getApiClientFromCookies } from "../../services/devGuardApi";
-import { Paged, ProjectDTO } from "../../types/api/api";
-import OrganizationHomePage from "./OrganizationHomePage";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useForm } from "react-hook-form";
+import Page from "../../components/Page";
 
-interface Props {
-  params: Promise<{ organizationSlug: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import { browserApiClient } from "../../services/devGuardApi";
+import { Paged, ProjectDTO, UserRole } from "../../types/api/api";
+import { CreateProjectReq } from "../../types/api/req";
 
-export default async function Page(props: Props) {
-  const { organizationSlug } = await props.params;
+import ListItem from "@/components/common/ListItem";
+import Section from "@/components/common/Section";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { toast } from "sonner";
 
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("ory_kratos_session");
+import CustomPagination from "@/components/common/CustomPagination";
+import EmptyList from "@/components/common/EmptyList";
+import { ProjectForm } from "@/components/project/ProjectForm";
+import { Input } from "@/components/ui/input";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { debounce } from "lodash";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
-    // Create API client with server-side context
-    const apiClient = getApiClientFromCookies(sessionCookie?.value);
+import useSWR from "swr";
+import Avatar from "../../components/Avatar";
+import EmptyParty from "../../components/common/EmptyParty";
+import Markdown from "../../components/common/Markdown";
+import { ProjectBadge } from "../../components/common/ProjectTitle";
+import { fetcher } from "../../hooks/useApi";
+import { classNames } from "../../utils/common";
+import ListRenderer from "../../components/common/ListRenderer";
 
-    // Build query parameters
-    const query = new URLSearchParams();
-    const searchParams = await props.searchParams;
-    const page = (searchParams.page || "1") as string;
-    const pageSize = (searchParams.pageSize || "20") as string;
+const OrganizationHomePage: FunctionComponent = () => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const activeOrg = useActiveOrg();
+  const [syncRunning, setSyncRunning] = useState(false);
+  const searchParams = useSearchParams();
 
-    query.set("page", page);
-    query.set("pageSize", pageSize);
+  const [page, setPage] = useState(
+    searchParams?.get("page") ? Number(searchParams.get("page")) : 1,
+  );
+  const [search, setSearch] = useState(
+    searchParams?.get("search") ? String(searchParams.get("search")) : "",
+  );
 
-    if (searchParams.search) {
-      query.set("search", searchParams.search as string);
-    }
+  const currentUserRole = useCurrentUserRole();
 
-    // Fetch projects for this organization
-    const resp = await apiClient(
-      `/organizations/${organizationSlug.replace("%40", "@")}/projects/?${query.toString()}`,
-    );
+  const form = useForm<ProjectDTO>({
+    mode: "onBlur",
+  });
 
-    if (!resp.ok) {
-      if (resp.status === 404) {
-        notFound();
+  const stillOnPage = useRef(true);
+
+  const {
+    isLoading,
+    data: projects,
+    error,
+    mutate,
+  } = useSWR<Paged<ProjectDTO>>(
+    activeOrg
+      ? `/organizations/${activeOrg.slug.replace("%40", "@")}/projects/?page=${
+          page
+        }&pageSize=${20}${search !== "" ? `&search=${search}` : ""}`
+      : null,
+    async (url: string) =>
+      fetcher<Paged<ProjectDTO>>(url).then((res) => {
+        res.data = res.data.sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+        );
+        return res;
+      }),
+  );
+
+  const handleSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.value === "") {
+        setSearch("");
+        setPage(1);
+      } else if (e.target.value.length >= 3) {
+        setSearch(e.target.value);
+        setPage(1);
       }
-      throw new Error(`Failed to fetch projects: ${resp.status}`);
+    },
+    [setSearch, setPage],
+  );
+
+  // Add debounce back
+  const debouncedHandleSearch = useCallback(debounce(handleSearch, 500), [
+    handleSearch,
+  ]);
+
+  const handleTriggerSync = useCallback(async () => {
+    setSyncRunning(true);
+    const resp = await browserApiClient(
+      `/organizations/${activeOrg.slug}/trigger-sync`,
+    );
+    if (resp.ok) {
+      toast.success("Sync triggered successfully!");
+      // reload the page to show the updated projects
+      if (stillOnPage.current) {
+        mutate();
+      }
+    } else {
+      toast.error("Failed to trigger sync. Please try again later.");
     }
+    setSyncRunning(false);
+  }, [activeOrg.slug, mutate]);
 
-    const projectsPaged: Paged<ProjectDTO> = await resp.json();
-
-    // Sort projects alphabetically
-    projectsPaged.data = projectsPaged.data.sort((a, b) =>
-      a.name.localeCompare(b.name),
+  const handleCreateProject = async (req: CreateProjectReq) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/projects",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      },
     );
+    if (resp.ok) {
+      const res: ProjectDTO = await resp.json();
+      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
+    } else {
+      toast("Error", {
+        description: "Could not create project",
+      });
+    }
+    mutate();
+  };
 
-    return (
-      <OrganizationHomePage
-        projects={projectsPaged}
-        organizationSlug={organizationSlug}
-        searchParams={searchParams}
-      />
-    );
-  } catch (error) {
-    console.error("Error loading organization page:", error);
-    notFound();
-  }
-}
+  useEffect(() => {
+    // trigger a sync on page load - if the org has an external entity provider
+    if (activeOrg.externalEntityProviderId) {
+      // check in localStorage if the sync was already triggered
+      const lastSync = localStorage.getItem(`lastSync-${activeOrg.slug}`);
+      if (
+        !lastSync ||
+        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
+      ) {
+        // if not, trigger sync
+        localStorage.setItem(
+          `lastSync-${activeOrg.slug}`,
+          new Date().toISOString(),
+        );
+        handleTriggerSync();
+      }
+    }
+    return () => {
+      stillOnPage.current = false;
+    };
+  }, [activeOrg.externalEntityProviderId, activeOrg.slug, handleTriggerSync]);
+
+  const orgMenu = useOrganizationMenu();
+
+  return (
+    <Page Title={null} title={""} Menu={orgMenu}>
+      <Dialog open={open}>
+        <DialogContent setOpen={setOpen}>
+          <DialogHeader>
+            <DialogTitle>Create new Group</DialogTitle>
+            <DialogDescription>
+              A project groups multiple software projects (repositories) inside
+              a single enitity. Something like: frontend and backend
+            </DialogDescription>
+          </DialogHeader>
+          <hr />
+          <Form {...form}>
+            <form
+              className="space-y-8"
+              onSubmit={form.handleSubmit(handleCreateProject)}
+            >
+              <ProjectForm forceVerticalSections form={form} hideDangerZone />
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  isSubmitting={form.formState.isSubmitting}
+                >
+                  Create
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <div>
+        {activeOrg.externalEntityProviderId && (
+          <div className="flex mb-4 flex-row items-center justify-end gap-2">
+            <Button
+              size={"sm"}
+              variant={"outline"}
+              onClick={handleTriggerSync}
+              disabled={syncRunning}
+            >
+              {syncRunning ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Import of projects running</span>
+                </span>
+              ) : (
+                <span>
+                  Import projects from {activeOrg.externalEntityProviderId}
+                </span>
+              )}
+            </Button>
+          </div>
+        )}
+        <Section
+          primaryHeadline
+          Button={
+            !activeOrg.externalEntityProviderId && (
+              <Button
+                disabled={
+                  currentUserRole !== UserRole.Owner &&
+                  currentUserRole !== UserRole.Admin
+                }
+                onClick={() => setOpen(true)}
+              >
+                New Group
+              </Button>
+            )
+          }
+          description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+          forceVertical
+          title="Groups"
+        >
+          <Input
+            onChange={debouncedHandleSearch}
+            defaultValue={search}
+            placeholder="Search for projects"
+          />
+          <ListRenderer
+            isLoading={isLoading}
+            error={error}
+            data={projects?.data}
+            renderItem={(project) => (
+              <Link
+                key={project.id}
+                href={`/${activeOrg.slug}/projects/${project.slug}`}
+                className="flex flex-col gap-2 hover:no-underline"
+              >
+                <ListItem
+                  reactOnHover
+                  Title={
+                    <div className="flex flex-row items-center gap-2">
+                      <Avatar {...project} />
+                      <span>{project.name}</span>
+                    </div>
+                  }
+                  Description={
+                    <div className="flex flex-col">
+                      <span>
+                        <Markdown>{project.description}</Markdown>
+                      </span>
+                      {project.type !== "default" && (
+                        <div className="flex mt-4 flex-row items-center gap-2">
+                          <ProjectBadge type={project.type} />
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+              </Link>
+            )}
+          />
+        </Section>
+        {projects && (
+          <div className="mt-4">
+            <CustomPagination {...projects} />
+          </div>
+        )}
+      </div>
+    </Page>
+  );
+};
+
+export default OrganizationHomePage;
