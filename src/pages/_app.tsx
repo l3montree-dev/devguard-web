@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { StoreProvider } from "../zustand/globalStoreProvider";
 import NotSupported from "./notsupported";
 import useConfig from "../hooks/useConfig";
+import { config } from "../config";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -53,7 +54,7 @@ export default function App({ Component, pageProps }) {
 
 const AppTheme = ({ Component, pageProps }: any) => {
   const [isMobile, setIsMobile] = useState(false);
-  const config = useConfig();
+  const c = useConfig() as typeof config | undefined;
   useEffect(() => {
     window.innerWidth < 768 && setIsMobile(true);
 
@@ -78,7 +79,7 @@ const AppTheme = ({ Component, pageProps }: any) => {
       attribute="class"
       defaultTheme="system"
       enableSystem
-      forcedTheme={config.enforceTheme ? config.enforceTheme : undefined}
+      forcedTheme={c?.enforceTheme ? c.enforceTheme : undefined}
       disableTransitionOnChange
     >
       <TooltipProvider delayDuration={100}>
