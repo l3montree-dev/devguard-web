@@ -78,7 +78,7 @@ const AppTheme = ({ Component, pageProps }: any) => {
       attribute="class"
       defaultTheme="system"
       enableSystem
-      forcedTheme={"white"}
+      forcedTheme={config.enforceTheme ? config.enforceTheme : undefined}
       disableTransitionOnChange
     >
       <TooltipProvider delayDuration={100}>
