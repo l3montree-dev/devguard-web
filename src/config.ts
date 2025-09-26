@@ -31,4 +31,9 @@ export const config = {
   devguardCIComponentBase:
     process.env.DEVGUARD_CI_COMPONENT_BASE ||
     "https://gitlab.com/l3montree/devguard/-/raw/main",
+
+  enforceTheme: (process.env.ENFORCE_THEME || false) as
+    | "white"
+    | "dark"
+    | false,
 };

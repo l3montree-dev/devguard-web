@@ -21,6 +21,7 @@ import { Inter, Lexend, Merriweather } from "next/font/google";
 import { useEffect, useState } from "react";
 import { StoreProvider } from "../zustand/globalStoreProvider";
 import NotSupported from "./notsupported";
+import useConfig from "../hooks/useConfig";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -43,7 +44,16 @@ export const merriweather = Merriweather({
 
 // @ts-ignore
 export default function App({ Component, pageProps }) {
+  return (
+    <StoreProvider initialZustand={pageProps.initialZustand}>
+      <AppTheme Component={Component} pageProps={pageProps} />
+    </StoreProvider>
+  );
+}
+
+const AppTheme = ({ Component, pageProps }: any) => {
   const [isMobile, setIsMobile] = useState(false);
+  const config = useConfig();
   useEffect(() => {
     window.innerWidth < 768 && setIsMobile(true);
 
@@ -63,21 +73,19 @@ export default function App({ Component, pageProps }) {
       document.body.appendChild(script);
     }
   }, []);
-
   return (
     <ThemeProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
+      forcedTheme={"white"}
       disableTransitionOnChange
     >
       <TooltipProvider delayDuration={100}>
-        <StoreProvider initialZustand={pageProps.initialZustand}>
-          <div className="font-body">
-            {isMobile ? <NotSupported /> : <Component {...pageProps} />}
-          </div>
-        </StoreProvider>
+        <div className="font-body">
+          {isMobile ? <NotSupported /> : <Component {...pageProps} />}
+        </div>
       </TooltipProvider>
     </ThemeProvider>
   );
-}
+};
