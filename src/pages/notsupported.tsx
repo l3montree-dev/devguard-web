@@ -63,7 +63,7 @@ export default function NotSupported() {
               <div className="flex w-full flex-row justify-between space-x-4">
                 <a
                   className={classNames(
-                    "!text-black flex-1",
+                    "!text-primary-foreground flex-1",
                     buttonVariants({ variant: "default" }),
                   )}
                   href="https://devguard.org"

@@ -357,7 +357,7 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
                   <Link
                     className={cn(
                       buttonVariants({ variant: "default" }),
-                      "!text-black hover:no-underline",
+                      "!text-primary-foreground hover:no-underline",
                     )}
                     href={
                       `https://github.com/apps/${devguardGithubAppUrl}/installations/new?state=` +

@@ -381,7 +381,7 @@ const Index: FunctionComponent<Props> = ({
           <Link
             className={classNames(
               buttonVariants({ variant: "default" }),
-              "!text-black",
+              "!text-primary-foreground",
             )}
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
