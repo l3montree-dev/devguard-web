@@ -24,6 +24,7 @@ import Document, {
 
 import { inter, lexend, merriweather } from "@/pages/_app";
 import Script from "next/script";
+import { url } from "inspector";
 
 class MyDocument extends Document {
   render() {
@@ -61,11 +62,49 @@ MyDocument.getInitialProps = async (
   ctx: DocumentContext,
 ): Promise<DocumentInitialProps> => {
   const initialProps = await Document.getInitialProps(ctx);
+
+  const handleThemeFetch = async (url: string, type: string) => {
+    try {
+      const baseUrl = process.env.FRONTEND_URL;
+      const apiUrl = `${baseUrl}/api/theme`;
+
+      const resp = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: url,
+          type: type,
+        }),
+      });
+
+      if (resp.ok) {
+        const content = await resp.text();
+        return content;
+      } else {
+        console.error(
+          `Failed to fetch theme ${type} content via API:`,
+          resp.statusText,
+        );
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error fetching theme via API for ${url}:`, error);
+      return null;
+    }
+  };
+
   if (process.env.THEME_JS_URL) {
-    console.log("Using THEME_JS_URL from env:", process.env.THEME_JS_URL);
+    const resp = await handleThemeFetch(
+      process.env.THEME_JS_URL,
+      "application/javascript",
+    );
+    console.log("Theme JS fetch response:", resp);
   }
   if (process.env.THEME_CSS_URL) {
-    console.log("Using THEME_CSS_URL from env:", process.env.THEME_CSS_URL);
+    const resp = await handleThemeFetch(process.env.THEME_CSS_URL, "text/css");
+    console.log("Theme CSS fetch response:", resp);
   }
 
   return {
