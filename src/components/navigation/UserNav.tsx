@@ -45,7 +45,7 @@ export default function UserNav() {
   const config = useConfig();
 
   return (
-    <div className="flex flex-row justify-between gap-1">
+    <div className="flex user-nav flex-row justify-between gap-1">
       {!config.enforceTheme && (
         <DropdownMenu>
           <DropdownMenuTrigger>
