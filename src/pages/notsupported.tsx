@@ -39,20 +39,7 @@ export default function NotSupported() {
         <div className="mx-4">
           <Card className="">
             <CardHeader>
-              <CardTitle>
-                <GradientText
-                  colors={[
-                    "#FEFDF8",
-                    "#FDE9B5",
-                    "#FDD36F",
-                    "#FDDA83",
-                    "#FCBF29",
-                  ]}
-                  animationSpeed={1}
-                >
-                  No Mobile Support for Devguard
-                </GradientText>
-              </CardTitle>
+              <CardTitle>No Mobile Support for Devguard</CardTitle>
               <CardDescription>
                 We are not sure if DevGuard on Mobile makes sense - if you are
                 interested in DevGuard Mobile Support give us a heads up on our
