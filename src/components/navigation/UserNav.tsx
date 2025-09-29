@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useOrg } from "@/hooks/useOrg";
 import { classNames } from "@/utils/common";
 
 import { LogoutLink } from "@/hooks/logoutLink";
@@ -24,10 +23,8 @@ import {
   SunIcon,
 } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/compat/router";
 import Link from "next/link";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import useOrganizations from "../../hooks/useOrganizations";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button, buttonVariants } from "../ui/button";
 import {
@@ -36,40 +33,39 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useConfig } from "../../context/ConfigContext";
 
 export default function UserNav() {
-  const router = useRouter();
-
   const { setTheme } = useTheme();
 
   const user = useCurrentUser();
-  const orgs = useOrganizations();
-
-  const activeOrg = useOrg() ?? orgs[0];
   const handleLogout = LogoutLink();
+  const config = useConfig();
 
   return (
-    <div className="flex flex-row justify-between gap-1">
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <div className="flex w-10 flex-row justify-center">
-            <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 text-background transition-all dark:-rotate-90 dark:scale-0 dark:text-muted-foreground" />
-            <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 text-background transition-all dark:rotate-0 dark:scale-100 dark:text-muted-foreground" />
-            <span className="sr-only">Toggle theme</span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme("light")}>
-            Light
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
-            Dark
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")}>
-            System
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex user-nav flex-row justify-between gap-1">
+      {!config.enforceTheme && (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <div className="flex w-10 flex-row justify-center">
+              <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 text-background transition-all dark:-rotate-90 dark:scale-0 dark:text-muted-foreground" />
+              <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 text-background transition-all dark:rotate-0 dark:scale-100 dark:text-muted-foreground" />
+              <span className="sr-only">Toggle theme</span>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       {user ? (
         <DropdownMenu>
           <DropdownMenuTrigger>

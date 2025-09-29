@@ -67,6 +67,7 @@ export default async function RootLayout({
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
+            forcedTheme={config?.enforceTheme ? config.enforceTheme : undefined}
             enableSystem
             disableTransitionOnChange
           >

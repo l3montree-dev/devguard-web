@@ -210,7 +210,7 @@ const Home: FunctionComponent<Props> = ({ projects, oauth2Error }) => {
             <Link
               className={classNames(
                 buttonVariants({ variant: "default" }),
-                "!text-black",
+                "!text-primary-foreground",
               )}
               href={
                 `/api/devguard-tunnel/api/v1/oauth2/gitlab/` +
