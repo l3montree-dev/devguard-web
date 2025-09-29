@@ -2,12 +2,13 @@
 
 import { ReactNode, ComponentType, useState } from "react";
 
-export type WithUpdater<T> = T & {
+export type WithUpdater<T> = { v: T } & {
   update: (newValue: T | ((prev: T) => T)) => void;
 };
 
 export type WithoutUpdater<T> = Omit<T, "update">;
 
+export const NoopUpdater = () => {};
 interface ClientContextWrapperProps<T = any> {
   children: ReactNode;
   Provider: ComponentType<{ value: WithUpdater<T>; children: ReactNode }>;
@@ -24,7 +25,7 @@ export function ClientContextWrapper<T>({
     <Provider
       value={
         {
-          ...state,
+          v: state as T,
           update,
         } as WithUpdater<T>
       }

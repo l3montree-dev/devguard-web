@@ -11,13 +11,17 @@ const OrganizationContext = createContext<
     contentTree: ContentTreeElement[];
   }>
 >({
-  organization: null,
-  contentTree: [],
+  v: {
+    organization: null,
+    contentTree: [],
+  },
   update: () => {},
 });
 
 export const OrganizationProvider = OrganizationContext.Provider;
-export const useOrganization = () => useContext(OrganizationContext);
+export const useOrganization = () => useContext(OrganizationContext).v;
+export const useUpdateOrganization = () =>
+  useContext(OrganizationContext).update;
 
 export const isOrganization = (
   org: OrganizationDetailsDTO | { oauth2Error: boolean } | null,

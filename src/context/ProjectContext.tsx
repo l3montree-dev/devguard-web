@@ -4,7 +4,8 @@ import { AssetDTO, ProjectDTO } from "../types/api/api";
 import { WithUpdater } from "./ClientContextWrapper";
 
 const ProjectContext = createContext<
-  (ProjectDTO & { assets: AssetDTO[] }) | null
->(null);
+  WithUpdater<(ProjectDTO & { assets: AssetDTO[] }) | null>
+>({ v: null, update: () => {} });
 export const ProjectProvider = ProjectContext.Provider;
-export const useProject = () => useContext(ProjectContext);
+export const useProject = () => useContext(ProjectContext).v;
+export const useUpdateProject = () => useContext(ProjectContext).update;

@@ -13,16 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { noStoreAvailable, useStore } from "@/zustand/globalStoreProvider";
 import { useProject } from "../context/ProjectContext";
 
 export function useActiveProject() {
-  const project = useStore((s) => {
-    return s.project!;
-  });
   const projectContext = useProject();
-  if (noStoreAvailable(project)) {
-    return projectContext;
-  }
-  return project;
+  return projectContext;
 }

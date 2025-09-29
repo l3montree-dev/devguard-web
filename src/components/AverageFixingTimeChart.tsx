@@ -18,6 +18,8 @@ import {
 import { classNames } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
 import { AverageFixingTime } from "../types/api/api";
+import Loading from "./common/Loading";
+import { Loader2 } from "lucide-react";
 
 function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
@@ -49,11 +51,12 @@ function getHumanReadableDuration(seconds: number) {
 }
 
 interface Props {
-  avgFixingTime: AverageFixingTime;
+  avgFixingTime: AverageFixingTime | undefined;
   variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
   mode: "risk" | "cvss";
+  isLoading: boolean;
 }
 
 const AverageFixingTimeChart: FunctionComponent<Props> = ({
@@ -62,7 +65,26 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   description,
   variant,
   mode,
+  isLoading,
 }) => {
+  if (isLoading || !avgFixingTime) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardDescription>
+          {description}. Target Line shows 30 days.
+        </CardDescription>
+        <CardContent>
+          <div className="-mb-20 relative">
+            <Loader2 />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const seconds =
     mode === "cvss"
       ? avgFixingTime.averageFixingTimeSecondsByCvss

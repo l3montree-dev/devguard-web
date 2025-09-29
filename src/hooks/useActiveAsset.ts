@@ -12,11 +12,9 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { useStore } from "@/zustand/globalStoreProvider";
+import { useAsset } from "../context/AssetContext";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export function useActiveAsset() {
-  return useStore((s) => {
-    return s.asset;
-  });
+  return useAsset();
 }
