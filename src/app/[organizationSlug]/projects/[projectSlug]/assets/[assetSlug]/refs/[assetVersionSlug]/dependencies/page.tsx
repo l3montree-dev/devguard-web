@@ -64,7 +64,7 @@ import { useActiveProject } from "../../../../../../../../../hooks/useActiveProj
 
 import Page from "@/components/Page";
 import { Combobox } from "@/components/common/Combobox";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
 
@@ -81,6 +81,7 @@ import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
 import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -116,7 +117,12 @@ const LicenseCall = (props: {
 }) => {
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useRouter().query;
+    useParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
   const [license, setLicense] = useState(props.license.licenseId);
 
   const handleManuallyOverwriteLicenseChange = async (license: string) => {
@@ -311,7 +317,8 @@ const Index: FunctionComponent<Props> = ({
   const [showVexModal, setShowVexModal] = useState(false);
 
   const { branches, tags } = useAssetBranchesAndTags();
-  const pathname = useRouter().asPath.split("?")[0];
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [datasets, setDatasets] = useState<{
     purl: string;
@@ -348,14 +355,14 @@ const Index: FunctionComponent<Props> = ({
 
   const handleLicenseRefresh = async () => {
     const resp = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/components/licenses/refresh`,
+      `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/components/licenses/refresh`,
       {
         method: "POST",
       },
     );
     if (resp.ok) {
       toast.success("License refresh triggered");
-      router.reload();
+      router.refresh();
     } else {
       toast.error("Failed to trigger license refresh");
     }
@@ -386,9 +393,11 @@ const Index: FunctionComponent<Props> = ({
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams(
-                router.query.artifact && {
-                  artifact: router.query.artifact as string,
-                },
+                searchParams.has("artifact")
+                  ? {
+                      artifact: searchParams.get("artifact") as string,
+                    }
+                  : ({} as Record<string, string>),
               )
             }
           >
@@ -459,7 +468,7 @@ const Index: FunctionComponent<Props> = ({
           />
           <Input
             onChange={handleSearch}
-            defaultValue={router.query.search as string}
+            defaultValue={searchParams.get("search") as string}
             placeholder="Search for dependencies or versions - just start typing..."
           />
         </div>

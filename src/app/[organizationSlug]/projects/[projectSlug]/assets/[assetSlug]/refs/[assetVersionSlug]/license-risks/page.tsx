@@ -51,7 +51,9 @@ import VexDownloadModal from "../../../../../../../../../components/dependencies
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import useConfig from "../../../../../../../../../hooks/useConfig";
+import { useConfig } from "../../../../../../../../../context/ConfigContext";
+import { usePathname, useSearchParams } from "next/navigation";
+import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 
 interface Props {
   vulns: Paged<LicenseRiskDTO>;
@@ -126,7 +128,9 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetVersion = useActiveAssetVersion();
 
   const { branches, tags } = useAssetBranchesAndTags();
-  const pathname = router.asPath.split("?")[0];
+  const pathname = usePathname();
+  const push = useRouterQuery();
+  const searchParams = useSearchParams();
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -156,19 +160,17 @@ const Index: FunctionComponent<Props> = (props) => {
           />
           <Tabs
             defaultValue={
-              (router.query.state as string | undefined)
-                ? (router.query.state as string)
+              searchParams.has("state")
+                ? (searchParams.get("state") as string)
                 : "open"
             }
+            value={searchParams.get("state") ?? "open"}
           >
             <TabsList>
               <TabsTrigger
                 onClick={() =>
-                  router.push({
-                    query: {
-                      ...router.query,
-                      state: "open",
-                    },
+                  push({
+                    state: "open",
                   })
                 }
                 value="open"
@@ -177,11 +179,8 @@ const Index: FunctionComponent<Props> = (props) => {
               </TabsTrigger>
               <TabsTrigger
                 onClick={() =>
-                  router.push({
-                    query: {
-                      ...router.query,
-                      state: "closed",
-                    },
+                  push({
+                    state: "closed",
                   })
                 }
                 value="closed"
@@ -192,7 +191,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Tabs>
           <Input
             onChange={handleSearch}
-            defaultValue={router.query.search as string}
+            defaultValue={searchParams.get("search") as string}
             placeholder="Search for cve, package name, message or scanner..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">

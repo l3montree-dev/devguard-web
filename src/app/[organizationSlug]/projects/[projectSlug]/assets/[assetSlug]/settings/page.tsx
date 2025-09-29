@@ -20,9 +20,8 @@ import {
   getApiClientFromContext,
 } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
-import { useStore } from "@/zustand/globalStoreProvider";
 import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -41,7 +40,8 @@ interface Props {
 }
 
 import { InputWithButton } from "@/components/ui/input-with-button";
-import useConfig from "../../../../../../../hooks/useConfig";
+import { useUpdateAsset } from "../../../../../../../context/AssetContext";
+import { useConfig } from "../../../../../../../context/ConfigContext";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -59,9 +59,9 @@ export const generateNewSecret = (): string => {
 const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
-  const project = useActiveProject();
+  const project = useActiveProject()!;
   const asset = useActiveAsset()!;
-  const updateAsset = useStore((s) => s.updateAsset);
+  const updateAsset = useUpdateAsset();
   const router = useRouter();
   const config = useConfig();
 

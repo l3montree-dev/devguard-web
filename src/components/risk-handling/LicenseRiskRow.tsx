@@ -1,6 +1,6 @@
 // components/license-risk/LicenseRiskRow.tsx
 import { beautifyPurl, classNames } from "@/utils/common";
-import { useRouter } from "next/compat/router";
+import { usePathname, useRouter } from "next/navigation";
 import { LicenseRiskDTO } from "../../types/api/api";
 import ArtifactBadge from "../ArtifactBadge";
 import EcosystemImage from "../common/EcosystemImage";
@@ -14,13 +14,10 @@ type Props = {
 export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
   const router = useRouter();
 
+  const pathname = usePathname();
   return (
     <tr
-      onClick={() =>
-        router.push(
-          router.asPath.split("?")[0] + "/../license-risks/" + risk.id,
-        )
-      }
+      onClick={() => router.push(pathname + "/../license-risks/" + risk.id)}
       className={classNames(
         "relative cursor-pointer align-top transition-all",
         index === arrLength - 1 ? "" : "border-b",

@@ -42,37 +42,34 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
 
-import { usePathname } from "next/navigation";
 import { useRouter } from "next/compat/router";
 import { FunctionComponent, useEffect, useState } from "react";
+
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
+import { withAssetVersion } from "@/decorators/withAssetVersion";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { Loader2Icon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
-} from "../../../../../../../../../hooks/useActiveAssetVersion";
-
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { context } from "@react-three/fiber";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { set } from "lodash";
-import { Loader2Icon } from "lucide-react";
+} from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 
 const DependencyGraphPage: FunctionComponent<{
   flaws: Array<VulnDTO>;
   artifacts: ArtifactDTO[];
 }> = ({ flaws, artifacts }) => {
+  const searchParams = useSearchParams();
   const { branches, tags } = useAssetBranchesAndTags();
-
   const dimensions = useDimensions();
-
-  const router = useRouter();
 
   const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
     useState(false);
 
-  const all = router.query.all === "1";
+  const all = searchParams.get("all") === "1";
   const menu = useAssetMenu();
 
   const activeOrg = useActiveOrg();
@@ -91,8 +88,8 @@ const DependencyGraphPage: FunctionComponent<{
       const resp = await browserApiClient(
         `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion.slug}/dependency-graph/?` +
           toSearchParams({
-            artifactName: router.query.artifact as string,
-            all: router.query.all === "1" ? "1" : undefined,
+            artifactName: searchParams.get("artifact") as string,
+            all: searchParams.get("all") ? "1" : undefined,
           }),
         {
           method: "GET",
@@ -107,7 +104,7 @@ const DependencyGraphPage: FunctionComponent<{
         recursiveRemoveParent(converted);
 
         // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
-        if (router.query.all !== "1") {
+        if (searchParams.get("all") !== "1") {
           recursiveRemoveWithoutRisk(converted);
         }
 
@@ -136,7 +133,9 @@ const DependencyGraphPage: FunctionComponent<{
       }
     }
     fetchData();
-  }, [router.query, flaws, activeOrg, project, asset, assetVersion]);
+  }, [flaws, searchParams, activeOrg, project, asset, assetVersion]);
+
+  const push = useRouterQuery();
 
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Dependencies">
@@ -164,16 +163,9 @@ const DependencyGraphPage: FunctionComponent<{
                   id="allDependencies"
                   checked={all}
                   onCheckedChange={() => {
-                    router.push(
-                      {
-                        query: {
-                          ...router.query,
-                          all: all ? undefined : "1",
-                        },
-                      },
-                      undefined,
-                      { scroll: false },
-                    );
+                    push({
+                      all: all ? undefined : "1",
+                    });
                   }}
                 />
               </div>

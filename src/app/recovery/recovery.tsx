@@ -19,31 +19,34 @@ import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Flow } from "../components/kratos/Flow";
+
+import Image from "next/image";
+import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
+import { useSearchParams } from "next/navigation";
+import { handleFlowError, ory } from "../../services/ory";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { handleFlowError, ory } from "../services/ory";
-import { Button } from "../components/ui/button";
-import Image from "next/image";
-import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
+} from "../../components/ui/card";
+import { Flow } from "../../components/kratos/Flow";
+import { Button } from "../../components/ui/button";
 
 const Recovery: NextPage = () => {
   const [flow, setFlow] = useState<RecoveryFlow>();
 
   // Get ?flow=... from the URL
   const router = useRouter();
-  const { flow: flowId, return_to: returnTo } = router.query;
+  const searchParams = useSearchParams();
+  const flowId = searchParams.get("flow");
+  const returnTo = searchParams.get("return_to");
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
-    if (!router.isReady || flow) {
+    if (flow) {
       return;
     }
 
@@ -78,36 +81,36 @@ const Recovery: NextPage = () => {
 
         return Promise.reject(err);
       });
-  }, [flowId, router, router.isReady, returnTo, flow]);
+  }, [flowId, router, returnTo, flow]);
 
-  const onSubmit = (values: UpdateRecoveryFlowBody) =>
+  const onSubmit = async (values: UpdateRecoveryFlowBody) => {
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/recovery?flow=${flow?.id}`, undefined, { shallow: true })
-      .then(() =>
-        ory
-          .updateRecoveryFlow({
-            flow: String(flow?.id),
-            updateRecoveryFlowBody: values,
-          })
-          .then(({ data }) => {
-            // Form submission was successful, show the message to the user!
-            setFlow(data);
-          })
-          .catch(handleFlowError(router, "recovery", setFlow))
-          .catch((err: AxiosError) => {
-            switch (err.response?.status) {
-              case 400:
-                // Status code 400 implies the form validation had an error
-                //@ts-expect-error
-                setFlow(err.response?.data);
-                return;
-            }
+      .push(`/recovery?flow=${flow?.id}`);
 
-            throw err;
-          }),
-      );
+    ory
+      .updateRecoveryFlow({
+        flow: String(flow?.id),
+        updateRecoveryFlowBody: values,
+      })
+      .then(({ data }) => {
+        // Form submission was successful, show the message to the user!
+        setFlow(data);
+      })
+      .catch(handleFlowError(router, "recovery", setFlow))
+      .catch((err: AxiosError) => {
+        switch (err.response?.status) {
+          case 400:
+            // Status code 400 implies the form validation had an error
+            //@ts-expect-error
+            setFlow(err.response?.data);
+            return;
+        }
+
+        throw err;
+      });
+  };
 
   return (
     <>

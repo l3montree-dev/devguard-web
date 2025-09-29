@@ -41,6 +41,7 @@ import { Dialog, DialogContent } from "./ui/dialog";
 import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
 import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
+import { useUpdateOrganization } from "../context/OrganizationContext";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -81,7 +82,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
   const [tab, setTab] = React.useState<"sbom" | "sarif">("sbom");
-  const updateOrg = useStore((s) => s.updateOrganization);
+  const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
   const sbomFileRef = useRef<File | undefined>(undefined);
@@ -189,8 +190,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
   const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
 
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
+  const activeOrg = useActiveOrg()!;
+  const activeProject = useActiveProject()!;
 
   const pat = usePersonalAccessToken();
   const [timedOut, setTimedOut] = React.useState(false);
@@ -295,7 +296,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             />
             <GitLabIntegrationSlide
               org={activeOrg}
-              updateOrg={updateOrg}
+              updateOrg={(v) =>
+                updateOrg((prev) => ({ ...prev, organization: v }))
+              }
               api={api}
               selectRepoSlideIndex={4}
               prevIndex={prevIndex}

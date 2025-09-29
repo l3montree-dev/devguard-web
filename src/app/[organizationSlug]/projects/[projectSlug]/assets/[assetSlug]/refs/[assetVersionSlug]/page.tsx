@@ -1,31 +1,22 @@
-import Page from "@/components/Page";
-
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import "@xyflow/react/dist/style.css";
-import { GetServerSidePropsContext } from "next";
-
-// ...existing code...
-import { FunctionComponent } from "react";
-
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
+import Page from "@/components/Page";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
-import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
+import "@xyflow/react/dist/style.css";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { FunctionComponent, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -47,14 +38,13 @@ import { groupBy } from "lodash";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import useSWR from "swr";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
 import { AsyncButton } from "../../../../../../../../components/ui/button";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
-import { withArtifacts } from "../../../../../../../../decorators/withArtifacts";
-import { useArtifacts } from "../../../../../../../../hooks/useArtifacts";
-import { fetchAssetStats } from "../../../../../../../../services/statService";
+import { fetcher } from "../../../../../../../../hooks/useApi";
 import {
   AverageFixingTime,
   ComponentRisk,
@@ -64,8 +54,7 @@ import {
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
 import { reduceRiskHistories } from "../../../../../../../../utils/view";
-import useSWR from "swr";
-import { fetcher } from "../../../../../../../../hooks/useApi";
+import { useArtifacts } from "../../../../../../../../context/AssetVersionContext";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -81,36 +70,40 @@ interface Props {
 const Index: FunctionComponent<Props> = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const activeAsset = useActiveAsset();
+  const activeProject = useActiveProject()!;
+  const activeAsset = useActiveAsset()!;
   const assetMenu = useAssetMenu();
-  const artifacts = useArtifacts() || [];
   const router = useRouter();
+  const artifacts = useArtifacts();
   const { branches, tags } = useAssetBranchesAndTags();
 
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = useParams() as {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-    assetVersionSlug: string;
-  }
-    const selectedArtifact = (
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+  const selectedArtifact = (
     useSearchParams() as {
       artifact?: string;
     }
   ).artifact;
 
-  const {data: events} = useSWR("/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/events/?pageSize=3", fetcher)
+  const { data: events } = useSWR<Paged<VulnEventDTO>>(
+    "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/refs/" +
+      assetVersionSlug +
+      "/events/?pageSize=3",
+    fetcher,
+  );
 
-           const url =
+  const url =
     "/organizations/" +
     organizationSlug +
     "/projects/" +
@@ -120,104 +113,86 @@ const Index: FunctionComponent<Props> = () => {
     "/refs/" +
     assetVersionSlug;
 
-  const urlQueryAppendixForArtifact = artifactName
-    ? "?artifactName=" + encodeURIComponent(artifactName)
+  const urlQueryAppendixForArtifact = selectedArtifact
+    ? "?artifactName=" + encodeURIComponent(selectedArtifact)
     : "";
-  const urlAppendixForArtifact = artifactName
-    ? "&artifactName=" + encodeURIComponent(artifactName)
+  const urlAppendixForArtifact = selectedArtifact
+    ? "&artifactName=" + encodeURIComponent(selectedArtifact)
     : "";
 
-  const [
-    componentRisk,
-    riskHistoryResp,
-    avgLowFixingTime,
-    avgMediumFixingTime,
-    avgHighFixingTime,
-    avgCriticalFixingTime,
-    licenses,
-    events,
-  ] = await Promise.all([
-    apiClient(
+  const { data: componentRisk, isLoading: componentRiskLoading } =
+    useSWR<ComponentRisk>(
       url + "/stats/component-risk/" + urlQueryAppendixForArtifact,
-    ).then((r) => r.json()),
-    apiClient(
-      url +
-        "/stats/risk-history/?start=" +
-        extractDateOnly(last3Month) +
-        "&end=" +
-        extractDateOnly(new Date()) +
-        urlAppendixForArtifact,
-    ),
-    apiClient(
+      fetcher,
+    );
+  const { data: riskHistoryResp, isLoading: riskHistoryLoading } = useSWR<
+    RiskHistory[]
+  >(
+    url +
+      "/stats/risk-history/?start=" +
+      extractDateOnly(last3Month) +
+      "&end=" +
+      extractDateOnly(new Date()) +
+      urlAppendixForArtifact,
+    fetcher,
+  );
+
+  const { data: avgLowFixingTime, isLoading: avgLowFixingTimeLoading } =
+    useSWR<AverageFixingTime>(
       url + "/stats/average-fixing-time/?severity=low" + urlAppendixForArtifact,
-    ).then((r) => r.json()),
-    apiClient(
+      fetcher,
+    );
+  const { data: avgMediumFixingTime, isLoading: avgMediumFixingTimeLoading } =
+    useSWR<AverageFixingTime>(
       url +
         "/stats/average-fixing-time/?severity=medium" +
         urlAppendixForArtifact,
-    ).then((r) => r.json()),
-    apiClient(
+      fetcher,
+    );
+  const { data: avgHighFixingTime, isLoading: avgHighFixingTimeLoading } =
+    useSWR<AverageFixingTime>(
       url +
         "/stats/average-fixing-time/?severity=high" +
         urlAppendixForArtifact,
-    ).then((r) => r.json()),
-    apiClient(
-      url +
-        "/stats/average-fixing-time/?severity=critical" +
-        urlAppendixForArtifact,
-    ).then((r) => r.json()),
-    apiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/components/licenses/" +
-        urlQueryAppendixForArtifact,
-    ).then((r) => r.json() as Promise<LicenseResponse[]>),
-    apiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/events/?pageSize=4" +
-        urlAppendixForArtifact,
-    ).then((r) => r.json()),
-  ]);
+      fetcher,
+    );
+  const {
+    data: avgCriticalFixingTime,
+    isLoading: avgCriticalFixingTimeLoading,
+  } = useSWR<AverageFixingTime>(
+    url +
+      "/stats/average-fixing-time/?severity=critical" +
+      urlAppendixForArtifact,
+    fetcher,
+  );
 
+  const { data: licenses, isLoading: licenseLoading } = useSWR<
+    LicenseResponse[]
+  >(
+    "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/refs/" +
+      assetVersionSlug +
+      "/components/licenses/" +
+      urlQueryAppendixForArtifact,
+    fetcher,
+  );
 
-
-
-    const groups = groupBy(riskHistory, "day");
+  const riskHistory = useMemo(() => {
+    const groups = groupBy(riskHistoryResp, "day");
     const days = Object.keys(groups).sort();
     const completeRiskHistory: RiskHistory[][] = days.map((day) => {
       return groups[day];
     });
-
-    return {
-      props: {
-        componentRisk,
-        riskHistory: reduceRiskHistories(completeRiskHistory),
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
-        licenses,
-        events,
-      },
-    };
-  },
+    return reduceRiskHistories(completeRiskHistory);
+  }, [riskHistoryResp]);
 
   const project = activeProject;
   const asset = activeAsset;
-
 
   const pathname = usePathname();
 
@@ -353,7 +328,11 @@ const Index: FunctionComponent<Props> = () => {
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
-              <VulnerableComponents mode={mode} data={componentRisk} />
+              <VulnerableComponents
+                isLoading={componentRiskLoading}
+                mode={mode}
+                data={componentRisk}
+              />
               <div className="col-span-2 flex flex-col">
                 <Card>
                   <CardHeader>
@@ -362,7 +341,7 @@ const Index: FunctionComponent<Props> = () => {
                       <Link
                         href={
                           asset
-                            ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/dependencies`
+                            ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/dependencies`
                             : "#"
                         }
                         className="absolute right-0 top-0 text-xs !text-muted-foreground"
@@ -421,6 +400,7 @@ const Index: FunctionComponent<Props> = () => {
                   variant="critical"
                   title="Avg. remediation time"
                   description="Time for critical severity vulnerabilities"
+                  isLoading={avgCriticalFixingTimeLoading}
                   avgFixingTime={avgCriticalFixingTime}
                 />
 
@@ -430,6 +410,7 @@ const Index: FunctionComponent<Props> = () => {
                   title="Avg. remediation time"
                   description="Time for high severity vulnerabilities"
                   avgFixingTime={avgHighFixingTime}
+                  isLoading={avgHighFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -438,6 +419,7 @@ const Index: FunctionComponent<Props> = () => {
                   title="Avg. remediation time"
                   description="Time for medium severity vulnerabilities"
                   avgFixingTime={avgMediumFixingTime}
+                  isLoading={avgMediumFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -446,6 +428,7 @@ const Index: FunctionComponent<Props> = () => {
                   title="Avg. remediation time"
                   description="Time for low severity vulnerabilities"
                   avgFixingTime={avgLowFixingTime}
+                  isLoading={avgLowFixingTimeLoading}
                 />
               </div>
               <Card className="col-span-4 flex flex-col">
@@ -455,7 +438,7 @@ const Index: FunctionComponent<Props> = () => {
                     <Link
                       href={
                         asset
-                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${router.query.assetVersionSlug}/events`
+                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/events`
                           : "#"
                       }
                       className="absolute right-0 top-0 text-xs !text-muted-foreground"
@@ -474,7 +457,8 @@ const Index: FunctionComponent<Props> = () => {
                       role="list"
                     >
                       <div className="absolute left-3 h-full border-l border-r bg-secondary" />
-                      {events.data.map((event, index, events) => {
+
+                      {events?.data.map((event, index, events) => {
                         return (
                           <VulnEventItem
                             key={event.id}
@@ -496,3 +480,7 @@ const Index: FunctionComponent<Props> = () => {
   );
 };
 export default Index;
+
+const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
+const last3Month = new Date();
+last3Month.setMonth(last3Month.getMonth() - 3);

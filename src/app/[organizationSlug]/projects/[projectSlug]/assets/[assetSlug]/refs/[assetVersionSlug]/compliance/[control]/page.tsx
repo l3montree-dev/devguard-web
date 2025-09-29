@@ -21,25 +21,25 @@ import { withContentTree } from "@/decorators/withContentTree";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { TriangleAlert, XIcon } from "lucide-react";
-import ColoredBadge from "../../../../../../../../../components/common/ColoredBadge";
+import usePersonalAccessToken from "../../../../../../../../../../hooks/usePersonalAccessToken";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../../../../../../../../../../components/ui/collapsible";
 import CopyCode, {
   CopyCodeFragment,
-} from "../../../../../../../../../components/common/CopyCode";
-import PatSection from "../../../../../../../../../components/PatSection";
+} from "../../../../../../../../../../components/common/CopyCode";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../../../../../../../components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../../../../../../../../components/ui/collapsible";
-import usePersonalAccessToken from "../../../../../../../../../hooks/usePersonalAccessToken";
-import { violationLengthToLevel } from "../../../../../../../../../app/[organizationSlug]/projects/[projectSlug]/compliance/compliance";
+} from "../../../../../../../../../../components/ui/card";
+import ColoredBadge from "../../../../../../../../../../components/common/ColoredBadge";
+import { violationLengthToLevel } from "../../../../../../compliance/compliance";
+import PatSection from "../../../../../../../../../../components/PatSection";
 
 interface Props {
   policyDetails: PolicyEvaluation;

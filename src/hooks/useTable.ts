@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { debounce } from "lodash";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import useFilter from "./useFilter";
 

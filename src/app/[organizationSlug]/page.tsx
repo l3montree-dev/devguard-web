@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FunctionComponent,
   useCallback,
@@ -47,7 +47,6 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/common/CustomPagination";
-import EmptyList from "@/components/common/EmptyList";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Input } from "@/components/ui/input";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
@@ -57,12 +56,11 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import Avatar from "../../components/Avatar";
-import EmptyParty from "../../components/common/EmptyParty";
+import ListRenderer from "../../components/common/ListRenderer";
 import Markdown from "../../components/common/Markdown";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
 import { fetcher } from "../../hooks/useApi";
-import { classNames } from "../../utils/common";
-import ListRenderer from "../../components/common/ListRenderer";
+import EmptyParty from "../../components/common/EmptyParty";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -265,6 +263,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             isLoading={isLoading}
             error={error}
             data={projects?.data}
+            Empty={<EmptyParty title={"No groups found"} description="" />}
             renderItem={(project) => (
               <Link
                 key={project.id}

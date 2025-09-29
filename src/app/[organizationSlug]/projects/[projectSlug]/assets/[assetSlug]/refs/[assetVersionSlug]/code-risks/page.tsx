@@ -2,9 +2,6 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { middleware } from "@/decorators/middleware";
 import { withAsset } from "@/decorators/withAsset";
 import { withProject } from "@/decorators/withProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
@@ -43,7 +40,9 @@ import RiskScannerDialog from "../../../../../../../../../components/RiskScanner
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
 import { defaultScanner } from "../../../../../../../../../utils/view";
-import useConfig from "../../../../../../../../../hooks/useConfig";
+import { usePathname, useSearchParams } from "next/navigation";
+import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
+import { useConfig } from "../../../../../../../../../context/ConfigContext";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -98,6 +97,9 @@ const Index: FunctionComponent<Props> = (props) => {
 
   const { branches, tags } = useAssetBranchesAndTags();
 
+  const params = useSearchParams();
+  const pathname = usePathname();
+  const push = useRouterQuery();
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
@@ -116,19 +118,14 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="relative flex flex-row gap-2">
           <Tabs
             defaultValue={
-              (router.query.state as string | undefined)
-                ? (router.query.state as string)
-                : "open"
+              params.has("state") ? (params.get("state") as string) : "open"
             }
           >
             <TabsList>
               <TabsTrigger
                 onClick={() =>
-                  router.push({
-                    query: {
-                      ...router.query,
-                      state: "open",
-                    },
+                  push({
+                    state: "open",
                   })
                 }
                 value="open"
@@ -137,11 +134,8 @@ const Index: FunctionComponent<Props> = (props) => {
               </TabsTrigger>
               <TabsTrigger
                 onClick={() =>
-                  router.push({
-                    query: {
-                      ...router.query,
-                      state: "closed",
-                    },
+                  push({
+                    state: "closed",
                   })
                 }
                 value="closed"
@@ -152,7 +146,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Tabs>
           <Input
             onChange={handleSearch}
-            defaultValue={router.query.search as string}
+            defaultValue={params.get("search") ?? ""}
             placeholder="Search for filename, message or scanner..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
@@ -211,9 +205,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     {table.getRowModel().rows.map((row, i, arr) => (
                       <tr
                         onClick={() =>
-                          router.push(
-                            router.asPath.split("?")[0] + "/" + row.original.id,
-                          )
+                          router?.push(pathname + "/" + row.original.id)
                         }
                         className={classNames(
                           "relative cursor-pointer align-top transition-all",

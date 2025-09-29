@@ -94,6 +94,9 @@ import CopyCode from "@/components/common/CopyCode";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import ArtifactBadge from "../../../../../../../../../../components/ArtifactBadge";
 import DependencyGraph from "../../../../../../../../../../components/DependencyGraph";
+import useSWR from "swr";
+import { fetcher } from "../../../../../../../../../../hooks/useApi";
+import { usePathname } from "next/navigation";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -392,6 +395,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
 
 const Index: FunctionComponent<Props> = (props) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
   useEffect(() => {
     setVuln(props.vuln);
@@ -399,7 +403,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const cve = vuln.cve;
 
   const activeOrg = useActiveOrg();
-  const project = useActiveProject();
+  const project = useActiveProject()!;
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
@@ -412,25 +416,11 @@ const Index: FunctionComponent<Props> = (props) => {
   const [selectedOption, setSelectedOption] = useState<string>(
     Object.keys(vexOptionMessages)[2],
   );
-  const [graphData, setGraphData] = useState<any>(null);
 
-  useEffect(() => {
-    (async () => {
-      const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(props.vuln.componentPurl)}`,
-        {
-          method: "GET",
-        },
-      );
-
-      if (resp.ok) {
-        const json2 = await resp.json();
-        setGraphData(json2);
-      } else {
-        toast.error("Could not fetch Graph Data from Endpoint");
-      }
-    })();
-  }, [props.vuln.componentPurl, activeOrg.slug, asset?.slug, project.slug]);
+  const { data: graphData, isLoading: graphLoading } = useSWR<any>(
+    `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(props.vuln.componentPurl)}`,
+    fetcher,
+  );
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -1106,7 +1096,7 @@ const Index: FunctionComponent<Props> = (props) => {
                             <Link
                               className={buttonVariants({ variant: "outline" })}
                               href={
-                                router.asPath +
+                                pathname +
                                 "/../../dependencies/graph?pkg=" +
                                 vuln.componentPurl +
                                 "&artifact=" +

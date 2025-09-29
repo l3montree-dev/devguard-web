@@ -36,6 +36,7 @@ import SkeletonListItems from "../../../components/common/SkeletonListItems";
 import Err from "../../../components/common/Err";
 import ListRenderer from "../../../components/common/ListRenderer";
 import { title } from "process";
+import EmptyParty from "../../../components/common/EmptyParty";
 
 interface Props {
   policies: Policy[];
@@ -228,6 +229,12 @@ const ComplianceIndex: FunctionComponent<Props> = () => {
               isLoading={isLoading}
               error={error}
               data={policies}
+              Empty={
+                <EmptyParty
+                  title="No Policies"
+                  description="Create a new policy to get started."
+                />
+              }
               renderItem={(policy) => (
                 <PolicyListItem
                   onPolicyDelete={handlePolicyDelete}
