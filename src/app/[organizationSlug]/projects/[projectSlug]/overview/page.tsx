@@ -48,6 +48,7 @@ import {
 } from "../../../../../types/api/api";
 import { beautifyPurl, classNames } from "../../../../../utils/common";
 import { normalizeContentTree } from "../../../../../zustand/globalStore";
+import { reduceRiskHistories } from "../../../../../utils/view";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -446,40 +447,6 @@ const OverviewPage = () => {
       </Section>
     </Page>
   );
-};
-
-const reduceRiskHistories = (
-  histories: RiskHistory[][],
-): Array<ReleaseRiskHistory> => {
-  return histories.map((dayHistories) => {
-    return dayHistories.reduce(
-      (acc, curr) => {
-        acc.low += curr.low;
-        acc.medium += curr.medium;
-        acc.high += curr.high;
-        acc.critical += curr.critical;
-        acc.lowCvss += curr.lowCvss;
-        acc.mediumCvss += curr.mediumCvss;
-        acc.highCvss += curr.highCvss;
-        acc.criticalCvss += curr.criticalCvss;
-        return acc;
-      },
-      {
-        id: dayHistories[0]?.id || "",
-        day: dayHistories[0]?.day || new Date(),
-        assetId: dayHistories[0]?.assetId || "",
-        artifactName: dayHistories[0]?.artifactName || "",
-        low: 0,
-        medium: 0,
-        high: 0,
-        critical: 0,
-        lowCvss: 0,
-        mediumCvss: 0,
-        highCvss: 0,
-        criticalCvss: 0,
-      } as RiskHistory,
-    );
-  });
 };
 
 export default OverviewPage;

@@ -16,6 +16,8 @@ import {
   AssetDTO,
   OrganizationDetailsDTO,
   ProjectDTO,
+  ReleaseRiskHistory,
+  RiskHistory,
   VulnEventDTO,
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
@@ -283,4 +285,38 @@ export const generateColor = (str: string) => {
   const hash = Math.abs(hashCode(str));
 
   return colors[hash % colors.length];
+};
+
+export const reduceRiskHistories = (
+  histories: RiskHistory[][],
+): Array<ReleaseRiskHistory> => {
+  return histories.map((dayHistories) => {
+    return dayHistories.reduce(
+      (acc, curr) => {
+        acc.low += curr.low;
+        acc.medium += curr.medium;
+        acc.high += curr.high;
+        acc.critical += curr.critical;
+        acc.lowCvss += curr.lowCvss;
+        acc.mediumCvss += curr.mediumCvss;
+        acc.highCvss += curr.highCvss;
+        acc.criticalCvss += curr.criticalCvss;
+        return acc;
+      },
+      {
+        id: dayHistories[0]?.id || "",
+        day: dayHistories[0]?.day || new Date(),
+        assetId: dayHistories[0]?.assetId || "",
+        artifactName: dayHistories[0]?.artifactName || "",
+        low: 0,
+        medium: 0,
+        high: 0,
+        critical: 0,
+        lowCvss: 0,
+        mediumCvss: 0,
+        highCvss: 0,
+        criticalCvss: 0,
+      } as RiskHistory,
+    );
+  });
 };

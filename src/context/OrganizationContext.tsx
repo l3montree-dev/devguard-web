@@ -20,6 +20,7 @@ const OrganizationContext = createContext<
 
 export const OrganizationProvider = OrganizationContext.Provider;
 export const useOrganization = () => useContext(OrganizationContext).v;
+
 export const useUpdateOrganization = () =>
   useContext(OrganizationContext).update;
 

@@ -25,7 +25,7 @@ import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { withContentTree } from "@/decorators/withContentTree";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useViewMode } from "@/hooks/useViewMode";
-import { useRouter } from "next/compat/router";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -63,7 +63,9 @@ import {
   RiskHistory,
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
-import { reduceRiskHistories } from "../../../../_overview";
+import { reduceRiskHistories } from "../../../../../../../../utils/view";
+import useSWR from "swr";
+import { fetcher } from "../../../../../../../../hooks/useApi";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -76,16 +78,7 @@ interface Props {
   events: Paged<VulnEventDTO>;
 }
 
-const Index: FunctionComponent<Props> = ({
-  componentRisk,
-  riskHistory,
-  avgLowFixingTime,
-  avgMediumFixingTime,
-  avgHighFixingTime,
-  avgCriticalFixingTime,
-  licenses,
-  events,
-}) => {
+const Index: FunctionComponent<Props> = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
@@ -95,12 +88,138 @@ const Index: FunctionComponent<Props> = ({
   const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
 
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = useParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  }
+    const selectedArtifact = (
+    useSearchParams() as {
+      artifact?: string;
+    }
+  ).artifact;
+
+  const {data: events} = useSWR("/organizations/" +
+          organizationSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/events/?pageSize=3", fetcher)
+
+           const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/refs/" +
+    assetVersionSlug;
+
+  const urlQueryAppendixForArtifact = artifactName
+    ? "?artifactName=" + encodeURIComponent(artifactName)
+    : "";
+  const urlAppendixForArtifact = artifactName
+    ? "&artifactName=" + encodeURIComponent(artifactName)
+    : "";
+
+  const [
+    componentRisk,
+    riskHistoryResp,
+    avgLowFixingTime,
+    avgMediumFixingTime,
+    avgHighFixingTime,
+    avgCriticalFixingTime,
+    licenses,
+    events,
+  ] = await Promise.all([
+    apiClient(
+      url + "/stats/component-risk/" + urlQueryAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/risk-history/?start=" +
+        extractDateOnly(last3Month) +
+        "&end=" +
+        extractDateOnly(new Date()) +
+        urlAppendixForArtifact,
+    ),
+    apiClient(
+      url + "/stats/average-fixing-time/?severity=low" + urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=medium" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=high" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      url +
+        "/stats/average-fixing-time/?severity=critical" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+    apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/components/licenses/" +
+        urlQueryAppendixForArtifact,
+    ).then((r) => r.json() as Promise<LicenseResponse[]>),
+    apiClient(
+      "/organizations/" +
+        organizationSlug +
+        "/projects/" +
+        projectSlug +
+        "/assets/" +
+        assetSlug +
+        "/refs/" +
+        assetVersionSlug +
+        "/events/?pageSize=4" +
+        urlAppendixForArtifact,
+    ).then((r) => r.json()),
+  ]);
+
+
+
+
+    const groups = groupBy(riskHistory, "day");
+    const days = Object.keys(groups).sort();
+    const completeRiskHistory: RiskHistory[][] = days.map((day) => {
+      return groups[day];
+    });
+
+    return {
+      props: {
+        componentRisk,
+        riskHistory: reduceRiskHistories(completeRiskHistory),
+        avgLowFixingTime,
+        avgMediumFixingTime,
+        avgHighFixingTime,
+        avgCriticalFixingTime,
+        licenses,
+        events,
+      },
+    };
+  },
+
   const project = activeProject;
   const asset = activeAsset;
 
-  const selectedArtifact = router.query.artifact as string;
 
-  const pathname = useRouter().asPath.split("?")[0];
+  const pathname = usePathname();
 
   const downloadPdfReport = async () => {
     try {
@@ -151,13 +270,13 @@ const Index: FunctionComponent<Props> = ({
 
         <div className="flex relative flex-col">
           <AsyncButton
-            disabled={router.query.artifact === undefined}
+            disabled={selectedArtifact === undefined}
             onClick={downloadPdfReport}
             variant={"secondary"}
           >
             Download PDF-Report
           </AsyncButton>
-          {!Boolean(router.query.artifact) && (
+          {!Boolean(selectedArtifact) && (
             <small className="mt-1 absolute right-0 text-right top-full w-52 text-muted-foreground">
               Select an artifact to include it in the report.
             </small>
@@ -377,103 +496,3 @@ const Index: FunctionComponent<Props> = ({
   );
 };
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (
-    context: GetServerSidePropsContext,
-    { artifacts },
-  ): Promise<{ props: Props }> => {
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-    const apiClient = getApiClientFromContext(context);
-
-    if (!artifacts || artifacts.length === 0) {
-      const events = await apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/events/?pageSize=3",
-      ).then((r) => r.json());
-      return {
-        props: {
-          componentRisk: {},
-          avgCriticalFixingTime: {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          },
-          avgHighFixingTime: {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          },
-          avgMediumFixingTime: {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          },
-          avgLowFixingTime: {
-            averageFixingTimeSeconds: 0,
-            averageFixingTimeSecondsByCvss: 0,
-          },
-          events,
-          riskHistory: [],
-          licenses: [],
-        },
-      };
-    }
-
-    const {
-      componentRisk,
-      riskHistory,
-      avgLowFixingTime,
-      avgMediumFixingTime,
-      avgHighFixingTime,
-      avgCriticalFixingTime,
-      licenses,
-      events,
-    } = await fetchAssetStats({
-      organizationSlug: organizationSlug as string,
-      projectSlug: projectSlug as string,
-      assetSlug: assetSlug as string,
-      assetVersionSlug: assetVersionSlug as string,
-      apiClient,
-      context,
-      // get artifact name from query params if available else undefined
-      artifactName: context.query.artifact
-        ? (context.query.artifact as string)
-        : undefined,
-    });
-
-    const groups = groupBy(riskHistory, "day");
-    const days = Object.keys(groups).sort();
-    const completeRiskHistory: RiskHistory[][] = days.map((day) => {
-      return groups[day];
-    });
-
-    return {
-      props: {
-        componentRisk,
-        riskHistory: reduceRiskHistories(completeRiskHistory),
-        avgLowFixingTime,
-        avgMediumFixingTime,
-        avgHighFixingTime,
-        avgCriticalFixingTime,
-        licenses,
-        events,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    assetVersion: withAssetVersion,
-    contentTree: withContentTree,
-    artifacts: withArtifacts,
-  },
-);
