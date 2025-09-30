@@ -267,28 +267,6 @@ const Registration = () => {
                       }}
                       flow={flow as LoginFlow}
                     />
-                    <div className="flex items-start gap-2 mt-4 flex-row">
-                      <Checkbox
-                        onCheckedChange={(v) =>
-                          setOidcTermsOfUseAgreed(Boolean(v))
-                        }
-                      />
-                      <span className="text-sm leading-4  block font-medium">
-                        I agree to the{" "}
-                        <a target="_blank" href={termsOfUseLink}>
-                          terms of use
-                        </a>{" "}
-                        and the{" "}
-                        <a
-                          target="_blank"
-                          className="whitespace-nowrap"
-                          href={privacyPolicyLink}
-                        >
-                          privacy policy
-                        </a>
-                        .
-                      </span>
-                    </div>
                   </div>
                 )}
               </CardContent>
