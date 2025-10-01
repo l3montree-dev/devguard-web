@@ -1,10 +1,9 @@
+"use client";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
-
 import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
-
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -37,7 +36,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch } from "lucide-react";
+import { ChevronDownIcon, GitBranch, Loader2 } from "lucide-react";
 import Link from "next/link";
 import DateString from "../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../components/common/SortingCaret";
@@ -49,13 +48,11 @@ import {
 } from "../../../../../../../../../components/ui/button";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../hooks/useActiveProject";
-
 import Page from "@/components/Page";
 import { Combobox } from "@/components/common/Combobox";
 import { useRouter } from "next/navigation";
 import DependencyDialog from "../../../../../../../../../components/DependencyDialog";
 import OpenSsfScore from "../../../../../../../../../components/common/OpenSsfScore";
-
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
@@ -75,12 +72,7 @@ import { fetcher } from "../../../../../../../../../hooks/useApi";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
-
-interface Props {
-  components: Paged<ComponentPaged & { license: LicenseResponse }>;
-  licenses: LicenseResponse[];
-  artifacts: ArtifactDTO[];
-}
+import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -357,7 +349,7 @@ const Index: FunctionComponent = () => {
     [updateQueryParams],
   );
 
-  const { data: components } = useSWR<Paged<ComponentPaged>>(
+  const { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
     url + "?" + params.toString(),
     fetcher,
     {
@@ -369,7 +361,9 @@ const Index: FunctionComponent = () => {
       },
     },
   );
-  const { data: licenses } = useSWR<LicenseResponse[]>(
+  const { data: licenses, isLoading: licensesLoading } = useSWR<
+    LicenseResponse[]
+  >(
     url +
       "/licenses" +
       (searchParams?.has("artifact")
@@ -506,49 +500,56 @@ const Index: FunctionComponent = () => {
         Button={
           <div className="w-1/3">
             <span className="text-xs text-muted-foreground">Licenses</span>
-            <span>
-              <span className="flex flex-row overflow-hidden rounded-full">
-                {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
-                  <span
-                    key={el.license.licenseId}
-                    className={classNames(
-                      "h-2",
-                      i === arr.length - 1 ? "" : "border-r",
-                    )}
-                    style={{
-                      width: percent + "%",
-                      backgroundColor:
-                        osiLicenseHexColors[el.license.licenseId] || "#eeeeee",
-                    }}
-                  />
-                ))}
-              </span>
-              <span className="mt-2 flex flex-row flex-wrap gap-2">
-                {licenseToPercentMapEntries
-                  .filter((el) => el[1] > 0.5)
-                  .map(([el, percent]) => (
-                    <span
-                      className="whitespace-nowrap text-xs capitalize"
-                      key={el.license.licenseId}
-                    >
+            {licensesLoading ? (
+              <Skeleton className="w-full h-20" />
+            ) : (
+              <>
+                <span>
+                  <span className="flex flex-row overflow-hidden rounded-full">
+                    {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
                       <span
+                        key={el.license.licenseId}
+                        className={classNames(
+                          "h-2",
+                          i === arr.length - 1 ? "" : "border-r",
+                        )}
                         style={{
+                          width: percent + "%",
                           backgroundColor:
-                            osiLicenseHexColors[el.license.licenseId] ??
+                            osiLicenseHexColors[el.license.licenseId] ||
                             "#eeeeee",
                         }}
-                        className={classNames(
-                          "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
-                        )}
                       />
-                      {el.license.licenseId}{" "}
-                      <span className="text-muted-foreground">
-                        {Math.round(percent as number)}%
-                      </span>
-                    </span>
-                  ))}
-              </span>
-            </span>
+                    ))}
+                  </span>
+                  <span className="mt-2 flex flex-row flex-wrap gap-2">
+                    {licenseToPercentMapEntries
+                      .filter((el) => el[1] > 0.5)
+                      .map(([el, percent]) => (
+                        <span
+                          className="whitespace-nowrap text-xs capitalize"
+                          key={el.license.licenseId}
+                        >
+                          <span
+                            style={{
+                              backgroundColor:
+                                osiLicenseHexColors[el.license.licenseId] ??
+                                "#eeeeee",
+                            }}
+                            className={classNames(
+                              "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
+                            )}
+                          />
+                          {el.license.licenseId}{" "}
+                          <span className="text-muted-foreground">
+                            {Math.round(percent as number)}%
+                          </span>
+                        </span>
+                      ))}
+                  </span>
+                </span>
+              </>
+            )}
           </div>
         }
       >
@@ -562,6 +563,11 @@ const Index: FunctionComponent = () => {
             defaultValue={searchParams?.get("search") as string}
             placeholder="Search for dependencies or versions - just start typing..."
           />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+            {isLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -592,6 +598,36 @@ const Index: FunctionComponent = () => {
             </thead>
 
             <tbody>
+              {isLoading &&
+                Array.from(Array(10).keys()).map((el, i, arr) => (
+                  <tr
+                    className={classNames(
+                      "relative cursor-pointer align-top transition-all",
+                      i === arr.length - 1 ? "" : "border-b",
+                      i % 2 !== 0 && "bg-card/50",
+                    )}
+                    key={el}
+                  >
+                    <td className="p-4">
+                      <Skeleton className="w-2/3 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-full h-[40px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                  </tr>
+                ))}
               {table.getRowModel().rows.map((row, index, arr) => (
                 <tr
                   onClick={() => dataPassthrough(row.original)}

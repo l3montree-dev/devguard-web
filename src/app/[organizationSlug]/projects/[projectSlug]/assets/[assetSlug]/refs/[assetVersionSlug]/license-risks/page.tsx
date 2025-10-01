@@ -1,3 +1,4 @@
+"use client";
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
@@ -8,10 +9,8 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
-
-import { beautifyPurl } from "@/utils/common";
-
+import { FunctionComponent, useMemo, useState } from "react";
+import { beautifyPurl, classNames } from "@/utils/common";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -33,7 +32,6 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
-import { debounce } from "lodash";
 import { CircleHelp, Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
@@ -45,8 +43,10 @@ import { useArtifacts } from "../../../../../../../../../context/AssetVersionCon
 import { useConfig } from "../../../../../../../../../context/ConfigContext";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
 import { fetcher } from "../../../../../../../../../hooks/useApi";
+import useDebouncedQuerySearch from "../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
+import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 
 interface Props {
   vulns: Paged<LicenseRiskDTO>;
@@ -146,14 +146,7 @@ const Index: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const handleSearch = useMemo(
-    () =>
-      debounce((v: ChangeEvent<HTMLInputElement>) => {
-        query.set("search", v.currentTarget.value);
-        return new URLSearchParams(query);
-      }, 500),
-    [query],
-  );
+  const handleSearch = useDebouncedQuerySearch();
 
   const {
     data: vulns,
@@ -263,9 +256,7 @@ const Index: FunctionComponent = () => {
             title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           />
-          <div className="mt-4">
-            <CustomPagination {...vulns!} />
-          </div>
+          <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       ) : (
         <div>
@@ -300,12 +291,12 @@ const Index: FunctionComponent = () => {
                                   <CircleHelp className=" w-4 h-4 text-gray-500" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <div className="relative ">
+                                  <div className="relative font-normal">
                                     Risk Value is a context-aware score that
                                     adjusts the CVSS by factoring in real-world
                                     exploitability and system relevance. It
                                     reflects the{" "}
-                                    <span className=" font-bold">
+                                    <span className="font-bold">
                                       actual risk a vulnerability poses
                                     </span>
                                     , not just its theoretical severity.
@@ -323,6 +314,30 @@ const Index: FunctionComponent = () => {
                   ))}
                 </thead>
                 <tbody className="text-sm text-foreground">
+                  {isLoading &&
+                    Array.from(Array(10).keys()).map((el, i, arr) => (
+                      <tr
+                        className={classNames(
+                          "relative cursor-pointer align-top transition-all",
+                          i === arr.length - 1 ? "" : "border-b",
+                          i % 2 !== 0 && "bg-card/50",
+                        )}
+                        key={el}
+                      >
+                        <td className="p-4">
+                          <Skeleton className="w-2/3 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-full h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-2/3 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-1/2 h-[20px]" />
+                        </td>
+                      </tr>
+                    ))}
                   {table.getRowModel().rows.map((row, i, arr) => (
                     <LicenseRiskRow
                       key={row.original.id}

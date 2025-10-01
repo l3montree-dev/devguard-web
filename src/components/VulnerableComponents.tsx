@@ -84,7 +84,7 @@ export function VulnerableComponents({
       <CardContent>
         <div className="flex -mt-4 flex-col">
           {isLoading
-            ? [0, 1, 2, 3, 4].map((_, i, arr) => (
+            ? Array.from(Array(5).keys()).map((_, i, arr) => (
                 <Skeleton
                   className={classNames(
                     "h-[46px]",

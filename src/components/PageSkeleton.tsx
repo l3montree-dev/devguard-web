@@ -23,7 +23,7 @@ const PageSkeleton = () => {
           </div>
 
           <div className="flex mt-4 -mb-8 flex-row items-end gap-6 text-sm">
-            {[0, 1, 2, 3, 4].map((el) => (
+            {Array.from(Array(5).keys()).map((el) => (
               <Skeleton className="w-[100px] h-[20px]" key={el} />
             ))}
           </div>
@@ -41,7 +41,7 @@ const PageSkeleton = () => {
       <div className="bg-footer">
         <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-footer-foreground lg:px-8">
           <div className="mb-2 flex flex-row gap-5">
-            {[0, 1, 2, 3, 4].map((el) => (
+            {Array.from(Array(5).keys()).map((el) => (
               <Skeleton key={el} />
             ))}
           </div>

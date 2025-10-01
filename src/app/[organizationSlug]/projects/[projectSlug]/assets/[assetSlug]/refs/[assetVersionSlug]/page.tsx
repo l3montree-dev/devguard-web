@@ -360,7 +360,7 @@ const Index: FunctionComponent<Props> = () => {
                   <CardContent>
                     <div className="flex -mt-4 flex-col">
                       {licenseLoading
-                        ? [0, 1, 2, 3, 4].map((_, i, arr) => (
+                        ? Array.from(Array(5).keys()).map((_, i, arr) => (
                             <Skeleton
                               className={classNames(
                                 "h-[46px]",
@@ -477,7 +477,7 @@ const Index: FunctionComponent<Props> = () => {
                       <div className="absolute left-3 h-full border-l border-r bg-secondary" />
 
                       {eventsLoading
-                        ? [0, 1, 2, 3].map((el) => (
+                        ? Array.from(Array(4).keys()).map((el) => (
                             <Skeleton key={el} className="w-full h-20" />
                           ))
                         : events?.data.map((event, index, events) => {

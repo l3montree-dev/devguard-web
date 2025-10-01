@@ -1,7 +1,6 @@
+"use client";
+
 import SortingCaret from "@/components/common/SortingCaret";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
@@ -11,13 +10,9 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/compat/router";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/devGuardApi";
 import { classNames } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -28,21 +23,22 @@ import Section from "@/components/common/Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
-import { buildFilterQuery, buildFilterSearchParams } from "@/utils/url";
-import { Loader2 } from "lucide-react";
+import { buildFilterSearchParams } from "@/utils/url";
+import { usePathname, useSearchParams } from "next/navigation";
+import useSWR from "swr";
 import { CopyCodeFragment } from "../../../../../../../../../components/common/CopyCode";
 import RiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../components/ui/badge";
-import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import { defaultScanner } from "../../../../../../../../../utils/view";
-import { usePathname, useSearchParams } from "next/navigation";
-import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 import { useConfig } from "../../../../../../../../../context/ConfigContext";
+import useDebouncedQuerySearch from "../../../../../../../../../hooks/useDebouncedQuerySearch";
+import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
+import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
+import { defaultScanner } from "../../../../../../../../../utils/view";
+import { fetcher } from "../../../../../../../../../hooks/useApi";
+import { Loader2 } from "lucide-react";
+import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -84,13 +80,63 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
   }),
 ];
 
-const Index: FunctionComponent<Props> = (props) => {
+const Index: FunctionComponent = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const { table, isLoading, handleSearch } = useTable({
+
+  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const searchParams = useSearchParams();
+
+  const query = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    if (searchParams?.has("state")) {
+      const state = searchParams.get("state");
+      if (!Boolean(state) || state === "open") {
+        p.append("filterQuery[state][is]", "open");
+      } else {
+        p.append("filterQuery[state][is not]", "open");
+      }
+    }
+
+    return p;
+  }, [searchParams]);
+
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/";
+
+  const {
+    data: vulns,
+    isLoading,
+    error,
+  } = useSWR<Paged<FirstPartyVuln>>(
+    uri +
+      "refs/" +
+      assetVersionSlug +
+      "/" +
+      "first-party-vulns/?" +
+      query.toString(),
+    fetcher,
+  );
+
+  const { table } = useTable({
     columnsDef,
-    data: props.vulns.data,
+    data: vulns?.data || [],
   });
+
+  const handleSearch = useDebouncedQuerySearch();
 
   const assetMenu = useAssetMenu();
   const config = useConfig();
@@ -100,6 +146,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const params = useSearchParams();
   const pathname = usePathname();
   const push = useRouterQuery();
+  console.log(vulns);
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
@@ -118,7 +165,7 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="relative flex flex-row gap-2">
           <Tabs
             defaultValue={
-              params.has("state") ? (params.get("state") as string) : "open"
+              params?.has("state") ? (params.get("state") as string) : "open"
             }
           >
             <TabsList>
@@ -146,7 +193,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Tabs>
           <Input
             onChange={handleSearch}
-            defaultValue={params.get("search") ?? ""}
+            defaultValue={params?.get("search") ?? ""}
             placeholder="Search for filename, message or scanner..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
@@ -156,15 +203,13 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       </Section>
-      {!props.vulns.data.length ? (
+      {!vulns?.data.length ? (
         <div>
           <EmptyParty
             title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           />
-          <div className="mt-4">
-            <CustomPagination {...props.vulns} />
-          </div>
+          <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       ) : (
         <div>
@@ -202,6 +247,27 @@ const Index: FunctionComponent<Props> = (props) => {
                     ))}
                   </thead>
                   <tbody className="text-sm text-foreground">
+                    {isLoading &&
+                      Array.from(Array(10).keys()).map((el, i, arr) => (
+                        <tr
+                          className={classNames(
+                            "relative cursor-pointer align-top transition-all",
+                            i === arr.length - 1 ? "" : "border-b",
+                            i % 2 !== 0 && "bg-card/50",
+                          )}
+                          key={el}
+                        >
+                          <td className="p-4">
+                            <Skeleton className="w-1/2 h-[20px]" />
+                          </td>
+                          <td className="p-4">
+                            <Skeleton className="w-full h-[20px]" />
+                          </td>
+                          <td className="p-4">
+                            <Skeleton className="w-1/2 h-[20px]" />
+                          </td>
+                        </tr>
+                      ))}
                     {table.getRowModel().rows.map((row, i, arr) => (
                       <tr
                         onClick={() =>
@@ -230,7 +296,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </div>
             </div>
             <div className="mt-4">
-              <CustomPagination {...props.vulns} />
+              {vulns && <CustomPagination {...vulns} />}
             </div>
           </div>
         </div>
@@ -247,74 +313,3 @@ const Index: FunctionComponent<Props> = (props) => {
 };
 
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { asset }) => {
-    // fetch the project
-    let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/";
-
-    const maybeRedirect = maybeGetRedirectDestination(
-      asset,
-      organizationSlug as string,
-      projectSlug as string,
-      assetVersionSlug as string,
-    );
-    if (maybeRedirect) {
-      return maybeRedirect;
-    }
-
-    const filterQuery = buildFilterQuery(context);
-    const query = buildFilterSearchParams(context);
-    // translate the state query param to a filter query
-    const state = context.query.state;
-    if (!Boolean(state) || state === "open") {
-      filterQuery["filterQuery[state][is]"] = "open";
-    } else {
-      filterQuery["filterQuery[state][is not]"] = "open";
-    }
-
-    Object.entries(filterQuery).forEach(([key, value]) => {
-      query.append(key, value as string);
-    });
-
-    // check for page and page size query params
-    // if they are there, append them to the uri
-    const flawResp = await apiClient(
-      uri +
-        "refs/" +
-        assetVersionSlug +
-        "/" +
-        "first-party-vulns/?" +
-        query.toString(),
-    );
-
-    const vulns = await flawResp.json();
-
-    return {
-      props: {
-        vulns,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    assetVersion: withAssetVersion,
-    contentTree: withContentTree,
-  },
-);

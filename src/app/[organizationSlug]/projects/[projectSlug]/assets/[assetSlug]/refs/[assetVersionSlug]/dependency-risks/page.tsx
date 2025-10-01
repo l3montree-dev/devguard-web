@@ -1,24 +1,23 @@
+"use client";
+
 import SortingCaret from "@/components/common/SortingCaret";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import {
+  DependencyVuln,
+  Paged,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/compat/router";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import { beautifyPurl, extractVersion } from "@/utils/common";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -37,9 +36,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -47,17 +43,21 @@ import {
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import useSWR from "swr";
 import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
-import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
-import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
-import { useConfig } from "../../../../../../../../../context/ConfigContext";
-import { usePathname, useSearchParams } from "next/navigation";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
+import { useConfig } from "../../../../../../../../../context/ConfigContext";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+import { fetcher } from "../../../../../../../../../hooks/useApi";
+import useDebouncedQuerySearch from "../../../../../../../../../hooks/useDebouncedQuerySearch";
+import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
+import useDecodedPathname from "../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
+import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 
 interface Props {
   vulns: Paged<VulnByPackage>;
@@ -198,12 +198,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
   },
 ];
 
-const Index: FunctionComponent<Props> = (props) => {
-  const router = useRouter();
-  const { table, isLoading, handleSearch } = useTable({
-    columnsDef,
-    data: props.vulns?.data || [],
-  });
+const Index: FunctionComponent = () => {
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -214,11 +209,73 @@ const Index: FunctionComponent<Props> = (props) => {
   const assetVersion = useActiveAssetVersion();
 
   const { branches, tags } = useAssetBranchesAndTags();
-  const pathname = usePathname();
+  const pathname = useDecodedPathname();
   const params = useSearchParams();
 
   const artifacts = useArtifacts();
   const push = useRouterQuery();
+
+  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const searchParams = useSearchParams();
+
+  const query = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    if (searchParams?.has("state")) {
+      const state = searchParams.get("state");
+      if (!Boolean(state) || state === "open") {
+        p.append("filterQuery[state][is]", "open");
+      } else {
+        p.append("filterQuery[state][is not]", "open");
+      }
+    }
+
+    if (searchParams?.has("artifact")) {
+      p.append(
+        "filterQuery[artifact_license_risks.artifact_artifact_name][is]",
+        searchParams.get("artifact") as string,
+      );
+    }
+
+    return p;
+  }, [searchParams]);
+
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/";
+
+  const {
+    data: vulns,
+    isLoading,
+    error,
+  } = useSWR<Paged<VulnByPackage>>(
+    uri +
+      "refs/" +
+      assetVersionSlug +
+      "/" +
+      "dependency-vulns/?" +
+      query.toString(),
+    fetcher,
+  );
+
+  const handleSearch = useDebouncedQuerySearch();
+
+  const { table } = useTable({
+    columnsDef,
+    data: vulns?.data || [],
+  });
+
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
@@ -257,7 +314,7 @@ const Index: FunctionComponent<Props> = (props) => {
           />
           <Tabs
             defaultValue={
-              params.has("state") ? (params.get("state") as string) : "open"
+              params?.has("state") ? (params.get("state") as string) : "open"
             }
           >
             <TabsList>
@@ -285,7 +342,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Tabs>
           <Input
             onChange={handleSearch}
-            defaultValue={params.get("search") as string}
+            defaultValue={params?.get("search") as string}
             placeholder="Search for cve, package name, message or scanner..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
@@ -295,15 +352,13 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       </Section>
-      {!props.vulns?.data?.length ? (
+      {!vulns?.data?.length ? (
         <div>
           <EmptyParty
             title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           />
-          <div className="mt-4">
-            <CustomPagination {...props.vulns} />
-          </div>
+          <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       ) : (
         <div>
@@ -348,7 +403,7 @@ const Index: FunctionComponent<Props> = (props) => {
                                   <CircleHelp className=" w-4 h-4 text-gray-500" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <div className="relative ">
+                                  <div className="relative font-normal">
                                     Risk Value is a context-aware score that
                                     adjusts the CVSS by factoring in real-world
                                     exploitability and system relevance. It
@@ -371,6 +426,39 @@ const Index: FunctionComponent<Props> = (props) => {
                   ))}
                 </thead>
                 <tbody className="text-sm text-foreground">
+                  {isLoading &&
+                    Array.from(Array(10).keys()).map((el, i, arr) => (
+                      <tr
+                        className={classNames(
+                          "relative cursor-pointer align-top transition-all",
+                          i === arr.length - 1 ? "" : "border-b",
+                          i % 2 !== 0 && "bg-card/50",
+                        )}
+                        key={el}
+                      >
+                        <td className="p-4">
+                          <Skeleton className="w-2/3 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-full h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-2/3 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-1/2 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-1/2 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-1/2 h-[20px]" />
+                        </td>
+                        <td className="p-4">
+                          <Skeleton className="w-full h-[40px]" />
+                        </td>
+                      </tr>
+                    ))}
                   {table.getRowModel().rows.map((row, i, arr) => (
                     <RiskHandlingRow
                       row={row}
@@ -383,9 +471,7 @@ const Index: FunctionComponent<Props> = (props) => {
               </table>
             </div>
           </div>
-          <div className="mt-4">
-            <CustomPagination {...props.vulns} />
-          </div>
+          <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       )}
       <SbomDownloadModal
@@ -408,79 +494,3 @@ const Index: FunctionComponent<Props> = (props) => {
 };
 
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { asset }) => {
-    // fetch the project
-    let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/";
-
-    const maybeRedirect = maybeGetRedirectDestination(
-      asset,
-      organizationSlug as string,
-      projectSlug as string,
-      assetVersionSlug as string,
-    );
-    if (maybeRedirect) {
-      return maybeRedirect;
-    }
-
-    const query = buildFilterSearchParams(context);
-    // translate the state query param to a filter query
-    const state = context.query.state;
-    if (!Boolean(state) || state === "open") {
-      query.append("filterQuery[state][is]", "open");
-    } else {
-      query.append("filterQuery[state][is not]", "open");
-    }
-
-    const artifact = context.query.artifact as string;
-    if (artifact) {
-      query.append(
-        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
-        artifact as string,
-      );
-    }
-
-    // check for page and page size query params
-    // if they are there, append them to the uri
-    const v = await apiClient(
-      uri +
-        "refs/" +
-        assetVersionSlug +
-        "/" +
-        "dependency-vulns/?" +
-        query.toString(),
-    );
-
-    // fetch a personal access token from the user
-    const vulns = await v.json();
-
-    return {
-      props: {
-        vulns,
-      },
-    };
-  },
-  {
-    artifacts: withArtifacts,
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    assetVersion: withAssetVersion,
-    contentTree: withContentTree,
-  },
-);
