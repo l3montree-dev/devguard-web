@@ -1,7 +1,4 @@
 import SortingCaret from "@/components/common/SortingCaret";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withProject } from "@/decorators/withProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
@@ -11,13 +8,8 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/compat/router";
-import { FunctionComponent, useState } from "react";
+import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
 
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/devGuardApi";
 import { beautifyPurl } from "@/utils/common";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
@@ -35,24 +27,25 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
+import { debounce } from "lodash";
 import { CircleHelp, Loader2 } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import useSWR from "swr";
 import Severity from "../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../components/RiskScannerDialog";
-import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
-import { maybeGetRedirectDestination } from "../../../../../../../../../utils/server";
+import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../context/ConfigContext";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
+import { fetcher } from "../../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 
 interface Props {
@@ -111,11 +104,74 @@ const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
   },
 ];
 
-const Index: FunctionComponent<Props> = (props) => {
-  const router = useRouter();
-  const { table, isLoading, handleSearch } = useTable({
+const Index: FunctionComponent = () => {
+  // fetch the project
+  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const searchParams = useSearchParams();
+
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/";
+
+  const query = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    if (searchParams?.has("state")) {
+      const state = searchParams.get("state");
+      if (!Boolean(state) || state === "open") {
+        p.append("filterQuery[state][is]", "open");
+      } else {
+        p.append("filterQuery[state][is not]", "open");
+      }
+    }
+
+    if (searchParams?.has("artifact")) {
+      p.append(
+        "filterQuery[artifact_license_risks.artifact_artifact_name][is]",
+        searchParams.get("artifact") as string,
+      );
+    }
+
+    return p;
+  }, [searchParams]);
+
+  const handleSearch = useMemo(
+    () =>
+      debounce((v: ChangeEvent<HTMLInputElement>) => {
+        query.set("search", v.currentTarget.value);
+        return new URLSearchParams(query);
+      }, 500),
+    [query],
+  );
+
+  const {
+    data: vulns,
+    error,
+    isLoading,
+  } = useSWR<Paged<LicenseRiskDTO>>(
+    uri +
+      "refs/" +
+      assetVersionSlug +
+      "/" +
+      "license-risks?" +
+      query.toString(),
+    fetcher,
+  );
+
+  const { table } = useTable({
     columnsDef,
-    data: props.vulns.data,
+    data: vulns?.data || [],
   });
   const config = useConfig();
 
@@ -130,7 +186,7 @@ const Index: FunctionComponent<Props> = (props) => {
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = usePathname();
   const push = useRouterQuery();
-  const searchParams = useSearchParams();
+  const artifacts = useArtifacts();
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -139,10 +195,10 @@ const Index: FunctionComponent<Props> = (props) => {
       </div>
 
       <VexDownloadModal
-        artifacts={props.artifacts}
+        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
-        pathname={pathname}
+        pathname={pathname || ""}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
       />
@@ -156,15 +212,15 @@ const Index: FunctionComponent<Props> = (props) => {
         <div className="relative flex flex-row gap-2">
           <QueryArtifactSelector
             unassignPossible
-            artifacts={props.artifacts.map((a) => a.artifactName)}
+            artifacts={artifacts.map((a) => a.artifactName)}
           />
           <Tabs
             defaultValue={
-              searchParams.has("state")
+              searchParams?.has("state")
                 ? (searchParams.get("state") as string)
                 : "open"
             }
-            value={searchParams.get("state") ?? "open"}
+            value={searchParams?.get("state") ?? "open"}
           >
             <TabsList>
               <TabsTrigger
@@ -191,7 +247,7 @@ const Index: FunctionComponent<Props> = (props) => {
           </Tabs>
           <Input
             onChange={handleSearch}
-            defaultValue={searchParams.get("search") as string}
+            defaultValue={searchParams?.get("search") as string}
             placeholder="Search for cve, package name, message or scanner..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
@@ -201,14 +257,14 @@ const Index: FunctionComponent<Props> = (props) => {
           </div>
         </div>
       </Section>
-      {!props.vulns.data.length ? (
+      {!vulns?.data.length ? (
         <div>
           <EmptyParty
             title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
           />
           <div className="mt-4">
-            <CustomPagination {...props.vulns} />
+            <CustomPagination {...vulns!} />
           </div>
         </div>
       ) : (
@@ -279,16 +335,14 @@ const Index: FunctionComponent<Props> = (props) => {
               </table>
             </div>
           </div>
-          <div className="mt-4">
-            <CustomPagination {...props.vulns} />
-          </div>
+          <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       )}
       <SbomDownloadModal
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
-        pathname={pathname}
-        artifacts={props.artifacts}
+        pathname={pathname || ""}
+        artifacts={artifacts}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
       />
@@ -304,88 +358,3 @@ const Index: FunctionComponent<Props> = (props) => {
 };
 
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { asset }) => {
-    // fetch the project
-    let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/";
-
-    const maybeRedirect = maybeGetRedirectDestination(
-      asset,
-      organizationSlug as string,
-      projectSlug as string,
-      assetVersionSlug as string,
-    );
-    if (maybeRedirect) {
-      return maybeRedirect;
-    }
-
-    const query = buildFilterSearchParams(context);
-    // translate the state query param to a filter query
-    const state = context.query.state;
-    if (!Boolean(state) || state === "open") {
-      query.append("filterQuery[state][is]", "open");
-    } else {
-      query.append("filterQuery[state][is not]", "open");
-    }
-
-    const artifact = context.query.artifact as string;
-
-    if (artifact) {
-      query.append(
-        "filterQuery[artifact_license_risks.artifact_artifact_name][is]",
-        artifact as string,
-      );
-    }
-
-    // check for page and page size query params
-    // if they are there, append them to the uri
-    const v = await apiClient(
-      uri +
-        "refs/" +
-        assetVersionSlug +
-        "/" +
-        "license-risks?" +
-        query.toString(),
-    );
-
-    // fetch a personal access token from the user
-    const vulns = await v.json();
-
-    let artifactsData: ArtifactDTO[] = [];
-    const artifactsResp = await apiClient(
-      uri + "refs/" + assetVersionSlug + "/artifacts/",
-    );
-    if (artifactsResp.ok) {
-      artifactsData = await artifactsResp.json();
-    }
-
-    return {
-      props: {
-        vulns,
-        artifacts: artifactsData,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    assetVersion: withAssetVersion,
-    contentTree: withContentTree,
-  },
-);

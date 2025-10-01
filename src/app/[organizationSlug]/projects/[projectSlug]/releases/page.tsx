@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "../../../../../components/ui/tooltip";
 import { fetcher } from "../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../services/devGuardApi";
 import {
@@ -33,7 +34,7 @@ const Releases = () => {
   const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
-  const { organizationSlug, projectSlug } = useParams() as {
+  const { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
   };

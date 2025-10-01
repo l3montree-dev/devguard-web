@@ -27,7 +27,7 @@ export async function withOrganization(organizationSlug: string) {
   if (organizationSlug) {
     // get the organization
     const org = await devGuardApiClient(
-      "/organizations/" + organizationSlug.replace("%40", "@"),
+      "/organizations/" + decodeURIComponent(organizationSlug),
     );
 
     // if the organization slug starts with an @ it is actually an identity provider

@@ -1,33 +1,46 @@
+"use client";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { PolicyEvaluation } from "@/types/api/api";
-
-import { FunctionComponent } from "react";
-
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { usePathname } from "next/navigation";
+import { FunctionComponent } from "react";
+import useSWR from "swr";
 import ColoredBadge from "../../../../../../../../../components/common/ColoredBadge";
+import EmptyParty from "../../../../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../../../../components/common/ListItem";
-import { withAssetVersion } from "../../../../../../../../../decorators/withAssetVersion";
-import { getApiClientFromContext } from "../../../../../../../../../services/devGuardApi";
-import { violationLengthToLevel } from "../../../../../../../../../app/[organizationSlug]/projects/[projectSlug]/compliance/compliance";
+import ListRenderer from "../../../../../../../../../components/common/ListRenderer";
+import { fetcher } from "../../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
+import { violationLengthToLevel } from "../../../../../compliance/page";
 interface Props {
   compliance: PolicyEvaluation[];
 }
 
-const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
-  const router = useRouter();
+const ComplianceIndex: FunctionComponent<Props> = () => {
   const menu = useAssetMenu();
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const {
+    data: compliance,
+    isLoading,
+    error,
+  } = useSWR<PolicyEvaluation[]>(
+    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance`,
+    fetcher,
+  );
+
+  const pathname = usePathname();
+
   return (
     <Page Menu={menu} Title={<AssetTitle />} title="Compliance Controls">
       <div className="flex flex-row">
@@ -38,34 +51,45 @@ const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
             title="Compliance Controls"
             forceVertical
           >
-            {compliance.map((control) => (
-              <Link key={control.id} href={router.asPath + "/" + control.id}>
-                <ListItem
-                  reactOnHover
-                  Title={
-                    <span className="flex flex-row items-center gap-2">
-                      {control.title}
-                      {control.compliant === null ? (
-                        <ColoredBadge variant="high">
-                          <TriangleAlert className="h-4 w-4 mr-1" />
-                          Could not evaluate control
-                        </ColoredBadge>
-                      ) : (
-                        <ColoredBadge
-                          variant={violationLengthToLevel(
-                            control.violations?.length ?? 0,
-                          )}
-                        >
-                          {control.violations?.length ?? 0} Violations
-                        </ColoredBadge>
-                      )}
-                    </span>
-                  }
-                  Description={<div>{control.description}</div>}
-                  Button={<div className="whitespace-nowrap"></div>}
+            <ListRenderer
+              isLoading={isLoading}
+              error={error}
+              Empty={
+                <EmptyParty
+                  title="No compliance controls found"
+                  description="Create compliance controls and inspect their evaluation."
                 />
-              </Link>
-            ))}
+              }
+              data={compliance || []}
+              renderItem={(control) => (
+                <Link key={control.id} href={pathname + "/" + control.id}>
+                  <ListItem
+                    reactOnHover
+                    Title={
+                      <span className="flex flex-row items-center gap-2">
+                        {control.title}
+                        {control.compliant === null ? (
+                          <ColoredBadge variant="high">
+                            <TriangleAlert className="h-4 w-4 mr-1" />
+                            Could not evaluate control
+                          </ColoredBadge>
+                        ) : (
+                          <ColoredBadge
+                            variant={violationLengthToLevel(
+                              control.violations?.length ?? 0,
+                            )}
+                          >
+                            {control.violations?.length ?? 0} Violations
+                          </ColoredBadge>
+                        )}
+                      </span>
+                    }
+                    Description={<div>{control.description}</div>}
+                    Button={<div className="whitespace-nowrap"></div>}
+                  />
+                </Link>
+              )}
+            />
           </Section>
         </div>
       </div>
@@ -74,42 +98,3 @@ const ComplianceIndex: FunctionComponent<Props> = ({ compliance }) => {
 };
 
 export default ComplianceIndex;
-
-export const getServerSideProps = middleware(
-  async (context) => {
-    const apiClient = getApiClientFromContext(context);
-    // fetch the compliance stats
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.query as {
-        organizationSlug: string;
-        projectSlug: string;
-        assetSlug: string;
-        assetVersionSlug: string;
-      };
-
-    let url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug;
-
-    return {
-      props: {
-        compliance: await apiClient(url + "/compliance").then((r) => r.json()),
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);

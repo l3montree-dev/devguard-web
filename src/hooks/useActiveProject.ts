@@ -17,5 +17,5 @@ import { useProject } from "../context/ProjectContext";
 
 export function useActiveProject() {
   const projectContext = useProject();
-  return projectContext;
+  return projectContext!;
 }

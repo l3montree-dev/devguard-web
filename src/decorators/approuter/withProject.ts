@@ -27,13 +27,12 @@ export async function withProject(
   // get the organization
   const r = await devGuardApiClient(
     "/organizations/" +
-      organizationSlug.replace("%40", "@") +
+      decodeURIComponent(organizationSlug) +
       "/projects/" +
       projectSlug,
   );
 
   if (!r.ok) {
-    console.log(r);
     throw new HttpError({
       redirect: {
         destination: "/" + organizationSlug,

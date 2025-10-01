@@ -11,12 +11,7 @@ import { withOrgs } from "../../../../../decorators/withOrgs";
 import { withSession } from "../../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../../services/devGuardApi";
-import {
-  OrganizationDetailsDTO,
-  ProjectDTO,
-  UserRole,
-  WebhookDTO,
-} from "../../../../../types/api/api";
+import { ProjectDTO, UserRole, WebhookDTO } from "../../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -27,8 +22,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { withContentTree } from "@/decorators/withContentTree";
-import { getCurrentUserRole, useCurrentUserRole } from "@/hooks/useUserRole";
-import { useParams, useRouter } from "next/navigation";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import MembersTable from "../../../../../components/MembersTable";
@@ -38,6 +33,7 @@ import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import { Label } from "../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../context/ProjectContext";
+import useDecodedParams from "../../../../../hooks/useDecodedParams";
 
 interface Props {}
 
@@ -200,7 +196,7 @@ const Index: FunctionComponent<Props> = () => {
     }
   };
 
-  const params = useParams();
+  const params = useDecodedParams();
 
   useEffect(() => {
     if (

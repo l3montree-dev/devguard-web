@@ -1,62 +1,62 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Form, useForm } from "react-hook-form";
+import Markdown from "react-markdown";
+import { toast } from "sonner";
 import useSWR from "swr";
+import AssetForm, {
+  AssetFormValues,
+} from "../../../../components/asset/AssetForm";
+import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
+import Avatar from "../../../../components/Avatar";
+import EmptyParty from "../../../../components/common/EmptyParty";
+import ListItem from "../../../../components/common/ListItem";
+import ProjectTitle from "../../../../components/common/ProjectTitle";
+import Section from "../../../../components/common/Section";
+import Page from "../../../../components/Page";
+import { ProjectForm } from "../../../../components/project/ProjectForm";
+import { Badge } from "../../../../components/ui/badge";
+import { Button } from "../../../../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../../components/ui/dialog";
 import {
   isOrganization,
   useOrganization,
 } from "../../../../context/OrganizationContext";
 import { useProject } from "../../../../context/ProjectContext";
-import { fetcher } from "../../../../hooks/useApi";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useForm, Form } from "react-hook-form";
-import Markdown from "react-markdown";
-import { toast } from "sonner";
-import AssetForm, {
-  AssetFormValues,
-} from "../../../../components/asset/AssetForm";
-import Image from "next/image";
-import AssetOverviewListItem from "../../../../components/AssetOverviewListItem";
-import EmptyParty from "../../../../components/common/EmptyParty";
-import ListItem from "../../../../components/common/ListItem";
-import ProjectTitle from "../../../../components/common/ProjectTitle";
-import { ProjectForm } from "../../../../components/project/ProjectForm";
-import {
-  DialogHeader,
-  DialogFooter,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "../../../../components/ui/dialog";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
+import { fetcher } from "../../../../hooks/useApi";
 import { useProjectMenu } from "../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../hooks/useUserRole";
 import { browserApiClient } from "../../../../services/devGuardApi";
 import {
-  RequirementsLevel,
-  ProjectDTO,
   AssetDTO,
   EnvDTO,
+  Paged,
+  ProjectDTO,
+  RequirementsLevel,
   UserRole,
 } from "../../../../types/api/api";
-import Page from "../../../../components/Page";
-import { Button } from "../../../../components/ui/button";
-import Section from "../../../../components/common/Section";
-import { Badge } from "../../../../components/ui/badge";
-import Avatar from "../../../../components/Avatar";
-import Link from "next/link";
-import ListRenderer from "../../../../components/common/ListRenderer";
 
 export default function RepositoriesPage() {
   const project = useProject()!;
   const assets = project.assets;
   const organization = useOrganization();
   const [showModal, setShowModal] = useState(false);
-  const { data: subgroups } = useSWR<ProjectDTO[]>(
+  const { data: subgroups } = useSWR<Paged<ProjectDTO>>(
     () =>
       isOrganization(organization.organization)
-        ? `/organizations/${organization.organization.slug.replace("%40", "@")}/projects?parentId=${project?.id}`
+        ? `/organizations/${decodeURIComponent(organization.organization.slug)}/projects?parentId=${project?.id}&pageSize=100`
         : null,
     fetcher,
   );
@@ -146,7 +146,7 @@ export default function RepositoriesPage() {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {assets.length === 0 && subgroups?.length === 0 ? (
+        {assets.length === 0 && subgroups?.data.length === 0 ? (
           <EmptyParty
             description="No repositories or subgroups found"
             title="Your Repositories will show up here!"
@@ -207,7 +207,7 @@ export default function RepositoriesPage() {
                 : "Subgroups & Repositories"
             }
           >
-            {subgroups?.map((subgroup) => (
+            {subgroups?.data.map((subgroup) => (
               <Link
                 key={subgroup.id}
                 href={`/${activeOrg.slug}/projects/${subgroup.slug}`}

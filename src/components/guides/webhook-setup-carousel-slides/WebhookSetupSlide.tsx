@@ -12,7 +12,8 @@ import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
-import useConfig from "../../../hooks/useConfig";
+import { useConfig } from "../../../context/ConfigContext";
+import { useUpdateAsset } from "../../../context/AssetContext";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -31,7 +32,7 @@ export default function WebhookSetupSlide({
     return crypto.randomUUID();
   };
   const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
-  const updateAsset = useStore((s) => s.updateAsset);
+  const updateAsset = useUpdateAsset();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset()!;

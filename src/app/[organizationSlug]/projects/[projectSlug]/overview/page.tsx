@@ -1,7 +1,7 @@
 "use client";
 
 import { groupBy } from "lodash";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../components/ArtifactSelector";
@@ -37,22 +37,22 @@ import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { fetcher } from "../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useViewMode } from "../../../../../hooks/useViewMode";
 import {
   AverageFixingTime,
   Paged,
   ReleaseDTO,
-  ReleaseRiskHistory,
   RiskHistory,
 } from "../../../../../types/api/api";
 import { beautifyPurl, classNames } from "../../../../../utils/common";
-import { normalizeContentTree } from "../../../../../zustand/globalStore";
 import { reduceRiskHistories } from "../../../../../utils/view";
+import { normalizeContentTree } from "../../../../../zustand/globalStore";
 
 const OverviewPage = () => {
   const search = useSearchParams();
-  const params = useParams() as {
+  const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
   };

@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 
 import { AssetDTO, AssetVersionDTO, UserRole } from "@/types/api/api";
+import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,
   CogIcon,
@@ -22,13 +23,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { CodeIcon, ScanText, TextSelect } from "lucide-react";
 import { useRouter } from "next/compat/router";
+import { usePathname } from "next/navigation";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
-import { RocketLaunchIcon } from "@heroicons/react/20/solid";
+import useDecodedParams from "./useDecodedParams";
 import { useCurrentUserRole } from "./useUserRole";
-import { useParams, usePathname } from "next/navigation";
+import useDecodedPathname from "./useDecodedPathname";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   if (!asset.refs || asset.refs.length === 0) {
@@ -49,7 +51,7 @@ export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
 
 export const getAssetVersionSlug = (
   asset: AssetDTO,
-  assetVersion: AssetVersionDTO | null,
+  assetVersion: AssetVersionDTO | null | undefined,
 ): string => {
   if (!assetVersion) {
     return getDefaultAssetVersionSlug(asset);
@@ -68,15 +70,18 @@ export const getAssetVersionSlug = (
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
-  const router = useRouter();
-  const params = useParams();
-  const { orgSlug, projectSlug, assetSlug } = params as {
-    orgSlug: string;
+  const params = useDecodedParams();
+  const {
+    organizationSlug: orgSlug,
+    projectSlug,
+    assetSlug,
+  } = params as {
+    organizationSlug: string;
     projectSlug: string;
     assetSlug: string;
   };
 
-  const pathname = usePathname() || "";
+  const pathname = useDecodedPathname();
 
   const loggedIn = useCurrentUser();
   const assetVersion = useActiveAssetVersion();
@@ -222,8 +227,7 @@ export const useAssetMenu = () => {
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
       Icon: RocketLaunchIcon,
       isActive:
-        pathname ===
-        `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`,
+        pathname === `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
     });
   }
 

@@ -1,8 +1,8 @@
-import { GetServerSidePropsContext } from "next";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
-export const buildFilterQuery = (context: GetServerSidePropsContext) => {
+export const buildFilterQuery = (params: ReadonlyURLSearchParams) => {
   const filterQuery = Object.fromEntries(
-    Object.entries(context.query).filter(
+    Object.entries(params).filter(
       ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
     ),
   );
@@ -10,16 +10,20 @@ export const buildFilterQuery = (context: GetServerSidePropsContext) => {
   return filterQuery;
 };
 
-export const buildFilterSearchParams = (context: GetServerSidePropsContext) => {
-  const page = (context.query.page || "1") as string;
-  const pageSize = (context.query.pageSize || "25") as string;
+export const buildFilterSearchParams = (
+  params: ReadonlyURLSearchParams | null,
+) => {
+  if (!params) return new URLSearchParams({ page: "1", pageSize: "25" });
 
-  const filterQuery = buildFilterQuery(context);
+  const page = params.get("page") || "1";
+  const pageSize = params.get("pageSize") || "25";
+
+  const filterQuery = buildFilterQuery(params);
 
   return new URLSearchParams({
     page,
     pageSize,
-    ...(context.query.search ? { search: context.query.search as string } : {}),
+    ...(params.has("search") ? { search: params.get("search") as string } : {}),
     ...filterQuery,
   });
 };

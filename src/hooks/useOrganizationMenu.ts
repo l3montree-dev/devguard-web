@@ -13,17 +13,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { useParams, usePathname, useRouter } from "next/navigation";
 import { UserRole } from "@/types/api/api";
+import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
 import { ScaleIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
 import { useCurrentUser } from "./useCurrentUser";
+import useDecodedParams from "./useDecodedParams";
 import { useCurrentUserRole } from "./useUserRole";
 
 export const useOrganizationMenu = () => {
   const pathName = usePathname() || "/";
-  const { organizationSlug: orgSlug } = useParams() as {
+  const { organizationSlug: orgSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
 

@@ -27,7 +27,7 @@ export async function withAsset(
 
   const url =
     "/organizations/" +
-    orgSlug +
+    decodeURIComponent(orgSlug) +
     "/projects/" +
     projectSlug +
     "/assets/" +

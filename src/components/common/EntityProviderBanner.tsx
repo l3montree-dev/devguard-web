@@ -1,10 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import React from "react";
 import { useActiveAsset } from "../../hooks/useActiveAsset";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { useActiveProject } from "../../hooks/useActiveProject";
+import useDecodedParams from "../../hooks/useDecodedParams";
 import { providerIdToBaseURL } from "../../utils/externalProvider";
 import { noStoreAvailable } from "../../zustand/globalStoreProvider";
 import GitProviderIcon from "../GitProviderIcon";
@@ -18,11 +17,11 @@ const EntityProviderBanner = () => {
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
 
-  const { organizationSlug, projectSlug, assetSlug } = useParams<{
+  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
     assetSlug: string;
-  }>()!;
+  };
 
   if (!activeOrg && !activeProject && !activeAsset) {
     return null;

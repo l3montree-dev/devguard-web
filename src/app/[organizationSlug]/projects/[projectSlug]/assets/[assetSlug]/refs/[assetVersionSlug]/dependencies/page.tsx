@@ -1,27 +1,15 @@
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
-import { GetServerSidePropsContext } from "next";
 
-import { FunctionComponent, useMemo, useState } from "react";
+import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -77,11 +65,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { debounce } from "lodash";
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import useSWR from "swr";
+import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
+import { fetcher } from "../../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
+import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";
-import { withArtifacts } from "../../../../../../../../../decorators/withArtifacts";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
 
 interface Props {
   components: Paged<ComponentPaged & { license: LicenseResponse }>;
@@ -117,7 +110,7 @@ const LicenseCall = (props: {
 }) => {
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useParams() as {
+    useDecodedParams() as {
       organizationSlug: string;
       projectSlug: string;
       assetSlug: string;
@@ -306,11 +299,7 @@ const columnsDef: ColumnDef<
   }),
 ];
 
-const Index: FunctionComponent<Props> = ({
-  components,
-  licenses,
-  artifacts,
-}) => {
+const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
@@ -326,9 +315,107 @@ const Index: FunctionComponent<Props> = ({
     project: Component["project"];
   }>();
 
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/refs/" +
+    assetVersionSlug +
+    "/components";
+
+  const params = useMemo(() => {
+    const params = buildFilterSearchParams(searchParams);
+    if (searchParams?.has("artifact")) {
+      params.append(
+        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
+        encodeURIComponent(searchParams.get("artifact") as string),
+      );
+    }
+    return params;
+  }, [searchParams]);
+
+  const updateQueryParams = useRouterQuery();
+
+  const handleSearch = useMemo(
+    () =>
+      debounce((v: ChangeEvent<HTMLInputElement>) => {
+        updateQueryParams({
+          search: v.currentTarget.value,
+        });
+      }, 500),
+    [updateQueryParams],
+  );
+
+  const { data: components } = useSWR<Paged<ComponentPaged>>(
+    url + "?" + params.toString(),
+    fetcher,
+    {
+      fallbackData: {
+        data: [],
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
+    },
+  );
+  const { data: licenses } = useSWR<LicenseResponse[]>(
+    url +
+      "/licenses" +
+      (searchParams?.has("artifact")
+        ? "?artifact=" +
+          encodeURIComponent(searchParams.get("artifact") as string)
+        : ""),
+    fetcher,
+  );
+
+  const artifacts = useArtifacts();
+
+  const licenseMap = useMemo(
+    () =>
+      (licenses || []).reduce(
+        (acc, curr) => ({
+          ...acc,
+          [curr.license.licenseId.toLowerCase()]: curr.license,
+        }),
+        {} as Record<string, License>,
+      ),
+    [licenses],
+  );
+
+  components!.data = useMemo(
+    () =>
+      components!.data.map((component) => ({
+        ...component,
+        license: licenseMap[
+          (component.dependency.license ?? "").toLowerCase()
+        ] ?? {
+          licenseId: "loading",
+          name: "Loading",
+          count: 0,
+        },
+      })),
+    [components, licenseMap],
+  );
+
   const router = useRouter();
-  const { table, isLoading, handleSearch } = useTable({
-    data: components.data,
+
+  const { table } = useTable({
+    data: (components?.data ?? []) as Array<
+      ComponentPaged & {
+        license: LicenseResponse;
+      }
+    >,
     columnsDef,
   });
 
@@ -346,6 +433,10 @@ const Index: FunctionComponent<Props> = ({
   const assetVersion = useActiveAssetVersion();
 
   const licenseToPercentMapEntries = useMemo(() => {
+    if (!licenses || licenses.length === 0) {
+      return [];
+    }
+
     const total = licenses.reduce((acc, curr) => acc + curr.count, 0);
 
     return licenses
@@ -393,7 +484,7 @@ const Index: FunctionComponent<Props> = ({
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams(
-                searchParams.has("artifact")
+                searchParams?.has("artifact")
                   ? {
                       artifact: searchParams.get("artifact") as string,
                     }
@@ -468,7 +559,7 @@ const Index: FunctionComponent<Props> = ({
           />
           <Input
             onChange={handleSearch}
-            defaultValue={searchParams.get("search") as string}
+            defaultValue={searchParams?.get("search") as string}
             placeholder="Search for dependencies or versions - just start typing..."
           />
         </div>
@@ -524,7 +615,7 @@ const Index: FunctionComponent<Props> = ({
             </tbody>
           </table>
         </div>
-        <CustomPagination {...components} />
+        {components && <CustomPagination {...components} />}
         <div className="flex flex-row justify-end">
           <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
             Refresh Licenses
@@ -545,7 +636,7 @@ const Index: FunctionComponent<Props> = ({
         artifacts={artifacts}
         showSBOMModal={showSBOMModal}
         setShowSBOMModal={setShowSBOMModal}
-        pathname={pathname}
+        pathname={pathname || ""}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
       />
@@ -553,7 +644,7 @@ const Index: FunctionComponent<Props> = ({
         artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
-        pathname={pathname}
+        pathname={pathname || ""}
         assetName={asset?.name}
         assetVersionName={assetVersion?.name}
       />
@@ -561,97 +652,3 @@ const Index: FunctionComponent<Props> = ({
   );
 };
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { artifacts }) => {
-    if (artifacts.length === 0) {
-      return {
-        notFound: true,
-      };
-    }
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const url =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/components";
-
-    const params = buildFilterSearchParams(context);
-
-    const artifact = context.query.artifact as string;
-    if (artifact) {
-      params.append(
-        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
-        artifact as string,
-      );
-    }
-
-    const [components, licenses, artifactsData] = await Promise.all([
-      apiClient(url + "?" + params.toString()).then((r) => r.json()) as Promise<
-        Paged<ComponentPaged>
-      >,
-      apiClient(
-        url +
-          "/licenses" +
-          (artifact ? "?artifact=" + encodeURIComponent(artifact) : ""),
-      ).then((r) => r.json() as Promise<LicenseResponse[]>),
-      apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/artifacts/",
-      ).then((r) => (!r.ok ? [] : (r.json() as Promise<ArtifactDTO[]>))),
-    ]);
-
-    const licenseMap = licenses.reduce(
-      (acc, curr) => ({
-        ...acc,
-        [curr.license.licenseId.toLowerCase()]: curr.license,
-      }),
-      {} as Record<string, License>,
-    );
-
-    components.data = components.data.map((component) => ({
-      ...component,
-      license: licenseMap[
-        (component.dependency.license ?? "").toLowerCase()
-      ] ?? {
-        licenseId: "loading",
-        name: "Loading",
-        count: 0,
-      },
-    }));
-
-    return {
-      props: {
-        components,
-        licenses,
-        artifacts: artifactsData,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    assetVersion: withAssetVersion,
-    contentTree: withContentTree,
-    artifacts: withArtifacts,
-  },
-);

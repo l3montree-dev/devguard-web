@@ -21,15 +21,16 @@ import {
   ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ContainerIcon } from "lucide-react";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { useProject } from "../context/ProjectContext";
 import { useCurrentUser } from "./useCurrentUser";
+import useDecodedParams from "./useDecodedParams";
+import useDecodedPathname from "./useDecodedPathname";
 import { useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
-  const params = useParams();
+  const params = useDecodedParams();
   const project = useProject()!;
-  const pathname = usePathname();
+  const pathname = useDecodedPathname();
   const orgSlug = params?.organizationSlug as string;
   const projectSlug = params?.projectSlug as string;
   const currentUserRole = useCurrentUserRole();
@@ -41,8 +42,7 @@ export const useProjectMenu = () => {
       title: "Overview",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
       Icon: ChartBarSquareIcon,
-      isActive:
-        pathname === "/[organizationSlug]/projects/[projectSlug]/overview",
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/overview`,
     },
     {
       title: "Releases",
@@ -55,6 +55,7 @@ export const useProjectMenu = () => {
         : "Subgroups & Repositories",
       href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
     },
   ];
   if (loggedIn) {

@@ -38,7 +38,7 @@ import {
   CardTitle,
 } from "../../../../../../../../../../components/ui/card";
 import ColoredBadge from "../../../../../../../../../../components/common/ColoredBadge";
-import { violationLengthToLevel } from "../../../../../../compliance/compliance";
+import { violationLengthToLevel } from "../../../../../../compliance/page";
 import PatSection from "../../../../../../../../../../components/PatSection";
 
 interface Props {

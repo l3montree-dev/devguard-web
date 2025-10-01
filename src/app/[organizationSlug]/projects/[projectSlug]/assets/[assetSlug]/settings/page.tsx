@@ -1,47 +1,33 @@
+"use client";
 import Page from "@/components/Page";
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
+import { InputWithButton } from "@/components/ui/input-with-button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
-import { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import useSWR from "swr";
 import ConnectToRepoSection from "../../../../../../../components/ConnectToRepoSection";
 import Alert from "../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../components/common/DangerZone";
 import ListItem from "../../../../../../../components/common/ListItem";
 import Section from "../../../../../../../components/common/Section";
-import { getParentRepositoryIdAndName } from "../../../../../../../utils/view";
-interface Props {
-  repositories: Array<{ value: string; label: string }> | null; // will be null, if repos could not be loaded - probably due to a missing github app installation
-  secrets: {
-    badgeSecret: string;
-    webhookSecret: string;
-  };
-}
-
-import { InputWithButton } from "@/components/ui/input-with-button";
 import { useUpdateAsset } from "../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../context/ConfigContext";
+import { fetcher } from "../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
+import { AssetDTO } from "../../../../../../../types/api/api";
+import { getParentRepositoryIdAndName } from "../../../../../../../utils/view";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -56,7 +42,7 @@ export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
-const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
+const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const assetMenu = useAssetMenu();
   const project = useActiveProject()!;
@@ -65,16 +51,37 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   const router = useRouter();
   const config = useConfig();
 
-  const [badgeSecret, setBadgeSecret] = useState<string>(secrets.badgeSecret);
-  const [webhookSecret, setWebhookSecret] = useState<string>(
-    secrets.webhookSecret,
+  // fetch the project
+  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  };
+
+  const { data: secrets, mutate: mutateSecrets } = useSWR<{
+    badgeSecret: string;
+    webhookSecret: string;
+  }>(
+    "/organizations/" +
+      organizationSlug +
+      "/projects/" +
+      projectSlug +
+      "/assets/" +
+      assetSlug +
+      "/secrets",
+    fetcher,
   );
+
+  const { data: repoResp } = useSWR<any[]>(
+    "/organizations/" + organizationSlug + "/integrations/repositories",
+    fetcher,
+  );
+
+  const repositories = useMemo(() => {
+    return convertRepos(repoResp || []);
+  }, [repoResp]);
 
   const apiBadgeUrl = config.devguardApiUrlPublicInternet + "/api/v1/badges/";
-
-  const [badgeURL, setBadgeURL] = useState<string>(
-    apiBadgeUrl + "cvss/" + badgeSecret,
-  );
 
   const form = useForm<AssetFormValues>({
     defaultValues: {
@@ -100,39 +107,44 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
     } else {
       bodyKey = "webhookSecret";
     }
+    const secret = generateNewSecret();
 
-    const resp = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
+    mutateSecrets(
+      async (prev) => {
+        const resp = await browserApiClient(
+          `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              [bodyKey]: secret,
+            }),
+          },
+        );
+
+        const r = (await resp.json()) as AssetDTO;
+
+        updateAsset(r);
+        return {
+          ...prev,
+          [bodyKey]: r[bodyKey as "badgeSecret" | "webhookSecret"],
+        } as {
+          badgeSecret: string;
+          webhookSecret: string;
+        };
+      },
       {
-        method: "PATCH",
-        body: JSON.stringify({
-          [bodyKey]: generateNewSecret(),
-        }),
+        optimisticData(currentData) {
+          return {
+            ...currentData,
+            [bodyKey]: secret,
+          } as {
+            badgeSecret: string;
+            webhookSecret: string;
+          };
+        },
+        revalidate: false,
       },
     );
-
-    if (resp.ok) {
-      const r = await resp.json();
-
-      if (type === "badge") {
-        setBadgeSecret(r.badgeSecret);
-        setBadgeURL(`${apiBadgeUrl}cvss/${r.badgeSecret}`);
-        asset.badgeSecret = r.badgeSecret;
-        toast("New badge secret generated", {
-          description: "The badge secret has been generated",
-        });
-      } else if (type === "webhook") {
-        setWebhookSecret(r.webhookSecret);
-        asset.webhookSecret = r.webhookSecret;
-        toast("New webhook secret generated", {
-          description: "The webhook secret has been generated",
-        });
-      }
-
-      updateAsset(asset);
-    } else {
-      toast.error("Could not generate new secret");
-    }
   };
 
   const handleDeleteAsset = async () => {
@@ -205,9 +217,6 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
     });
   };
 
-  const { repos, searchLoading, handleSearchRepos } =
-    useRepositorySearch(repositories);
-
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
@@ -228,7 +237,7 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
             parentRepositoryName={parentRepositoryName}
             repositoryName={asset.repositoryName}
             repositoryId={asset.repositoryId}
-            repositories={repos}
+            repositories={repositories}
             onUpdate={handleUpdate}
           />
         )}
@@ -266,7 +275,7 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
           <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
             <InputWithButton
               label="Badge Secret"
-              value={badgeURL}
+              value={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
               message="You can use the URL to display this badge in your README or other documentation.
               The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
               copyable
@@ -279,7 +288,7 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
               }}
             />
             <img
-              src={badgeURL}
+              src={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
               alt="CVSS Badge"
               className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
             />
@@ -300,7 +309,7 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
 
             <InputWithButton
               label="Webhook Secret"
-              value={webhookSecret ?? "No webhook secret set"}
+              value={secrets?.webhookSecret ?? "No webhook secret set"}
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
               copyable
               update={{
@@ -344,65 +353,3 @@ const Index: FunctionComponent<Props> = ({ repositories, secrets }) => {
   );
 };
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (
-    context: GetServerSidePropsContext,
-    { organization, session, project },
-  ) => {
-    // fetch the project
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/";
-
-    const [resp, repoResp, secretsResp] = await Promise.all([
-      apiClient(uri),
-      apiClient(
-        "/organizations/" + organizationSlug + "/integrations/repositories",
-      ),
-      apiClient(
-        "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/secrets",
-      ),
-    ]);
-
-    let repos: Array<{ value: string; label: string }> | null = null;
-    if (repoResp.ok) {
-      repos = convertRepos(await repoResp.json());
-    }
-
-    // fetch a personal access token from the user
-    const [asset] = await Promise.all([resp.json()]);
-
-    const secrets = await secretsResp.json();
-
-    return {
-      props: {
-        asset,
-        repositories: repos,
-        secrets,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    contentTree: withContentTree,
-  },
-);

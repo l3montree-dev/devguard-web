@@ -1,45 +1,58 @@
+"use client";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
-import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FunctionComponent, useState } from "react";
 import Autosetup from "../../../../../../components/Autosetup";
 import ListItem from "../../../../../../components/common/ListItem";
 import RiskScannerDialog from "../../../../../../components/RiskScannerDialog";
 import { Button } from "../../../../../../components/ui/button";
-
-import { useActiveAsset } from "../../../../../../hooks/useActiveAsset";
+import { useAsset } from "../../../../../../context/AssetContext";
+import { useConfig } from "../../../../../../context/ConfigContext";
 import { useAutosetup } from "../../../../../../hooks/useAutosetup";
-import useConfig from "../../../../../../hooks/useConfig";
+import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../utils/externalProvider";
 
-interface Props {
-  repositories: Array<{ value: string; label: string }> | null;
-}
-
-const Index: FunctionComponent<Props> = ({ repositories }) => {
+const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
 
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
-  const asset = useActiveAsset();
   const config = useConfig();
   const autosetup = useAutosetup(
     !riskScanningIsOpen,
     config.devguardApiUrlPublicInternet,
     "full",
   );
+  const router = useRouter();
+  const params = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  };
+  // check if we can redirect to the first ref
+  const asset = useAsset();
+  if (!asset) {
+    return null;
+  }
+
+  // check if there exists a ref on the asset
+  if (asset.refs.length > 0) {
+    // redirect to the default ref
+    let redirectTo = asset.refs.find((r) => r.defaultBranch);
+    // if there is no default ref, redirect to the first one
+    if (!redirectTo) {
+      redirectTo = asset.refs[0];
+    }
+    let destination = `/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${redirectTo.slug}`;
+    router.replace(destination);
+    return null;
+  }
 
   return (
     <Page
@@ -152,48 +165,3 @@ const Index: FunctionComponent<Props> = ({ repositories }) => {
   );
 };
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { asset }) => {
-    const { organizationSlug, projectSlug, assetSlug } = context.params!;
-
-    // check if there is a path query parameter
-    const path = context.query["path"];
-
-    // check if there exists a ref on the asset
-    if (asset.refs.length > 0) {
-      // redirect to the default ref
-      let redirectTo = asset.refs.find((r) => r.defaultBranch);
-      // if there is no default ref, redirect to the first one
-      if (!redirectTo) {
-        redirectTo = asset.refs[0];
-      }
-
-      let destination = `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${redirectTo.slug}`;
-
-      if (path) {
-        destination += path;
-      }
-
-      return {
-        redirect: {
-          destination,
-          permanent: false,
-        },
-      };
-    }
-
-    // there is no ref at all
-    return {
-      props: {},
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    contentTree: withContentTree,
-  },
-);

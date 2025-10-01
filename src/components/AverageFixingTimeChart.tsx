@@ -20,6 +20,7 @@ import { getSeverityClassNames } from "./common/Severity";
 import { AverageFixingTime } from "../types/api/api";
 import Loading from "./common/Loading";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
@@ -67,22 +68,28 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   mode,
   isLoading,
 }) => {
-  if (isLoading || !avgFixingTime) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
+          <CardDescription>
+            {description}. Target Line shows 30 days.
+          </CardDescription>
         </CardHeader>
-        <CardDescription>
-          {description}. Target Line shows 30 days.
-        </CardDescription>
+
         <CardContent>
-          <div className="-mb-20 relative">
-            <Loader2 />
-          </div>
+          <Skeleton className="w-full h-46" />
         </CardContent>
       </Card>
     );
+  }
+
+  if (!avgFixingTime) {
+    avgFixingTime = {
+      averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
+    };
   }
 
   const seconds =

@@ -15,7 +15,7 @@ const AssetVersionContext = createContext<
 export const AssetVersionProvider = AssetVersionContext.Provider;
 export const useAssetVersion = () =>
   useContext(AssetVersionContext).v?.assetVersion;
-export const useUpdateAssetVersion = () =>
+export const useUpdateAssetVersionState = () =>
   useContext(AssetVersionContext).update;
 
 export const useArtifacts = () =>

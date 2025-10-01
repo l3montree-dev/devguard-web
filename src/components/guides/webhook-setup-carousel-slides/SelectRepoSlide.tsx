@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { useStore } from "../../../zustand/globalStoreProvider";
+import { useUpdateAsset } from "../../../context/AssetContext";
 
 interface StartSlideProps {
   api?: {
@@ -51,7 +52,7 @@ export default function SelectRepoSlide({
 
   const asset = useActiveAsset()!;
   const project = useActiveProject();
-  const updateAsset = useStore((s) => s.updateAsset);
+  const updateAsset = useUpdateAsset();
 
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,

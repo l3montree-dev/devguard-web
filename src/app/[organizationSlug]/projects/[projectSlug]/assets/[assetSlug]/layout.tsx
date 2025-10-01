@@ -2,6 +2,9 @@ import React from "react";
 import { ClientContextWrapper } from "../../../../../../context/ClientContextWrapper";
 import { AssetProvider } from "../../../../../../context/AssetContext";
 import { withAsset } from "../../../../../../decorators/approuter/withAsset";
+import { HttpError } from "../../../../../../decorators/middleware";
+import { redirect } from "next/navigation";
+import { withArtifacts } from "../../../../../../decorators/withArtifacts";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -17,15 +20,24 @@ const AssetLayout = async ({
   }>;
 }) => {
   const { organizationSlug, projectSlug, assetSlug } = await params;
-  const [project] = await Promise.all([
-    withAsset(organizationSlug, projectSlug, assetSlug),
-  ]);
+  try {
+    const [asset] = await Promise.all([
+      withAsset(organizationSlug, projectSlug, assetSlug),
+    ]);
 
-  return (
-    <ClientContextWrapper Provider={AssetProvider} value={project}>
-      {children}
-    </ClientContextWrapper>
-  );
+    return (
+      <ClientContextWrapper Provider={AssetProvider} value={asset}>
+        {children}
+      </ClientContextWrapper>
+    );
+  } catch (error) {
+    if (error instanceof HttpError) {
+      if (error.instructions && "redirect" in error.instructions) {
+        return redirect(error.instructions.redirect.destination);
+      }
+    }
+    throw error;
+  }
 };
 
 export default AssetLayout;

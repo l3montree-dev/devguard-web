@@ -91,7 +91,7 @@ const OrganizationHomePage: FunctionComponent = () => {
     mutate,
   } = useSWR<Paged<ProjectDTO>>(
     activeOrg
-      ? `/organizations/${activeOrg.slug.replace("%40", "@")}/projects/?page=${
+      ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?page=${
           page
         }&pageSize=${20}${search !== "" ? `&search=${search}` : ""}`
       : null,

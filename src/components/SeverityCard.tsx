@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Skeleton } from "./ui/skeleton";
 
 interface Props {
   currentAmount: number;
@@ -21,6 +21,7 @@ interface Props {
   queryIntervalEnd: number;
   variant: "high" | "medium" | "low" | "critical";
   mode?: "risk" | "cvss";
+  isLoading: boolean;
 }
 
 const SeverityCard: FunctionComponent<Props> = ({
@@ -28,6 +29,7 @@ const SeverityCard: FunctionComponent<Props> = ({
   variant,
   queryIntervalStart,
   queryIntervalEnd,
+  isLoading,
   mode = "risk",
 }) => {
   const activeOrg = useActiveOrg();
@@ -64,6 +66,13 @@ const SeverityCard: FunctionComponent<Props> = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <Card className="p-6">
+        <Skeleton className="w-full h-26" />
+      </Card>
+    );
+  }
   return (
     <Card>
       <CardHeader className="pb-2">

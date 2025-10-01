@@ -58,7 +58,7 @@ const Autosetup: FunctionComponent<Props> = ({
     <div className="">
       <div className="relative isolate">
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto flex max-w-2xl flex-col gap-16 px-6 py-16 ring-1 bg-card/50 ring-primary/10 sm:rounded-lg sm:p-8 lg:mx-0 lg:max-w-none lg:flex-row lg:items-center lg:py-20 xl:gap-x-20 xl:px-20">
+          <div className="mx-auto flex flex-col gap-16 px-6 py-16 ring-1 bg-card/50 ring-primary/10 sm:rounded-lg sm:p-8 lg:mx-0 lg:max-w-none lg:flex-row lg:items-center lg:py-20 xl:gap-x-20 xl:px-20">
             <div className="h-96 w-full flex-none max-w-sm relative">
               <span className="text-2xl font-semibold absolute inset-0 flex items-center justify-center">
                 Auto-Setup

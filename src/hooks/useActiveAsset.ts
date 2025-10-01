@@ -16,5 +16,5 @@ import { useAsset } from "../context/AssetContext";
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export function useActiveAsset() {
-  return useAsset();
+  return useAsset()!;
 }

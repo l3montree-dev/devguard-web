@@ -1,4 +1,4 @@
-import PageSkeleton from "../../../../components/PageSkeleton";
+import PageSkeleton from "../../../../../../../../components/PageSkeleton";
 
 const loading = () => {
   return <PageSkeleton />;

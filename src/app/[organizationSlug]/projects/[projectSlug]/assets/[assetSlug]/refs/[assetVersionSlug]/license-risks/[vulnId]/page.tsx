@@ -1,11 +1,6 @@
+"use client";
+
 import Page from "@/components/Page";
-
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
-
 import { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -14,10 +9,10 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FunctionComponent, useEffect, useState } from "react";
+import useSWR from "swr";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
@@ -29,13 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
+import { browserApiClient } from "@/services/devGuardApi";
 import { beautifyPurl, extractVersion, licenses } from "@/utils/common";
 import {
   emptyThenNull,
@@ -47,9 +36,11 @@ import VulnState from "../../../../../../../../../../components/common/VulnState
 import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
 import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 
-import EcosystemImage from "../../../../../../../../../../components/common/EcosystemImage";
-import Callout from "../../../../../../../../../../components/common/Callout";
 import ArtifactBadge from "@/components/ArtifactBadge";
+import Callout from "../../../../../../../../../../components/common/Callout";
+import EcosystemImage from "../../../../../../../../../../components/common/EcosystemImage";
+import { fetcher } from "../../../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -58,35 +49,56 @@ const MarkdownEditor = dynamic(
   },
 );
 
-interface Props {
-  vuln: DetailedLicenseRiskDTO;
-}
-
-const Index: FunctionComponent<Props> = (props) => {
-  const [vuln, setVuln] = useState<DetailedLicenseRiskDTO>(props.vuln);
-  useEffect(() => {
-    setVuln(props.vuln);
-  }, [props.vuln]);
+const Index: FunctionComponent = () => {
+  const params = useDecodedParams();
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
+    params as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+      vulnId: string;
+    };
 
   const activeOrg = useActiveOrg();
-  const project = useActiveProject();
+  const project = useActiveProject()!;
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
-  const assetVersion = useActiveAssetVersion();
+  const assetVersion = useActiveAssetVersion()!;
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+
+  // Data fetching with useSWR
+  const { data: vuln, mutate } = useSWR<DetailedLicenseRiskDTO>(
+    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/license-risks/${vulnId}`,
+    fetcher,
+    { suspense: true },
+  ) as {
+    data: DetailedLicenseRiskDTO;
+    mutate: (data?: DetailedLicenseRiskDTO, shouldRevalidate?: boolean) => void;
+  };
+
+  const [updatedLicense, setUpdatedLicense] = useState<string>(
+    vuln?.component.license ?? "unknown",
+  );
+
+  // Update updatedLicense when vuln data changes
+  useEffect(() => {
+    if (vuln?.component.license) {
+      setUpdatedLicense(vuln.component.license);
+    }
+  }, [vuln?.component.license]);
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
     license?: string;
   }) => {
-    if (data.status === undefined) {
+    if (!vuln) {
       return;
     }
-
     if (!Boolean(data.justification)) {
       return toast("Please provide a justification", {
         description: "You need to provide a justification for your decision.",
@@ -144,23 +156,23 @@ const Index: FunctionComponent<Props> = (props) => {
       });
     }
 
-    setVuln((prev) => ({
-      ...prev,
-      ...json,
-      events: prev.events.concat([
-        {
-          ...json.events.slice(-1)[0],
-        },
-      ]),
-    }));
+    // Update the local data and revalidate
+    await mutate(
+      {
+        ...vuln,
+        ...json,
+        events: vuln.events.concat([
+          {
+            ...json.events.slice(-1)[0],
+          },
+        ]),
+      },
+      false,
+    );
     setJustification("");
   };
 
-  const isOpen = vuln.state === "open";
-
-  const [updatedLicense, setUpdatedLicense] = useState<string>(
-    vuln.component.license ?? "unknown",
-  );
+  const isOpen = vuln?.state === "open";
 
   return (
     <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
@@ -171,7 +183,7 @@ const Index: FunctionComponent<Props> = (props) => {
               <h1 className="text-2xl font-semibold">License Details</h1>
 
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
-                {vuln.ticketUrl && (
+                {vuln?.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
                       <div className="mr-2">
@@ -499,49 +511,3 @@ const Index: FunctionComponent<Props> = (props) => {
 };
 
 export default Index;
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { assetVersion }) => {
-    // fetch the project
-
-    const {
-      organizationSlug,
-      projectSlug,
-      assetSlug,
-      assetVersionSlug,
-      vulnId,
-    } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/license-risks/" +
-      vulnId;
-
-    const [resp]: [DetailedLicenseRiskDTO] = await Promise.all([
-      apiClient(uri).then((r) => r.json()),
-    ]);
-
-    return {
-      props: {
-        vuln: resp,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    asset: withAsset,
-    project: withProject,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);

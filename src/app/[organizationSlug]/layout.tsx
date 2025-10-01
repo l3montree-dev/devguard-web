@@ -8,7 +8,7 @@ import { withOrganization } from "../../decorators/approuter/withOrganization";
 import { redirect } from "next/navigation";
 import { HttpError } from "../../decorators/middleware";
 
-export default async function RootLayout({
+export default async function OrganizationLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
@@ -20,8 +20,8 @@ export default async function RootLayout({
   try {
     const { organizationSlug } = await params;
     const [org, contentTree] = await Promise.all([
-      withOrganization(organizationSlug.replace("%40", "@")),
-      withContentTree(organizationSlug.replace("%40", "@")),
+      withOrganization(decodeURIComponent(organizationSlug)),
+      withContentTree(decodeURIComponent(organizationSlug)),
     ]);
 
     return (

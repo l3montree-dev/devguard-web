@@ -1,18 +1,17 @@
-import { CubeTransparentIcon } from "@heroicons/react/24/outline";
-
-import { Badge } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import React from "react";
+import { toast } from "sonner";
+import { browserApiClient } from "../../../services/devGuardApi";
+import { AssetDTO } from "../../../types/api/api";
 import { classNames } from "../../../utils/common";
-import { Card, CardHeader, CardTitle, CardDescription } from "../../ui/card";
+import { useStore } from "../../../zustand/globalStoreProvider";
+import { AsyncButton } from "../../ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogHeader, DialogTitle } from "../../ui/dialog";
-import { AssetDTO } from "../../../types/api/api";
-import Image from "next/image";
-import { browserApiClient } from "../../../services/devGuardApi";
-import { useRouter } from "next/compat/router";
-import { toast } from "sonner";
-import { useStore } from "../../../zustand/globalStoreProvider";
-import { AsyncButton, Button } from "../../ui/button";
+import useDecodedParams from "../../../hooks/useDecodedParams";
+import { useUpdateAsset } from "../../../context/AssetContext";
 
 interface Props {
   api?: {
@@ -25,8 +24,12 @@ const UpdateRepositoryProviderSlide = ({ api, nextIndex }: Props) => {
   const [selectedProvider, setSelectedProvider] = React.useState<
     AssetDTO["repositoryProvider"] | undefined
   >();
-  const { organizationSlug, projectSlug, assetSlug } = useRouter().query;
-  const updateAsset = useStore((s) => s.updateAsset);
+  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  };
+  const updateAsset = useUpdateAsset();
 
   const handleProviderUpdate = async () => {
     // update the asset provider

@@ -2,19 +2,14 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { middleware } from "@/decorators/middleware";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withSession } from "@/decorators/withSession";
 import { Policy } from "@/types/api/api";
-
 import React, { FunctionComponent, useState } from "react";
-
 import { EllipsisVerticalIcon } from "lucide-react";
-import { useRouter } from "next/compat/router";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import useSWR from "swr";
+import EmptyParty from "../../../components/common/EmptyParty";
 import ListItem from "../../../components/common/ListItem";
+import ListRenderer from "../../../components/common/ListRenderer";
 import PolicyDialog from "../../../components/PolicyDialog";
 import { Badge } from "../../../components/ui/badge";
 import { Button, buttonVariants } from "../../../components/ui/button";
@@ -24,19 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-import { withContentTree } from "../../../decorators/withContentTree";
-import { useOrganizationMenu } from "../../../hooks/useOrganizationMenu";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "../../../services/devGuardApi";
-import useSWR from "swr";
 import { fetcher } from "../../../hooks/useApi";
-import SkeletonListItems from "../../../components/common/SkeletonListItems";
-import Err from "../../../components/common/Err";
-import ListRenderer from "../../../components/common/ListRenderer";
-import { title } from "process";
-import EmptyParty from "../../../components/common/EmptyParty";
+import useDecodedParams from "../../../hooks/useDecodedParams";
+import { useOrganizationMenu } from "../../../hooks/useOrganizationMenu";
+import { browserApiClient } from "../../../services/devGuardApi";
 
 interface Props {
   policies: Policy[];
@@ -116,7 +102,7 @@ export const PolicyListItem = ({
 const ComplianceIndex: FunctionComponent<Props> = () => {
   const menu = useOrganizationMenu();
   const [open, setOpen] = useState(false);
-  const { organizationSlug } = useParams() as {
+  const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
   const {

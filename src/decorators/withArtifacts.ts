@@ -1,20 +1,19 @@
-import { getApiClientFromContext } from "@/services/devGuardApi";
 import { ArtifactDTO } from "@/types/api/api";
-import { GetServerSidePropsContext } from "next";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
-export async function withArtifacts(ctx: GetServerSidePropsContext) {
+export async function withArtifacts(
+  organizationSlug: string,
+  projectSlug: string,
+  assetSlug: string,
+  assetVersionSlug: string,
+) {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
-
-  const organization = ctx.params?.organizationSlug;
-  const projectSlug = ctx.params?.projectSlug;
-  const assetSlug = ctx.params?.assetSlug;
-  const assetVersionSlug = ctx.params?.assetVersionSlug;
+  const devGuardApiClient = await getApiClientInAppRouter();
 
   // get the organization
   const r = await devGuardApiClient(
     "/organizations/" +
-      organization +
+      organizationSlug +
       "/projects/" +
       projectSlug +
       "/assets/" +

@@ -3,7 +3,7 @@ import { NodeInputProps } from "./helpers";
 import { useId } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "@/components/ui/label";
-import useConfig from "../../hooks/useConfig";
+import { useConfig } from "../../context/ConfigContext";
 
 export function NodeInputCheckbox<T>({
   node,

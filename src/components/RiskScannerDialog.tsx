@@ -5,6 +5,7 @@ import React, {
   FunctionComponent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -42,6 +43,7 @@ import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slide
 import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 import { useUpdateOrganization } from "../context/OrganizationContext";
+import { memoize } from "lodash";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -58,7 +60,13 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   devguardCIComponentBase,
   onOpenChange,
 }) => {
-  const [api, setApi] = React.useState<CarouselApi>();
+  const [api, setApi] = React.useState<{
+    reInit: () => void;
+    scrollTo: (index: number) => void;
+  }>({
+    reInit: () => {},
+    scrollTo: () => {},
+  });
 
   const asset = useActiveAsset()!;
 
@@ -249,23 +257,24 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // save the slide history to make the back button implementation easier
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  useEffect(() => {
-    if (api) {
-      api.on("settle", (...ev) => {
-        const currentSlide = api.slidesInView()[0];
+  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+
+  const setProxyApi = useCallback((api: CarouselApi) => {
+    return setApi({
+      reInit: api ? api.reInit : () => {},
+      scrollTo: (index: number) => {
+        api?.scrollTo(index);
         // if the current slide is not in the history, update the history
         setSlideHistory((prev) => {
           // check if the previous slide is already in the history
-          if (prev.includes(currentSlide)) {
-            return prev.slice(0, prev.lastIndexOf(currentSlide) + 1);
+          if (prev.includes(index)) {
+            return prev.slice(0, prev.lastIndexOf(index) + 1);
           }
-          return [...prev, currentSlide];
+          return [...prev, index];
         });
-      });
-    }
-  }, [api]);
-
-  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+      },
+    });
+  }, []);
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -278,7 +287,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           }}
           className="w-full"
           plugins={[AutoHeight(), Fade()]}
-          setApi={setApi}
+          setApi={setProxyApi}
         >
           <CarouselContent>
             {/** Only needed if asset is not connected already */}

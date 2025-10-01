@@ -1,3 +1,4 @@
+"use client";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -10,12 +11,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import "@xyflow/react/dist/style.css";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { FunctionComponent, useMemo } from "react";
 import {
   Card,
@@ -44,7 +40,9 @@ import SeverityCard from "../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../components/ui/badge";
 import { AsyncButton } from "../../../../../../../../components/ui/button";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
+import { useArtifacts } from "../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import {
   AverageFixingTime,
   ComponentRisk,
@@ -54,7 +52,8 @@ import {
   VulnEventDTO,
 } from "../../../../../../../../types/api/api";
 import { reduceRiskHistories } from "../../../../../../../../utils/view";
-import { useArtifacts } from "../../../../../../../../context/AssetVersionContext";
+import { classNames } from "../../../../../../../../utils/common";
+import { Skeleton } from "../../../../../../../../components/ui/skeleton";
 
 interface Props {
   componentRisk: ComponentRisk;
@@ -73,12 +72,11 @@ const Index: FunctionComponent<Props> = () => {
   const activeProject = useActiveProject()!;
   const activeAsset = useActiveAsset()!;
   const assetMenu = useAssetMenu();
-  const router = useRouter();
   const artifacts = useArtifacts();
   const { branches, tags } = useAssetBranchesAndTags();
 
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useParams() as {
+    useDecodedParams() as {
       organizationSlug: string;
       projectSlug: string;
       assetSlug: string;
@@ -90,7 +88,9 @@ const Index: FunctionComponent<Props> = () => {
     }
   ).artifact;
 
-  const { data: events } = useSWR<Paged<VulnEventDTO>>(
+  const { data: events, isLoading: eventsLoading } = useSWR<
+    Paged<VulnEventDTO>
+  >(
     "/organizations/" +
       organizationSlug +
       "/projects/" +
@@ -99,7 +99,7 @@ const Index: FunctionComponent<Props> = () => {
       assetSlug +
       "/refs/" +
       assetVersionSlug +
-      "/events/?pageSize=3",
+      "/events/?pageSize=4",
     fetcher,
   );
 
@@ -287,6 +287,7 @@ const Index: FunctionComponent<Props> = () => {
               <SeverityCard
                 variant="critical"
                 queryIntervalStart={9}
+                isLoading={riskHistoryLoading}
                 queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"
@@ -298,6 +299,7 @@ const Index: FunctionComponent<Props> = () => {
               <SeverityCard
                 variant="high"
                 queryIntervalStart={7}
+                isLoading={riskHistoryLoading}
                 queryIntervalEnd={8}
                 currentAmount={
                   mode === "risk"
@@ -310,6 +312,7 @@ const Index: FunctionComponent<Props> = () => {
                 variant="medium"
                 queryIntervalStart={4}
                 queryIntervalEnd={7}
+                isLoading={riskHistoryLoading}
                 currentAmount={
                   mode === "risk"
                     ? (latest?.medium ?? 0)
@@ -321,6 +324,7 @@ const Index: FunctionComponent<Props> = () => {
                 variant="low"
                 queryIntervalStart={0}
                 queryIntervalEnd={3}
+                isLoading={riskHistoryLoading}
                 currentAmount={
                   mode === "risk" ? (latest?.low ?? 0) : (latest?.lowCvss ?? 0)
                 }
@@ -355,44 +359,58 @@ const Index: FunctionComponent<Props> = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex -mt-4 flex-col">
-                      {(licenses || []).slice(0, 5).map((el, i, arr) => (
-                        <div
-                          className={
-                            i === arr.length - 1 ? "pt-4" : "border-b py-4"
-                          }
-                          key={el.license.licenseId}
-                        >
-                          <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                            <span className="capitalize">
-                              {el.license.licenseId}
-                            </span>
-                            <div className="flex flex-row flex-wrap gap-2">
-                              {el.license.isOsiApproved ? (
-                                <Badge variant={"secondary"}>
-                                  <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
-                                  OSI Approved
-                                </Badge>
-                              ) : (
-                                <Badge variant={"secondary"}>
-                                  <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
-                                </Badge>
+                      {licenseLoading
+                        ? [0, 1, 2, 3, 4].map((_, i, arr) => (
+                            <Skeleton
+                              className={classNames(
+                                "h-[46px]",
+                                i === arr.length - 1 ? "mt-4" : "border-b my-4",
                               )}
+                              key={i}
+                            />
+                          ))
+                        : (licenses || []).slice(0, 5).map((el, i, arr) => (
+                            <div
+                              className={
+                                i === arr.length - 1 ? "pt-4" : "border-b py-4"
+                              }
+                              key={el.license.licenseId}
+                            >
+                              <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                                <span className="capitalize">
+                                  {el.license.licenseId}
+                                </span>
+                                <div className="flex flex-row flex-wrap gap-2">
+                                  {el.license.isOsiApproved ? (
+                                    <Badge variant={"secondary"}>
+                                      <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                                      OSI Approved
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant={"secondary"}>
+                                      <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {el.license.name
+                                  ? el.license.name
+                                  : "Unknown license information"}
+                                , {el.count} dependencies
+                              </p>
                             </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {el.license.name
-                              ? el.license.name
-                              : "Unknown license information"}
-                            , {el.count} dependencies
-                          </p>
-                        </div>
-                      ))}
+                          ))}
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </div>
-            <RiskHistoryDistributionDiagram data={riskHistory} mode={mode} />
+            <RiskHistoryDistributionDiagram
+              isLoading={riskHistoryLoading}
+              data={riskHistory}
+              mode={mode}
+            />
             <div className="grid grid-cols-8 gap-4">
               <div className="col-span-4 grid grid-cols-2 gap-4">
                 <AverageFixingTimeChart
@@ -458,16 +476,20 @@ const Index: FunctionComponent<Props> = () => {
                     >
                       <div className="absolute left-3 h-full border-l border-r bg-secondary" />
 
-                      {events?.data.map((event, index, events) => {
-                        return (
-                          <VulnEventItem
-                            key={event.id}
-                            event={event}
-                            index={index}
-                            events={events}
-                          />
-                        );
-                      })}
+                      {eventsLoading
+                        ? [0, 1, 2, 3].map((el) => (
+                            <Skeleton key={el} className="w-full h-20" />
+                          ))
+                        : events?.data.map((event, index, events) => {
+                            return (
+                              <VulnEventItem
+                                key={event.id}
+                                event={event}
+                                index={index}
+                                events={events}
+                              />
+                            );
+                          })}
                     </ul>
                   </div>
                 </CardContent>
