@@ -39,7 +39,7 @@ const GithubTokenSlide = ({
   api,
   yamlGeneratorSlideIndex,
 }: GithubTokenSlideProps) => {
-  const { theme, resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const imageSrc =
     theme === "dark"
       ? "/assets/repo-secret-dark.png"
