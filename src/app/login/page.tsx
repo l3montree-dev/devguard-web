@@ -245,25 +245,27 @@ const Login: NextPage = () => {
             <div className="mt-4 sm:mx-auto mt-8">
               {flow?.requested_aal !== "aal2" ? (
                 <Tabs value={activeTab} className="w-full">
-                  <TabsList>
-                    {(availableMethods.includes("oidc") ||
-                      availableMethods.includes("passkey")) && (
-                      <TabsTrigger
-                        onClick={() => setActiveTab("passwordless")}
-                        value="passwordless"
-                      >
-                        Passwordless Login
-                      </TabsTrigger>
-                    )}
-                    {availableMethods.includes(UiNodeGroupEnum.Password) && (
-                      <TabsTrigger
-                        onClick={() => setActiveTab("password")}
-                        value="password"
-                      >
-                        Legacy Password Login
-                      </TabsTrigger>
-                    )}
-                  </TabsList>
+                  {!themeConfig.oidcOnly && (
+                    <TabsList>
+                      {(availableMethods.includes("oidc") ||
+                        availableMethods.includes("passkey")) && (
+                        <TabsTrigger
+                          onClick={() => setActiveTab("passwordless")}
+                          value="passwordless"
+                        >
+                          Passwordless Login
+                        </TabsTrigger>
+                      )}
+                      {availableMethods.includes(UiNodeGroupEnum.Password) && (
+                        <TabsTrigger
+                          onClick={() => setActiveTab("password")}
+                          value="password"
+                        >
+                          Legacy Password Login
+                        </TabsTrigger>
+                      )}
+                    </TabsList>
+                  )}
                   <TabsContent value="passwordless" className={"mt-6"}>
                     <PasswordlessLogin
                       flow={flow}
