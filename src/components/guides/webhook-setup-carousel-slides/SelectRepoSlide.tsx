@@ -1,9 +1,8 @@
 import { AssetFormValues } from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CarouselApi, CarouselItem } from "@/components/ui/carousel";
+import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -11,8 +10,8 @@ import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useUpdateAsset } from "../../../context/AssetContext";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
-import { useStore } from "../../../zustand/globalStoreProvider";
 
 interface StartSlideProps {
   api?: {
@@ -51,7 +50,7 @@ export default function SelectRepoSlide({
 
   const asset = useActiveAsset()!;
   const project = useActiveProject();
-  const updateAsset = useStore((s) => s.updateAsset);
+  const updateAsset = useUpdateAsset();
 
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,

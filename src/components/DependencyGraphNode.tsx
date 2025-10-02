@@ -16,7 +16,7 @@
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 import {
@@ -26,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { VulnDTO } from "../types/api/api";
+import { useSearchParams } from "next/navigation";
+import useDecodedPathname from "../hooks/useDecodedPathname";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -41,8 +43,10 @@ export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = severityToColor(riskToSeverity(props.data.risk));
+  const searchParams = useSearchParams();
+  const pathname = useDecodedPathname();
   const shouldFocus =
-    beautifyPurl(useRouter().query.pkg as string) ===
+    beautifyPurl(searchParams?.get("pkg") as string) ===
     beautifyPurl(props.data.label);
   const router = useRouter();
   const version = extractVersion(props.data.label);
@@ -106,10 +110,7 @@ export const DependencyGraphNode: FunctionComponent<
           <DropdownMenuItem key={vuln.id}>
             <Link
               className="!text-foreground hover:no-underline"
-              href={
-                router.asPath.split("?")[0] +
-                `/../../dependency-risks/${vuln.id}`
-              }
+              href={pathname + `/../../dependency-risks/${vuln.id}`}
             >
               {vuln.cveID}
             </Link>

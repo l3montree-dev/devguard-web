@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 
 import { AssetDTO, AssetVersionDTO, UserRole } from "@/types/api/api";
+import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,
   CogIcon,
@@ -21,12 +22,12 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { CodeIcon, ScanText, TextSelect } from "lucide-react";
-import { useRouter } from "next/router";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
-import { RocketLaunchIcon } from "@heroicons/react/20/solid";
+import useDecodedParams from "./useDecodedParams";
+import useDecodedPathname from "./useDecodedPathname";
 import { useCurrentUserRole } from "./useUserRole";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
@@ -48,7 +49,7 @@ export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
 
 export const getAssetVersionSlug = (
   asset: AssetDTO,
-  assetVersion?: AssetVersionDTO,
+  assetVersion: AssetVersionDTO | null | undefined,
 ): string => {
   if (!assetVersion) {
     return getDefaultAssetVersionSlug(asset);
@@ -67,10 +68,18 @@ export const getAssetVersionSlug = (
 
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 export const useAssetMenu = () => {
-  const router = useRouter();
-  const orgSlug = router.query.organizationSlug as string;
-  const projectSlug = router.query.projectSlug as string;
-  const assetSlug = router.query.assetSlug as string;
+  const params = useDecodedParams();
+  const {
+    organizationSlug: orgSlug,
+    projectSlug,
+    assetSlug,
+  } = params as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  };
+
+  const pathname = useDecodedPathname();
 
   const loggedIn = useCurrentUser();
   const assetVersion = useActiveAssetVersion();
@@ -106,8 +115,8 @@ export const useAssetMenu = () => {
         assetVersionSlug +
         "/compliance",
       Icon: ScaleIcon,
-      isActive: router.pathname.startsWith(
-        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/compliance",
+      isActive: pathname.startsWith(
+        `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance`,
       ),
     });
 
@@ -124,12 +133,13 @@ export const useAssetMenu = () => {
         assetVersionSlug,
       Icon: ChartBarSquareIcon,
       isActive:
-        router.pathname ===
-          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]" ||
-        router.pathname ===
-          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/controls/[control]" ||
-        router.pathname ===
-          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]/events",
+        pathname ===
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}` ||
+        pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/controls/`,
+        ) ||
+        pathname ===
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events`,
     });
 
     menu = menu.concat([
@@ -146,7 +156,7 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/artifacts",
         Icon: TextSelect,
-        isActive: router.pathname.includes("artifacts"),
+        isActive: pathname.includes("artifacts"),
       },
       {
         title: "Code Risks",
@@ -161,7 +171,7 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/code-risks",
         Icon: CodeIcon,
-        isActive: router.pathname.includes("code-risks"),
+        isActive: pathname.includes("code-risks"),
       },
       {
         title: "Dependency Risks",
@@ -176,7 +186,7 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/dependency-risks",
         Icon: WrenchScrewdriverIcon,
-        isActive: router.pathname.includes("dependency-risks"),
+        isActive: pathname.includes("dependency-risks"),
       },
       {
         title: "License Risks",
@@ -191,7 +201,7 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/license-risks",
         Icon: ScanText,
-        isActive: router.pathname.includes("license-risks"),
+        isActive: pathname.includes("license-risks"),
       },
       {
         title: "Dependencies",
@@ -206,7 +216,7 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/dependencies",
         Icon: ShareIcon,
-        isActive: router.pathname.includes("dependencies"),
+        isActive: pathname.includes("dependencies"),
       },
     ]);
   } else {
@@ -215,8 +225,7 @@ export const useAssetMenu = () => {
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
       Icon: RocketLaunchIcon,
       isActive:
-        router.pathname ===
-        "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/refs/[assetVersionSlug]",
+        pathname === `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
     });
   }
 
@@ -237,8 +246,8 @@ export const useAssetMenu = () => {
           "/settings",
         Icon: CogIcon,
         isActive:
-          router.pathname ===
-          "/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/settings",
+          pathname ===
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
       },
     ]);
   }

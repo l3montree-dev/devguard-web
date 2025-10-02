@@ -1,6 +1,6 @@
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
-import router from "next/router";
+
 import React, {
   FunctionComponent,
   useCallback,
@@ -18,13 +18,12 @@ import {
   browserApiClient,
   multipartBrowserApiClient,
 } from "../services/devGuardApi";
-
 import { useAutosetup } from "@/hooks/useAutosetup";
-
+import { useUpdateOrganization } from "../context/OrganizationContext";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
-import { useStore } from "../zustand/globalStoreProvider";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
+import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 import GithubTokenSlide from "./guides/risk-scanner-carousel-slides/GithubTokenSlide";
 import GitLabIntegrationSlide from "./guides/risk-scanner-carousel-slides/GitLabIntegrationSlide";
 import GitlabTokenSlide from "./guides/risk-scanner-carousel-slides/GitlabTokenSlide";
@@ -34,13 +33,12 @@ import ProviderSetupSlide from "./guides/risk-scanner-carousel-slides/Repository
 import ScannerOptionsSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerOptionsSelectionSlide";
 import ScannerSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerSelectionSlide";
 import { SetupMethodSelectionSlide } from "./guides/risk-scanner-carousel-slides/SetupMethodSelectionSlide";
+import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import YamlGeneratorSlide from "./guides/risk-scanner-carousel-slides/YamlGeneratorSlide";
 import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSlide";
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
-import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
-import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
-import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
+import { useRouter } from "next/navigation";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -57,7 +55,15 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   devguardCIComponentBase,
   onOpenChange,
 }) => {
-  const [api, setApi] = React.useState<CarouselApi>();
+  const [api, setApi] = React.useState<{
+    reInit: () => void;
+    scrollTo: (index: number) => void;
+  }>({
+    reInit: () => {},
+    scrollTo: () => {},
+  });
+
+  const router = useRouter();
 
   const asset = useActiveAsset()!;
 
@@ -81,7 +87,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
   const [tab, setTab] = React.useState<"sbom" | "sarif">("sbom");
-  const updateOrg = useStore((s) => s.updateOrganization);
+  const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
   const sbomFileRef = useRef<File | undefined>(undefined);
@@ -158,10 +164,10 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     } else {
       toast.error("SBOM has not been sent successfully");
     }
+    onOpenChange(false);
     router.push(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/dependency-risks/`,
     );
-    onOpenChange(false);
   };
 
   const uploadSARIF = async () => {
@@ -181,6 +187,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     } else {
       toast.error("SARIF report has not been sent successfully");
     }
+    onOpenChange(false);
     router.push(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/code-risks/`,
     );
@@ -189,8 +196,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
   const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
 
-  const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
+  const activeOrg = useActiveOrg()!;
+  const activeProject = useActiveProject()!;
 
   const pat = usePersonalAccessToken();
   const [timedOut, setTimedOut] = React.useState(false);
@@ -248,23 +255,24 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // save the slide history to make the back button implementation easier
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  useEffect(() => {
-    if (api) {
-      api.on("settle", (...ev) => {
-        const currentSlide = api.slidesInView()[0];
+  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+
+  const setProxyApi = useCallback((api: CarouselApi) => {
+    return setApi({
+      reInit: api ? api.reInit : () => {},
+      scrollTo: (index: number) => {
+        api?.scrollTo(index);
         // if the current slide is not in the history, update the history
         setSlideHistory((prev) => {
           // check if the previous slide is already in the history
-          if (prev.includes(currentSlide)) {
-            return prev.slice(0, prev.lastIndexOf(currentSlide) + 1);
+          if (prev.includes(index)) {
+            return prev.slice(0, prev.lastIndexOf(index) + 1);
           }
-          return [...prev, currentSlide];
+          return [...prev, index];
         });
-      });
-    }
-  }, [api]);
-
-  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+      },
+    });
+  }, []);
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -277,7 +285,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           }}
           className="w-full"
           plugins={[AutoHeight(), Fade()]}
-          setApi={setApi}
+          setApi={setProxyApi}
         >
           <CarouselContent>
             {/** Only needed if asset is not connected already */}
@@ -295,7 +303,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             />
             <GitLabIntegrationSlide
               org={activeOrg}
-              updateOrg={updateOrg}
+              updateOrg={(v) =>
+                updateOrg((prev) => ({ ...prev, organization: v }))
+              }
               api={api}
               selectRepoSlideIndex={4}
               prevIndex={prevIndex}

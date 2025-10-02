@@ -24,8 +24,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import useConfig from "../../hooks/useConfig";
-import { useStore } from "../../zustand/globalStoreProvider";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button, buttonVariants } from "../ui/button";
 import {
@@ -34,11 +33,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useConfig } from "../../context/ConfigContext";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
 
-  const user = useStore((s) => s.session?.identity);
+  const user = useCurrentUser();
   const handleLogout = LogoutLink();
   const config = useConfig();
 

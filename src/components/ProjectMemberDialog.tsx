@@ -10,19 +10,18 @@ import {
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { browserApiClient } from "@/services/devGuardApi";
+import { UserRole } from "@/types/api/api";
 import { toast } from "sonner";
+import { useUpdateProject } from "../context/ProjectContext";
 import { useActiveProject } from "../hooks/useActiveProject";
-import Callout from "./common/Callout";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { cn } from "../lib/utils";
-import { Button } from "./ui/button";
-import { useStore } from "../zustand/globalStoreProvider";
-import { UserRole } from "@/types/api/api";
 
 interface Props {
   isOpen: boolean;
@@ -34,8 +33,8 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
   onOpenChange,
 }) => {
   const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const updateProject = useStore((s) => s.updateProject);
+  const activeProject = useActiveProject()!;
+  const updateProject = useUpdateProject();
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const handleInviteSelectedMembers = async () => {

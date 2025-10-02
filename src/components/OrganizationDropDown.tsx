@@ -11,14 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useOrg } from "@/hooks/useOrg";
-import { OrganizationDetailsDTO, OrganizationDTO } from "@/types/api/api";
-import { useStore } from "@/zustand/globalStoreProvider";
+import { OrganizationDTO } from "@/types/api/api";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { browserApiClient } from "../services/devGuardApi";
@@ -33,6 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useSession, useUpdateSession } from "../context/SessionContext";
+import { useActiveOrg } from "../hooks/useActiveOrg";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -44,24 +44,22 @@ const activeOrgName = (name: string, slug: string) => {
   return name;
 };
 export const OrganizationDropDown = () => {
-  const orgs = useStore((s) => s.organizations);
+  const orgs = useSession().organizations;
+  const updateOrganizations = useUpdateSession();
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
 
   const user = useCurrentUser();
   const router = useRouter();
-  let activeOrg = useOrg();
+  let activeOrg = useActiveOrg() as OrganizationDTO | null;
   if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
-  const updateOrganization = useStore((s) => s.updateOrganization);
-  const updateOrganizations = useStore((s) => s.updateOrganizations);
 
   const handleActiveOrgChange = (slug: string) => () => {
     // redirect to the new slug
     const org = orgs.find((o) => o.slug === slug);
     if (org) {
       router.push(`/${org.slug}`);
-      updateOrganization(org as OrganizationDetailsDTO);
     }
   };
 
@@ -88,7 +86,10 @@ export const OrganizationDropDown = () => {
               toast.success("Organization synced successfully");
               // if the response is ok, update the organizations
               return response.json().then((data: Array<OrganizationDTO>) => {
-                updateOrganizations(uniqBy(data.concat(orgs), "id"));
+                updateOrganizations((prev) => ({
+                  ...prev,
+                  organizations: uniqBy(data.concat(orgs), "id"),
+                }));
               });
             }
           })
@@ -99,7 +100,7 @@ export const OrganizationDropDown = () => {
           });
       }
     }
-  }, [user]);
+  }, [user, updateOrganizations, orgs]);
 
   const handleNavigateToSetupOrg = () => {
     router.push(`/setup`);

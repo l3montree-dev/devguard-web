@@ -13,25 +13,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { UserRole } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
   ScaleIcon,
-  TagIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-import { useCurrentUser } from "./useCurrentUser";
-import { useActiveProject } from "./useActiveProject";
-import { useCurrentUserRole } from "./useUserRole";
-import { UserRole } from "@/types/api/api";
 import { ContainerIcon } from "lucide-react";
+import { useProject } from "../context/ProjectContext";
+import { useCurrentUser } from "./useCurrentUser";
+import useDecodedParams from "./useDecodedParams";
+import useDecodedPathname from "./useDecodedPathname";
+import { useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
-  const router = useRouter();
-  const orgSlug = router.query.organizationSlug as string;
-  const projectSlug = router.query.projectSlug as string;
-  const project = useActiveProject();
+  const params = useDecodedParams();
+  const project = useProject()!;
+  const pathname = useDecodedPathname();
+  const orgSlug = params?.organizationSlug as string;
+  const projectSlug = params?.projectSlug as string;
   const currentUserRole = useCurrentUserRole();
 
   const loggedIn = useCurrentUser();
@@ -41,14 +42,13 @@ export const useProjectMenu = () => {
       title: "Overview",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
       Icon: ChartBarSquareIcon,
-      isActive:
-        router.pathname ===
-        "/[organizationSlug]/projects/[projectSlug]/overview",
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/overview`,
     },
     {
       title: "Releases",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
       Icon: ContainerIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
     },
     {
       title: project.externalEntityProviderId
@@ -56,6 +56,7 @@ export const useProjectMenu = () => {
         : "Subgroups & Repositories",
       href: "/" + orgSlug + "/projects/" + projectSlug,
       Icon: ListBulletIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
     },
   ];
   if (loggedIn) {
@@ -63,6 +64,7 @@ export const useProjectMenu = () => {
       title: "Compliance",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
       Icon: ScaleIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/compliance`,
     });
 
     if (
@@ -73,6 +75,7 @@ export const useProjectMenu = () => {
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
         Icon: CogIcon,
+        isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
       });
     }
   }

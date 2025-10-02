@@ -13,38 +13,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  ChartBarSquareIcon,
-  CogIcon,
-  ListBulletIcon,
-} from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-
-import { useCurrentUser } from "./useCurrentUser";
-import { ScaleIcon } from "lucide-react";
-import { useActiveOrg } from "./useActiveOrg";
-import { useCurrentUserRole } from "./useUserRole";
 import { UserRole } from "@/types/api/api";
+import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { ScaleIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useActiveOrg } from "./useActiveOrg";
+import { useCurrentUser } from "./useCurrentUser";
+import useDecodedParams from "./useDecodedParams";
+import { useCurrentUserRole } from "./useUserRole";
 
 export const useOrganizationMenu = () => {
-  const router = useRouter();
-  const orgSlug = router.query.organizationSlug as string;
+  const pathName = usePathname() || "/";
+  const { organizationSlug: orgSlug } = useDecodedParams() as {
+    organizationSlug: string;
+  };
+
   const loggedIn = useCurrentUser();
   const currentUserRole = useCurrentUserRole();
+
+  // decode the path name and the org slug
+  const decodedPathName = decodeURIComponent(pathName);
+  const decodedOrgSlug = decodeURIComponent(orgSlug);
+
   const org = useActiveOrg();
   const menu = [
     {
       title: "Groups",
-      href: "/" + orgSlug,
+      href: "/" + decodedOrgSlug,
       Icon: ListBulletIcon,
+      isActive: decodedPathName === "/" + decodedOrgSlug,
     },
   ];
 
   if (loggedIn && !org.externalEntityProviderId) {
     menu.push({
       title: "Compliance",
-      href: "/" + orgSlug + "/compliance",
+      href: "/" + decodedOrgSlug + "/compliance",
       Icon: ScaleIcon,
+      isActive: decodedPathName === "/" + decodedOrgSlug + "/compliance",
     });
 
     if (
@@ -53,8 +59,11 @@ export const useOrganizationMenu = () => {
     ) {
       menu.push({
         title: "Settings",
-        href: "/" + orgSlug + "/settings",
+        href: "/" + decodedOrgSlug + "/settings",
         Icon: CogIcon,
+        isActive: decodedPathName.startsWith(
+          "/" + decodedOrgSlug + "/settings",
+        ),
       });
     }
 

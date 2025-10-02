@@ -7,16 +7,16 @@ import { useMemo } from "react";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUser } from "./useCurrentUser";
-import { useParams } from "next/navigation";
+import useDecodedParams from "./useDecodedParams";
 
 export const useCurrentUserRole = () => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
 
-  const { projectSlug } = useParams<{
+  const { projectSlug } = useDecodedParams() as {
     projectSlug: string;
-  }>();
+  }; // projectSlug from URL params
 
   return useMemo(() => {
     return getCurrentUserRole(
@@ -32,7 +32,7 @@ export const getCurrentUserRole = (
   currentUser: User | undefined,
   org: OrganizationDetailsDTO,
   projectSlug?: string | undefined,
-  project?: ProjectDTO,
+  project?: ProjectDTO | null,
 ): UserRole | null => {
   if (!currentUser) {
     return UserRole.Guest;

@@ -23,13 +23,16 @@ import {
   YAxis,
 } from "recharts";
 import { severityToColor } from "./common/Severity";
+import { Skeleton } from "./ui/skeleton";
 
 export function RiskHistoryDistributionDiagram({
   data,
   mode = "risk",
+  isLoading,
 }: {
   data: ReleaseRiskHistory[];
   mode?: "risk" | "cvss";
+  isLoading: boolean;
 }) {
   return (
     <Card>
@@ -44,100 +47,104 @@ export function RiskHistoryDistributionDiagram({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <ChartContainer
-            config={{
-              critical: {
-                label: "Critical",
-                color: severityToColor("CRITICAL"),
-              },
-              high: {
-                label: "High",
-                color: severityToColor("HIGH"),
-              },
-              medium: {
-                label: "Medium",
-                color: severityToColor("MEDIUM"),
-              },
-              low: {
-                label: "Low",
-                color: severityToColor("LOW"),
-              },
-            }}
-          >
-            <AreaChart accessibilityLayer data={data}>
-              <ChartLegend content={<ChartLegendContent />} />
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="day"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => {
-                  return new Date(value).toLocaleDateString("de-DE", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-              />
-              <YAxis />
-              <ChartTooltip
-                cursor={false}
-                labelFormatter={(value) =>
-                  new Date(value).toLocaleDateString("de-DE", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                }
-                content={
-                  <ChartTooltipContent
-                    indicator="dot"
-                    className="bg-background"
-                  />
-                }
-              />
-              <defs>
-                {["critical", "high", "medium", "low"].map((level, i) => {
-                  const sev = level.toUpperCase();
-                  return (
-                    <linearGradient
-                      key={level}
-                      id={`fill-${level}`}
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={severityToColor(sev)}
-                        stopOpacity={0.2}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor={severityToColor(sev)}
-                        stopOpacity={0.2}
-                      />
-                    </linearGradient>
-                  );
-                })}
-              </defs>
-              {["low", "medium", "high", "critical"].map((level) => (
-                <Area
-                  key={level}
-                  dataKey={mode === "risk" ? level : level + "Cvss"}
-                  type="monotone"
-                  stackId="1"
-                  stroke={severityToColor(level.toUpperCase())}
-                  strokeWidth={2}
-                  fill={`url(#fill-${level})`}
-                  fillOpacity={0.8}
-                  dot={false}
+        {isLoading ? (
+          <Skeleton className="w-full h-[300px]" />
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <ChartContainer
+              config={{
+                critical: {
+                  label: "Critical",
+                  color: severityToColor("CRITICAL"),
+                },
+                high: {
+                  label: "High",
+                  color: severityToColor("HIGH"),
+                },
+                medium: {
+                  label: "Medium",
+                  color: severityToColor("MEDIUM"),
+                },
+                low: {
+                  label: "Low",
+                  color: severityToColor("LOW"),
+                },
+              }}
+            >
+              <AreaChart accessibilityLayer data={data}>
+                <ChartLegend content={<ChartLegendContent />} />
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => {
+                    return new Date(value).toLocaleDateString("de-DE", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
                 />
-              ))}
-            </AreaChart>
-          </ChartContainer>
-        </ResponsiveContainer>
+                <YAxis />
+                <ChartTooltip
+                  cursor={false}
+                  labelFormatter={(value) =>
+                    new Date(value).toLocaleDateString("de-DE", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      className="bg-background"
+                    />
+                  }
+                />
+                <defs>
+                  {["critical", "high", "medium", "low"].map((level, i) => {
+                    const sev = level.toUpperCase();
+                    return (
+                      <linearGradient
+                        key={level}
+                        id={`fill-${level}`}
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor={severityToColor(sev)}
+                          stopOpacity={0.2}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor={severityToColor(sev)}
+                          stopOpacity={0.2}
+                        />
+                      </linearGradient>
+                    );
+                  })}
+                </defs>
+                {["low", "medium", "high", "critical"].map((level) => (
+                  <Area
+                    key={level}
+                    dataKey={mode === "risk" ? level : level + "Cvss"}
+                    type="monotone"
+                    stackId="1"
+                    stroke={severityToColor(level.toUpperCase())}
+                    strokeWidth={2}
+                    fill={`url(#fill-${level})`}
+                    fillOpacity={0.8}
+                    dot={false}
+                  />
+                ))}
+              </AreaChart>
+            </ChartContainer>
+          </ResponsiveContainer>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none"></div>

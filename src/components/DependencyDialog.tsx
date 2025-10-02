@@ -33,6 +33,7 @@ import OpenSsfScore from "./common/OpenSsfScore";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import useDecodedParams from "../hooks/useDecodedParams";
 
 interface Props {
   open: boolean;
@@ -51,20 +52,31 @@ const DependencyDialog: FunctionComponent<Props> = ({
 }) => {
   const search = useSearchParams();
 
-  const asset = useActiveAsset();
-  const organization = useActiveOrg();
-  const project = useActiveProject();
-
   const [graphData, setGraphData] = useState<any>(null);
 
   //read artifactName from url query params
-  const artifactName = (search.get("artifact") as string) || "";
-  const assetVersion = useActiveAssetVersion();
+  const artifactName = (search?.get("artifact") as string) || "";
+
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
 
   const handleGraphFetch = useCallback(
     async (data: string) => {
+      const query = new URLSearchParams({
+        purl: data,
+      });
+      // check if artifact is set
+      if (artifactName) {
+        query.append("artifact", artifactName);
+      }
+
       const resp = await browserApiClient(
-        `/organizations/${organization.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?artifact=${artifactName}&purl=${encodeURIComponent(data)}`,
+        `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/path-to-component?${query.toString()}`,
         {
           method: "GET",
         },
@@ -77,7 +89,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
         toast.error("Could not fetch Graph Data from Endpoint");
       }
     },
-    [asset?.slug, organization.slug, project.slug, artifactName],
+    [artifactName, organizationSlug, projectSlug, assetSlug, assetVersionSlug],
   );
 
   useEffect(() => {
