@@ -11,7 +11,7 @@ import Products from "@/components/billling/ProductsList";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ProductsData } from "@/types/api/billing";
 import Link from "next/link";
-import { fetcher } from "@/hooks/useApi";
+import { fetcher } from "@/data-fetcher/fetcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";
 

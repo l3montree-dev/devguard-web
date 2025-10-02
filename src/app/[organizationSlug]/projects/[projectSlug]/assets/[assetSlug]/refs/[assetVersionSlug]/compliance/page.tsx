@@ -13,7 +13,7 @@ import ColoredBadge from "../../../../../../../../../components/common/ColoredBa
 import EmptyParty from "../../../../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../../../../components/common/ListRenderer";
-import { fetcher } from "../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import { violationLengthToLevel } from "../../../../../compliance/page";
 interface Props {

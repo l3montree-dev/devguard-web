@@ -36,7 +36,7 @@ import useDebouncedQuerySearch from "../../../../../../../../../hooks/useDebounc
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../utils/view";
-import { fetcher } from "../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 

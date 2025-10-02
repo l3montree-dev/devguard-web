@@ -52,7 +52,7 @@ import DependencyRiskScannerDialog from "../../../../../../../../../components/R
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../context/ConfigContext";
 import { useActiveAsset } from "../../../../../../../../../hooks/useActiveAsset";
-import { fetcher } from "../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../hooks/useDecodedPathname";

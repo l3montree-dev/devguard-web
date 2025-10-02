@@ -36,7 +36,7 @@ import {
 import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
-import { fetcher } from "../../../../../hooks/useApi";
+import { fetcher } from "../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useViewMode } from "../../../../../hooks/useViewMode";

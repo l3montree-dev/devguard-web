@@ -22,15 +22,13 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { CodeIcon, ScanText, TextSelect } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
-import { useCurrentUserRole } from "./useUserRole";
 import useDecodedPathname from "./useDecodedPathname";
+import { useCurrentUserRole } from "./useUserRole";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   if (!asset.refs || asset.refs.length === 0) {

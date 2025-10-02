@@ -59,7 +59,7 @@ import Avatar from "../../components/Avatar";
 import ListRenderer from "../../components/common/ListRenderer";
 import Markdown from "../../components/common/Markdown";
 import { ProjectBadge } from "../../components/common/ProjectTitle";
-import { fetcher } from "../../hooks/useApi";
+import { fetcher } from "../../data-fetcher/fetcher";
 import EmptyParty from "../../components/common/EmptyParty";
 
 const OrganizationHomePage: FunctionComponent = () => {

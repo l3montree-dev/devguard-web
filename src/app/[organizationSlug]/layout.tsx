@@ -1,12 +1,12 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React from "react";
-import { withContentTree } from "../../decorators/withContentTree";
+import { withContentTree } from "../../data-fetcher/fetchContentTree";
 
 import { ClientContextWrapper } from "../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../context/OrganizationContext";
-import { withOrganization } from "../../decorators/withOrganization";
+import { withOrganization } from "../../data-fetcher/fetchOrganization";
 import { redirect } from "next/navigation";
-import { HttpError } from "../../decorators/http-error";
+import { HttpError } from "../../data-fetcher/http-error";
 
 export default async function OrganizationLayout({
   // Layouts must accept a children prop.

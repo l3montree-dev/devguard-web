@@ -1,8 +1,8 @@
 import React from "react";
 import { AssetVersionProvider } from "../../../../../../../../context/AssetVersionContext";
-import { withArtifacts } from "../../../../../../../../decorators/withArtifacts";
+import { withArtifacts } from "../../../../../../../../data-fetcher/fetchArtifacts";
 import { ClientContextWrapper } from "../../../../../../../../context/ClientContextWrapper";
-import { withAsset } from "../../../../../../../../decorators/withAsset";
+import { withAsset } from "../../../../../../../../data-fetcher/fetchAsset";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.

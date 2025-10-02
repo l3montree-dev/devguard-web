@@ -18,7 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../../../../../components/ui/tooltip";
-import { fetcher } from "../../../../../hooks/useApi";
+import { fetcher } from "../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../services/devGuardApi";

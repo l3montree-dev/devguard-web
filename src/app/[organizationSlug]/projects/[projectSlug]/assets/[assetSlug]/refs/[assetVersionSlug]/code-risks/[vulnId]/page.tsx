@@ -37,7 +37,7 @@ import VulnState from "@/components/common/VulnState";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import GitProviderIcon from "@/components/GitProviderIcon";
 import useSWR from "swr";
-import { fetcher } from "@/hooks/useApi";
+import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";

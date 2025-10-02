@@ -13,7 +13,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import VulnEventItem from "@/components/VulnEventItem";
 import Section from "@/components/common/Section";
 import useSWR from "swr";
-import { fetcher } from "@/hooks/useApi";
+import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";

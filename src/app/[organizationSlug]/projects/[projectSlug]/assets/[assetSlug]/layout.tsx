@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import { AssetProvider } from "../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../context/ClientContextWrapper";
-import { HttpError } from "../../../../../../decorators/http-error";
-import { withAsset } from "../../../../../../decorators/withAsset";
+import { HttpError } from "../../../../../../data-fetcher/http-error";
+import { withAsset } from "../../../../../../data-fetcher/fetchAsset";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.

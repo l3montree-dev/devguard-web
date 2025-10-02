@@ -52,7 +52,7 @@ import { LogoutLink } from "../../hooks/logoutLink";
 
 import useSWR from "swr";
 import { useConfig } from "../../context/ConfigContext";
-import { fetcher } from "../../hooks/useApi";
+import { fetcher } from "../../data-fetcher/fetcher";
 import { handleFlowError, ory } from "../../services/ory";
 import { PersonalAccessTokenDTO } from "../../types/api/api";
 

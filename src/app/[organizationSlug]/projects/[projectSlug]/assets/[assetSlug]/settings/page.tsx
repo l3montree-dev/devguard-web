@@ -23,7 +23,7 @@ import ListItem from "../../../../../../../components/common/ListItem";
 import Section from "../../../../../../../components/common/Section";
 import { useUpdateAsset } from "../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { AssetDTO } from "../../../../../../../types/api/api";
 import {

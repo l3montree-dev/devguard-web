@@ -29,7 +29,7 @@ import {
 import ColoredBadge from "@/components/common/ColoredBadge";
 import PatSection from "@/components/PatSection";
 import useSWR from "swr";
-import { fetcher } from "@/hooks/useApi";
+import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "../../../../../../../../../../components/common/Err";

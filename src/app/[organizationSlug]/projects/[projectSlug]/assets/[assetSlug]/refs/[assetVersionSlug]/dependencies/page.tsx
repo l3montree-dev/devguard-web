@@ -68,7 +68,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../hooks/useRouterQuery";
 import { osiLicenseHexColors } from "../../../../../../../../../utils/view";

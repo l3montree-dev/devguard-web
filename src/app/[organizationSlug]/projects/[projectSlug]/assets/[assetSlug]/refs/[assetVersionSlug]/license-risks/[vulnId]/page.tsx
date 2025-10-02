@@ -39,7 +39,7 @@ import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useAc
 import ArtifactBadge from "@/components/ArtifactBadge";
 import Callout from "../../../../../../../../../../components/common/Callout";
 import EcosystemImage from "../../../../../../../../../../components/common/EcosystemImage";
-import { fetcher } from "../../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";

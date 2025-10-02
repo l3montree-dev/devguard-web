@@ -1,6 +1,6 @@
 import React from "react";
 import { ProjectProvider } from "../../../../context/ProjectContext";
-import { withProject } from "../../../../decorators/withProject";
+import { withProject } from "../../../../data-fetcher/fetchProject";
 import { ClientContextWrapper } from "../../../../context/ClientContextWrapper";
 
 export default async function RootLayout({

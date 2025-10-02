@@ -44,7 +44,7 @@ import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
-import { fetcher } from "../../../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 

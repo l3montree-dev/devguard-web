@@ -35,7 +35,7 @@ import {
 } from "../../../../context/OrganizationContext";
 import { useProject } from "../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../hooks/useActiveOrg";
-import { fetcher } from "../../../../hooks/useApi";
+import { fetcher } from "../../../../data-fetcher/fetcher";
 import { useProjectMenu } from "../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../hooks/useUserRole";
 import { browserApiClient } from "../../../../services/devGuardApi";

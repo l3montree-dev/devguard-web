@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-import { fetcher } from "../../../hooks/useApi";
+import { fetcher } from "../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../hooks/useOrganizationMenu";
 import { browserApiClient } from "../../../services/devGuardApi";

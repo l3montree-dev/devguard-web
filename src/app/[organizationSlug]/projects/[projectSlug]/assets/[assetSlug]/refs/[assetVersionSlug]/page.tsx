@@ -41,7 +41,7 @@ import { Badge } from "../../../../../../../../components/ui/badge";
 import { AsyncButton } from "../../../../../../../../components/ui/button";
 import VulnEventItem from "../../../../../../../../components/VulnEventItem";
 import { useArtifacts } from "../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../hooks/useApi";
+import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import {
   AverageFixingTime,
