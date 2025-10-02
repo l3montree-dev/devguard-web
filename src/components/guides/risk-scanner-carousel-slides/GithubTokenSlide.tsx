@@ -18,6 +18,7 @@ import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { useTheme } from "next-themes";
 
 interface GithubTokenSlideProps {
   pat?: string;
@@ -38,6 +39,12 @@ const GithubTokenSlide = ({
   api,
   yamlGeneratorSlideIndex,
 }: GithubTokenSlideProps) => {
+  const { theme, resolvedTheme } = useTheme();
+  const imageSrc =
+    theme === "dark"
+      ? "/assets/repo-secret-dark.png"
+      : "/assets/repo-secret.png";
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -58,7 +65,7 @@ const GithubTokenSlide = ({
           <ImageZoom
             alt="Open the project settings in GitHub"
             className="rounded-lg border object-fill"
-            src={"/assets/repo-secret.png"}
+            src={imageSrc}
             fill
           />
         </div>
