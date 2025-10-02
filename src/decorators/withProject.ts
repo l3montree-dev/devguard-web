@@ -14,26 +14,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { AssetDTO, ProjectDTO } from "@/types/api/api";
-import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/devGuardApi";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
-export async function withProject(ctx: GetServerSidePropsContext) {
+export async function withProject(
+  organizationSlug: string,
+  projectSlug: string,
+) {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
-
-  const organization = ctx.params?.organizationSlug;
-  const projectSlug = ctx.params?.projectSlug;
+  const devGuardApiClient = await getApiClientInAppRouter();
 
   // get the organization
   const r = await devGuardApiClient(
-    "/organizations/" + organization + "/projects/" + projectSlug,
+    "/organizations/" +
+      decodeURIComponent(organizationSlug) +
+      "/projects/" +
+      projectSlug,
   );
 
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination: "/" + organization,
+        destination: "/" + organizationSlug,
         permanent: false,
       },
     });

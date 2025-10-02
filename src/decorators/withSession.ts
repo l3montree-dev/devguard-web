@@ -13,20 +13,26 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GetServerSidePropsContext } from "next";
 import { ory } from "../services/ory";
 
-import { HttpError } from "./http-error";
 import { User } from "@/types/auth";
 import { isAxiosError } from "axios";
+import { cookies, headers } from "next/headers";
+import { HttpError } from "./http-error";
 
-export async function withSession(ctx: GetServerSidePropsContext) {
-  const orySessionCookie = ctx.req.cookies["ory_kratos_session"];
+export async function withSession() {
+  const c = await cookies();
+  const requestedUrl = (await headers()).get("referer") || "/";
+  const orySessionCookie = c.get("ory_kratos_session");
+
+  if (!orySessionCookie) {
+    return null;
+  }
   // get the latest session
   try {
     const session = await ory.toSession(
       {
-        cookie: "ory_kratos_session=" + orySessionCookie + ";",
+        cookie: "ory_kratos_session=" + orySessionCookie.value + ";",
       },
       {
         baseURL: "http://localhost:3000",
@@ -40,6 +46,7 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     // call the initial endpoint with the latest information available
     return session.data as { identity: User };
   } catch (e: unknown) {
+    console.error(e);
     if (isAxiosError(e)) {
       if (e.response?.status === 401) {
         return null;
@@ -47,7 +54,7 @@ export async function withSession(ctx: GetServerSidePropsContext) {
     }
     throw new HttpError({
       redirect: {
-        destination: "/login?return_to=" + ctx.resolvedUrl,
+        destination: "/login?return_to=" + requestedUrl,
         permanent: false,
       },
     });

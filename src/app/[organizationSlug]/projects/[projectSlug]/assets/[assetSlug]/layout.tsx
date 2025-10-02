@@ -1,10 +1,9 @@
-import React from "react";
-import { ClientContextWrapper } from "../../../../../../context/ClientContextWrapper";
-import { AssetProvider } from "../../../../../../context/AssetContext";
-import { withAsset } from "../../../../../../decorators/approuter/withAsset";
-import { HttpError } from "../../../../../../decorators/http-error";
 import { redirect } from "next/navigation";
-import { withArtifacts } from "../../../../../../decorators/withArtifacts";
+import React from "react";
+import { AssetProvider } from "../../../../../../context/AssetContext";
+import { ClientContextWrapper } from "../../../../../../context/ClientContextWrapper";
+import { HttpError } from "../../../../../../decorators/http-error";
+import { withAsset } from "../../../../../../decorators/withAsset";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.

@@ -12,22 +12,22 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import { AssetDTO, AssetVersionDTO } from "@/types/api/api";
-import { GetServerSidePropsContext } from "next";
+import { AssetDTO } from "@/types/api/api";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+
 import { HttpError } from "./http-error";
 
-export async function withAsset(ctx: GetServerSidePropsContext) {
+export async function withAsset(
+  orgSlug: string,
+  projectSlug: string,
+  assetSlug: string,
+) {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
-
-  const organization = ctx.params?.organizationSlug;
-  const projectSlug = ctx.params?.projectSlug;
-  const assetSlug = ctx.params?.assetSlug;
+  const devGuardApiClient = await getApiClientInAppRouter();
 
   const url =
     "/organizations/" +
-    organization +
+    decodeURIComponent(orgSlug) +
     "/projects/" +
     projectSlug +
     "/assets/" +
@@ -39,7 +39,7 @@ export async function withAsset(ctx: GetServerSidePropsContext) {
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination: "/" + organization + "/projects/" + projectSlug,
+        destination: "/" + orgSlug + "/projects/" + projectSlug,
         permanent: false,
       },
     });

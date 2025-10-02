@@ -40,6 +40,7 @@ import useSWR from "swr";
 import { fetcher } from "@/hooks/useApi";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
+import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 
@@ -112,10 +113,7 @@ const Index = () => {
   if (error) {
     return (
       <Page title="Error Loading Vulnerability">
-        <div className="text-center py-8">
-          <p className="text-red-600">Failed to load vulnerability details</p>
-          <p className="text-sm text-gray-500 mt-2">Please try again later</p>
-        </div>
+        <Err />
       </Page>
     );
   }

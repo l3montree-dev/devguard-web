@@ -17,6 +17,7 @@ import { fetcher } from "@/hooks/useApi";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
+import Err from "@/components/common/Err";
 
 const Index = () => {
   const params = useDecodedParams();
@@ -60,11 +61,8 @@ const Index = () => {
   // Show error state
   if (error) {
     return (
-      <Page title="Error Loading Events">
-        <div className="text-center py-8">
-          <p className="text-red-600">Failed to load events</p>
-          <p className="text-sm text-gray-500 mt-2">Please try again later</p>
-        </div>
+      <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+        <Err />
       </Page>
     );
   }

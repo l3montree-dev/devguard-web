@@ -44,6 +44,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import Err from "../../../../../../../../../../components/common/Err";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -78,10 +79,10 @@ const Index: FunctionComponent = () => {
     data: vuln,
     mutate,
     isLoading,
+    error,
   } = useSWR<DetailedLicenseRiskDTO>(
     `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/license-risks/${vulnId}`,
     fetcher,
-    { suspense: true },
   );
 
   const [updatedLicense, setUpdatedLicense] = useState<string>(
@@ -202,6 +203,10 @@ const Index: FunctionComponent = () => {
         </div>
       </Page>
     );
+  }
+
+  if (error) {
+    return <Err />;
   }
 
   return (

@@ -32,6 +32,7 @@ import useSWR from "swr";
 import { fetcher } from "@/hooks/useApi";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
+import Err from "../../../../../../../../../../components/common/Err";
 
 // Import the violationLengthToLevel function
 const violationLengthToLevel = (violationCount: number) => {
@@ -90,13 +91,12 @@ const Index = () => {
   // Show error state
   if (error) {
     return (
-      <Page title="Error Loading Compliance Control">
-        <div className="text-center py-8">
-          <p className="text-red-600">
-            Failed to load compliance control details
-          </p>
-          <p className="text-sm text-gray-500 mt-2">Please try again later</p>
-        </div>
+      <Page
+        Menu={assetMenu}
+        Title={<AssetTitle />}
+        title="Error Loading Compliance Control"
+      >
+        <Err />
       </Page>
     );
   }

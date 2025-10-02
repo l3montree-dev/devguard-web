@@ -15,33 +15,25 @@
 
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/devGuardApi";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
 export const OAUTH2_ERROR = "OAUTH2_ERROR";
 
-export async function withOrganization(ctx: GetServerSidePropsContext) {
+export async function withOrganization(organizationSlug: string) {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
-  // check if there is a slug in the query
-  const organizationSlug = ctx.params?.organizationSlug;
+  const devGuardApiClient = await getApiClientInAppRouter();
 
   if (organizationSlug) {
     // get the organization
-    const org = await devGuardApiClient("/organizations/" + organizationSlug);
+    const org = await devGuardApiClient(
+      "/organizations/" + decodeURIComponent(organizationSlug),
+    );
 
     // if the organization slug starts with an @ it is actually an identity provider
     // there has to be a token in the backend - maybe the user just needs to reauthorize.
     if (!org.ok && (organizationSlug as string).startsWith("@")) {
       // make sure to redirect to the slug base
-      if (decodeURIComponent(ctx.resolvedUrl) !== `/${organizationSlug}`) {
-        throw new HttpError({
-          redirect: {
-            destination: `/${organizationSlug}`,
-            permanent: false,
-          },
-        });
-      }
 
       return {
         oauth2Error: true,

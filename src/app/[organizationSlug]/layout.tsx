@@ -1,10 +1,10 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React from "react";
-import { withContentTree } from "../../decorators/approuter/withContentTree";
+import { withContentTree } from "../../decorators/withContentTree";
 
 import { ClientContextWrapper } from "../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../context/OrganizationContext";
-import { withOrganization } from "../../decorators/approuter/withOrganization";
+import { withOrganization } from "../../decorators/withOrganization";
 import { redirect } from "next/navigation";
 import { HttpError } from "../../decorators/http-error";
 

@@ -13,14 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/devGuardApi";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
-export async function withContentTree(ctx: GetServerSidePropsContext) {
+export async function withContentTree(organizationSlug: string) {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
+  const devGuardApiClient = await getApiClientInAppRouter();
   // check if there is a slug in the query
-  const organizationSlug = ctx.params?.organizationSlug;
 
   if (organizationSlug) {
     // get the organization

@@ -13,17 +13,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { GetServerSidePropsContext } from "next";
-import { getApiClientFromContext } from "../services/devGuardApi";
-import { HttpError } from "./http-error";
 import { OrganizationDTO } from "@/types/api/api";
+import { uniqBy } from "lodash";
+import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { HttpError } from "./http-error";
 
-export async function withOrgs(ctx: GetServerSidePropsContext) {
+export async function withOrgs() {
   // get the devGuardApiClient
-  const devGuardApiClient = getApiClientFromContext(ctx);
+  const devGuardApiClient = await getApiClientInAppRouter();
 
   // get the organization
-  const r = await devGuardApiClient("/organizations/");
+  const [r, orgsAfterTrigger] = await Promise.all([
+    devGuardApiClient("/organizations/"),
+    devGuardApiClient("/trigger-sync", {
+      method: "GET",
+    }),
+  ]);
 
   if (!r.ok) {
     console.log("LOGIN REDIRECT", r);
@@ -36,7 +41,14 @@ export async function withOrgs(ctx: GetServerSidePropsContext) {
     });
   }
   // parse the organization
-  const organizations: OrganizationDTO[] = await r.json();
+  let organizations: OrganizationDTO[] = await r.json();
+
+  if (orgsAfterTrigger.ok) {
+    const orgsAfterTriggerJson: OrganizationDTO[] =
+      await orgsAfterTrigger.json();
+    // merge the two org lists, avoiding duplicates
+    organizations = uniqBy(organizations.concat(orgsAfterTriggerJson), "slug");
+  }
   // sort the orgs by name
   organizations.sort((a, b) => {
     return a.name.localeCompare(b.name);

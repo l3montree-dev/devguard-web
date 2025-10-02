@@ -78,6 +78,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
+import Err from "../../../../../../../../../../components/common/Err";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -410,10 +411,11 @@ const Index: FunctionComponent = () => {
     "/dependency-vulns/" +
     vulnId;
 
-  const { data: vuln, mutate } = useSWR<DetailedDependencyVulnDTO>(
-    uri,
-    fetcher,
-  );
+  const {
+    data: vuln,
+    mutate,
+    error,
+  } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
   const { data: graphData, isLoading: graphLoading } = useSWR<any>(
     vuln
       ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(vuln.componentPurl)}`
@@ -512,6 +514,19 @@ const Index: FunctionComponent = () => {
     vuln,
     cvssVectorObj,
   );
+
+  // Show error state
+  if (error) {
+    return (
+      <Page
+        Menu={assetMenu}
+        Title={<AssetTitle />}
+        title="Error Loading Vulnerability"
+      >
+        <Err />
+      </Page>
+    );
+  }
 
   return (
     <Page
