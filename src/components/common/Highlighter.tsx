@@ -37,13 +37,21 @@ const Highlighter: FunctionComponent<{
   }
 
   return (
-    <div className="w-full bg-black">
+    <div className="w-full bg-white dark:bg-black">
       <SyntaxHighlighter
         showLineNumbers
         startingLineNumber={startLine}
-        lineNumberStyle={{ color: "rgba(255, 255, 255, 0.3)" }}
+        lineNumberStyle={{ color: "rgba(148, 163, 184, 0.7)" }}
         language={props.language}
         style={docco}
+        customStyle={{
+          background: "transparent",
+          margin: 0,
+          color: "rgb(0, 0, 0)",
+        }}
+        codeTagProps={{
+          className: "dark:text-white",
+        }}
       >
         {props.codeString}
       </SyntaxHighlighter>
