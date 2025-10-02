@@ -4,97 +4,23 @@ import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Policy, UserRole } from "@/types/api/api";
 
-import React, { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import Link from "next/link";
 import { toast } from "sonner";
 import useSWR from "swr";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
-import ListItem from "../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../components/common/ListRenderer";
+import { PolicyListItem } from "../../../../../../components/common/ProjectPolicyListItem";
 import ProjectTitle from "../../../../../../components/common/ProjectTitle";
-import PolicyDialog from "../../../../../../components/PolicyDialog";
-import { Badge } from "../../../../../../components/ui/badge";
 import { buttonVariants } from "../../../../../../components/ui/button";
-import { Switch } from "../../../../../../components/ui/switch";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 
-interface Props {
-  policies: Array<Policy & { enabled: boolean }>;
-}
-
-export const violationLengthToLevel = (length: number) => {
-  if (length === 0) return "low";
-  if (length <= 2) return "medium";
-  if (length <= 4) return "high";
-  return "critical";
-};
-
-export const PolicyListItem = ({
-  policy,
-  onEnablePolicy,
-  onDisablePolicy,
-}: {
-  policy: Policy & { enabled: boolean };
-  onEnablePolicy: (policy: Policy) => Promise<void>;
-  onDisablePolicy: (policy: Policy) => Promise<void>;
-}) => {
-  const currentUserRole = useCurrentUserRole();
-  const [isOpen, setIsOpen] = useState(false);
-  const handlePolicyToggle = async (enabled: boolean) => {
-    if (enabled) {
-      await onEnablePolicy(policy);
-    } else {
-      await onDisablePolicy(policy);
-    }
-  };
-
-  return (
-    <React.Fragment key={policy.id}>
-      <div className="cursor-pointer" onClick={() => setIsOpen(true)}>
-        <ListItem
-          reactOnHover
-          key={policy.id}
-          Button={
-            <div onClick={(e) => e.stopPropagation()}>
-              <Switch
-                checked={policy.enabled}
-                onCheckedChange={handlePolicyToggle}
-                disabled={
-                  currentUserRole !== UserRole.Admin &&
-                  currentUserRole !== UserRole.Owner
-                }
-              />
-            </div>
-          }
-          Title={
-            <span className="flex flex-row items-center gap-2">
-              {policy.title}
-              {policy.organizationId === null && (
-                <Badge variant="secondary">Community Managed</Badge>
-              )}
-            </span>
-          }
-          Description={policy.description}
-        />
-      </div>
-      <PolicyDialog
-        isOpen={isOpen}
-        title={policy.title}
-        description={policy.description}
-        buttonTitle="Update Policy"
-        onOpenChange={setIsOpen}
-        policy={policy}
-      />
-    </React.Fragment>
-  );
-};
-
-const ComplianceIndex: FunctionComponent<Props> = () => {
+const ComplianceIndex: FunctionComponent = () => {
   const params = useDecodedParams();
   const menu = useProjectMenu();
   const activeOrg = useActiveOrg();

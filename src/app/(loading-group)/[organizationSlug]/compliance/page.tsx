@@ -3,103 +3,20 @@
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Policy } from "@/types/api/api";
-import React, { FunctionComponent, useState } from "react";
-import { EllipsisVerticalIcon } from "lucide-react";
+import { FunctionComponent, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import EmptyParty from "../../../../components/common/EmptyParty";
-import ListItem from "../../../../components/common/ListItem";
 import ListRenderer from "../../../../components/common/ListRenderer";
+import PolicyListItem from "../../../../components/common/PolicyListItem";
 import PolicyDialog from "../../../../components/PolicyDialog";
-import { Badge } from "../../../../components/ui/badge";
-import { Button, buttonVariants } from "../../../../components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../components/ui/dropdown-menu";
+import { Button } from "../../../../components/ui/button";
 import { fetcher } from "../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
 import { browserApiClient } from "../../../../services/devGuardApi";
 
-interface Props {
-  policies: Policy[];
-}
-
-export const PolicyListItem = ({
-  policy,
-  onPolicyUpdate,
-  onPolicyDelete,
-}: {
-  policy: Policy;
-  onPolicyUpdate: (policy: Policy) => Promise<void>;
-  onPolicyDelete: (policy: Policy) => Promise<void>;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const handlePolicyUpdate = async (newPolicy: Policy) => {
-    await onPolicyUpdate({ ...newPolicy, id: policy.id });
-    setIsOpen(false);
-  };
-  return (
-    <React.Fragment key={policy.id}>
-      <div className="cursor-pointer" onClick={() => setIsOpen(true)}>
-        <ListItem
-          key={policy.id}
-          Button={
-            policy.organizationId !== null && (
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "icon",
-                  })}
-                >
-                  <EllipsisVerticalIcon className="h-5 w-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setIsOpen(true);
-                    }}
-                  >
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onPolicyDelete(policy)}>
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )
-          }
-          Title={
-            <span className="flex flex-row items-center gap-2">
-              {policy.title}
-              {policy.organizationId === null && (
-                <Badge variant={"secondary"}>Community Managed</Badge>
-              )}
-            </span>
-          }
-          Description={policy.description}
-        />
-      </div>
-      <PolicyDialog
-        isOpen={isOpen}
-        title="Edit Policy"
-        description="Edit the policy for your organization."
-        buttonTitle="Update Policy"
-        onOpenChange={setIsOpen}
-        onSubmit={
-          policy.organizationId !== null ? handlePolicyUpdate : undefined
-        }
-        policy={policy}
-      />
-    </React.Fragment>
-  );
-};
-
-const ComplianceIndex: FunctionComponent<Props> = () => {
+const ComplianceIndex: FunctionComponent = () => {
   const menu = useOrganizationMenu();
   const [open, setOpen] = useState(false);
   const { organizationSlug } = useDecodedParams() as {
