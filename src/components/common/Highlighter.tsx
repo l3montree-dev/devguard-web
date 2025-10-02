@@ -26,16 +26,10 @@ SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
 SyntaxHighlighter.registerLanguage("rego", basic);
 
-const resolveStyle = (styleImport: any) =>
-  styleImport?.default ? styleImport.default : styleImport;
-
-const githubBase = resolveStyle(github);
-const anOldHopeBase = resolveStyle(anOldHope);
-
 const githubLightTheme = {
-  ...githubBase,
+  ...github,
   hljs: {
-    ...(githubBase.hljs || {}),
+    ...(github.hljs || {}),
     background: "transparent",
   },
 };
@@ -65,11 +59,11 @@ const Highlighter: FunctionComponent<{
     return current === "dark";
   }, [resolvedTheme, theme]);
 
-  const textColor = isDark ? "#E2E8F0" : (githubBase.hljs?.color ?? "#24292E");
+  const textColor = isDark ? "#E2E8F0" : (github.hljs?.color ?? "#24292E");
   const lineNumberColor = isDark
     ? "rgba(255, 255, 255, 0.35)"
     : "rgba(71, 85, 105, 0.75)";
-  const syntaxTheme = isDark ? anOldHopeBase : githubLightTheme;
+  const syntaxTheme = isDark ? anOldHope : githubLightTheme;
 
   return (
     <div className="w-full bg-white dark:bg-black">
