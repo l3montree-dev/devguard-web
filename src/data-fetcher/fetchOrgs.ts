@@ -18,7 +18,7 @@ import { uniqBy } from "lodash";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
-export async function withOrgs() {
+export async function fetchOrgs() {
   // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
 

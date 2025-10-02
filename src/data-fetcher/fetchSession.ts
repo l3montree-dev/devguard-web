@@ -20,7 +20,7 @@ import { isAxiosError } from "axios";
 import { cookies, headers } from "next/headers";
 import { HttpError } from "./http-error";
 
-export async function withSession() {
+export async function fetchSession() {
   const c = await cookies();
   const requestedUrl = (await headers()).get("referer") || "/";
   const orySessionCookie = c.get("ory_kratos_session");

@@ -15,7 +15,7 @@
 
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
-export async function withContentTree(organizationSlug: string) {
+export async function fetchContentTree(organizationSlug: string) {
   // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
   // check if there is a slug in the query

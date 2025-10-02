@@ -17,7 +17,7 @@ import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
 import { HttpError } from "./http-error";
 
-export async function withAsset(
+export async function fetchAsset(
   orgSlug: string,
   projectSlug: string,
   assetSlug: string,

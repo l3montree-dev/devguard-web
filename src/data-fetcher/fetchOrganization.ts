@@ -14,13 +14,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { OrganizationDetailsDTO } from "@/types/api/api";
-import { GetServerSidePropsContext } from "next";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
 export const OAUTH2_ERROR = "OAUTH2_ERROR";
 
-export async function withOrganization(organizationSlug: string) {
+export async function fetchOrganization(organizationSlug: string) {
   // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
 

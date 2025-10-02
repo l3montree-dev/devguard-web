@@ -1,7 +1,7 @@
 import { ArtifactDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
-export async function withArtifacts(
+export async function fetchArtifacts(
   organizationSlug: string,
   projectSlug: string,
   assetSlug: string,

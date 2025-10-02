@@ -4,10 +4,10 @@ import "focus-visible";
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
 import React from "react";
-import { withSession } from "../data-fetcher/fetchSession";
+import { fetchSession } from "../data-fetcher/fetchSession";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { SessionProvider } from "../context/SessionContext";
-import { withOrgs } from "../data-fetcher/fetchOrgs";
+import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { HttpError } from "../data-fetcher/http-error";
 import { redirect } from "next/navigation";
 import { ConfigProvider } from "../context/ConfigContext";
@@ -40,7 +40,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   try {
-    const [session, orgs] = await Promise.all([withSession(), withOrgs()]);
+    const [session, orgs] = await Promise.all([fetchSession(), fetchOrgs()]);
 
     return (
       <html

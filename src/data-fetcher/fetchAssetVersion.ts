@@ -16,7 +16,7 @@ import { AssetVersionDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
-export async function withAssetVersion(
+export async function fetchAssetVersion(
   orgSlug: string,
   projectSlug: string,
   assetSlug: string,
