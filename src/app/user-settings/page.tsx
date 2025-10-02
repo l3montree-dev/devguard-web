@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { middleware } from "@/decorators/middleware";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { AxiosError } from "axios";
 import Link from "next/link";
@@ -48,17 +47,14 @@ import { Flow, Methods } from "../../components/kratos/Flow";
 
 import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
 import { Switch } from "@/components/ui/switch";
-import { withOrgs } from "@/decorators/withOrgs";
 import { uniq } from "lodash";
-import { withSession } from "../../decorators/withSession";
 import { LogoutLink } from "../../hooks/logoutLink";
 
+import useSWR from "swr";
 import { useConfig } from "../../context/ConfigContext";
-import { getApiClientFromContext } from "../../services/devGuardApi";
+import { fetcher } from "../../hooks/useApi";
 import { handleFlowError, ory } from "../../services/ory";
 import { PersonalAccessTokenDTO } from "../../types/api/api";
-import useSWR from "swr";
-import { fetcher } from "../../hooks/useApi";
 
 interface Props {
   flow?: SettingsFlow;

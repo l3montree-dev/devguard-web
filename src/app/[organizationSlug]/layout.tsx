@@ -6,7 +6,7 @@ import { ClientContextWrapper } from "../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../context/OrganizationContext";
 import { withOrganization } from "../../decorators/approuter/withOrganization";
 import { redirect } from "next/navigation";
-import { HttpError } from "../../decorators/middleware";
+import { HttpError } from "../../decorators/http-error";
 
 export default async function OrganizationLayout({
   // Layouts must accept a children prop.

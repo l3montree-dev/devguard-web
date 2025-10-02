@@ -2,7 +2,7 @@ import React from "react";
 import { ClientContextWrapper } from "../../../../../../context/ClientContextWrapper";
 import { AssetProvider } from "../../../../../../context/AssetContext";
 import { withAsset } from "../../../../../../decorators/approuter/withAsset";
-import { HttpError } from "../../../../../../decorators/middleware";
+import { HttpError } from "../../../../../../decorators/http-error";
 import { redirect } from "next/navigation";
 import { withArtifacts } from "../../../../../../decorators/withArtifacts";
 

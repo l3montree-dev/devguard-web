@@ -18,7 +18,7 @@ import { ory } from "../../services/ory";
 import { User } from "@/types/auth";
 import { isAxiosError } from "axios";
 import { cookies, headers } from "next/headers";
-import { HttpError } from "../middleware";
+import { HttpError } from "../http-error";
 
 export async function withSession() {
   const c = await cookies();

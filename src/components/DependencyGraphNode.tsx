@@ -16,7 +16,7 @@
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 import {

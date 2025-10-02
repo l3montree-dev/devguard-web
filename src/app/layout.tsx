@@ -8,7 +8,7 @@ import { withSession } from "../decorators/approuter/withSession";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { SessionProvider } from "../context/SessionContext";
 import { withOrgs } from "../decorators/approuter/withOrgs";
-import { HttpError } from "../decorators/middleware";
+import { HttpError } from "../decorators/http-error";
 import { redirect } from "next/navigation";
 import { ConfigProvider } from "../context/ConfigContext";
 import { config } from "../config";

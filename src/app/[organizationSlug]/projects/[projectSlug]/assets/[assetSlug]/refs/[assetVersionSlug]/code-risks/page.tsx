@@ -10,7 +10,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { FunctionComponent, useMemo, useState } from "react";
 
 import { classNames } from "@/utils/common";
@@ -146,7 +146,7 @@ const Index: FunctionComponent = () => {
   const params = useSearchParams();
   const pathname = usePathname();
   const push = useRouterQuery();
-  console.log(vulns);
+
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">

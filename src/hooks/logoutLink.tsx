@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { DependencyList, useState, useEffect } from "react";
 import { ory } from "../services/ory";
 import { AxiosError } from "axios";
@@ -46,7 +46,7 @@ export function LogoutLink(deps: DependencyList = []) {
       ory
         .updateLogoutFlow({ token: logoutToken })
         .then(() => router.push("/login"))
-        .then(() => router.reload());
+        .then(() => router.refresh());
     }
   };
 }

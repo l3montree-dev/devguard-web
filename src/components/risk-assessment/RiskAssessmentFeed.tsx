@@ -46,7 +46,7 @@ import { Badge } from "../ui/badge";
 import FormatDate from "./FormatDate";
 import rehypeExternalLinks from "rehype-external-links";
 import remarkGfm from "remark-gfm";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {

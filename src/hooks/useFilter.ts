@@ -16,10 +16,10 @@ export default function useFilter() {
     // push the filter to the query params
     // get the current params first
     const newSearchParams = new URLSearchParams(filterForm2Query(data));
-    searchParams.forEach((value, key) => {
+    searchParams?.forEach((value, key) => {
       if (!newSearchParams.has(key)) newSearchParams.set(key, value);
     });
-    router.push(pathname + "?" + searchParams.toString());
+    router.push(pathname + "?" + searchParams?.toString());
   };
 
   const [sortingState, setSortingState] = useState<SortingState>([]);
@@ -27,14 +27,14 @@ export default function useFilter() {
   const removeFilter = (f: FilterForm) => {
     // remove the filter from the query params
     // get the current params first
-    const copied = new URLSearchParams(searchParams);
+    const copied = new URLSearchParams(searchParams || {});
     copied.delete("filterQuery[" + f.field + "][" + f.operator + "]");
     router.push(pathname + "?" + copied.toString());
   };
 
   useEffect(() => {
     // remove all sorting query params
-    const params = Object.fromEntries(searchParams.entries());
+    const params = Object.fromEntries(searchParams?.entries() || []);
     const paramsWithoutSort = Object.entries(params).filter(([k]) =>
       k.startsWith("sort["),
     );
@@ -46,7 +46,7 @@ export default function useFilter() {
     });
 
     router.push(pathname + "?" + finalParams.toString());
-  }, [sortingState]);
+  }, [sortingState, pathname, router, searchParams]);
 
   return {
     handleFilter,

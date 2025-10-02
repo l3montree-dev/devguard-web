@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
 import { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
-import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
+import { useUpdateOrganization } from "../../../context/OrganizationContext";
+import useDecodedPathname from "../../../hooks/useDecodedPathname";
 
 export interface ProviderIntegrationSetupSlideProps {
   api?: {
@@ -29,20 +30,26 @@ export default function ProviderIntegrationSetupSlide({
   prevIndex,
 }: ProviderIntegrationSetupSlideProps) {
   const activeOrg = useActiveOrg();
-  const updateOrganization = useStore((s) => s.updateOrganization);
+  const updateOrganization = useUpdateOrganization();
 
   const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
-    });
+    updateOrganization((prev) => ({
+      ...prev,
+      organization: {
+        ...activeOrg,
+        gitLabIntegrations: activeOrg.gitLabIntegrations.concat(integration),
+      },
+    }));
   };
 
   const handleNewJiraIntegration = (integration: JiraIntegrationDTO) => {
-    updateOrganization({
-      ...activeOrg,
-      jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
-    });
+    updateOrganization((prev) => ({
+      ...prev,
+      organization: {
+        ...activeOrg,
+        jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+      },
+    }));
   };
 
   const providerToBeautifulName: {
@@ -54,6 +61,7 @@ export default function ProviderIntegrationSetupSlide({
     opencode: "openCode",
   };
 
+  const pathname = useDecodedPathname();
   const router = useRouter();
 
   return (
@@ -90,7 +98,7 @@ export default function ProviderIntegrationSetupSlide({
                 "https://github.com/apps/devguard-bot/installations/new?state=" +
                 encodeObjectBase64({
                   orgSlug: activeOrg.slug,
-                  redirectTo: router.asPath,
+                  redirectTo: pathname,
                 })
               }
               target="_blank"

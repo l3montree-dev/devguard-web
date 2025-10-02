@@ -16,7 +16,7 @@
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
-import { HttpError } from "./middleware";
+import { HttpError } from "./http-error";
 
 export const OAUTH2_ERROR = "OAUTH2_ERROR";
 

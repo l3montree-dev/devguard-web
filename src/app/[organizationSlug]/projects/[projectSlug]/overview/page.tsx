@@ -47,8 +47,10 @@ import {
   RiskHistory,
 } from "../../../../../types/api/api";
 import { beautifyPurl, classNames } from "../../../../../utils/common";
-import { reduceRiskHistories } from "../../../../../utils/view";
-import { normalizeContentTree } from "../../../../../zustand/globalStore";
+import {
+  normalizeContentTree,
+  reduceRiskHistories,
+} from "../../../../../utils/view";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -81,7 +83,9 @@ const OverviewPage = () => {
   }
 
   // fetch all the data
-  const { data: riskHistory } = useSWR<RiskHistory[]>(
+  const { data: riskHistory, isLoading: riskHistoryLoading } = useSWR<
+    RiskHistory[]
+  >(
     () =>
       releaseId
         ? "/organizations/" +
@@ -283,6 +287,7 @@ const OverviewPage = () => {
           <TabsContent value={mode} className="space-y-4">
             <div className="grid grid-cols-4 gap-4">
               <SeverityCard
+                isLoading={riskHistoryLoading}
                 variant="critical"
                 currentAmount={criticalAmount}
                 queryIntervalStart={7}
@@ -290,6 +295,7 @@ const OverviewPage = () => {
                 mode={mode}
               />
               <SeverityCard
+                isLoading={riskHistoryLoading}
                 variant="high"
                 currentAmount={highAmount}
                 queryIntervalStart={4}
@@ -297,6 +303,7 @@ const OverviewPage = () => {
                 mode={mode}
               />
               <SeverityCard
+                isLoading={riskHistoryLoading}
                 variant="medium"
                 currentAmount={mediumAmount}
                 queryIntervalStart={1}
@@ -304,6 +311,7 @@ const OverviewPage = () => {
                 mode={mode}
               />
               <SeverityCard
+                isLoading={riskHistoryLoading}
                 variant="low"
                 currentAmount={lowAmount}
                 queryIntervalStart={0}
@@ -438,6 +446,7 @@ const OverviewPage = () => {
             </div>
             <div className="col-span-2">
               <RiskHistoryDistributionDiagram
+                isLoading={riskHistoryLoading}
                 data={reduceRiskHistories(completeRiskHistory)}
                 mode={mode}
               />

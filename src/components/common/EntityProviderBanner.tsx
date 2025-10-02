@@ -5,7 +5,6 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { useActiveProject } from "../../hooks/useActiveProject";
 import useDecodedParams from "../../hooks/useDecodedParams";
 import { providerIdToBaseURL } from "../../utils/externalProvider";
-import { noStoreAvailable } from "../../zustand/globalStoreProvider";
 import GitProviderIcon from "../GitProviderIcon";
 
 const slugToProvider = (slug: string | undefined) => {
@@ -27,13 +26,7 @@ const EntityProviderBanner = () => {
     return null;
   }
 
-  if (
-    assetSlug &&
-    activeAsset &&
-    !noStoreAvailable(activeAsset) &&
-    !noStoreAvailable(activeProject) &&
-    activeAsset.externalEntityProviderId
-  ) {
+  if (assetSlug && activeAsset && activeAsset.externalEntityProviderId) {
     return (
       <div>
         <Link

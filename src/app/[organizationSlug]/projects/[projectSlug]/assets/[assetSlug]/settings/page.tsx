@@ -3,18 +3,17 @@ import Page from "@/components/Page";
 import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { AsyncButton, Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
+import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
 import { FunctionComponent, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
 import ConnectToRepoSection from "../../../../../../../components/ConnectToRepoSection";
@@ -243,7 +242,7 @@ const Index: FunctionComponent = () => {
       </div>
       <hr />
       <div>
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <AssetForm
               disable={Boolean(asset.externalEntityProviderId)}
@@ -264,7 +263,7 @@ const Index: FunctionComponent = () => {
               </AsyncButton>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </div>
       <div>
         <Section

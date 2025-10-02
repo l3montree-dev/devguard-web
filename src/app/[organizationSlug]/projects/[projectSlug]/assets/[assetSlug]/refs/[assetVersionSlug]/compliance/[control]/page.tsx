@@ -1,70 +1,115 @@
+"use client";
+
 import Page from "@/components/Page";
 
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/devGuardApi";
 import { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { GetServerSidePropsContext } from "next";
 import { FunctionComponent } from "react";
 import Markdown from "react-markdown";
 
-import { withOrganization } from "@/decorators/withOrganization";
-
 import AssetTitle from "@/components/common/AssetTitle";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { TriangleAlert, XIcon } from "lucide-react";
-import usePersonalAccessToken from "../../../../../../../../../../hooks/usePersonalAccessToken";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../../../../../../../../../../components/ui/collapsible";
-import CopyCode, {
-  CopyCodeFragment,
-} from "../../../../../../../../../../components/common/CopyCode";
+} from "@/components/ui/collapsible";
+import CopyCode, { CopyCodeFragment } from "@/components/common/CopyCode";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../../../../../../../../../components/ui/card";
-import ColoredBadge from "../../../../../../../../../../components/common/ColoredBadge";
-import { violationLengthToLevel } from "../../../../../../compliance/page";
-import PatSection from "../../../../../../../../../../components/PatSection";
+} from "@/components/ui/card";
+import ColoredBadge from "@/components/common/ColoredBadge";
+import PatSection from "@/components/PatSection";
+import useSWR from "swr";
+import { fetcher } from "@/hooks/useApi";
+import useDecodedParams from "@/hooks/useDecodedParams";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface Props {
-  policyDetails: PolicyEvaluation;
-}
+// Import the violationLengthToLevel function
+const violationLengthToLevel = (violationCount: number) => {
+  if (violationCount === 0) return "low";
+  if (violationCount <= 2) return "medium";
+  return "high";
+};
 
-const Index: FunctionComponent<Props> = (props) => {
+const Index = () => {
+  const params = useDecodedParams();
+  const {
+    organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+    control,
+  } = params;
+
+  // Fetch policy details using SWR
+  const {
+    data: policyDetails,
+    error,
+    isLoading,
+  } = useSWR<PolicyEvaluation>(
+    organizationSlug && projectSlug && assetSlug && assetVersionSlug && control
+      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance/${control}`
+      : null,
+    fetcher,
+  );
+
   const assetMenu = useAssetMenu();
-
   const pat = usePersonalAccessToken();
+
+  // Show loading skeleton if data is loading
+  if (isLoading || !policyDetails) {
+    return (
+      <Page title="Loading Compliance Control...">
+        <div className="flex flex-row gap-4">
+          <div className="flex-1">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-3">
+                <Skeleton className="w-full h-8 mb-4" />
+                <Skeleton className="w-full h-32 mb-4" />
+                <Skeleton className="w-full h-20 mb-4" />
+              </div>
+              <div className="col-span-1 border-l pl-4">
+                <Skeleton className="w-full h-64" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Page>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Page title="Error Loading Compliance Control">
+        <div className="text-center py-8">
+          <p className="text-red-600">
+            Failed to load compliance control details
+          </p>
+          <p className="text-sm text-gray-500 mt-2">Please try again later</p>
+        </div>
+      </Page>
+    );
+  }
   return (
-    <Page
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-      title={props.policyDetails.title}
-    >
+    <Page Menu={assetMenu} Title={<AssetTitle />} title={policyDetails.title}>
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">
-                {props.policyDetails.title}
-              </h1>
+              <h1 className="text-2xl font-semibold">{policyDetails.title}</h1>
               <div className="mt-4 text-muted-foreground">
                 <Markdown>
-                  {props.policyDetails.description.replaceAll("\n", "\n\n")}
+                  {policyDetails.description.replaceAll("\n", "\n\n")}
                 </Markdown>
               </div>
 
@@ -75,20 +120,17 @@ const Index: FunctionComponent<Props> = (props) => {
                     <ChevronDownIcon className="h-4 w-4 ml-2 inline-block" />
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <CopyCode
-                      language="rego"
-                      codeString={props.policyDetails.rego}
-                    />
+                    <CopyCode language="rego" codeString={policyDetails.rego} />
                   </CollapsibleContent>
                 </Collapsible>
               </div>
-              {props.policyDetails.compliant === false ? (
+              {policyDetails.compliant === false ? (
                 <div className="text-sm">
                   <h2 className="mt-8 text-lg font-semibold">
                     Control evaluation result
                   </h2>
                   <div className="flex flex-col gap-2 mt-4">
-                    {props.policyDetails.violations?.map((violation) => (
+                    {policyDetails.violations?.map((violation) => (
                       <div
                         key={violation}
                         className="flex flex-row items-center gap-2 rounded-lg border p-2"
@@ -99,7 +141,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     ))}
                   </div>
                 </div>
-              ) : props.policyDetails.compliant === true ? (
+              ) : policyDetails.compliant === true ? (
                 <div className="text-sm">
                   <h2 className="mt-8 text-lg font-semibold">
                     Control evaluation result
@@ -115,19 +157,19 @@ const Index: FunctionComponent<Props> = (props) => {
                     No attestation available
                   </h2>
                   <div className="flex items-start flex-row  gap-2 rounded-lg border p-2 mt-4">
-                    <TriangleAlert className="h-4 w-4 mt-1 text-yellow-500" />
+                    <TriangleAlert className="h-4 w-4 mt-2 text-yellow-500" />
 
                     <div className="flex-1 text-sm/7">
                       No attestation available for this control. This control
                       expects a{" "}
                       <CopyCodeFragment
-                        codeString={props.policyDetails.predicateType}
+                        codeString={policyDetails.predicateType}
                       ></CopyCodeFragment>{" "}
                       predicate type. Use the following command to create such
                       an attestation and upload it to the container-registry as
                       well as to DevGuard{" "}
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${props.policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
                     </div>
                   </div>
@@ -146,7 +188,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-row">
-                    {props.policyDetails.compliant === null ? (
+                    {policyDetails.compliant === null ? (
                       <ColoredBadge variant="high">
                         <TriangleAlert className="h-4 w-4 mr-1" />
                         Could not evaluate control
@@ -154,10 +196,10 @@ const Index: FunctionComponent<Props> = (props) => {
                     ) : (
                       <ColoredBadge
                         variant={violationLengthToLevel(
-                          props.policyDetails.violations?.length ?? 0,
+                          policyDetails.violations?.length ?? 0,
                         )}
                       >
-                        {props.policyDetails.violations?.length ?? 0} Violations
+                        {policyDetails.violations?.length ?? 0} Violations
                       </ColoredBadge>
                     )}
                   </div>
@@ -168,7 +210,7 @@ const Index: FunctionComponent<Props> = (props) => {
                     </span>
                     <div className="mt-2">
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${props.policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
                     </div>
                     <div className="mt-10">
@@ -187,50 +229,5 @@ const Index: FunctionComponent<Props> = (props) => {
     </Page>
   );
 };
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
-    // fetch the project
-    const {
-      organizationSlug,
-      projectSlug,
-      assetSlug,
-      assetVersionSlug,
-      control,
-    } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/compliance/" +
-      control;
-
-    const [resp]: [PolicyEvaluation] = await Promise.all([
-      apiClient(uri).then((r) => r.json()),
-    ]);
-
-    return {
-      props: {
-        policyDetails: resp,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    asset: withAsset,
-    project: withProject,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);
 
 export default Index;

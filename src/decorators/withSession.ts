@@ -16,7 +16,7 @@
 import { GetServerSidePropsContext } from "next";
 import { ory } from "../services/ory";
 
-import { HttpError } from "./middleware";
+import { HttpError } from "./http-error";
 import { User } from "@/types/auth";
 import { isAxiosError } from "axios";
 

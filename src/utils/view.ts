@@ -22,6 +22,7 @@ import {
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
+import { config } from "../config";
 
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
@@ -324,3 +325,38 @@ export const reduceRiskHistories = (
 export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
+
+export interface ContentTreeElement extends ProjectDTO {
+  assets: Array<AssetDTO>;
+}
+
+export const normalizeContentTree = (
+  contentTree: Array<ContentTreeElement>,
+) => {
+  const assetMap: {
+    [key: string]:
+      | (AssetDTO & {
+          project: ProjectDTO;
+        })
+      | undefined;
+  } = {};
+
+  contentTree.forEach((element) => {
+    element.assets.forEach((asset) => {
+      assetMap[asset.id] = {
+        ...asset,
+        project: {
+          ...element,
+          // @ts-expect-error
+          assets: undefined, // remove assets to avoid circular reference
+        },
+      };
+    });
+  });
+
+  return assetMap;
+};
+
+export interface ThemeConfig {
+  config: typeof config;
+}

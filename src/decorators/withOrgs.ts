@@ -15,7 +15,7 @@
 
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
-import { HttpError } from "./middleware";
+import { HttpError } from "./http-error";
 import { OrganizationDTO } from "@/types/api/api";
 
 export async function withOrgs(ctx: GetServerSidePropsContext) {

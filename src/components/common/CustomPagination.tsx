@@ -1,7 +1,7 @@
 import { Paged } from "@/types/api/api";
-import React, { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo } from "react";
 
-import { useRouter } from "next/compat/router";
+import useRouterQuery from "../../hooks/useRouterQuery";
 import { Button } from "../ui/button";
 
 const getPaginationData = (currentPage: number, totalPages: number) => {
@@ -60,11 +60,11 @@ const CustomPagination: FunctionComponent<Props> = ({
 }) => {
   // calculate the amount of pages
   const pages = Math.ceil(total / pageSize);
-  const router = useRouter();
+  const pushQueryParam = useRouterQuery();
 
   const navigateToPage = (page: number) => {
-    router.push({
-      query: { ...router.query, page },
+    pushQueryParam({
+      page,
     });
   };
 

@@ -9,14 +9,13 @@ import { ProjectDTO, UserRole, WebhookDTO } from "../../../../../types/api/api";
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { useActiveProject } from "@/hooks/useActiveProject";
 
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import MembersTable from "../../../../../components/MembersTable";
 import ProjectMemberDialog from "../../../../../components/ProjectMemberDialog";
@@ -278,7 +277,7 @@ const Index: FunctionComponent = () => {
             <hr />
           </>
         )}
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm
               disabled={Boolean(project.externalEntityProviderId)}
@@ -296,7 +295,7 @@ const Index: FunctionComponent = () => {
               </Button>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </div>
     </Page>
   );

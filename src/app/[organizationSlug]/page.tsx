@@ -24,7 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import Page from "../../components/Page";
 
 import { useActiveOrg } from "../../hooks/useActiveOrg";
@@ -194,7 +194,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             </DialogDescription>
           </DialogHeader>
           <hr />
-          <Form {...form}>
+          <FormProvider {...form}>
             <form
               className="space-y-8"
               onSubmit={form.handleSubmit(handleCreateProject)}
@@ -209,7 +209,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 </Button>
               </DialogFooter>
             </form>
-          </Form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
 

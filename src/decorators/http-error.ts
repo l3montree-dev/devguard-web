@@ -13,9 +13,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { useSession } from "../context/SessionContext";
-
-export const useCurrentUser = () => {
-  const { session } = useSession();
-  return session?.identity;
-};
+export class HttpError extends Error {
+  constructor(
+    public instructions: {
+      redirect: {
+        destination: string;
+        permanent: boolean;
+      };
+    },
+  ) {
+    super("HTTP Error");
+    this.instructions = instructions;
+  }
+}

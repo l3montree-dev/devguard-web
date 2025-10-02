@@ -2,8 +2,8 @@
 
 import { createContext, useContext } from "react";
 import { OrganizationDetailsDTO } from "../types/api/api";
-import { ContentTreeElement } from "../zustand/globalStore";
 import { WithUpdater } from "./ClientContextWrapper";
+import { ContentTreeElement } from "../utils/view";
 
 const OrganizationContext = createContext<
   WithUpdater<{

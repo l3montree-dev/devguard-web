@@ -238,7 +238,7 @@ const Index: FunctionComponent = () => {
 
     if (searchParams?.has("artifact")) {
       p.append(
-        "filterQuery[artifact_license_risks.artifact_artifact_name][is]",
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
         searchParams.get("artifact") as string,
       );
     }

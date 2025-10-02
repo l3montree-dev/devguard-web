@@ -15,7 +15,7 @@
 
 import { AssetDTO, ProjectDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../../services/devGuardApiAppRouter";
-import { HttpError } from "../middleware";
+import { HttpError } from "../http-error";
 
 export async function withProject(
   organizationSlug: string,

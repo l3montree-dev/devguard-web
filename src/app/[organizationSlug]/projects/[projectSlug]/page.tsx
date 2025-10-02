@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Form, useForm } from "react-hook-form";
+import { Form, FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -257,7 +257,7 @@ export default function RepositoriesPage() {
             </DialogDescription>
           </DialogHeader>
           <hr />
-          <Form {...form}>
+          <FormProvider {...projectForm}>
             <form
               className="space-y-8"
               onSubmit={projectForm.handleSubmit(handleCreateProject)}
@@ -277,7 +277,7 @@ export default function RepositoriesPage() {
                 </Button>
               </DialogFooter>
             </form>
-          </Form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
 
@@ -291,7 +291,7 @@ export default function RepositoriesPage() {
             </DialogDescription>
           </DialogHeader>
           <hr />
-          <Form {...form}>
+          <FormProvider {...form}>
             <form
               className="flex flex-col"
               onSubmit={form.handleSubmit(handleCreateAsset)}
@@ -313,7 +313,7 @@ export default function RepositoriesPage() {
                 </Button>
               </DialogFooter>
             </form>
-          </Form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
     </>

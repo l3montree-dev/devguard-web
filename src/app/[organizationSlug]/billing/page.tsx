@@ -8,13 +8,13 @@ import { browserApiClient } from "@/services/devGuardApi";
 import ProductManagement from "@/components/billling/ProductManagement";
 import Products from "@/components/billling/ProductsList";
 import { config as appConfig } from "@/config";
+import { middleware } from "@/decorators/http-error";
+import { withContentTree } from "@/decorators/withContentTree";
+import { withOrganization } from "@/decorators/withOrganization";
+import { withOrgs } from "@/decorators/withOrgs";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ProductsData } from "@/types/api/billing";
-import { middleware } from "@/decorators/middleware";
-import { withOrgs } from "@/decorators/withOrgs";
 import Link from "next/link";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withContentTree } from "@/decorators/withContentTree";
 
 export default function Billing({
   productsData,

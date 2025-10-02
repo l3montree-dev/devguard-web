@@ -15,7 +15,7 @@
 import { getApiClientFromContext } from "@/services/devGuardApi";
 import { AssetVersionDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
-import { HttpError } from "./middleware";
+import { HttpError } from "./http-error";
 
 export async function withAssetVersion(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient

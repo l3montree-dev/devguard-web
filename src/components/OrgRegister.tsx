@@ -13,23 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 
 import { browserApiClient } from "@/services/devGuardApi";
 import { Form } from "./ui/form";
 
-import { useStore } from "@/zustand/globalStoreProvider";
 import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
 
 import { toast } from "sonner";
+import { useUpdateOrganization } from "../context/OrganizationContext";
 
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
-  const updateOrganization = useStore((s) => s.updateOrganization);
+  const updateOrganization = useUpdateOrganization();
   const form = useForm<OrganizationDTO>();
 
   const router = useRouter();
@@ -54,7 +54,10 @@ export default function OrgRegisterForm(props: Props) {
 
     const orgDTO: OrganizationDetailsDTO = await resp.json();
 
-    updateOrganization(orgDTO);
+    updateOrganization((prev) => ({
+      ...prev,
+      organization: orgDTO,
+    }));
 
     // move the user to the newly created organization
     router.push(`/${orgDTO.slug}`);

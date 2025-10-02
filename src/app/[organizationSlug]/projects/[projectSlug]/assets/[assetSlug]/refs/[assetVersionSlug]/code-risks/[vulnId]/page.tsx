@@ -1,19 +1,9 @@
+"use client";
+
 import Page from "@/components/Page";
 
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
-import {
-  DetailedDependencyVulnDTO,
-  DetailedFirstPartyVulnDTO,
-  VulnEventDTO,
-} from "@/types/api/api";
+import { browserApiClient } from "@/services/devGuardApi";
+import { DetailedFirstPartyVulnDTO, VulnEventDTO } from "@/types/api/api";
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -22,7 +12,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { FunctionComponent, useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -35,21 +24,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { withOrganization } from "@/decorators/withOrganization";
 
 import AssetTitle from "@/components/common/AssetTitle";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
 import {
   emptyThenNull,
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
 } from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import CopyCode from "../../../../../../../../../../components/common/CopyCode";
-import VulnState from "../../../../../../../../../../components/common/VulnState";
-import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
-import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
+import CopyCode from "@/components/common/CopyCode";
+import VulnState from "@/components/common/VulnState";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import GitProviderIcon from "@/components/GitProviderIcon";
+import useSWR from "swr";
+import { fetcher } from "@/hooks/useApi";
+import useDecodedParams from "@/hooks/useDecodedParams";
+import { Skeleton } from "@/components/ui/skeleton";
+import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
+import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -58,17 +50,25 @@ const MarkdownEditor = dynamic(
   },
 );
 
-interface Props {
-  vuln: DetailedFirstPartyVulnDTO;
-}
-
 const highlightRegex = new RegExp(/\+\+\+(.+)\+\+\+/, "gms");
 
-const Index: FunctionComponent<Props> = (props) => {
-  const [vuln, setVuln] = useState<DetailedFirstPartyVulnDTO>(props.vuln);
-  useEffect(() => {
-    setVuln(props.vuln);
-  }, [props.vuln]);
+const Index = () => {
+  const params = useDecodedParams();
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
+    params;
+
+  // Fetch vulnerability data using SWR
+  const {
+    data: vuln,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<DetailedFirstPartyVulnDTO>(
+    organizationSlug && projectSlug && assetSlug && assetVersionSlug && vulnId
+      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/first-party-vulns/${vulnId}`
+      : null,
+    fetcher,
+  );
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -80,6 +80,45 @@ const Index: FunctionComponent<Props> = (props) => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+
+  // Show loading skeleton if data is loading
+  if (isLoading || !vuln) {
+    return (
+      <Page title="Loading...">
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-3">
+            <Skeleton className="w-64 h-10" />
+            <Skeleton className="w-full mt-4 h-20" />
+            <div className="mt-4 flex flex-row gap-2">
+              <Skeleton className="w-20 h-4" />
+              <Skeleton className="w-20 h-4" />
+            </div>
+            <Skeleton className="w-full mt-10 mb-16 h-[200px]" />
+            <RiskAssessmentFeedSkeleton />
+            <div>
+              <EditorSkeleton />
+            </div>
+          </div>
+
+          <div className="border-l col-span-1 flex-col pl-4">
+            <Skeleton className="w-full h-[200px]" />
+          </div>
+        </div>
+      </Page>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Page title="Error Loading Vulnerability">
+        <div className="text-center py-8">
+          <p className="text-red-600">Failed to load vulnerability details</p>
+          <p className="text-sm text-gray-500 mt-2">Please try again later</p>
+        </div>
+      </Page>
+    );
+  }
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -148,16 +187,20 @@ const Index: FunctionComponent<Props> = (props) => {
       });
     }
 
-    setVuln((prev) => ({
-      ...prev,
-      ...json,
-      events: prev.events.concat([
-        {
-          ...json.events.slice(-1)[0],
-          assetVersionName: assetVersion?.name,
-        },
-      ]),
-    }));
+    // Optimistically update the local data
+    mutate((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        ...json,
+        events: current.events.concat([
+          {
+            ...json.events.slice(-1)[0],
+            assetVersionName: assetVersion?.name,
+          },
+        ]),
+      };
+    }, false);
     setJustification("");
   };
 
@@ -449,7 +492,7 @@ const Index: FunctionComponent<Props> = (props) => {
                 </Card>
               </div>
             </div>
-            <div className="col-span-1">
+            <div className="col-span-1 p-4 border-l pt-0">
               <h3 className="mb-2 text-lg font-semibold">Rule Details</h3>
               <div className="text-sm text-muted-foreground">
                 <Markdown>{vuln.ruleDescription}</Markdown>
@@ -470,50 +513,5 @@ const Index: FunctionComponent<Props> = (props) => {
     </Page>
   );
 };
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext, { assetVersion }) => {
-    // fetch the project
-    const {
-      organizationSlug,
-      projectSlug,
-      assetSlug,
-      assetVersionSlug,
-      vulnId,
-    } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/first-party-vulns/" +
-      vulnId;
-
-    const [resp]: [DetailedDependencyVulnDTO] = await Promise.all([
-      apiClient(uri).then((r) => r.json()),
-    ]);
-
-    return {
-      props: {
-        vuln: resp,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    asset: withAsset,
-    project: withProject,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);
 
 export default Index;

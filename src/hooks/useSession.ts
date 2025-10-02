@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Session } from "@ory/client";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ory } from "../services/ory";
 

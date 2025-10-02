@@ -52,7 +52,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useConfig } from "../../../context/ConfigContext";
 import {
@@ -518,7 +518,7 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
       </Section>
       <hr />
       <div className="pb-12">
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <OrgForm forceVertical={false} />
             <div className="mt-6 flex items-center justify-end gap-x-6">
@@ -527,10 +527,10 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
               </Button>
             </div>
           </form>
-        </Form>
+        </FormProvider>
       </div>
       <hr />
-      <Form {...form}>
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>
           <Section
             title="Visibility"
@@ -571,7 +571,7 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
             </DangerZone>
           </Section>
         </form>
-      </Form>
+      </FormProvider>
       <hr />
       <Section
         id="request-org-deletion"

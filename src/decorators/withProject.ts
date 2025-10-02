@@ -16,7 +16,7 @@
 import { AssetDTO, ProjectDTO } from "@/types/api/api";
 import { GetServerSidePropsContext } from "next";
 import { getApiClientFromContext } from "../services/devGuardApi";
-import { HttpError } from "./middleware";
+import { HttpError } from "./http-error";
 
 export async function withProject(ctx: GetServerSidePropsContext) {
   // get the devGuardApiClient

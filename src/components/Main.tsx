@@ -15,12 +15,13 @@
 import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
-import { useRouter } from "next/compat/router";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { FunctionComponent } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 
 import { useConfig } from "../context/ConfigContext";
+import useDecodedPathname from "../hooks/useDecodedPathname";
 import { OrganizationDropDown } from "./OrganizationDropDown";
 import EntityProviderBanner from "./common/EntityProviderBanner";
 import EntityProviderImage from "./common/EntityProviderImage";
@@ -52,6 +53,7 @@ const Main: FunctionComponent<Props> = ({
   const themeConfig = useConfig();
   const activeOrg = useActiveOrg();
 
+  const pathname = useDecodedPathname();
   return (
     <main className="flex-1 font-body">
       <header
@@ -85,7 +87,7 @@ const Main: FunctionComponent<Props> = ({
                   key={item.title}
                   href={item.href}
                 >
-                  {(item.isActive || router?.asPath == item.href) && (
+                  {(item.isActive || pathname == item.href) && (
                     <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
                   )}
                   <div className="mt-4 flex flex-row items-center gap-1">

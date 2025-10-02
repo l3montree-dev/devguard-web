@@ -1,11 +1,10 @@
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
-import router from "next/router";
+
 import React, {
   FunctionComponent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -19,13 +18,12 @@ import {
   browserApiClient,
   multipartBrowserApiClient,
 } from "../services/devGuardApi";
-
 import { useAutosetup } from "@/hooks/useAutosetup";
-
+import { useUpdateOrganization } from "../context/OrganizationContext";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
-import { useStore } from "../zustand/globalStoreProvider";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
+import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 import GithubTokenSlide from "./guides/risk-scanner-carousel-slides/GithubTokenSlide";
 import GitLabIntegrationSlide from "./guides/risk-scanner-carousel-slides/GitLabIntegrationSlide";
 import GitlabTokenSlide from "./guides/risk-scanner-carousel-slides/GitlabTokenSlide";
@@ -35,15 +33,12 @@ import ProviderSetupSlide from "./guides/risk-scanner-carousel-slides/Repository
 import ScannerOptionsSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerOptionsSelectionSlide";
 import ScannerSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerSelectionSlide";
 import { SetupMethodSelectionSlide } from "./guides/risk-scanner-carousel-slides/SetupMethodSelectionSlide";
+import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import YamlGeneratorSlide from "./guides/risk-scanner-carousel-slides/YamlGeneratorSlide";
 import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSlide";
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
-import ProviderIntegrationSetupSlide from "./guides/webhook-setup-carousel-slides/ProviderIntegrationSetupSlide";
-import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
-import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
-import { useUpdateOrganization } from "../context/OrganizationContext";
-import { memoize } from "lodash";
+import { useRouter } from "next/navigation";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -67,6 +62,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     reInit: () => {},
     scrollTo: () => {},
   });
+
+  const router = useRouter();
 
   const asset = useActiveAsset()!;
 
@@ -167,10 +164,10 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     } else {
       toast.error("SBOM has not been sent successfully");
     }
+    onOpenChange(false);
     router.push(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/dependency-risks/`,
     );
-    onOpenChange(false);
   };
 
   const uploadSARIF = async () => {
@@ -190,6 +187,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     } else {
       toast.error("SARIF report has not been sent successfully");
     }
+    onOpenChange(false);
     router.push(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/code-risks/`,
     );

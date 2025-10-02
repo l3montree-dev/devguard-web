@@ -41,6 +41,9 @@ import Callout from "../../../../../../../../../../components/common/Callout";
 import EcosystemImage from "../../../../../../../../../../components/common/EcosystemImage";
 import { fetcher } from "../../../../../../../../../../hooks/useApi";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
+import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -71,14 +74,15 @@ const Index: FunctionComponent = () => {
   );
 
   // Data fetching with useSWR
-  const { data: vuln, mutate } = useSWR<DetailedLicenseRiskDTO>(
+  const {
+    data: vuln,
+    mutate,
+    isLoading,
+  } = useSWR<DetailedLicenseRiskDTO>(
     `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/license-risks/${vulnId}`,
     fetcher,
     { suspense: true },
-  ) as {
-    data: DetailedLicenseRiskDTO;
-    mutate: (data?: DetailedLicenseRiskDTO, shouldRevalidate?: boolean) => void;
-  };
+  );
 
   const [updatedLicense, setUpdatedLicense] = useState<string>(
     vuln?.component.license ?? "unknown",
@@ -157,7 +161,7 @@ const Index: FunctionComponent = () => {
     }
 
     // Update the local data and revalidate
-    await mutate(
+    mutate(
       {
         ...vuln,
         ...json,
@@ -173,6 +177,32 @@ const Index: FunctionComponent = () => {
   };
 
   const isOpen = vuln?.state === "open";
+
+  if (isLoading || !vuln) {
+    return (
+      <Page title="Loading...">
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-3">
+            <Skeleton className="w-64 h-10" />
+            <Skeleton className="w-full mt-4 h-20" />
+            <div className="mt-4 flex flex-row gap-2">
+              <Skeleton className="w-20 h-4" />
+              <Skeleton className="w-20 h-4" />
+            </div>
+            <Skeleton className="w-full mt-10 mb-16 h-[200px]" />
+            <RiskAssessmentFeedSkeleton />
+            <div>
+              <EditorSkeleton />
+            </div>
+          </div>
+
+          <div className="border-l col-span-1 flex-col pl-4">
+            <Skeleton className="w-full h-[200px]" />
+          </div>
+        </div>
+      </Page>
+    );
+  }
 
   return (
     <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">

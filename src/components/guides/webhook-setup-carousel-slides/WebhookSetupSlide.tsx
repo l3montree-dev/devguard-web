@@ -8,12 +8,11 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
-import { useStore } from "@/zustand/globalStoreProvider";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useConfig } from "../../../context/ConfigContext";
 import { useUpdateAsset } from "../../../context/AssetContext";
+import { useConfig } from "../../../context/ConfigContext";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -35,7 +34,7 @@ export default function WebhookSetupSlide({
   const updateAsset = useUpdateAsset();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
-  const asset = useActiveAsset()!;
+  const asset = useActiveAsset();
 
   const isExternalEntityProvider =
     asset?.externalEntityProviderId &&

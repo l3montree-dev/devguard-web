@@ -41,8 +41,8 @@ const Recovery: NextPage = () => {
   // Get ?flow=... from the URL
   const router = useRouter();
   const searchParams = useSearchParams();
-  const flowId = searchParams.get("flow");
-  const returnTo = searchParams.get("return_to");
+  const flowId = searchParams?.get("flow");
+  const returnTo = searchParams?.get("return_to");
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
