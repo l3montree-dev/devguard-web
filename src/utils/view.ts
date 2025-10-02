@@ -320,3 +320,7 @@ export const reduceRiskHistories = (
     );
   });
 };
+
+export const generateNewSecret = (): string => {
+  return crypto.randomUUID();
+};

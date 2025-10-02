@@ -27,7 +27,10 @@ import { useConfig } from "../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../hooks/useApi";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { AssetDTO } from "../../../../../../../types/api/api";
-import { getParentRepositoryIdAndName } from "../../../../../../../utils/view";
+import {
+  generateNewSecret,
+  getParentRepositoryIdAndName,
+} from "../../../../../../../utils/view";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -37,10 +40,6 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
 };
 
 type SecretType = "badge" | "webhook";
-
-export const generateNewSecret = (): string => {
-  return crypto.randomUUID();
-};
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();

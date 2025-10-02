@@ -48,6 +48,7 @@ export const useProjectMenu = () => {
       title: "Releases",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
       Icon: ContainerIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
     },
     {
       title: project.externalEntityProviderId
@@ -63,6 +64,7 @@ export const useProjectMenu = () => {
       title: "Compliance",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
       Icon: ScaleIcon,
+      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/compliance`,
     });
 
     if (
@@ -73,6 +75,7 @@ export const useProjectMenu = () => {
         title: "Settings",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
         Icon: CogIcon,
+        isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
       });
     }
   }

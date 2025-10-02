@@ -1,14 +1,8 @@
 "use client";
-import { GetServerSidePropsContext } from "next";
 import { FunctionComponent, useEffect, useState } from "react";
 import Page from "../../../../../components/Page";
 
-import { middleware } from "@/decorators/middleware";
-
-import { withOrganization } from "@/decorators/withOrganization";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
-import { withOrgs } from "../../../../../decorators/withOrgs";
-import { withSession } from "../../../../../decorators/withSession";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../../services/devGuardApi";
 import { ProjectDTO, UserRole, WebhookDTO } from "../../../../../types/api/api";
@@ -16,12 +10,10 @@ import { ProjectDTO, UserRole, WebhookDTO } from "../../../../../types/api/api";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { withProject } from "@/decorators/withProject";
 import { useActiveProject } from "@/hooks/useActiveProject";
 
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
-import { withContentTree } from "@/decorators/withContentTree";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -35,11 +27,9 @@ import { Label } from "../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../hooks/useDecodedParams";
 
-interface Props {}
-
-const Index: FunctionComponent<Props> = () => {
+const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
-  const project = useActiveProject()!;
+  const project = useActiveProject();
   const updateProject = useUpdateProject();
   const currentUserRole = useCurrentUserRole();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
@@ -311,29 +301,5 @@ const Index: FunctionComponent<Props> = () => {
     </Page>
   );
 };
-
-export const getServerSideProps = middleware(
-  async (
-    context: GetServerSidePropsContext,
-    { organization, session, project },
-  ) => {
-    if (organization && "oauth2Error" in organization) {
-      return {
-        props: {},
-      };
-    }
-
-    return {
-      props: {},
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    contentTree: withContentTree,
-  },
-);
 
 export default Index;

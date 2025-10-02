@@ -1,25 +1,54 @@
-import { DEFAULT_DECORATORS, middleware } from "@/decorators/middleware";
-import { withSession } from "@/decorators/withSession";
-import { getApiClientFromContext } from "@/services/devGuardApi";
-import { GetServerSideProps } from "next";
+import { browserApiClient } from "@/services/devGuardApi";
 import Head from "next/head";
+
+import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { useCurrentUser } from "../hooks/useCurrentUser";
-import { Button } from "../components/ui/button";
-import { LogoutLink } from "../hooks/logoutLink";
-import Link from "next/link";
-import Image from "next/image";
-import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
+} from "../../components/ui/card";
+import { LogoutLink } from "../../hooks/logoutLink";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();
 
   const handleLogout = LogoutLink();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    (async function () {
+      if (!searchParams?.get("code")) {
+        return;
+      }
+
+      const resp = await browserApiClient("/accept-invitation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: searchParams?.get("code") }),
+      });
+
+      if (!resp.ok) {
+        return {
+          props: {},
+        };
+      }
+
+      // the invitation was accepted - redirect the user to the organization
+      const { slug } = await resp.json();
+      // redirect the user
+      router.replace(`/${slug}`);
+    })();
+  }, [searchParams, router]);
 
   return (
     <>
@@ -101,42 +130,3 @@ const AcceptInvitation = () => {
 };
 
 export default AcceptInvitation;
-
-export const getServerSideProps: GetServerSideProps = middleware(
-  async (context) => {
-    // make a request to accept that invitation
-    const apiClient = getApiClientFromContext(context);
-    const code = context.query.code as string;
-    if (!code) {
-      return {
-        notFound: true,
-      };
-    }
-
-    const resp = await apiClient("/accept-invitation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ code }),
-    });
-
-    if (!resp.ok) {
-      return {
-        props: {},
-      };
-    }
-
-    // the invitation was accepted - redirect the user to the organization
-    const { slug } = await resp.json();
-    return {
-      redirect: {
-        destination: `/${slug}`,
-        permanent: false,
-      },
-    };
-  },
-  {
-    session: withSession,
-  },
-);

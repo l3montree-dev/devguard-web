@@ -32,6 +32,7 @@ import { beautifyPurl } from "@/utils/common";
 import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
 import { riskToSeverity, severityToColor } from "./common/Severity";
+import { useSearchParams } from "next/navigation";
 
 const addRecursive = (
   dagreGraph: graphlib.Graph,
@@ -185,7 +186,7 @@ const DependencyGraph: FunctionComponent<{
   graph: { root: ViewDependencyTreeNode };
 }> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
@@ -202,7 +203,7 @@ const DependencyGraph: FunctionComponent<{
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, asset?.name, flaws]);
+  }, [graph, asset?.name, variant, flaws]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -212,10 +213,10 @@ const DependencyGraph: FunctionComponent<{
     setEdges(initialEdges);
 
     // check if we want to focus a specific node
-    if (router.query.pkg) {
+    if (searchParams?.has("pkg")) {
       const focusNode = initialNodes.find((n) =>
         beautifyPurl(n.data.label).startsWith(
-          beautifyPurl(router.query.pkg as string),
+          beautifyPurl(searchParams.get("pkg") as string),
         ),
       );
 
@@ -243,7 +244,7 @@ const DependencyGraph: FunctionComponent<{
     rootNode,
     width,
     height,
-    router.query.pkg,
+    searchParams,
   ]);
 
   const { theme } = useTheme();

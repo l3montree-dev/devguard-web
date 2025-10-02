@@ -15,15 +15,15 @@
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { classNames } from "@/utils/common";
-import { defaultScanner } from "@/utils/view";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
-import { useRouter } from "next/compat/router";
+import { useRouter } from "next/navigation";
 import React, { FunctionComponent } from "react";
+import ArtifactBadge from "../ArtifactBadge";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
-import ArtifactBadge from "../ArtifactBadge";
 import { Badge } from "../ui/badge";
+import useDecodedPathname from "../../hooks/useDecodedPathname";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -91,6 +91,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const router = useRouter();
+  const pathname = useDecodedPathname();
   return (
     <>
       <tr
@@ -150,9 +151,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       key={vuln.id}
                       onClick={() =>
                         router.push(
-                          router.asPath.split("?")[0] +
-                            "/../dependency-risks/" +
-                            vuln.id,
+                          pathname + "/../dependency-risks/" + vuln.id,
                         )
                       }
                     />

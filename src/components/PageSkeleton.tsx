@@ -1,7 +1,5 @@
-import React from "react";
 import { classNames } from "../utils/common";
 import { Skeleton } from "./ui/skeleton";
-import { Loader2 } from "lucide-react";
 
 const PageSkeleton = () => {
   return (
@@ -34,9 +32,7 @@ const PageSkeleton = () => {
         className={classNames(
           "mx-auto h-screen max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
         )}
-      >
-        <div className="opacity-25 text-center">Loading...</div>
-      </div>
+      />
 
       <div className="bg-footer">
         <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-footer-foreground lg:px-8">

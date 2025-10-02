@@ -1,17 +1,9 @@
+"use client";
+
 import Page from "@/components/Page";
-
-import VulnState from "@/components/common/VulnState";
-
 import Severity from "@/components/common/Severity";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
-import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
+import VulnState from "@/components/common/VulnState";
+import { browserApiClient } from "@/services/devGuardApi";
 import {
   AssetDTO,
   DependencyVulnHints,
@@ -21,25 +13,15 @@ import {
 } from "@/types/api/api";
 import Image from "next/image";
 import { Label, Pie, PieChart } from "recharts";
-
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-import { useRouter } from "next/compat/router";
-import {
-  FunctionComponent,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FunctionComponent, ReactNode, useMemo, useState } from "react";
 import Markdown from "react-markdown";
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -59,15 +41,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { withOrganization } from "@/decorators/withOrganization";
 import {
   BugAntIcon,
   InformationCircleIcon,
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-
 import AssetTitle from "@/components/common/AssetTitle";
+import CopyCode from "@/components/common/CopyCode";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import {
@@ -75,28 +56,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
-import { withContentTree } from "@/decorators/withContentTree";
 import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
   vexOptionMessages,
 } from "@/utils/view";
-import { useStore } from "@/zustand/globalStoreProvider";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { CheckCircleIcon, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
-import CopyCode from "@/components/common/CopyCode";
-import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import useSWR from "swr";
 import ArtifactBadge from "../../../../../../../../../../components/ArtifactBadge";
 import DependencyGraph from "../../../../../../../../../../components/DependencyGraph";
-import useSWR from "swr";
+import GitProviderIcon from "../../../../../../../../../../components/GitProviderIcon";
+import { useActiveAssetVersion } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import { fetcher } from "../../../../../../../../../../hooks/useApi";
-import { usePathname } from "next/navigation";
+import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import RiskAssessmentFeedSkeleton from "../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
+import EditorSkeleton from "../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -104,11 +85,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-
-interface Props {
-  vuln: DetailedDependencyVulnDTO;
-  hints: DependencyVulnHints;
-}
 
 const parseCvssVector = (vector: string) => {
   const parts = vector.split("/");
@@ -123,12 +99,19 @@ const parseCvssVector = (vector: string) => {
 };
 
 const exploitMessage = (
-  vuln: DetailedDependencyVulnDTO,
+  vuln: DetailedDependencyVulnDTO | undefined,
   obj: { [key: string]: string },
 ): {
   short: string;
   long: ReactNode;
 } => {
+  if (!vuln) {
+    return {
+      short: "",
+      long: null,
+    };
+  }
+
   if (obj["E"] === "POC" || obj["E"] === "P") {
     return {
       short: "Proof of Concept",
@@ -393,14 +376,8 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   );
 }
 
-const Index: FunctionComponent<Props> = (props) => {
-  const router = useRouter();
+const Index: FunctionComponent = () => {
   const pathname = usePathname();
-  const [vuln, setVuln] = useState<DetailedDependencyVulnDTO>(props.vuln);
-  useEffect(() => {
-    setVuln(props.vuln);
-  }, [props.vuln]);
-  const cve = vuln.cve;
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -417,17 +394,40 @@ const Index: FunctionComponent<Props> = (props) => {
     Object.keys(vexOptionMessages)[2],
   );
 
-  const { data: graphData, isLoading: graphLoading } = useSWR<any>(
-    `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(props.vuln.componentPurl)}`,
+  // fetch the project
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
+    useDecodedParams();
+
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/refs/" +
+    assetVersionSlug +
+    "/dependency-vulns/" +
+    vulnId;
+
+  const { data: vuln, mutate } = useSWR<DetailedDependencyVulnDTO>(
+    uri,
     fetcher,
   );
+  const { data: graphData, isLoading: graphLoading } = useSWR<any>(
+    vuln
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(vuln.componentPurl)}`
+      : null,
+    fetcher,
+  );
+  const { data: hints } = useSWR<DependencyVulnHints>(uri + "/hints", fetcher);
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
     mechanicalJustification?: string;
   }) => {
-    if (data.status === undefined) {
+    if (data.status === undefined || !vuln) {
       return;
     }
 
@@ -437,76 +437,77 @@ const Index: FunctionComponent<Props> = (props) => {
       });
     }
 
-    let json: any;
-    if (data.status === "mitigate") {
-      const resp = await browserApiClient(
-        "/api/v1/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset.slug +
-          "/refs/" +
-          assetVersion?.slug +
-          "/dependency-vulns/" +
-          vuln.id +
-          "/mitigate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+    mutate(async (prev) => {
+      let json: any;
+      if (data.status === "mitigate") {
+        const resp = await browserApiClient(
+          "/api/v1/organizations/" +
+            activeOrg.slug +
+            "/projects/" +
+            project.slug +
+            "/assets/" +
+            asset.slug +
+            "/refs/" +
+            assetVersion?.slug +
+            "/dependency-vulns/" +
+            vuln.id +
+            "/mitigate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              comment: data.justification,
+            }),
           },
-          body: JSON.stringify({
-            comment: data.justification,
-          }),
-        },
-        "",
-      );
-      json = await resp.json();
-    } else {
-      const resp = await browserApiClient(
-        "/api/v1/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset.slug +
-          "/refs/" +
-          assetVersion?.slug +
-          "/dependency-vulns/" +
-          vuln.id,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+          "",
+        );
+        json = await resp.json();
+      } else {
+        const resp = await browserApiClient(
+          "/api/v1/organizations/" +
+            activeOrg.slug +
+            "/projects/" +
+            project.slug +
+            "/assets/" +
+            asset.slug +
+            "/refs/" +
+            assetVersion?.slug +
+            "/dependency-vulns/" +
+            vuln.id,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
           },
-          body: JSON.stringify(data),
-        },
-        "",
-      );
-      json = await resp.json();
-    }
+          "",
+        );
+        json = await resp.json();
+      }
 
-    if (!json.events) {
-      return toast("Failed to update vulnerability", {
-        description: "Please try again later.",
-      });
-    }
-
-    setVuln((prev) => ({
-      ...prev,
-      ...json,
-      events: prev.events.concat([
-        {
-          ...json.events.slice(-1)[0],
-          assetVersionName: assetVersion?.name ?? "",
-        },
-      ]),
-    }));
-    setJustification("");
+      if (!json.events) {
+        return toast("Failed to update vulnerability", {
+          description: "Please try again later.",
+        });
+      }
+      setJustification("");
+      return {
+        ...prev,
+        ...json,
+        events: prev?.events.concat([
+          {
+            ...json.events.slice(-1)[0],
+            assetVersionName: assetVersion?.name ?? "",
+          },
+        ]),
+      };
+    });
   };
 
-  const cvssVectorObj = parseCvssVector(cve?.vector ?? "");
+  const cvssVectorObj = parseCvssVector(vuln?.cve?.vector ?? "");
   const { short: exploitShort, long: ExploitLong } = exploitMessage(
     vuln,
     cvssVectorObj,
@@ -516,18 +517,24 @@ const Index: FunctionComponent<Props> = (props) => {
     <Page
       Menu={assetMenu}
       Title={<AssetTitle />}
-      title={vuln.cve?.cve ?? "Vuln Details"}
+      title={vuln?.cve?.cve ?? "Vulnerability Details"}
     >
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">{vuln.cveID}</h1>
+              <h1 className="text-2xl font-semibold">
+                {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
+              </h1>
               <p className="mt-4 text-muted-foreground">
-                {vuln.cve?.description}
+                {vuln ? (
+                  vuln.cve?.description
+                ) : (
+                  <Skeleton className="w-full h-20" />
+                )}
               </p>
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
-                {vuln.ticketUrl && (
+                {vuln?.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
                     <Badge className="h-full" variant={"secondary"}>
                       {vuln.ticketId?.startsWith("github:") ? (
@@ -554,9 +561,17 @@ const Index: FunctionComponent<Props> = (props) => {
                   </Link>
                 )}
 
-                <VulnState state={vuln.state} />
-                {cve && <Severity risk={vuln.rawRiskAssessment} />}
-                {vuln.artifacts.map((a) => (
+                {vuln ? (
+                  <VulnState state={vuln.state} />
+                ) : (
+                  <Skeleton className="w-10 h-4" />
+                )}
+                {vuln ? (
+                  <Severity risk={vuln.rawRiskAssessment} />
+                ) : (
+                  <Skeleton className="w-10 h-4" />
+                )}
+                {vuln?.artifacts.map((a) => (
                   <ArtifactBadge
                     key={a.artifactName + vuln.id}
                     artifactName={a.artifactName}
@@ -582,673 +597,655 @@ const Index: FunctionComponent<Props> = (props) => {
                 )}
               </div>
               <div className="mb-16 mt-4">
-                <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
+                {vuln && (
+                  <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
+                )}
               </div>
 
-              <RiskAssessmentFeed
-                vulnerabilityName={vuln.cveID ?? ""}
-                events={vuln.events}
-                page="dependency-risks"
-              />
-              <div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {vuln.state === "open"
-                        ? "Add a comment"
-                        : "Reopen this vulnerability"}
-                    </CardTitle>
-                    <CardDescription></CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {vuln.state === "open" ? (
-                      <form
-                        className="flex flex-col gap-4"
-                        onSubmit={(e) => e.preventDefault()}
-                      >
-                        <div>
-                          <label className="mb-2 block text-sm font-semibold">
-                            Comment
-                          </label>
-                          <MarkdownEditor
-                            placeholder="Add your comment here..."
-                            value={justification ?? ""}
-                            setValue={setJustification}
-                          />
-                        </div>
-
-                        <div className="flex flex-row justify-end gap-1">
-                          <div className="flex flex-row items-start gap-2 pt-2">
-                            {vuln.ticketId === null &&
-                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                asset,
-                                project,
-                              ) === "gitlab" && (
-                                <AsyncButton
-                                  variant={"secondary"}
-                                  onClick={() =>
-                                    handleSubmit({
-                                      status: "mitigate",
-                                      justification,
-                                    })
-                                  }
-                                >
-                                  <div className="flex flex-col">
-                                    <div className="flex flex-row items-center">
-                                      <div className="mr-2">
-                                        <GitProviderIcon
-                                          externalEntityProviderIdOrRepositoryId={
-                                            asset.externalEntityProviderId ??
-                                            "gitlab"
-                                          }
-                                        />
-                                      </div>
-                                      Create Ticket
-                                    </div>
-                                  </div>
-                                </AsyncButton>
-                              )}
-
-                            {vuln.ticketId === null &&
-                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                asset,
-                                project,
-                              ) === "github" && (
-                                <AsyncButton
-                                  variant={"secondary"}
-                                  onClick={() =>
-                                    handleSubmit({
-                                      status: "mitigate",
-                                      justification,
-                                    })
-                                  }
-                                >
-                                  <div className="flex flex-col">
-                                    <div className="flex">
-                                      <Image
-                                        alt="GitLab Logo"
-                                        width={15}
-                                        height={15}
-                                        className="mr-2 dark:invert"
-                                        src={"/assets/github.svg"}
-                                      />
-                                      Create GitHub Ticket
-                                    </div>
-                                  </div>
-                                </AsyncButton>
-                              )}
-
-                            {vuln.ticketId === null &&
-                              getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                asset,
-                                project,
-                              ) === "jira" && (
-                                <AsyncButton
-                                  variant={"secondary"}
-                                  onClick={() =>
-                                    handleSubmit({
-                                      status: "mitigate",
-                                      justification,
-                                    })
-                                  }
-                                >
-                                  <div className="flex flex-col">
-                                    <div className="flex">
-                                      <Image
-                                        alt="Jira Logo"
-                                        width={15}
-                                        height={15}
-                                        className="mr-2"
-                                        src={"/assets/jira-svgrepo-com.svg"}
-                                      />
-                                      Create Jira Ticket
-                                    </div>
-                                  </div>
-                                </AsyncButton>
-                              )}
-                            <AsyncButton
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "accepted",
-                                  justification,
-                                })
-                              }
-                              variant={"secondary"}
-                            >
-                              Accept risk
-                            </AsyncButton>
-                            <div className="flex flex-col items-center">
-                              <div className="flex flex-row items-center">
-                                <AsyncButton
-                                  onClick={() =>
-                                    handleSubmit({
-                                      status: "falsePositive",
-                                      justification,
-                                      mechanicalJustification: selectedOption,
-                                    })
-                                  }
-                                  variant={"secondary"}
-                                  className="mr-0 capitalize rounded-r-none pr-0"
-                                >
-                                  {removeUnderscores(selectedOption)}
-                                </AsyncButton>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant={"secondary"}
-                                      className=" flex items-center rounded-l-none pl-1 pr-2"
-                                    >
-                                      <ChevronDown className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-
-                                  <DropdownMenuContent align="end">
-                                    {Object.entries(vexOptionMessages).map(
-                                      ([option, description]) => (
-                                        <DropdownMenuItem
-                                          key={option}
-                                          onClick={() =>
-                                            setSelectedOption(option)
-                                          }
-                                        >
-                                          <div className="flex flex-col">
-                                            <span className="capitalize">
-                                              {removeUnderscores(option)}{" "}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">
-                                              {description}
-                                            </span>
-                                          </div>
-                                        </DropdownMenuItem>
-                                      ),
-                                    )}
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                              <div className="flex-1 w-full">
-                                <span className=" text-left text-xs text-muted-foreground">
-                                  {"Mark as False Positive"}
-                                </span>
-                              </div>
+              {vuln ? (
+                <>
+                  <RiskAssessmentFeed
+                    vulnerabilityName={vuln.cveID ?? ""}
+                    events={vuln.events}
+                    page="dependency-risks"
+                  />
+                  <div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>
+                          {vuln.state === "open"
+                            ? "Add a comment"
+                            : "Reopen this vulnerability"}
+                        </CardTitle>
+                        <CardDescription></CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {vuln.state === "open" ? (
+                          <form
+                            className="flex flex-col gap-4"
+                            onSubmit={(e) => e.preventDefault()}
+                          >
+                            <div>
+                              <label className="mb-2 block text-sm font-semibold">
+                                Comment
+                              </label>
+                              <MarkdownEditor
+                                placeholder="Add your comment here..."
+                                value={justification ?? ""}
+                                setValue={setJustification}
+                              />
                             </div>
 
-                            <AsyncButton
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "comment",
-                                  justification,
-                                })
-                              }
-                              variant={"default"}
-                            >
-                              Comment
-                            </AsyncButton>
-                          </div>
-                        </div>
-                      </form>
-                    ) : (
-                      <form
-                        className="flex flex-col gap-4"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                        }}
-                      >
-                        <div>
-                          <label className="mb-2 block text-sm font-semibold">
-                            Comment
-                          </label>
-                          <MarkdownEditor
-                            value={justification ?? ""}
-                            setValue={setJustification}
-                            placeholder="Add your comment here..."
-                          />
-                        </div>
+                            <div className="flex flex-row justify-end gap-1">
+                              <div className="flex flex-row items-start gap-2 pt-2">
+                                {vuln.ticketId === null &&
+                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                    asset,
+                                    project,
+                                  ) === "gitlab" && (
+                                    <AsyncButton
+                                      variant={"secondary"}
+                                      onClick={() =>
+                                        handleSubmit({
+                                          status: "mitigate",
+                                          justification,
+                                        })
+                                      }
+                                    >
+                                      <div className="flex flex-col">
+                                        <div className="flex flex-row items-center">
+                                          <div className="mr-2">
+                                            <GitProviderIcon
+                                              externalEntityProviderIdOrRepositoryId={
+                                                asset.externalEntityProviderId ??
+                                                "gitlab"
+                                              }
+                                            />
+                                          </div>
+                                          Create Ticket
+                                        </div>
+                                      </div>
+                                    </AsyncButton>
+                                  )}
 
-                        <p className="text-sm text-muted-foreground">
-                          You can reopen this vuln, if you plan to mitigate the
-                          risk now, or accepted this vuln by accident.
-                        </p>
-                        <div className="flex flex-row justify-end">
-                          <AsyncButton
-                            onClick={() =>
-                              handleSubmit({
-                                status: "reopened",
-                                justification,
-                              })
-                            }
-                            variant={"secondary"}
-                            type="submit"
+                                {vuln.ticketId === null &&
+                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                    asset,
+                                    project,
+                                  ) === "github" && (
+                                    <AsyncButton
+                                      variant={"secondary"}
+                                      onClick={() =>
+                                        handleSubmit({
+                                          status: "mitigate",
+                                          justification,
+                                        })
+                                      }
+                                    >
+                                      <div className="flex flex-col">
+                                        <div className="flex">
+                                          <Image
+                                            alt="GitLab Logo"
+                                            width={15}
+                                            height={15}
+                                            className="mr-2 dark:invert"
+                                            src={"/assets/github.svg"}
+                                          />
+                                          Create GitHub Ticket
+                                        </div>
+                                      </div>
+                                    </AsyncButton>
+                                  )}
+
+                                {vuln.ticketId === null &&
+                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                    asset,
+                                    project,
+                                  ) === "jira" && (
+                                    <AsyncButton
+                                      variant={"secondary"}
+                                      onClick={() =>
+                                        handleSubmit({
+                                          status: "mitigate",
+                                          justification,
+                                        })
+                                      }
+                                    >
+                                      <div className="flex flex-col">
+                                        <div className="flex">
+                                          <Image
+                                            alt="Jira Logo"
+                                            width={15}
+                                            height={15}
+                                            className="mr-2"
+                                            src={"/assets/jira-svgrepo-com.svg"}
+                                          />
+                                          Create Jira Ticket
+                                        </div>
+                                      </div>
+                                    </AsyncButton>
+                                  )}
+                                <AsyncButton
+                                  onClick={() =>
+                                    handleSubmit({
+                                      status: "accepted",
+                                      justification,
+                                    })
+                                  }
+                                  variant={"secondary"}
+                                >
+                                  Accept risk
+                                </AsyncButton>
+                                <div className="flex flex-col items-center">
+                                  <div className="flex flex-row items-center">
+                                    <AsyncButton
+                                      onClick={() =>
+                                        handleSubmit({
+                                          status: "falsePositive",
+                                          justification,
+                                          mechanicalJustification:
+                                            selectedOption,
+                                        })
+                                      }
+                                      variant={"secondary"}
+                                      className="mr-0 capitalize rounded-r-none pr-0"
+                                    >
+                                      {removeUnderscores(selectedOption)}
+                                    </AsyncButton>
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant={"secondary"}
+                                          className=" flex items-center rounded-l-none pl-1 pr-2"
+                                        >
+                                          <ChevronDown className="h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+
+                                      <DropdownMenuContent align="end">
+                                        {Object.entries(vexOptionMessages).map(
+                                          ([option, description]) => (
+                                            <DropdownMenuItem
+                                              key={option}
+                                              onClick={() =>
+                                                setSelectedOption(option)
+                                              }
+                                            >
+                                              <div className="flex flex-col">
+                                                <span className="capitalize">
+                                                  {removeUnderscores(
+                                                    option,
+                                                  )}{" "}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                  {description}
+                                                </span>
+                                              </div>
+                                            </DropdownMenuItem>
+                                          ),
+                                        )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </div>
+                                  <div className="flex-1 w-full">
+                                    <span className=" text-left text-xs text-muted-foreground">
+                                      {"Mark as False Positive"}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <AsyncButton
+                                  onClick={() =>
+                                    handleSubmit({
+                                      status: "comment",
+                                      justification,
+                                    })
+                                  }
+                                  variant={"default"}
+                                >
+                                  Comment
+                                </AsyncButton>
+                              </div>
+                            </div>
+                          </form>
+                        ) : (
+                          <form
+                            className="flex flex-col gap-4"
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                            }}
                           >
-                            Reopen
-                          </AsyncButton>
-                        </div>
-                      </form>
-                    )}
-                    {vuln.ticketUrl && (
-                      <small className="mt-2 block w-full text-right text-muted-foreground">
-                        Comment will be synced with{" "}
-                        <Link href={vuln.ticketUrl} target="_blank">
-                          {vuln.ticketUrl}
-                        </Link>
-                      </small>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-            <div className="border-l">
-              <div>
-                <ChartContainer config={{}} className="aspect-square w-full">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        {
-                          name: "Total",
-                          score: 10 - vuln.rawRiskAssessment,
-                          fill: "hsl(var(--secondary))",
-                        },
-                        {
-                          name: "Risk",
-                          score: vuln.rawRiskAssessment,
-                          fill: "hsl(var(--primary))",
-                        },
-                      ]}
-                      startAngle={-270}
-                      dataKey="score"
-                      nameKey="name"
-                      innerRadius={80}
-                      strokeWidth={5}
-                    >
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text
-                                x={viewBox.cx}
-                                y={viewBox.cy}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
+                            <div>
+                              <label className="mb-2 block text-sm font-semibold">
+                                Comment
+                              </label>
+                              <MarkdownEditor
+                                value={justification ?? ""}
+                                setValue={setJustification}
+                                placeholder="Add your comment here..."
+                              />
+                            </div>
+
+                            <p className="text-sm text-muted-foreground">
+                              You can reopen this vuln, if you plan to mitigate
+                              the risk now, or accepted this vuln by accident.
+                            </p>
+                            <div className="flex flex-row justify-end">
+                              <AsyncButton
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "reopened",
+                                    justification,
+                                  })
+                                }
+                                variant={"secondary"}
+                                type="submit"
                               >
-                                <tspan
+                                Reopen
+                              </AsyncButton>
+                            </div>
+                          </form>
+                        )}
+                        {vuln.ticketUrl && (
+                          <small className="mt-2 block w-full text-right text-muted-foreground">
+                            Comment will be synced with{" "}
+                            <Link href={vuln.ticketUrl} target="_blank">
+                              {vuln.ticketUrl}
+                            </Link>
+                          </small>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <RiskAssessmentFeedSkeleton />
+                  <div>
+                    <EditorSkeleton />
+                  </div>
+                </>
+              )}
+            </div>
+            {vuln ? (
+              <div className="border-l">
+                <div>
+                  <ChartContainer config={{}} className="aspect-square w-full">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          {
+                            name: "Total",
+                            score: 10 - vuln.rawRiskAssessment,
+                            fill: "hsl(var(--secondary))",
+                          },
+                          {
+                            name: "Risk",
+                            score: vuln.rawRiskAssessment,
+                            fill: "hsl(var(--primary))",
+                          },
+                        ]}
+                        startAngle={-270}
+                        dataKey="score"
+                        nameKey="name"
+                        innerRadius={80}
+                        strokeWidth={5}
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                              return (
+                                <text
                                   x={viewBox.cx}
                                   y={viewBox.cy}
-                                  className="fill-foreground text-3xl font-bold"
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
                                 >
-                                  {vuln.rawRiskAssessment}
-                                </tspan>
-                                <tspan
-                                  x={viewBox.cx}
-                                  y={(viewBox.cy || 0) + 24}
-                                  className="fill-muted-foreground"
-                                >
-                                  Risk
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              </div>
-              <div className="p-5">
-                <Collapsible>
-                  <CollapsibleTrigger className="flex w-full flex-row items-center justify-between text-sm font-semibold">
-                    Show detailed risk assessment
-                    <CaretDownIcon />
-                  </CollapsibleTrigger>
-                  <small className="text-muted-foreground">
-                    Last calculated at:{" "}
-                    <FormatDate dateString={vuln.riskRecalculatedAt} />
-                  </small>
-                  <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
-                    <div className="w-full border-b pb-4">
-                      <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">
-                          EPSS{" "}
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                The epss score describes the propability of this
-                                vulnerability being exploited in the upcoming 30
-                                days. The score gets recalculated every 24 hours
-                                and is the output of an AI model maintained by
-                                the FIRST organization, which is the publisher
-                                of the cvss standard itself.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </span>
-                        <div className="whitespace-nowrap">
-                          <Badge variant="outline">
-                            {((vuln.cve?.epss ?? 0) * 100).toFixed(1)}%
-                          </Badge>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={viewBox.cy}
+                                    className="fill-foreground text-3xl font-bold"
+                                  >
+                                    {vuln.rawRiskAssessment}
+                                  </tspan>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={(viewBox.cy || 0) + 24}
+                                    className="fill-muted-foreground"
+                                  >
+                                    Risk
+                                  </tspan>
+                                </text>
+                              );
+                            }
+                          }}
+                        />
+                      </Pie>
+                    </PieChart>
+                  </ChartContainer>
+                </div>
+                <div className="p-5">
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full flex-row items-center justify-between text-sm font-semibold">
+                      Show detailed risk assessment
+                      <CaretDownIcon />
+                    </CollapsibleTrigger>
+                    <small className="text-muted-foreground">
+                      Last calculated at:{" "}
+                      <FormatDate dateString={vuln.riskRecalculatedAt} />
+                    </small>
+                    <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
+                      <div className="w-full border-b pb-4">
+                        <div className="flex w-full flex-row items-center justify-between">
+                          <span className="font-semibold">
+                            EPSS{" "}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-screen-sm font-normal">
+                                <p>
+                                  The epss score describes the propability of
+                                  this vulnerability being exploited in the
+                                  upcoming 30 days. The score gets recalculated
+                                  every 24 hours and is the output of an AI
+                                  model maintained by the FIRST organization,
+                                  which is the publisher of the cvss standard
+                                  itself.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                          <div className="whitespace-nowrap">
+                            <Badge variant="outline">
+                              {((vuln.cve?.epss ?? 0) * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {epssMessage(vuln.cve?.epss ?? 0)}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {epssMessage(vuln.cve?.epss ?? 0)}
-                      </p>
-                    </div>
-                    <div className="w-full border-b pb-4">
-                      <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">
-                          Exploit{" "}
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                An exploit is software or commands that take
-                                advantage of a bug to cause unintended behavior,
-                                like unauthorized access or system disruption.
-                                Exploits can be shared on the dark web or
-                                GitHub. Many use these shared exploits because
-                                they can&quot;t create their own. If an exploit
-                                is available, <i>script kiddies</i> are more
-                                likely to use it.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </span>
-                        <div className="whitespace-nowrap">
-                          <Badge variant="outline">{exploitShort}</Badge>
+                      <div className="w-full border-b pb-4">
+                        <div className="flex w-full flex-row items-center justify-between">
+                          <span className="font-semibold">
+                            Exploit{" "}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-screen-sm font-normal">
+                                <p>
+                                  An exploit is software or commands that take
+                                  advantage of a bug to cause unintended
+                                  behavior, like unauthorized access or system
+                                  disruption. Exploits can be shared on the dark
+                                  web or GitHub. Many use these shared exploits
+                                  because they can&quot;t create their own. If
+                                  an exploit is available, <i>script kiddies</i>{" "}
+                                  are more likely to use it.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                          <div className="whitespace-nowrap">
+                            <Badge variant="outline">{exploitShort}</Badge>
+                          </div>
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {ExploitLong}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {ExploitLong}
-                      </p>
-                    </div>
-                    <div className="w-full border-b pb-4">
-                      <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">
-                          Vulnerability depth{" "}
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                The depth of the component describes how many
-                                levels deep the vulnerability is in your
-                                project. The deeper a vulnerability is inside
-                                the tree, the propability decreases, that it can
-                                be exploited.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </span>
-                        <div className="whitespace-nowrap">
-                          <Badge variant="outline">
-                            {vuln.componentDepth === 1
-                              ? "Direct"
-                              : "Transitive"}
-                          </Badge>
+                      <div className="w-full border-b pb-4">
+                        <div className="flex w-full flex-row items-center justify-between">
+                          <span className="font-semibold">
+                            Vulnerability depth{" "}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-screen-sm font-normal">
+                                <p>
+                                  The depth of the component describes how many
+                                  levels deep the vulnerability is in your
+                                  project. The deeper a vulnerability is inside
+                                  the tree, the propability decreases, that it
+                                  can be exploited.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                          <div className="whitespace-nowrap">
+                            <Badge variant="outline">
+                              {vuln.componentDepth === 1
+                                ? "Direct"
+                                : "Transitive"}
+                            </Badge>
+                          </div>
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {componentDepthMessages(vuln.componentDepth ?? 0)}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {componentDepthMessages(vuln.componentDepth ?? 0)}
-                      </p>
-                    </div>
-                    <div className="w-full border-b pb-4">
-                      <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">
-                          CVSS-BE{" "}
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                The cvss-be score describes the risk of this
-                                vulnerability in the context of the asset it
-                                affects. The score is calculated by the cvss
-                                standard and takes your asset requirements into
-                                account.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </span>
-                        <div className="whitespace-nowrap">
-                          <Badge variant="outline">
-                            {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)}
-                          </Badge>
+                      <div className="w-full border-b pb-4">
+                        <div className="flex w-full flex-row items-center justify-between">
+                          <span className="font-semibold">
+                            CVSS-BE{" "}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-screen-sm font-normal">
+                                <p>
+                                  The cvss-be score describes the risk of this
+                                  vulnerability in the context of the asset it
+                                  affects. The score is calculated by the cvss
+                                  standard and takes your asset requirements
+                                  into account.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                          <div className="whitespace-nowrap">
+                            <Badge variant="outline">
+                              {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)}
+                            </Badge>
+                          </div>
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {cvssBE(asset!, cvssVectorObj)}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {cvssBE(asset!, cvssVectorObj)}
-                      </p>
-                    </div>
 
-                    <div className="w-full">
-                      <div className="flex w-full flex-row items-center justify-between">
-                        <span className="font-semibold">
-                          CVSS{" "}
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                The CVSS score indicates the severity of this
-                                vulnerability in general. It is calculated
-                                according to the CVSS standard and does not take
-                                into account your asset&quot;s specific
-                                requirements or any threat intelligence
-                                information.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </span>
-                        <div className="whitespace-nowrap">
-                          <Badge variant="outline">
-                            {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
-                          </Badge>
+                      <div className="w-full">
+                        <div className="flex w-full flex-row items-center justify-between">
+                          <span className="font-semibold">
+                            CVSS{" "}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-screen-sm font-normal">
+                                <p>
+                                  The CVSS score indicates the severity of this
+                                  vulnerability in general. It is calculated
+                                  according to the CVSS standard and does not
+                                  take into account your asset&quot;s specific
+                                  requirements or any threat intelligence
+                                  information.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </span>
+                          <div className="whitespace-nowrap">
+                            <Badge variant="outline">
+                              {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
+                            </Badge>
+                          </div>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {describeCVSS(cvssVectorObj)}
+                        </p>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+                {vuln.componentPurl !== null && (
+                  <div className="p-5">
+                    <h3 className="mb-2 text-sm font-semibold">
+                      Affected component
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <div className="rounded-lg border bg-card p-4">
+                          <p className="text-sm">
+                            <span className="flex flex-row gap-2">
+                              <EcosystemImage
+                                packageName={vuln.componentPurl}
+                              />{" "}
+                              <span className="flex-1">
+                                {beautifyPurl(vuln.componentPurl)}
+                              </span>
+                            </span>
+                          </p>
+                          <div className="mt-4 text-sm">
+                            <div className="mt-1 flex flex-row justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Installed version:{" "}
+                              </span>
+                              <Badge variant={"outline"}>
+                                {extractVersion(vuln.componentPurl) ??
+                                  "unknown"}
+                              </Badge>
+                            </div>
+                            <div className="mt-1 flex flex-row justify-between">
+                              <span className="text-xs text-muted-foreground">
+                                Fixed in:{" "}
+                              </span>
+                              <Badge variant={"outline"}>
+                                {Boolean(vuln.componentFixedVersion)
+                                  ? vuln.componentFixedVersion
+                                  : "no patch available"}
+                              </Badge>
+                            </div>
+                            <div className="mt-4">
+                              <Link
+                                className={buttonVariants({
+                                  variant: "outline",
+                                })}
+                                href={
+                                  pathname +
+                                  "/../../dependencies/graph?pkg=" +
+                                  vuln.componentPurl +
+                                  "&artifact=" +
+                                  vuln.artifacts[0].artifactName
+                                }
+                              >
+                                Show in dependency graph
+                              </Link>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {describeCVSS(cvssVectorObj)}
-                      </p>
+                      {vuln.componentFixedVersion !== null && (
+                        <>
+                          <Quickfix
+                            vuln={vuln.componentPurl}
+                            version={
+                              Boolean(vuln.componentFixedVersion)
+                                ? (vuln.componentFixedVersion as string)
+                                : ""
+                            }
+                            package={
+                              Boolean(vuln.componentPurl)
+                                ? (beautifyPurl(vuln.componentPurl) as string)
+                                : ""
+                            }
+                          />
+                        </>
+                      )}
                     </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-              {vuln.componentPurl !== null && (
+                  </div>
+                )}
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
-                    Affected component
+                    Management decisions across the organization
                   </h3>
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <div className="rounded-lg border bg-card p-4">
-                        <p className="text-sm">
-                          <span className="flex flex-row gap-2">
-                            <EcosystemImage packageName={vuln.componentPurl} />{" "}
-                            <span className="flex-1">
-                              {beautifyPurl(vuln.componentPurl)}
-                            </span>
-                          </span>
-                        </p>
-                        <div className="mt-4 text-sm">
-                          <div className="mt-1 flex flex-row justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              Installed version:{" "}
-                            </span>
-                            <Badge variant={"outline"}>
-                              {extractVersion(vuln.componentPurl) ?? "unknown"}
-                            </Badge>
-                          </div>
-                          <div className="mt-1 flex flex-row justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              Fixed in:{" "}
-                            </span>
-                            <Badge variant={"outline"}>
-                              {Boolean(vuln.componentFixedVersion)
-                                ? vuln.componentFixedVersion
-                                : "no patch available"}
-                            </Badge>
-                          </div>
-                          <div className="mt-4">
-                            <Link
-                              className={buttonVariants({ variant: "outline" })}
-                              href={
-                                pathname +
-                                "/../../dependencies/graph?pkg=" +
-                                vuln.componentPurl +
-                                "&artifact=" +
-                                vuln.artifacts[0].artifactName
-                              }
-                            >
-                              Show in dependency graph
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
+                  {hints ? (
+                    <div className="flex flex-row justify-around mt-4">
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant={"secondary"}>
+                            <BugAntIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            {hints.amountOpen}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          This vulnerability is still open in {hints.amountOpen}{" "}
+                          projects, artifacts and assets.
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant={"secondary"}>
+                            <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            {hints.amountFixed}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          This vulnerability has been fixed in{" "}
+                          {hints.amountFixed} projects, artifacts and assets.
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant={"secondary"}>
+                            <SpeakerXMarkIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            {hints.amountAccepted}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          This vulnerability has been accepted in{" "}
+                          {hints.amountAccepted} projects, artifacts and assets.
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant={"secondary"}>
+                            <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            {hints.amountFalsePositive}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          This vulnerability has been marked as false positive
+                          in {hints.amountFalsePositive} projects, artifacts and
+                          assets.
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                    {vuln.componentFixedVersion !== null && (
-                      <>
-                        <Quickfix
-                          vuln={vuln.componentPurl}
-                          version={
-                            Boolean(vuln.componentFixedVersion)
-                              ? (vuln.componentFixedVersion as string)
-                              : ""
-                          }
-                          package={
-                            Boolean(vuln.componentPurl)
-                              ? (beautifyPurl(vuln.componentPurl) as string)
-                              : ""
-                          }
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-              <div className="p-5">
-                <h3 className="mb-2 text-sm font-semibold">
-                  Management decisions across the organization
-                </h3>
-                <div className="flex flex-row justify-around mt-4">
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Badge variant={"secondary"}>
-                        <BugAntIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                        {props.hints.amountOpen}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-screen-sm font-normal">
-                      This vulnerability is still open in{" "}
-                      {props.hints.amountOpen} projects, artifacts and assets.
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Badge variant={"secondary"}>
-                        <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                        {props.hints.amountFixed}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-screen-sm font-normal">
-                      This vulnerability has been fixed in{" "}
-                      {props.hints.amountFixed} projects, artifacts and assets.
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Badge variant={"secondary"}>
-                        <SpeakerXMarkIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                        {props.hints.amountAccepted}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-screen-sm font-normal">
-                      This vulnerability has been accepted in{" "}
-                      {props.hints.amountAccepted} projects, artifacts and
-                      assets.
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Badge variant={"secondary"}>
-                        <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                        {props.hints.amountFalsePositive}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-screen-sm font-normal">
-                      This vulnerability has been marked as false positive in{" "}
-                      {props.hints.amountFalsePositive} projects, artifacts and
-                      assets.
-                    </TooltipContent>
-                  </Tooltip>
+                  ) : (
+                    <Skeleton className="w-full h-20" />
+                  )}
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="border-l flex-col pl-4 flex gap-8">
+                <Skeleton className="w-full h-[250px]" />
+                <Skeleton className="w-full h-20" />
+                <Skeleton className="w-full h-[250px]" />
+                <Skeleton className="w-full h-[250px]" />
+                <Skeleton className="w-full h-[250px]" />
+                <Skeleton className="w-full h-[250px]" />
+              </div>
+            )}
           </div>
         </div>
       </div>
     </Page>
   );
 };
-
-export const getServerSideProps = middleware(
-  async (context: GetServerSidePropsContext) => {
-    // fetch the project
-    const {
-      organizationSlug,
-      projectSlug,
-      assetSlug,
-      assetVersionSlug,
-      vulnId,
-    } = context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/dependency-vulns/" +
-      vulnId;
-
-    const [resp, hints]: [Response, Response] = await Promise.all([
-      apiClient(uri),
-      apiClient(uri + "/hints"),
-    ]);
-
-    if (!resp.ok) {
-      return {
-        notFound: true,
-      };
-    }
-    const detailedDependencyVulnDTO = await resp.json();
-
-    return {
-      props: {
-        vuln: detailedDependencyVulnDTO,
-        hints: await hints.json(),
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    asset: withAsset,
-    project: withProject,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);
 
 export default Index;

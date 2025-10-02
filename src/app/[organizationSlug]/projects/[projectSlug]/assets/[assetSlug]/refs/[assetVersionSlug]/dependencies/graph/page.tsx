@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+"use client";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
@@ -21,20 +21,14 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
-import { middleware } from "@/decorators/middleware";
-import { withAsset } from "@/decorators/withAsset";
-import { withContentTree } from "@/decorators/withContentTree";
-import { withOrganization } from "@/decorators/withOrganization";
-import { withOrgs } from "@/decorators/withOrgs";
-import { withProject } from "@/decorators/withProject";
-import { withSession } from "@/decorators/withSession";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
 import {
-  browserApiClient,
-  getApiClientFromContext,
-} from "@/services/devGuardApi";
-import { ArtifactDTO, DependencyTreeNode, VulnDTO } from "@/types/api/api";
+  ArtifactDTO,
+  DependencyTreeNode,
+  ScaVulnDTO,
+  VulnDTO,
+} from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
 import {
@@ -42,20 +36,16 @@ import {
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
 
-import { useRouter } from "next/compat/router";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import { withAssetVersion } from "@/decorators/withAssetVersion";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import useSWR from "swr";
+import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import { fetcher } from "../../../../../../../../../../hooks/useApi";
+import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 
 const DependencyGraphPage: FunctionComponent<{
@@ -65,75 +55,85 @@ const DependencyGraphPage: FunctionComponent<{
   const searchParams = useSearchParams();
   const { branches, tags } = useAssetBranchesAndTags();
   const dimensions = useDimensions();
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
 
   const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
     useState(false);
 
-  const all = searchParams.get("all") === "1";
+  const all = searchParams?.get("all") === "1";
   const menu = useAssetMenu();
+  const asset = useActiveAsset();
 
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/refs/" +
+    assetVersionSlug;
 
-  const asset = useActiveAsset()!;
-  const assetVersion = useActiveAssetVersion();
+  // fetch a personal access token from the user
 
-  const [graph, setGraph] = useState<ViewDependencyTreeNode | null>(null);
+  const { data: affectedComponents, isLoading: affectedComponentsLoading } =
+    useSWR<ScaVulnDTO[]>(uri + "/affected-components/", fetcher);
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!activeOrg || !project || !asset || !assetVersion) {
-        return;
-      }
-      const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion.slug}/dependency-graph/?` +
-          toSearchParams({
-            artifactName: searchParams.get("artifact") as string,
-            all: searchParams.get("all") ? "1" : undefined,
-          }),
-        {
-          method: "GET",
-        },
-      );
+  const { data: graphData, isLoading: graphLoading } = useSWR<{
+    root: DependencyTreeNode;
+  }>(
+    uri +
+      "/dependency-graph/?" +
+      toSearchParams({
+        artifactName: searchParams?.get("artifact") as string,
+        all: searchParams?.get("all") ? "1" : undefined,
+      }),
+    fetcher,
+  );
 
-      if (resp.ok) {
-        const json = await resp.json();
-        let converted = convertGraph(json.root);
-        recursiveAddRisk(converted, flaws);
-        // we cannot return a circular data structure - remove the parent again
-        recursiveRemoveParent(converted);
-
-        // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
-        if (searchParams.get("all") !== "1") {
-          recursiveRemoveWithoutRisk(converted);
-        }
-
-        // the first childrens are the detection targets.
-        // they might start with the asset id itself.
-        // if there is only a first level child, which starts with the asset id, we can remove the root node
-        if (
-          converted.children.length === 1 &&
-          converted.children[0].name.startsWith(asset.id)
-        ) {
-          converted = {
-            ...converted.children[0],
-            name: converted.children[0].name.replace(asset.id + "/", ""),
-            parent: null,
-          };
-        } else {
-          // check if thats the case, if so, remove the assetId prefix
-          converted.children = converted.children.map((c) => {
-            if (c.name.startsWith(asset.id)) {
-              c.name = c.name.replace(asset.id + "/", "");
-            }
-            return c;
-          });
-        }
-        setGraph(converted);
-      }
+  const graph = useMemo(() => {
+    if (!graphData) {
+      return null;
     }
-    fetchData();
-  }, [flaws, searchParams, activeOrg, project, asset, assetVersion]);
+    let converted = convertGraph(graphData.root);
+    recursiveAddRisk(converted, affectedComponents ?? []);
+    // we cannot return a circular data structure - remove the parent again
+    recursiveRemoveParent(converted);
+
+    // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
+    if (searchParams?.get("all") !== "1") {
+      recursiveRemoveWithoutRisk(converted);
+    }
+
+    // the first childrens are the detection targets.
+    // they might start with the asset id itself.
+    // if there is only a first level child, which starts with the asset id, we can remove the root node
+    if (
+      converted.children.length === 1 &&
+      converted.children[0].name.startsWith(asset.id)
+    ) {
+      converted = {
+        ...converted.children[0],
+        name: converted.children[0].name.replace(asset.id + "/", ""),
+        parent: null,
+      };
+    } else {
+      // check if thats the case, if so, remove the assetId prefix
+      converted.children = converted.children.map((c) => {
+        if (c.name.startsWith(asset.id)) {
+          c.name = c.name.replace(asset.id + "/", "");
+        }
+        return c;
+      });
+    }
+    return converted;
+  }, [graphData, searchParams, affectedComponents, asset.id]);
 
   const push = useRouterQuery();
 
@@ -274,65 +274,3 @@ export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
     .filter((n): n is ViewDependencyTreeNode => n !== null);
   return node;
 };
-
-export const getServerSideProps = middleware(
-  async (context, { asset }) => {
-    // fetch the project
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      context.params!;
-
-    const apiClient = getApiClientFromContext(context);
-
-    const uri =
-      "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug;
-
-    const [vulnResponse] = await Promise.all([
-      apiClient(uri + "/affected-components/"),
-    ]);
-
-    // fetch a personal access token from the user
-
-    const [vulns] = await Promise.all([
-      vulnResponse.json() as Promise<Array<VulnDTO>>,
-    ]);
-    let artifactsData: ArtifactDTO[] = [];
-    const artifactsResp = await apiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/artifacts/",
-    );
-
-    if (artifactsResp.ok) {
-      artifactsData = await artifactsResp.json();
-    }
-
-    return {
-      props: {
-        flaws: vulns,
-        artifacts: artifactsData,
-      },
-    };
-  },
-  {
-    session: withSession,
-    organizations: withOrgs,
-    organization: withOrganization,
-    project: withProject,
-    asset: withAsset,
-    contentTree: withContentTree,
-    assetVersion: withAssetVersion,
-  },
-);

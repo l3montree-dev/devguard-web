@@ -49,13 +49,16 @@ import {
   UserRole,
   WebhookDTO,
 } from "@/types/api/api";
-import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useOrganization } from "../../../context/OrganizationContext";
 import { useConfig } from "../../../context/ConfigContext";
+import {
+  useOrganization,
+  useUpdateOrganization,
+} from "../../../context/OrganizationContext";
 
 interface HomeProps {
   devguardGithubAppUrl: string;
@@ -64,7 +67,7 @@ interface HomeProps {
 const Home = ({ devguardGithubAppUrl }: HomeProps) => {
   const orgCtx = useOrganization();
   const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
-  const updateOrgCtx = orgCtx?.update;
+  const updateOrgCtx = useUpdateOrganization();
   const orgMenu = useOrganizationMenu();
   const router = useRouter();
   const pathName = usePathname();

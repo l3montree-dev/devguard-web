@@ -558,15 +558,17 @@ const Index: FunctionComponent = () => {
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
-          <Input
-            onChange={handleSearch}
-            defaultValue={searchParams?.get("search") as string}
-            placeholder="Search for dependencies or versions - just start typing..."
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-            {isLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
+          <div className="relative flex-1">
+            <Input
+              onChange={handleSearch}
+              defaultValue={searchParams?.get("search") as string}
+              placeholder="Search for dependencies or versions - just start typing..."
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
           </div>
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
