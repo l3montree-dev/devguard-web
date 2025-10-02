@@ -18,13 +18,27 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import yaml from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
 import shell from "react-syntax-highlighter/dist/esm/languages/hljs/bash";
 import basic from "react-syntax-highlighter/dist/esm/languages/hljs/basic";
-import docco from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
+import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
 import anOldHope from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
 import { useTheme } from "next-themes";
 
 SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
 SyntaxHighlighter.registerLanguage("rego", basic);
+
+const resolveStyle = (styleImport: any) =>
+  styleImport?.default ? styleImport.default : styleImport;
+
+const githubBase = resolveStyle(github);
+const anOldHopeBase = resolveStyle(anOldHope);
+
+const githubLightTheme = {
+  ...githubBase,
+  hljs: {
+    ...(githubBase.hljs || {}),
+    background: "transparent",
+  },
+};
 
 const Highlighter: FunctionComponent<{
   codeString: string;
@@ -51,9 +65,11 @@ const Highlighter: FunctionComponent<{
     return current === "dark";
   }, [resolvedTheme, theme]);
 
+  const textColor = isDark ? "#E2E8F0" : (githubBase.hljs?.color ?? "#24292E");
   const lineNumberColor = isDark
     ? "rgba(255, 255, 255, 0.35)"
     : "rgba(71, 85, 105, 0.75)";
+  const syntaxTheme = isDark ? anOldHopeBase : githubLightTheme;
 
   return (
     <div className="w-full bg-white dark:bg-black">
@@ -62,15 +78,15 @@ const Highlighter: FunctionComponent<{
         startingLineNumber={startLine}
         lineNumberStyle={{ color: lineNumberColor }}
         language={language}
-        style={anOldHope}
+        style={syntaxTheme}
         customStyle={{
           background: "transparent",
           margin: 0,
-          color: isDark ? "#E2E8F0" : "#0F172A",
+          color: textColor,
         }}
         codeTagProps={{
           style: {
-            color: isDark ? "#E2E8F0" : "#0F172A",
+            color: textColor,
             background: "transparent",
           },
         }}
