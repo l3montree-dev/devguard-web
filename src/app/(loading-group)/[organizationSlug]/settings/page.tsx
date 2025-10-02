@@ -34,7 +34,6 @@ import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { Card } from "@/components/ui/card";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -60,11 +59,7 @@ import {
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
 
-interface HomeProps {
-  devguardGithubAppUrl: string;
-}
-
-const Home = ({ devguardGithubAppUrl }: HomeProps) => {
+const Home = () => {
   const orgCtx = useOrganization();
   const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
   const updateOrgCtx = useUpdateOrganization();
@@ -72,7 +67,6 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
   const router = useRouter();
   const pathName = usePathname();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
-  const config = useConfig();
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
@@ -268,6 +262,8 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
     }
   };
 
+  const config = useConfig();
+
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
       <div className="flex flex-row justify-between">
@@ -394,7 +390,7 @@ const Home = ({ devguardGithubAppUrl }: HomeProps) => {
                       "!text-primary-foreground hover:no-underline",
                     )}
                     href={
-                      `https://github.com/apps/${devguardGithubAppUrl}/installations/new?state=` +
+                      `https://github.com/apps/${config.devguardGithubAppUrl}/installations/new?state=` +
                       encodeObjectBase64({
                         orgSlug: activeOrg.slug,
                         redirectTo: pathName || "/",

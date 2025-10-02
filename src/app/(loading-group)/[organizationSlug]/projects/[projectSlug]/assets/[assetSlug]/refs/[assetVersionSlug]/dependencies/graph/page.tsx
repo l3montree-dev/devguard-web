@@ -47,11 +47,9 @@ import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
+import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 
-const DependencyGraphPage: FunctionComponent<{
-  flaws: Array<VulnDTO>;
-  artifacts: ArtifactDTO[];
-}> = ({ flaws, artifacts }) => {
+const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const { branches, tags } = useAssetBranchesAndTags();
   const dimensions = useDimensions();
@@ -69,6 +67,7 @@ const DependencyGraphPage: FunctionComponent<{
   const all = searchParams?.get("all") === "1";
   const menu = useAssetMenu();
   const asset = useActiveAsset();
+  const artifacts = useArtifacts();
 
   const uri =
     "/organizations/" +
@@ -197,7 +196,7 @@ const DependencyGraphPage: FunctionComponent<{
 
           {graph ? (
             <DependencyGraph
-              flaws={flaws}
+              flaws={affectedComponents ?? []}
               width={dimensions.width - SIDEBAR_WIDTH}
               height={dimensions.height - HEADER_HEIGHT - 85}
               graph={{ root: graph }}
@@ -265,7 +264,7 @@ const convertGraph = (
   return convertedNode;
 };
 
-export const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
+const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
   if (node.risk === 0) {
     return null;
   }

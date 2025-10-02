@@ -2,21 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getApiClientFromRequest } from "@/services/devGuardApi";
 import { cookies } from "next/headers";
 
-export async function GET(
-  request: NextRequest,
-  {
-    params,
-  }: {
-    params: {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
-  },
-) {
+export async function GET(request: NextRequest, ctx: any) {
   try {
-    const { organizationSlug, projectSlug, assetSlug } = params;
+    const { organizationSlug, projectSlug, assetSlug } = await ctx.params;
 
     // Get cookies for authentication
     const cookieStore = await cookies();

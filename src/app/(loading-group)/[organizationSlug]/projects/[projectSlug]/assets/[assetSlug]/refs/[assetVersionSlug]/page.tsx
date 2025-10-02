@@ -55,18 +55,7 @@ import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 
-interface Props {
-  componentRisk: ComponentRisk;
-  riskHistory: RiskHistory[];
-  avgLowFixingTime: AverageFixingTime;
-  avgMediumFixingTime: AverageFixingTime;
-  avgHighFixingTime: AverageFixingTime;
-  avgCriticalFixingTime: AverageFixingTime;
-  licenses: Array<LicenseResponse>;
-  events: Paged<VulnEventDTO>;
-}
-
-const Index: FunctionComponent<Props> = () => {
+const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;

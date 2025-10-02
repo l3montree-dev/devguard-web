@@ -15,12 +15,9 @@ import ListItem from "../../../../../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../../../../../components/common/ListRenderer";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { violationLengthToLevel } from "../../../../../compliance/page";
-interface Props {
-  compliance: PolicyEvaluation[];
-}
+import { violationLengthToLevel } from "../../../../../../../../../../utils/view";
 
-const ComplianceIndex: FunctionComponent<Props> = () => {
+const ComplianceIndex: FunctionComponent = () => {
   const menu = useAssetMenu();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {

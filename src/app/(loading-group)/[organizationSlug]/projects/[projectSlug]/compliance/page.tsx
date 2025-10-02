@@ -4,8 +4,6 @@ import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Policy, UserRole } from "@/types/api/api";
 
-import { FunctionComponent } from "react";
-
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -20,7 +18,7 @@ import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 
-const ComplianceIndex: FunctionComponent = () => {
+const ComplianceIndex = () => {
   const params = useDecodedParams();
   const menu = useProjectMenu();
   const activeOrg = useActiveOrg();

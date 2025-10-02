@@ -1,23 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getApiClientFromRequest } from "@/services/devGuardApi";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  {
-    params,
-  }: {
-    params: {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
-  },
-) {
+export async function GET(request: NextRequest, ctx: any) {
   try {
     const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      params;
+      await ctx.params;
 
     // Get search params for artifact query parameter
     const searchParams = request.nextUrl.searchParams;
