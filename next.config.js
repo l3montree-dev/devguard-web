@@ -14,7 +14,6 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@mdxeditor/editor", "react-diff-view", "@ory/integrations"],
   reactStrictMode: true,
   experimental: {
     turbo: {
