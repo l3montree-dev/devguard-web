@@ -13,11 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
-import Lanyard from "@/components/misc/Lanyard";
+
 import OrgRegisterForm from "@/components/OrgRegister";
 import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const Lanyard = dynamic(
+  () => import("@/components/misc/Lanyard").then((mod) => mod.default),
+  { ssr: false },
+);
 
 export default function SetupOrg() {
   const session = useSession();
