@@ -426,6 +426,8 @@ const Index: FunctionComponent = () => {
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
+  console.log("asset version", assetVersion);
+
   const licenseToPercentMapEntries = useMemo(() => {
     if (!licenses || licenses.length === 0) {
       return [];

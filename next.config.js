@@ -14,8 +14,15 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@mdxeditor/editor", "react-diff-view"],
+  transpilePackages: ["@mdxeditor/editor", "react-diff-view", "@ory/integrations"],
   reactStrictMode: true,
+  experimental: {
+    turbo: {
+      resolveAlias: {
+        'istextorbinary': './src/lib/istextorbinary-wrapper.js',
+      },
+    },
+  },
   webpack: (config) => {
     // this will override the experiments
     config.experiments = { ...config.experiments, topLevelAwait: true };
