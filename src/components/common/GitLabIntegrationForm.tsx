@@ -16,6 +16,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { ImageZoom } from "./Zoom";
+import { useTheme } from "next-themes";
 
 export function urlToBaseURL(url: string): string {
   const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
@@ -68,6 +69,12 @@ export default function GitLabIntegrationForm({
       );
     }
   };
+
+  const { theme, resolvedTheme } = useTheme();
+  const imageSrc =
+    theme === "dark"
+      ? "/assets/gitlab-create-token-dark.png"
+      : "/assets/gitlab-create-token-white.png";
 
   return (
     <Form {...form}>
@@ -150,11 +157,7 @@ export default function GitLabIntegrationForm({
           )}
         />
         <div className="w-full border rounded overflow-hidden relative h-[120px]">
-          <ImageZoom
-            src="/assets/gitlab-access-token-scopes.png"
-            alt="GitLab Scope selection"
-            fill
-          />
+          <ImageZoom src={imageSrc} alt="GitLab Scope selection" fill />
         </div>
         <div className="flex flex-row justify-end">
           <div className="flex flex-col items-end justify-end gap-2">
