@@ -71,11 +71,7 @@ const Index: FunctionComponent = () => {
       assetSlug: string;
       assetVersionSlug: string;
     };
-  const selectedArtifact = (
-    useSearchParams() as {
-      artifact?: string;
-    }
-  ).artifact;
+  const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
 
   const { data: events, isLoading: eventsLoading } = useSWR<
     Paged<VulnEventDTO>
