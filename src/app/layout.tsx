@@ -12,6 +12,8 @@ import { HttpError } from "../data-fetcher/http-error";
 import { redirect } from "next/navigation";
 import { ConfigProvider } from "../context/ConfigContext";
 import { config } from "../config";
+import Err from "../components/common/Err";
+import InternalServerErrorPage from "./error";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -94,5 +96,40 @@ export default async function RootLayout({
     ) {
       redirect(error.instructions.redirect.destination);
     }
+    console.error("Error in RootLayout:", error);
+    return (
+      <html
+        suppressHydrationWarning
+        className={
+          "h-full scroll-smooth antialiased " +
+          lexend.className +
+          " " +
+          inter.className
+        }
+        lang="en"
+      >
+        <body
+          suppressHydrationWarning
+          className={
+            "flex min-h-full flex-col " +
+            inter.variable +
+            " " +
+            lexend.variable +
+            " " +
+            merriweather.variable
+          }
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            forcedTheme={config?.enforceTheme ? config.enforceTheme : undefined}
+            enableSystem
+            disableTransitionOnChange
+          >
+            <InternalServerErrorPage />
+          </ThemeProvider>
+        </body>
+      </html>
+    );
   }
 }
