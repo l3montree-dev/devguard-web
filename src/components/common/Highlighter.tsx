@@ -13,39 +13,79 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import yaml from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
 import shell from "react-syntax-highlighter/dist/esm/languages/hljs/bash";
 import basic from "react-syntax-highlighter/dist/esm/languages/hljs/basic";
-import docco from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
+import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
+import anOldHope from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
+import { useTheme } from "next-themes";
 
 SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
 SyntaxHighlighter.registerLanguage("rego", basic);
+
+const githubLightTheme = {
+  ...github,
+  hljs: {
+    ...(github.hljs || {}),
+    background: "transparent",
+  },
+};
 
 const Highlighter: FunctionComponent<{
   codeString: string;
   language?: "yaml" | "shell" | "rego";
   startingLineNumber?: number;
   startingHighlightLineNumber?: number | null;
-}> = (props) => {
+}> = ({
+  codeString,
+  language,
+  startingLineNumber,
+  startingHighlightLineNumber,
+}) => {
   let startLine = 1;
-  if (props.startingLineNumber && props.startingHighlightLineNumber) {
-    startLine =
-      props.startingLineNumber - props.startingHighlightLineNumber + 1;
+  if (startingLineNumber && startingHighlightLineNumber) {
+    startLine = startingLineNumber - startingHighlightLineNumber + 1;
   }
 
+  const { theme, resolvedTheme } = useTheme();
+  const isDark = useMemo(() => {
+    const current = theme || resolvedTheme;
+    if (current === "system") {
+      return resolvedTheme === "dark";
+    }
+    return current === "dark";
+  }, [resolvedTheme, theme]);
+
+  const textColor = isDark ? "#E2E8F0" : (github.hljs?.color ?? "#24292E");
+  const lineNumberColor = isDark
+    ? "rgba(255, 255, 255, 0.35)"
+    : "rgba(71, 85, 105, 0.75)";
+  const syntaxTheme = isDark ? anOldHope : githubLightTheme;
+
   return (
-    <div className="w-full bg-black">
+    <div className="w-full bg-white dark:bg-black">
       <SyntaxHighlighter
         showLineNumbers
         startingLineNumber={startLine}
-        lineNumberStyle={{ color: "rgba(255, 255, 255, 0.3)" }}
-        language={props.language}
-        style={docco}
+        lineNumberStyle={{ color: lineNumberColor }}
+        language={language}
+        style={syntaxTheme}
+        customStyle={{
+          background: "transparent",
+          margin: 0,
+          color: textColor,
+        }}
+        codeTagProps={{
+          style: {
+            color: textColor,
+            background: "transparent",
+          },
+        }}
       >
-        {props.codeString}
+        {codeString}
       </SyntaxHighlighter>
     </div>
   );
