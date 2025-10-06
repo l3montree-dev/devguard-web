@@ -3,6 +3,7 @@ import { AssetVersionProvider } from "../../../../../../../../../context/AssetVe
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchAsset } from "../../../../../../../../../data-fetcher/fetchAsset";
+import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -21,7 +22,12 @@ const AssetLayout = async ({
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     await params;
   const [assetVersion, artifacts] = await Promise.all([
-    fetchAsset(organizationSlug, projectSlug, assetSlug),
+    fetchAssetVersion(
+      organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    ),
     fetchArtifacts(organizationSlug, projectSlug, assetSlug, assetVersionSlug),
   ]);
 

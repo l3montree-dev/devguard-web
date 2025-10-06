@@ -482,7 +482,11 @@ const Index: FunctionComponent = () => {
                   ? {
                       artifact: searchParams.get("artifact") as string,
                     }
-                  : ({} as Record<string, string>),
+                  : artifacts && artifacts.length > 0
+                    ? {
+                        artifact: artifacts[0].artifactName,
+                      }
+                    : ({} as Record<string, string>),
               )
             }
           >
