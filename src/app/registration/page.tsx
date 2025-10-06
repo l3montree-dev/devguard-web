@@ -222,7 +222,7 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly && !Boolean(flow) && (
+                  {!oidcOnly && Boolean(flow) && (
                     <div className="mb-6 border-b-2 pb-4">
                       <Flow
                         hideGlobalMessages
