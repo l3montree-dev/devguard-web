@@ -53,7 +53,6 @@ export function BranchTagSelector({
     return items.filter((item) => item.name.includes(filter));
   }, [items, filter]);
 
-  const pushQueryParam = useRouterQuery();
   const pathname = usePathname();
 
   return (

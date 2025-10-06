@@ -1,13 +1,12 @@
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const buildFilterQuery = (params: ReadonlyURLSearchParams) => {
-  const filterQuery = Object.fromEntries(
-    Object.entries(params).filter(
-      ([k]) => k.startsWith("filterQuery[") || k.startsWith("sort["),
-    ),
-  );
-
-  return filterQuery;
+  const obj: Record<string, string> = {};
+  params.forEach((value, key) => {
+    if (key.startsWith("filterQuery") || key.startsWith("sort"))
+      obj[key] = value;
+  });
+  return obj;
 };
 
 export const buildFilterSearchParams = (

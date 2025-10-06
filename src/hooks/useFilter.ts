@@ -3,7 +3,7 @@ import {
   filterForm2Query,
   sortingState2Query,
 } from "@/services/filter";
-import { SortingState } from "@tanstack/react-table";
+import { OnChangeFn, SortingState, Updater } from "@tanstack/react-table";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -32,26 +32,36 @@ export default function useFilter() {
     router.push(pathname + "?" + copied.toString());
   };
 
-  useEffect(() => {
+  const handleSetSortingState: OnChangeFn<SortingState> = (
+    newState: Updater<SortingState>,
+  ) => {
+    let newStateObject: SortingState;
+    if (newState instanceof Function) {
+      newStateObject = newState(sortingState);
+    } else {
+      newStateObject = newState;
+    }
+
     // remove all sorting query params
     const params = Object.fromEntries(searchParams?.entries() || []);
-    const paramsWithoutSort = Object.entries(params).filter(([k]) =>
-      k.startsWith("sort["),
+    const paramsWithoutSort = Object.entries(params).filter(
+      ([k]) => !k.startsWith("sort["),
     );
 
-    const s = sortingState2Query(sortingState);
+    const s = sortingState2Query(newStateObject);
     const finalParams = new URLSearchParams({
       ...Object.fromEntries(paramsWithoutSort),
       ...s,
     });
 
     router.push(pathname + "?" + finalParams.toString());
-  }, [sortingState, pathname, router, searchParams]);
+    setSortingState(newStateObject);
+  };
 
   return {
     handleFilter,
     removeFilter,
-    handleSort: setSortingState,
+    handleSort: handleSetSortingState,
     sortingState,
   };
 }
