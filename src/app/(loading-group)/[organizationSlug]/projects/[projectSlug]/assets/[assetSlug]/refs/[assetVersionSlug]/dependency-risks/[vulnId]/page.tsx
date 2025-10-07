@@ -23,6 +23,7 @@ import Link from "next/link";
 import { FunctionComponent, ReactNode, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import { Badge } from "@/components/ui/badge";
+import { useTheme } from "next-themes";
 import {
   Card,
   CardContent,
@@ -379,6 +380,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
 
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
+  const { theme } = useTheme();
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -599,7 +601,9 @@ const Index: FunctionComponent = () => {
                     <span className="font-semibold mb-2 block">
                       Path to component
                     </span>
-                    <div className="h-40 w-full rounded-lg border bg-black">
+                    <div
+                      className={`h-40 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                    >
                       <DependencyGraph
                         variant="compact"
                         width={100}
