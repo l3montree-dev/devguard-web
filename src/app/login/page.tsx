@@ -46,6 +46,7 @@ import PasswordlessLogin from "../../components/login/PasswordlessLogin";
 import PasswordLogin from "../../components/login/PasswordLogin";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
 import { Flow } from "../../components/kratos/Flow";
+import Loading from "../../components/common/Loading";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
@@ -243,47 +244,55 @@ const Login: NextPage = () => {
               <Messages messages={flow?.ui.messages} />
             </div>
             <div className="mt-4 sm:mx-auto mt-8">
-              {flow?.requested_aal !== "aal2" ? (
-                <Tabs value={activeTab} className="w-full">
-                  {!themeConfig.oidcOnly && (
-                    <TabsList>
-                      {(availableMethods.includes("oidc") ||
-                        availableMethods.includes("passkey")) && (
-                        <TabsTrigger
-                          onClick={() => setActiveTab("passwordless")}
-                          value="passwordless"
-                        >
-                          Passwordless Login
-                        </TabsTrigger>
+              {flow ? (
+                <>
+                  {flow?.requested_aal !== "aal2" ? (
+                    <Tabs value={activeTab} className="w-full">
+                      {!themeConfig.oidcOnly && (
+                        <TabsList>
+                          {(availableMethods.includes("oidc") ||
+                            availableMethods.includes("passkey")) && (
+                            <TabsTrigger
+                              onClick={() => setActiveTab("passwordless")}
+                              value="passwordless"
+                            >
+                              Passwordless Login
+                            </TabsTrigger>
+                          )}
+                          {availableMethods.includes(
+                            UiNodeGroupEnum.Password,
+                          ) && (
+                            <TabsTrigger
+                              onClick={() => setActiveTab("password")}
+                              value="password"
+                            >
+                              Legacy Password Login
+                            </TabsTrigger>
+                          )}
+                        </TabsList>
                       )}
-                      {availableMethods.includes(UiNodeGroupEnum.Password) && (
-                        <TabsTrigger
-                          onClick={() => setActiveTab("password")}
-                          value="password"
-                        >
-                          Legacy Password Login
-                        </TabsTrigger>
-                      )}
-                    </TabsList>
-                  )}
-                  <TabsContent value="passwordless" className={"mt-6"}>
-                    <PasswordlessLogin
-                      flow={flow}
-                      availableMethods={availableMethods}
+                      <TabsContent value="passwordless" className={"mt-6"}>
+                        <PasswordlessLogin
+                          flow={flow}
+                          availableMethods={availableMethods}
+                          onSubmit={onSubmit}
+                        />
+                      </TabsContent>
+                      <TabsContent value="password" className={"mt-6"}>
+                        <PasswordLogin flow={flow} onSubmit={onSubmit} />
+                      </TabsContent>
+                    </Tabs>
+                  ) : (
+                    <Flow
+                      only="totp"
+                      hideGlobalMessages
                       onSubmit={onSubmit}
+                      flow={flow as LoginFlow}
                     />
-                  </TabsContent>
-                  <TabsContent value="password" className={"mt-6"}>
-                    <PasswordLogin flow={flow} onSubmit={onSubmit} />
-                  </TabsContent>
-                </Tabs>
+                  )}
+                </>
               ) : (
-                <Flow
-                  only="totp"
-                  hideGlobalMessages
-                  onSubmit={onSubmit}
-                  flow={flow as LoginFlow}
-                />
+                <Loading />
               )}
             </div>
             <p className="mt-4 text-sm/6 text-muted-foreground flex justify-end">

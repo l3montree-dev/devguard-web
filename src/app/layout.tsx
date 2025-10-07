@@ -94,6 +94,10 @@ export default async function RootLayout({
       error.instructions &&
       "redirect" in error.instructions
     ) {
+      console.log(
+        "Redirecting to in RootLayout:",
+        error.instructions.redirect.destination,
+      );
       redirect(error.instructions.redirect.destination);
     }
     console.error("Error in RootLayout:", error);
