@@ -227,13 +227,11 @@ const Index: FunctionComponent = () => {
 
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
-    if (searchParams?.has("state")) {
-      const state = searchParams.get("state");
-      if (!Boolean(state) || state === "open") {
-        p.append("filterQuery[state][is]", "open");
-      } else {
-        p.append("filterQuery[state][is not]", "open");
-      }
+    const state = searchParams?.get("state");
+    if (!Boolean(state) || state === "open") {
+      p.append("filterQuery[state][is]", "open");
+    } else {
+      p.append("filterQuery[state][is not]", "open");
     }
 
     if (searchParams?.has("artifact")) {
