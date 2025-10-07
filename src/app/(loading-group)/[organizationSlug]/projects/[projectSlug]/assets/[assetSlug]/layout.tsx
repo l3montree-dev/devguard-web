@@ -1,9 +1,10 @@
+import AssetHeader from "@/components/common/AssetHeader";
 import { redirect } from "next/navigation";
 import React from "react";
 import { AssetProvider } from "../../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
-import { HttpError } from "../../../../../../../data-fetcher/http-error";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
+import { HttpError } from "../../../../../../../data-fetcher/http-error";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -26,6 +27,7 @@ const AssetLayout = async ({
 
     return (
       <ClientContextWrapper Provider={AssetProvider} value={asset}>
+        <AssetHeader />
         {children}
       </ClientContextWrapper>
     );

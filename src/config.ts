@@ -11,6 +11,9 @@
 // GNU Affero General Public License for more details.
 //
 // You should have received a copy of the GNU Affero General Public License
+
+import React from "react";
+
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,

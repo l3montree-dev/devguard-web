@@ -2,10 +2,11 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
+import OrgHeader from "@/components/common/OrgHeader";
+import { redirect } from "next/navigation";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
-import { redirect } from "next/navigation";
 import { HttpError } from "../../../data-fetcher/http-error";
 
 export default async function OrganizationLayout({
@@ -32,6 +33,7 @@ export default async function OrganizationLayout({
           contentTree,
         }}
       >
+        <OrgHeader />
         <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
       </ClientContextWrapper>
     );
