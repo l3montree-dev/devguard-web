@@ -47,10 +47,12 @@ import PasswordLogin from "../../components/login/PasswordLogin";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
 import { Flow } from "../../components/kratos/Flow";
 import Loading from "../../components/common/Loading";
+import { useUpdateSession } from "../../context/SessionContext";
 
 const Login: NextPage = () => {
   const [flow, setFlow] = useState<LoginFlow>();
 
+  const updateSession = useUpdateSession();
   const [activeTab, setActiveTab] = useState<
     "passwordless" | "password" | undefined
   >(undefined);
@@ -152,11 +154,16 @@ const Login: NextPage = () => {
         updateLoginFlowBody: values,
       })
       // We logged in successfully! Let's bring the user home.
-      .then(() => {
+      .then((resp) => {
         if (flow?.return_to) {
           window.location.href = flow?.return_to;
           return;
         }
+
+        updateSession((prev) => ({
+          ...prev,
+          session: { identity: resp.data.session.identity! },
+        }));
         router.push("/");
       })
       .then(() => {})

@@ -42,6 +42,7 @@ import { useConfig } from "../../context/ConfigContext";
 import { useSearchParams } from "next/navigation";
 import { handleFlowError, ory } from "../../services/ory";
 import { Checkbox } from "../../components/ui/checkbox";
+import { useUpdateSession } from "../../context/SessionContext";
 
 // Renders the registration page
 const Registration = () => {
@@ -49,6 +50,7 @@ const Registration = () => {
 
   const query = useSearchParams();
 
+  const updateSession = useUpdateSession();
   const { oidcOnly, termsOfUseLink, privacyPolicyLink } = useConfig();
   const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
   // The "flow" represents a registration process and contains
@@ -110,6 +112,12 @@ const Registration = () => {
 
         // continue_with is a list of actions that the user might need to take before the registration is complete.
         // It could, for example, contain a link to the verification form.
+
+        updateSession((prev) => ({
+          ...prev,
+          session: { identity: data.identity! },
+        }));
+
         if (data.continue_with) {
           for (const item of data.continue_with) {
             switch (item.action) {
@@ -121,7 +129,7 @@ const Registration = () => {
         }
 
         // If continue_with did not contain anything, we can just return to the home page.
-        await router.push(flow?.return_to || "/");
+        router.push(flow?.return_to || "/");
       })
       .catch(handleFlowError(router, "registration", setFlow))
       .catch((err: AxiosError) => {
