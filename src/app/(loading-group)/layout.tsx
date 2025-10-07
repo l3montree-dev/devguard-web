@@ -18,7 +18,7 @@ export default function Layout({
   return (
     <>
       <RootHeader />
-      <div className="pt-32">{children}</div>
+      <div className="pt-[112px]">{children}</div>
     </>
   );
 }
