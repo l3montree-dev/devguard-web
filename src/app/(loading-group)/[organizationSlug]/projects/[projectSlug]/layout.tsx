@@ -1,7 +1,8 @@
+import ProjectHeader from "@/components/common/ProjectHeader";
 import React from "react";
+import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectProvider } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
-import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.
@@ -19,6 +20,7 @@ export default async function RootLayout({
 
   return (
     <ClientContextWrapper Provider={ProjectProvider} value={project}>
+      <ProjectHeader />
       {children}
     </ClientContextWrapper>
   );

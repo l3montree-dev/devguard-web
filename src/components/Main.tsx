@@ -41,65 +41,12 @@ interface Props {
   fullscreen?: boolean;
 }
 
-const Main: FunctionComponent<Props> = ({
-  title,
-  Title,
-  children,
-  Menu,
-  fullscreen,
-}) => {
-  const router = useRouter();
+const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
   const dimensions = useDimensions();
   const themeConfig = useConfig();
-  const activeOrg = useActiveOrg();
 
-  const pathname = useDecodedPathname();
   return (
     <main className="flex-1 font-body">
-      <header
-        className={classNames(
-          "relative z-20 flex min-h-[109px] items-center justify-between bg-header px-4 pt-5 sm:px-6 lg:px-8",
-          Boolean(Menu) ? "pb-3" : "pb-5",
-        )}
-      >
-        <div className="mx-auto w-full max-w-screen-2xl">
-          <div className="flex flex-row items-center gap-4">
-            <Link href={`/${activeOrg?.slug}`}>
-              <EntityProviderImage provider={activeOrg?.slug || ""} />
-            </Link>
-            <div>
-              <OrganizationDropDown />
-            </div>
-            <div className="flex w-full flex-row items-center justify-between">
-              <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-header-foreground">
-                {Title ?? title}
-              </h1>
-              <UserNav />
-            </div>
-          </div>
-          {Menu !== undefined && (
-            <div className="flex flex-row items-end gap-6 text-sm">
-              {Menu.map((item) => (
-                <Link
-                  className={classNames(
-                    "cursor:pointer relative hover:no-underline",
-                  )}
-                  key={item.title}
-                  href={item.href}
-                >
-                  {(item.isActive || pathname == item.href) && (
-                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
-                  )}
-                  <div className="mt-4 flex flex-row items-center gap-1">
-                    <item.Icon className="h-5 w-5 text-gray-400" />
-                    <span className="text-header-foreground">{item.title}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </header>
       <EntityProviderBanner />
       <div
         style={{ minHeight: dimensions.height - HEADER_HEIGHT - 100 }}
