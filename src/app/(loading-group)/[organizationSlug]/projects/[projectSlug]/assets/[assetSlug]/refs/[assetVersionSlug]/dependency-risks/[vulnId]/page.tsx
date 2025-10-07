@@ -439,7 +439,7 @@ const Index: FunctionComponent = () => {
       });
     }
 
-    mutate(async (prev) => {
+    await mutate(async (prev) => {
       let json: any;
       if (data.status === "mitigate") {
         const resp = await browserApiClient(
