@@ -19,6 +19,7 @@ import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import React, { FunctionComponent } from "react";
+import Link from "next/link";
 import ArtifactBadge from "../ArtifactBadge";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
@@ -32,43 +33,52 @@ interface Props {
 }
 
 const VulnWithCveTableRow = ({
-  onClick,
   vuln,
+  href,
 }: {
-  onClick: () => void;
   vuln: VulnWithCVE;
+  href: string;
 }) => {
   return (
     <tr
-      onClick={onClick}
       className="border-b align-top hover:bg-gray-50 dark:hover:bg-secondary"
       key={vuln.id}
     >
-      <td className="p-4">
+      <td className="p-4 relative">
+        <Link href={href} className="absolute inset-0" />
         <div className="flex flex-row">
           <VulnState state={vuln.state} />
         </div>
       </td>
-      <td className="p-4">
-        {vuln.artifacts.map((artifact) => (
-          <ArtifactBadge
-            key={vuln.id + artifact.artifactName}
-            artifactName={artifact.artifactName}
-          />
-        ))}
+      <td className="p-4 relative">
+        <Link href={href} className="absolute inset-0 z-0" />
+        <div className="relative z-10">
+          {vuln.artifacts.map((artifact) => (
+            <ArtifactBadge
+              key={vuln.id + artifact.artifactName}
+              artifactName={artifact.artifactName}
+            />
+          ))}
+        </div>
       </td>
-      <td className="p-4">{vuln.cveID}</td>
-      <td className="p-4">
+      <td className="p-4 relative">
+        <Link href={href} className="absolute inset-0" />
+        <span>{vuln.cveID}</span>
+      </td>
+      <td className="p-4  relative">
+        <Link href={href} className="absolute inset-0" />
         <div className="flex flex-row">
           <Severity risk={vuln.rawRiskAssessment} />
         </div>
       </td>
-      <td className="p-4">
-        <div className="flex justify-start flex-row">
+      <td className="p-4  relative">
+        <Link href={href} className="absolute inset-0" />
+        <div className="flex flex-row justify-start">
           <Severity gray risk={vuln.cve?.cvss ?? 0} />
         </div>
       </td>
-      <td className="p-4">
+      <td className="p-4  relative">
+        <Link href={href} className="absolute inset-0" />
         {vuln.componentFixedVersion ? (
           <span>
             <Badge variant={"secondary"}>{vuln.componentFixedVersion}</Badge>
@@ -77,8 +87,9 @@ const VulnWithCveTableRow = ({
           <span className="text-muted-foreground">No fix available</span>
         )}
       </td>
-      <td className="p-4" colSpan={2}>
-        <div className="line-clamp-3">{vuln.cve?.description} </div>
+      <td className="p-4 relative" colSpan={2}>
+        <Link href={href} className="absolute inset-0" />
+        <div className="line-clamp-3">{vuln.cve?.description}\u00a0</div>
       </td>
     </tr>
   );
@@ -149,11 +160,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     <VulnWithCveTableRow
                       vuln={vuln}
                       key={vuln.id}
-                      onClick={() =>
-                        router.push(
-                          pathname + "/../dependency-risks/" + vuln.id,
-                        )
-                      }
+                      href={pathname + "/../dependency-risks/" + vuln.id}
                     />
                   ))}
                 </tbody>
