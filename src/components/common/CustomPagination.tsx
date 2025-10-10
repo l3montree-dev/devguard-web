@@ -5,8 +5,8 @@ import useRouterQuery from "../../hooks/useRouterQuery";
 import { Button } from "../ui/button";
 
 const getPaginationData = (currentPage: number, totalPages: number) => {
-  const showFirstPage = currentPage > 3;
-  const showLastPage = currentPage + 2 < totalPages;
+  const showFirstPage = currentPage > 2;
+  const showLastPage = currentPage + 1 < totalPages;
 
   const getPages = (): number[] => {
     if (totalPages <= 3) {

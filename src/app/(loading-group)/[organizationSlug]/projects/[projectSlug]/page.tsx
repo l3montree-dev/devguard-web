@@ -56,7 +56,7 @@ export default function RepositoriesPage() {
   const { data: subgroups } = useSWR<Paged<ProjectDTO>>(
     () =>
       isOrganization(organization.organization)
-        ? `/organizations/${decodeURIComponent(organization.organization.slug)}/projects?parentId=${project?.id}&pageSize=100`
+        ? `/organizations/${decodeURIComponent(organization.organization.slug)}/projects?parentId=${project?.id}&pageSize=1000`
         : null,
     fetcher,
   );

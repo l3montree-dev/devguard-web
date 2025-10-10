@@ -111,6 +111,18 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
     }),
   },
   {
+    header: "Installed Version",
+    id: "installed",
+    enableSorting: false,
+    cell: ({ row }: any) => (
+      <span>
+        <Badge variant={"secondary"}>
+          {extractVersion((row.original.vulns[0] as VulnWithCVE).componentPurl)}
+        </Badge>
+      </span>
+    ),
+  },
+  {
     ...columnHelper.accessor("maxRisk", {
       header: "Max Risk",
       enableSorting: true,
@@ -150,18 +162,7 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       cell: (row) => row.getValue(),
     }),
   },
-  {
-    header: "Installed Version",
-    id: "installed",
-    enableSorting: false,
-    cell: ({ row }: any) => (
-      <span>
-        <Badge variant={"secondary"}>
-          {extractVersion((row.original.vulns[0] as VulnWithCVE).componentPurl)}
-        </Badge>
-      </span>
-    ),
-  },
+
   {
     header: "Action",
     id: "fixAvailable",

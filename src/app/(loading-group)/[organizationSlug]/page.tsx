@@ -61,6 +61,7 @@ import Markdown from "../../../components/common/Markdown";
 import { ProjectBadge } from "../../../components/common/ProjectTitle";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
+import useRouterQuery from "../../../hooks/useRouterQuery";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -69,13 +70,6 @@ const OrganizationHomePage: FunctionComponent = () => {
   const [syncRunning, setSyncRunning] = useState(false);
   const searchParams = useSearchParams();
 
-  const [page, setPage] = useState(
-    searchParams?.get("page") ? Number(searchParams.get("page")) : 1,
-  );
-  const [search, setSearch] = useState(
-    searchParams?.get("search") ? String(searchParams.get("search")) : "",
-  );
-
   const currentUserRole = useCurrentUserRole();
 
   const form = useForm<ProjectDTO>({
@@ -83,7 +77,7 @@ const OrganizationHomePage: FunctionComponent = () => {
   });
 
   const stillOnPage = useRef(true);
-
+  const pushQuery = useRouterQuery();
   const {
     isLoading,
     data: projects,
@@ -92,8 +86,8 @@ const OrganizationHomePage: FunctionComponent = () => {
   } = useSWR<Paged<ProjectDTO>>(
     activeOrg
       ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?page=${
-          page
-        }&pageSize=${20}${search !== "" ? `&search=${search}` : ""}`
+          searchParams?.get("page") || 1
+        }&pageSize=${20}${(searchParams?.get("search") || "") !== "" ? `&search=${searchParams?.get("search")}` : ""}`
       : null,
     async (url: string) =>
       fetcher<Paged<ProjectDTO>>(url).then((res) => {
@@ -104,23 +98,16 @@ const OrganizationHomePage: FunctionComponent = () => {
       }),
   );
 
-  const handleSearch = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+  const debouncedHandleSearch = useCallback(
+    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value === "") {
-        setSearch("");
-        setPage(1);
+        pushQuery({ search: undefined, page: "1" });
       } else if (e.target.value.length >= 3) {
-        setSearch(e.target.value);
-        setPage(1);
+        pushQuery({ search: e.target.value, page: "1" });
       }
-    },
-    [setSearch, setPage],
+    }, 500),
+    [],
   );
-
-  // Add debounce back
-  const debouncedHandleSearch = useCallback(debounce(handleSearch, 500), [
-    handleSearch,
-  ]);
 
   const handleTriggerSync = useCallback(async () => {
     setSyncRunning(true);
@@ -256,7 +243,7 @@ const OrganizationHomePage: FunctionComponent = () => {
         >
           <Input
             onChange={debouncedHandleSearch}
-            defaultValue={search}
+            defaultValue={searchParams?.get("search") || ""}
             placeholder="Search for projects"
           />
           <ListRenderer
