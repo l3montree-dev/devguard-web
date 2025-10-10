@@ -41,7 +41,7 @@ const VulnWithCveTableRow = ({
 }) => {
   return (
     <tr
-      className="border-b align-top hover:bg-gray-50 dark:hover:bg-secondary"
+      className="border-b align-top hover:bg-gray-50 dark:hover:bg-accent"
       key={vuln.id}
     >
       <td className="p-4 relative">

@@ -27,6 +27,8 @@ export const config = {
     process.env.PRIVACY_POLICY_LINK || "https://devguard.org/privacy-policy",
   termsOfUseLink:
     process.env.TERMS_OF_USE_LINK || "https://devguard.org/terms-of-use",
+  themeJsUrl: process.env.THEME_JS_URL || "",
+  themeCssUrl: process.env.THEME_CSS_URL || "",
   imprintLink: process.env.IMPRINT_LINK || "https://devguard.org/imprint",
   frontendUrl: process.env.FRONTEND_URL || "https://app.devguard.org",
   accountDeletionMail:

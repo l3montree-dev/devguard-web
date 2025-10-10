@@ -16,16 +16,10 @@ import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { FunctionComponent } from "react";
-import { useActiveOrg } from "../hooks/useActiveOrg";
 
 import { useConfig } from "../context/ConfigContext";
-import useDecodedPathname from "../hooks/useDecodedPathname";
-import { OrganizationDropDown } from "./OrganizationDropDown";
 import EntityProviderBanner from "./common/EntityProviderBanner";
-import EntityProviderImage from "./common/EntityProviderImage";
-import UserNav from "./navigation/UserNav";
 
 interface Props {
   title: string;

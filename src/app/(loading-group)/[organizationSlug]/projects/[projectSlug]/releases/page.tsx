@@ -39,6 +39,25 @@ const Releases = () => {
     projectSlug: string;
   };
 
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/releases/";
+
+  const {
+    data: releases,
+    mutate,
+    isLoading,
+    error,
+  } = useSWR<Paged<ReleaseDTO>>(uri, fetcher);
+  const { data: candidates } = useSWR<CandidatesDTO>(
+    uri + "candidates/",
+    fetcher,
+    { fallbackData: { artifacts: [], releases: [] } },
+  );
+
   const handleReleaseCreation = async (
     release: Modify<
       Omit<ReleaseDTO, "id" | "createdAt" | "updatedAt">,
@@ -58,6 +77,9 @@ const Releases = () => {
 
     if (resp.ok) {
       router.refresh();
+      toast.success("Release created");
+      setOpen(false);
+      mutate();
     } else {
       toast.error("Failed to create release");
     }
@@ -81,24 +103,6 @@ const Releases = () => {
       toast.error("Failed to delete release");
     }
   };
-
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/releases/";
-
-  const {
-    data: releases,
-    isLoading,
-    error,
-  } = useSWR<Paged<ReleaseDTO>>(uri, fetcher);
-  const { data: candidates } = useSWR<CandidatesDTO>(
-    uri + "candidates/",
-    fetcher,
-    { fallbackData: { artifacts: [], releases: [] } },
-  );
 
   return (
     <Page Menu={menu} Title={<ProjectTitle />} title="Releases">

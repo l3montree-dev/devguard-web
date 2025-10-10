@@ -109,7 +109,7 @@ const OverviewPage = () => {
             projectSlug +
             "/releases/" +
             releaseId +
-            "/average-fixing-time?severity=low"
+            "/stats/average-fixing-time?severity=low"
           : null,
       fetcher,
     );
@@ -124,7 +124,7 @@ const OverviewPage = () => {
             projectSlug +
             "/releases/" +
             releaseId +
-            "/average-fixing-time?severity=medium"
+            "/stats/average-fixing-time?severity=medium"
           : null,
       fetcher,
     );
@@ -139,7 +139,7 @@ const OverviewPage = () => {
             projectSlug +
             "/releases/" +
             releaseId +
-            "/average-fixing-time?severity=high"
+            "/stats/average-fixing-time?severity=high"
           : null,
       fetcher,
     );
@@ -155,7 +155,7 @@ const OverviewPage = () => {
           projectSlug +
           "/releases/" +
           releaseId +
-          "/average-fixing-time?severity=critical"
+          "/stats/average-fixing-time?severity=critical"
         : null,
     fetcher,
     { suspense: true },

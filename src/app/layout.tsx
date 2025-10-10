@@ -3,16 +3,15 @@ import "focus-visible";
 
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
+import { redirect } from "next/navigation";
 import React from "react";
-import { fetchSession } from "../data-fetcher/fetchSession";
+import { config } from "../config";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
+import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
+import { fetchSession } from "../data-fetcher/fetchSession";
 import { HttpError } from "../data-fetcher/http-error";
-import { redirect } from "next/navigation";
-import { ConfigProvider } from "../context/ConfigContext";
-import { config } from "../config";
-import Err from "../components/common/Err";
 import InternalServerErrorPage from "./error";
 
 export const lexend = Lexend({
@@ -66,6 +65,10 @@ export default async function RootLayout({
             merriweather.variable
           }
         >
+          {config.themeCssUrl && (
+            <link rel="stylesheet" href={config.themeCssUrl} />
+          )}
+          {config.themeJsUrl && <script src={config.themeJsUrl} defer></script>}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -12,16 +12,19 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
 import { useRouter } from "next/navigation";
 import { DependencyList, useState, useEffect } from "react";
 import { ory } from "../services/ory";
 import { AxiosError } from "axios";
+import { useUpdateSession } from "../context/SessionContext";
 
 // Returns a function which will log the user out
 export function LogoutLink(deps: DependencyList = []) {
   const [logoutToken, setLogoutToken] = useState<string>("");
   const router = useRouter();
+  const updateSession = useUpdateSession();
 
   useEffect(() => {
     ory
@@ -45,7 +48,13 @@ export function LogoutLink(deps: DependencyList = []) {
     if (logoutToken) {
       ory
         .updateLogoutFlow({ token: logoutToken })
-        .then(() => router.push("/login"))
+        .then(() => {
+          router.push("/login");
+          updateSession({
+            session: null,
+            organizations: [],
+          });
+        })
         .then(() => router.refresh());
     }
   };

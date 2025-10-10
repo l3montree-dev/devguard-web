@@ -112,11 +112,10 @@ const Registration = () => {
 
         // continue_with is a list of actions that the user might need to take before the registration is complete.
         // It could, for example, contain a link to the verification form.
-
-        updateSession((prev) => ({
-          ...prev,
+        updateSession({
+          organizations: [],
           session: { identity: data.identity! },
-        }));
+        });
 
         if (data.continue_with) {
           for (const item of data.continue_with) {

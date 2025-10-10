@@ -103,9 +103,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
     <Card>
       <CardHeader>
         <CardTitle className="">{title}</CardTitle>
-        <CardDescription>
-          {description}. Target Line shows 30 days.
-        </CardDescription>
+        <CardDescription>{description}.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="-mb-20 relative">
@@ -180,7 +178,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
                 />
               </PolarRadiusAxis>
               <RadialBar
-                fill="hsl(var(--muted-foreground) / 1)"
+                fill="hsl(var(--secondary))"
                 dataKey="should"
                 className="stroke-transparent"
               />

@@ -31,14 +31,7 @@ export async function fetchOrganization(organizationSlug: string) {
 
     // if the organization slug starts with an @ it is actually an identity provider
     // there has to be a token in the backend - maybe the user just needs to reauthorize.
-    if (!org.ok && (organizationSlug as string).startsWith("@")) {
-      // make sure to redirect to the slug base
-
-      return {
-        oauth2Error: true,
-      };
-    }
-    if (!org.ok && !(organizationSlug as string).startsWith("@")) {
+    if (!org.ok) {
       console.log("LOGIN REDIRECT", org);
       // it must be an 500
       throw new HttpError({

@@ -3,6 +3,7 @@ import React from "react";
 import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectProvider } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
+import { notFound } from "next/navigation";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.
@@ -13,15 +14,19 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string; projectSlug: string }>;
 }) {
-  const { organizationSlug, projectSlug } = await params;
-  const [project] = await Promise.all([
-    fetchProject(organizationSlug, projectSlug),
-  ]);
+  try {
+    const { organizationSlug, projectSlug } = await params;
+    const [project] = await Promise.all([
+      fetchProject(organizationSlug, projectSlug),
+    ]);
 
-  return (
-    <ClientContextWrapper Provider={ProjectProvider} value={project}>
-      <ProjectHeader />
-      {children}
-    </ClientContextWrapper>
-  );
+    return (
+      <ClientContextWrapper Provider={ProjectProvider} value={project}>
+        <ProjectHeader />
+        {children}
+      </ClientContextWrapper>
+    );
+  } catch (e) {
+    notFound();
+  }
 }

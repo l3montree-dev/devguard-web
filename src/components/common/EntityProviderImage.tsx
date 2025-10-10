@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
 function isLightColor(cssVariable: string) {
   const color = getComputedStyle(document.documentElement)
@@ -9,11 +10,7 @@ function isLightColor(cssVariable: string) {
     .trim();
 
   // Parse HSL format: "0 0% 0%" or "hsl(0, 0%, 0%)"
-  const hslMatch =
-    color.match(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/) ||
-    color.match(
-      /hsl\(\s*(\d+(?:\.\d+)?),?\s*(\d+(?:\.\d+)?)%,?\s*(\d+(?:\.\d+)?)%\s*\)/,
-    );
+  const hslMatch = color.match(/(\d+),\s(\d+)%,\s(\d+)%/);
 
   if (!hslMatch) return null;
 
@@ -25,6 +22,7 @@ function isLightColor(cssVariable: string) {
 
 const EntityProviderImage = ({ provider }: { provider: string }) => {
   const [isLightForegroundColor, setLightForegroundColor] = useState(false);
+  const theme = useTheme();
   useEffect(() => {
     const isLight = isLightColor("--header-background");
     if (isLight !== null) {
@@ -37,7 +35,7 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
         setLightForegroundColor(isLight);
       }
     }, 1000);
-  }, []);
+  }, [theme]);
   if (provider === "@official") {
     return (
       <Image
