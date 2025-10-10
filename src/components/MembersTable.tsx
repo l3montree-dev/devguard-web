@@ -82,8 +82,13 @@ const MembersTable: FunctionComponent<Props> = ({
                         {Boolean(m?.avatarUrl) && (
                           <AvatarImage src={m?.avatarUrl} alt={m.name} />
                         )}
+
                         <AvatarFallback className="bg-secondary">
-                          {m.name.charAt(0)}
+                          {m.name
+                            .split(" ")
+                            .slice(0, 2)
+                            .map((n) => n.charAt(0).toUpperCase())
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                     </td>
