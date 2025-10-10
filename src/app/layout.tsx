@@ -133,7 +133,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <InternalServerErrorPage />
+            <InternalServerErrorPage error={error as Error} />
           </ThemeProvider>
         </body>
       </html>
