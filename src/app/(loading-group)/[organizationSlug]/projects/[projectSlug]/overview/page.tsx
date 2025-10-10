@@ -2,7 +2,7 @@
 
 import { groupBy } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
 import Avatar from "../../../../../../components/Avatar";
@@ -51,6 +51,7 @@ import {
   normalizeContentTree,
   reduceRiskHistories,
 } from "../../../../../../utils/view";
+import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -69,18 +70,24 @@ const OverviewPage = () => {
 
   const { data: releases } = useSWR<Paged<ReleaseDTO>>(
     `/organizations/${organizationSlug}/projects/${projectSlug}/releases/`,
+    fetcher,
   );
 
+  const pushQuery = useRouterQuery();
   let releaseId: string | undefined = undefined;
 
   if (releases) {
     const artifactIndex = releases.data.findIndex((r) => r.name === artifact);
-    if (!artifact || artifactIndex === -1) {
-      releaseId = releases.data.length > 0 ? releases.data[0].id : undefined;
-    } else {
+    if (artifact && artifactIndex != -1) {
       releaseId = releases.data[artifactIndex].id;
     }
   }
+
+  useEffect(() => {
+    if (!artifact && releases?.data.length && releases.data[0].name) {
+      pushQuery({ artifact: releases.data[0].name });
+    }
+  }, [artifact, releases, pushQuery]);
 
   // fetch all the data
   const { data: riskHistory, isLoading: riskHistoryLoading } = useSWR<
@@ -94,7 +101,10 @@ const OverviewPage = () => {
           projectSlug +
           "/releases/" +
           releaseId +
-          "/stats"
+          "/stats/risk-history?start=" +
+          last3Month.toISOString().split("T")[0] +
+          "&end=" +
+          new Date().toISOString().split("T")[0]
         : null,
     fetcher,
   );
