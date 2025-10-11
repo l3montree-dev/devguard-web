@@ -95,7 +95,8 @@ export default async function RootLayout({
     if (
       error instanceof HttpError &&
       error.instructions &&
-      "redirect" in error.instructions
+      "redirect" in error.instructions &&
+      "destination" in error.instructions.redirect
     ) {
       console.log(
         "Redirecting to in RootLayout:",

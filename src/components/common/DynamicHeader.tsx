@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import { classNames } from "@/utils/common";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { classNames } from "@/utils/common";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
 import { OrganizationDropDown } from "../OrganizationDropDown";
 import EntityProviderImage from "./EntityProviderImage";
-import Link from "next/link";
 
 interface Props {
   Title: ReactNode;
@@ -24,7 +25,9 @@ interface Props {
 export default function DynamicHeader({ Title, menu, z }: Props) {
   const activeOrg = useActiveOrg();
   const pathname = usePathname();
+  const params = useDecodedParams();
 
+  const slug = params.organizationSlug || activeOrg.slug;
   return (
     <header
       style={{ zIndex: 20 + z }}
@@ -35,8 +38,8 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
     >
       <div className="mx-auto w-full max-w-screen-2xl">
         <div className="flex flex-row items-center gap-4">
-          <Link href={`/${activeOrg?.slug}`}>
-            <EntityProviderImage provider={activeOrg?.slug || ""} />
+          <Link href={`/${slug}`}>
+            <EntityProviderImage provider={slug || ""} />
           </Link>
           <div>
             <OrganizationDropDown />

@@ -3,7 +3,7 @@ import React from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
@@ -43,6 +43,9 @@ export default async function OrganizationLayout({
       error.instructions &&
       "redirect" in error.instructions
     ) {
+      if ("notFound" in error.instructions.redirect) {
+        return notFound();
+      }
       redirect(error.instructions.redirect.destination);
     }
   }

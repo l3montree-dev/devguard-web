@@ -16,10 +16,14 @@
 export class HttpError extends Error {
   constructor(
     public instructions: {
-      redirect: {
-        destination: string;
-        permanent: boolean;
-      };
+      redirect:
+        | {
+            destination: string;
+            permanent: boolean;
+          }
+        | {
+            notFound: true;
+          };
     },
   ) {
     super("HTTP Error");

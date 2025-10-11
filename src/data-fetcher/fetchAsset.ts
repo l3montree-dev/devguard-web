@@ -39,8 +39,7 @@ export async function fetchAsset(
   if (!r.ok) {
     throw new HttpError({
       redirect: {
-        destination: "/" + orgSlug + "/projects/" + projectSlug,
-        permanent: false,
+        notFound: true,
       },
     });
   }

@@ -36,6 +36,8 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
       }
     }, 1000);
   }, [theme]);
+
+  console.log(provider);
   if (provider === "@official") {
     return (
       <Image

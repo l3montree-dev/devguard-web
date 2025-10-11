@@ -1,5 +1,5 @@
 import AssetHeader from "@/components/common/AssetHeader";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React from "react";
 import { AssetProvider } from "../../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
@@ -34,6 +34,9 @@ const AssetLayout = async ({
   } catch (error) {
     if (error instanceof HttpError) {
       if (error.instructions && "redirect" in error.instructions) {
+        if ("notFound" in error.instructions.redirect) {
+          return notFound();
+        }
         return redirect(error.instructions.redirect.destination);
       }
     }
