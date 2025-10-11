@@ -27,7 +27,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
   const pathname = usePathname();
   const params = useDecodedParams();
 
-  const slug = params.organizationSlug || activeOrg.slug;
+  const slug = params.organizationSlug || activeOrg?.slug || "";
   return (
     <header
       style={{ zIndex: 20 + z }}
@@ -39,7 +39,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
       <div className="mx-auto w-full max-w-screen-2xl">
         <div className="flex flex-row items-center gap-4">
           <Link href={`/${slug}`}>
-            <EntityProviderImage provider={slug || ""} />
+            <EntityProviderImage provider={slug} />
           </Link>
           <div>
             <OrganizationDropDown />
