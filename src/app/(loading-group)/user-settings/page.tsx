@@ -55,6 +55,8 @@ import { useConfig } from "../../../context/ConfigContext";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import { handleFlowError, ory } from "../../../services/ory";
 import { PersonalAccessTokenDTO } from "../../../types/api/api";
+import CopyInput from "../../../components/common/CopyInput";
+import { useCurrentUser } from "../../../hooks/useCurrentUser";
 
 interface Props {
   flow?: SettingsFlow;
@@ -86,6 +88,7 @@ const Settings: FunctionComponent = () => {
   // Get ?flow=... from the URL
   const router = useRouter();
   const searchParams = useSearchParams();
+  const currentUser = useCurrentUser();
   const flowId = searchParams?.get("flow");
   const returnTo = searchParams?.get("return_to");
 
@@ -252,6 +255,9 @@ const Settings: FunctionComponent = () => {
               </div>
             </div>
           </Card>
+
+          <Label className="mt-4">User ID</Label>
+          <CopyInput value={currentUser?.id ?? ""} />
         </Section>
 
         {availableMethods.includes("password") && (

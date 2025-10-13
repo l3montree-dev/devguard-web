@@ -12,7 +12,7 @@ import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -25,11 +25,13 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { AssetDTO } from "../../../../../../../../types/api/api";
+import { AssetDTO, UserRole } from "../../../../../../../../types/api/api";
 import {
   generateNewSecret,
   getParentRepositoryIdAndName,
 } from "../../../../../../../../utils/view";
+import MembersTable from "../../../../../../../../components/MembersTable";
+import AssetMemberDialog from "../../../../../../../../components/AssetMemberDialog";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -48,6 +50,8 @@ const Index: FunctionComponent = () => {
   const updateAsset = useUpdateAsset();
   const router = useRouter();
   const config = useConfig();
+
+  const [memberDialogOpen, setMemberDialogOpen] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
@@ -97,6 +101,64 @@ const Index: FunctionComponent = () => {
       ),
     },
   });
+
+  const handleRemoveMember = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project?.slug +
+        "/assets/" +
+        asset.slug +
+        "/members/" +
+        id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateAsset({
+        ...asset,
+        members: asset.members.filter((member) => member.id !== id),
+      });
+      toast.success("Member deleted");
+    } else {
+      toast.error("Failed to remove member");
+    }
+  };
+
+  const handleChangeMemberRole = async (
+    id: string,
+    role: UserRole.Admin | UserRole.Member,
+  ) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project?.slug +
+        "/assets" +
+        asset.slug +
+        "/members/" +
+        id,
+      {
+        method: "PUT",
+        body: JSON.stringify({ role }),
+      },
+    );
+
+    if (resp.ok) {
+      updateAsset({
+        ...asset,
+        members: asset.members.map((member) =>
+          member.id === id ? { ...member, role } : member,
+        ),
+      });
+      toast.success("Role successfully changed");
+    } else {
+      toast.error("Failed to update member role");
+    }
+  };
 
   const handleGenerateNewSecret = async (type: SecretType) => {
     let bodyKey: string;
@@ -265,6 +327,32 @@ const Index: FunctionComponent = () => {
           </form>
         </FormProvider>
       </div>
+      {!asset.externalEntityProviderId && (
+        <>
+          <hr className="mt-10" />
+          <Section
+            title="Member"
+            description="Manage the members of your organization"
+          >
+            <MembersTable
+              onChangeMemberRole={handleChangeMemberRole}
+              onRemoveMember={handleRemoveMember}
+              members={asset.members}
+            />
+            <AssetMemberDialog
+              isOpen={memberDialogOpen}
+              onOpenChange={setMemberDialogOpen}
+            />
+
+            <div className="flex flex-row justify-end">
+              <Button onClick={() => setMemberDialogOpen(true)}>
+                Add Member
+              </Button>
+            </div>
+          </Section>
+          <hr />
+        </>
+      )}
       <div>
         <Section
           title="Badge Management"
