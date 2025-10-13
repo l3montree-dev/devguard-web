@@ -12,23 +12,32 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { browserApiClient } from "@/services/devGuardApi";
 import { UserRole } from "@/types/api/api";
 import { toast } from "sonner";
-import { useUpdateProject } from "../context/ProjectContext";
+import { useUpdateAsset } from "../context/AssetContext";
+import { useActiveAsset } from "../hooks/useActiveAsset";
+import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { MultiselectCombobox } from "./common/MultiselectCombobox";
-import { Button } from "./ui/button";
 
 interface Props {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const ProjectMemberDialog: FunctionComponent<Props> = ({
+const AssetMemberDialog: FunctionComponent<Props> = ({
   isOpen,
   onOpenChange,
 }) => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
-  const updateProject = useUpdateProject();
+  const activeAsset = useActiveAsset()!;
+  const updateAsset = useUpdateAsset();
   const [selectedMembers, setSelectedMembers] = useState<
     Array<{
       value: string;
@@ -43,6 +52,8 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
         activeOrg.slug +
         "/projects/" +
         activeProject.slug +
+        "/assets/" +
+        activeAsset.slug +
         "/members",
       {
         method: "POST",
@@ -56,10 +67,10 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
       toast.error("Failed to invite member");
       return;
     } else {
-      updateProject({
-        ...activeProject,
-        members: activeProject.members.concat(
-          activeOrg.members
+      updateAsset({
+        ...activeAsset,
+        members: activeAsset.members.concat(
+          activeProject.members
             .filter((e) => ids.includes(e.id))
             .map((e) => ({
               ...e,
@@ -73,15 +84,15 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
   };
 
   const membersToInvite = useMemo(() => {
-    const projectMemberIds = activeProject.members.reduce(
+    const assetMemberIds = activeAsset.members.reduce(
       (acc, m) => {
         acc[m.id] = true;
         return acc;
       },
       {} as { [key: string]: boolean },
     );
-    return activeOrg.members.filter((m) => !projectMemberIds[m.id]);
-  }, [activeProject.members, activeOrg.members]);
+    return activeProject.members.filter((m) => !assetMemberIds[m.id]);
+  }, [activeAsset.members, activeProject.members]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -89,9 +100,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
-            Invite someone to participate in the project {activeProject.name}.
-            Make sure they are part of the organization already. Otherwise they
-            need to be invited to the organization first.
+            Invite a new member to the asset by entering their email address.
           </DialogDescription>
         </DialogHeader>
         <MultiselectCombobox
@@ -131,4 +140,4 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
   );
 };
 
-export default ProjectMemberDialog;
+export default AssetMemberDialog;

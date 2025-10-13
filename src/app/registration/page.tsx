@@ -16,6 +16,7 @@
 import {
   LoginFlow,
   RegistrationFlow,
+  UiNodeGroupEnum,
   UiNodeScriptAttributes,
   UpdateRegistrationFlowBody,
 } from "@ory/client";
@@ -182,6 +183,26 @@ const Registration = () => {
     return uniq(flow?.ui.nodes.map((node) => node.group));
   }, [flow?.ui.nodes]);
 
+  const profileFlowIsOnlyBackButton = useMemo(() => {
+    if (!flow) {
+      return true;
+    }
+    const profileNodes = flow.ui.nodes.filter(
+      (t) => t.group === UiNodeGroupEnum.Profile,
+    );
+    if (profileNodes.length === 0) {
+      return false;
+    }
+    // if its just a single node its the back button - we already render that one.
+    if (
+      profileNodes.length === 1 &&
+      "value" in profileNodes[0].attributes &&
+      profileNodes[0].attributes.value === "previous"
+    ) {
+      return true;
+    }
+    return false;
+  }, [flow]);
   return (
     <>
       <Head>
@@ -229,16 +250,19 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly && Boolean(flow) && (
-                    <div className="mb-6 border-b-2 pb-4">
-                      <Flow
-                        hideGlobalMessages
-                        only="profile"
-                        onSubmit={onSubmit}
-                        flow={flow as LoginFlow}
-                      />
-                    </div>
-                  )}
+                  {!oidcOnly &&
+                    Boolean(flow) &&
+                    // if its just a single node its the back button - we already render that one.
+                    !profileFlowIsOnlyBackButton && (
+                      <div className="mb-6 border-b-2 pb-4">
+                        <Flow
+                          hideGlobalMessages
+                          only="profile"
+                          onSubmit={onSubmit}
+                          flow={flow as LoginFlow}
+                        />
+                      </div>
+                    )}
 
                   {availableMethods.includes("passkey") && (
                     <div className="mb-6 border-b-2 pb-4">

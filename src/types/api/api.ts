@@ -491,6 +491,13 @@ export interface AssetDTO {
 
   vulnAutoReopenAfterDays?: number;
   repositoryProvider?: "github" | "gitlab";
+
+  members: Array<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    role?: UserRole.Admin | UserRole.Member;
+  }>;
 }
 
 export interface DependencyTreeNode {

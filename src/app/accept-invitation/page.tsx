@@ -1,3 +1,4 @@
+"use client";
 import { browserApiClient } from "@/services/devGuardApi";
 import Head from "next/head";
 
