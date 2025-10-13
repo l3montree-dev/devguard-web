@@ -248,6 +248,7 @@ interface BaseVulnEventDTO {
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
+  upstream: number;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
@@ -625,6 +626,9 @@ export interface ArtifactDTO {
   artifactName: string;
   assetId: string;
   assetVersionName: string;
+  upstreamUrls: {
+    upstreamUrl: string;
+  }[];
 }
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
