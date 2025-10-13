@@ -17,7 +17,7 @@ export default async function RootLayout({
   try {
     const { organizationSlug, projectSlug } = await params;
     const [project] = await Promise.all([
-      fetchProject(organizationSlug, projectSlug),
+      fetchProject(decodeURIComponent(organizationSlug), projectSlug),
     ]);
 
     return (
