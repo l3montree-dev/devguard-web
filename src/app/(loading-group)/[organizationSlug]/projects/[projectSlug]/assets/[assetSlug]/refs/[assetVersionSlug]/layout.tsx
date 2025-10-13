@@ -1,9 +1,8 @@
+import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 import React from "react";
 import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
-import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
-import { fetchAsset } from "../../../../../../../../../data-fetcher/fetchAsset";
-import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
+import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -23,12 +22,17 @@ const AssetLayout = async ({
     await params;
   const [assetVersion, artifacts] = await Promise.all([
     fetchAssetVersion(
-      organizationSlug,
+      decodeURIComponent(organizationSlug),
       projectSlug,
       assetSlug,
       assetVersionSlug,
     ),
-    fetchArtifacts(organizationSlug, projectSlug, assetSlug, assetVersionSlug),
+    fetchArtifacts(
+      decodeURIComponent(organizationSlug),
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    ),
   ]);
 
   return (

@@ -22,7 +22,7 @@ const AssetLayout = async ({
   const { organizationSlug, projectSlug, assetSlug } = await params;
   try {
     const [asset] = await Promise.all([
-      fetchAsset(organizationSlug, projectSlug, assetSlug),
+      fetchAsset(decodeURIComponent(organizationSlug), projectSlug, assetSlug),
     ]);
 
     return (
