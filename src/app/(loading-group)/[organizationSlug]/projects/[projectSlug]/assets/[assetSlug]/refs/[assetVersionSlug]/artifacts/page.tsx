@@ -29,11 +29,15 @@ const Artifacts = () => {
   const artifacts = useArtifacts();
   const updateAssetVersionState = useUpdateAssetVersionState();
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingArtifact, setEditingArtifact] = useState<ArtifactDTO | null>(
-    null,
-  );
+  const [dialogState, setDialogState] = useState<{
+    isOpen: boolean;
+    mode: "create" | "edit";
+    artifact: ArtifactDTO | null;
+  }>({
+    isOpen: false,
+    mode: "create",
+    artifact: null,
+  });
 
   const artifactForm = useForm<ArtifactDTO>({
     defaultValues: {
@@ -52,39 +56,61 @@ const Artifacts = () => {
       assetVersionSlug: string;
     };
 
+  const openCreateDialog = () => {
+    setDialogState({
+      isOpen: true,
+      mode: "create",
+      artifact: null,
+    });
+    artifactForm.reset({
+      artifactName: "",
+      assetId: "",
+      assetVersionName: "",
+      upstreamUrls: [],
+    });
+  };
+
   const openEditDialog = (artifact: ArtifactDTO) => {
-    setEditingArtifact(artifact);
+    setDialogState({
+      isOpen: true,
+      mode: "edit",
+      artifact: artifact,
+    });
     artifactForm.reset({
       artifactName: artifact.artifactName,
       assetId: artifact.assetId,
       assetVersionName: artifact.assetVersionName,
       upstreamUrls: artifact.upstreamUrls || [],
     });
-    setIsEditDialogOpen(true);
   };
 
-  const handleEditSubmit = async (data: ArtifactDTO) => {
-    if (!editingArtifact) return;
-
-    await updateArtifact({
-      ...editingArtifact,
-      artifactName: data.artifactName,
-      upstreamUrls: data.upstreamUrls,
+  const closeDialog = () => {
+    setDialogState({
+      isOpen: false,
+      mode: "create",
+      artifact: null,
     });
-
-    setIsEditDialogOpen(false);
-    setEditingArtifact(null);
     artifactForm.reset();
+  };
+
+  const handleSubmit = async (data: ArtifactDTO) => {
+    if (dialogState.mode === "create") {
+      await createArtifact(data);
+    } else if (dialogState.mode === "edit" && dialogState.artifact) {
+      await updateArtifact({
+        ...dialogState.artifact,
+        artifactName: data.artifactName,
+        upstreamUrls: data.upstreamUrls,
+      });
+    }
+    closeDialog();
   };
 
   const handleDelete = async () => {
-    if (!editingArtifact) return;
-
-    await deleteArtifact(editingArtifact);
-
-    setIsEditDialogOpen(false);
-    setEditingArtifact(null);
-    artifactForm.reset();
+    if (dialogState.artifact) {
+      await deleteArtifact(dialogState.artifact);
+      closeDialog();
+    }
   };
 
   const createArtifact = async (data: ArtifactDTO) => {
@@ -109,8 +135,6 @@ const Artifacts = () => {
     }));
 
     toast.success("Artifact created successfully");
-    setIsCreateDialogOpen(false);
-    artifactForm.reset();
   };
 
   const deleteArtifact = async (artifact: ArtifactDTO) => {
@@ -163,11 +187,9 @@ const Artifacts = () => {
             description="Manage and view artifacts associated with this asset version."
             title="Artifacts"
             forceVertical
-            /*             Button={
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                Create new Artifact
-              </Button>
-            } */
+            Button={
+              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+            }
           >
             <div>
               {artifacts.length === 0 && (
@@ -200,20 +222,13 @@ const Artifacts = () => {
         </div>
       </div>
 
-      {/*       <ArtifactForm
-        form={artifactForm}
-        isOpen={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onSubmit={createArtifact}
-      /> */}
-
       <ArtifactForm
         form={artifactForm}
-        isOpen={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onSubmit={handleEditSubmit}
-        onDelete={handleDelete}
-        isEditMode={true}
+        isOpen={dialogState.isOpen}
+        onOpenChange={(open) => !open && closeDialog()}
+        onSubmit={handleSubmit}
+        onDelete={dialogState.mode === "edit" ? handleDelete : undefined}
+        isEditMode={dialogState.mode === "edit"}
       />
     </Page>
   );

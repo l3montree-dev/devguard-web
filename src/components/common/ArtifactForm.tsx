@@ -81,7 +81,7 @@ const ArtifactForm = ({
                   <FormControl>
                     <Input
                       placeholder="Enter artifact name"
-                      disabled={true}
+                      disabled={isEditMode}
                       {...field}
                     />
                   </FormControl>
