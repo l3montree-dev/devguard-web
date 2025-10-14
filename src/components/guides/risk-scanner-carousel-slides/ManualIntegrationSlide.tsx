@@ -15,6 +15,7 @@
 import React, { FunctionComponent } from "react";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { CarouselItem } from "../../ui/carousel";
 import { Button } from "../../ui/button";
 import {
@@ -26,9 +27,11 @@ import {
 } from "../../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import FileUpload from "../../FileUpload";
-import Section from "../../common/Section";
-
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { ArtifactDTO } from "@/types/api/api";
+import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
+import { Badge } from "@/components/ui/badge";
+import { GitBranchIcon } from "lucide-react";
 
 interface ManualIntegrationSlideProps {
   api?: {
@@ -36,6 +39,7 @@ interface ManualIntegrationSlideProps {
   };
   tab: "sbom" | "sarif";
   setTab: (tab: "sbom" | "sarif") => void;
+  setArtifactName?: (name: string | undefined) => void;
   sbomFileName?: string;
   sarifFileName?: string;
   sbomDropzone: any;
@@ -44,6 +48,8 @@ interface ManualIntegrationSlideProps {
   prevIndex: number;
   onClose: () => void;
   handleUpload: () => void;
+  assetVersionName?: string;
+  artifacts?: Array<ArtifactDTO>;
 }
 
 const ManualIntegrationSlide: FunctionComponent<
@@ -52,6 +58,7 @@ const ManualIntegrationSlide: FunctionComponent<
   api,
   tab,
   setTab,
+  setArtifactName,
   sbomFileName,
   sarifFileName,
   sbomDropzone,
@@ -59,7 +66,27 @@ const ManualIntegrationSlide: FunctionComponent<
   sarifDropzone,
   isUploadDisabled,
   handleUpload,
+  assetVersionName,
+  artifacts,
 }) => {
+  const searchParams = useSearchParams();
+
+  const [selectedArtifact, setSelectedArtifact] = React.useState<
+    string | undefined
+  >(() => {
+    const urlArtifact = searchParams?.get("artifact");
+    if (urlArtifact) {
+      return urlArtifact;
+    }
+  });
+
+  // Update parent component when artifact changes
+  React.useEffect(() => {
+    if (setArtifactName) {
+      setArtifactName(selectedArtifact);
+    }
+  }, [selectedArtifact, setArtifactName]);
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -83,7 +110,20 @@ const ManualIntegrationSlide: FunctionComponent<
               <TabsTrigger value="sarif">SARIF</TabsTrigger>
             </TabsList>
           </div>
-
+          {tab === "sbom" && (
+            <div className="my-4  flex flex-row gap-6">
+              <Badge variant={"outline"} className="ml-1">
+                <GitBranchIcon className="mr-1 h-5 w-5 text-muted-foreground" />
+                {assetVersionName}
+              </Badge>
+              <SimpleArtifactSelector
+                unassignPossible
+                artifacts={artifacts?.map((a) => a.artifactName) || []}
+                selectedArtifact={selectedArtifact}
+                onSelect={setSelectedArtifact}
+              />
+            </div>
+          )}
           <TabsContent value="sbom" className="mt-6">
             <Card>
               <CardHeader>

@@ -487,6 +487,8 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        assetVersion={assetVersion}
+        artifacts={artifacts || []}
       />
     </Page>
   );
