@@ -32,6 +32,7 @@ import {
 } from "../../../../../../../../utils/view";
 import MembersTable from "../../../../../../../../components/MembersTable";
 import AssetMemberDialog from "../../../../../../../../components/AssetMemberDialog";
+import { Switch } from "../../../../../../../../components/ui/switch";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -373,11 +374,13 @@ const Index: FunctionComponent = () => {
                   "This will generate a new badge secret. The badge URL will change and you need to update the badge URL in your documentation.",
               }}
             />
-            <img
-              src={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
-              alt="CVSS Badge"
-              className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-            />
+            {secrets && (
+              <img
+                src={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
+                alt="CVSS Badge"
+                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+              />
+            )}
           </div>
         </Section>
 
@@ -417,6 +420,29 @@ const Index: FunctionComponent = () => {
             title="Advanced"
             description="These settings are for advanced users only. Please be careful when changing these settings."
           >
+            <ListItem
+              Description={
+                "Setting this to true will make the repository visible to the public."
+              }
+              Title="Public Repository"
+              Button={
+                <Switch
+                  disabled={!project.isPublic}
+                  checked={asset.isPublic}
+                  onCheckedChange={(checked) =>
+                    handleUpdate({
+                      isPublic: checked,
+                    })
+                  }
+                />
+              }
+            />
+            {!project.isPublic && (
+              <small>
+                The project is not public. You can not make the repository
+                public.
+              </small>
+            )}
             <ListItem
               Title="Delete Repository"
               Description={
