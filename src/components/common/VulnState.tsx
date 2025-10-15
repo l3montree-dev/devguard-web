@@ -7,10 +7,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
-import { VulnDTO } from "../../types/api/api";
+import { ExpandedVulnDTOState, VulnDTO } from "../../types/api/api";
 import { Scale } from "lucide-react";
 
-const VulnState: FunctionComponent<{ state: VulnDTO["state"] }> = ({
+const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
   state,
 }) => {
   const defaultClasses =
@@ -52,6 +52,20 @@ const VulnState: FunctionComponent<{ state: VulnDTO["state"] }> = ({
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
+        </Badge>
+      );
+
+    case "not-found":
+      return (
+        <Badge
+          variant={"default"}
+          className={classNames(
+            defaultClasses,
+            "bg-secondary text-secondary-foreground",
+          )}
+        >
+          <Scale className="-ml-1 inline-block h-4 w-4" />
+          Not Found
         </Badge>
       );
 
