@@ -58,6 +58,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import Link from "next/link";
 
 interface Props {
   vulns: Paged<VulnByPackage>;
@@ -228,6 +229,19 @@ const Index: FunctionComponent = () => {
 
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
+
+    if (searchParams?.has("artifact")) {
+      p.append(
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
+        searchParams.get("artifact") as string,
+      );
+    }
+
+    return p;
+  }, [searchParams]);
+
+  const queryWithState = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
     if (!Boolean(state) || state === "open") {
       p.append("filterQuery[state][is]", "open");
@@ -264,6 +278,16 @@ const Index: FunctionComponent = () => {
       assetVersionSlug +
       "/" +
       "dependency-vulns/?" +
+      queryWithState.toString(),
+    fetcher,
+  );
+
+  const { data: vulnsToSync } = useSWR<Paged<VulnByPackage>>(
+    uri +
+      "refs/" +
+      assetVersionSlug +
+      "/" +
+      "dependency-vulns/sync/?" +
       query.toString(),
     fetcher,
   );
@@ -351,6 +375,16 @@ const Index: FunctionComponent = () => {
           </div>
         </div>
       </Section>
+      {vulnsToSync && vulnsToSync.data.length > 0 && (
+        <div className="mb-4">
+          <Link href={pathname + "/sync/"} className="flex justify-center">
+            <span className="underline">
+              There are new Events from a upstreram source. Click here to handle
+              them.
+            </span>
+          </Link>
+        </div>
+      )}
       {!vulns?.data?.length ? (
         <div>
           <EmptyParty
