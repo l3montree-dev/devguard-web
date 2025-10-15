@@ -185,7 +185,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
               <RadialBar
                 dataKey="has"
                 cornerRadius={5}
-                fill="hsl(var(--primary) / 1)"
+                fill="hsl(var(--primary))"
                 className="stroke-2"
               />
               {/* Custom reference line */}
