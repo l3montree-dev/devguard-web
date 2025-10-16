@@ -469,6 +469,7 @@ export interface AssetDTO {
   repositoryName?: string;
 
   reachableFromTheInternet: boolean;
+  paranoiaMode: boolean;
 
   lastSecretScan: string;
   lastSastScan: string;

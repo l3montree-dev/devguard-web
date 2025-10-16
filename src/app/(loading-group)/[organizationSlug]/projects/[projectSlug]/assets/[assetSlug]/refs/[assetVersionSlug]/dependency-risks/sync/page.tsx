@@ -12,7 +12,10 @@ import {
 } from "@/types/api/api";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { useArtifacts } from "@/context/AssetVersionContext";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -52,6 +55,10 @@ import { TabsList } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import Link from "next/link";
+import { browserApiClient } from "@/services/devGuardApi";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 const columnHelper = createColumnHelper<DetailedDependencyVulnDTO>();
 
@@ -158,6 +165,12 @@ const Index: FunctionComponent = () => {
   const artifacts = useArtifacts();
   const pathname = usePathname();
   const [vulnsToUpdate, setVulnsToUpdate] = useState<string[]>([]);
+
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject()!;
+
+  const asset = useActiveAsset()!;
+  const assetVersion = useActiveAssetVersion();
 
   let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -287,17 +300,46 @@ const Index: FunctionComponent = () => {
         return;
       }
 
-      const response = await fetch(
-        uri + "refs/" + assetVersionSlug + "/" + "dependency-vulns/sync/",
+      interface SyncRequestBody {
+        vulnID: string;
+        event: VulnEventDTO;
+      }
+
+      let vulnsReq: SyncRequestBody[] = [];
+
+      for (const vuln of vulns?.data || []) {
+        if (vulnsToUpdate.includes(vuln.id)) {
+          vulnsReq.push({
+            vulnID: vuln.id,
+            //the last event with upstream 2
+            event: vuln.events
+              .slice()
+              .reverse()
+              .find((e) => e.upstream === 2) as VulnEventDTO,
+          });
+        }
+      }
+
+      const response = await browserApiClient(
+        "/api/v1/organizations/" +
+          activeOrg.slug +
+          "/projects/" +
+          project.slug +
+          "/assets/" +
+          asset.slug +
+          "/refs/" +
+          assetVersion?.slug +
+          "/dependency-vulns/sync/",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            vulnIDs: vulnsToUpdate,
+            vulnsReq,
           }),
         },
+        "",
       );
 
       if (!response.ok) {

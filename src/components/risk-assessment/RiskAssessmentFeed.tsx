@@ -123,13 +123,7 @@ export default function RiskAssessmentFeed({
               >
                 <EventTypeIcon eventType={event.type} />
               </div>
-              <div
-                className={classNames(
-                  event.upstream === 1 &&
-                    "bg-gray-900 border border-red-700 p-2 rounded-lg",
-                  "w-full",
-                )}
-              >
+              <div className={classNames("w-full")}>
                 <div className="flex w-full flex-col">
                   <div className="flex flex-row items-start gap-2">
                     {event.userId === "system" ? (
@@ -171,7 +165,8 @@ export default function RiskAssessmentFeed({
                         <div className="absolute right-2 top-2">
                           <div>
                             <Badge variant={"outline"} className="mr-1 ">
-                              {event.upstream === 1 && (
+                              {(event.upstream === 1 ||
+                                event.upstream === 2) && (
                                 <span
                                   className="mr-1 text-red-500"
                                   title="Upstream Vulnerability"
