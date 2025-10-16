@@ -241,11 +241,20 @@ const OrganizationHomePage: FunctionComponent = () => {
           forceVertical
           title="Groups"
         >
-          <Input
-            onChange={debouncedHandleSearch}
-            defaultValue={searchParams?.get("search") || ""}
-            placeholder="Search for projects"
-          />
+          <div className="flex flex-row gap-4">
+            <Input
+              className="w-5/6"
+              onChange={debouncedHandleSearch}
+              defaultValue={searchParams?.get("search") || ""}
+              placeholder="Search for projects"
+            />
+            <Input
+              className="w-1/6"
+              onChange={debouncedHandleSearch}
+              defaultValue={searchParams?.get("search") || ""}
+              placeholder="Search for Package"
+            />
+          </div>
           <ListRenderer
             isLoading={isLoading}
             error={error}
