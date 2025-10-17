@@ -96,6 +96,7 @@ export default function ScannerSelectionSlide({
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
           variant={"secondary"}
+          id="scanner-selection-back"
           onClick={() => {
             api?.scrollTo(prevIndex); // Back to SetupMethodSelectionSlide
           }}
@@ -104,6 +105,7 @@ export default function ScannerSelectionSlide({
         </Button>
         <Button
           disabled={selectedSetup === undefined}
+          id="scanner-selection-continue"
           onClick={() => {
             api?.scrollTo(
               selectedSetup === "devguard-tools"

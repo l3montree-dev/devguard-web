@@ -108,6 +108,7 @@ const UpdateRepositoryProviderSlide = ({ api, nextIndex }: Props) => {
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <AsyncButton
           disabled={selectedProvider === undefined}
+          id="update-repository-continue"
           onClick={handleProviderUpdate}
         >
           {selectedProvider === undefined

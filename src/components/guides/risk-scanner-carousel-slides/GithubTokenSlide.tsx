@@ -75,10 +75,15 @@ const GithubTokenSlide = ({
         <DevguardTokenCard />
       </div>
       <div className="flex mt-10 flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
+        <Button
+          variant={"secondary"}
+          id="github-token-back"
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
         <Button
+          id="github-token-continue"
           onClick={() => {
             api?.scrollTo(yamlGeneratorSlideIndex);
           }}

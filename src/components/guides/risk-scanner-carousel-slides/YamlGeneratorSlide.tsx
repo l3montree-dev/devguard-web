@@ -125,11 +125,16 @@ jobs:`
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant={"secondary"} onClick={() => api?.scrollTo(prevIndex)}>
+        <Button
+          variant={"secondary"}
+          id="yaml-generator-back"
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
         <Button
           disabled={Object.values(config).every((v) => v === false)}
+          id="yaml-generator-continue"
           onClick={async () => {
             onClose();
           }}
