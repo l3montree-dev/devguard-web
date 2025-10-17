@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { envConfig, generateOTP } from "../utils";
 
 export class OpenCodePOM {
@@ -115,11 +115,12 @@ export class OpenCodePOM {
 
         if (!await this.page.getByText("You don't have any authorized applications.").isVisible()) {
             // await this.page.getByRole('button', { name: 'Revoke application' }).click();
-            const revokeButtons = this.page.getByRole('button', { name: 'Revoke' });
-            for (let i = 0; i < await revokeButtons.count(); i++) {
-                await this.page.getByRole('button', { name: 'Revoke' }).nth(i).click();
+            let revokeButtons: Locator;
+            do {
+                revokeButtons = this.page.getByRole('button', { name: 'Revoke' });
+                await this.page.getByRole('button', { name: 'Revoke' }).nth(0).click();
                 await this.page.getByTestId('confirm-ok-button').click();
-            }
+            } while((await revokeButtons.count()) > 1);
         }
     }
 }
