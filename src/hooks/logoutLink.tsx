@@ -50,12 +50,14 @@ export function LogoutLink(deps: DependencyList = []) {
         .updateLogoutFlow({ token: logoutToken })
         .then(() => {
           router.push("/login");
-          updateSession({
-            session: null,
-            organizations: [],
-          });
+          setTimeout(() => {
+            // ensure the session is cleared (client-side)
+            updateSession({
+              session: null,
+              organizations: [],
+            });
+          }, 1000); // wait one second to ensure the redirect has started
         })
-        .then(() => router.refresh());
     }
   };
 }
