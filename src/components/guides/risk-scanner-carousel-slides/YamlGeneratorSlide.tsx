@@ -125,10 +125,11 @@ jobs:`
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button 
-          variant={"secondary"} 
+        <Button
+          variant={"secondary"}
           id="yaml-generator-back"
-          onClick={() => api?.scrollTo(prevIndex)}>
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
         <Button

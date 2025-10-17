@@ -104,12 +104,13 @@ const AutomatedIntegrationSlide: FunctionComponent<
         <Button
           variant="secondary"
           id="automated-integration-back"
-          onClick={() => api?.scrollTo(prevIndex)}>
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
-        <Button
-          id="automated-integration-continue"
-          onClick={onClose}>Finish Setup</Button>
+        <Button id="automated-integration-continue" onClick={onClose}>
+          Finish Setup
+        </Button>
       </div>
     </CarouselItem>
   );

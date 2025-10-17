@@ -220,10 +220,11 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
       </div>
 
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button 
-          variant={"secondary"} 
+        <Button
+          variant={"secondary"}
           id="scanner-options-selection-back"
-          onClick={() => api?.scrollTo(prevIndex)}>
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
         <Button

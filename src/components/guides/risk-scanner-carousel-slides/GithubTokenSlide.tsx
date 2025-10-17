@@ -78,7 +78,8 @@ const GithubTokenSlide = ({
         <Button
           variant={"secondary"}
           id="github-token-back"
-          onClick={() => api?.scrollTo(prevIndex)}>
+          onClick={() => api?.scrollTo(prevIndex)}
+        >
           Back
         </Button>
         <Button

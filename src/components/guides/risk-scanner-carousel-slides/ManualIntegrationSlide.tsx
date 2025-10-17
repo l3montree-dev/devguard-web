@@ -143,16 +143,18 @@ const ManualIntegrationSlide: FunctionComponent<
         </Tabs>
 
         <div className="flex mt-6 flex-row gap-2 justify-end">
-          <Button 
+          <Button
             variant="secondary"
             id="manual-integration-back"
-            onClick={() => api?.scrollTo(prevIndex)}>
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
             Back
           </Button>
-          <Button 
+          <Button
             disabled={isUploadDisabled}
             id="manual-integration-continue"
-            onClick={handleUpload}>
+            onClick={handleUpload}
+          >
             Upload
           </Button>
         </div>

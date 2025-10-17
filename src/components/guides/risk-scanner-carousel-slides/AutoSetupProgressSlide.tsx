@@ -140,7 +140,9 @@ const AutoSetupProgressSlide: FunctionComponent<
         >
           Back
         </Button>
-        <Button id="auto-setup-progress-continue" onClick={onClose}>Close</Button>
+        <Button id="auto-setup-progress-continue" onClick={onClose}>
+          Close
+        </Button>
       </div>
     </CarouselItem>
   );

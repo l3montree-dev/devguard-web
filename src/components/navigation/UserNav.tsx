@@ -89,21 +89,22 @@ export default function UserNav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <Link className="hover:no-underline" href={"/user-settings"}>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 id="user-nav-settings-button"
-                className="text-foreground hover:no-underline">
+                className="text-foreground hover:no-underline"
+              >
                 <CogIcon className="mr-2 h-5 w-5 text-muted-foreground" />
                 User Settings
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem
-                id="user-nav-logout-button"
-                className="text-foreground hover:no-underline"
-                onClick={handleLogout}
-              >
-                <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground"></ArrowRightStartOnRectangleIcon>
-                Logout
-              </DropdownMenuItem>
+              id="user-nav-logout-button"
+              className="text-foreground hover:no-underline"
+              onClick={handleLogout}
+            >
+              <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground"></ArrowRightStartOnRectangleIcon>
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
