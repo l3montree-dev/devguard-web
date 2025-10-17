@@ -51,7 +51,7 @@ import { ProjectForm } from "@/components/project/ProjectForm";
 import { Input } from "@/components/ui/input";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
+import { Funnel, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 import useSWR from "swr";
@@ -104,6 +104,17 @@ const OrganizationHomePage: FunctionComponent = () => {
         pushQuery({ search: undefined, page: "1" });
       } else if (e.target.value.length >= 3) {
         pushQuery({ search: e.target.value, page: "1" });
+      }
+    }, 500),
+    [],
+  );
+
+  const debouncedPackageSearch = useCallback(
+    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.value === "") {
+        pushQuery({ searchPkg: undefined, page: "1" });
+      } else if (e.target.value.length >= 3) {
+        pushQuery({ searchPkg: e.target.value, page: "1" });
       }
     }, 500),
     [],
@@ -250,10 +261,10 @@ const OrganizationHomePage: FunctionComponent = () => {
             />
             <Input
               className="w-1/6"
-              onChange={debouncedHandleSearch}
+              onChange={debouncedPackageSearch}
               defaultValue={searchParams?.get("search") || ""}
               placeholder="Search for Package"
-            />
+            ></Input>
           </div>
           <ListRenderer
             isLoading={isLoading}
