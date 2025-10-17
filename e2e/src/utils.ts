@@ -2,6 +2,11 @@ import * as OTPAuth from "otpauth";
 import { DevGuardPOM } from "./pom/devguard";
 import { Page } from "@playwright/test";
 import { OpenCodePOM } from "./pom/opencode";
+import path from "path";
+import dotenv from "dotenv";
+
+const envPath = path.resolve(__dirname, '../.env');
+dotenv.config({ path: envPath });
 
 export async function generateOTP(secret: string) {
   const totp = new OTPAuth.TOTP({
@@ -12,9 +17,9 @@ export async function generateOTP(secret: string) {
   });
 
   const remaining = totp.remaining();
-  if(remaining < 10000) { // if less than 5 seconds remain, wait for the next period
+  if (remaining < 5000) { // if less than X seconds remain, wait for the next period
     console.log("Waiting for next OTP period...");
-    await sleep(remaining + 2000);
+    await sleep(remaining + 1000);
   }
   console.log(`Time remaining for current OTP: ${remaining} milliseconds`);
 
@@ -46,7 +51,37 @@ export async function loginToDevGuardUsingOpenCode(page: Page) {
   await devguardPOM.loginWithOpenCode(); // click on login with openCode button
   await openCodePOM.login(false); // complete login via openCode without redirect
   await openCodePOM.grantAccess();
-  
+
   // expect to be back on devguard
   await devguardPOM.verifyOnDevGuardURL();
 };
+
+function loadEnvVariables() {
+  console.log(`Loading environment variables from: ${envPath}`);
+
+  const config = {
+    openCode: {
+      username: process.env.OPEN_CODE_USERNAME!,
+      password: process.env.OPEN_CODE_PASSWORD!,
+      totpSecret: process.env.OPEN_CODE_TOTP_SECRET!,
+    },
+    devGuard: {
+      usernameTemplate: process.env.DEVGUARD_EMAIL_LOGIN_USERNAME!,
+      password: process.env.DEVGUARD_EMAIL_LOGIN_PASSWORD!,
+      domain: process.env.DEVGUARD_DOMAIN!,
+      uniqueUsername: () => config.devGuard.usernameTemplate.replace("XXX", Date.now().toString()),
+    }
+  }
+
+  for (const [key, value] of Object.entries(config)) {
+    for (const [subKey, subValue] of Object.entries(value)) {
+      if (subValue === undefined) {
+        throw new Error(`Missing config value: ${key}.${subKey}`)
+      }
+    }
+  }
+
+  return config;
+}
+
+export const envConfig = loadEnvVariables();

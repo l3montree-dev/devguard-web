@@ -5,9 +5,7 @@ import { DevGuardPOM } from './pom/devguard';
 import { loginToDevGuardUsingOpenCode, TEMPORARY_WORKAROUND } from './utils';
 
 
-
-
-describe('DevGuard login / logout flows', () => {
+describe('DevGuard <-> OpenCode login / logout flows', () => {
 
   test.beforeEach(async ({ page }) => {
     const openCodePOM = new OpenCodePOM(page);
@@ -48,14 +46,4 @@ describe('DevGuard login / logout flows', () => {
     await page.waitForLoadState('networkidle')
     // await page.waitForTimeout(120_000);
   });
-
-  /*
-  test.afterAll(async ({ page }) => {
-    const openCodePOM = new OpenCode(page);
-    await openCodePOM.revokeAppAccess();
-    await openCodePOM.logout(page);
-  });
-  */
 })
-
-

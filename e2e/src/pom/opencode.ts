@@ -1,26 +1,9 @@
 import { expect, Page } from "@playwright/test";
-import { generateOTP } from "../utils";
-import path from "path";
-import dotenv from "dotenv";
-
-// Read from ".env" file.
-const envPath = path.resolve(__dirname, '../../.env');
-console.log(`Loading environment variables from: ${envPath}`);
-dotenv.config({ path: envPath });
+import { envConfig, generateOTP } from "../utils";
 
 export class OpenCodePOM {
 
-    readonly configOpenCode = {
-        username: process.env.OPEN_CODE_USERNAME!,
-        password: process.env.OPEN_CODE_PASSWORD!,
-        totpSecret: process.env.OPEN_CODE_TOTP_SECRET!,
-    }
-
-    constructor(public page: Page) { 
-        if(!this.configOpenCode.username || !this.configOpenCode.password || !this.configOpenCode.totpSecret) {
-            throw new Error("Missing OpenCode configuration in environment variables.");
-        }
-    }
+    constructor(public page: Page) { }
 
     async deleteRepo(userName: string, repoName: string) {
         await this.page.goto('https://gitlab.opencode.de/' + userName + '/' + repoName);
@@ -77,19 +60,39 @@ export class OpenCodePOM {
         } else {
             await this.verifyOnOpenCodeLoginURL();
         }
+
         await this.page.getByRole('textbox', { name: 'Username or email' }).click();
-        await this.page.getByRole('textbox', { name: 'Username or email' }).fill(this.configOpenCode.username);
+        await this.page.getByRole('textbox', { name: 'Username or email' }).fill(envConfig.openCode.username);
         await this.page.getByRole('textbox', { name: 'Password' }).click();
-        await this.page.getByRole('textbox', { name: 'Password' }).fill(this.configOpenCode.password);
+        await this.page.getByRole('textbox', { name: 'Password' }).fill(envConfig.openCode.password);
         await this.page.getByRole('button', { name: 'Sign In' }).click();
-        const otp = await generateOTP(this.configOpenCode.totpSecret);
-        await this.page.getByRole('textbox', { name: 'One-time code' }).fill(otp);
-        await this.page.getByRole('button', { name: 'Sign In' }).click();
-        
-        await this.page.waitForTimeout(500); // not sure why.. but otherwise the VR tests get stuck sometimes
+
+        let retries = 0;
+        const maxRetries = 3;
+        let retry = false;
+        do {
+            const otp = await generateOTP(envConfig.openCode.totpSecret);
+            await this.page.getByRole('textbox', { name: 'One-time code' }).fill(otp);
+            await this.page.getByRole('button', { name: 'Sign In' }).click();
+            await this.page.waitForTimeout(500); // not sure why.. but otherwise the VR tests get stuck sometimes
+
+            const invalidAuthText = this.page.getByText('Invalid authenticator code.');
+            retry = await invalidAuthText.isVisible();
+            if (retry) {
+                console.log(`OTP login attempt ${retries + 1} failed. Retrying...`);
+                await this.page.waitForTimeout(2000);
+            }
+        } while (retry && retries++ < maxRetries);
+
+        if(retry) {
+            throw new Error('OTP login failed after maximum retries');
+        }
+
         if(await this.page.getByRole('button', { name: 'Only necessary Cookies' }).isVisible()) {
             await this.page.getByRole('button', { name: 'Only necessary Cookies' }).click();
         }
+
+        console.log("Login successful");
     }
 
     async grantAccess() {
@@ -111,8 +114,12 @@ export class OpenCodePOM {
         // await this.page.waitForURL(new RegExp(`^https://gitlab.opencode.de/-/user_settings/applications`))
 
         if (!await this.page.getByText("You don't have any authorized applications.").isVisible()) {
-            await this.page.getByRole('button', { name: 'Revoke application' }).click();
-            await this.page.getByTestId('confirm-ok-button').click();
+            // await this.page.getByRole('button', { name: 'Revoke application' }).click();
+            const revokeButtons = this.page.getByRole('button', { name: 'Revoke' });
+            for (let i = 0; i < await revokeButtons.count(); i++) {
+                await this.page.getByRole('button', { name: 'Revoke' }).nth(i).click();
+                await this.page.getByTestId('confirm-ok-button').click();
+            }
         }
     }
 }

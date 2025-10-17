@@ -3,7 +3,6 @@ import { describe } from 'node:test';
 
 import { DevGuardPOM } from "./pom/devguard";
 import { OpenCodePOM } from "./pom/opencode";
-import { loginToDevGuardUsingOpenCode } from "./utils";
 
 describe('OpenCode project handling', () => {
 
@@ -32,6 +31,7 @@ describe('OpenCode project handling', () => {
     await devguardPOM.logout();
   })
 
+  /*
   test('test bla', async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
@@ -40,4 +40,5 @@ describe('OpenCode project handling', () => {
 
     // TODO.. do whatever here 
   });
+  */
 });
