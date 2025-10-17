@@ -101,10 +101,15 @@ const AutomatedIntegrationSlide: FunctionComponent<
         />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
+        <Button
+          variant="secondary"
+          id="automated-integration-back"
+          onClick={() => api?.scrollTo(prevIndex)}>
           Back
         </Button>
-        <Button onClick={onClose}>Finish Setup</Button>
+        <Button
+          id="automated-integration-continue"
+          onClick={onClose}>Finish Setup</Button>
       </div>
     </CarouselItem>
   );

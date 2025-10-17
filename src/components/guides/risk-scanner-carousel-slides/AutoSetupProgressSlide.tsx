@@ -133,13 +133,14 @@ const AutoSetupProgressSlide: FunctionComponent<
       <div className="flex flex-row gap-2 justify-end">
         <Button
           variant={"secondary"}
+          id="auto-setup-progress-back"
           onClick={() => {
             api?.scrollTo(prevIndex);
           }}
         >
           Back
         </Button>
-        <Button onClick={onClose}>Close</Button>
+        <Button id="auto-setup-progress-continue" onClick={onClose}>Close</Button>
       </div>
     </CarouselItem>
   );

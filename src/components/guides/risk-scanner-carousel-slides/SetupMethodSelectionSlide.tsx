@@ -96,6 +96,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
           disabled={selectedScanner === undefined}
+          id="setup-method-continue"
           onClick={() => {
             const targetSlide =
               selectedScanner === "auto-setup"
