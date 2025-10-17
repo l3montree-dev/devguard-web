@@ -32,6 +32,7 @@ interface Props {
   onSubmit?: (data: ArtifactDTO) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   isEditMode?: boolean;
+  invalidUrls?: string[]; 
 }
 
 const ArtifactForm = ({
@@ -41,6 +42,7 @@ const ArtifactForm = ({
   onSubmit,
   onDelete,
   isEditMode = false,
+  invalidUrls = [], 
 }: Props) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -111,35 +113,50 @@ const ArtifactForm = ({
                 </p>
               )}
 
-              {fields.map((field, index) => (
-                <div key={field.id} className="flex items-center space-x-2">
-                  <div className="flex-1">
-                    <FormField
-                      control={form.control}
-                      name={`upstreamUrls.${index}.upstreamUrl`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter upstream URL (e.g., https://example.com/artifact.json)"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              {fields.map((field, index) => {
+                const isInvalid = invalidUrls.includes(field.upstreamUrl);
+                return (
+                  <div key={field.id} className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <FormField
+                          control={form.control}
+                          name={`upstreamUrls.${index}.upstreamUrl`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter upstream URL (e.g., https://example.com/artifact.json)"
+                                  className={
+                                    isInvalid
+                                      ? "border-red-500 focus-visible:ring-red-500"
+                                      : ""
+                                  }
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {isInvalid && (
+                      <p className="text-sm text-red-500 pl-3">
+                        This URL is invalid or could not be reached
+                      </p>
+                    )}
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => remove(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <DialogFooter>
@@ -162,8 +179,8 @@ const ArtifactForm = ({
                         ? "Updating..."
                         : "Creating..."
                       : isEditMode
-                        ? "Update"
-                        : "Create"}
+                      ? "Update"
+                      : "Create"}
                   </Button>
                 </div>
                 <div className="flex gap-2 w-full">

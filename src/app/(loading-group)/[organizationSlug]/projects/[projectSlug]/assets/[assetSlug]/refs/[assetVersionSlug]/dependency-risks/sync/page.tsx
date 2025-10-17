@@ -221,7 +221,6 @@ const Index: FunctionComponent = () => {
   const handleSearch = useDebouncedQuerySearch();
   const params = useSearchParams();
 
-  console.log("vulns", vulns);
 
   useEffect(() => {
     if (vulns?.data) {
@@ -347,6 +346,7 @@ const Index: FunctionComponent = () => {
       }
 
       toast.success("Vulnerabilities synced successfully");
+
     } catch (error) {
       console.error("Error syncing vulnerabilities:", error);
       toast.error("Error syncing vulnerabilities");

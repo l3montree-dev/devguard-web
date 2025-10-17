@@ -104,8 +104,6 @@ export default function RiskAssessmentFeed({
           const user = findUser(event.userId, org, currentUser);
           const msg = eventMessages(event);
 
-          console.log("events", events);
-
           return (
             <li
               className={classNames(

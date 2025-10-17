@@ -19,7 +19,7 @@ import {
 } from "../../../../../../../../../../context/AssetVersionContext";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import CollapseList from "@/components/common/CollapseList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ArtifactForm from "@/components/common/ArtifactForm";
 import { useForm } from "react-hook-form";
 
@@ -38,6 +38,8 @@ const Artifacts = () => {
     mode: "create",
     artifact: null,
   });
+
+  const [invalidUrls, setInvalidUrls] = useState<string[]>([]);
 
   const artifactForm = useForm<ArtifactDTO>({
     defaultValues: {
@@ -94,16 +96,21 @@ const Artifacts = () => {
   };
 
   const handleSubmit = async (data: ArtifactDTO) => {
+    let success = false;
+    
     if (dialogState.mode === "create") {
-      await createArtifact(data);
+      success = await createArtifact(data);
     } else if (dialogState.mode === "edit" && dialogState.artifact) {
-      await updateArtifact({
+      success = await updateArtifact({
         ...dialogState.artifact,
         artifactName: data.artifactName,
         upstreamUrls: data.upstreamUrls,
       });
     }
-    closeDialog();
+
+    if (success) {
+      closeDialog();
+    }
   };
 
   const handleDelete = async () => {
@@ -113,7 +120,7 @@ const Artifacts = () => {
     }
   };
 
-  const createArtifact = async (data: ArtifactDTO) => {
+  const createArtifact = async (data: ArtifactDTO): Promise<boolean> => {
     const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/`;
     const resp = await browserApiClient(url, {
       method: "POST",
@@ -125,7 +132,7 @@ const Artifacts = () => {
 
     if (!resp.ok) {
       toast.error("Failed to create artifact: " + resp.statusText);
-      return;
+      return false;
     }
 
     const newArtifact = await resp.json();
@@ -135,6 +142,7 @@ const Artifacts = () => {
     }));
 
     toast.success("Artifact created successfully");
+    return true;
   };
 
   const deleteArtifact = async (artifact: ArtifactDTO) => {
@@ -154,29 +162,54 @@ const Artifacts = () => {
     toast.success("Artifact deleted");
   };
 
-  const updateArtifact = async (artifact: ArtifactDTO) => {
+  const updateArtifact = async (artifact: ArtifactDTO): Promise<boolean> => {
     const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}`;
-    const resp = await browserApiClient(url, {
+    const response = await browserApiClient(url, {
       method: "PUT",
       body: JSON.stringify({
         artifactName: artifact.artifactName,
         upstreamUrls: artifact.upstreamUrls || [],
       }),
     });
-    if (!resp.ok) {
-      toast.error("Failed to update artifact: " + resp.statusText);
-      return;
+    if (!response.ok) {
+      toast.error("Failed to update artifact: " + response.statusText);
+      return false;
     }
-    const updatedArtifact = await resp.json();
+
+    interface UpdateArtifactResponse {
+      artifact: ArtifactDTO;
+      invalidURLs: string[];
+    }
+    const resp = await response.json() as UpdateArtifactResponse;
+    const updatedArtifact = resp.artifact;
+
+
+    if (resp.invalidURLs && resp.invalidURLs.length > 0) {
+      setInvalidUrls(resp.invalidURLs); 
+      toast.error(
+        `Some upstream URLs were invalid: ${resp.invalidURLs.join(", ")}`
+      );
+      return false; 
+    }
+
     updateAssetVersionState((prev) => ({
       ...prev!,
       artifacts: prev!.artifacts.map((a) =>
-        a.artifactName === artifact.artifactName ? updatedArtifact : a,
+        a.artifactName === artifact.artifactName ? updatedArtifact : a
       ),
     }));
 
     toast.success("Artifact updated");
+    setInvalidUrls([]); 
+    return true;
   };
+
+  useEffect(() => {
+    // Reset invalid URLs whenever the dialog is opened
+    if (dialogState.isOpen) {
+      setInvalidUrls([]);
+    }
+  }, [dialogState.isOpen]);
 
   return (
     <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
@@ -229,6 +262,7 @@ const Artifacts = () => {
         onSubmit={handleSubmit}
         onDelete={dialogState.mode === "edit" ? handleDelete : undefined}
         isEditMode={dialogState.mode === "edit"}
+        invalidUrls={invalidUrls} 
       />
     </Page>
   );
