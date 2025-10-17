@@ -3,7 +3,7 @@
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ContainerIcon } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import {
@@ -12,15 +12,16 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import useRouterQuery from "../hooks/useRouterQuery";
 
 export function useSelectArtifact(
   unassignPossible: boolean,
   artifacts: string[],
 ) {
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [selectedArtifact, setSelectedArtifact] = useState(
-    (router.query.artifact as string) ||
+    searchParams?.get("artifact") ||
       (unassignPossible ? undefined : artifacts[0]),
   );
 
@@ -102,24 +103,15 @@ export function QueryArtifactSelector({
     unassignPossible,
     artifacts,
   );
-  const router = useRouter();
+  const pushQueryParameter = useRouterQuery();
 
   // add selected artifact to the url query params as ?artifact=artifactName
 
   const handleSelect = (artifact?: string) => {
-    // update the query
-    const newQuery = { ...router.query };
-
-    if (artifact) {
-      newQuery.artifact = artifact;
-    } else {
-      // Remove the artifact parameter when clearing selection
-      delete newQuery.artifact;
-    }
-
-    router.push({
-      query: newQuery,
+    pushQueryParameter({
+      artifact,
     });
+
     setSelectedArtifact(artifact);
   };
 

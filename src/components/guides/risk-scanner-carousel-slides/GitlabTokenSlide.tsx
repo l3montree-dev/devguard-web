@@ -20,6 +20,7 @@ import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
+import { useTheme } from "next-themes";
 
 interface GitlabTokenSlideProps {
   pat?: string;
@@ -40,6 +41,12 @@ const GitlabTokenSlide = ({
   prevIndex,
   yamlGeneratorSlideIndex,
 }: GitlabTokenSlideProps) => {
+  const { theme, resolvedTheme } = useTheme();
+  const imageSrc =
+    theme === "dark"
+      ? "/assets/gitlab-token-dark.png"
+      : "/assets/gitlab-token-white.png";
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -64,7 +71,7 @@ const GitlabTokenSlide = ({
           <ImageZoom
             alt="Open the CI/CD settings in GitLab"
             className="rounded-lg border object-fill"
-            src={"/assets/gitlab-secret.png"}
+            src={imageSrc}
             fill
           />
         </div>

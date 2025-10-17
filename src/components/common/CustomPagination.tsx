@@ -1,12 +1,12 @@
 import { Paged } from "@/types/api/api";
-import React, { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useMemo } from "react";
 
-import { useRouter } from "next/router";
+import useRouterQuery from "../../hooks/useRouterQuery";
 import { Button } from "../ui/button";
 
 const getPaginationData = (currentPage: number, totalPages: number) => {
-  const showFirstPage = currentPage > 3;
-  const showLastPage = currentPage + 2 < totalPages;
+  const showFirstPage = currentPage > 2;
+  const showLastPage = currentPage + 1 < totalPages;
 
   const getPages = (): number[] => {
     if (totalPages <= 3) {
@@ -60,11 +60,11 @@ const CustomPagination: FunctionComponent<Props> = ({
 }) => {
   // calculate the amount of pages
   const pages = Math.ceil(total / pageSize);
-  const router = useRouter();
+  const pushQueryParam = useRouterQuery();
 
   const navigateToPage = (page: number) => {
-    router.push({
-      query: { ...router.query, page },
+    pushQueryParam({
+      page,
     });
   };
 

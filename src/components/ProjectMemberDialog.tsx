@@ -10,19 +10,12 @@ import {
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
-import { useActiveProject } from "../hooks/useActiveProject";
-import Callout from "./common/Callout";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { cn } from "../lib/utils";
-import { Button } from "./ui/button";
-import { useStore } from "../zustand/globalStoreProvider";
 import { UserRole } from "@/types/api/api";
+import { toast } from "sonner";
+import { useUpdateProject } from "../context/ProjectContext";
+import { useActiveProject } from "../hooks/useActiveProject";
+import { MultiselectCombobox } from "./common/MultiselectCombobox";
+import { Button } from "./ui/button";
 
 interface Props {
   isOpen: boolean;
@@ -34,11 +27,17 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
   onOpenChange,
 }) => {
   const activeOrg = useActiveOrg();
-  const activeProject = useActiveProject();
-  const updateProject = useStore((s) => s.updateProject);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const activeProject = useActiveProject()!;
+  const updateProject = useUpdateProject();
+  const [selectedMembers, setSelectedMembers] = useState<
+    Array<{
+      value: string;
+      label: string;
+    }>
+  >([]);
 
   const handleInviteSelectedMembers = async () => {
+    const ids = selectedMembers.map((m) => m.value);
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
@@ -48,7 +47,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
       {
         method: "POST",
         body: JSON.stringify({
-          ids: selectedMembers,
+          ids,
         }),
       },
     );
@@ -61,7 +60,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
         ...activeProject,
         members: activeProject.members.concat(
           activeOrg.members
-            .filter((e) => selectedMembers.includes(e.id))
+            .filter((e) => ids.includes(e.id))
             .map((e) => ({
               ...e,
               role: UserRole.Member,
@@ -90,38 +89,36 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
-            Invite a new member to your organization by entering their email
-            address.
+            Invite someone to participate in the project {activeProject.name}.
+            Make sure they are part of the organization already. Otherwise they
+            need to be invited to the organization first.
           </DialogDescription>
         </DialogHeader>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={cn(
-              "flex h-10 w-full items-center justify-between rounded-md border border-input bg-card px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-            )}
-          >
-            Select the people you would like to invite to the project. (
-            {selectedMembers.length} currently selected)
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-full">
-            {membersToInvite.map((m) => (
-              <DropdownMenuCheckboxItem
-                onClick={() =>
-                  setSelectedMembers((prev) => {
-                    if (prev.includes(m.id)) {
-                      return prev.filter((el) => el !== m.id);
-                    }
-                    return prev.concat(m.id);
-                  })
-                }
-                checked={selectedMembers.includes(m.id)}
-                key={m.id}
-              >
-                {m.name}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <MultiselectCombobox
+          placeholder="Search organization members..."
+          items={membersToInvite.map((r) => ({
+            label: r.name,
+            value: r.id,
+          }))}
+          loading={false}
+          onRemove={(item) => {
+            setSelectedMembers((prev) =>
+              prev.filter((el) => el.value !== item.value),
+            );
+          }}
+          onSelect={(item) => {
+            setSelectedMembers((prev) => {
+              const index = prev.findIndex((el) => el.value === item.value);
+              if (index !== -1) {
+                // remove item
+                return prev.filter((el) => el.value !== item.value);
+              }
+              return prev.concat(item);
+            });
+          }}
+          values={selectedMembers}
+          emptyMessage="No repositories found"
+        />
         <DialogFooter className="mt-2">
           <div className="flex flex-col items-end justify-end gap-2">
             <Button onClick={handleInviteSelectedMembers} type="submit">

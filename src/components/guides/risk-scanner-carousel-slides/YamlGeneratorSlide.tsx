@@ -21,6 +21,8 @@ interface YamlGeneratorSlideProps {
   projectSlug: string;
   assetSlug: string;
   apiUrl: string;
+  frontendUrl: string;
+  devguardCIComponentBase: string;
   activeOrg: OrganizationDetailsDTO;
   activeProject: ProjectDTO | null;
   asset: AssetDTO | null;
@@ -38,6 +40,8 @@ const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   projectSlug,
   assetSlug,
   apiUrl,
+  frontendUrl,
+  devguardCIComponentBase,
   prevIndex,
   api,
   onClose,
@@ -65,6 +69,8 @@ jobs:`
         projectSlug,
         assetSlug,
         apiUrl,
+        frontendUrl,
+        devguardCIComponentBase,
       })[gitInstance]["devsecops"];
       return base + codeString;
     } else {
@@ -76,6 +82,8 @@ jobs:`
             projectSlug,
             assetSlug,
             apiUrl,
+            frontendUrl,
+            devguardCIComponentBase,
           })[gitInstance][selectedOption as keyof Config];
         })
         .map((value) => value)

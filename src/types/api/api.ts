@@ -37,6 +37,8 @@ export enum UserRole {
   Admin = "admin",
   Member = "member",
   Guest = "guest",
+
+  Unknown = "unknown",
 }
 
 export enum RequirementsLevel {
@@ -489,6 +491,14 @@ export interface AssetDTO {
 
   vulnAutoReopenAfterDays?: number;
   repositoryProvider?: "github" | "gitlab";
+
+  members: Array<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+    role?: UserRole.Admin | UserRole.Member;
+  }>;
+  isPublic: boolean;
 }
 
 export interface DependencyTreeNode {

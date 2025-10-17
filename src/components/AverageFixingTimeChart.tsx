@@ -18,6 +18,9 @@ import {
 import { classNames } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
 import { AverageFixingTime } from "../types/api/api";
+import Loading from "./common/Loading";
+import { Loader2 } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
@@ -49,11 +52,12 @@ function getHumanReadableDuration(seconds: number) {
 }
 
 interface Props {
-  avgFixingTime: AverageFixingTime;
+  avgFixingTime: AverageFixingTime | undefined;
   variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
   mode: "risk" | "cvss";
+  isLoading: boolean;
 }
 
 const AverageFixingTimeChart: FunctionComponent<Props> = ({
@@ -62,7 +66,32 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   description,
   variant,
   mode,
+  isLoading,
 }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>
+            {description}. Target Line shows 30 days.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <Skeleton className="w-full h-46" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!avgFixingTime) {
+    avgFixingTime = {
+      averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
+    };
+  }
+
   const seconds =
     mode === "cvss"
       ? avgFixingTime.averageFixingTimeSecondsByCvss
@@ -74,9 +103,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
     <Card>
       <CardHeader>
         <CardTitle className="">{title}</CardTitle>
-        <CardDescription>
-          {description}. Target Line shows 30 days.
-        </CardDescription>
+        <CardDescription>{description}.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="-mb-20 relative">
@@ -151,14 +178,14 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
                 />
               </PolarRadiusAxis>
               <RadialBar
-                fill="hsl(var(--muted-foreground) / 1)"
+                fill="hsl(var(--secondary))"
                 dataKey="should"
                 className="stroke-transparent"
               />
               <RadialBar
                 dataKey="has"
                 cornerRadius={5}
-                fill="hsl(var(--primary) / 1)"
+                fill="hsl(var(--primary))"
                 className="stroke-2"
               />
               {/* Custom reference line */}

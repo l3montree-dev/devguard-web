@@ -1,7 +1,6 @@
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useLoader } from "@/hooks/useLoader";
-import { generateNewSecret } from "@/pages/[organizationSlug]/projects/[projectSlug]/assets/[assetSlug]/settings";
 import { browserApiClient } from "@/services/devGuardApi";
 import { WebhookDTO } from "@/types/api/api";
 import React, { FunctionComponent, ReactNode, useEffect } from "react";
@@ -37,6 +36,7 @@ import {
 
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
+import { generateNewSecret } from "../../utils/view";
 
 interface Props {
   Button: ReactNode;

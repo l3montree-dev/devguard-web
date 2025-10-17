@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 import { browserApiClient } from "@/services/devGuardApi";
 import { OrganizationDetailsDTO } from "@/types/api/api";
 import { ExternalTicketProvider } from "@/types/common";
-import { useStore } from "@/zustand/globalStoreProvider";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useUpdateSession } from "../../context/SessionContext";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
@@ -30,7 +30,7 @@ export default function ProviderSetup({
   selectRepoSlideIndex,
   isLoadingRepositories,
 }: ProviderSetupProps) {
-  const updateOrganization = useStore((s) => s.updateOrganization);
+  const updateOrganization = useUpdateSession();
 
   const handleDelete = async (id: string) => {
     const resp = await browserApiClient(
@@ -41,12 +41,13 @@ export default function ProviderSetup({
     );
 
     if (resp.ok) {
-      updateOrganization({
+      updateOrganization((prev) => ({
+        ...prev,
         ...activeOrg,
         gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
           (i) => i.id !== id,
         ),
-      });
+      }));
     }
   };
 

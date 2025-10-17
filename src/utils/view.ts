@@ -16,10 +16,13 @@ import {
   AssetDTO,
   OrganizationDetailsDTO,
   ProjectDTO,
+  ReleaseRiskHistory,
+  RiskHistory,
   VulnEventDTO,
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
+import { config } from "../config";
 
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
@@ -284,3 +287,76 @@ export const generateColor = (str: string) => {
 
   return colors[hash % colors.length];
 };
+
+export const reduceRiskHistories = (
+  histories: RiskHistory[][],
+): Array<ReleaseRiskHistory> => {
+  return histories.map((dayHistories) => {
+    return dayHistories.reduce(
+      (acc, curr) => {
+        acc.low += curr.low;
+        acc.medium += curr.medium;
+        acc.high += curr.high;
+        acc.critical += curr.critical;
+        acc.lowCvss += curr.lowCvss;
+        acc.mediumCvss += curr.mediumCvss;
+        acc.highCvss += curr.highCvss;
+        acc.criticalCvss += curr.criticalCvss;
+        return acc;
+      },
+      {
+        id: dayHistories[0]?.id || "",
+        day: dayHistories[0]?.day || new Date(),
+        assetId: dayHistories[0]?.assetId || "",
+        artifactName: dayHistories[0]?.artifactName || "",
+        low: 0,
+        medium: 0,
+        high: 0,
+        critical: 0,
+        lowCvss: 0,
+        mediumCvss: 0,
+        highCvss: 0,
+        criticalCvss: 0,
+      } as RiskHistory,
+    );
+  });
+};
+
+export const generateNewSecret = (): string => {
+  return crypto.randomUUID();
+};
+
+export interface ContentTreeElement extends ProjectDTO {
+  assets: Array<AssetDTO>;
+}
+
+export const normalizeContentTree = (
+  contentTree: Array<ContentTreeElement>,
+) => {
+  const assetMap: {
+    [key: string]:
+      | (AssetDTO & {
+          project: ProjectDTO;
+        })
+      | undefined;
+  } = {};
+
+  contentTree.forEach((element) => {
+    element.assets.forEach((asset) => {
+      assetMap[asset.id] = {
+        ...asset,
+        project: {
+          ...element,
+          // @ts-expect-error
+          assets: undefined, // remove assets to avoid circular reference
+        },
+      };
+    });
+  });
+
+  return assetMap;
+};
+
+export interface ThemeConfig {
+  config: typeof config;
+}

@@ -1,9 +1,8 @@
 import { AssetFormValues } from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CarouselApi, CarouselItem } from "@/components/ui/carousel";
+import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -11,8 +10,8 @@ import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useUpdateAsset } from "../../../context/AssetContext";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
-import { useStore } from "../../../zustand/globalStoreProvider";
 
 interface StartSlideProps {
   api?: {
@@ -51,7 +50,7 @@ export default function SelectRepoSlide({
 
   const asset = useActiveAsset()!;
   const project = useActiveProject();
-  const updateAsset = useStore((s) => s.updateAsset);
+  const updateAsset = useUpdateAsset();
 
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,
@@ -126,7 +125,7 @@ export default function SelectRepoSlide({
           Title={
             <div className="flex flex-row gap-2">
               <div
-                className={`flex-1  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
+                className={`flex-1 min-w-0  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
               >
                 <Combobox
                   onValueChange={handleSearchRepos}
@@ -143,40 +142,42 @@ export default function SelectRepoSlide({
                   emptyMessage="No repositories found"
                 />
               </div>
-              {repoSelectedAndSet ? (
-                <Button
-                  variant={"destructive"}
-                  onClick={async () => {
-                    if (selectedRepo) {
-                      await handleUpdateSelectedRepository({
-                        repositoryId: "",
-                        repositoryName: "",
-                      });
-                      setSelectedRepo(null);
-                      setRepoSelectedAndSet(false);
-                    }
-                  }}
-                >
-                  Disconnect
-                </Button>
-              ) : (
-                <Button
-                  onClick={async () => {
-                    if (selectedRepo) {
-                      await handleUpdateSelectedRepository({
-                        repositoryId: selectedRepo.id,
-                        repositoryName: selectedRepo.name,
-                      });
-                      setEditRepo(false);
-                      setRepoSelectedAndSet(true);
-                    }
-                  }}
-                  disabled={!Boolean(selectedRepo) || !hasIntegration}
-                  variant="secondary"
-                >
-                  Connect
-                </Button>
-              )}
+              <div className="flex-shrink-0">
+                {repoSelectedAndSet ? (
+                  <Button
+                    variant={"destructive"}
+                    onClick={async () => {
+                      if (selectedRepo) {
+                        await handleUpdateSelectedRepository({
+                          repositoryId: "",
+                          repositoryName: "",
+                        });
+                        setSelectedRepo(null);
+                        setRepoSelectedAndSet(false);
+                      }
+                    }}
+                  >
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={async () => {
+                      if (selectedRepo) {
+                        await handleUpdateSelectedRepository({
+                          repositoryId: selectedRepo.id,
+                          repositoryName: selectedRepo.name,
+                        });
+                        setEditRepo(false);
+                        setRepoSelectedAndSet(true);
+                      }
+                    }}
+                    disabled={!Boolean(selectedRepo) || !hasIntegration}
+                    variant="secondary"
+                  >
+                    Connect
+                  </Button>
+                )}
+              </div>
             </div>
           }
           Description={

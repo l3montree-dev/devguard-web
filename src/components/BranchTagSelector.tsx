@@ -1,7 +1,7 @@
 import { AssetVersionDTO } from "@/types/api/api";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon, StarIcon } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import {
@@ -13,6 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
+import useDecodedParams from "../hooks/useDecodedParams";
+import useRouterQuery from "../hooks/useRouterQuery";
+import { usePathname } from "next/navigation";
 
 export function BranchTagSelector({
   branches,
@@ -24,9 +27,14 @@ export function BranchTagSelector({
   const router = useRouter();
   const [view, setView] = useState("branches");
   const items = view === "branches" ? branches : tags;
+  const params = useDecodedParams() as {
+    assetVersionSlug: string;
+    organizationSlug: string;
+    assetSlug: string;
+    projectSlug: string;
+  };
   const [selected, setSelected] = useState(
-    items.find((i) => i.slug === (router.query.assetVersionSlug as string))
-      ?.name ||
+    items.find((i) => i.slug === params.assetVersionSlug)?.name ||
       branches?.[0]?.name ||
       tags?.[0]?.name ||
       "",
@@ -44,6 +52,8 @@ export function BranchTagSelector({
     }
     return items.filter((item) => item.name.includes(filter));
   }, [items, filter]);
+
+  const pathname = usePathname();
 
   return (
     <DropdownMenu>
@@ -89,14 +99,17 @@ export function BranchTagSelector({
                 checked={selected === item.name}
                 key={item.slug}
                 onClick={() => {
-                  router.push(
-                    {
-                      query: { ...router.query, assetVersionSlug: item.slug },
-                    },
-                    undefined,
-                    { shallow: false },
-                  );
+                  if (!pathname) {
+                    return;
+                  }
 
+                  let pageArr = pathname.split("/refs/")[1].split("/");
+                  // the first element is the current refname
+                  pageArr = pageArr.slice(1);
+
+                  router?.push(
+                    `/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${item.slug}/${pageArr.join("/")}`,
+                  );
                   setSelected(item.name);
                 }}
               >

@@ -1,20 +1,9 @@
-import { useStore } from "@/zustand/globalStoreProvider";
 import { useMemo } from "react";
+import { useAssetVersion } from "../context/AssetVersionContext";
 import { useActiveAsset } from "./useActiveAsset";
-import { GlobalStore } from "../zustand/globalStore";
-
-const assetVersionSelector = (s: GlobalStore) => {
-  if (s.assetVersion) {
-    // make sure the asset version is the same as the active asset
-    if (s.assetVersion.assetId === s.asset?.id) {
-      return s.assetVersion;
-    }
-  }
-  return undefined;
-};
 
 export function useActiveAssetVersion() {
-  return useStore(assetVersionSelector);
+  return useAssetVersion();
 }
 
 export function useAssetBranchesAndTags() {

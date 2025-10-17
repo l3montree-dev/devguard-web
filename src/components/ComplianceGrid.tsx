@@ -1,6 +1,7 @@
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { FunctionComponent, useMemo } from "react";
+import useDecodedPathname from "../hooks/useDecodedPathname";
 import { PolicyEvaluation } from "../types/api/api";
 import { classNames } from "../utils/common";
 import { Badge } from "./ui/badge";
@@ -16,15 +17,14 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
   );
 
   const router = useRouter();
+  const pathname = useDecodedPathname();
   return (
     <div>
       <div className="grid-cols-25 grid gap-1">
         {compliance.map((policy) => (
           <Tooltip key={policy.title}>
             <TooltipTrigger
-              onClick={() =>
-                router.push(router.asPath + "/compliance/" + policy.id)
-              }
+              onClick={() => router.push(pathname + "/compliance/" + policy.id)}
             >
               <div
                 className={classNames(
