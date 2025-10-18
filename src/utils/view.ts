@@ -14,6 +14,7 @@
 
 import {
   AssetDTO,
+  ComponentRisk,
   OrganizationDetailsDTO,
   ProjectDTO,
   ReleaseRiskHistory,
@@ -48,6 +49,35 @@ export const emptyThenNull = (input: string | null): string | null => {
   }
   return input;
 };
+
+export const sortRisk =
+  (viewMode: "risk" | "cvss") =>
+  (a: ComponentRisk[string], b: ComponentRisk[string]) => {
+    if (viewMode === "cvss") {
+      if (a.criticalCvss !== b.criticalCvss) {
+        return b.criticalCvss - a.criticalCvss;
+      }
+      if (a.highCvss !== b.highCvss) {
+        return b.highCvss - a.highCvss;
+      }
+      if (a.mediumCvss !== b.mediumCvss) {
+        return b.mediumCvss - a.mediumCvss;
+      }
+      return b.lowCvss - a.lowCvss;
+    }
+
+    // critical > high > medium > low
+    if (a.critical !== b.critical) {
+      return b.critical - a.critical;
+    }
+    if (a.high !== b.high) {
+      return b.high - a.high;
+    }
+    if (a.medium !== b.medium) {
+      return b.medium - a.medium;
+    }
+    return b.low - a.low;
+  };
 
 export const vexOptionMessages: Record<string, string> = {
   component_not_present: "The vulnerable component is not part of the product.",

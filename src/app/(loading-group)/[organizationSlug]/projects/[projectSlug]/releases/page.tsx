@@ -76,7 +76,6 @@ const Releases = () => {
     );
 
     if (resp.ok) {
-      router.refresh();
       toast.success("Release created");
       setOpen(false);
       mutate();
@@ -97,8 +96,8 @@ const Releases = () => {
     );
 
     if (resp.ok) {
-      router.refresh();
       toast.success("Release deleted");
+      mutate();
     } else {
       toast.error("Failed to delete release");
     }
