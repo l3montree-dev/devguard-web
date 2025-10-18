@@ -18,12 +18,37 @@ import {
   useUpdateAssetVersionState,
 } from "../../../../../../../../../../context/AssetVersionContext";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import CollapseList from "@/components/common/CollapseList";
+import { useState, useEffect } from "react";
+import ArtifactForm from "@/components/common/ArtifactForm";
+import { useForm } from "react-hook-form";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
 
   const artifacts = useArtifacts();
   const updateAssetVersionState = useUpdateAssetVersionState();
+
+  const [dialogState, setDialogState] = useState<{
+    isOpen: boolean;
+    mode: "create" | "edit";
+    artifact: ArtifactDTO | null;
+  }>({
+    isOpen: false,
+    mode: "create",
+    artifact: null,
+  });
+
+  const [invalidUrls, setInvalidUrls] = useState<string[]>([]);
+
+  const artifactForm = useForm<ArtifactDTO>({
+    defaultValues: {
+      artifactName: "",
+      assetId: "",
+      assetVersionName: "",
+      upstreamUrls: [],
+    },
+  });
 
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -32,6 +57,93 @@ const Artifacts = () => {
       assetSlug: string;
       assetVersionSlug: string;
     };
+
+  const openCreateDialog = () => {
+    setDialogState({
+      isOpen: true,
+      mode: "create",
+      artifact: null,
+    });
+    artifactForm.reset({
+      artifactName: "",
+      assetId: "",
+      assetVersionName: "",
+      upstreamUrls: [],
+    });
+  };
+
+  const openEditDialog = (artifact: ArtifactDTO) => {
+    setDialogState({
+      isOpen: true,
+      mode: "edit",
+      artifact: artifact,
+    });
+    artifactForm.reset({
+      artifactName: artifact.artifactName,
+      assetId: artifact.assetId,
+      assetVersionName: artifact.assetVersionName,
+      upstreamUrls: artifact.upstreamUrls || [],
+    });
+  };
+
+  const closeDialog = () => {
+    setDialogState({
+      isOpen: false,
+      mode: "create",
+      artifact: null,
+    });
+    artifactForm.reset();
+  };
+
+  const handleSubmit = async (data: ArtifactDTO) => {
+    let success = false;
+    
+    if (dialogState.mode === "create") {
+      success = await createArtifact(data);
+    } else if (dialogState.mode === "edit" && dialogState.artifact) {
+      success = await updateArtifact({
+        ...dialogState.artifact,
+        artifactName: data.artifactName,
+        upstreamUrls: data.upstreamUrls,
+      });
+    }
+
+    if (success) {
+      closeDialog();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (dialogState.artifact) {
+      await deleteArtifact(dialogState.artifact);
+      closeDialog();
+    }
+  };
+
+  const createArtifact = async (data: ArtifactDTO): Promise<boolean> => {
+    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/`;
+    const resp = await browserApiClient(url, {
+      method: "POST",
+      body: JSON.stringify({
+        artifactName: data.artifactName,
+        upstreamUrls: data.upstreamUrls || [],
+      }),
+    });
+
+    if (!resp.ok) {
+      toast.error("Failed to create artifact: " + resp.statusText);
+      return false;
+    }
+
+    const newArtifact = await resp.json();
+    updateAssetVersionState((prev) => ({
+      ...prev!,
+      artifacts: [...prev!.artifacts, newArtifact],
+    }));
+
+    toast.success("Artifact created successfully");
+    return true;
+  };
 
   const deleteArtifact = async (artifact: ArtifactDTO) => {
     const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}/`;
@@ -50,6 +162,55 @@ const Artifacts = () => {
     toast.success("Artifact deleted");
   };
 
+  const updateArtifact = async (artifact: ArtifactDTO): Promise<boolean> => {
+    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}`;
+    const response = await browserApiClient(url, {
+      method: "PUT",
+      body: JSON.stringify({
+        artifactName: artifact.artifactName,
+        upstreamUrls: artifact.upstreamUrls || [],
+      }),
+    });
+    if (!response.ok) {
+      toast.error("Failed to update artifact: " + response.statusText);
+      return false;
+    }
+
+    interface UpdateArtifactResponse {
+      artifact: ArtifactDTO;
+      invalidURLs: string[];
+    }
+    const resp = await response.json() as UpdateArtifactResponse;
+    const updatedArtifact = resp.artifact;
+
+
+    if (resp.invalidURLs && resp.invalidURLs.length > 0) {
+      setInvalidUrls(resp.invalidURLs); 
+      toast.error(
+        `Some upstream URLs were invalid: ${resp.invalidURLs.join(", ")}`
+      );
+      return false; 
+    }
+
+    updateAssetVersionState((prev) => ({
+      ...prev!,
+      artifacts: prev!.artifacts.map((a) =>
+        a.artifactName === artifact.artifactName ? updatedArtifact : a
+      ),
+    }));
+
+    toast.success("Artifact updated");
+    setInvalidUrls([]); 
+    return true;
+  };
+
+  useEffect(() => {
+    // Reset invalid URLs whenever the dialog is opened
+    if (dialogState.isOpen) {
+      setInvalidUrls([]);
+    }
+  }, [dialogState.isOpen]);
+
   return (
     <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
       <div className="flex flex-row">
@@ -59,31 +220,50 @@ const Artifacts = () => {
             description="Manage and view artifacts associated with this asset version."
             title="Artifacts"
             forceVertical
+            Button={
+              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+            }
           >
-            {artifacts.length === 0 && (
-              <EmptyParty
-                title="No Artifacts Available"
-                description="There are currently no artifacts associated with this asset version."
-              />
-            )}
-            {artifacts.map((artifact) => (
-              <ListItem
-                key={artifact.artifactName + artifact.assetVersionName}
-                Title={artifact.artifactName}
-                Button={
-                  <Alert
-                    onConfirm={() => deleteArtifact(artifact)}
-                    title="Delete Artifact"
-                    description={`Are you sure you want to delete the artifact "${artifact.artifactName}"? This action cannot be undone.`}
-                  >
-                    <Button variant="destructive">Delete</Button>
-                  </Alert>
-                }
-              />
-            ))}
+            <div>
+              {artifacts.length === 0 && (
+                <EmptyParty
+                  title="No Artifacts Available"
+                  description="There are currently no artifacts associated with this asset version."
+                />
+              )}
+              {artifacts.map((artifact) => (
+                <CollapseList
+                  key={artifact.artifactName + artifact.assetVersionName}
+                  Title={artifact.artifactName}
+                  Items={artifact.upstreamUrls?.map((upstreamUrl, index) => ({
+                    Title: upstreamUrl.upstreamUrl,
+                    className: index % 2 === 0 ? "bg-card" : "bg-card/50",
+                  }))}
+                  Button={
+                    <Button
+                      variant="secondary"
+                      onClick={() => openEditDialog(artifact)}
+                    >
+                      Edit
+                    </Button>
+                  }
+                  className="mb-4"
+                ></CollapseList>
+              ))}
+            </div>
           </Section>
         </div>
       </div>
+
+      <ArtifactForm
+        form={artifactForm}
+        isOpen={dialogState.isOpen}
+        onOpenChange={(open) => !open && closeDialog()}
+        onSubmit={handleSubmit}
+        onDelete={dialogState.mode === "edit" ? handleDelete : undefined}
+        isEditMode={dialogState.mode === "edit"}
+        invalidUrls={invalidUrls} 
+      />
     </Page>
   );
 };
