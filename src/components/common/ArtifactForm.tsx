@@ -24,6 +24,7 @@ import { Input } from "../ui/input";
 import { Trash2, Plus } from "lucide-react";
 import Alert from "./Alert";
 import ListItem from "./ListItem";
+import { useState, useEffect } from "react";
 
 interface Props {
   form: UseFormReturn<ArtifactDTO>;
@@ -48,6 +49,12 @@ const ArtifactForm = ({
     control: form.control,
     name: "upstreamUrls",
   });
+
+  useEffect(() => {
+    if (invalidUrls.length > 0) {
+      form.trigger("upstreamUrls");
+    }
+  }, [invalidUrls, form]);
 
   const handleSubmit = async (data: ArtifactDTO) => {
     if (onSubmit) {

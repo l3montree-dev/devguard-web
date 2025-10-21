@@ -172,7 +172,7 @@ export interface ProjectDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 }
-export type ExpandedVulnDTOState = VulnDTO["state"] | "not-found";
+export type ExpandedVulnDTOState = VulnDTO["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;

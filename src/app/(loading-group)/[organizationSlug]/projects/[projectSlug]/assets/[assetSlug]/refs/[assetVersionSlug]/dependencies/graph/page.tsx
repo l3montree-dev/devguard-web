@@ -214,7 +214,7 @@ const DependencyGraphPage: FunctionComponent = () => {
 
 export default DependencyGraphPage;
 
-const RISK_INHERITANCE_FACTOR = 1;
+const RISK_INHERITANCE_FACTOR = 0.3;
 const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<VulnDTO>,
@@ -232,9 +232,11 @@ const recursiveAddRisk = (
     let i = 0;
     while (parent != null) {
       i++;
+      if (parent.name.startsWith("pkg:") ){
       parent.risk = parent.risk
         ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
         : node.risk * (RISK_INHERITANCE_FACTOR / i);
+      }
       parent = parent.parent;
     }
   }

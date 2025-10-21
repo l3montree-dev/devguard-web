@@ -41,7 +41,7 @@ import {
 import { CircleHelp, Loader2 } from "lucide-react";
 import Section from "@/components/common/Section";
 
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buildFilterSearchParams } from "@/utils/url";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -62,27 +62,35 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 
 const columnHelper = createColumnHelper<DetailedDependencyVulnDTO>();
 
-const allowedStates: VulnDTO["state"][] = [
-  "open",
-  "fixed",
-  "accepted",
-  "falsePositive",
-  "markedForTransfer",
-];
+
+const convertTypeToState = (type: string): ExpandedVulnDTOState => {
+  switch (type) {
+    case "open":
+      return "open";
+    case "fixed":
+      return "fixed";
+    case "accepted":
+      return "accepted";
+    case "falsePositive":
+      return "falsePositive";
+    case "markedForTransfer":
+      return "markedForTransfer";
+     case "detected":
+      return "open" 
+      default:
+      return "not-found";
+  }
+};
+
 
 const getState = (
-  upstream: number,
+  upstream: boolean,
   events: VulnEventDTO[],
 ): ExpandedVulnDTOState => {
-  for (let i = events.length - 1; i >= 0; i--) {
-    if (
-      events[i].upstream === upstream &&
-      allowedStates.includes(events[i].type as VulnDTO["state"])
-    ) {
-      return events[i].type as VulnDTO["state"];
-    }
-  }
-  return "not-found";
+  const event = events.findLast(e =>
+    upstream ? e.upstream === 2 : e.upstream !== 2
+  );
+  return event ? convertTypeToState(event.type) : "not-found";
 };
 
 const getJustification = (
@@ -133,7 +141,7 @@ const baseColumnsDef: ColumnDef<DetailedDependencyVulnDTO, any>[] = [
     enableSorting: false,
     cell: ({ row }: any) => (
       <div className="w-fit">
-        <VulnState state={getState(2, row.original.events)} />
+        <VulnState state={getState(false, row.original.events)} />
       </div>
     ),
   },
@@ -143,7 +151,7 @@ const baseColumnsDef: ColumnDef<DetailedDependencyVulnDTO, any>[] = [
     enableSorting: false,
     cell: ({ row }: any) => (
       <div className="w-fit">
-        <VulnState state={getState(1, row.original.events)} />
+        <VulnState state={getState(true, row.original.events)} />
       </div>
     ),
   },
@@ -153,7 +161,7 @@ const baseColumnsDef: ColumnDef<DetailedDependencyVulnDTO, any>[] = [
     enableSorting: false,
     cell: ({ row }: any) => (
       <span className="text-foreground">
-        {getJustification(1, row.original.events)}
+        {getJustification(2, row.original.events)}
       </span>
     ),
   },
@@ -207,6 +215,7 @@ const Index: FunctionComponent = () => {
   const {
     data: vulns,
     isLoading,
+    mutate,
     error,
   } = useSWR<Paged<DetailedDependencyVulnDTO>>(
     uri +
@@ -240,7 +249,7 @@ const Index: FunctionComponent = () => {
         <div
           className={`w-fit rounded-full ${!vulnsToUpdate?.includes(row.original.id) ? "border border-yellow-300" : ""}`}
         >
-          <VulnState state={getState(2, row.original.events)} />
+          <VulnState state={getState(false, row.original.events)} />
         </div>
       ),
     },
@@ -252,7 +261,7 @@ const Index: FunctionComponent = () => {
         <div
           className={`w-fit rounded-full ${vulnsToUpdate?.includes(row.original.id) ? "border border-yellow-300" : ""}`}
         >
-          <VulnState state={getState(1, row.original.events)} />
+          <VulnState state={getState(true, row.original.events)} />
         </div>
       ),
     },
@@ -351,7 +360,10 @@ const Index: FunctionComponent = () => {
       console.error("Error syncing vulnerabilities:", error);
       toast.error("Error syncing vulnerabilities");
     }
+    mutate();
   };
+
+  console.log("vulsn", vulns);
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>

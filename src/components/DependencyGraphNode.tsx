@@ -50,6 +50,7 @@ export const DependencyGraphNode: FunctionComponent<
     beautifyPurl(props.data.label);
   const router = useRouter();
   const version = extractVersion(props.data.label);
+  const artifactName = searchParams?.get("artifact");
   const Node = (
     <div
       style={{
@@ -58,8 +59,12 @@ export const DependencyGraphNode: FunctionComponent<
         // backgroundColor: props.data.vuln !== undefined ? color : "white",
       }}
       className={classNames(
-        "relative rounded border bg-card p-3 text-xs text-card-foreground",
+        "relative  border bg-card p-3 text-xs text-card-foreground",
         shouldFocus ? "border-2 border-primary" : "",
+        // check if valid purl
+        props.data.label.startsWith("pkg:")
+          ? "rounded"
+          : "rounded-full",
       )}
     >
       <Handle
@@ -85,8 +90,7 @@ export const DependencyGraphNode: FunctionComponent<
           </span>
         )}
         <label htmlFor="text" className="text-left">
-          {beautifyPurl(props.data.label)}
-          {version ? `@${version}` : ""}
+          {props.data.label}
         </label>
       </div>
       <Handle
