@@ -1,6 +1,6 @@
 "use client";
 
-import { groupBy } from "lodash";
+import { groupBy, shuffle } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import useSWR from "swr";
@@ -50,6 +50,7 @@ import { beautifyPurl, classNames } from "../../../../../../utils/common";
 import {
   normalizeContentTree,
   reduceRiskHistories,
+  sortRisk,
 } from "../../../../../../utils/view";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 
@@ -246,6 +247,16 @@ const OverviewPage = () => {
     );
   }, [completeRiskHistory, mode]);
 
+  const vulnerableArtifacts = useMemo(() => {
+    if (completeRiskHistory.length === 0) return [];
+    const latestRiskHistory =
+      completeRiskHistory[completeRiskHistory.length - 1];
+
+    const sorter = sortRisk(mode);
+
+    return latestRiskHistory.sort(sorter).slice(0, 7);
+  }, [completeRiskHistory, mode]);
+
   if (releases?.data.length === 0) {
     return (
       <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
@@ -374,81 +385,76 @@ const OverviewPage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col gap-2">
-                    {completeRiskHistory.length > 0 &&
-                      completeRiskHistory[completeRiskHistory.length - 1]
-                        .slice(0, 7)
-                        .map((r, i, arr) => {
-                          const asset = normalizedContentTree[r.assetId || ""];
+                    {vulnerableArtifacts.map((r, i, arr) => {
+                      const asset = normalizedContentTree[r.assetId || ""];
 
-                          return (
-                            <div
-                              key={r.id}
-                              className={classNames(
-                                i === 0
-                                  ? "border-b pb-4"
-                                  : i === arr.length - 1
-                                    ? "pt-4"
-                                    : "border-b py-4",
-                                "flex items-center flex-row gap-4",
-                              )}
-                            >
-                              <div className="flex-1">
-                                <Avatar
-                                  name={
-                                    asset?.name
-                                      ? asset.name
-                                      : r.artifactName || ""
+                      return (
+                        <div
+                          key={r.id}
+                          className={classNames(
+                            i === 0
+                              ? "border-b pb-4"
+                              : i === arr.length - 1
+                                ? "pt-4"
+                                : "border-b py-4",
+                            "flex items-center flex-row gap-4",
+                          )}
+                        >
+                          <div className="flex-1">
+                            <Avatar
+                              name={
+                                asset?.name ? asset.name : r.artifactName || ""
+                              }
+                              avatar={asset?.avatar}
+                            />
+                          </div>
+                          <div className="w-full">
+                            <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <span className="text-foreground text-left line-clamp-1">
+                                    {beautifyPurl(r.artifactName || "")}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {r.artifactName}
+                                </TooltipContent>
+                              </Tooltip>
+                              <div className="flex whitespace-nowrap flex-row flex-wrap gap-2">
+                                <CVERainbowBadge
+                                  low={
+                                    mode === "risk"
+                                      ? (r?.low ?? 0)
+                                      : (r?.lowCvss ?? 0)
                                   }
-                                  avatar={asset?.avatar}
+                                  medium={
+                                    mode === "risk"
+                                      ? (r?.medium ?? 0)
+                                      : (r?.mediumCvss ?? 0)
+                                  }
+                                  high={
+                                    mode === "risk"
+                                      ? (r?.high ?? 0)
+                                      : (r?.highCvss ?? 0)
+                                  }
+                                  critical={
+                                    mode === "risk"
+                                      ? (r?.critical ?? 0)
+                                      : (r?.criticalCvss ?? 0)
+                                  }
                                 />
                               </div>
-                              <div className="w-full">
-                                <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <span className="text-foreground text-left line-clamp-1">
-                                        {beautifyPurl(r.artifactName || "")}
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      {r.artifactName}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                  <div className="flex whitespace-nowrap flex-row flex-wrap gap-2">
-                                    <CVERainbowBadge
-                                      low={
-                                        mode === "risk"
-                                          ? (r?.low ?? 0)
-                                          : (r?.lowCvss ?? 0)
-                                      }
-                                      medium={
-                                        mode === "risk"
-                                          ? (r?.medium ?? 0)
-                                          : (r?.mediumCvss ?? 0)
-                                      }
-                                      high={
-                                        mode === "risk"
-                                          ? (r?.high ?? 0)
-                                          : (r?.highCvss ?? 0)
-                                      }
-                                      critical={
-                                        mode === "risk"
-                                          ? (r?.critical ?? 0)
-                                          : (r?.criticalCvss ?? 0)
-                                      }
-                                    />
-                                  </div>
-                                </div>
-
-                                <p className="text-sm text-muted-foreground">
-                                  {asset?.description
-                                    ? asset.description
-                                    : "No description available"}
-                                </p>
-                              </div>
                             </div>
-                          );
-                        })}
+
+                            <p className="text-sm text-muted-foreground">
+                              {asset?.description
+                                ? asset.description
+                                : "No description available"}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="flex items-center gap-4"></div>
                 </CardContent>
