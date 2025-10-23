@@ -33,7 +33,7 @@ interface Props {
   onSubmit?: (data: ArtifactDTO) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   isEditMode?: boolean;
-  invalidUrls?: string[]; 
+  invalidUrls?: string[];
 }
 
 const ArtifactForm = ({
@@ -43,7 +43,7 @@ const ArtifactForm = ({
   onSubmit,
   onDelete,
   isEditMode = false,
-  invalidUrls = [], 
+  invalidUrls = [],
 }: Props) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -186,8 +186,8 @@ const ArtifactForm = ({
                         ? "Updating..."
                         : "Creating..."
                       : isEditMode
-                      ? "Update"
-                      : "Create"}
+                        ? "Update"
+                        : "Create"}
                   </Button>
                 </div>
                 <div className="flex gap-2 w-full">

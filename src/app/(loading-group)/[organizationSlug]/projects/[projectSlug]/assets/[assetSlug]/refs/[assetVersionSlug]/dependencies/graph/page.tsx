@@ -232,10 +232,10 @@ const recursiveAddRisk = (
     let i = 0;
     while (parent != null) {
       i++;
-      if (parent.name.startsWith("pkg:") ){
-      parent.risk = parent.risk
-        ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
-        : node.risk * (RISK_INHERITANCE_FACTOR / i);
+      if (parent.name.startsWith("pkg:")) {
+        parent.risk = parent.risk
+          ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
+          : node.risk * (RISK_INHERITANCE_FACTOR / i);
       }
       parent = parent.parent;
     }

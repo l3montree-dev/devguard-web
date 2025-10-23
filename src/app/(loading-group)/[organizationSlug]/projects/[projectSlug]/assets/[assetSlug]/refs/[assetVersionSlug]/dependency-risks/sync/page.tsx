@@ -62,7 +62,6 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 
 const columnHelper = createColumnHelper<DetailedDependencyVulnDTO>();
 
-
 const convertTypeToState = (type: string): ExpandedVulnDTOState => {
   switch (type) {
     case "open":
@@ -75,20 +74,19 @@ const convertTypeToState = (type: string): ExpandedVulnDTOState => {
       return "falsePositive";
     case "markedForTransfer":
       return "markedForTransfer";
-     case "detected":
-      return "open" 
-      default:
+    case "detected":
+      return "open";
+    default:
       return "not-found";
   }
 };
-
 
 const getState = (
   upstream: boolean,
   events: VulnEventDTO[],
 ): ExpandedVulnDTOState => {
-  const event = events.findLast(e =>
-    upstream ? e.upstream === 2 : e.upstream !== 2
+  const event = events.findLast((e) =>
+    upstream ? e.upstream === 2 : e.upstream !== 2,
   );
   return event ? convertTypeToState(event.type) : "not-found";
 };
@@ -230,7 +228,6 @@ const Index: FunctionComponent = () => {
   const handleSearch = useDebouncedQuerySearch();
   const params = useSearchParams();
 
-
   useEffect(() => {
     if (vulns?.data) {
       setVulnsToUpdate(vulns.data.map((v) => v.id));
@@ -355,7 +352,6 @@ const Index: FunctionComponent = () => {
       }
 
       toast.success("Vulnerabilities synced successfully");
-
     } catch (error) {
       console.error("Error syncing vulnerabilities:", error);
       toast.error("Error syncing vulnerabilities");

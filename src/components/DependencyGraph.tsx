@@ -186,7 +186,6 @@ const DependencyGraph: FunctionComponent<{
 }> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();
   const searchParams = useSearchParams();
-  
 
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 

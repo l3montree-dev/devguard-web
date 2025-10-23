@@ -97,7 +97,7 @@ const Artifacts = () => {
 
   const handleSubmit = async (data: ArtifactDTO) => {
     let success = false;
-    
+
     if (dialogState.mode === "create") {
       success = await createArtifact(data);
     } else if (dialogState.mode === "edit" && dialogState.artifact) {
@@ -180,27 +180,26 @@ const Artifacts = () => {
       artifact: ArtifactDTO;
       invalidURLs: string[];
     }
-    const resp = await response.json() as UpdateArtifactResponse;
+    const resp = (await response.json()) as UpdateArtifactResponse;
     const updatedArtifact = resp.artifact;
 
-
     if (resp.invalidURLs && resp.invalidURLs.length > 0) {
-      setInvalidUrls(resp.invalidURLs); 
+      setInvalidUrls(resp.invalidURLs);
       toast.error(
-        `Some upstream URLs were invalid: ${resp.invalidURLs.join(", ")}`
+        `Some upstream URLs were invalid: ${resp.invalidURLs.join(", ")}`,
       );
-      return false; 
+      return false;
     }
 
     updateAssetVersionState((prev) => ({
       ...prev!,
       artifacts: prev!.artifacts.map((a) =>
-        a.artifactName === artifact.artifactName ? updatedArtifact : a
+        a.artifactName === artifact.artifactName ? updatedArtifact : a,
       ),
     }));
 
     toast.success("Artifact updated");
-    setInvalidUrls([]); 
+    setInvalidUrls([]);
     return true;
   };
 
@@ -262,7 +261,7 @@ const Artifacts = () => {
         onSubmit={handleSubmit}
         onDelete={dialogState.mode === "edit" ? handleDelete : undefined}
         isEditMode={dialogState.mode === "edit"}
-        invalidUrls={invalidUrls} 
+        invalidUrls={invalidUrls}
       />
     </Page>
   );

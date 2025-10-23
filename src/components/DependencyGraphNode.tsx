@@ -62,9 +62,7 @@ export const DependencyGraphNode: FunctionComponent<
         "relative  border bg-card p-3 text-xs text-card-foreground",
         shouldFocus ? "border-2 border-primary" : "",
         // check if valid purl
-        props.data.label.startsWith("pkg:")
-          ? "rounded"
-          : "rounded-full",
+        props.data.label.startsWith("pkg:") ? "rounded" : "rounded-full",
       )}
     >
       <Handle
