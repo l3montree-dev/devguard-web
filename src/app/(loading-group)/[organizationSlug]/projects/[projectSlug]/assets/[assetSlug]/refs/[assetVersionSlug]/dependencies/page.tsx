@@ -3,7 +3,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
-import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -341,9 +341,9 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useMemo(
     () =>
-      debounce((v: ChangeEvent<HTMLInputElement>) => {
+      debounce((value: string) => {
         updateQueryParams({
-          search: v.currentTarget.value,
+          search: value,
         });
       }, 500),
     [updateQueryParams],
@@ -564,7 +564,7 @@ const Index: FunctionComponent = () => {
           />
           <div className="relative flex-1">
             <Input
-              onChange={handleSearch}
+              onChange={(event) => handleSearch(event.currentTarget.value)}
               defaultValue={searchParams?.get("search") as string}
               placeholder="Search for dependencies or versions - just start typing..."
             />
