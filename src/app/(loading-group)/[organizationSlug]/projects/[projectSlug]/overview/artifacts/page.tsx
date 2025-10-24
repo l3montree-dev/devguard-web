@@ -160,12 +160,6 @@ const Index: FunctionComponent = () => {
     // Add Release Infos
     const latestRiskHistoryWithRelease = sorted.map((r) => ({ risk: r, release: release }));
 
-    /*
-    for(let i = 1; i < 10; i++) {
-      latestRiskHistoryWithRelease = [...latestRiskHistoryWithRelease, ...latestRiskHistoryWithRelease];
-    }
-    */
-
     return latestRiskHistoryWithRelease;
   }, [riskHistory, release]);
 
