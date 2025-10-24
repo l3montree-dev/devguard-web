@@ -10,9 +10,9 @@ import {
 import { ComponentRisk } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { useMemo } from "react";
+import { sortRisk } from "../utils/view";
 import EcosystemImage from "./common/EcosystemImage";
 import CVERainbowBadge from "./CVERainbowBadge";
-import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
 export interface ChartConfig {
@@ -21,35 +21,6 @@ export interface ChartConfig {
     color: string;
   };
 }
-
-const sortRisk =
-  (viewMode: "risk" | "cvss") =>
-  (a: ComponentRisk[string], b: ComponentRisk[string]) => {
-    if (viewMode === "cvss") {
-      if (a.criticalCvss !== b.criticalCvss) {
-        return b.criticalCvss - a.criticalCvss;
-      }
-      if (a.highCvss !== b.highCvss) {
-        return b.highCvss - a.highCvss;
-      }
-      if (a.mediumCvss !== b.mediumCvss) {
-        return b.mediumCvss - a.mediumCvss;
-      }
-      return b.lowCvss - a.lowCvss;
-    }
-
-    // critical > high > medium > low
-    if (a.critical !== b.critical) {
-      return b.critical - a.critical;
-    }
-    if (a.high !== b.high) {
-      return b.high - a.high;
-    }
-    if (a.medium !== b.medium) {
-      return b.medium - a.medium;
-    }
-    return b.low - a.low;
-  };
 
 export function VulnerableComponents({
   data,

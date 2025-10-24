@@ -3,10 +3,14 @@ import { DropzoneState } from "react-dropzone/.";
 interface Props {
   dropzone: DropzoneState;
   files: string[];
+  id?: string;
 }
-export default function FileUpload({ dropzone, files }: Props) {
+export default function FileUpload({ dropzone, files, id }: Props) {
   return (
-    <div className="border-muted-foreground border-2 border-dashed group p-1 rounded">
+    <div
+      id={id}
+      className="border-muted-foreground border-2 border-dashed group p-1 rounded"
+    >
       <div
         {...dropzone.getRootProps()}
         className="flex h-20 bg-card cursor-pointer items-center justify-center rounded dash-border"

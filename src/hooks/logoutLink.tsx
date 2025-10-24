@@ -46,16 +46,16 @@ export function LogoutLink(deps: DependencyList = []) {
 
   return () => {
     if (logoutToken) {
-      ory
-        .updateLogoutFlow({ token: logoutToken })
-        .then(() => {
-          router.push("/login");
+      ory.updateLogoutFlow({ token: logoutToken }).then(() => {
+        router.push("/login");
+        setTimeout(() => {
+          // ensure the session is cleared (client-side)
           updateSession({
             session: null,
             organizations: [],
           });
-        })
-        .then(() => router.refresh());
+        }, 1000); // wait one second to ensure the redirect has started
+      });
     }
   };
 }

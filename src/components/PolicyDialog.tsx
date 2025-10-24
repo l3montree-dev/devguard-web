@@ -150,7 +150,7 @@ const PolicyDialog: FunctionComponent<Props> = ({
                 )}
               </div>
             ) : (
-              <FileUpload files={[]} dropzone={dropzone} />
+              <FileUpload id="policy-upload" files={[]} dropzone={dropzone} />
             )}
             <p className="text-muted-foreground text-sm">
               Use a .rego editor to create a policy. Be inspired by our example

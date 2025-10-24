@@ -100,10 +100,15 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           </Card>
         </div>
         <div className="mt-10 flex flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
+          <Button
+            variant="secondary"
+            id="integration-method-selection-back"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
             Back
           </Button>
           <Button
+            id="integration-method-selection-continue"
             onClick={() =>
               api?.scrollTo(
                 variant === "auto" ? cliSlideIndex : fileUploadSlideIndex,
