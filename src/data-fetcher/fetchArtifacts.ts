@@ -7,21 +7,11 @@ export async function fetchArtifacts(
   assetSlug: string,
   assetVersionSlug: string,
 ) {
-  // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
 
-  // get the organization
-  const r = await devGuardApiClient(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/artifacts",
-  );
+  const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts`;
+  // console.log(url);
+  const r = await devGuardApiClient(url);
 
   if (!r.ok) {
     return [];
