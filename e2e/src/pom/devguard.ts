@@ -51,6 +51,8 @@ export class DevGuardPOM {
         await this.page.locator('input[name="password"]').fill(password);
         await this.page.getByRole('button', { name: 'Sign up', exact: true }).click();
 
+        console.log("Registered user with email: " + username + " and password: " + password);
+
         if (!this.devGuardDomain.includes("localhost")) {
             // email validation only for non-localhost deployments
             await expect(this.page.getByText('An email containing a verification code has been sent to the email address you provided. If you have not received an email, check the spelling of the address and make sure to use the address you registered with.')).toBeVisible({ timeout: 10_000 });
@@ -96,5 +98,25 @@ export class DevGuardPOM {
         await this.createOrganization('Test Organization');
         await this.createGroup('Test Group', 'Test Group that contains very important projects!');
         await this.createRepo('Test Repo', 'This repo contains top secret information. Without a Provider though..');
+    }
+
+    async setupFlow_setupRiskScanning() {
+        // setup risk scanning
+        await this.page.getByRole('button', { name: 'Setup Risk Scanning' }).click();
+        await this.page.waitForTimeout(500);
+        await this.page.getByRole('heading', { name: 'Use your own Scanner Expert' }).click();
+        await this.page.locator('button[id="scanner-selection-continue"]').click();
+    }
+
+    async setupFlow_selectManualUpload() {
+        await this.page.waitForTimeout(500);
+        await this.page.getByRole('heading', { name: 'Upload manually File Upload' }).click();
+        await this.page.locator('button[id="integration-method-selection-continue"]').click();
+    }
+
+    async setupFlow_uploadSbomFile(inputFile: string) {
+        await this.page.waitForTimeout(500);
+        await this.page.locator('#file-upload-sbom  input').setInputFiles(inputFile);
+        await this.page.locator('button[id="manual-integration-continue"]').click();
     }
 }
