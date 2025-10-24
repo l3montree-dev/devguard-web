@@ -746,9 +746,9 @@ export interface RiskHistory {
   highCvss: number;
   criticalCvss: number;
 
-  artifactName?: string;
-  assetId?: string;
-  assetVersionName?: string;
+  artifactName: string;
+  assetId: string;
+  assetVersionName: string;
 }
 
 export type ReleaseRiskHistory = Omit<
