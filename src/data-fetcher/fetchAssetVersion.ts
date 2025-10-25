@@ -24,7 +24,7 @@ export async function fetchAssetVersion(
 ) {
   const devGuardApiClient = await getApiClientInAppRouter();
 
-  const url = `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`;
+  const url = `/organizations/${decodeURIComponent(orgSlug)}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`;
   // console.log(url);
   const r = await devGuardApiClient(url);
 

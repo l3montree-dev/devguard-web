@@ -9,7 +9,7 @@ export async function fetchArtifacts(
 ) {
   const devGuardApiClient = await getApiClientInAppRouter();
 
-  const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts`;
+  const url = `/organizations/${decodeURIComponent(organizationSlug)}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts`;
   // console.log(url);
   const r = await devGuardApiClient(url);
 
