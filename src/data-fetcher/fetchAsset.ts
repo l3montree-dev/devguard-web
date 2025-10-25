@@ -18,22 +18,14 @@ import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
 export async function fetchAsset(
-  orgSlug: string,
+  organizationSlug: string,
   projectSlug: string,
   assetSlug: string,
 ) {
-  // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
 
-  const url =
-    "/organizations/" +
-    decodeURIComponent(orgSlug) +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug;
-
-  // get the organization
+  const url = `/organizations/${decodeURIComponent(organizationSlug)}/projects/${projectSlug}/assets/${assetSlug}`;
+  // console.log(url);
   const r = await devGuardApiClient(url);
 
   if (!r.ok) {
