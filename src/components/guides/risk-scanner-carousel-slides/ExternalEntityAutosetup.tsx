@@ -128,13 +128,16 @@ const ExternalEntityAutosetup: FunctionComponent<Props> = ({
       <div className="flex flex-row gap-2 justify-end">
         <Button
           variant={"secondary"}
+          id="external-entity-auto-setup-back"
           onClick={() => {
             api?.scrollTo(prevIndex);
           }}
         >
           Back
         </Button>
-        <Button onClick={onClose}>Close</Button>
+        <Button id="external-entity-auto-setup-continue" onClick={onClose}>
+          Close
+        </Button>
       </div>
     </CarouselItem>
   );

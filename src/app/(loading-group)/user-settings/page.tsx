@@ -515,7 +515,11 @@ const Settings: FunctionComponent = () => {
         </Section>
 
         <div className="flex flex-row justify-end">
-          <Button variant={"destructiveOutline"} onClick={handleLogout}>
+          <Button
+            id="settings-page-logout-button"
+            variant={"destructiveOutline"}
+            onClick={handleLogout}
+          >
             Logout
           </Button>
         </div>

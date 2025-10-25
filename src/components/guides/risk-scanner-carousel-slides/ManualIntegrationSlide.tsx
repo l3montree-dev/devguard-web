@@ -134,6 +134,7 @@ const ManualIntegrationSlide: FunctionComponent<
               </CardHeader>
               <CardContent>
                 <FileUpload
+                  id="file-upload-sbom"
                   files={sbomFileName ? [sbomFileName] : []}
                   dropzone={sbomDropzone}
                 />
@@ -162,6 +163,7 @@ const ManualIntegrationSlide: FunctionComponent<
               </CardHeader>
               <CardContent>
                 <FileUpload
+                  id="file-upload-sarif"
                   files={sarifFileName ? [sarifFileName] : []}
                   dropzone={sarifDropzone}
                 />
@@ -181,10 +183,18 @@ const ManualIntegrationSlide: FunctionComponent<
         </Tabs>
 
         <div className="flex mt-6 flex-row gap-2 justify-end">
-          <Button variant="secondary" onClick={() => api?.scrollTo(prevIndex)}>
+          <Button
+            variant="secondary"
+            id="manual-integration-back"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
             Back
           </Button>
-          <Button disabled={isUploadDisabled} onClick={handleUpload}>
+          <Button
+            disabled={isUploadDisabled}
+            id="manual-integration-continue"
+            onClick={handleUpload}
+          >
             Upload
           </Button>
         </div>

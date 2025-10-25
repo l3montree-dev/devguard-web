@@ -23,7 +23,9 @@ export async function fetchContentTree(organizationSlug: string) {
   if (organizationSlug) {
     // get the organization
     const contentTree = await devGuardApiClient(
-      "/organizations/" + organizationSlug + "/content-tree",
+      "/organizations/" +
+        decodeURIComponent(organizationSlug) +
+        "/content-tree",
     );
 
     const contentTreeData = await contentTree.json();

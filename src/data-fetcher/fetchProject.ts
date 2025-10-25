@@ -21,16 +21,11 @@ export async function fetchProject(
   organizationSlug: string,
   projectSlug: string,
 ) {
-  // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();
 
-  // get the organization
-  const r = await devGuardApiClient(
-    "/organizations/" +
-      decodeURIComponent(organizationSlug) +
-      "/projects/" +
-      projectSlug,
-  );
+  const url = `/organizations/${decodeURIComponent(organizationSlug)}/projects/${projectSlug}`;
+  // console.log(url);
+  const r = await devGuardApiClient(url);
 
   if (!r.ok) {
     throw new HttpError({

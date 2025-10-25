@@ -14,6 +14,7 @@
 
 import {
   AssetDTO,
+  ComponentRisk,
   OrganizationDetailsDTO,
   ProjectDTO,
   ReleaseRiskHistory,
@@ -48,6 +49,35 @@ export const emptyThenNull = (input: string | null): string | null => {
   }
   return input;
 };
+
+export const sortRisk =
+  (viewMode: "risk" | "cvss") =>
+  (a: ComponentRisk[string], b: ComponentRisk[string]) => {
+    if (viewMode === "cvss") {
+      if (a.criticalCvss !== b.criticalCvss) {
+        return b.criticalCvss - a.criticalCvss;
+      }
+      if (a.highCvss !== b.highCvss) {
+        return b.highCvss - a.highCvss;
+      }
+      if (a.mediumCvss !== b.mediumCvss) {
+        return b.mediumCvss - a.mediumCvss;
+      }
+      return b.lowCvss - a.lowCvss;
+    }
+
+    // critical > high > medium > low
+    if (a.critical !== b.critical) {
+      return b.critical - a.critical;
+    }
+    if (a.high !== b.high) {
+      return b.high - a.high;
+    }
+    if (a.medium !== b.medium) {
+      return b.medium - a.medium;
+    }
+    return b.low - a.low;
+  };
 
 export const vexOptionMessages: Record<string, string> = {
   component_not_present: "The vulnerable component is not part of the product.",
@@ -359,4 +389,80 @@ export const normalizeContentTree = (
 
 export interface ThemeConfig {
   config: typeof config;
+}
+
+export class RedirectorBuilder {
+  private organizationSlug?: string;
+  private projectSlug?: string;
+  private assetSlug?: string;
+  private assetId?: string;
+  private assetVersionName?: string;
+  private contentTreeElement?: ContentTreeElement[];
+
+  setOrganizationSlug(organizationSlug: string): RedirectorBuilder {
+    this.organizationSlug = organizationSlug;
+    return this;
+  }
+
+  setProjectSlug(projectSlug: string): RedirectorBuilder {
+    this.projectSlug = projectSlug;
+    return this;
+  }
+
+  setAssetSlug(assetSlug: string): RedirectorBuilder {
+    this.assetSlug = assetSlug;
+    return this;
+  }
+
+  setAssetId(assetId: string): RedirectorBuilder {
+    this.assetId = assetId;
+    return this;
+  }
+
+  setAssetVersionName(assetVersionName: string): RedirectorBuilder {
+    this.assetVersionName = assetVersionName;
+    return this;
+  }
+
+  setContentTree(contentTreeElement: ContentTreeElement[]): RedirectorBuilder {
+    this.contentTreeElement = contentTreeElement;
+    return this;
+  }
+
+  build(): string {
+    if (this.assetId !== undefined) {
+      if (this.contentTreeElement === undefined) {
+        throw new Error("ContentTreeElement must be set when using assetId");
+      } else {
+        const asset = this.contentTreeElement
+          .map((ct) => ct.assets.find((a) => a.id === this.assetId!))
+          .filter((a) => !!a)[0];
+        if (asset === undefined) {
+          throw new Error(
+            `Asset with id ${this.assetId} not found in content tree element - maybe missing permission`,
+          );
+        }
+        this.assetSlug = asset.slug;
+      }
+    }
+
+    if (this.organizationSlug === undefined) {
+      throw new Error("OrganizationSlug is required");
+    }
+
+    let url = `/${this.organizationSlug}/`;
+
+    if (this.projectSlug !== undefined) {
+      url += `projects/${this.projectSlug}/`;
+
+      if (this.assetSlug !== undefined) {
+        url += `assets/${this.assetSlug}`;
+
+        if (this.assetVersionName !== undefined) {
+          url += `/refs/${this.assetVersionName}`;
+        }
+      }
+    }
+    return url;
+  }
 }

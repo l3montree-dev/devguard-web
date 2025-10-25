@@ -49,7 +49,7 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM gcr.io/distroless/nodejs24-debian12:nonroot@sha256:1ab51c2cd3568f94aa31d4e5eb7e7918a16a30179d004a0c7011376783eb5dbf
+FROM registry.opencode.de/open-code/oci/nodejs:24@sha256:8b2e6bda94c1a452942f2adda9c25eb877fa6f646b3beb57a978a1366c696136
 
 USER 53111
 
