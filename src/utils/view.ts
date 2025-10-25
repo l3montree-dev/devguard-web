@@ -434,9 +434,13 @@ export class RedirectorBuilder {
       if (this.contentTreeElement === undefined) {
         throw new Error("ContentTreeElement must be set when using assetId");
       } else {
-        const asset = this.contentTreeElement.map((ct => ct.assets.find(a => a.id === this.assetId!))).filter(a => !!a)[0];
+        const asset = this.contentTreeElement
+          .map((ct) => ct.assets.find((a) => a.id === this.assetId!))
+          .filter((a) => !!a)[0];
         if (asset === undefined) {
-          throw new Error(`Asset with id ${this.assetId} not found in content tree element - maybe missing permission`);
+          throw new Error(
+            `Asset with id ${this.assetId} not found in content tree element - maybe missing permission`,
+          );
         }
         this.assetSlug = asset.slug;
       }
@@ -449,10 +453,10 @@ export class RedirectorBuilder {
     let url = `/${this.organizationSlug}/`;
 
     if (this.projectSlug !== undefined) {
-      url += `projects/${this.projectSlug}/`
+      url += `projects/${this.projectSlug}/`;
 
       if (this.assetSlug !== undefined) {
-        url += `assets/${this.assetSlug}`
+        url += `assets/${this.assetSlug}`;
 
         if (this.assetVersionName !== undefined) {
           url += `/refs/${this.assetVersionName}`;

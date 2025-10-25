@@ -382,16 +382,16 @@ const OverviewPage = () => {
                   <CardTitle className="relative w-full">
                     Vulnerable Artifacts
                     <Link
-                        href={
-                          releaseId
-                            ? `/${activeOrg.slug}/projects/${project.slug}/overview/artifacts?releaseId=${releaseId}`
-                            : "#"
-                        }
-                        className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                      >
-                        See all
-                      </Link>
-                    </CardTitle>
+                      href={
+                        releaseId
+                          ? `/${activeOrg.slug}/projects/${project.slug}/overview/artifacts?releaseId=${releaseId}`
+                          : "#"
+                      }
+                      className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                    >
+                      See all
+                    </Link>
+                  </CardTitle>
                   <CardDescription>
                     The most vulnerable artifacts in this release
                   </CardDescription>
