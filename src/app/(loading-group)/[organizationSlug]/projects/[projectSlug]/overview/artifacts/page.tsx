@@ -24,6 +24,11 @@ import { Skeleton } from "../../../../../../../components/ui/skeleton";
 import { fetcher } from "../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { RedirectorBuilder, sortRisk } from "../../../../../../../utils/view";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "../../../../../../../components/ui/tabs";
 
 const columnHelper = createColumnHelper<{
   risk: RiskHistory;
@@ -44,12 +49,25 @@ const columnsDef: ColumnDef<{ risk: RiskHistory; release: ReleaseDTO }, any>[] =
     columnHelper.accessor((row) => row.risk, {
       header: "Score",
       id: "critical",
-      cell: (row) =>
-        row.getValue() && (
-          <div className="w-fit">
-            <CVERainbowBadge {...row.getValue()} />
-          </div>
-        ),
+      cell: (row) => {
+        const mode = (row as any).mode || "risk";
+        return (
+          row.getValue() && (
+            <div className="w-fit">
+              {mode === "risk" ? (
+                <CVERainbowBadge {...row.row.original.risk} />
+              ) : (
+                <CVERainbowBadge
+                  low={row.row.original.risk.lowCvss}
+                  medium={row.row.original.risk.mediumCvss}
+                  high={row.row.original.risk.highCvss}
+                  critical={row.row.original.risk.criticalCvss}
+                />
+              )}
+            </div>
+          )
+        );
+      },
     }),
   ];
 
@@ -138,6 +156,18 @@ const Index: FunctionComponent = () => {
         description="Artifacts of the Release"
         title="Artifacts"
       >
+        <Tabs
+          value={mode}
+          onValueChange={(value) => setMode(value as "risk" | "cvss")}
+          className="w-full"
+        >
+          <div className="mb-0 flex">
+            <TabsList>
+              <TabsTrigger value="risk">Risk values</TabsTrigger>
+              <TabsTrigger value="cvss">CVSS values</TabsTrigger>
+            </TabsList>
+          </div>
+        </Tabs>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">
@@ -227,10 +257,10 @@ const Index: FunctionComponent = () => {
                         }
                       }}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, {
+                        ...cell.getContext(),
+                        mode,
+                      })}
                     </td>
                   ))}
                 </tr>

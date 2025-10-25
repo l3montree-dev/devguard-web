@@ -121,7 +121,7 @@ export default function RiskAssessmentFeed({
               >
                 <EventTypeIcon eventType={event.type} />
               </div>
-              <div className="w-full">
+              <div className={classNames("w-full")}>
                 <div className="flex w-full flex-col">
                   <div className="flex flex-row items-start gap-2">
                     {event.userId === "system" ? (
@@ -161,14 +161,28 @@ export default function RiskAssessmentFeed({
                         </p>
 
                         <div className="absolute right-2 top-2">
-                          <Link
-                            href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionName}/${page}/${event.vulnId}`}
-                          >
-                            <Badge variant={"outline"}>
-                              <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                              {event.assetVersionName}
+                          <div>
+                            <Badge variant={"outline"} className="mr-1 ">
+                              {(event.upstream === 1 ||
+                                event.upstream === 2) && (
+                                <span
+                                  className="mr-1 text-red-500"
+                                  title="Upstream Vulnerability"
+                                >
+                                  {"upstream Event"}
+                                </span>
+                              )}
                             </Badge>
-                          </Link>
+
+                            <Link
+                              href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionName}/${page}/${event.vulnId}`}
+                            >
+                              <Badge variant={"outline"}>
+                                <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                                {event.assetVersionName}
+                              </Badge>
+                            </Link>
+                          </div>
                         </div>
                       </div>
 

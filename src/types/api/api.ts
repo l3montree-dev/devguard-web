@@ -172,7 +172,7 @@ export interface ProjectDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 }
-
+export type ExpandedVulnDTOState = VulnDTO["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -248,6 +248,7 @@ interface BaseVulnEventDTO {
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
+  upstream: number;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
@@ -468,6 +469,7 @@ export interface AssetDTO {
   repositoryName?: string;
 
   reachableFromTheInternet: boolean;
+  paranoiaMode: boolean;
 
   lastSecretScan: string;
   lastSastScan: string;
@@ -626,6 +628,9 @@ export interface ArtifactDTO {
   artifactName: string;
   assetId: string;
   assetVersionName: string;
+  upstreamUrls: {
+    upstreamUrl: string;
+  }[];
 }
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {

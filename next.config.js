@@ -18,7 +18,7 @@ const nextConfig = {
   experimental: {
     turbo: {
       resolveAlias: {
-        'istextorbinary': './src/lib/istextorbinary-wrapper.js',
+        istextorbinary: "./src/lib/istextorbinary-wrapper.js",
       },
     },
   },

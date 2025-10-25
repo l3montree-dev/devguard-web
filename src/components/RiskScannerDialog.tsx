@@ -39,6 +39,7 @@ import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSl
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { useRouter } from "next/navigation";
+import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -46,6 +47,8 @@ interface RiskScannerDialogProps {
   apiUrl: string;
   frontendUrl: string;
   devguardCIComponentBase: string;
+  assetVersion?: AssetVersionDTO;
+  artifacts?: Array<ArtifactDTO>;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -54,6 +57,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   frontendUrl,
   devguardCIComponentBase,
   onOpenChange,
+  assetVersion,
+  artifacts,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -87,6 +92,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
   const [tab, setTab] = React.useState<"sbom" | "sarif">("sbom");
+  const [artifactName, setArtifactName] = useState<string | undefined>();
   const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
@@ -155,7 +161,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       {
         method: "POST",
         body: formdata,
-        headers: { "X-Scanner": "website:sbom" },
+        headers: {
+          "X-Scanner": "website:sbom",
+          "X-Asset-Ref": assetVersion?.name || "",
+          "X-Tag": assetVersion?.type === "tag" ? "1" : "",
+          "X-Artifact-Name": artifactName || "",
+        },
       },
     );
 
@@ -166,7 +177,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     }
     onOpenChange(false);
     router.push(
-      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/dependency-risks/`,
+      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersion?.name || "main"}/dependency-risks/`,
     );
   };
 
@@ -412,6 +423,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             <ManualIntegrationSlide
               tab={tab}
               setTab={setTab}
+              setArtifactName={setArtifactName}
               sbomFileName={sbomFileName}
               sarifFileName={sarifFileName}
               sbomDropzone={sbomDropzone}
@@ -421,6 +433,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
               api={api}
+              assetVersionName={assetVersion?.name}
+              artifacts={artifacts || []}
             />
             <ExternalEntityAutosetup
               handleAutosetup={autosetup.handleAutosetup}
