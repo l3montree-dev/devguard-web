@@ -449,6 +449,7 @@ export interface AssetVersionDTO {
   lastIacScan: string;
   lastContainerScan: string;
   lastDastScan: string;
+  lastAccessedAt: string;
 
   signingPubKey?: string;
 }

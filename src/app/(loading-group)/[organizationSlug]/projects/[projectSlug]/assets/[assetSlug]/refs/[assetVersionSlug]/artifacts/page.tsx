@@ -22,6 +22,8 @@ import CollapseList from "@/components/common/CollapseList";
 import { useState, useEffect } from "react";
 import ArtifactForm from "@/components/common/ArtifactForm";
 import { useForm } from "react-hook-form";
+import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
+import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -210,10 +212,13 @@ const Artifacts = () => {
     }
   }, [dialogState.isOpen]);
 
+  const { branches, tags } = useAssetBranchesAndTags();
+
   return (
     <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
       <div className="flex flex-row">
         <div className="flex-1">
+          <BranchTagSelector branches={branches} tags={tags} />
           <Section
             primaryHeadline
             description="Manage and view artifacts associated with this asset version."
@@ -230,25 +235,27 @@ const Artifacts = () => {
                   description="There are currently no artifacts associated with this asset version."
                 />
               )}
-              {artifacts.map((artifact) => (
-                <CollapseList
-                  key={artifact.artifactName + artifact.assetVersionName}
-                  Title={artifact.artifactName}
-                  Items={artifact.upstreamUrls?.map((upstreamUrl, index) => ({
-                    Title: upstreamUrl.upstreamUrl,
-                    className: index % 2 === 0 ? "bg-card" : "bg-card/50",
-                  }))}
-                  Button={
-                    <Button
-                      variant="secondary"
-                      onClick={() => openEditDialog(artifact)}
-                    >
-                      Edit
-                    </Button>
-                  }
-                  className="mb-4"
-                ></CollapseList>
-              ))}
+              <div>
+                {artifacts.map((artifact) => (
+                  <CollapseList
+                    key={artifact.artifactName + artifact.assetVersionName}
+                    Title={artifact.artifactName}
+                    Items={artifact.upstreamUrls?.map((upstreamUrl, index) => ({
+                      Title: upstreamUrl.upstreamUrl,
+                      className: index % 2 === 0 ? "bg-card" : "bg-card/50",
+                    }))}
+                    Button={
+                      <Button
+                        variant="secondary"
+                        onClick={() => openEditDialog(artifact)}
+                      >
+                        Edit
+                      </Button>
+                    }
+                    className="mb-4"
+                  />
+                ))}
+              </div>
             </div>
           </Section>
         </div>

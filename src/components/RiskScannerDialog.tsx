@@ -40,6 +40,8 @@ import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { useRouter } from "next/navigation";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import { useUpdateAsset } from "../context/AssetContext";
+import { fetchAsset } from "../data-fetcher/fetchAsset";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -151,44 +153,74 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
-  const uploadSBOM = async () => {
+  const updateAsset = useUpdateAsset();
+  const uploadSBOM = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
     if (!sbomFileRef.current) return;
     const formdata = new FormData();
     formdata.append("file", sbomFileRef.current);
 
     const resp = await multipartBrowserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
+      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
       {
         method: "POST",
         body: formdata,
         headers: {
-          "X-Scanner": "website:sbom",
-          "X-Asset-Ref": assetVersion?.name || "",
-          "X-Tag": assetVersion?.type === "tag" ? "1" : "",
-          "X-Artifact-Name": artifactName || "",
+          "X-Asset-Ref": params.branchOrTagName,
+          "X-Asset-Default-Branch": params.isDefault
+            ? params.branchOrTagName
+            : "",
+          "X-Tag": params.isTag ? "1" : "0",
+          "X-Artifact-Name": params.artifactName,
+          "X-Origin": params.origin,
+          "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
         },
       },
     );
 
     if (resp.ok) {
-      toast.success("SBOM has successfully been sent!");
+      // fetch the asset again
+      const updatedAsset = await browserApiClient(
+        `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
+        { method: "GET" },
+      );
+      if (updatedAsset.ok) {
+        const assetData = await updatedAsset.json();
+        router.push(
+          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
+        );
+        onOpenChange(false);
+        updateAsset(assetData);
+        toast.success("SBOM has successfully been sent!");
+      }
     } else {
       toast.error("SBOM has not been sent successfully");
     }
-    onOpenChange(false);
-    router.push(
-      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersion?.name || "main"}/dependency-risks/`,
-    );
   };
 
-  const uploadSARIF = async () => {
+  const uploadSARIF = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
     if (!sarifContentRef.current) return;
 
     const resp = await browserApiClient(`/sarif-scan`, {
       method: "POST",
       body: sarifContentRef.current,
       headers: {
-        "X-Scanner": "website:sarif",
+        "X-Tag": params.isTag ? "1" : "0",
+        "X-Asset-Ref": params.branchOrTagName,
+        "X-Asset-Default-Branch": params.isDefault
+          ? params.branchOrTagName
+          : "",
         "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
       },
     });
@@ -205,7 +237,13 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   };
 
   const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
-  const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
+  const handleUpload = (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => (tab === "sbom" ? uploadSBOM(params) : uploadSARIF(params));
 
   const activeOrg = useActiveOrg()!;
   const activeProject = useActiveProject()!;

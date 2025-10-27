@@ -22,7 +22,7 @@ const DangerZone: FunctionComponent<PropsWithChildren<DangerZoneProps>> = ({
   children,
 }) => {
   return (
-    <div>
+    <div className="w-full">
       {displayTitle && (
         <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
       )}

@@ -4,12 +4,7 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import {
-  DependencyVuln,
-  Paged,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -43,22 +38,22 @@ import {
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import Severity from "../../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
-import Link from "next/link";
 
 interface Props {
   vulns: Paged<VulnByPackage>;

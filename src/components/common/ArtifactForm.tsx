@@ -25,6 +25,7 @@ import { Trash2, Plus } from "lucide-react";
 import Alert from "./Alert";
 import ListItem from "./ListItem";
 import { useState, useEffect } from "react";
+import DangerZone from "./DangerZone";
 
 interface Props {
   form: UseFormReturn<ArtifactDTO>;
@@ -192,24 +193,26 @@ const ArtifactForm = ({
                 </div>
                 <div className="flex gap-2 w-full">
                   {isEditMode && onDelete && (
-                    <ListItem
-                      Title="Delete Artifact"
-                      Description={
-                        "This will delete the artifact and all of its data. This action cannot be undone."
-                      }
-                      Button={
-                        <Alert
-                          onConfirm={onDelete}
-                          title="Delete Artifact"
-                          description="Are you sure you want to delete this artifact? This action cannot be undone."
-                        >
-                          <Button type="button" variant="destructive">
-                            Delete
-                          </Button>
-                        </Alert>
-                      }
-                      className="w-full"
-                    />
+                    <DangerZone>
+                      <ListItem
+                        Title="Delete Artifact"
+                        Description={
+                          "This will delete the artifact and all of its data. This action cannot be undone."
+                        }
+                        Button={
+                          <Alert
+                            onConfirm={onDelete}
+                            title="Delete Artifact"
+                            description="Are you sure you want to delete this artifact? This action cannot be undone."
+                          >
+                            <Button type="button" variant="destructive">
+                              Delete
+                            </Button>
+                          </Alert>
+                        }
+                        className="w-full"
+                      />
+                    </DangerZone>
                   )}
                 </div>
               </div>

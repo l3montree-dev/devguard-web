@@ -139,7 +139,9 @@ export const useAssetMenu = () => {
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/controls/`,
         ) ||
         pathname ===
-          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events`,
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events` ||
+        pathname ===
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs`,
     });
 
     menu = menu.concat([
@@ -224,8 +226,9 @@ export const useAssetMenu = () => {
       title: "Onboarding",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
       Icon: RocketLaunchIcon,
-      isActive:
-        pathname === `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
+      isActive: pathname.startsWith(
+        `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
+      ),
     });
   }
 
