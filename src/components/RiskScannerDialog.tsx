@@ -93,7 +93,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
-  const [tab, setTab] = React.useState<"sbom" | "sarif">("sbom");
+  const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
   const [artifactName, setArtifactName] = useState<string | undefined>();
   const updateOrg = useUpdateOrganization();
 
@@ -101,6 +101,35 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const sbomFileRef = useRef<File | undefined>(undefined);
   const [sarifFileName, setSarifFileName] = useState<string | undefined>();
   const sarifContentRef = useRef<string | undefined>(undefined);
+  const [vexFileName, setVexFileName] = useState<string | undefined>();
+  const vexContentRef = useRef<string | undefined>(undefined);
+
+  const onDropVex = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const txt = reader.result as string;
+          const parsed = JSON.parse(txt);
+
+          if (parsed?.bomFormat === "CycloneDX") {
+            vexContentRef.current = txt;
+            setVexFileName(file.name);
+          } else {
+            toast.error(
+              "VEX file does not follow CycloneDX format or Version is < 1.6",
+            );
+          }
+        } catch (_e) {
+          toast.error(
+            "JSON format is not recognized, make sure it is the proper format",
+          );
+          return;
+        }
+      };
+      reader.readAsText(file);
+    });
+  }, []);
 
   const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -146,6 +175,15 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const sarifDropzone = useDropzone({
     onDrop: onDropSarif,
+    accept: {
+      "application/json": [".json"],
+      "application/sarif+json": [".sarif"],
+      "text/plain": [".sarif"],
+    },
+  });
+
+  const vexDropzone = useDropzone({
+    onDrop: onDropVex,
     accept: {
       "application/json": [".json"],
       "application/sarif+json": [".sarif"],
@@ -236,14 +274,56 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
   };
 
-  const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
+  const uploadVEX = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
+    if (!vexContentRef.current) return;
+
+    const resp = await browserApiClient(`/vex`, {
+      method: "POST",
+      body: vexContentRef.current,
+      headers: {
+        "X-Tag": params.isTag ? "1" : "0",
+        "X-Asset-Ref": params.branchOrTagName,
+        "X-Artifact-Name": params.artifactName,
+        "X-Asset-Default-Branch": params.isDefault
+          ? params.branchOrTagName
+          : "",
+        "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+        "X-Origin": params.origin,
+      },
+    });
+
+    if (resp.ok) {
+      toast.success("VEX has successfully been sent!");
+    } else {
+      toast.error("VEX has not been sent successfully");
+    }
+    onOpenChange(false);
+    router.push(
+      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
+    );
+  };
+
   const handleUpload = (params: {
     branchOrTagName: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
     origin: string;
-  }) => (tab === "sbom" ? uploadSBOM(params) : uploadSARIF(params));
+  }) => {
+    if (tab === "sbom") {
+      uploadSBOM(params);
+    } else if (tab === "sarif") {
+      uploadSARIF(params);
+    } else {
+      uploadVEX(params);
+    }
+  };
 
   const activeOrg = useActiveOrg()!;
   const activeProject = useActiveProject()!;
@@ -323,6 +403,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
   }, []);
 
+  const isUploadDisabled =
+    tab === "sbom"
+      ? !sbomFileName
+      : tab === "sarif"
+        ? !sarifFileName
+        : !vexFileName;
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -461,12 +547,13 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             <ManualIntegrationSlide
               tab={tab}
               setTab={setTab}
-              setArtifactName={setArtifactName}
               sbomFileName={sbomFileName}
               sarifFileName={sarifFileName}
               sbomDropzone={sbomDropzone}
               sarifDropzone={sarifDropzone}
               isUploadDisabled={isUploadDisabled}
+              vexDropzone={vexDropzone}
+              vexFileName={vexFileName}
               handleUpload={handleUpload}
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}

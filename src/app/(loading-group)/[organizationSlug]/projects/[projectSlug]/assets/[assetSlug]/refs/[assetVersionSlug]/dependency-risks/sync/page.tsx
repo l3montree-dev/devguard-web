@@ -1,70 +1,66 @@
 "use client";
-import AssetTitle from "@/components/common/AssetTitle";
-import { FunctionComponent, use, useEffect, useMemo, useState } from "react";
-import Page from "@/components/Page";
-import {
-  DependencyVuln,
-  DetailedDependencyVulnDTO,
-  ExpandedVulnDTOState,
-  Paged,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { BranchTagSelector } from "@/components/BranchTagSelector";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "@/hooks/useActiveAssetVersion";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import { useArtifacts } from "@/context/AssetVersionContext";
-import EcosystemImage from "@/components/common/EcosystemImage";
-import Severity from "@/components/common/Severity";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import {
-  createColumnHelper,
-  ColumnDef,
-  flexRender,
-} from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { fetcher } from "@/data-fetcher/fetcher";
+import { BranchTagSelector } from "@/components/BranchTagSelector";
+import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
+import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyParty from "@/components/common/EmptyParty";
+import Section from "@/components/common/Section";
+import Severity from "@/components/common/Severity";
 import SortingCaret from "@/components/common/SortingCaret";
-import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import useTable from "@/hooks/useTable";
+import Page from "@/components/Page";
+import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useArtifacts } from "@/context/AssetVersionContext";
+import { fetcher } from "@/data-fetcher/fetcher";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useTable from "@/hooks/useTable";
+import {
+  DetailedDependencyVulnDTO,
+  ExpandedVulnDTOState,
+  Paged,
+} from "@/types/api/api";
+import { classNames } from "@/utils/common";
+import {
+  ColumnDef,
+  createColumnHelper,
+  flexRender,
+} from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
-import Section from "@/components/common/Section";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 
-import useSWR, { mutate } from "swr";
-import { Skeleton } from "@/components/ui/skeleton";
-import { buildFilterSearchParams } from "@/utils/url";
-import { usePathname, useSearchParams } from "next/navigation";
-import useDecodedParams from "@/hooks/useDecodedParams";
 import VulnState from "@/components/common/VulnState";
-import { Switch } from "@/components/ui/switch";
-import { VulnDTO, VulnEventDTO } from "@/types/api/api";
 import { AsyncButton } from "@/components/ui/button";
-import { toast } from "sonner";
-import { TabsList } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import Link from "next/link";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import useDecodedParams from "@/hooks/useDecodedParams";
+import { browserApiClient } from "@/services/devGuardApi";
+import { VulnEventDTO } from "@/types/api/api";
+import { buildFilterSearchParams } from "@/utils/url";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import useSWR from "swr";
 
 const columnHelper = createColumnHelper<DetailedDependencyVulnDTO>();
 
 const convertTypeToState = (type: string): ExpandedVulnDTOState => {
   switch (type) {
     case "open":
+    case "reopened":
       return "open";
     case "fixed":
       return "fixed";
@@ -81,7 +77,7 @@ const convertTypeToState = (type: string): ExpandedVulnDTOState => {
   }
 };
 
-const getState = (
+export const getState = (
   upstream: boolean,
   events: VulnEventDTO[],
 ): ExpandedVulnDTOState => {
@@ -244,7 +240,7 @@ const Index: FunctionComponent = () => {
       enableSorting: false,
       cell: ({ row }: any) => (
         <div
-          className={`w-fit rounded-full ${!vulnsToUpdate?.includes(row.original.id) ? "border border-yellow-300" : ""}`}
+          className={`w-fit rounded-full ${!vulnsToUpdate?.includes(row.original.id) ? "border-2 border-primary" : ""}`}
         >
           <VulnState state={getState(false, row.original.events)} />
         </div>
@@ -256,7 +252,7 @@ const Index: FunctionComponent = () => {
       enableSorting: false,
       cell: ({ row }: any) => (
         <div
-          className={`w-fit rounded-full ${vulnsToUpdate?.includes(row.original.id) ? "border border-yellow-300" : ""}`}
+          className={`w-fit rounded-full ${vulnsToUpdate?.includes(row.original.id) ? "border-2 border-primary" : ""}`}
         >
           <VulnState state={getState(true, row.original.events)} />
         </div>
@@ -266,7 +262,7 @@ const Index: FunctionComponent = () => {
     baseColumnsDef[4],
 
     {
-      header: "Upstream State Sync",
+      header: "Apply Upstream State",
       id: "upstreamSync",
       enableSorting: false,
       cell: ({ row }: any) => (
@@ -543,7 +539,7 @@ const Index: FunctionComponent = () => {
           </div>
           <div className="mt-4 flex justify-end">
             <AsyncButton onClick={handleVulnsSync}>
-              Sync Vulnerabilities
+              Apply {vulnsToUpdate.length} selected Upstream states
             </AsyncButton>
           </div>
           <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>

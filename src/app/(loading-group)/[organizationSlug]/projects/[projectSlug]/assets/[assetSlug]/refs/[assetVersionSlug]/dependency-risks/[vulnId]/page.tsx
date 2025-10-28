@@ -424,6 +424,46 @@ const Index: FunctionComponent = () => {
       : null,
     fetcher,
   );
+
+  const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
+    if (!vuln) {
+      return;
+    }
+
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/assets/" +
+        asset.slug +
+        "/refs/" +
+        assetVersion?.slug +
+        "/dependency-vulns/sync",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          vulnsReq: [
+            {
+              vulnId: event.vulnId,
+              event: event,
+            },
+          ],
+        }),
+      },
+    );
+
+    if (!resp.ok) {
+      return toast("Failed to accept upstream change", {
+        description: "Please try again later.",
+      });
+    }
+    mutate();
+  };
+
   const { data: hints } = useSWR<DependencyVulnHints>(uri + "/hints", fetcher);
 
   const handleSubmit = async (data: {
@@ -626,6 +666,7 @@ const Index: FunctionComponent = () => {
                   <RiskAssessmentFeed
                     vulnerabilityName={vuln.cveID ?? ""}
                     events={vuln.events}
+                    acceptUpstreamChange={handleAcceptUpstreamChange}
                     page="dependency-risks"
                   />
                   <div>

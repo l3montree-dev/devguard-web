@@ -65,7 +65,8 @@ export function SimpleArtifactSelector({
 
   const updateAssetVersion = useUpdateAssetVersionState();
 
-  const handleArtifactCreation = async () => {
+  const handleArtifactCreation = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
     if (!params.assetVersionSlug) {
       toast.error("Asset version is not selected.");
       return;

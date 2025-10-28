@@ -73,10 +73,12 @@ export const useAssetMenu = () => {
     organizationSlug: orgSlug,
     projectSlug,
     assetSlug,
+    assetVersionSlug: existingAssetVersionSlug,
   } = params as {
     organizationSlug: string;
     projectSlug: string;
     assetSlug: string;
+    assetVersionSlug?: string;
   };
 
   const pathname = useDecodedPathname();
@@ -87,7 +89,9 @@ export const useAssetMenu = () => {
 
   const currentUserRole = useCurrentUserRole();
 
-  const assetVersionSlug = getAssetVersionSlug(activeAsset!, assetVersion);
+  const assetVersionSlug = existingAssetVersionSlug
+    ? existingAssetVersionSlug
+    : getAssetVersionSlug(activeAsset!, assetVersion);
 
   let menu: Array<{
     title: string;
@@ -226,9 +230,12 @@ export const useAssetMenu = () => {
       title: "Onboarding",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/assets/" + assetSlug,
       Icon: RocketLaunchIcon,
-      isActive: pathname.startsWith(
-        `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
-      ),
+      isActive:
+        pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
+        ) &&
+        pathname !==
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
     });
   }
 

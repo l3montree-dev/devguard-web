@@ -33,6 +33,7 @@ import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
 import { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
+import { classNames } from "../../../../../../../../utils/common";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -134,18 +135,24 @@ const RefsPage = () => {
                     </td>
                   </tr>
                 )}
-                {assetVersions.tags.map((tag) => (
-                  <tr key={tag.name} className="border-b">
-                    <td className="p-4">
+                {assetVersions.tags.map((tag, i) => (
+                  <tr
+                    key={tag.name}
+                    className={classNames(
+                      "border-b",
+                      i % 2 !== 0 && "bg-card/50",
+                    )}
+                  >
+                    <td className="px-4 py-2">
                       <Badge variant={"outline"}>
                         <TagIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                         {tag.name}
                       </Badge>
                     </td>
-                    <td className="p-4">
+                    <td className="px-4 py-2">
                       <DateString date={new Date(tag.lastAccessedAt)} />
                     </td>
-                    <td className="p-4 flex flex-row justify-end">
+                    <td className="px-4 py-2 flex flex-row justify-end">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button size={"icon"} variant={"ghost"}>
@@ -203,24 +210,30 @@ const RefsPage = () => {
                     </td>
                   </tr>
                 )}
-                {assetVersions.branches.map((branch) => (
+                {assetVersions.branches.map((branch, i) => (
                   <>
-                    <tr key={branch.name} className="border-b">
-                      <td className="p-4">
+                    <tr
+                      key={branch.name}
+                      className={classNames(
+                        "border-b",
+                        i % 2 !== 0 && "bg-card/50",
+                      )}
+                    >
+                      <td className="px-4 py-2">
                         <Badge variant={"outline"}>
                           <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                           {branch.name}
                         </Badge>
                       </td>
-                      <td className="p-4">
+                      <td className="px-4 py-2">
                         {branch.defaultBranch && (
                           <Badge variant={"success"}>Default</Badge>
                         )}
                       </td>
-                      <td className="p-4">
+                      <td className="px-4 py-2">
                         <DateString date={new Date(branch.lastAccessedAt)} />
                       </td>
-                      <td className="p-4 flex flex-row justify-end">
+                      <td className="px-4 py-2 flex flex-row justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button size={"icon"} variant={"ghost"}>

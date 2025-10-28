@@ -23,7 +23,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -371,12 +371,15 @@ const Index: FunctionComponent = () => {
         </div>
       </Section>
       {vulnsToSync && vulnsToSync.data.length > 0 && (
-        <div className="mb-4">
-          <Link href={pathname + "/sync/"} className="flex justify-center">
-            <span className="underline">
-              There are new Events from a upstreram source. Click here to handle
-              them.
-            </span>
+        <div className="mb-4 flex flex-row justify-center">
+          <Link
+            href={pathname + "/sync/"}
+            className={buttonVariants({
+              variant: "secondary",
+            })}
+          >
+            There are new Events from a upstream source. Click here to handle
+            them.
           </Link>
         </div>
       )}

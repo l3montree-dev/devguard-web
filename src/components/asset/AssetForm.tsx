@@ -259,14 +259,14 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
 
       <FormField
         control={form.control}
-        name="paranoiaMode"
+        name="paranoidMode"
         render={({ field }) => (
           <FormItem>
             <ListItem
               Description={
                 "Do you trust your upstream supplier? If not, enable this mode so you need to accept the vex reports from your supplier manually."
               }
-              Title="Paranoia Mode"
+              Title="Paranoid Mode"
               Button={
                 <FormControl>
                   <Switch

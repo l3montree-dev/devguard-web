@@ -22,11 +22,11 @@ import Link from "next/link";
 export function BranchTagSelector({
   branches,
   tags,
-  disableNavigateToRef,
+  disableNavigateToRefInsteadCall,
 }: {
   branches: AssetVersionDTO[];
   tags: AssetVersionDTO[];
-  disableNavigateToRef?: boolean;
+  disableNavigateToRefInsteadCall?: (assetVersionDTO: AssetVersionDTO) => void;
 }) {
   const router = useRouter();
   const params = useDecodedParams() as {
@@ -102,7 +102,10 @@ export function BranchTagSelector({
   };
 
   const pushAssetRef = (refSlug: string) => {
-    if (disableNavigateToRef) {
+    if (disableNavigateToRefInsteadCall) {
+      disableNavigateToRefInsteadCall(
+        branches.concat(tags).find((el) => el.slug === refSlug)!,
+      );
       return;
     }
     if (!pathname) {

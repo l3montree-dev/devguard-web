@@ -2,28 +2,28 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import Alert from "@/components/common/Alert";
+import ArtifactForm from "@/components/common/ArtifactForm";
 import AssetTitle from "@/components/common/AssetTitle";
+import CollapseList from "@/components/common/CollapseList";
 import EmptyParty from "@/components/common/EmptyParty";
-import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import { ArtifactDTO } from "@/types/api/api";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import {
   useArtifacts,
   useUpdateAssetVersionState,
 } from "../../../../../../../../../../context/AssetVersionContext";
-import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import CollapseList from "@/components/common/CollapseList";
-import { useState, useEffect } from "react";
-import ArtifactForm from "@/components/common/ArtifactForm";
-import { useForm } from "react-hook-form";
-import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import { classNames } from "../../../../../../../../../../utils/common";
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -236,25 +236,57 @@ const Artifacts = () => {
                 />
               )}
               <div>
-                {artifacts.map((artifact) => (
-                  <CollapseList
-                    key={artifact.artifactName + artifact.assetVersionName}
-                    Title={artifact.artifactName}
-                    Items={artifact.upstreamUrls?.map((upstreamUrl, index) => ({
-                      Title: upstreamUrl.upstreamUrl,
-                      className: index % 2 === 0 ? "bg-card" : "bg-card/50",
-                    }))}
-                    Button={
-                      <Button
-                        variant="secondary"
-                        onClick={() => openEditDialog(artifact)}
-                      >
-                        Edit
-                      </Button>
-                    }
-                    className="mb-4"
-                  />
-                ))}
+                <div className="overflow-hidden rounded-lg border shadow-sm">
+                  <div className="overflow-auto">
+                    <table className="w-full table-fixed overflow-x-auto text-sm">
+                      <thead className="border-b bg-card text-foreground">
+                        <tr>
+                          <th className="p-4 text-left">Name</th>
+                          <th className="p-4 text-left">Upstream</th>
+                          <th />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {artifacts.map((artifact, i) => (
+                          <tr
+                            key={artifact.artifactName}
+                            className={classNames(
+                              "border-b",
+                              i % 2 !== 0 && "bg-card/50",
+                            )}
+                          >
+                            <td className="px-4 py-2 text-left font-medium">
+                              {artifact.artifactName}
+                            </td>
+                            <td className="px-4 py-2">
+                              {artifact.upstreamUrls &&
+                              artifact.upstreamUrls.length > 0 ? (
+                                <div>
+                                  {artifact.upstreamUrls.map((url, idx) => (
+                                    <div key={idx}>{url.upstreamUrl}</div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  No upstream URLs
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              <Button
+                                variant="ghost"
+                                size={"icon"}
+                                onClick={() => openEditDialog(artifact)}
+                              >
+                                <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           </Section>
