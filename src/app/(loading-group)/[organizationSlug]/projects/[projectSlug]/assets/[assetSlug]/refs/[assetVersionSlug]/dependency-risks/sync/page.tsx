@@ -77,7 +77,7 @@ const convertTypeToState = (type: string): ExpandedVulnDTOState => {
   }
 };
 
-export const getState = (
+const getState = (
   upstream: boolean,
   events: VulnEventDTO[],
 ): ExpandedVulnDTOState => {

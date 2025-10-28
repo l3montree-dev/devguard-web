@@ -127,7 +127,6 @@ export default function SbomDownloadModal({
                 artifact: selectedArtifact || "",
               })}`
             }
-            format={"json"}
             icon={
               <Image
                 src="/assets/cyclonedx-logo.svg"
@@ -146,7 +145,6 @@ export default function SbomDownloadModal({
                 artifact: selectedArtifact || "",
               })}`
             }
-            format={"xml"}
             icon={
               <FileCode className="h-5 w-auto inline-block text-green-500" />
             }
