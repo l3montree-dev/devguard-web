@@ -269,7 +269,13 @@ const Registration = () => {
                   Boolean(flow) &&
                   // if its just a single node its the back button - we already render that one.
                   !profileFlowIsOnlyBackButton ? (
-                    <div className="mb-6 border-b-2 pb-4">
+                    <div
+                      className={classNames(
+                        availableMethods.includes("password") === true
+                          ? "mb-6 border-b-2 pb-4"
+                          : "",
+                      )}
+                    >
                       <Flow
                         hideTos
                         overrideValues={termsOverride}
