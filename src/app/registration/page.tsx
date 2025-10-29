@@ -214,6 +214,10 @@ const Registration = () => {
     }
     return false;
   }, [flow]);
+  const hasPasskey = availableMethods.includes("passkey");
+  const hasPassword = availableMethods.includes("password");
+  const showProfileFlow =
+    !oidcOnly && Boolean(flow) && !profileFlowIsOnlyBackButton;
 
   return (
     <>
@@ -262,16 +266,11 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly &&
-                  flow?.ui.nodes.some(
-                    (t) => t.group === UiNodeGroupEnum.Oidc,
-                  ) &&
-                  Boolean(flow) &&
-                  // if its just a single node its the back button - we already render that one.
-                  !profileFlowIsOnlyBackButton ? (
+                  {showProfileFlow && (
                     <div
                       className={classNames(
-                        availableMethods.includes("password") === true
+                        availableMethods.includes("passkey") ||
+                          availableMethods.includes("password")
                           ? "mb-6 border-b-2 pb-4"
                           : "",
                       )}
@@ -285,25 +284,12 @@ const Registration = () => {
                         flow={flow as LoginFlow}
                       />
                     </div>
-                  ) : (
-                    !profileFlowIsOnlyBackButton && (
-                      <div>
-                        <Flow
-                          hideTos
-                          overrideValues={termsOverride}
-                          hideGlobalMessages
-                          only="profile"
-                          onSubmit={onSubmit}
-                          flow={flow as LoginFlow}
-                        />
-                      </div>
-                    )
                   )}
 
                   {availableMethods.includes("passkey") && (
                     <div
                       className={classNames(
-                        availableMethods.includes("password") === true
+                        availableMethods.includes("password")
                           ? "mb-6 border-b-2 pb-4"
                           : "",
                       )}
@@ -317,7 +303,7 @@ const Registration = () => {
                     </div>
                   )}
                   {availableMethods.includes("password") && (
-                    <div className={"mt-6"}>
+                    <div className="mt-6">
                       <Flow
                         hideGlobalMessages
                         only="password"
