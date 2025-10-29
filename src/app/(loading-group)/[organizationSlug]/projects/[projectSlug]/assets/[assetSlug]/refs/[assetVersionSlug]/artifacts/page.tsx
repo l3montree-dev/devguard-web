@@ -24,6 +24,23 @@ import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/use
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { classNames } from "../../../../../../../../../../utils/common";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../../../../../../../../../components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../../../../../../../../components/ui/alert-dialog";
+import { TriangleAlert } from "lucide-react";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -40,6 +57,10 @@ const Artifacts = () => {
     mode: "create",
     artifact: null,
   });
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<ArtifactDTO | null>(
+    null,
+  );
 
   const [invalidUrls, setInvalidUrls] = useState<string[]>([]);
 
@@ -116,9 +137,22 @@ const Artifacts = () => {
   };
 
   const handleDelete = async () => {
-    if (dialogState.artifact) {
-      await deleteArtifact(dialogState.artifact);
-      closeDialog();
+    if (deleteDialogOpen) {
+      const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(deleteDialogOpen.artifactName)}/`;
+      const resp = await browserApiClient(url, { method: "DELETE" });
+      if (!resp.ok) {
+        toast.error("Failed to delete artifact: " + resp.statusText);
+        return;
+      }
+      updateAssetVersionState((prev) => ({
+        ...prev!,
+        artifacts: prev!.artifacts.filter(
+          (a) => a.artifactName != deleteDialogOpen.artifactName,
+        ),
+      }));
+
+      toast.success("Artifact deleted");
+      setDeleteDialogOpen(null);
     }
   };
 
@@ -145,23 +179,6 @@ const Artifacts = () => {
 
     toast.success("Artifact created successfully");
     return true;
-  };
-
-  const deleteArtifact = async (artifact: ArtifactDTO) => {
-    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}/`;
-    const resp = await browserApiClient(url, { method: "DELETE" });
-    if (!resp.ok) {
-      toast.error("Failed to delete artifact: " + resp.statusText);
-      return;
-    }
-    updateAssetVersionState((prev) => ({
-      ...prev!,
-      artifacts: prev!.artifacts.filter(
-        (a) => a.artifactName != artifact.artifactName,
-      ),
-    }));
-
-    toast.success("Artifact deleted");
   };
 
   const updateArtifact = async (artifact: ArtifactDTO): Promise<boolean> => {
@@ -255,15 +272,21 @@ const Artifacts = () => {
                               i % 2 !== 0 && "bg-card/50",
                             )}
                           >
-                            <td className="px-4 py-2 text-left font-medium">
+                            <td className="px-4 content-start py-2 text-left font-medium">
                               {artifact.artifactName}
                             </td>
                             <td className="px-4 py-2">
                               {artifact.upstreamUrls &&
                               artifact.upstreamUrls.length > 0 ? (
-                                <div>
+                                <div className="flex flex-col">
                                   {artifact.upstreamUrls.map((url, idx) => (
-                                    <div key={idx}>{url.upstreamUrl}</div>
+                                    <a
+                                      target="_blank"
+                                      href={url.upstreamUrl}
+                                      key={idx}
+                                    >
+                                      {url.upstreamUrl}
+                                    </a>
                                   ))}
                                 </div>
                               ) : (
@@ -272,14 +295,28 @@ const Artifacts = () => {
                                 </span>
                               )}
                             </td>
-                            <td className="px-4 py-2 text-right">
-                              <Button
-                                variant="ghost"
-                                size={"icon"}
-                                onClick={() => openEditDialog(artifact)}
-                              >
-                                <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
-                              </Button>
+                            <td className="px-4 py-2 content-start text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size={"icon"}>
+                                    <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem
+                                    onClick={() => openEditDialog(artifact)}
+                                  >
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      setDeleteDialogOpen(artifact)
+                                    }
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -302,6 +339,29 @@ const Artifacts = () => {
         isEditMode={dialogState.mode === "edit"}
         invalidUrls={invalidUrls}
       />
+      <AlertDialog
+        open={Boolean(deleteDialogOpen)}
+        onOpenChange={(open) => setDeleteDialogOpen(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <TriangleAlert className="mr-2 inline-block h-6 w-6 text-destructive" />
+              Are you sure you want to delete this artifact?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. All data associated with this ref
+              will be deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDelete()}>
+              <span>Confirm</span>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Page>
   );
 };

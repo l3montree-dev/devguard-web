@@ -235,6 +235,12 @@ export interface RiskCalculationReport {
 interface EventArbitraryJsonData {
   scannerIds: string;
 }
+
+export enum UpstreamState {
+  Internal = 0,
+  AcceptedFromUpstream = 1,
+  PendingUpstream = 2,
+}
 interface BaseVulnEventDTO {
   userId: string;
   createdAt: string;

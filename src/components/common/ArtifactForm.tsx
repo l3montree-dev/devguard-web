@@ -9,9 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
-import { FormProvider, UseFormReturn, useFieldArray } from "react-hook-form";
 import { ArtifactDTO } from "@/types/api/api";
+import { Plus, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -21,11 +23,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Trash2, Plus } from "lucide-react";
-import Alert from "./Alert";
-import ListItem from "./ListItem";
-import { useState, useEffect } from "react";
-import DangerZone from "./DangerZone";
 
 interface Props {
   form: UseFormReturn<ArtifactDTO>;
@@ -190,30 +187,6 @@ const ArtifactForm = ({
                         ? "Update"
                         : "Create"}
                   </Button>
-                </div>
-                <div className="flex gap-2 w-full">
-                  {isEditMode && onDelete && (
-                    <DangerZone>
-                      <ListItem
-                        Title="Delete Artifact"
-                        Description={
-                          "This will delete the artifact and all of its data. This action cannot be undone."
-                        }
-                        Button={
-                          <Alert
-                            onConfirm={onDelete}
-                            title="Delete Artifact"
-                            description="Are you sure you want to delete this artifact? This action cannot be undone."
-                          >
-                            <Button type="button" variant="destructive">
-                              Delete
-                            </Button>
-                          </Alert>
-                        }
-                        className="w-full"
-                      />
-                    </DangerZone>
-                  )}
                 </div>
               </div>
             </DialogFooter>

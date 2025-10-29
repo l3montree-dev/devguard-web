@@ -18,7 +18,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { VulnEventDTO } from "@/types/api/api";
+import { UpstreamState, VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,
@@ -133,8 +133,10 @@ export default function RiskAssessmentFeed({
               />
               <div
                 className={classNames(
-                  evTypeBackground[event.type],
-                  event.upstream === 2 ? "grayscale" : "",
+                  event.upstream === 2 ||
+                    (event.upstream === 1 && event.type === "accepted")
+                    ? "bg-secondary"
+                    : evTypeBackground[event.type],
                   "h-7 w-7 rounded-full text-white border-2 flex flex-row items-center z-10 justify-center border-background p-1",
                 )}
               >

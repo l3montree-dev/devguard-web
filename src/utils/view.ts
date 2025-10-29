@@ -19,6 +19,7 @@ import {
   ProjectDTO,
   ReleaseRiskHistory,
   RiskHistory,
+  UpstreamState,
   VulnEventDTO,
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
@@ -118,6 +119,9 @@ export const eventTypeMessages = (
     case "reopened":
       return "reopened " + flawName;
     case "accepted":
+      if (event.upstream === UpstreamState.AcceptedFromUpstream) {
+        return "won't fix " + flawName;
+      }
       return "accepted the risk of " + flawName;
     case "fixed":
       return "fixed " + flawName;
