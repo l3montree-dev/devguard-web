@@ -46,6 +46,7 @@ import { handleFlowError, ory } from "../../services/ory";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useUpdateSession } from "../../context/SessionContext";
 import { TermsConsent } from "@/components/kratos/TermsConsent";
+import { classNames } from "@/utils/common";
 
 // Renders the registration page
 const Registration = () => {
@@ -294,7 +295,13 @@ const Registration = () => {
                   )}
 
                   {availableMethods.includes("passkey") && (
-                    <div className="mb-6 border-b-2 pb-4">
+                    <div
+                      className={classNames(
+                        availableMethods.includes("password") === true
+                          ? "mb-6 border-b-2 pb-4"
+                          : "",
+                      )}
+                    >
                       <Flow
                         hideGlobalMessages
                         only="passkey"
