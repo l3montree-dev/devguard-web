@@ -256,6 +256,7 @@ const Registration = () => {
                     !profileFlowIsOnlyBackButton && (
                       <div className="mb-6 border-b-2 pb-4">
                         <Flow
+                          hideTos
                           hideGlobalMessages
                           only="profile"
                           onSubmit={onSubmit}
@@ -302,31 +303,31 @@ const Registration = () => {
                       }}
                       flow={flow as LoginFlow}
                     />
-                    <div className="flex items-start gap-2 mt-4 flex-row">
-                      <Checkbox
-                        onCheckedChange={(v) =>
-                          setOidcTermsOfUseAgreed(Boolean(v))
-                        }
-                      />
-                      <span className="text-sm leading-4  block font-medium">
-                        I agree to the{" "}
-                        <a target="_blank" href={termsOfUseLink}>
-                          terms of use
-                        </a>{" "}
-                        and the{" "}
-                        <a
-                          target="_blank"
-                          className="whitespace-nowrap"
-                          href={privacyPolicyLink}
-                        >
-                          privacy policy
-                        </a>
-                        .
-                      </span>
-                    </div>
                   </div>
                 )}
               </CardContent>
+            </Card>
+            <Card className="mt-4">
+              <div className="flex items-start gap-2 p-4 flex-row">
+                <Checkbox
+                  onCheckedChange={(v) => setOidcTermsOfUseAgreed(Boolean(v))}
+                />
+                <span className="text-sm leading-4  block font-medium">
+                  I agree to the{" "}
+                  <a target="_blank" href={termsOfUseLink}>
+                    terms of use
+                  </a>{" "}
+                  and the{" "}
+                  <a
+                    target="_blank"
+                    className="whitespace-nowrap"
+                    href={privacyPolicyLink}
+                  >
+                    privacy policy
+                  </a>
+                  .
+                </span>
+              </div>
             </Card>
             {!oidcOnly && Boolean(flow) && (
               <div className="flex flex-row justify-end">

@@ -64,6 +64,7 @@ export type Props<T> = {
     | RecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
+  hideTos?: boolean;
   // Is triggered on submission
   onSubmit: (values: T) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
@@ -124,11 +125,20 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
   };
 
   filterNodes = (): Array<UiNode> => {
-    const { flow, only } = this.props;
+    const { flow, only, hideTos } = this.props;
     if (!flow) {
       return [];
     }
-    return flow.ui.nodes.filter(({ group }) => {
+    return flow.ui.nodes.filter((node) => {
+      if (
+        hideTos &&
+        isUiNodeInputAttributes(node.attributes) &&
+        node.attributes.name === "traits.confirmedTerms"
+      ) {
+        return false;
+      }
+
+      const { group } = node;
       if (!only) {
         return true;
       }
