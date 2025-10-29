@@ -213,6 +213,19 @@ const Registration = () => {
     }
     return false;
   }, [flow]);
+
+  const soloMethodsCheck = useMemo(() => {
+    if (!flow) {
+      return true;
+    }
+
+    console.log(flow?.ui.nodes);
+    const profileNodes = flow.ui.nodes.map(
+      (t) => t.group === UiNodeGroupEnum.Profile,
+    );
+    console.log(profileNodes);
+  }, [flow?.ui.nodes]);
+
   return (
     <>
       <Head>
