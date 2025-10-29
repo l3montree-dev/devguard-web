@@ -214,18 +214,6 @@ const Registration = () => {
     return false;
   }, [flow]);
 
-  const soloMethodsCheck = useMemo(() => {
-    if (!flow) {
-      return true;
-    }
-
-    console.log(flow?.ui.nodes);
-    const profileNodes = flow.ui.nodes.map(
-      (t) => t.group === UiNodeGroupEnum.Profile,
-    );
-    console.log(profileNodes);
-  }, [flow?.ui.nodes]);
-
   return (
     <>
       <Head>
@@ -273,21 +261,34 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly &&
-                    Boolean(flow) &&
-                    // if its just a single node its the back button - we already render that one.
-                    !profileFlowIsOnlyBackButton && (
-                      <div className="mb-6 border-b-2 pb-4">
-                        <Flow
-                          hideTos
-                          overrideValues={termsOverride}
-                          hideGlobalMessages
-                          only="profile"
-                          onSubmit={onSubmit}
-                          flow={flow as LoginFlow}
-                        />
-                      </div>
-                    )}
+                  {flow?.ui.nodes.some(
+                    (t) => t.group === UiNodeGroupEnum.Oidc,
+                  ) &&
+                  Boolean(flow) &&
+                  // if its just a single node its the back button - we already render that one.
+                  !profileFlowIsOnlyBackButton ? (
+                    <div className="mb-6 border-b-2 pb-4">
+                      <Flow
+                        hideTos
+                        overrideValues={termsOverride}
+                        hideGlobalMessages
+                        only="profile"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <Flow
+                        hideTos
+                        overrideValues={termsOverride}
+                        hideGlobalMessages
+                        only="profile"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  )}
 
                   {availableMethods.includes("passkey") && (
                     <div className="mb-6 border-b-2 pb-4">
