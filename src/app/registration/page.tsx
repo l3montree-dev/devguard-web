@@ -36,6 +36,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useId,
 } from "react";
 import { toast, Toaster } from "sonner";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
@@ -44,6 +45,7 @@ import { useSearchParams } from "next/navigation";
 import { handleFlowError, ory } from "../../services/ory";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useUpdateSession } from "../../context/SessionContext";
+import { TermsConsent } from "@/components/kratos/TermsConsent";
 
 // Renders the registration page
 const Registration = () => {
@@ -52,8 +54,16 @@ const Registration = () => {
   const query = useSearchParams();
 
   const updateSession = useUpdateSession();
-  const { oidcOnly, termsOfUseLink, privacyPolicyLink } = useConfig();
+  const { oidcOnly } = useConfig();
+  const oidcTermsCheckboxId = useId();
   const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
+  const termsOverride = useMemo(
+    () =>
+      ({
+        "traits.confirmedTerms": oidcTermsOfUseAgreed,
+      }) as Partial<UpdateRegistrationFlowBody>,
+    [oidcTermsOfUseAgreed],
+  );
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
   const [flow, setFlow] = useState<RegistrationFlow>();
@@ -257,6 +267,7 @@ const Registration = () => {
                       <div className="mb-6 border-b-2 pb-4">
                         <Flow
                           hideTos
+                          overrideValues={termsOverride}
                           hideGlobalMessages
                           only="profile"
                           onSubmit={onSubmit}
@@ -290,6 +301,8 @@ const Registration = () => {
                   <div className="mt-6">
                     <Flow
                       className="flex flex-row flex-wrap gap-2 justify-center"
+                      hideTos
+                      overrideValues={termsOverride as any}
                       only="oidc"
                       hideGlobalMessages
                       onSubmit={async (v) => {
@@ -310,23 +323,16 @@ const Registration = () => {
             <Card className="mt-4">
               <div className="flex items-start gap-2 p-4 flex-row">
                 <Checkbox
+                  id={oidcTermsCheckboxId}
+                  checked={oidcTermsOfUseAgreed}
                   onCheckedChange={(v) => setOidcTermsOfUseAgreed(Boolean(v))}
                 />
-                <span className="text-sm leading-4  block font-medium">
-                  I agree to the{" "}
-                  <a target="_blank" href={termsOfUseLink}>
-                    terms of use
-                  </a>{" "}
-                  and the{" "}
-                  <a
-                    target="_blank"
-                    className="whitespace-nowrap"
-                    href={privacyPolicyLink}
-                  >
-                    privacy policy
-                  </a>
-                  .
-                </span>
+                <TermsConsent
+                  htmlFor={oidcTermsCheckboxId}
+                  className="text-sm leading-4 block font-medium"
+                >
+                  I agree to the
+                </TermsConsent>
               </div>
             </Card>
             {!oidcOnly && Boolean(flow) && (
