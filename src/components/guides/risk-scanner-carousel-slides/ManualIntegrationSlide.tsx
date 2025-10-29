@@ -118,7 +118,7 @@ const ManualIntegrationSlide: FunctionComponent<
   const [artifactName, setArtifactNameLocal] = useState(
     "pkg:devguard/" + params.organizationSlug + "/" + params.assetSlug,
   );
-  const [origin, setOrigin] = useState("DEFAULT");
+  const [origin, setOrigin] = useState("");
   const [isTag, setIsTag] = useState(false);
 
   // Update parent component when artifact changes
@@ -231,7 +231,7 @@ const ManualIntegrationSlide: FunctionComponent<
                       <div className="w-full">
                         <Label className="mb-2 block">Origin of the sbom</Label>
                         <Input
-                          value={origin}
+                          value={origin ? origin : "DEFAULT"}
                           onChange={(e) => setOrigin(e.target.value)}
                           placeholder="Origin"
                         />
@@ -258,7 +258,7 @@ const ManualIntegrationSlide: FunctionComponent<
                   <div className="w-full">
                     <Input
                       variant="onCard"
-                      value={origin}
+                      value={origin ? origin : "DEFAULT"}
                       onChange={(e) => setOrigin(e.target.value)}
                       placeholder="Origin"
                     />
@@ -441,7 +441,7 @@ const ManualIntegrationSlide: FunctionComponent<
                       <div className="w-full">
                         <Label className="mb-2 block">Origin of the VeX</Label>
                         <Input
-                          value={origin}
+                          value={origin ? origin : "VEX_DEFAULT"}
                           onChange={(e) => setOrigin(e.target.value)}
                           placeholder="Origin"
                         />
@@ -468,7 +468,7 @@ const ManualIntegrationSlide: FunctionComponent<
                   <div className="w-full">
                     <Input
                       variant="onCard"
-                      value={origin}
+                      value={origin ? origin : "VEX_DEFAULT"}
                       onChange={(e) => setOrigin(e.target.value)}
                       placeholder="Origin"
                     />
