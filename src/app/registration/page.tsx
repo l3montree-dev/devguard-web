@@ -261,7 +261,8 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {flow?.ui.nodes.some(
+                  {!oidcOnly &&
+                  flow?.ui.nodes.some(
                     (t) => t.group === UiNodeGroupEnum.Oidc,
                   ) &&
                   Boolean(flow) &&
@@ -278,16 +279,18 @@ const Registration = () => {
                       />
                     </div>
                   ) : (
-                    <div>
-                      <Flow
-                        hideTos
-                        overrideValues={termsOverride}
-                        hideGlobalMessages
-                        only="profile"
-                        onSubmit={onSubmit}
-                        flow={flow as LoginFlow}
-                      />
-                    </div>
+                    !profileFlowIsOnlyBackButton && (
+                      <div>
+                        <Flow
+                          hideTos
+                          overrideValues={termsOverride}
+                          hideGlobalMessages
+                          only="profile"
+                          onSubmit={onSubmit}
+                          flow={flow as LoginFlow}
+                        />
+                      </div>
+                    )
                   )}
 
                   {availableMethods.includes("passkey") && (
