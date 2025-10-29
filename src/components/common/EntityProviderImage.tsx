@@ -37,7 +37,7 @@ const EntityProviderImage = ({ provider }: { provider: string }) => {
     }, 1000);
   }, [theme]);
 
-  if (provider === "@official") {
+  if (provider === "@gitlab") {
     return (
       <Image
         src="/assets/gitlab.svg"
