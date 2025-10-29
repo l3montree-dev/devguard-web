@@ -118,7 +118,7 @@ const ManualIntegrationSlide: FunctionComponent<
   const [artifactName, setArtifactNameLocal] = useState(
     "pkg:devguard/" + params.organizationSlug + "/" + params.assetSlug,
   );
-  const [origin, setOrigin] = useState("DEFAULT");
+  const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isTag, setIsTag] = useState(false);
 
   // Update parent component when artifact changes
@@ -132,7 +132,14 @@ const ManualIntegrationSlide: FunctionComponent<
     if (api?.reInit) {
       setTimeout(() => api.reInit && api.reInit(), 0);
     }
-  }, [api, tab]);
+
+    setOrigin((prev) => {
+      if (prev === "SBOM_DEFAULT" || prev === "VEX_DEFAULT") {
+        return tab.toUpperCase() + "_DEFAULT";
+      }
+      return prev;
+    });
+  }, [api, tab, setOrigin]);
 
   return (
     <CarouselItem>
