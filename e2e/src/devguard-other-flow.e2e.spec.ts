@@ -4,7 +4,6 @@ import { DevGuardPOM } from './pom/devguard';
 import path from 'path';
 import { envConfig } from './utils';
 
-
 describe('DevGuard Other flows', () => {
 
   test('test manual sbom upload', async ({ page }) => {
