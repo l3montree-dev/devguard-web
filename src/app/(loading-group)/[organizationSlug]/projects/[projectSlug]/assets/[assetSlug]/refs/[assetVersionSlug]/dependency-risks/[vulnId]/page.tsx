@@ -642,12 +642,12 @@ const Index: FunctionComponent = () => {
                       Path to component
                     </span>
                     <div
-                      className={`h-40 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                      className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
                     >
                       <DependencyGraph
                         variant="compact"
                         width={100}
-                        height={100}
+                        height={200}
                         flaws={[]}
                         graph={graphData}
                       />

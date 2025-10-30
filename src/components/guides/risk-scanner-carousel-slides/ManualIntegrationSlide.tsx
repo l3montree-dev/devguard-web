@@ -134,7 +134,10 @@ const ManualIntegrationSlide: FunctionComponent<
     }
 
     setOrigin((prev) => {
-      if (prev === "SBOM_DEFAULT" || prev === "VEX_DEFAULT") {
+      if (
+        (prev === "SBOM_DEFAULT" || prev === "VEX_DEFAULT") &&
+        (tab === "vex" || tab === "sbom")
+      ) {
         return tab.toUpperCase() + "_DEFAULT";
       }
       return prev;
