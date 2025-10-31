@@ -17,6 +17,7 @@ interface InputWithButtonProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   value: string;
+  nameKey: string;
   message?: string;
   variant?: "default" | "onCard";
   copyable?: boolean;
@@ -37,6 +38,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
     message,
     variant,
     mutable,
+    nameKey,
     ...inputProps
   } = props;
 
@@ -61,10 +63,12 @@ const InputWithButton = (props: InputWithButtonProps) => {
             value={props.value ?? ""}
             className={classNames("w-full bg-transparent focus:outline-none")}
             readOnly={!mutable}
+            name={"input" + nameKey}
           />
           <div className="flex flex-row items-center gap-2">
             {copyable && (
               <button
+                name={"clipboard-" + nameKey}
                 className="cursor-pointer transition-all hover:opacity-100"
                 type="button"
                 onClick={handleCopy}
@@ -79,7 +83,12 @@ const InputWithButton = (props: InputWithButtonProps) => {
                 description={update.updateConfirmDescription}
                 onConfirm={() => update?.update()}
               >
-                <ArrowPathIcon className="h-4 w-4" />
+                <button
+                  name={"update-" + nameKey}
+                  className="cursor-pointer transition-all hover:opacity-100" type="button"
+                >
+                  <ArrowPathIcon className="h-4 w-4" />
+                </button>
               </Alert>
             )}
           </div>

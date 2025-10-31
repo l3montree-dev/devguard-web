@@ -1,19 +1,36 @@
 import { expect, Page } from "@playwright/test";
-import { envConfig } from "../utils";
+import { envConfig, LoggingAnalyzer } from "../utils";
+
+export enum DevGuardNavigationLevel {
+    Root = '.level-root',
+    Organization = '.level-organization',
+    Group = '.level-group',
+    Repo = '.level-repo'
+}
 
 export class DevGuardPOM {
 
     readonly devGuardDomain = envConfig.devGuard.domain;
 
-    constructor(public page: Page) { }
+    constructor(public page: Page) {
+        const loggingAnalyzer = new LoggingAnalyzer(page);
+
+        page.on('close', () => {
+            // expect(loggingAnalyzer.logs).toEqual([]); // todo!!
+        });
+    }
 
     async loadDevGuard() {
         await this.page.goto(this.devGuardDomain);
         await this.verifyOnDevGuardURL();
     }
 
-    async logout() {
+    async clickOnUserIconInHeader() {
         await this.page.getByRole('link', { name: 'OD', exact: true }).click();
+    }
+
+    async logout() {
+        await this.clickOnUserIconInHeader();
         await this.page.getByRole('link', { name: 'User Settings Logout' }).click();
     }
 
@@ -46,7 +63,7 @@ export class DevGuardPOM {
 
         await this.page.getByRole('button', { name: 'Sign up' }).click();
 
-        await expect(this.page.getByText('Please choose a credential to authenticate yourself with.')).toBeVisible({ timeout: 10_000});
+        await expect(this.page.getByText('Please choose a credential to authenticate yourself with.')).toBeVisible({ timeout: 10_000 });
         await this.page.locator('input[name="password"]').click();
         await this.page.locator('input[name="password"]').fill(password);
         await this.page.getByRole('button', { name: 'Sign up', exact: true }).click();
@@ -84,7 +101,7 @@ export class DevGuardPOM {
 
         await this.page.getByRole('button', { name: 'Sign up' }).click();
 
-        await expect(this.page.getByText('Please choose a credential to authenticate yourself with.')).toBeVisible({ timeout: 10_000});
+        await expect(this.page.getByText('Please choose a credential to authenticate yourself with.')).toBeVisible({ timeout: 10_000 });
         await this.page.locator('input[name="password"]').click();
         await this.page.locator('input[name="password"]').fill(password);
         await this.page.getByRole('button', { name: 'Sign up', exact: true }).click();
@@ -97,9 +114,9 @@ export class DevGuardPOM {
 
             console.log("Please check your emails, enter the verification code and click on 'Continue'");
         }
-        await this.page.getByRole('button', { name: 'Go back' }).click();
+        // await this.page.getByRole('button', { name: 'Go back' }).click();
     }
-    
+
 
     async createRepo(name: string, description: string) {
         await this.page.getByRole('button', { name: 'Create new Repository' }).click({ timeout: 10_000 });
@@ -142,43 +159,43 @@ export class DevGuardPOM {
 
     async setupFlow_selectManualUpload() {
         await this.page.waitForTimeout(500);
-        await this.page.getByRole('heading', { name: 'Upload manually File Upload' }).click({timeout: 5_000});
-        await this.page.locator('button[id="integration-method-selection-continue"]').click({timeout: 5_000});
+        await this.page.getByRole('heading', { name: 'Upload manually File Upload' }).click({ timeout: 5_000 });
+        await this.page.locator('button[id="integration-method-selection-continue"]').click({ timeout: 5_000 });
     }
 
     async setupFlow_uploadSbomFile(inputFile: string) {
         await this.page.waitForTimeout(500);
         await this.page.locator('#file-upload-sbom  input').setInputFiles(inputFile);
-        await this.page.locator('button[id="manual-integration-continue"]').click({timeout: 5_000});
+        await this.page.locator('button[id="manual-integration-continue"]').click({ timeout: 5_000 });
     }
 
     async setupFlow_automatedCLI() {
         await this.page.waitForTimeout(500);
-        await this.page.getByText('Use our CLIRecommendedUse the').click({timeout: 5_000});
-        await this.page.locator('#integration-method-selection-continue').click({timeout: 5_000});
-        await this.page.getByRole('button', { name: 'Create Personal Access Token' }).click({timeout: 5_000});
-        await this.page.getByRole('button', { name: 'Copy' }).nth(4).click({timeout: 5_000}); // todo.. find better way to select the correct copy button
-        await this.page.locator('#automated-integration-continue').click({timeout: 5_000});
+        await this.page.getByText('Use our CLIRecommendedUse the').click({ timeout: 5_000 });
+        await this.page.locator('#integration-method-selection-continue').click({ timeout: 5_000 });
+        await this.page.getByRole('button', { name: 'Create Personal Access Token' }).click({ timeout: 5_000 });
+        await this.page.getByRole('button', { name: 'Copy' }).nth(4).click({ timeout: 5_000 }); // todo.. find better way to select the correct copy button
+        await this.page.locator('#automated-integration-continue').click({ timeout: 5_000 });
     }
 
-    async deleteRepo(){
-        await this.page.getByRole('link', { name: 'Settings' }).nth(3).click({timeout: 5_000}); // todo.. find better way to select the correct Settings button
+    async deleteRepo() {
+        await this.page.locator(DevGuardNavigationLevel.Repo).getByRole('link', { name: 'Settings' }).click({ timeout: 5_000 }); // todo.. find better way to select the correct Settings button
         await this.page.getByRole('button', { name: 'Delete' }).click();
         await this.page.getByRole('button', { name: 'Confirm' }).click();
     }
 
-    async testLightDarkMode(){
-        await this.page.locator('#radix-_r_h_').click();
-        await this.page.getByRole('menuitem', { name: 'Dark' }).click();
+    async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
+        await this.page.locator(level).locator('.theme-chooser').click({ timeout: 5_000 });
+        await this.page.getByRole('menuitem', { name: 'Dark' }).click({ timeout: 5_000 });
         await this.page.waitForTimeout(1_000);
-        await this.page.locator('#radix-_r_h_').click();
-        await this.page.getByRole('menuitem', { name: 'System' }).click();
+        await this.page.locator(level).locator('.theme-chooser').click({ timeout: 5_000 });
+        await this.page.getByRole('menuitem', { name: 'System' }).click({ timeout: 5_000 });
         await this.page.waitForTimeout(1_000);
-        await this.page.locator('#radix-_r_h_').click();
-        await this.page.getByRole('menuitem', { name: 'Light' }).click();
+        await this.page.locator(level).locator('.theme-chooser').click({ timeout: 5_000 });
+        await this.page.getByRole('menuitem', { name: 'Light' }).click({ timeout: 5_000 });
     }
 
-    async settingClickthroughRepo(){
+    async settingClickthroughRepo() {
         await this.page.getByRole('link', { name: 'Settings' }).nth(3).click(); // todo.. find better way to select the correct copy button
         await this.page.getByRole('combobox', { name: 'Confidentiality Requirement' }).click();
         await this.page.getByRole('option', { name: 'Low' }).click();
@@ -188,15 +205,13 @@ export class DevGuardPOM {
         await this.page.getByRole('option', { name: 'Low' }).click();
         await this.page.getByRole('combobox', { name: 'Automatically reopen accepted' }).click();
         await this.page.getByLabel('Year').getByText('Year').click();
-        //await this.page.locator('[id="_r_4r_-form-item"]').click();
-        //await this.page.locator('[id="_r_4s_-form-item"]').click();
         await this.page.getByRole('button', { name: 'Add Member' }).click();
         await this.page.getByRole('combobox').click();
         await this.page.getByRole('button', { name: 'Close' }).click();
     }
 
-    async checkHeaderGroup(){
-        await this.page.getByRole('link', { name: 'Test Group' }).nth(1).click();
+    async checkHeaderGroup() {
+        await this.page.getByRole('link', { name: 'Test Group' }).click({ timeout: 5_000 });
         await this.page.getByRole('link', { name: 'Overview' }).click();
         await this.page.getByRole('link', { name: 'Releases' }).click();
         await this.page.getByRole('link', { name: 'Subgroups & Repositories' }).click();
@@ -204,53 +219,38 @@ export class DevGuardPOM {
         await this.page.getByRole('link', { name: 'Settings' }).nth(2).click();
     }
 
-    async checkNewReleaseGroup(){
-        await this.page.getByRole('link', { name: 'Overview' }).click();
-        await this.page.getByRole('button', { name: 'Create new release' }).click();
-        await this.page.getByRole('button', { name: 'Create new Release' }).click();
-        await this.page.getByRole('textbox', { name: 'Release name like pkg:maven/' }).click();
-        await this.page.getByRole('textbox', { name: 'Release name like pkg:maven/' }).fill('Test');
-        await this.page.getByRole('combobox').filter({ hasText: 'Select artifacts' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select artifacts' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select existing releases' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select existing releases' }).click();
-        await this.page.getByRole('button', { name: 'Create Release' }).click();
-        await this.page.getByRole('button', { name: 'Delete' }).click();
-        await this.page.getByRole('button', { name: 'Confirm' }).click();
-    }
-
-    async createNewSubgroup(){
-        await this.page.getByRole('link', { name: 'Overview' }).click();
-        await this.page.getByRole('button', { name: 'Create new release' }).click();
-        await this.page.getByRole('button', { name: 'Create new Release' }).click();
-        await this.page.getByRole('textbox', { name: 'Release name like pkg:maven/' }).click();
-        await this.page.getByRole('textbox', { name: 'Release name like pkg:maven/' }).fill('Test');
-        await this.page.getByRole('combobox').filter({ hasText: 'Select artifacts' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select artifacts' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select existing releases' }).click();
-        await this.page.getByRole('combobox').filter({ hasText: 'Select existing releases' }).click();
-        await this.page.getByRole('button', { name: 'Create Release' }).click();
-        await this.page.getByRole('button', { name: 'Delete' }).click();
-        await this.page.getByRole('button', { name: 'Confirm' }).click();
+    async createNewSubgroup() {
         await this.page.getByRole('link', { name: 'Subgroups & Repositories' }).click();
         await this.page.getByRole('button', { name: 'Create subgroup' }).click();
         await this.page.getByRole('textbox', { name: 'Name' }).fill('Test');
         await this.page.getByRole('textbox', { name: 'Description' }).click();
         await this.page.getByRole('textbox', { name: 'Description' }).fill('Test');
         await this.page.getByRole('button', { name: 'Create' }).click();
-        await this.page.getByRole('link', { name: 'Settings' }).nth(2).click();
-        await this.page.getByRole('button', { name: 'Delete' }).click();
-        await this.page.getByRole('button', { name: 'Confirm' }).click();
     }
 
-    async checkHeaderOrganization(){
+    async checkHeaderOrganization() {
         //await this.page.getByRole('link', { name: 'Test Organization' }).nth(1).click();
         await this.page.getByRole('link', { name: 'Compliance' }).click();
         await this.page.getByRole('link', { name: 'Settings', exact: true }).click();
         await this.page.getByRole('link', { name: 'Groups' }).click();
     }
 
+    async createNewArtifact(name: string, url: string) {
+        await this.page.getByRole('link', { name: 'Artifacts' }).click();
+        await this.page.getByRole('button', { name: 'Create new Artifact' }).click();
+        await this.page.getByRole('textbox', { name: 'Artifact Name' }).click();
+        await this.page.getByRole('textbox', { name: 'Artifact Name' }).fill(name);
+        await this.page.getByRole('button', { name: 'Add Upstream URL' }).click();
+        await this.page.getByRole('textbox', { name: 'Enter upstream URL (e.g.,' }).click();
+        await this.page.getByRole('textbox', { name: 'Enter upstream URL (e.g.,' }).fill(url);
+        await this.page.getByRole('button', { name: 'Create' }).click();
+    }
 
+    async deleteFirstArtifact() {
+        await this.page.locator('.artifact-options').nth(0).click();
+        await this.page.getByRole('menuitem', { name: 'Delete' }).click();
+        await this.page.getByRole('button', { name: 'Confirm' }).click();
+    }
 }
 
 

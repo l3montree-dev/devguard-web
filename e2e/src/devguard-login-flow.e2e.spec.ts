@@ -44,20 +44,4 @@ test('test if registration fails if user already exists', async ({ page }) => {
 
     await expect(devguardPOM.page.getByText('An account with the same identifier (email, phone, username, ...) exists already.')).toBeVisible({ timeout: 10_000});
   });
-
-  /* 
-  // TEMPLATE FOR NEW TESTS
-  test('test', async ({ page }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadDevGuard();
-    const username = envConfig.devGuard.uniqueUsername()
-    await devguardPOM.registerWithEmail(username, envConfig.devGuard.password);
-
-    // await devguardPOM.createTestOrganizationGroupAndRepo();
-
-    // my code goes here...
-
-    await page.waitForTimeout(500_000);
-  });
-  */
 })

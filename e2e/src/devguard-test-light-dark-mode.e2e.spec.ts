@@ -3,7 +3,7 @@
 
 import { test, expect } from '@playwright/test';
 import { describe } from 'node:test';
-import { DevGuardPOM } from './pom/devguard';
+import { DevGuardNavigationLevel, DevGuardPOM } from './pom/devguard';
 import { envConfig } from './utils';
 
 describe('DevGuard test light and dark mode', () => {
@@ -12,13 +12,13 @@ describe('DevGuard test light and dark mode', () => {
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername()
     await devguardPOM.registerWithEmail(username, envConfig.devGuard.password);
-    //Creates Organization
+
+    // Creates Organization
     await devguardPOM.createOrganization('Test');
-    //await page.waitForTimeout(500);
+    
+    // Test light, dark and system mode
+    await devguardPOM.testLightDarkSystemMode(DevGuardNavigationLevel.Organization);
 
-    //Test light, dark and system mode
-    await devguardPOM.testLightDarkMode();
-
-    await page.waitForTimeout(500_000);
+    // await page.waitForTimeout(500_000);
  });
 })

@@ -17,8 +17,7 @@ describe('OpenCode project handling', () => {
 
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
-    await page.getByRole('link', { name: 'OD', exact: true }).click();
-    await page.getByRole('link', { name: 'User Settings Logout' }).click();
+    await devguardPOM.logout();
     await devguardPOM.verifyOnDevGuardLoginURL();
   });
 

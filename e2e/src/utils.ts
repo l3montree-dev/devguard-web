@@ -84,4 +84,23 @@ function loadEnvVariables() {
   return config;
 }
 
+export class LoggingAnalyzer {
+
+  public readonly logs: string[] = [];
+
+  constructor(page: Page) {
+
+    // Listen for all console logs
+    page.on('console', msg => console.log(msg.text()));
+
+    // Listen for all console events and handle errors
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log(`Error text: "${msg.text()}"`);
+        this.logs.push(msg.text());
+      }
+    });
+  }
+}
+
 export const envConfig = loadEnvVariables();
