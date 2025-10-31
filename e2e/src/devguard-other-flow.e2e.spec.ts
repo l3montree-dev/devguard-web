@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { describe } from 'node:test';
 import { DevGuardPOM } from './pom/devguard';
 import path from 'path';

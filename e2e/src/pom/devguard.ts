@@ -68,6 +68,7 @@ export class DevGuardPOM {
             await this.page.getByRole('button', { name: 'Continue', exact: true }).click();
         }
     }
+
     async registerWithEmailwithoutVerification(username: string, password: string) {
         await this.page.goto(`${this.devGuardDomain}/login`);
         await this.page.getByRole('tab', { name: 'Legacy Password Login' }).click();
@@ -137,33 +138,31 @@ export class DevGuardPOM {
         await this.page.waitForTimeout(500);
         await this.page.getByRole('heading', { name: 'Use your own Scanner Expert' }).click();
         await this.page.locator('button[id="scanner-selection-continue"]').click();
-        await this.page.getByText('Use our CLIRecommendedUse the').click();
-        await this.page.locator('#integration-method-selection-continue').click();
-        //await this.page.locator('#radix-_r_2r_-trigger-sarif').click();
-        //await this.page.locator('#radix-_r_2r_-trigger-sbom').click();
-        //await this.page.locator('#radix-_r_2r_-content-sbom').getByRole('button', { name: 'Copy' }).click();
-        //await this.page.locator('#radix-_r_2r_-trigger-sarif').click();
-        //await this.page.locator('#radix-_r_2r_-content-sarif').getByRole('button', { name: 'Copy' }).click();
-        //await this.page.locator('#radix-_r_2r_-trigger-sbom').click();
-        await this.page.getByRole('button', { name: 'Create Personal Access Token' }).click();
-        await this.page.getByRole('button', { name: 'Copy' }).nth(4).click();
-        await this.page.locator('#automated-integration-continue').click();
     }
 
     async setupFlow_selectManualUpload() {
         await this.page.waitForTimeout(500);
-        await this.page.getByRole('heading', { name: 'Upload manually File Upload' }).click();
-        await this.page.locator('button[id="integration-method-selection-continue"]').click();
+        await this.page.getByRole('heading', { name: 'Upload manually File Upload' }).click({timeout: 5_000});
+        await this.page.locator('button[id="integration-method-selection-continue"]').click({timeout: 5_000});
     }
 
     async setupFlow_uploadSbomFile(inputFile: string) {
         await this.page.waitForTimeout(500);
         await this.page.locator('#file-upload-sbom  input').setInputFiles(inputFile);
-        await this.page.locator('button[id="manual-integration-continue"]').click();
+        await this.page.locator('button[id="manual-integration-continue"]').click({timeout: 5_000});
+    }
+
+    async setupFlow_automatedCLI() {
+        await this.page.waitForTimeout(500);
+        await this.page.getByText('Use our CLIRecommendedUse the').click({timeout: 5_000});
+        await this.page.locator('#integration-method-selection-continue').click({timeout: 5_000});
+        await this.page.getByRole('button', { name: 'Create Personal Access Token' }).click({timeout: 5_000});
+        await this.page.getByRole('button', { name: 'Copy' }).nth(4).click({timeout: 5_000}); // todo.. find better way to select the correct copy button
+        await this.page.locator('#automated-integration-continue').click({timeout: 5_000});
     }
 
     async deleteRepo(){
-        await this.page.getByRole('link', { name: 'Settings' }).nth(3).click();
+        await this.page.getByRole('link', { name: 'Settings' }).nth(3).click({timeout: 5_000}); // todo.. find better way to select the correct Settings button
         await this.page.getByRole('button', { name: 'Delete' }).click();
         await this.page.getByRole('button', { name: 'Confirm' }).click();
     }
@@ -171,14 +170,16 @@ export class DevGuardPOM {
     async testLightDarkMode(){
         await this.page.locator('#radix-_r_h_').click();
         await this.page.getByRole('menuitem', { name: 'Dark' }).click();
+        await this.page.waitForTimeout(1_000);
         await this.page.locator('#radix-_r_h_').click();
         await this.page.getByRole('menuitem', { name: 'System' }).click();
+        await this.page.waitForTimeout(1_000);
         await this.page.locator('#radix-_r_h_').click();
         await this.page.getByRole('menuitem', { name: 'Light' }).click();
     }
 
     async settingClickthroughRepo(){
-        await this.page.getByRole('link', { name: 'Settings' }).nth(3).click();
+        await this.page.getByRole('link', { name: 'Settings' }).nth(3).click(); // todo.. find better way to select the correct copy button
         await this.page.getByRole('combobox', { name: 'Confidentiality Requirement' }).click();
         await this.page.getByRole('option', { name: 'Low' }).click();
         await this.page.getByRole('combobox', { name: 'Integrity Requirement' }).click();
