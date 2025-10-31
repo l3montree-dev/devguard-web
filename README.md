@@ -1,22 +1,24 @@
 <!--
  Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
- 
+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as
  published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Affero General Public License for more details.
- 
+
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+
 <a name="readme-top"></a>
+
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
 *** that would make this better, please fork the repo and create a pull request
@@ -46,14 +48,12 @@
   </p>
 </div>
 
-
 <p align="center">
    <a href="https://www.bestpractices.dev/projects/8928"><img src="https://www.bestpractices.dev/projects/8928/badge" alt="OpenSSF Badge"></a>
    <a href="https://github.com/l3montree-dev/devguard/blob/main/LICENSE.txt"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/l3montree-dev/devguard/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22"><img src="https://img.shields.io/badge/Help%20Wanted-Contribute-blue"></a>
     <a href="https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/refs/main"><img src="https://api.main.devguard.org/api/v1/badges/cvss/5ac91915-1c88-4180-9606-475cf82e682c" alt="CVSS"></a>
 </p>
-
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -74,13 +74,12 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 DevGuard is a vulnerability management that fits perfectly into any IT environment and ensures mitigation of vulnerabilities and complete documentation of the handling processes. It aims to be compliant to various security frameworks, like ISO 27001 or German BSI Grundschutz.
-With DevGuard you can easily go through the vulnerability management process: 
+With DevGuard you can easily go through the vulnerability management process:
 
 1. Consolidation of vulnerabilities
 2. Enhancing the data
@@ -97,30 +96,30 @@ We are using DevGuard to scan and manage the risks of DevGuard itself—essentia
 
 [DEMO](https://main.devguard.org/l3montree-cybersecurity/projects/devguard)
 
-We believe VEX information should be shared via a link due to its dynamic nature, as what is risk-free today may be affected by a CVE tomorrow. We've integrated the DevGuard risk scoring into the metrics, with detailed documentation on its calculation to follow soon. SBOM and VEX data are always up to date at these links: 
+We believe VEX information should be shared via a link due to its dynamic nature, as what is risk-free today may be affected by a CVE tomorrow. We've integrated the DevGuard risk scoring into the metrics, with detailed documentation on its calculation to follow soon. SBOM and VEX data are always up to date at these links:
 
-|Project|SBOM|VeX|
-|---|---|---|
-|[Devguard Golang API](https://github.com/l3montree-dev/devguard)|[SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/sbom.json?scanner=container-scanning)|[VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/vex.json?scanner=container-scanning)|
-|[Devguard Web-Frontend](https://github.com/l3montree-dev/devguard-web)|[SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/sbom.json?scanner=container-scanning)|[VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/vex.json?scanner=container-scanning)|
-
+| Project                                                                | SBOM                                                                                                                                 | VeX                                                                                                                                |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| [Devguard Golang API](https://github.com/l3montree-dev/devguard)       | [SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/sbom.json?scanner=container-scanning)     | [VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/vex.json?scanner=container-scanning)     |
+| [Devguard Web-Frontend](https://github.com/l3montree-dev/devguard-web) | [SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/sbom.json?scanner=container-scanning) | [VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/vex.json?scanner=container-scanning) |
 
 ### Built With
 
-DevGuard is divided into two projects: A frontend (DevGuard Web) and a backend (DevGuard Backend). 
+DevGuard is divided into two projects: A frontend (DevGuard Web) and a backend (DevGuard Backend).
 
 **Frontend (this project):**
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
+
+- [![Next][Next.js]][Next-url]
+- [![React][React.js]][React-url]
 
 **Backend:**
-* [![Go][go.dev]][go-url]
+
+- [![Go][go.dev]][go-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 To get a local copy up and running follow these simple example steps.
@@ -145,52 +144,50 @@ To get a local copy up and running follow these simple example steps.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
+
 ## Roadmap MVP
 
 - [x] Consolidation of vulnerabilities
-- [X] Enhancing the data
+- [x] Enhancing the data
 - [x] Risk Assessment
 - [x] Selection of the mitigation type
 - [ ] Sharing of the vulnerability information to responsible parties
 - [ ] Reporting
 - [ ] Multi-language Support
-    - [ ] German
-    - [ ] English
+  - [ ] German
+  - [ ] English
 
 See the [open issues](https://github.com/l3montree-dev/devguard-web/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
 Please read our contribution guide if you would like to report a bug, ask a question, or help us with coding.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- Code of Conduct -->
+
 ## Code of Conduct
 
 Help us keep DevGuard open and inclusive. Please read and follow our Code of Conduct.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the AGPL-3.0-or-later License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
@@ -198,8 +195,8 @@ Distributed under the AGPL-3.0-or-later License. See `LICENSE.txt` for more info
 [go.dev]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
 [go-url]: https://go.dev
 
-
 ## Build using kaniko
+
 ```bash
 docker run --rm -v $(pwd):/workspace gcr.io/kaniko-project/executor:latest --dockerfile=/workspace/Dockerfile --context=/workspace --tarPath=/workspace/image.tar --no-push
 ```

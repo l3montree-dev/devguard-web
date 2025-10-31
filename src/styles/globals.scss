@@ -1,5 +1,3 @@
-
-
 @layer base {
   :root {
     --background: 214 20% 98%;
@@ -58,9 +56,8 @@
     --footer-background: 214 20% 98%;
     --footer-foreground: 226 57% 0%;
   }
-  
+
   .dark {
-  
     --background: 213 27% 7%;
     --foreground: 0 0% 98%;
 
@@ -112,69 +109,74 @@
     --header-foreground: 0 0% 100%;
     --footer-background: 213 27% 7%;
     --footer-foreground: 0 0% 98%;
-    }  
+  }
 }
 
 @layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-
-
 .animated-outline {
-    --border-angle: 0turn; // For animation.
-    --main-bg: conic-gradient(
-        from var(--border-angle),
-        hsl(var(--card)) 0%,
-        hsl(var(--card)) 5%,
-        hsl(var(--card)) 60%,
-        hsl(var(--card)) 95%
-      );
-    margin: -0.5px;
-    border: solid 2px transparent;
-    
-    --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, transparent, hsl(var(--primary)) 99%, transparent);
-    
-    background: 
+  --border-angle: 0turn; // For animation.
+  --main-bg: conic-gradient(
+    from var(--border-angle),
+    hsl(var(--card)) 0%,
+    hsl(var(--card)) 5%,
+    hsl(var(--card)) 60%,
+    hsl(var(--card)) 95%
+  );
+  margin: -0.5px;
+  border: solid 2px transparent;
+
+  --gradient-border: conic-gradient(
+    from var(--border-angle),
+    transparent 25%,
+    transparent,
+    hsl(var(--primary)) 99%,
+    transparent
+  );
+
+  background: 
       // padding-box clip this background in to the overall element except the border.
       
       // border-box extends this background to the border space
-      var(--gradient-border) border-box, 
-      // Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background.
-      var(--main-bg) border-box;
-  
-    animation: bg-spin 3s linear infinite;
-    @keyframes bg-spin {
-      to {
-        --border-angle: 1turn;
-      }
+    var(--gradient-border) border-box,
+    // Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background.
+    var(--main-bg) border-box;
+
+  animation: bg-spin 3s linear infinite;
+  @keyframes bg-spin {
+    to {
+      --border-angle: 1turn;
     }
-}
-  
-  @property --border-angle {
-    syntax: "<angle>";
-    inherits: true;
-    initial-value: 0turn;
   }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
+}
 
 .hide-handles {
-    .react-flow__handle {
-        opacity: 0;
-    }
+  .react-flow__handle {
+    opacity: 0;
+  }
 }
 
 [data-state="open"] {
-    > button > div > div .caret, > div > h3 .caret {
-        transition: all 0.2s ease;
-        transform: rotate(180deg);
-    }
+  > button > div > div .caret,
+  > div > h3 .caret {
+    transition: all 0.2s ease;
+    transform: rotate(180deg);
+  }
 }
 
 .caret {
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }

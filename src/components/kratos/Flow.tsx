@@ -19,7 +19,6 @@ import {
   RegistrationFlow,
   SettingsFlow,
   UiNode,
-  UiText,
   UpdateLoginFlowBody,
   UpdateRecoveryFlowBody,
   UpdateRegistrationFlowBody,
@@ -30,11 +29,9 @@ import {
 import { getNodeId, isUiNodeInputAttributes } from "@ory/integrations/ui";
 import { Component, FormEvent, MouseEvent } from "react";
 
+import { classNames } from "../../utils/common";
 import { Messages } from "./Messages";
 import { Node } from "./Node";
-import Callout from "../common/Callout";
-import { classNames } from "../../utils/common";
-import { kratosMessageTypeToIntent } from "./helpers";
 
 export type Values = Partial<
   | UpdateLoginFlowBody
@@ -64,6 +61,7 @@ export type Props<T> = {
     | RecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
+  overrideValues?: Partial<T>;
   // Is triggered on submission
   onSubmit: (values: T) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
@@ -98,6 +96,15 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       // Flow has changed, reload the values!
       this.initializeValues(this.filterNodes());
     }
+    if (prevProps.overrideValues !== this.props.overrideValues) {
+      this.setState((state) => ({
+        ...state,
+        values: {
+          ...state.values,
+          ...(this.props.overrideValues ?? {}),
+        },
+      }));
+    }
   }
 
   initializeValues = (nodes: Array<UiNode> = []) => {
@@ -119,6 +126,10 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       }
     });
 
+    if (this.props.overrideValues) {
+      Object.assign(values, this.props.overrideValues);
+    }
+
     // Set all the values!
     this.setState((state) => ({ ...state, values }));
   };
@@ -128,7 +139,8 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
     if (!flow) {
       return [];
     }
-    return flow.ui.nodes.filter(({ group }) => {
+    return flow.ui.nodes.filter((node) => {
+      const { group } = node;
       if (!only) {
         return true;
       }

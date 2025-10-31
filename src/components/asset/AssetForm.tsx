@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import {
   FormControl,
   FormDescription,
@@ -8,7 +8,9 @@ import {
   FormMessage,
 } from "../ui/form";
 
+import { Slider } from "@/components/ui/slider";
 import { AssetDTO } from "@/types/api/api";
+import { Modify } from "@/types/common";
 import { UseFormReturn } from "react-hook-form";
 import ListItem from "../common/ListItem";
 import Section from "../common/Section";
@@ -21,17 +23,19 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Switch } from "../ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Modify } from "@/types/common";
 
-import React from "react";
-import { Button } from "../ui/button";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
+import React from "react";
+import { useConfig } from "../../context/ConfigContext";
+import { Button } from "../ui/button";
+import { InputWithButton } from "../ui/input-with-button";
 import { Label } from "../ui/label";
+import { CopyCodeFragment } from "../common/CopyCode";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
+  assetId?: string;
   disable?: boolean;
 }
 
@@ -49,7 +53,6 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
 }) => {
   const gitInstance = form.watch("repositoryProvider");
   const externalEntityProviderId = form.watch("externalEntityProviderId");
-
   return (
     <>
       <FormField
@@ -136,7 +139,12 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
   );
 };
 
-export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
+export const AssetFormRequirements: FunctionComponent<Props> = ({
+  form,
+  assetId,
+}) => {
+  const devguardApiUrl = useConfig().devguardApiUrlPublicInternet;
+
   return (
     <>
       <FormField
@@ -256,6 +264,79 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="paranoidMode"
+        render={({ field }) => (
+          <FormItem>
+            <ListItem
+              Description={
+                "Do you trust your upstream supplier? If not, enable this mode so you need to accept the statement vulnerability assessment in the VEX reports from your supplier manually."
+              }
+              Title="Paranoid Mode"
+              Button={
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              }
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {assetId && (
+        <FormField
+          control={form.control}
+          name="sharesInformation"
+          render={({ field }) => (
+            <FormItem>
+              <ListItem
+                Description={
+                  <>
+                    By enabling this option, your vulnerability endpoints are
+                    made publicly accessible. You can add the two query
+                    parameters{" "}
+                    <CopyCodeFragment codeString="?ref=<Branch slug | Tag slug>" />{" "}
+                    and{" "}
+                    <CopyCodeFragment codeString="?artifactName=<Name of the artifact url encoded>" />{" "}
+                    to the URL to further scope the data. If none is provided,
+                    the default branch and all artifacts are used.
+                    <div className="text-white mt-4">
+                      <InputWithButton
+                        label="VeX-URL (Always up to date vulnerability information)"
+                        copyable
+                        variant="onCard"
+                        value={
+                          devguardApiUrl +
+                          "/api/v1/public/" +
+                          assetId +
+                          "/vex.json"
+                        }
+                      />
+                    </div>
+                  </>
+                }
+                Title={"Enable public access to vulnerability data."}
+                Button={
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                }
+              />
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
     </>
   );
 };
@@ -378,6 +459,7 @@ export const AssetSettingsForm: FunctionComponent<
     disable?: boolean;
     showSecurityRequirements?: boolean;
     showEnvironmentalInformation?: boolean;
+    assetId?: string;
   }
 > = ({
   form,
@@ -386,6 +468,7 @@ export const AssetSettingsForm: FunctionComponent<
   disable,
   showSecurityRequirements = true,
   showEnvironmentalInformation = true,
+  assetId,
 }) => {
   return (
     <>
@@ -405,7 +488,7 @@ export const AssetSettingsForm: FunctionComponent<
             description="
 Security requirements are specific criteria or conditions that an application, system, or organization must meet to ensure the protection of data, maintain integrity, confidentiality, and availability, and guard against threats and vulnerabilities. These requirements help to establish security policies, guide the development of secure systems, and ensure compliance with regulatory and industry standards."
           >
-            <AssetFormRequirements form={form} />
+            <AssetFormRequirements assetId={assetId} form={form} />
           </Section>
         </>
       )}

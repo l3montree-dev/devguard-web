@@ -70,9 +70,9 @@ import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { osiLicenseHexColors } from "../../../../../../../../../../utils/view";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -337,17 +337,7 @@ const Index: FunctionComponent = () => {
     return params;
   }, [searchParams]);
 
-  const updateQueryParams = useRouterQuery();
-
-  const handleSearch = useMemo(
-    () =>
-      debounce((v: ChangeEvent<HTMLInputElement>) => {
-        updateQueryParams({
-          search: v.currentTarget.value,
-        });
-      }, 500),
-    [updateQueryParams],
-  );
+  const handleSearch = useDebouncedQuerySearch();
 
   const { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
     url + "?" + params.toString(),
@@ -564,7 +554,7 @@ const Index: FunctionComponent = () => {
           />
           <div className="relative flex-1">
             <Input
-              onChange={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
               defaultValue={searchParams?.get("search") as string}
               placeholder="Search for dependencies or versions - just start typing..."
             />

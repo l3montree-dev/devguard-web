@@ -39,6 +39,14 @@ export interface DependencyGraphNodeProps {
   };
 }
 
+const nodeStyle = (type: string) => {
+  if (type === "sbom") {
+    return "bg-blue-100 border-blue-400 dark:border-blue-800 dark:bg-blue-900";
+  } else if (type === "vex") {
+    return "bg-green-100 dark:border-green-800 border-green-600 dark:bg-green-900";
+  }
+  return "bg-card";
+};
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
@@ -48,8 +56,8 @@ export const DependencyGraphNode: FunctionComponent<
   const shouldFocus =
     beautifyPurl(searchParams?.get("pkg") as string) ===
     beautifyPurl(props.data.label);
-  const router = useRouter();
-  const version = extractVersion(props.data.label);
+
+  const type = props.data.label.split(":")[0];
   const Node = (
     <div
       style={{
@@ -58,8 +66,10 @@ export const DependencyGraphNode: FunctionComponent<
         // backgroundColor: props.data.vuln !== undefined ? color : "white",
       }}
       className={classNames(
-        "relative rounded border bg-card p-3 text-xs text-card-foreground",
+        "relative  border rounded p-3 text-xs text-card-foreground",
         shouldFocus ? "border-2 border-primary" : "",
+        // check if valid purl
+        nodeStyle(type),
       )}
     >
       <Handle
@@ -85,8 +95,7 @@ export const DependencyGraphNode: FunctionComponent<
           </span>
         )}
         <label htmlFor="text" className="text-left">
-          {beautifyPurl(props.data.label)}
-          {version ? `@${version}` : ""}
+          {props.data.label.replace("sbom:", "").replace("vex:", "")}
         </label>
       </div>
       <Handle

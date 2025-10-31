@@ -121,7 +121,6 @@ export default function VexDownloadModal({
                 artifact: selectedArtifact as string,
               })}`
             }
-            format={"json"}
             icon={
               <Image
                 src="/assets/cyclonedx-logo.svg"
@@ -140,7 +139,6 @@ export default function VexDownloadModal({
                 artifact: selectedArtifact as string,
               })}`
             }
-            format={"xml"}
             icon={
               <FileCode className="h-5 w-auto inline-block text-green-500" />
             }

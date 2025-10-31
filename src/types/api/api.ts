@@ -172,7 +172,7 @@ export interface ProjectDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 }
-
+export type ExpandedVulnDTOState = VulnDTO["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -235,6 +235,12 @@ export interface RiskCalculationReport {
 interface EventArbitraryJsonData {
   scannerIds: string;
 }
+
+export enum UpstreamState {
+  Internal = 0,
+  AcceptedFromUpstream = 1,
+  PendingUpstream = 2,
+}
 interface BaseVulnEventDTO {
   userId: string;
   createdAt: string;
@@ -248,6 +254,7 @@ interface BaseVulnEventDTO {
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
+  upstream: number;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
@@ -448,6 +455,7 @@ export interface AssetVersionDTO {
   lastIacScan: string;
   lastContainerScan: string;
   lastDastScan: string;
+  lastAccessedAt: string;
 
   signingPubKey?: string;
 }
@@ -468,6 +476,7 @@ export interface AssetDTO {
   repositoryName?: string;
 
   reachableFromTheInternet: boolean;
+  paranoidMode: boolean;
 
   lastSecretScan: string;
   lastSastScan: string;
@@ -498,7 +507,9 @@ export interface AssetDTO {
     avatarUrl?: string;
     role?: UserRole.Admin | UserRole.Member;
   }>;
+
   isPublic: boolean;
+  sharesInformation: boolean;
 }
 
 export interface DependencyTreeNode {
@@ -620,6 +631,11 @@ export interface LicenseRiskDTO extends BaseVulnDTO {
     version: string;
     license: string;
   };
+}
+
+export interface ArtifactCreateUpdateRequest {
+  artifactName: string;
+  informationSources: { url: string }[]; // was upstreamUrls
 }
 
 export interface ArtifactDTO {
@@ -746,9 +762,9 @@ export interface RiskHistory {
   highCvss: number;
   criticalCvss: number;
 
-  artifactName?: string;
-  assetId?: string;
-  assetVersionName?: string;
+  artifactName: string;
+  assetId: string;
+  assetVersionName: string;
 }
 
 export type ReleaseRiskHistory = Omit<
