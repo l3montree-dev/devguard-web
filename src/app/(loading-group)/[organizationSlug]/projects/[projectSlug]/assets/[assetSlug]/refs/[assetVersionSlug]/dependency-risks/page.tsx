@@ -359,7 +359,7 @@ const Index: FunctionComponent = () => {
             </TabsList>
           </Tabs>
           <Input
-            onChange={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
             defaultValue={params?.get("search") as string}
             placeholder="Search for cve, package name, message or scanner..."
           />

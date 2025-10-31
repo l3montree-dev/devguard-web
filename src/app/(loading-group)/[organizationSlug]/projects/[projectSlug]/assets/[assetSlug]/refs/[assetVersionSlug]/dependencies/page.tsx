@@ -554,7 +554,7 @@ const Index: FunctionComponent = () => {
           />
           <div className="relative flex-1">
             <Input
-              onChange={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
               defaultValue={searchParams?.get("search") as string}
               placeholder="Search for dependencies or versions - just start typing..."
             />
