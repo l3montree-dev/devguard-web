@@ -16,6 +16,7 @@
 import {
   LoginFlow,
   RegistrationFlow,
+  UiNode,
   UiNodeGroupEnum,
   UiNodeScriptAttributes,
   UpdateRegistrationFlowBody,
@@ -24,7 +25,10 @@ import {
 import { Flow } from "@/components/kratos/Flow";
 import { Messages } from "@/components/kratos/Messages";
 import { Card, CardContent } from "@/components/ui/card";
-import { filterNodesByGroups } from "@ory/integrations/ui";
+import {
+  filterNodesByGroups,
+  isUiNodeInputAttributes,
+} from "@ory/integrations/ui";
 import { AxiosError } from "axios";
 import { uniq } from "lodash";
 import Head from "next/head";
@@ -67,7 +71,28 @@ const Registration = () => {
   );
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
-  const [flow, setFlow] = useState<RegistrationFlow>();
+  const [flow, _setFlow] = useState<RegistrationFlow>();
+
+  const removeTosNode = (nodes: Array<UiNode>) => {
+    return nodes.filter((n) => {
+      if (
+        isUiNodeInputAttributes(n.attributes) &&
+        n.attributes.name === "traits.confirmedTerms"
+      ) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const setFlow = (flow: RegistrationFlow | undefined) => {
+    if (!flow) {
+      _setFlow(undefined);
+      return;
+    }
+    flow.ui.nodes = removeTosNode(flow.ui.nodes);
+    _setFlow(flow);
+  };
 
   // Get ?flow=... from the URL
   const { flow: flowId, return_to: returnTo } = query as {
@@ -88,6 +113,7 @@ const Registration = () => {
         .getRegistrationFlow({ id: String(flowId) })
         .then(({ data }) => {
           // We received the flow - let's use its data and render the form!
+          // remove the tos button since we override it
           setFlow(data);
         })
         .catch(handleFlowError(router, "registration", setFlow));
@@ -100,12 +126,19 @@ const Registration = () => {
         returnTo: returnTo ? String(returnTo) : undefined,
       })
       .then(({ data }) => {
+        data.ui.nodes = removeTosNode(data.ui.nodes);
         setFlow(data);
       })
       .catch(handleFlowError(router, "registration", setFlow));
   }, [flowId, router, returnTo, flow]);
 
   const onSubmit = async (values: UpdateRegistrationFlowBody) => {
+    if (!oidcTermsOfUseAgreed) {
+      toast.error(
+        "You must agree to the terms of use and privacy policy to continue.",
+      );
+      return;
+    }
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
@@ -214,8 +247,7 @@ const Registration = () => {
     }
     return false;
   }, [flow]);
-  const hasPasskey = availableMethods.includes("passkey");
-  const hasPassword = availableMethods.includes("password");
+
   const showProfileFlow =
     !oidcOnly && Boolean(flow) && !profileFlowIsOnlyBackButton;
 
@@ -276,7 +308,6 @@ const Registration = () => {
                       )}
                     >
                       <Flow
-                        hideTos
                         overrideValues={termsOverride}
                         hideGlobalMessages
                         only="profile"
@@ -317,19 +348,10 @@ const Registration = () => {
                   <div className="mt-6">
                     <Flow
                       className="flex flex-row flex-wrap gap-2 justify-center"
-                      hideTos
                       overrideValues={termsOverride as any}
                       only="oidc"
                       hideGlobalMessages
-                      onSubmit={async (v) => {
-                        if (!oidcTermsOfUseAgreed) {
-                          toast.error(
-                            "You must agree to the terms of use and privacy policy to continue.",
-                          );
-                          return;
-                        }
-                        return onSubmit(v as any);
-                      }}
+                      onSubmit={onSubmit}
                       flow={flow as LoginFlow}
                     />
                   </div>

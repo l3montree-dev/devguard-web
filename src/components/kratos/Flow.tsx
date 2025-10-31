@@ -19,7 +19,6 @@ import {
   RegistrationFlow,
   SettingsFlow,
   UiNode,
-  UiText,
   UpdateLoginFlowBody,
   UpdateRecoveryFlowBody,
   UpdateRegistrationFlowBody,
@@ -30,11 +29,9 @@ import {
 import { getNodeId, isUiNodeInputAttributes } from "@ory/integrations/ui";
 import { Component, FormEvent, MouseEvent } from "react";
 
+import { classNames } from "../../utils/common";
 import { Messages } from "./Messages";
 import { Node } from "./Node";
-import Callout from "../common/Callout";
-import { classNames } from "../../utils/common";
-import { kratosMessageTypeToIntent } from "./helpers";
 
 export type Values = Partial<
   | UpdateLoginFlowBody
@@ -64,7 +61,6 @@ export type Props<T> = {
     | RecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
-  hideTos?: boolean;
   overrideValues?: Partial<T>;
   // Is triggered on submission
   onSubmit: (values: T) => Promise<void>;
@@ -92,13 +88,13 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
   }
 
   componentDidMount() {
-    this.initializeValues(this.filterNodes({ includeHidden: true }));
+    this.initializeValues(this.filterNodes());
   }
 
   componentDidUpdate(prevProps: Props<T>) {
     if (prevProps.flow !== this.props.flow) {
       // Flow has changed, reload the values!
-      this.initializeValues(this.filterNodes({ includeHidden: true }));
+      this.initializeValues(this.filterNodes());
     }
     if (prevProps.overrideValues !== this.props.overrideValues) {
       this.setState((state) => ({
@@ -138,23 +134,12 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
     this.setState((state) => ({ ...state, values }));
   };
 
-  filterNodes = ({
-    includeHidden = false,
-  }: { includeHidden?: boolean } = {}): Array<UiNode> => {
-    const { flow, only, hideTos } = this.props;
+  filterNodes = (): Array<UiNode> => {
+    const { flow, only } = this.props;
     if (!flow) {
       return [];
     }
     return flow.ui.nodes.filter((node) => {
-      if (
-        !includeHidden &&
-        hideTos &&
-        isUiNodeInputAttributes(node.attributes) &&
-        node.attributes.name === "traits.confirmedTerms"
-      ) {
-        return false;
-      }
-
       const { group } = node;
       if (!only) {
         return true;
@@ -219,12 +204,11 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
   };
 
   render() {
-    const { hideGlobalMessages, flow, hideTos } = this.props;
+    const { hideGlobalMessages, flow } = this.props;
     const { values, isLoading } = this.state;
 
     // Filter the nodes - only show the ones we want
     const nodes = this.filterNodes();
-    const termsValue = (values as Record<string, any>)["traits.confirmedTerms"];
 
     if (!flow) {
       // No flow was set yet? It's probably still loading...
@@ -241,13 +225,6 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
         className={classNames("flex flex-col gap-4", this.props.className)}
         onSubmit={this.handleSubmit}
       >
-        {hideTos ? (
-          <input
-            type="hidden"
-            name="traits.confirmedTerms"
-            value={termsValue ? "true" : "false"}
-          />
-        ) : null}
         {!hideGlobalMessages && Boolean(flow.ui.messages) ? (
           <Messages messages={flow.ui.messages} />
         ) : null}
