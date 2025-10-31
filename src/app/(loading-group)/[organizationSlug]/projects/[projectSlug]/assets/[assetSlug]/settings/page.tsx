@@ -364,6 +364,7 @@ const Index: FunctionComponent = () => {
             <InputWithButton
               label="Badge Secret"
               value={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
+              nameKey="settings-badge-secret"
               message="You can use the URL to display this badge in your README or other documentation.
               The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
               variant="onCard"
@@ -394,6 +395,7 @@ const Index: FunctionComponent = () => {
             <InputWithButton
               label="Webhook URL"
               value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}
+              nameKey="settings-webhook-url"
               message="You can use the URL to send webhook requests to this endpoint."
               variant="onCard"
               copyable
@@ -402,6 +404,7 @@ const Index: FunctionComponent = () => {
             <InputWithButton
               label="Webhook Secret"
               value={secrets?.webhookSecret ?? "No webhook secret set"}
+              nameKey="settings-webhook-secret"
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
               copyable
               variant="onCard"

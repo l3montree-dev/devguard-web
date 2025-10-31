@@ -344,7 +344,10 @@ const Artifacts = () => {
                               </td>
                               <td className="px-4 py-2 content-start text-right">
                                 <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
+                                  <DropdownMenuTrigger
+                                    className="artifact-options"
+                                    asChild
+                                  >
                                     <Button variant="ghost" size={"icon"}>
                                       <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
                                     </Button>

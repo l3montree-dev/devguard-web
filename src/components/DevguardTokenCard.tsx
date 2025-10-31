@@ -19,7 +19,7 @@ const DevguardTokenCard = () => {
         <div className="mb-2">
           <InputWithButton
             label="Secret token"
-            placeholder="the secret"
+            nameKey="devguard-secret-token"
             copyable={true}
             mutable={true}
             variant="onCard"

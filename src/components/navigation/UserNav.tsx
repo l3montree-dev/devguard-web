@@ -47,7 +47,7 @@ export default function UserNav() {
     <div className="flex user-nav flex-row justify-between gap-1">
       {!config.enforceTheme && (
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger className="theme-chooser">
             <div className="flex w-10 flex-row justify-center">
               <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 text-background transition-all dark:-rotate-90 dark:scale-0 dark:text-muted-foreground" />
               <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 text-background transition-all dark:rotate-0 dark:scale-100 dark:text-muted-foreground" />
