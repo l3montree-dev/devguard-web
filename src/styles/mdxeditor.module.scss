@@ -58,6 +58,6 @@
     "Courier New", monospace;
 
   color: hsl(var(--foreground));
-  --basePageBg: black;
+  --basePageBg: hsl(var(--background));
   background: hsl(var(--background));
 }
