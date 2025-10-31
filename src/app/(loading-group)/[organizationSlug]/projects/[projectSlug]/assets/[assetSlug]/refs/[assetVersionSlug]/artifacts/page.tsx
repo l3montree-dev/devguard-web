@@ -286,97 +286,102 @@ const Artifacts = () => {
             }
           >
             <div>
-              {artifacts.length === 0 && (
+              {artifacts.length === 0 ? (
                 <EmptyParty
                   title="No Artifacts Available"
                   description="There are currently no artifacts associated with this asset version."
                 />
-              )}
-              <div>
-                <div className="overflow-hidden rounded-lg border shadow-sm">
-                  <div className="overflow-auto">
-                    <table className="w-full table-fixed overflow-x-auto text-sm">
-                      <thead className="border-b bg-card text-foreground">
-                        <tr>
-                          <th className="p-4 text-left">Name</th>
-                          <th className="p-4 text-left">Information sources</th>
-                          <th />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {artifacts.map((artifact, i) => (
-                          <tr
-                            key={artifact.artifactName}
-                            className={classNames(
-                              "border-b",
-                              i % 2 !== 0 && "bg-card/50",
-                            )}
-                          >
-                            <td className="px-4 content-start py-2 text-left font-medium">
-                              {artifact.artifactName}
-                            </td>
-                            <td className="px-4 py-2">
-                              {artifact.artifactName in rootNodes! &&
-                              rootNodes![artifact.artifactName].length > 0 ? (
-                                <div className="flex flex-row flex-wrap gap-2">
-                                  {rootNodes![artifact.artifactName].map(
-                                    (node) =>
-                                      node.startsWith("vex:") ? (
-                                        <Badge variant={"success"} key={node}>
-                                          {node.replaceAll("vex:", "")}
-                                        </Badge>
-                                      ) : node.startsWith("sbom:") ? (
-                                        <Badge variant={"blue"} key={node}>
-                                          {node.replaceAll("sbom:", "")}
-                                        </Badge>
-                                      ) : (
-                                        <Badge key={node}>{node}</Badge>
-                                      ),
-                                  )}
-                                </div>
-                              ) : (
-                                <span className="text-muted-foreground">
-                                  No upstream URLs
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-2 content-start text-right">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size={"icon"}>
-                                    <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem
-                                    onClick={() => openEditDialog(artifact)}
-                                  >
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      syncExternalSources(artifact.artifactName)
-                                    }
-                                  >
-                                    Sync External Sources
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      setDeleteDialogOpen(artifact)
-                                    }
-                                  >
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
+              ) : (
+                <div>
+                  <div className="overflow-hidden rounded-lg border shadow-sm">
+                    <div className="overflow-auto">
+                      <table className="w-full table-fixed overflow-x-auto text-sm">
+                        <thead className="border-b bg-card text-foreground">
+                          <tr>
+                            <th className="p-4 text-left">Name</th>
+                            <th className="p-4 text-left">
+                              Information sources
+                            </th>
+                            <th />
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {artifacts.map((artifact, i) => (
+                            <tr
+                              key={artifact.artifactName}
+                              className={classNames(
+                                "border-b",
+                                i % 2 !== 0 && "bg-card/50",
+                              )}
+                            >
+                              <td className="px-4 content-start py-2 text-left font-medium">
+                                {artifact.artifactName}
+                              </td>
+                              <td className="px-4 py-2">
+                                {artifact.artifactName in rootNodes! &&
+                                rootNodes![artifact.artifactName].length > 0 ? (
+                                  <div className="flex flex-row flex-wrap gap-2">
+                                    {rootNodes![artifact.artifactName].map(
+                                      (node) =>
+                                        node.startsWith("vex:") ? (
+                                          <Badge variant={"success"} key={node}>
+                                            {node.replaceAll("vex:", "")}
+                                          </Badge>
+                                        ) : node.startsWith("sbom:") ? (
+                                          <Badge variant={"blue"} key={node}>
+                                            {node.replaceAll("sbom:", "")}
+                                          </Badge>
+                                        ) : (
+                                          <Badge key={node}>{node}</Badge>
+                                        ),
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground">
+                                    No upstream URLs
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2 content-start text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size={"icon"}>
+                                      <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                      onClick={() => openEditDialog(artifact)}
+                                    >
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        syncExternalSources(
+                                          artifact.artifactName,
+                                        )
+                                      }
+                                    >
+                                      Sync External Sources
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        setDeleteDialogOpen(artifact)
+                                      }
+                                    >
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </Section>
         </div>
