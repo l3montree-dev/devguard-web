@@ -264,7 +264,7 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({ form }) => {
           <FormItem>
             <ListItem
               Description={
-                "Do you trust your upstream supplier? If not, enable this mode so you need to accept the vex reports from your supplier manually."
+                "Do you trust your upstream supplier? If not, enable this mode so you need to accept the statement vulnerability assessment in the VEX reports from your supplier manually."
               }
               Title="Paranoid Mode"
               Button={
