@@ -282,8 +282,7 @@ const Index: FunctionComponent = () => {
       "refs/" +
       assetVersionSlug +
       "/" +
-      "dependency-vulns/sync/?" +
-      query.toString(),
+      "dependency-vulns/sync/",
     fetcher,
   );
 
