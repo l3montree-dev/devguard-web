@@ -42,6 +42,7 @@ import { useRouter } from "next/navigation";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 import { useUpdateAsset } from "../context/AssetContext";
 import { fetchAsset } from "../data-fetcher/fetchAsset";
+import { SetupInformationSourceSlide } from "./guides/risk-scanner-carousel-slides/SetupInformationSourceSlide";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -75,11 +76,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const asset = useActiveAsset()!;
 
   const [selectedSetup, setSelectedSetup] = React.useState<
-    "devguard-tools" | "own-setup" | undefined
+    "devguard-tools" | "own-setup" | "information-source" | undefined
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "custom-setup" | "auto-setup" | undefined
+    "custom-setup" | "auto-setup" | "information-source" | undefined
   >();
 
   const [config, setConfig] = React.useState({
@@ -94,7 +95,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
   const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
-  const [artifactName, setArtifactName] = useState<string | undefined>();
   const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
@@ -309,6 +309,61 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
   };
 
+  const handleInformationSourceSetup = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    informationSources: Array<string>;
+  }) => {
+    // first create the asset version
+    const resp = await browserApiClient(
+      `/organizations/${decodeURIComponent(
+        activeOrg.slug,
+      )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: params.branchOrTagName,
+          tag: params.isTag,
+          defaultBranch: params.isDefault,
+        }),
+      },
+    );
+
+    // now create the artifact
+    if (resp.ok) {
+      const assetVersionData = await resp.json();
+      const artifactResp = await browserApiClient(
+        `/organizations/${decodeURIComponent(
+          activeOrg.slug,
+        )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/artifacts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            artifactName: params.artifactName,
+            informationSources: params.informationSources,
+          }),
+        },
+      );
+      if (artifactResp.ok) {
+        toast.success("Information source setup successfully created!");
+        router.push(
+          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
+        );
+        onOpenChange(false);
+      } else {
+        toast.error("Artifact could not be created successfully");
+      }
+    }
+  };
+
   const handleUpload = (params: {
     branchOrTagName: string;
     isTag: boolean;
@@ -432,6 +487,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               asset={asset!}
               selectScannerSlideIndex={6}
+              setupInformationSourceSlideIndex={15}
               autosetupSlideIndex={getAutosetupSlideIndex()} // if we have integrations, present the user directly the provider setup slide. If no, present the gitlab integration slide and SKIP the provider setup slide
               selectedScanner={selectedScanner}
               setSelectedScanner={setSelectedScanner}
@@ -477,6 +533,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               selectedSetup={selectedSetup}
               setSelectedSetup={setSelectedSetup}
               prevIndex={prevIndex}
+              informationSourceSlideIndex={15}
               devguardToolsSlideIndex={7}
               customSetupSlideIndex={11}
             />
@@ -569,6 +626,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
+            />
+            <SetupInformationSourceSlide
+              api={api}
+              prevIndex={prevIndex}
+              onInformationSourceSetup={handleInformationSourceSetup}
             />
           </CarouselContent>
         </Carousel>

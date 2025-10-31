@@ -26,19 +26,19 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
+import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { CopyCodeFragment } from "../../../../../../../../../../components/common/CopyCode";
 import RiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
+import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
-import { Loader2 } from "lucide-react";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;

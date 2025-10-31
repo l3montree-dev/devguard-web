@@ -11,22 +11,27 @@ import {
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { classNames } from "@/utils/common";
+import { LinkIcon } from "@heroicons/react/24/outline";
 
 interface ScannerSelectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
   prevIndex: number;
-  selectedSetup?: "devguard-tools" | "own-setup";
+  selectedSetup?: "devguard-tools" | "own-setup" | "information-source";
   devguardToolsSlideIndex: number;
   customSetupSlideIndex: number;
-  setSelectedSetup: (setup: "devguard-tools" | "own-setup") => void;
+  informationSourceSlideIndex: number;
+  setSelectedSetup: (
+    setup: "devguard-tools" | "own-setup" | "information-source",
+  ) => void;
 }
 
 export default function ScannerSelectionSlide({
   api,
   selectedSetup,
   setSelectedSetup,
+  informationSourceSlideIndex,
   devguardToolsSlideIndex,
   customSetupSlideIndex,
   prevIndex,
@@ -92,6 +97,29 @@ export default function ScannerSelectionSlide({
             </CardDescription>
           </CardHeader>
         </Card>
+        <Card
+          className={classNames(
+            "cursor-pointer mt-2   ",
+            selectedSetup === "information-source"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => setSelectedSetup("information-source")}
+        >
+          <CardHeader>
+            <CardTitle className="text-lg items-center flex flex-row leading-tight">
+              <LinkIcon className="inline-block mr-2 w-4 h-4" />
+              Setup from external information source
+              <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+                Expert
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              Provide VeX or SBOM URLs to setup Devguard based on external data
+              sources. This data will be periodically fetched and updated.
+            </CardDescription>
+          </CardHeader>
+        </Card>
       </div>
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
@@ -110,7 +138,9 @@ export default function ScannerSelectionSlide({
             api?.scrollTo(
               selectedSetup === "devguard-tools"
                 ? devguardToolsSlideIndex
-                : customSetupSlideIndex,
+                : selectedSetup === "information-source"
+                  ? informationSourceSlideIndex
+                  : customSetupSlideIndex,
             ); // Forward to slide 3
           }}
         >

@@ -44,6 +44,7 @@ import { TriangleAlert } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
+import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -178,6 +179,17 @@ const Artifacts = () => {
       toast.success("Artifact deleted");
       setDeleteDialogOpen(null);
     }
+  };
+
+  const syncExternalSources = async (artifactName: string) => {
+    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}/sync-external-sources/`;
+    const resp = await browserApiClient(url, { method: "POST" });
+    if (!resp.ok) {
+      toast.error("Failed to sync external sources: " + resp.statusText);
+      return;
+    }
+
+    toast.success("External sources synced. Reload required to see updates.");
   };
 
   const createArtifact = async (
@@ -344,6 +356,13 @@ const Artifacts = () => {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     onClick={() =>
+                                      syncExternalSources(artifact.artifactName)
+                                    }
+                                  >
+                                    Sync External Sources
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
                                       setDeleteDialogOpen(artifact)
                                     }
                                   >
@@ -364,7 +383,7 @@ const Artifacts = () => {
         </div>
       </div>
 
-      <ArtifactForm
+      <ArtifactDialog
         form={artifactForm}
         isOpen={dialogState.isOpen}
         onOpenChange={(open) => !open && closeDialog()}

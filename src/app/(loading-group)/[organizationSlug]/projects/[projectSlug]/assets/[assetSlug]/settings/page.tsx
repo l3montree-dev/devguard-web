@@ -310,6 +310,7 @@ const Index: FunctionComponent = () => {
             <AssetForm
               disable={Boolean(asset.externalEntityProviderId)}
               form={form}
+              assetId={asset.id}
               showReportingRange={
                 asset.repositoryId !== null ||
                 Boolean(asset.externalEntityProviderId)
@@ -359,12 +360,13 @@ const Index: FunctionComponent = () => {
           title="Badge Management"
           description="The provided URL can be used to display the CVSS badge in your README or other documentation."
         >
-          <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+          <div className="space-y-2 p-4 border rounded-xl bg-card mt-1">
             <InputWithButton
               label="Badge Secret"
               value={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
               message="You can use the URL to display this badge in your README or other documentation.
               The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
+              variant="onCard"
               copyable
               update={{
                 update: () => handleGenerateNewSecret("badge"),
@@ -388,11 +390,12 @@ const Index: FunctionComponent = () => {
           title="Webhook Management"
           description="Provides a webhook URL and secret for this repository."
         >
-          <div className="space-y-2 p-4 border rounded-xl bg-muted mt-1">
+          <div className="space-y-2 p-4 border rounded-xl bg-card mt-1">
             <InputWithButton
               label="Webhook URL"
               value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}
               message="You can use the URL to send webhook requests to this endpoint."
+              variant="onCard"
               copyable
             />
 
@@ -401,6 +404,7 @@ const Index: FunctionComponent = () => {
               value={secrets?.webhookSecret ?? "No webhook secret set"}
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
               copyable
+              variant="onCard"
               update={{
                 update: () => handleGenerateNewSecret("webhook"),
                 updateConfirmTitle:

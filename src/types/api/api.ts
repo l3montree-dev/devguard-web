@@ -507,7 +507,9 @@ export interface AssetDTO {
     avatarUrl?: string;
     role?: UserRole.Admin | UserRole.Member;
   }>;
+
   isPublic: boolean;
+  sharesInformation: boolean;
 }
 
 export interface DependencyTreeNode {

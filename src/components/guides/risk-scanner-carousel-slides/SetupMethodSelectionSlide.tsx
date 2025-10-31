@@ -14,6 +14,7 @@ import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { classNames } from "@/utils/common";
 import { AssetDTO } from "@/types/api/api";
+import { LinkIcon } from "@heroicons/react/24/outline";
 
 interface SetupMethodSelectionSlideProps {
   api?: {
@@ -21,9 +22,16 @@ interface SetupMethodSelectionSlideProps {
   };
   autosetupSlideIndex: number;
   selectScannerSlideIndex: number;
+  setupInformationSourceSlideIndex: number;
   asset: AssetDTO | null;
-  selectedScanner: "custom-setup" | "auto-setup" | undefined;
-  setSelectedScanner: (scanner: "custom-setup" | "auto-setup") => void;
+  selectedScanner:
+    | "custom-setup"
+    | "auto-setup"
+    | "information-source"
+    | undefined;
+  setSelectedScanner: (
+    scanner: "custom-setup" | "auto-setup" | "information-source",
+  ) => void;
 }
 
 export const SetupMethodSelectionSlide: FunctionComponent<
@@ -33,6 +41,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
   asset,
   selectedScanner,
   setSelectedScanner,
+  setupInformationSourceSlideIndex,
   autosetupSlideIndex,
   selectScannerSlideIndex,
 }) => {
@@ -93,6 +102,29 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           </CardDescription>
         </CardHeader>
       </Card>
+      <Card
+        className={classNames(
+          "cursor-pointer mt-2   ",
+          selectedScanner === "information-source"
+            ? "border border-primary"
+            : "border border-transparent",
+        )}
+        onClick={() => setSelectedScanner("information-source")}
+      >
+        <CardHeader>
+          <CardTitle className="text-lg items-center flex flex-row leading-tight">
+            <LinkIcon className="inline-block mr-2 w-4 h-4" />
+            Setup from external information source
+            <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+              Expert
+            </Badge>
+          </CardTitle>
+          <CardDescription>
+            Provide VeX or SBOM URLs to setup Devguard based on external data
+            sources. This data will be periodically fetched and updated.
+          </CardDescription>
+        </CardHeader>
+      </Card>
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
           disabled={selectedScanner === undefined}
@@ -101,7 +133,9 @@ export const SetupMethodSelectionSlide: FunctionComponent<
             const targetSlide =
               selectedScanner === "auto-setup"
                 ? autosetupSlideIndex
-                : selectScannerSlideIndex;
+                : selectedScanner === "information-source"
+                  ? setupInformationSourceSlideIndex
+                  : selectScannerSlideIndex;
             api?.scrollTo(targetSlide);
           }}
         >
