@@ -5,7 +5,7 @@ import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
 
-const envPath = path.resolve(__dirname, '../.env');
+const envPath = path.resolve(__dirname, "../.env");
 dotenv.config({ path: envPath });
 
 export async function generateOTP(secret: string) {
@@ -17,7 +17,8 @@ export async function generateOTP(secret: string) {
   });
 
   const remaining = totp.remaining();
-  if (remaining < 5000) { // if less than X seconds remain, wait for the next period
+  if (remaining < 5000) {
+    // if less than X seconds remain, wait for the next period
     console.log("Waiting for next OTP period...");
     await sleep(remaining + 1000);
   }
@@ -30,14 +31,16 @@ function sleep(timeInMs: number) {
   return new Promise((resolve) => setTimeout(resolve, timeInMs));
 }
 
-
 // TODO: Remove this workaround once https://github.com/l3montree-dev/devguard/issues/1193 is fixed
-export async function TEMPORARY_WORKAROUND(page: Page, devguardPOM: DevGuardPOM) {
+export async function TEMPORARY_WORKAROUND(
+  page: Page,
+  devguardPOM: DevGuardPOM,
+) {
   // race-condition sometimes where token is not updated properly.. therefore update first
   // remove this block once Tim has fixed this race condition
   await page.waitForTimeout(5_000);
-  if (await page.getByRole('link', { name: 'Reauthorize' }).isVisible()) {
-    await page.getByRole('link', { name: 'Reauthorize' }).click();
+  if (await page.getByRole("link", { name: "Reauthorize" }).isVisible()) {
+    await page.getByRole("link", { name: "Reauthorize" }).click();
     await page.waitForTimeout(5_000); // wait for token to be updated
     await devguardPOM.verifyOnDevGuardURL();
   }
@@ -54,7 +57,7 @@ export async function loginToDevGuardUsingOpenCode(page: Page) {
 
   // expect to be back on devguard
   await devguardPOM.verifyOnDevGuardURL();
-};
+}
 
 function loadEnvVariables() {
   console.log(`Loading environment variables from: ${envPath}`);
@@ -69,14 +72,15 @@ function loadEnvVariables() {
       usernameTemplate: process.env.DEVGUARD_EMAIL_LOGIN_USERNAME!,
       password: process.env.DEVGUARD_EMAIL_LOGIN_PASSWORD!,
       domain: process.env.DEVGUARD_DOMAIN!,
-      uniqueUsername: () => config.devGuard.usernameTemplate.replace("XXX", Date.now().toString()),
-    }
-  }
+      uniqueUsername: () =>
+        config.devGuard.usernameTemplate.replace("XXX", Date.now().toString()),
+    },
+  };
 
   for (const [key, value] of Object.entries(config)) {
     for (const [subKey, subValue] of Object.entries(value)) {
       if (subValue === undefined) {
-        throw new Error(`Missing config value: ${key}.${subKey}`)
+        throw new Error(`Missing config value: ${key}.${subKey}`);
       }
     }
   }
@@ -85,17 +89,15 @@ function loadEnvVariables() {
 }
 
 export class LoggingAnalyzer {
-
   public readonly logs: string[] = [];
 
   constructor(page: Page) {
-
     // Listen for all console logs
-    page.on('console', msg => console.log(msg.text()));
+    page.on("console", (msg) => console.log(msg.text()));
 
     // Listen for all console events and handle errors
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
         console.log(`Error text: "${msg.text()}"`);
         this.logs.push(msg.text());
       }

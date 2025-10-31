@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Read environment variables from file.
@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './src',
+  testDir: "./src",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -21,27 +21,27 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1, // only one worker because otherwise tests interfere with each other (e.g. login/logout)
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
-    video: 'on',
+    trace: "on",
+    video: "on",
   },
   timeout: 5 * 60 * 1000, // 5 minutes per test
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
         // locale: 'de-DE',
-        locale: 'en-US',
-       },
+        locale: "en-US",
+      },
     },
     /*
     {

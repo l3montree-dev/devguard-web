@@ -85,7 +85,8 @@ const InputWithButton = (props: InputWithButtonProps) => {
               >
                 <button
                   name={"update-" + nameKey}
-                  className="cursor-pointer transition-all hover:opacity-100" type="button"
+                  className="cursor-pointer transition-all hover:opacity-100"
+                  type="button"
                 >
                   <ArrowPathIcon className="h-4 w-4" />
                 </button>

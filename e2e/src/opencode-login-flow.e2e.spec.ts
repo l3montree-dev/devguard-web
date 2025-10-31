@@ -1,12 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { describe } from 'node:test';
-import { OpenCodePOM } from './pom/opencode';
-import { DevGuardPOM } from './pom/devguard';
-import { loginToDevGuardUsingOpenCode, TEMPORARY_WORKAROUND } from './utils';
+import { test, expect } from "@playwright/test";
+import { describe } from "node:test";
+import { OpenCodePOM } from "./pom/opencode";
+import { DevGuardPOM } from "./pom/devguard";
+import { loginToDevGuardUsingOpenCode, TEMPORARY_WORKAROUND } from "./utils";
 
-
-describe('DevGuard <-> OpenCode login / logout flows', () => {
-
+describe("DevGuard <-> OpenCode login / logout flows", () => {
   test.beforeEach(async ({ page }) => {
     const openCodePOM = new OpenCodePOM(page);
     // login to openCode and make sure we don't have authorized DevGuard yet
@@ -15,7 +13,9 @@ describe('DevGuard <-> OpenCode login / logout flows', () => {
     await openCodePOM.logout();
   });
 
-  test('test login flow with missing initial authorization', async ({ page }) => {
+  test("test login flow with missing initial authorization", async ({
+    page,
+  }) => {
     const devguardPOM = new DevGuardPOM(page);
     const openCodePOM = new OpenCodePOM(page);
 
@@ -24,7 +24,9 @@ describe('DevGuard <-> OpenCode login / logout flows', () => {
     await TEMPORARY_WORKAROUND(page, devguardPOM);
 
     // check if login was successful
-    await expect(page.getByText('Here you will see all your groups')).toBeVisible();
+    await expect(
+      page.getByText("Here you will see all your groups"),
+    ).toBeVisible();
 
     // await page.waitForTimeout(120_000);
     // TODO.. test if we are logged in
@@ -32,7 +34,7 @@ describe('DevGuard <-> OpenCode login / logout flows', () => {
     await page.waitForTimeout(5_000);
 
     // open openCode again
-    await openCodePOM.loadOpenCode()
+    await openCodePOM.loadOpenCode();
 
     // revoke application access
     await openCodePOM.revokeAppAccess();
@@ -43,7 +45,7 @@ describe('DevGuard <-> OpenCode login / logout flows', () => {
     // navigate back to devguard
     await devguardPOM.loadDevGuard();
 
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState("networkidle");
     // await page.waitForTimeout(120_000);
   });
-})
+});
