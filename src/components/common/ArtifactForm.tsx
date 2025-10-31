@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArtifactDTO } from "@/types/api/api";
+import { ArtifactCreateUpdateRequest, ArtifactDTO } from "@/types/api/api";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
@@ -25,10 +25,10 @@ import {
 import { Input } from "../ui/input";
 
 interface Props {
-  form: UseFormReturn<ArtifactDTO>;
+  form: UseFormReturn<ArtifactCreateUpdateRequest>;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSubmit?: (data: ArtifactDTO) => Promise<void> | void;
+  onSubmit?: (data: ArtifactCreateUpdateRequest) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   isEditMode?: boolean;
   invalidUrls?: string[];
@@ -39,22 +39,21 @@ const ArtifactForm = ({
   isOpen,
   onOpenChange,
   onSubmit,
-  onDelete,
   isEditMode = false,
   invalidUrls = [],
 }: Props) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "upstreamUrls",
+    name: "informationSources" as const,
   });
 
   useEffect(() => {
     if (invalidUrls.length > 0) {
-      form.trigger("upstreamUrls");
+      form.trigger("informationSources");
     }
   }, [invalidUrls, form]);
 
-  const handleSubmit = async (data: ArtifactDTO) => {
+  const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
     if (onSubmit) {
       await onSubmit(data);
     }
@@ -99,12 +98,12 @@ const ArtifactForm = ({
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <FormLabel>Upstream URLs</FormLabel>
+                <FormLabel>Information Sources (Upstream URLs)</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => append({ upstreamUrl: "" })}
+                  onClick={() => append({ url: "" })}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Upstream URL
@@ -119,19 +118,19 @@ const ArtifactForm = ({
               )}
 
               {fields.map((field, index) => {
-                const isInvalid = invalidUrls.includes(field.upstreamUrl);
+                const isInvalid = invalidUrls.includes(field.url);
                 return (
                   <div key={field.id} className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <div className="flex-1">
                         <FormField
                           control={form.control}
-                          name={`upstreamUrls.${index}.upstreamUrl`}
+                          name={`informationSources.${index}.url`}
                           render={({ field }) => (
                             <FormItem>
                               <FormControl>
                                 <Input
-                                  placeholder="Enter upstream URL (e.g., https://example.com/artifact.json)"
+                                  placeholder="Enter upstream URL (e.g., https://example.com/vex.json)"
                                   className={
                                     isInvalid
                                       ? "border-red-500 focus-visible:ring-red-500"

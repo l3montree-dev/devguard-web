@@ -11,7 +11,7 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
-import { ArtifactDTO } from "@/types/api/api";
+import { ArtifactCreateUpdateRequest, ArtifactDTO } from "@/types/api/api";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -41,6 +41,9 @@ import {
   AlertDialogTitle,
 } from "../../../../../../../../../../components/ui/alert-dialog";
 import { TriangleAlert } from "lucide-react";
+import useSWR from "swr";
+import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { Badge } from "../../../../../../../../../../components/ui/badge";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -62,14 +65,37 @@ const Artifacts = () => {
     null,
   );
 
+  const params = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  };
+
+  const { data: rootNodes, isLoading } = useSWR<{
+    [artifactName: string]: string[];
+  }>(
+    "/organizations/" +
+      params.organizationSlug +
+      "/projects/" +
+      params.projectSlug +
+      "/assets/" +
+      params.assetSlug +
+      "/refs/" +
+      params.assetVersionSlug +
+      "/artifact-root-nodes",
+    fetcher,
+    {
+      fallbackData: {},
+    },
+  );
+
   const [invalidUrls, setInvalidUrls] = useState<string[]>([]);
 
-  const artifactForm = useForm<ArtifactDTO>({
+  const artifactForm = useForm<ArtifactCreateUpdateRequest>({
     defaultValues: {
       artifactName: "",
-      assetId: "",
-      assetVersionName: "",
-      upstreamUrls: [],
+      informationSources: [],
     },
   });
 
@@ -89,9 +115,7 @@ const Artifacts = () => {
     });
     artifactForm.reset({
       artifactName: "",
-      assetId: "",
-      assetVersionName: "",
-      upstreamUrls: [],
+      informationSources: [],
     });
   };
 
@@ -103,9 +127,10 @@ const Artifacts = () => {
     });
     artifactForm.reset({
       artifactName: artifact.artifactName,
-      assetId: artifact.assetId,
-      assetVersionName: artifact.assetVersionName,
-      upstreamUrls: artifact.upstreamUrls || [],
+      informationSources:
+        rootNodes && artifact.artifactName in rootNodes
+          ? rootNodes[artifact.artifactName].map((url) => ({ url }))
+          : [],
     });
   };
 
@@ -118,16 +143,15 @@ const Artifacts = () => {
     artifactForm.reset();
   };
 
-  const handleSubmit = async (data: ArtifactDTO) => {
+  const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
     let success = false;
 
     if (dialogState.mode === "create") {
       success = await createArtifact(data);
     } else if (dialogState.mode === "edit" && dialogState.artifact) {
       success = await updateArtifact({
-        ...dialogState.artifact,
         artifactName: data.artifactName,
-        upstreamUrls: data.upstreamUrls,
+        informationSources: data.informationSources,
       });
     }
 
@@ -156,13 +180,15 @@ const Artifacts = () => {
     }
   };
 
-  const createArtifact = async (data: ArtifactDTO): Promise<boolean> => {
+  const createArtifact = async (
+    data: ArtifactCreateUpdateRequest,
+  ): Promise<boolean> => {
     const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/`;
     const resp = await browserApiClient(url, {
       method: "POST",
       body: JSON.stringify({
         artifactName: data.artifactName,
-        upstreamUrls: data.upstreamUrls || [],
+        informationSources: data.informationSources.map((el) => el.url) || [],
       }),
     });
 
@@ -181,13 +207,16 @@ const Artifacts = () => {
     return true;
   };
 
-  const updateArtifact = async (artifact: ArtifactDTO): Promise<boolean> => {
+  const updateArtifact = async (
+    artifact: ArtifactCreateUpdateRequest,
+  ): Promise<boolean> => {
     const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}`;
     const response = await browserApiClient(url, {
       method: "PUT",
       body: JSON.stringify({
         artifactName: artifact.artifactName,
-        upstreamUrls: artifact.upstreamUrls || [],
+        informationSources:
+          artifact.informationSources.map((el) => el.url) || [],
       }),
     });
     if (!response.ok) {
@@ -259,7 +288,7 @@ const Artifacts = () => {
                       <thead className="border-b bg-card text-foreground">
                         <tr>
                           <th className="p-4 text-left">Name</th>
-                          <th className="p-4 text-left">Upstream</th>
+                          <th className="p-4 text-left">Information sources</th>
                           <th />
                         </tr>
                       </thead>
@@ -276,18 +305,23 @@ const Artifacts = () => {
                               {artifact.artifactName}
                             </td>
                             <td className="px-4 py-2">
-                              {artifact.upstreamUrls &&
-                              artifact.upstreamUrls.length > 0 ? (
-                                <div className="flex flex-col">
-                                  {artifact.upstreamUrls.map((url, idx) => (
-                                    <a
-                                      target="_blank"
-                                      href={url.upstreamUrl}
-                                      key={idx}
-                                    >
-                                      {url.upstreamUrl}
-                                    </a>
-                                  ))}
+                              {artifact.artifactName in rootNodes! &&
+                              rootNodes![artifact.artifactName].length > 0 ? (
+                                <div className="flex flex-row flex-wrap gap-2">
+                                  {rootNodes![artifact.artifactName].map(
+                                    (node) =>
+                                      node.startsWith("vex:") ? (
+                                        <Badge variant={"success"} key={node}>
+                                          {node.replaceAll("vex:", "")}
+                                        </Badge>
+                                      ) : node.startsWith("sbom:") ? (
+                                        <Badge variant={"blue"} key={node}>
+                                          {node.replaceAll("sbom:", "")}
+                                        </Badge>
+                                      ) : (
+                                        <Badge key={node}>{node}</Badge>
+                                      ),
+                                  )}
                                 </div>
                               ) : (
                                 <span className="text-muted-foreground">
