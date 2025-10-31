@@ -16,9 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Project, ScoreCard } from "@/types/api/api";
 import { toast } from "sonner";
@@ -32,7 +29,6 @@ import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import useDecodedParams from "../hooks/useDecodedParams";
 
 interface Props {
@@ -123,7 +119,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
           </Badge>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
-          <InformationCircleIcon className="h-7 w-7" />
+          <InformationCircleIcon className="h-7 w-7 shrink-0" />
           <span className="text-xs">
             Please note that the data shown is for the whole project{" "}
             {beautifyPurl(purl)} and not a specific version of the component.
