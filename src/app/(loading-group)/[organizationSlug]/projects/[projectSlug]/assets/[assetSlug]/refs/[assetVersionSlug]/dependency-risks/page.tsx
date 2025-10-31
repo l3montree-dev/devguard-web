@@ -278,12 +278,7 @@ const Index: FunctionComponent = () => {
   );
 
   const { data: vulnsToSync } = useSWR<Paged<VulnByPackage>>(
-    uri +
-      "refs/" +
-      assetVersionSlug +
-      "/" +
-      "dependency-vulns/sync/?" +
-      query.toString(),
+    uri + "refs/" + assetVersionSlug + "/" + "dependency-vulns/sync/",
     fetcher,
   );
 
