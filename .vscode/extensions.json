@@ -1,10 +1,10 @@
 {
-    "recommendations": [
-        "formulahendry.auto-rename-tag",
-        "streetsidesoftware.code-spell-checker",
-        "dbaeumer.vscode-eslint",
-        "orta.vscode-jest",
-        "bradlc.vscode-tailwindcss",
-        "ymotongpoo.licenser"
-    ]
+  "recommendations": [
+    "formulahendry.auto-rename-tag",
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "orta.vscode-jest",
+    "bradlc.vscode-tailwindcss",
+    "ymotongpoo.licenser"
+  ]
 }

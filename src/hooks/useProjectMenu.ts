@@ -42,7 +42,9 @@ export const useProjectMenu = () => {
       title: "Overview",
       href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
       Icon: ChartBarSquareIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/overview`,
+      isActive: pathname.startsWith(
+        `/${orgSlug}/projects/${projectSlug}/overview`,
+      ),
     },
     {
       title: "Releases",

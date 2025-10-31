@@ -4,12 +4,7 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import {
-  DependencyVuln,
-  Paged,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -28,7 +23,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -43,21 +38,22 @@ import {
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import Severity from "../../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 
 interface Props {
   vulns: Paged<VulnByPackage>;
@@ -228,6 +224,19 @@ const Index: FunctionComponent = () => {
 
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
+
+    if (searchParams?.has("artifact")) {
+      p.append(
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
+        searchParams.get("artifact") as string,
+      );
+    }
+
+    return p;
+  }, [searchParams]);
+
+  const queryWithState = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
     if (!Boolean(state) || state === "open") {
       p.append("filterQuery[state][is]", "open");
@@ -264,6 +273,16 @@ const Index: FunctionComponent = () => {
       assetVersionSlug +
       "/" +
       "dependency-vulns/?" +
+      queryWithState.toString(),
+    fetcher,
+  );
+
+  const { data: vulnsToSync } = useSWR<Paged<VulnByPackage>>(
+    uri +
+      "refs/" +
+      assetVersionSlug +
+      "/" +
+      "dependency-vulns/sync/?" +
       query.toString(),
     fetcher,
   );
@@ -351,6 +370,19 @@ const Index: FunctionComponent = () => {
           </div>
         </div>
       </Section>
+      {vulnsToSync && vulnsToSync.data.length > 0 && (
+        <div className="mb-4 flex flex-row justify-center">
+          <Link
+            href={pathname + "/sync/"}
+            className={buttonVariants({
+              variant: "secondary",
+            })}
+          >
+            There are new Events from a upstream source. Click here to handle
+            them.
+          </Link>
+        </div>
+      )}
       {!vulns?.data?.length ? (
         <div>
           <EmptyParty
@@ -487,6 +519,8 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        assetVersion={assetVersion}
+        artifacts={artifacts || []}
       />
     </Page>
   );
