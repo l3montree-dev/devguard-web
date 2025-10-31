@@ -246,12 +246,12 @@ const Artifacts = () => {
             }
           >
             <div>
-              {artifacts.length === 0 && (
+              {artifacts.length === 0 ? (
                 <EmptyParty
                   title="No Artifacts Available"
                   description="There are currently no artifacts associated with this asset version."
                 />
-              )}
+              ) : (
               <div>
                 <div className="overflow-hidden rounded-lg border shadow-sm">
                   <div className="overflow-auto">
@@ -272,7 +272,7 @@ const Artifacts = () => {
                               i % 2 !== 0 && "bg-card/50",
                             )}
                           >
-                            <td className="px-4 content-start py-2 text-left font-medium">
+                            <td className="px-4 py-2 text-left font-medium">
                               {artifact.artifactName}
                             </td>
                             <td className="px-4 py-2">
@@ -325,6 +325,7 @@ const Artifacts = () => {
                   </div>
                 </div>
               </div>
+              )}
             </div>
           </Section>
         </div>
