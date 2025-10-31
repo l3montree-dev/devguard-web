@@ -236,11 +236,13 @@ const RefsPage = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() => handleMakeDefault(branch)}
-                            >
-                              Make default
-                            </DropdownMenuItem>
+                            {!branch.defaultBranch && (
+                              <DropdownMenuItem
+                                onClick={() => handleMakeDefault(branch)}
+                              >
+                                Make default
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem onClick={() => setOpen(branch)}>
                               Delete
                             </DropdownMenuItem>
