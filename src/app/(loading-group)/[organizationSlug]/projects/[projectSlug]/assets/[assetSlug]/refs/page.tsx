@@ -160,11 +160,6 @@ const RefsPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={() => handleMakeDefault(tag)}
-                          >
-                            Make default
-                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => setOpen(tag)}>
                             Delete
                           </DropdownMenuItem>
