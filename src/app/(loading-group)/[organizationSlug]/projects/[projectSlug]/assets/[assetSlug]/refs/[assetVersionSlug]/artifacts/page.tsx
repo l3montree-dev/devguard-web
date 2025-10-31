@@ -4,7 +4,6 @@
 
 import ArtifactForm from "@/components/common/ArtifactForm";
 import AssetTitle from "@/components/common/AssetTitle";
-import CollapseList from "@/components/common/CollapseList";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";

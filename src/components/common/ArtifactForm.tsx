@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
@@ -121,6 +122,14 @@ const ArtifactForm = ({
             </div>
           );
         })}
+        <span className="text-sm text-muted-foreground flex items-center">
+          You can add several upstream VEX (Vulnerability Exploitability
+          eXchange) or SBOM URLs here. DevGuard will sync the given
+          vulnerability assessment results of these VEX Documents to your
+          dependency vulnerabilities. This is useful if your supplier already
+          offers you with this standard exchange format for vulnerability
+          assessments. Currently, this has to be a public reachable URL.
+        </span>
       </div>
     </>
   );
