@@ -121,7 +121,10 @@ const ArtifactForm = ({
               <div className="flex items-center gap-2 text-muted-foreground">
                 <InformationCircleIcon className="h-7 w-7 shrink-0" />
                 <span className="text-xs">
-                  You can add several upstream VEX (Vulnerability Exploitability eXchange) URLs here. DevGuard will sync the given vulnerability assessment results of these VEX Documents to your dependency vulnerabilities. This is useful if your supplier already offers you with this standard exchange format for vulnerability assessments. Currently, this has to be a public reachable URL.
+                  You can add several upstream VEX (Vulnerability Exploitability eXchange) URLs here. DevGuard will sync the 
+                  given vulnerability assessment results of these VEX Documents to your dependency vulnerabilities. 
+                  This is useful if your supplier already offers you with this standard exchange format for vulnerability assessments. 
+                  Currently, this has to be a public reachable URL.
                 </span>
               </div>
 
