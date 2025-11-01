@@ -72,7 +72,11 @@ const Artifacts = () => {
     assetVersionSlug: string;
   };
 
-  const { data: rootNodes, isLoading } = useSWR<{
+  const {
+    data: rootNodes,
+    isLoading,
+    mutate,
+  } = useSWR<{
     [artifactName: string]: string[];
   }>(
     "/organizations/" +
@@ -156,6 +160,7 @@ const Artifacts = () => {
     }
 
     if (success) {
+      mutate();
       closeDialog();
     }
   };
@@ -213,7 +218,7 @@ const Artifacts = () => {
       ...prev!,
       artifacts: [...prev!.artifacts, newArtifact],
     }));
-
+    mutate();
     toast.success("Artifact created successfully");
     return true;
   };
@@ -256,7 +261,7 @@ const Artifacts = () => {
         a.artifactName === artifact.artifactName ? updatedArtifact : a,
       ),
     }));
-
+    mutate();
     toast.success("Artifact updated");
     setInvalidUrls([]);
     return true;
@@ -314,7 +319,7 @@ const Artifacts = () => {
                                 i % 2 !== 0 && "bg-card/50",
                               )}
                             >
-                              <td className="px-4 content-start py-2 text-left font-medium">
+                              <td className="content-start p-4 text-left font-medium">
                                 {artifact.artifactName}
                               </td>
                               <td className="px-4 py-2">

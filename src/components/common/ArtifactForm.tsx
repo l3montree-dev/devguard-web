@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
