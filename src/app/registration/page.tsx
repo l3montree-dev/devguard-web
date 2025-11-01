@@ -147,7 +147,11 @@ const Registration = () => {
     ory
       .updateRegistrationFlow({
         flow: String(flow?.id),
-        updateRegistrationFlowBody: values,
+        updateRegistrationFlowBody: {
+          ...values,
+          // @ts-ignore
+          "traits.confirmedTerms": true,
+        },
       })
       .then(async ({ data }) => {
         // If we ended up here, it means we are successfully signed up!
