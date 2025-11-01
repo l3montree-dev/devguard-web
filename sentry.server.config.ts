@@ -3,16 +3,16 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { config } from "./src/config";
 
-if (!process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN) {
+if (!config.errorTrackingDsn) {
   console.warn(
-    "Sentry is not initialized because NEXT_PUBLIC_ERROR_TRACKING_DSN is not set.",
+    "Sentry is not initialized because ERROR_TRACKING_DSN is not set.",
   );
 } else {
   Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN,
+    dsn: config.errorTrackingDsn,
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
     release: process.env.NEXT_PUBLIC_VERSION,
@@ -28,7 +28,6 @@ if (!process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN) {
       if (event.user && event.user.ip_address) {
         delete event.user.ip_address;
       }
-      console.log("Sentry event processed:", event);
       return event;
     },
 
