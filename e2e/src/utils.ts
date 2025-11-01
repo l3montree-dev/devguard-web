@@ -93,10 +93,10 @@ export class LoggingAnalyzer {
 
   constructor(page: Page) {
     // Listen for all console logs
-    page.on("console", (msg) => console.log(msg.text()));
+    page.on("console", (msg: { text: () => any; }) => console.log(msg.text()));
 
     // Listen for all console events and handle errors
-    page.on("console", (msg) => {
+    page.on("console", (msg: { type: () => string; text: () => string; }) => {
       if (msg.type() === "error") {
         console.log(`Error text: "${msg.text()}"`);
         this.logs.push(msg.text());

@@ -310,12 +310,27 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                       <InputWithButton
                         label="VeX-URL (Always up to date vulnerability information)"
                         copyable
+                        nameKey="vex-url"
                         variant="onCard"
                         value={
                           devguardApiUrl +
                           "/api/v1/public/" +
                           assetId +
                           "/vex.json"
+                        }
+                      />
+                    </div>
+                    <div className="text-white mt-0">
+                      <InputWithButton
+                        label="SBOM-URL (Always up to date SBOM information)"
+                        copyable
+                        nameKey="sbom-url"
+                        variant="onCard"
+                        value={
+                          devguardApiUrl +
+                          "/api/v1/public/" +
+                          assetId +
+                          "/sbom.json"
                         }
                       />
                     </div>
