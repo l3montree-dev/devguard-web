@@ -182,7 +182,7 @@ const DependencyGraph: FunctionComponent<{
   height: number;
   variant?: "compact";
   flaws: Array<VulnDTO>;
-  graph: { root: ViewDependencyTreeNode };
+  graph: ViewDependencyTreeNode;
 }> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();
   const searchParams = useSearchParams();
@@ -190,17 +190,17 @@ const DependencyGraph: FunctionComponent<{
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
-    graph.root.name = searchParams?.get("artifact") ?? asset?.name ?? "";
+    graph.name = searchParams?.get("artifact") ?? asset?.name ?? "";
 
     const [nodes, edges] = getLayoutedElements(
-      graph.root,
+      graph,
       flaws,
       "LR",
       variant === "compact" ? 150 : 300,
       variant === "compact" ? 150 : 300,
     );
     // get the root node - we use it for the initial position of the viewport
-    const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
+    const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
   }, [graph, searchParams?.get("artifact"), asset?.name, variant, flaws]);
 

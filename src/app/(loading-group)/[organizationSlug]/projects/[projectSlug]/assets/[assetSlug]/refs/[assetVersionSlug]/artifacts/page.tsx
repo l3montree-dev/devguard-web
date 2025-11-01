@@ -332,7 +332,9 @@ const Artifacts = () => {
                                             {node.replaceAll("sbom:", "")}
                                           </Badge>
                                         ) : (
-                                          <Badge key={node}>{node}</Badge>
+                                          <Badge variant={"outline"} key={node}>
+                                            {node}
+                                          </Badge>
                                         ),
                                     )}
                                   </div>
