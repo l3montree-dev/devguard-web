@@ -12,10 +12,12 @@ const getSentryConfig = () => {
     const dsnUrl = new URL(dsn);
     const host = dsnUrl.hostname;
     const projectId = dsnUrl.pathname?.replace(/^\//, "");
-    // Fformat: https://<public_key>@<host>/<project_id>
+    // format: https://<public_key>@<host>/<project_id>
     const publicKey = dsnUrl.username;
 
-    return { host, projectId, publicKey };
+    const sentryPackageVersion = "sentry.javascript.nextjs%2F9.34.0"; //url encoded
+
+    return { host, projectId, publicKey, sentryPackageVersion };
   } catch (e) {
     console.error("Invalid Sentry DSN format", e);
     return null;
@@ -38,7 +40,7 @@ export default async function handler(
   }
 
   try {
-    const upstreamSentryUrl = `https://${sentryConfig.host}/api/${sentryConfig.projectId}/envelope/?sentry_version=9&sentry_key=${sentryConfig.publicKey}&sentry_client=sentry.javascript.nextjs%2F9.34.0`;
+    const upstreamSentryUrl = `https://${sentryConfig.host}/api/${sentryConfig.projectId}/envelope/?sentry_version=9&sentry_key=${sentryConfig.publicKey}&sentry_client=${sentryConfig.sentryPackageVersion}`;
 
     const response = await fetch(upstreamSentryUrl, {
       method: "POST",
