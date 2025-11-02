@@ -191,6 +191,18 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
+  const refreshAssetData = async () => {
+    // fetch the asset again
+    const updatedAsset = await browserApiClient(
+      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
+      { method: "GET" },
+    );
+    if (updatedAsset.ok) {
+      const assetData = await updatedAsset.json();
+      updateAsset(assetData);
+    }
+  };
+
   const updateAsset = useUpdateAsset();
   const uploadSBOM = async (params: {
     branchOrTagName: string;
@@ -222,20 +234,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
 
     if (resp.ok) {
-      // fetch the asset again
-      const updatedAsset = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
-        { method: "GET" },
+      await refreshAssetData();
+      router.push(
+        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
       );
-      if (updatedAsset.ok) {
-        const assetData = await updatedAsset.json();
-        router.push(
-          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
-        );
-        onOpenChange(false);
-        updateAsset(assetData);
-        toast.success("SBOM has successfully been sent!");
-      }
+      onOpenChange(false);
+      toast.success("SBOM has successfully been sent!");
     } else {
       toast.error("SBOM has not been sent successfully");
     }
@@ -299,6 +303,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
+      await refreshAssetData();
       toast.success("VEX has successfully been sent!");
     } else {
       toast.error("VEX has not been sent successfully");
