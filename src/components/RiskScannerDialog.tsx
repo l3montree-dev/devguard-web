@@ -260,8 +260,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   }) => {
     if (!sarifContentRef.current) return;
 
-    console.log("origin", params.origin);
-
     const resp = await browserApiClient(`/sarif-scan`, {
       method: "POST",
       body: sarifContentRef.current,
