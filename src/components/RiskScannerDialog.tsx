@@ -167,6 +167,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       const reader = new FileReader();
       reader.onload = () => {
         sarifContentRef.current = reader.result as string;
+        const parsed = JSON.parse(sarifContentRef.current || "{}");
+        if (!parsed.$schema?.includes("sarif")) {
+          toast.error("SARIF file does not follow SARIF format");
+          return;
+        }
+
         setSarifFileName(file.name);
       };
       reader.readAsText(file);
@@ -254,6 +260,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   }) => {
     if (!sarifContentRef.current) return;
 
+    console.log("origin", params.origin);
+
     const resp = await browserApiClient(`/sarif-scan`, {
       method: "POST",
       body: sarifContentRef.current,
@@ -264,6 +272,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           ? params.branchOrTagName
           : "",
         "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+        "X-Scanner": params.origin,
       },
     });
 
