@@ -133,14 +133,8 @@ const ManualIntegrationSlide: FunctionComponent<
       setTimeout(() => api.reInit && api.reInit(), 0);
     }
 
-    setOrigin((prev) => {
-      if (
-        (prev === "SBOM_DEFAULT" || prev === "VEX_DEFAULT") &&
-        (tab === "vex" || tab === "sbom")
-      ) {
-        return tab.toUpperCase() + "_DEFAULT";
-      }
-      return prev;
+    setOrigin(() => {
+      return tab.toUpperCase() + "_DEFAULT";
     });
   }, [api, tab, setOrigin]);
 
@@ -351,6 +345,16 @@ const ManualIntegrationSlide: FunctionComponent<
                           </span>
                         </div>
                       </div>
+                      <div className="w-full">
+                        <Label className="mb-2 block">
+                          Origin of the SARIF
+                        </Label>
+                        <Input
+                          value={origin}
+                          onChange={(e) => setOrigin(e.target.value)}
+                          placeholder="Origin"
+                        />
+                      </div>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
@@ -364,6 +368,17 @@ const ManualIntegrationSlide: FunctionComponent<
                         setBranchOrTagName(v.name)
                       }
                     />
+                  </div>
+                  <div className="w-full">
+                    <Input
+                      variant="onCard"
+                      value={origin}
+                      onChange={(e) => setOrigin(e.target.value)}
+                      placeholder="Origin"
+                    />
+                    <span className="text-muted-foreground text-xs">
+                      Origin of the SARIF (e.g., DEFAULT)
+                    </span>
                   </div>
                 </div>
               )}
