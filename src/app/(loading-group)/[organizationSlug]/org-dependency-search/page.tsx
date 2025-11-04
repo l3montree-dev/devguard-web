@@ -3,7 +3,7 @@
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { ComponentPaged, OrgDependency, Paged, Policy } from "@/types/api/api";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import EmptyParty from "../../../../components/common/EmptyParty";
@@ -29,19 +29,28 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/dist/client/components/navigation";
+
+import { buildFilterSearchParams } from "@/utils/url";
 import Image from "next/image";
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
-  const [open, setOpen] = useState(false);
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
+
+  // localhost:8080/api/v1/organizations/org/dependency-components/?search=alpine
 
   const url = "/organizations/" + organizationSlug + "/dependency-components/";
   const handleSearch = useDebouncedQuerySearch();
   const searchParams = useSearchParams();
   //  /dependency-components/?search=alpine";
+
+  const params = useMemo(() => {
+    const params = buildFilterSearchParams(searchParams);
+
+    return params;
+  }, [searchParams]);
 
   const columnHelper = createColumnHelper<OrgDependency>();
 
@@ -51,14 +60,28 @@ const OrgDependencySearch: FunctionComponent = () => {
       id: "dependency_purl",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
-          <Image src="/public/logo_icon.svg/" alt="Devguard Logo"></Image>
+          <Image
+            src="/logo_icon.svg"
+            alt="Devguard Logo"
+            width={24}
+            height={24}
+          ></Image>
+        </span>
+      ),
+    }),
+    columnHelper.accessor("organizationName", {
+      header: "Organization Name",
+      id: "dependency_purl",
+      cell: (row) => (
+        <span className="flex flex-row items-start gap-2">
+          {row.getValue()}
         </span>
       ),
     }),
   ];
 
   const { data: components, isLoading } = useSWR<Paged<OrgDependency>>(
-    url + "?" + searchParams,
+    url + "?" + params?.toString(),
     fetcher,
     {
       fallbackData: {
@@ -70,9 +93,6 @@ const OrgDependencySearch: FunctionComponent = () => {
     },
   );
 
-  toast.success("Policy created successfully");
-  setOpen(false);
-
   const { table } = useTable({
     data: (components?.data ?? []) as Array<OrgDependency>,
     columnsDef,
@@ -83,8 +103,8 @@ const OrgDependencySearch: FunctionComponent = () => {
       <Section
         primaryHeadline
         forceVertical
-        description="Dependencies of the asset"
-        title="Dependencies"
+        description="Search for every Dependency in your Organization"
+        title="Organization Dependencies"
       >
         <div className="flex flex-row items-center justify-between gap-2">
           {/* <QueryArtifactSelector
@@ -95,7 +115,7 @@ const OrgDependencySearch: FunctionComponent = () => {
             <Input
               onChange={(e) => handleSearch(e.target.value)}
               defaultValue={searchParams?.get("search") as string}
-              placeholder="Search for dependencies or versions - just start typing..."
+              placeholder="Search for dependencies"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
               {isLoading && (
@@ -171,7 +191,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                   )}
-                  key={row.original.id}
+                  key={row.original.componentDependencyId}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td className="p-4" key={cell.id}>
