@@ -2,7 +2,7 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { Policy } from "@/types/api/api";
+import { ComponentPaged, OrgDependency, Paged, Policy } from "@/types/api/api";
 import { FunctionComponent, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -15,151 +15,185 @@ import { fetcher } from "../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
 import { browserApiClient } from "../../../../services/devGuardApi";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import { Skeleton } from "@/components/ui/skeleton";
+import useTable from "@/hooks/useTable";
+import { classNames } from "@/utils/common";
+import SortingCaret from "@/components/common/SortingCaret";
+import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
+import {
+  flexRender,
+  ColumnDef,
+  createColumnHelper,
+} from "@tanstack/react-table";
+import { useSearchParams } from "next/dist/client/components/navigation";
+import Image from "next/image";
 
-const ComplianceIndex: FunctionComponent = () => {
+const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
   const [open, setOpen] = useState(false);
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
-  const {
-    data: policies,
-    isLoading,
-    error,
-    mutate,
-  } = useSWR<Array<Policy>>(
-    "/organizations/" + organizationSlug + "/policies/",
+
+  const url = "/organizations/" + organizationSlug + "/dependency-components/";
+  const handleSearch = useDebouncedQuerySearch();
+  const searchParams = useSearchParams();
+  //  /dependency-components/?search=alpine";
+
+  const columnHelper = createColumnHelper<OrgDependency>();
+
+  const columnsDef: ColumnDef<OrgDependency, any>[] = [
+    columnHelper.accessor("organizationName", {
+      header: "Package",
+      id: "dependency_purl",
+      cell: (row) => (
+        <span className="flex flex-row items-start gap-2">
+          <Image src="/public/logo_icon.svg/" alt="Devguard Logo"></Image>
+        </span>
+      ),
+    }),
+  ];
+
+  const { data: components, isLoading } = useSWR<Paged<OrgDependency>>(
+    url + "?" + searchParams,
     fetcher,
+    {
+      fallbackData: {
+        data: [],
+        page: 1,
+        pageSize: 20,
+        total: 0,
+      },
+    },
   );
 
-  const handleCreatePolicy = async (policy: Policy) => {
-    mutate(
-      async (prev) => {
-        let url = "/organizations/" + organizationSlug + "/policies/";
+  toast.success("Policy created successfully");
+  setOpen(false);
 
-        const resp = await browserApiClient(url, {
-          method: "POST",
-          body: JSON.stringify(policy),
-        });
-
-        if (!resp.ok) {
-          toast.error("Failed to create policy");
-          return;
-        }
-        // update the policies
-        const newPolicy = await resp.json();
-        return [newPolicy, ...(prev || [])];
-      },
-      {
-        optimisticData: (prev) => [
-          { ...policy, id: Math.random().toString() },
-          ...(prev || []),
-        ],
-      },
-    );
-
-    toast.success("Policy created successfully");
-    setOpen(false);
-  };
-
-  const handlePolicyUpdate = async (policy: Policy) => {
-    mutate(
-      async (prev) => {
-        let url =
-          "/organizations/" + organizationSlug + "/policies/" + policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "PUT",
-          body: JSON.stringify(policy),
-        });
-
-        if (!resp.ok) {
-          toast.error("Failed to update policy");
-          return;
-        }
-
-        // update the policies
-        const newPolicy = await resp.json();
-        toast.success("Policy updated successfully");
-        return prev?.map((p) => (p.id === newPolicy.id ? newPolicy : p));
-      },
-      {
-        optimisticData: (prev) =>
-          prev?.map((p) => (p.id === policy.id ? policy : p)) || [],
-      },
-    );
-  };
-
-  const handlePolicyDelete = async (policy: Policy) => {
-    mutate(
-      async (prev) => {
-        let url =
-          "/organizations/" + organizationSlug + "/policies/" + policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "DELETE",
-        });
-
-        if (!resp.ok) {
-          toast.error("Failed to delete policy");
-          return;
-        }
-
-        // update the policies
-        toast.success("Policy deleted successfully");
-        return prev?.filter((p) => p.id !== policy.id);
-      },
-      {
-        optimisticData: (prev) => prev?.filter((p) => p.id !== policy.id) || [],
-      },
-    );
-  };
+  const { table } = useTable({
+    data: (components?.data ?? []) as Array<OrgDependency>,
+    columnsDef,
+  });
 
   return (
     <Page Menu={menu} Title={null} title="">
-      <div className="flex flex-row">
-        <div className="flex-1">
-          <Section
-            primaryHeadline
-            description="Modify your organization compliance policies here."
-            title="Compliance Controls"
-            forceVertical
-            Button={
-              <Button onClick={() => setOpen(true)}>Upload new Policy</Button>
-            }
-          >
-            <ListRenderer
-              isLoading={isLoading}
-              error={error}
-              data={policies}
-              Empty={
-                <EmptyParty
-                  title="No Policies"
-                  description="Create a new policy to get started."
-                />
-              }
-              renderItem={(policy) => (
-                <PolicyListItem
-                  onPolicyDelete={handlePolicyDelete}
-                  onPolicyUpdate={handlePolicyUpdate}
-                  key={policy.id}
-                  policy={policy}
-                />
-              )}
+      <Section
+        primaryHeadline
+        forceVertical
+        description="Dependencies of the asset"
+        title="Dependencies"
+      >
+        <div className="flex flex-row items-center justify-between gap-2">
+          {/* <QueryArtifactSelector
+            unassignPossible
+            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
+          /> */}
+          <div className="relative flex-1">
+            <Input
+              onChange={(e) => handleSearch(e.target.value)}
+              defaultValue={searchParams?.get("search") as string}
+              placeholder="Search for dependencies or versions - just start typing..."
             />
-          </Section>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-      <PolicyDialog
-        isOpen={open}
-        title="Create new Policy"
-        description="Create a new policy for your organization."
-        buttonTitle="Create Policy"
-        onOpenChange={setOpen}
-        onSubmit={handleCreatePolicy}
-      />
+        <div className="overflow-hidden rounded-lg border shadow-sm">
+          <table className="w-full table-fixed overflow-x-auto text-sm">
+            <thead className="border-b bg-card text-foreground">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      className="cursor-pointer break-normal p-4 text-left"
+                      key={header.id}
+                    >
+                      <div
+                        className="flex flex-row gap-2"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        <SortingCaret
+                          sortDirection={header.column.getIsSorted()}
+                        />
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+
+            <tbody>
+              {isLoading &&
+                Array.from(Array(10).keys()).map((el, i, arr) => (
+                  <tr
+                    className={classNames(
+                      "relative cursor-pointer align-top transition-all",
+                      i === arr.length - 1 ? "" : "border-b",
+                      i % 2 !== 0 && "bg-card/50",
+                    )}
+                    key={el}
+                  >
+                    <td className="p-4">
+                      <Skeleton className="w-2/3 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-full h-[40px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="w-1/2 h-[20px]" />
+                    </td>
+                  </tr>
+                ))}
+              {table.getRowModel().rows.map((row, index, arr) => (
+                <tr
+                  //   onClick={() => dataPassthrough(row.original)}
+                  className={classNames(
+                    "relative cursor-pointer bg-background align-top transition-all ",
+                    index === arr.length - 1 ? "" : "border-b",
+                    index % 2 != 0 && "bg-card/50",
+                  )}
+                  key={row.original.id}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td className="p-4" key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* {components && <CustomPagination {...components} />} */}
+        <div className="flex flex-row justify-end">
+          {/* <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
+            Refresh Licenses
+          </AsyncButton> */}
+        </div>
+      </Section>
     </Page>
   );
 };
-
-export default ComplianceIndex;
+export default OrgDependencySearch;
