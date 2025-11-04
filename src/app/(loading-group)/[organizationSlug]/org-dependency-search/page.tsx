@@ -32,6 +32,7 @@ import { useSearchParams } from "next/dist/client/components/navigation";
 
 import { buildFilterSearchParams } from "@/utils/url";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
@@ -55,9 +56,9 @@ const OrgDependencySearch: FunctionComponent = () => {
   const columnHelper = createColumnHelper<OrgDependency>();
 
   const columnsDef: ColumnDef<OrgDependency, any>[] = [
-    columnHelper.accessor("organizationName", {
+    columnHelper.accessor("componentVersion", {
       header: "Package",
-      id: "dependency_purl",
+      id: "componentVersion",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           <Image
@@ -66,12 +67,40 @@ const OrgDependencySearch: FunctionComponent = () => {
             width={24}
             height={24}
           ></Image>
+          {row.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor("componentPurl", {
+      header: "Version",
+      id: "componentPurl",
+      cell: (row) => (
+        <span className="flex flex-row items-start gap-2">
+          <Badge variant={"outline"}> {row.getValue()}</Badge>
         </span>
       ),
     }),
     columnHelper.accessor("organizationName", {
-      header: "Organization Name",
-      id: "dependency_purl",
+      header: "Organization",
+      id: "organizationName",
+      cell: (row) => (
+        <span className="flex flex-row items-start gap-2">
+          {row.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor("projectName", {
+      header: "Project",
+      id: "projectName",
+      cell: (row) => (
+        <span className="flex flex-row items-start gap-2">
+          {row.getValue()}
+        </span>
+      ),
+    }),
+    columnHelper.accessor("assetName", {
+      header: "Repository",
+      id: "assetName",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           {row.getValue()}
