@@ -18,7 +18,7 @@ import { browserApiClient } from "../../../../services/devGuardApi";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import { Skeleton } from "@/components/ui/skeleton";
 import useTable from "@/hooks/useTable";
-import { classNames } from "@/utils/common";
+import { beautifyPurl, classNames } from "@/utils/common";
 import SortingCaret from "@/components/common/SortingCaret";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,8 @@ import { useSearchParams } from "next/dist/client/components/navigation";
 import { buildFilterSearchParams } from "@/utils/url";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import EcosystemImage from "@/components/common/EcosystemImage";
+import CustomPagination from "@/components/common/CustomPagination";
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
@@ -56,24 +58,21 @@ const OrgDependencySearch: FunctionComponent = () => {
   const columnHelper = createColumnHelper<OrgDependency>();
 
   const columnsDef: ColumnDef<OrgDependency, any>[] = [
-    columnHelper.accessor("componentVersion", {
+    columnHelper.accessor("componentPurl", {
       header: "Package",
-      id: "componentVersion",
+      id: "componentPurl",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
-          <Image
-            src="/logo_icon.svg"
-            alt="Devguard Logo"
-            width={24}
-            height={24}
-          ></Image>
-          {row.getValue()}
+          <EcosystemImage packageName={row.getValue()} />
+
+          {beautifyPurl(row.getValue())}
         </span>
       ),
     }),
-    columnHelper.accessor("componentPurl", {
+
+    columnHelper.accessor("componentVersion", {
       header: "Version",
-      id: "componentPurl",
+      id: "componentVersion",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           <Badge variant={"outline"}> {row.getValue()}</Badge>
@@ -127,6 +126,8 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnsDef,
   });
 
+  console.log(components);
+
   return (
     <Page Menu={menu} Title={null} title="">
       <Section
@@ -153,89 +154,97 @@ const OrgDependencySearch: FunctionComponent = () => {
             </div>
           </div>
         </div>
-        <div className="overflow-hidden rounded-lg border shadow-sm">
-          <table className="w-full table-fixed overflow-x-auto text-sm">
-            <thead className="border-b bg-card text-foreground">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      className="cursor-pointer break-normal p-4 text-left"
-                      key={header.id}
-                    >
-                      <div
-                        className="flex flex-row gap-2"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        <SortingCaret
-                          sortDirection={header.column.getIsSorted()}
-                        />
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
 
-            <tbody>
-              {isLoading &&
-                Array.from(Array(10).keys()).map((el, i, arr) => (
-                  <tr
-                    className={classNames(
-                      "relative cursor-pointer align-top transition-all",
-                      i === arr.length - 1 ? "" : "border-b",
-                      i % 2 !== 0 && "bg-card/50",
-                    )}
-                    key={el}
-                  >
-                    <td className="p-4">
-                      <Skeleton className="w-2/3 h-[20px]" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="w-1/2 h-[20px]" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="w-1/2 h-[20px]" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="w-full h-[40px]" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="w-1/2 h-[20px]" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="w-1/2 h-[20px]" />
-                    </td>
+        {!components?.data.length ? (
+          <EmptyParty
+            title="No matching results."
+            description={` The package ${searchParams?.get("search")} could not be found in any repository currently associated with your organization.`}
+          />
+        ) : (
+          <div className="overflow-hidden rounded-lg border shadow-sm">
+            <table className="w-full table-fixed overflow-x-auto text-sm">
+              <thead className="border-b bg-card text-foreground">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        className="cursor-pointer break-normal p-4 text-left"
+                        key={header.id}
+                      >
+                        <div
+                          className="flex flex-row gap-2"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          <SortingCaret
+                            sortDirection={header.column.getIsSorted()}
+                          />
+                        </div>
+                      </th>
+                    ))}
                   </tr>
                 ))}
-              {table.getRowModel().rows.map((row, index, arr) => (
-                <tr
-                  //   onClick={() => dataPassthrough(row.original)}
-                  className={classNames(
-                    "relative cursor-pointer bg-background align-top transition-all ",
-                    index === arr.length - 1 ? "" : "border-b",
-                    index % 2 != 0 && "bg-card/50",
-                  )}
-                  key={row.original.componentDependencyId}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td className="p-4" key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+              </thead>
+
+              <tbody>
+                {isLoading &&
+                  Array.from(Array(10).keys()).map((el, i, arr) => (
+                    <tr
+                      className={classNames(
+                        "relative cursor-pointer align-top transition-all",
+                        i === arr.length - 1 ? "" : "border-b",
+                        i % 2 !== 0 && "bg-card/50",
                       )}
-                    </td>
+                      key={el}
+                    >
+                      <td className="p-4">
+                        <Skeleton className="w-2/3 h-[20px]" />
+                      </td>
+                      <td className="p-4">
+                        <Skeleton className="w-1/2 h-[20px]" />
+                      </td>
+                      <td className="p-4">
+                        <Skeleton className="w-1/2 h-[20px]" />
+                      </td>
+                      <td className="p-4">
+                        <Skeleton className="w-full h-[40px]" />
+                      </td>
+                      <td className="p-4">
+                        <Skeleton className="w-1/2 h-[20px]" />
+                      </td>
+                      <td className="p-4">
+                        <Skeleton className="w-1/2 h-[20px]" />
+                      </td>
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {/* {components && <CustomPagination {...components} />} */}
+                {table.getRowModel().rows.map((row, index, arr) => (
+                  <tr
+                    //   onClick={() => dataPassthrough(row.original)}
+                    className={classNames(
+                      "relative cursor-pointer bg-background align-top transition-all ",
+                      index === arr.length - 1 ? "" : "border-b",
+                      index % 2 != 0 && "bg-card/50",
+                    )}
+                    key={row.original.componentDependencyId}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td className="p-4" key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {components && <CustomPagination {...components} />}
         <div className="flex flex-row justify-end">
           {/* <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
             Refresh Licenses
