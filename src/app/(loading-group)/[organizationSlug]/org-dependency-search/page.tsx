@@ -27,6 +27,7 @@ import {
   flexRender,
   ColumnDef,
   createColumnHelper,
+  Header,
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/dist/client/components/navigation";
 
@@ -125,6 +126,31 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnsDef,
   });
 
+  const renderHeaderCell = (header: Header<OrgDependency, unknown>) => {
+    switch (header.id) {
+      case "organizationName":
+        return (
+          <Badge variant={"outline"}>
+            {flexRender(header.column.columnDef.header, header.getContext())}
+          </Badge>
+        );
+      case "projectName":
+        return (
+          <Badge variant={"outline"}>
+            {flexRender(header.column.columnDef.header, header.getContext())}
+          </Badge>
+        );
+      case "assetName":
+        return (
+          <Badge variant={"outline"}>
+            {flexRender(header.column.columnDef.header, header.getContext())}
+          </Badge>
+        );
+      default:
+        return flexRender(header.column.columnDef.header, header.getContext());
+    }
+  };
+
   console.log(components);
 
   return (
@@ -170,29 +196,11 @@ const OrgDependencySearch: FunctionComponent = () => {
                         className="cursor-pointer break-normal p-4 text-left"
                         key={header.id}
                       >
-                        <div className="flex flex-row items-center gap-2">
-                          {header.isPlaceholder ? null : header.id ===
-                            "organizationName" ? (
-                            <Badge variant={"outline"}>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </Badge>
-                          ) : (
-                            <div>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </div>
-                          )}
-                        </div>
-
                         <div
-                          className="flex flex-row gap-2"
+                          className="flex flex-row items-center gap-2"
                           onClick={header.column.getToggleSortingHandler()}
                         >
+                          {renderHeaderCell(header)}
                           <SortingCaret
                             sortDirection={header.column.getIsSorted()}
                           />
