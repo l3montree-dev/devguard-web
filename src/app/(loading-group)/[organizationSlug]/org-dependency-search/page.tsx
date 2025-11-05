@@ -64,7 +64,6 @@ const OrgDependencySearch: FunctionComponent = () => {
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           <EcosystemImage packageName={row.getValue()} />
-
           {beautifyPurl(row.getValue())}
         </span>
       ),
@@ -75,7 +74,7 @@ const OrgDependencySearch: FunctionComponent = () => {
       id: "componentVersion",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
-          <Badge variant={"outline"}> {row.getValue()}</Badge>
+          <Badge variant={"secondary"}> {row.getValue()}</Badge>
         </span>
       ),
     }),
@@ -158,7 +157,7 @@ const OrgDependencySearch: FunctionComponent = () => {
         {!components?.data.length ? (
           <EmptyParty
             title="No matching results."
-            description={` The package ${searchParams?.get("search")} could not be found in any repository currently associated with your organization.`}
+            description={`The package ${searchParams?.get("search")} could not be found in any repository currently associated with your organization.`}
           />
         ) : (
           <div className="overflow-hidden rounded-lg border shadow-sm">
@@ -171,14 +170,29 @@ const OrgDependencySearch: FunctionComponent = () => {
                         className="cursor-pointer break-normal p-4 text-left"
                         key={header.id}
                       >
+                        <div className="flex flex-row items-center gap-2">
+                          {header.isPlaceholder ? null : header.id ===
+                            "organizationName" ? (
+                            <Badge variant={"outline"}>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </Badge>
+                          ) : (
+                            <div>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </div>
+                          )}
+                        </div>
+
                         <div
                           className="flex flex-row gap-2"
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
                           <SortingCaret
                             sortDirection={header.column.getIsSorted()}
                           />

@@ -705,6 +705,8 @@ export interface OrgDependency {
   assetVersionName: string;
   componentPurl: string;
   componentVersion: string;
+  artifactName?: string;
+  artifactAssetVersion?: string;
 }
 
 export interface Project {
