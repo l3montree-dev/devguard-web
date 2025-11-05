@@ -19,6 +19,7 @@ import {
   ProjectDTO,
   ReleaseRiskHistory,
   RiskHistory,
+  UpstreamState,
   VulnEventDTO,
 } from "@/types/api/api";
 import { Identity } from "@ory/client";
@@ -118,6 +119,9 @@ export const eventTypeMessages = (
     case "reopened":
       return "reopened " + flawName;
     case "accepted":
+      if (event.upstream === UpstreamState.AcceptedFromUpstream) {
+        return "won't fix " + flawName;
+      }
       return "accepted the risk of " + flawName;
     case "fixed":
       return "fixed " + flawName;
@@ -389,4 +393,80 @@ export const normalizeContentTree = (
 
 export interface ThemeConfig {
   config: typeof config;
+}
+
+export class RedirectorBuilder {
+  private organizationSlug?: string;
+  private projectSlug?: string;
+  private assetSlug?: string;
+  private assetId?: string;
+  private assetVersionName?: string;
+  private contentTreeElement?: ContentTreeElement[];
+
+  setOrganizationSlug(organizationSlug: string): RedirectorBuilder {
+    this.organizationSlug = organizationSlug;
+    return this;
+  }
+
+  setProjectSlug(projectSlug: string): RedirectorBuilder {
+    this.projectSlug = projectSlug;
+    return this;
+  }
+
+  setAssetSlug(assetSlug: string): RedirectorBuilder {
+    this.assetSlug = assetSlug;
+    return this;
+  }
+
+  setAssetId(assetId: string): RedirectorBuilder {
+    this.assetId = assetId;
+    return this;
+  }
+
+  setAssetVersionName(assetVersionName: string): RedirectorBuilder {
+    this.assetVersionName = assetVersionName;
+    return this;
+  }
+
+  setContentTree(contentTreeElement: ContentTreeElement[]): RedirectorBuilder {
+    this.contentTreeElement = contentTreeElement;
+    return this;
+  }
+
+  build(): string {
+    if (this.assetId !== undefined) {
+      if (this.contentTreeElement === undefined) {
+        throw new Error("ContentTreeElement must be set when using assetId");
+      } else {
+        const asset = this.contentTreeElement
+          .map((ct) => ct.assets.find((a) => a.id === this.assetId!))
+          .filter((a) => !!a)[0];
+        if (asset === undefined) {
+          throw new Error(
+            `Asset with id ${this.assetId} not found in content tree element - maybe missing permission`,
+          );
+        }
+        this.assetSlug = asset.slug;
+      }
+    }
+
+    if (this.organizationSlug === undefined) {
+      throw new Error("OrganizationSlug is required");
+    }
+
+    let url = `/${this.organizationSlug}/`;
+
+    if (this.projectSlug !== undefined) {
+      url += `projects/${this.projectSlug}/`;
+
+      if (this.assetSlug !== undefined) {
+        url += `assets/${this.assetSlug}`;
+
+        if (this.assetVersionName !== undefined) {
+          url += `/refs/${this.assetVersionName}`;
+        }
+      }
+    }
+    return url;
+  }
 }

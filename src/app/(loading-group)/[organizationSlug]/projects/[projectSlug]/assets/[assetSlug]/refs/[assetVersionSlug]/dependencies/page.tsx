@@ -1,21 +1,30 @@
 "use client";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { browserApiClient } from "@/services/devGuardApi";
-import "@xyflow/react/dist/style.css";
-import { FunctionComponent, useMemo, useState } from "react";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
+import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
+import { Combobox } from "@/components/common/Combobox";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
+import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
+import { browserApiClient } from "@/services/devGuardApi";
 import {
-  ArtifactDTO,
   Component,
   ComponentPaged,
   License,
@@ -36,9 +45,22 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch, Loader2 } from "lucide-react";
+import "@xyflow/react/dist/style.css";
+import {
+  ChevronDownIcon,
+  GitBranch,
+  GitBranchIcon,
+  Loader2,
+  Loader2Icon,
+} from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FunctionComponent, useMemo, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
+import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
 import DateString from "../../../../../../../../../../components/common/DateString";
+import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
 import SortingCaret from "../../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import {
@@ -46,33 +68,13 @@ import {
   Button,
   buttonVariants,
 } from "../../../../../../../../../../components/ui/button";
-import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
-import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
-import Page from "@/components/Page";
-import { Combobox } from "@/components/common/Combobox";
-import { useRouter } from "next/navigation";
-import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
-import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
-import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { debounce } from "lodash";
-import { GitBranchIcon, Loader2Icon } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import useSWR from "swr";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
+import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { osiLicenseHexColors } from "../../../../../../../../../../utils/view";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -337,17 +339,7 @@ const Index: FunctionComponent = () => {
     return params;
   }, [searchParams]);
 
-  const updateQueryParams = useRouterQuery();
-
-  const handleSearch = useMemo(
-    () =>
-      debounce((value: string) => {
-        updateQueryParams({
-          search: value,
-        });
-      }, 500),
-    [updateQueryParams],
-  );
+  const handleSearch = useDebouncedQuerySearch();
 
   const { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
     url + "?" + params.toString(),
@@ -564,7 +556,7 @@ const Index: FunctionComponent = () => {
           />
           <div className="relative flex-1">
             <Input
-              onChange={(event) => handleSearch(event.currentTarget.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               defaultValue={searchParams?.get("search") as string}
               placeholder="Search for dependencies or versions - just start typing..."
             />

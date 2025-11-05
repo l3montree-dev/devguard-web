@@ -56,8 +56,11 @@ export function padRiskHistory<T extends RiskHistoryEl>(
 
       r.riskHistory = [
         {
+          id: "pad-" + clone.getTime(),
           day: clone.toUTCString(),
-          id: (r.project?.id ?? r.asset?.id) as string,
+          assetId: "",
+          artifactName: "",
+          assetVersionName: "",
           sumClosedRisk: 0,
           sumOpenRisk: 0,
           maxClosedRisk: 0,

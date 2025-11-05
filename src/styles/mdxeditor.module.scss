@@ -1,50 +1,63 @@
 .mdxeditor {
-    --accentBase: hsl(var(--accent));
-    --accentBgSubtle: hsl(var(--accent));
-    --accentBg: hsl(var(--accent));
-    --accentBgHover: hsl(var(--muted));
-    --accentBgActive: hsl(var(--muted));
-    --accentLine: hsl(var(--border));
-    --accentBorder: hsl(var(--border));
-    --accentBorderHover: hsl(var(--ring));
-    --accentSolid: hsl(var(--primary));
-    --accentSolidHover: hsl(var(--primary));
-    --accentText: hsl(var(--accent-foreground));
-    --accentTextContrast: hsl(var(--foreground));
+  --accentBase: hsl(var(--accent));
+  --accentBgSubtle: hsl(var(--accent));
+  --accentBg: hsl(var(--accent));
+  --accentBgHover: hsl(var(--muted));
+  --accentBgActive: hsl(var(--muted));
+  --accentLine: hsl(var(--border));
+  --accentBorder: hsl(var(--border));
+  --accentBorderHover: hsl(var(--ring));
+  --accentSolid: hsl(var(--primary));
+  --accentSolidHover: hsl(var(--primary));
+  --accentText: hsl(var(--accent-foreground));
+  --accentTextContrast: hsl(var(--foreground));
 
-    --baseBase: hsl(var(--background));
-    --baseBgSubtle: hsl(var(--card));
-    --baseBg: hsl(var(--background));
-    --baseBgHover: hsl(var(--card));
-    --baseBgActive: hsl(var(--card));
-    --baseLine: hsl(var(--border));
-    --baseBorder: transparent;
-    --baseBorder: hsl(var(--primary));
-    --baseBorderHover: hsl(var(--ring));
-    --baseSolid: hsl(var(--muted-foreground));
-    --baseSolidHover: hsl(var(--muted));
-    --baseText: hsl(var(--foreground));
-    --baseTextContrast: hsl(var(--foreground));
+  --baseBase: hsl(var(--background));
+  --baseBgSubtle: hsl(var(--card));
+  --baseBg: hsl(var(--background));
+  --baseBgHover: hsl(var(--card));
+  --baseBgActive: hsl(var(--muted));
+  --baseLine: hsl(var(--border));
+  --baseBorder: transparent;
+  --baseBorder: hsl(var(--primary));
+  --baseBorderHover: hsl(var(--ring));
+  --baseSolid: hsl(var(--muted-foreground));
+  --baseSolidHover: hsl(var(--muted));
+  --baseText: hsl(var(--foreground));
+  --baseTextContrast: hsl(var(--foreground));
 
-    --admonitionTipBg: hsl(var(--chart-2));
-    --admonitionTipBorder: hsl(var(--chart-2));
+  --admonitionTipBg: hsl(var(--chart-2));
+  --admonitionTipBorder: hsl(var(--chart-2));
 
-    --admonitionInfoBg: hsl(var(--chart-1));
-    --admonitionInfoBorder: hsl(var(--chart-1));
+  --admonitionInfoBg: hsl(var(--chart-1));
+  --admonitionInfoBorder: hsl(var(--chart-1));
 
-    --admonitionCautionBg: hsl(var(--chart-5));
-    --admonitionCautionBorder: hsl(var(--chart-5));
+  --admonitionCautionBg: hsl(var(--chart-5));
+  --admonitionCautionBorder: hsl(var(--chart-5));
 
-    --admonitionDangerBg: hsl(var(--destructive));
-    --admonitionDangerBorder: hsl(var(--destructive));
+  --admonitionDangerBg: hsl(var(--destructive));
+  --admonitionDangerBorder: hsl(var(--destructive));
 
-    --admonitionNoteBg: hsl(var(--muted));
-    --admonitionNoteBorder: hsl(var(--border));
+  --admonitionNoteBg: hsl(var(--muted));
+  --admonitionNoteBorder: hsl(var(--border));
 
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
-    color: hsl(var(--foreground));
-    --basePageBg: black;
-    background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  --basePageBg: hsl(var(--background));
+  background: hsl(var(--background));
 }

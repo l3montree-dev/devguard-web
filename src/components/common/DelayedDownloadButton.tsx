@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, FileCode, ImageIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
+import { useState } from "react";
 
 interface DelayedDownloadButtonProps {
   href: string;
-  format: "json" | "xml";
   icon: React.ReactNode;
   label: string;
   className?: string;
@@ -12,7 +11,6 @@ interface DelayedDownloadButtonProps {
 
 export function DelayedDownloadButton({
   href,
-  format,
   icon,
   label,
   className = "",
@@ -25,7 +23,11 @@ export function DelayedDownloadButton({
     setTimeout(() => {
       const link = document.createElement("a");
       link.href = href;
-      link.download = `sbom.${format}`;
+      // get the basename of the file from the href
+      const parts = href.split("/");
+      const filename = parts[parts.length - 1].split("?")[0];
+
+      link.download = filename;
       link.target = "_blank";
       document.body.appendChild(link);
       link.click();

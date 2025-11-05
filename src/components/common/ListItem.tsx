@@ -25,7 +25,7 @@ const ListItem: FunctionComponent<Props> = ({
   return (
     <Card
       className={classNames(
-        "flex flex-row items-center justify-between",
+        "flex flex-row items-start justify-between",
         reactOnHover && "transition-all hover:bg-accent",
         className,
       )}

@@ -4,36 +4,33 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-// IF ERROR_TRACKING_DSN IS NOT SET, DO NOT INITIALIZE SENTRY
-if (!process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN) {
-  console.warn(
-    "Sentry is not initialized because NEXT_PUBLIC_ERROR_TRACKING_DSN is not set.",
-  );
-} else {
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_ERROR_TRACKING_DSN,
+Sentry.init({
+  // Use a placeholder DSN to satisfy type requirements see error-tracking.ts for actual forwarding
+  dsn: "https://something@dummy.devguard.org/1",
 
-    // Setting this option to true will print useful information to the console while you're setting up Sentry.
-    debug: false,
+  // Use the tunnel to avoid ad-blockers and respect privacy
+  tunnel: "/api/error-tracking",
 
-    release: process.env.NEXT_PUBLIC_VERSION,
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: false,
 
-    beforeSend(event) {
-      if (event.request && event.request.cookies) {
-        delete event.request.cookies;
-      }
-      if (event.request && event.request.headers) {
-        delete event.request.headers.cookie;
-      }
-      // remove user ip from event
-      if (event.user && event.user.ip_address) {
-        delete event.user.ip_address;
-      }
-      return event;
-    },
+  release: process.env.NEXT_PUBLIC_VERSION,
 
-    sendDefaultPii: false,
-  });
-}
+  beforeSend(event) {
+    if (event.request && event.request.cookies) {
+      delete event.request.cookies;
+    }
+    if (event.request && event.request.headers) {
+      delete event.request.headers.cookie;
+    }
+    // remove user ip from event
+    if (event.user && event.user.ip_address) {
+      delete event.user.ip_address;
+    }
+    return event;
+  },
+
+  sendDefaultPii: false,
+});
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

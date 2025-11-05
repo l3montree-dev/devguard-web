@@ -24,15 +24,14 @@ import {
 } from "@xyflow/react";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
 
-import { useRouter } from "next/navigation";
 import { DependencyGraphNode } from "./DependencyGraphNode";
 
 // or if you just want basic styles
 import { beautifyPurl } from "@/utils/common";
 import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
-import { riskToSeverity, severityToColor } from "./common/Severity";
 import { useSearchParams } from "next/navigation";
+import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const addRecursive = (
   dagreGraph: graphlib.Graph,
@@ -183,7 +182,7 @@ const DependencyGraph: FunctionComponent<{
   height: number;
   variant?: "compact";
   flaws: Array<VulnDTO>;
-  graph: { root: ViewDependencyTreeNode };
+  graph: ViewDependencyTreeNode;
 }> = ({ graph, width, height, flaws, variant }) => {
   const asset = useActiveAsset();
   const searchParams = useSearchParams();
@@ -191,19 +190,19 @@ const DependencyGraph: FunctionComponent<{
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
-    graph.root.name = asset?.name ?? "";
+    graph.name = searchParams?.get("artifact") ?? asset?.name ?? "";
 
     const [nodes, edges] = getLayoutedElements(
-      graph.root,
+      graph,
       flaws,
       "LR",
       variant === "compact" ? 150 : 300,
       variant === "compact" ? 150 : 300,
     );
     // get the root node - we use it for the initial position of the viewport
-    const rootNode = nodes.find((n) => n.data.label === graph.root.name)!;
+    const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, asset?.name, variant, flaws]);
+  }, [graph, searchParams?.get("artifact"), asset?.name, variant, flaws]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

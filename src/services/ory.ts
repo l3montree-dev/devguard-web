@@ -24,7 +24,7 @@ export const ory = new FrontendApi(new Configuration(edgeConfig));
 export function handleFlowError<S>(
   router: AppRouterInstance,
   flowType: "login" | "registration" | "settings" | "recovery" | "verification",
-  resetFlow: Dispatch<SetStateAction<S | undefined>>,
+  resetFlow: (value: undefined) => void,
 ) {
   return (err: any) => {
     switch (err.response?.data.error?.id) {

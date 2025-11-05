@@ -39,6 +39,10 @@ import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSl
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { useRouter } from "next/navigation";
+import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import { useUpdateAsset } from "../context/AssetContext";
+import { fetchAsset } from "../data-fetcher/fetchAsset";
+import { SetupInformationSourceSlide } from "./guides/risk-scanner-carousel-slides/SetupInformationSourceSlide";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -46,6 +50,8 @@ interface RiskScannerDialogProps {
   apiUrl: string;
   frontendUrl: string;
   devguardCIComponentBase: string;
+  assetVersion?: AssetVersionDTO;
+  artifacts?: Array<ArtifactDTO>;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -54,6 +60,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   frontendUrl,
   devguardCIComponentBase,
   onOpenChange,
+  assetVersion,
+  artifacts,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -68,11 +76,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const asset = useActiveAsset()!;
 
   const [selectedSetup, setSelectedSetup] = React.useState<
-    "devguard-tools" | "own-setup" | undefined
+    "devguard-tools" | "own-setup" | "information-source" | undefined
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
-    "custom-setup" | "auto-setup" | undefined
+    "custom-setup" | "auto-setup" | "information-source" | undefined
   >();
 
   const [config, setConfig] = React.useState({
@@ -86,13 +94,42 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
-  const [tab, setTab] = React.useState<"sbom" | "sarif">("sbom");
+  const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
   const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
   const sbomFileRef = useRef<File | undefined>(undefined);
   const [sarifFileName, setSarifFileName] = useState<string | undefined>();
   const sarifContentRef = useRef<string | undefined>(undefined);
+  const [vexFileName, setVexFileName] = useState<string | undefined>();
+  const vexContentRef = useRef<string | undefined>(undefined);
+
+  const onDropVex = useCallback((acceptedFiles: File[]) => {
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const txt = reader.result as string;
+          const parsed = JSON.parse(txt);
+
+          if (parsed?.bomFormat === "CycloneDX") {
+            vexContentRef.current = txt;
+            setVexFileName(file.name);
+          } else {
+            toast.error(
+              "VEX file does not follow CycloneDX format or Version is < 1.6",
+            );
+          }
+        } catch (_e) {
+          toast.error(
+            "JSON format is not recognized, make sure it is the proper format",
+          );
+          return;
+        }
+      };
+      reader.readAsText(file);
+    });
+  }, []);
 
   const onDropSbom = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -130,6 +167,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       const reader = new FileReader();
       reader.onload = () => {
         sarifContentRef.current = reader.result as string;
+        const parsed = JSON.parse(sarifContentRef.current || "{}");
+        if (!parsed.$schema?.includes("sarif")) {
+          toast.error("SARIF file does not follow SARIF format");
+          return;
+        }
+
         setSarifFileName(file.name);
       };
       reader.readAsText(file);
@@ -145,40 +188,89 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
-  const uploadSBOM = async () => {
+  const vexDropzone = useDropzone({
+    onDrop: onDropVex,
+    accept: {
+      "application/json": [".json"],
+      "application/sarif+json": [".sarif"],
+      "text/plain": [".sarif"],
+    },
+  });
+
+  const refreshAssetData = async () => {
+    // fetch the asset again
+    const updatedAsset = await browserApiClient(
+      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
+      { method: "GET" },
+    );
+    if (updatedAsset.ok) {
+      const assetData = await updatedAsset.json();
+      updateAsset(assetData);
+    }
+  };
+
+  const updateAsset = useUpdateAsset();
+  const uploadSBOM = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
     if (!sbomFileRef.current) return;
     const formdata = new FormData();
     formdata.append("file", sbomFileRef.current);
 
     const resp = await multipartBrowserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
+      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
       {
         method: "POST",
         body: formdata,
-        headers: { "X-Scanner": "website:sbom" },
+        headers: {
+          "X-Asset-Ref": params.branchOrTagName,
+          "X-Asset-Default-Branch": params.isDefault
+            ? params.branchOrTagName
+            : "",
+          "X-Tag": params.isTag ? "1" : "0",
+          "X-Artifact-Name": params.artifactName,
+          "X-Origin": params.origin,
+          "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+        },
       },
     );
 
     if (resp.ok) {
+      await refreshAssetData();
+      router.push(
+        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
+      );
+      onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {
       toast.error("SBOM has not been sent successfully");
     }
-    onOpenChange(false);
-    router.push(
-      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/dependency-risks/`,
-    );
   };
 
-  const uploadSARIF = async () => {
+  const uploadSARIF = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
     if (!sarifContentRef.current) return;
 
     const resp = await browserApiClient(`/sarif-scan`, {
       method: "POST",
       body: sarifContentRef.current,
       headers: {
-        "X-Scanner": "website:sarif",
+        "X-Tag": params.isTag ? "1" : "0",
+        "X-Asset-Ref": params.branchOrTagName,
+        "X-Asset-Default-Branch": params.isDefault
+          ? params.branchOrTagName
+          : "",
         "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+        "X-Scanner": params.origin,
       },
     });
 
@@ -193,8 +285,112 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
   };
 
-  const isUploadDisabled = tab === "sbom" ? !sbomFileName : !sarifFileName;
-  const handleUpload = () => (tab === "sbom" ? uploadSBOM() : uploadSARIF());
+  const uploadVEX = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
+    if (!vexContentRef.current) return;
+
+    const resp = await browserApiClient(`/vex`, {
+      method: "POST",
+      body: vexContentRef.current,
+      headers: {
+        "X-Tag": params.isTag ? "1" : "0",
+        "X-Asset-Ref": params.branchOrTagName,
+        "X-Artifact-Name": params.artifactName,
+        "X-Asset-Default-Branch": params.isDefault
+          ? params.branchOrTagName
+          : "",
+        "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+        "X-Origin": params.origin,
+      },
+    });
+
+    if (resp.ok) {
+      await refreshAssetData();
+      toast.success("VEX has successfully been sent!");
+    } else {
+      toast.error("VEX has not been sent successfully");
+    }
+    onOpenChange(false);
+    router.push(
+      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
+    );
+  };
+
+  const handleInformationSourceSetup = async (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    informationSources: Array<string>;
+  }) => {
+    // first create the asset version
+    const resp = await browserApiClient(
+      `/organizations/${decodeURIComponent(
+        activeOrg.slug,
+      )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: params.branchOrTagName,
+          tag: params.isTag,
+          defaultBranch: params.isDefault,
+        }),
+      },
+    );
+
+    // now create the artifact
+    if (resp.ok) {
+      const assetVersionData = await resp.json();
+      const artifactResp = await browserApiClient(
+        `/organizations/${decodeURIComponent(
+          activeOrg.slug,
+        )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/artifacts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            artifactName: params.artifactName,
+            informationSources: params.informationSources,
+          }),
+        },
+      );
+      if (artifactResp.ok) {
+        toast.success("Information source setup successfully created!");
+        router.push(
+          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
+        );
+        onOpenChange(false);
+      } else {
+        toast.error("Artifact could not be created successfully");
+      }
+    }
+  };
+
+  const handleUpload = (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    artifactName: string;
+    isDefault: boolean;
+    origin: string;
+  }) => {
+    if (tab === "sbom") {
+      uploadSBOM(params);
+    } else if (tab === "sarif") {
+      uploadSARIF(params);
+    } else {
+      uploadVEX(params);
+    }
+  };
 
   const activeOrg = useActiveOrg()!;
   const activeProject = useActiveProject()!;
@@ -274,6 +470,12 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
   }, []);
 
+  const isUploadDisabled =
+    tab === "sbom"
+      ? !sbomFileName
+      : tab === "sarif"
+        ? !sarifFileName
+        : !vexFileName;
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -297,6 +499,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               asset={asset!}
               selectScannerSlideIndex={6}
+              setupInformationSourceSlideIndex={15}
               autosetupSlideIndex={getAutosetupSlideIndex()} // if we have integrations, present the user directly the provider setup slide. If no, present the gitlab integration slide and SKIP the provider setup slide
               selectedScanner={selectedScanner}
               setSelectedScanner={setSelectedScanner}
@@ -342,6 +545,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               selectedSetup={selectedSetup}
               setSelectedSetup={setSelectedSetup}
               prevIndex={prevIndex}
+              informationSourceSlideIndex={15}
               devguardToolsSlideIndex={7}
               customSetupSlideIndex={11}
             />
@@ -417,10 +621,14 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               sbomDropzone={sbomDropzone}
               sarifDropzone={sarifDropzone}
               isUploadDisabled={isUploadDisabled}
+              vexDropzone={vexDropzone}
+              vexFileName={vexFileName}
               handleUpload={handleUpload}
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
               api={api}
+              assetVersionName={assetVersion?.name}
+              artifacts={artifacts || []}
             />
             <ExternalEntityAutosetup
               handleAutosetup={autosetup.handleAutosetup}
@@ -430,6 +638,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
+            />
+            <SetupInformationSourceSlide
+              api={api}
+              prevIndex={prevIndex}
+              onInformationSourceSetup={handleInformationSourceSetup}
             />
           </CarouselContent>
         </Carousel>

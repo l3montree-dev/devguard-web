@@ -16,6 +16,7 @@
 import {
   LoginFlow,
   RegistrationFlow,
+  UiNode,
   UiNodeGroupEnum,
   UiNodeScriptAttributes,
   UpdateRegistrationFlowBody,
@@ -24,7 +25,10 @@ import {
 import { Flow } from "@/components/kratos/Flow";
 import { Messages } from "@/components/kratos/Messages";
 import { Card, CardContent } from "@/components/ui/card";
-import { filterNodesByGroups } from "@ory/integrations/ui";
+import {
+  filterNodesByGroups,
+  isUiNodeInputAttributes,
+} from "@ory/integrations/ui";
 import { AxiosError } from "axios";
 import { uniq } from "lodash";
 import Head from "next/head";
@@ -36,6 +40,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useId,
 } from "react";
 import { toast, Toaster } from "sonner";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
@@ -44,6 +49,8 @@ import { useSearchParams } from "next/navigation";
 import { handleFlowError, ory } from "../../services/ory";
 import { Checkbox } from "../../components/ui/checkbox";
 import { useUpdateSession } from "../../context/SessionContext";
+import { TermsConsent } from "@/components/kratos/TermsConsent";
+import { classNames } from "@/utils/common";
 
 // Renders the registration page
 const Registration = () => {
@@ -52,11 +59,40 @@ const Registration = () => {
   const query = useSearchParams();
 
   const updateSession = useUpdateSession();
-  const { oidcOnly, termsOfUseLink, privacyPolicyLink } = useConfig();
+  const { oidcOnly } = useConfig();
+  const oidcTermsCheckboxId = useId();
   const [oidcTermsOfUseAgreed, setOidcTermsOfUseAgreed] = useState(false);
+  const termsOverride = useMemo(
+    () =>
+      ({
+        "traits.confirmedTerms": oidcTermsOfUseAgreed,
+      }) as Partial<UpdateRegistrationFlowBody>,
+    [oidcTermsOfUseAgreed],
+  );
   // The "flow" represents a registration process and contains
   // information about the form we need to render (e.g. username + password)
-  const [flow, setFlow] = useState<RegistrationFlow>();
+  const [flow, _setFlow] = useState<RegistrationFlow>();
+
+  const removeTosNode = (nodes: Array<UiNode>) => {
+    return nodes.filter((n) => {
+      if (
+        isUiNodeInputAttributes(n.attributes) &&
+        n.attributes.name === "traits.confirmedTerms"
+      ) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const setFlow = (flow: RegistrationFlow | undefined) => {
+    if (!flow) {
+      _setFlow(undefined);
+      return;
+    }
+    flow.ui.nodes = removeTosNode(flow.ui.nodes);
+    _setFlow(flow);
+  };
 
   // Get ?flow=... from the URL
   const { flow: flowId, return_to: returnTo } = query as {
@@ -77,6 +113,7 @@ const Registration = () => {
         .getRegistrationFlow({ id: String(flowId) })
         .then(({ data }) => {
           // We received the flow - let's use its data and render the form!
+          // remove the tos button since we override it
           setFlow(data);
         })
         .catch(handleFlowError(router, "registration", setFlow));
@@ -89,12 +126,19 @@ const Registration = () => {
         returnTo: returnTo ? String(returnTo) : undefined,
       })
       .then(({ data }) => {
+        data.ui.nodes = removeTosNode(data.ui.nodes);
         setFlow(data);
       })
       .catch(handleFlowError(router, "registration", setFlow));
   }, [flowId, router, returnTo, flow]);
 
   const onSubmit = async (values: UpdateRegistrationFlowBody) => {
+    if (!oidcTermsOfUseAgreed) {
+      toast.error(
+        "You must agree to the terms of use and privacy policy to continue.",
+      );
+      return;
+    }
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
@@ -103,7 +147,11 @@ const Registration = () => {
     ory
       .updateRegistrationFlow({
         flow: String(flow?.id),
-        updateRegistrationFlowBody: values,
+        updateRegistrationFlowBody: {
+          ...values,
+          // @ts-ignore
+          "traits.confirmedTerms": true,
+        },
       })
       .then(async ({ data }) => {
         // If we ended up here, it means we are successfully signed up!
@@ -203,6 +251,10 @@ const Registration = () => {
     }
     return false;
   }, [flow]);
+
+  const showProfileFlow =
+    !oidcOnly && Boolean(flow) && !profileFlowIsOnlyBackButton;
+
   return (
     <>
       <Head>
@@ -250,22 +302,33 @@ const Registration = () => {
             <Card className="mt-10">
               <CardContent>
                 <div className="mt-6 sm:mx-auto">
-                  {!oidcOnly &&
-                    Boolean(flow) &&
-                    // if its just a single node its the back button - we already render that one.
-                    !profileFlowIsOnlyBackButton && (
-                      <div className="mb-6 border-b-2 pb-4">
-                        <Flow
-                          hideGlobalMessages
-                          only="profile"
-                          onSubmit={onSubmit}
-                          flow={flow as LoginFlow}
-                        />
-                      </div>
-                    )}
+                  {showProfileFlow && (
+                    <div
+                      className={classNames(
+                        availableMethods.includes("passkey") ||
+                          availableMethods.includes("password")
+                          ? "mb-6 border-b-2 pb-4"
+                          : "",
+                      )}
+                    >
+                      <Flow
+                        overrideValues={termsOverride}
+                        hideGlobalMessages
+                        only="profile"
+                        onSubmit={onSubmit}
+                        flow={flow as LoginFlow}
+                      />
+                    </div>
+                  )}
 
                   {availableMethods.includes("passkey") && (
-                    <div className="mb-6 border-b-2 pb-4">
+                    <div
+                      className={classNames(
+                        availableMethods.includes("password")
+                          ? "mb-6 border-b-2 pb-4"
+                          : "",
+                      )}
+                    >
                       <Flow
                         hideGlobalMessages
                         only="passkey"
@@ -275,7 +338,7 @@ const Registration = () => {
                     </div>
                   )}
                   {availableMethods.includes("password") && (
-                    <div className={"mt-6"}>
+                    <div className="mt-6">
                       <Flow
                         hideGlobalMessages
                         only="password"
@@ -289,44 +352,30 @@ const Registration = () => {
                   <div className="mt-6">
                     <Flow
                       className="flex flex-row flex-wrap gap-2 justify-center"
+                      overrideValues={termsOverride as any}
                       only="oidc"
                       hideGlobalMessages
-                      onSubmit={async (v) => {
-                        if (!oidcTermsOfUseAgreed) {
-                          toast.error(
-                            "You must agree to the terms of use and privacy policy to continue.",
-                          );
-                          return;
-                        }
-                        return onSubmit(v as any);
-                      }}
+                      onSubmit={onSubmit}
                       flow={flow as LoginFlow}
                     />
-                    <div className="flex items-start gap-2 mt-4 flex-row">
-                      <Checkbox
-                        onCheckedChange={(v) =>
-                          setOidcTermsOfUseAgreed(Boolean(v))
-                        }
-                      />
-                      <span className="text-sm leading-4  block font-medium">
-                        I agree to the{" "}
-                        <a target="_blank" href={termsOfUseLink}>
-                          terms of use
-                        </a>{" "}
-                        and the{" "}
-                        <a
-                          target="_blank"
-                          className="whitespace-nowrap"
-                          href={privacyPolicyLink}
-                        >
-                          privacy policy
-                        </a>
-                        .
-                      </span>
-                    </div>
                   </div>
                 )}
               </CardContent>
+            </Card>
+            <Card className="mt-4">
+              <div className="flex items-start gap-2 p-4 flex-row">
+                <Checkbox
+                  id={oidcTermsCheckboxId}
+                  checked={oidcTermsOfUseAgreed}
+                  onCheckedChange={(v) => setOidcTermsOfUseAgreed(Boolean(v))}
+                />
+                <TermsConsent
+                  htmlFor={oidcTermsCheckboxId}
+                  className="text-sm leading-4 block font-medium"
+                >
+                  I agree to the
+                </TermsConsent>
+              </div>
             </Card>
             {!oidcOnly && Boolean(flow) && (
               <div className="flex flex-row justify-end">

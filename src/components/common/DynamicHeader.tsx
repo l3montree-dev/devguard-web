@@ -6,11 +6,26 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
 import { OrganizationDropDown } from "../OrganizationDropDown";
 import EntityProviderImage from "./EntityProviderImage";
+
+const levelMapping: { [idx: number]: string } = {
+  1: "root",
+  2: "organization",
+  3: "group",
+  4: "repo",
+};
+
+function getLevelMapping(level: number) {
+  const mapping = levelMapping[level];
+  if (mapping === undefined) {
+    throw new Error("invalid mapping for level: " + level);
+  }
+  return mapping;
+}
 
 interface Props {
   Title: ReactNode;
@@ -26,6 +41,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
   const activeOrg = useActiveOrg();
   const pathname = usePathname();
   const params = useDecodedParams();
+  const levelStr = useMemo(() => "level-" + getLevelMapping(z), [z]);
 
   const slug = params.organizationSlug || activeOrg?.slug || "";
   return (
@@ -34,6 +50,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
       className={classNames(
         "absolute top-0 left-0 right-0 z-20 flex min-h-[109px] items-center justify-between bg-header px-4 pt-5 sm:px-6 lg:px-8",
         Boolean(menu) ? "pb-3" : "pb-5",
+        levelStr,
       )}
     >
       <div className="mx-auto w-full max-w-screen-2xl">

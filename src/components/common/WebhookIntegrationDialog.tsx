@@ -254,6 +254,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                     <InputWithButton
                       label="Secret token"
                       placeholder="the secret"
+                      nameKey="webhook-integration-secret-token"
                       {...field}
                       copyable={true}
                       mutable={true}

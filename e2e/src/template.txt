@@ -1,0 +1,15 @@
+/* 
+// TEMPLATE FOR NEW TESTS
+test('test', async ({ page }) => {
+    const devguardPOM = new DevGuardPOM(page);
+    await devguardPOM.loadDevGuard();
+    const username = envConfig.devGuard.uniqueUsername()
+    await devguardPOM.registerWithEmail(username, envConfig.devGuard.password);
+
+    // await devguardPOM.createTestOrganizationGroupAndRepo();
+
+    // my code goes here...
+
+    await page.waitForTimeout(500_000);
+});
+*/

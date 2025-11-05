@@ -84,23 +84,24 @@ const DependencyGraphPage: FunctionComponent = () => {
   const { data: affectedComponents, isLoading: affectedComponentsLoading } =
     useSWR<ScaVulnDTO[]>(uri + "/affected-components/", fetcher);
 
-  const { data: graphData, isLoading: graphLoading } = useSWR<{
-    root: DependencyTreeNode;
-  }>(
-    uri +
-      "/dependency-graph/?" +
-      toSearchParams({
-        artifactName: searchParams?.get("artifact") as string,
-        all: searchParams?.get("all") ? "1" : undefined,
-      }),
-    fetcher,
-  );
+  const { data: graphData, isLoading: graphLoading } =
+    useSWR<DependencyTreeNode>(
+      uri +
+        "/dependency-graph/?" +
+        toSearchParams({
+          artifactName: searchParams?.get("artifact") ?? undefined,
+          all: searchParams?.get("all") ? "1" : undefined,
+        }),
+      fetcher,
+    );
 
   const graph = useMemo(() => {
     if (!graphData) {
       return null;
     }
-    let converted = convertGraph(graphData.root);
+
+    let converted = convertGraph(graphData);
+
     recursiveAddRisk(converted, affectedComponents ?? []);
     // we cannot return a circular data structure - remove the parent again
     recursiveRemoveParent(converted);
@@ -199,7 +200,7 @@ const DependencyGraphPage: FunctionComponent = () => {
               flaws={affectedComponents ?? []}
               width={dimensions.width - SIDEBAR_WIDTH}
               height={dimensions.height - HEADER_HEIGHT - 85}
-              graph={{ root: graph }}
+              graph={graph}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
@@ -214,7 +215,7 @@ const DependencyGraphPage: FunctionComponent = () => {
 
 export default DependencyGraphPage;
 
-const RISK_INHERITANCE_FACTOR = 1;
+const RISK_INHERITANCE_FACTOR = 0.3;
 const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
   flaws: Array<VulnDTO>,
@@ -232,9 +233,11 @@ const recursiveAddRisk = (
     let i = 0;
     while (parent != null) {
       i++;
+      //   if (parent.name.startsWith("pkg:")) {
       parent.risk = parent.risk
         ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
         : node.risk * (RISK_INHERITANCE_FACTOR / i);
+      // }
       parent = parent.parent;
     }
   }

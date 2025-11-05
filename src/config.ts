@@ -45,4 +45,5 @@ export const config = {
     | "white"
     | "dark"
     | false,
+  errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
 };

@@ -5,25 +5,25 @@ name: DevGuard Workflow
 on:
   workflow_dispatch:
   push:
- 
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 - https://github.com/actions/checkout/releases/tag/v5.0.0
-    - name: "Install Dependencies"
-      run: |
-        npm install
-    - name: "Run Tests"
-      run: |
-        npm test
-        
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 - https://github.com/actions/checkout/releases/tag/v5.0.0
+      - name: "Install Dependencies"
+        run: |
+          npm install
+      - name: "Run Tests"
+        run: |
+          npm test
+
   devguard-scanner:
     uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
     with:
-        asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
-        api-url: https://api.main.devguard.org
+      asset-name: "l3montree-cybersecurity/projects/devguard/assets/devguard-web"
+      api-url: https://api.main.devguard.org
     secrets:
-        devguard-token: ${{ secrets.DEVGUARD_TOKEN }} 
-        build-args: "--context=. --dockerfile=Dockerfile --build-arg=DEVGUARD_API_URL=https://api.main.devguard.org  --build-arg=VERSION=${{ github.sha }} --build-arg=NEXT_PUBLIC_ERROR_TRACKING_DSN=${{ secrets.NEXT_PUBLIC_ERROR_TRACKING_DSN }}  --build-arg=SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
+      devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
+      build-args: "--context=. --dockerfile=Dockerfile --build-arg=DEVGUARD_API_URL=https://api.main.devguard.org  --build-arg=VERSION=${{ github.sha }}  --build-arg=SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
