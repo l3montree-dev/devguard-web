@@ -693,6 +693,7 @@ export interface Component {
 }
 
 export interface OrgDependency {
+  dependencyPurl: string;
   componentDependencyId: string;
   organizationId: string;
   organizationName: string;

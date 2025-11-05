@@ -36,19 +36,16 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import CustomPagination from "@/components/common/CustomPagination";
+import ArtifactBadge from "@/components/ArtifactBadge";
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
-
-  // localhost:8080/api/v1/organizations/org/dependency-components/?search=alpine
-
   const url = "/organizations/" + organizationSlug + "/dependency-components/";
   const handleSearch = useDebouncedQuerySearch();
   const searchParams = useSearchParams();
-  //  /dependency-components/?search=alpine";
 
   const params = useMemo(() => {
     const params = buildFilterSearchParams(searchParams);
@@ -59,9 +56,9 @@ const OrgDependencySearch: FunctionComponent = () => {
   const columnHelper = createColumnHelper<OrgDependency>();
 
   const columnsDef: ColumnDef<OrgDependency, any>[] = [
-    columnHelper.accessor("componentPurl", {
+    columnHelper.accessor("dependencyPurl", {
       header: "Package",
-      id: "componentPurl",
+      id: "dependencyPurl",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           <EcosystemImage packageName={row.getValue()} />
@@ -106,6 +103,13 @@ const OrgDependencySearch: FunctionComponent = () => {
         </span>
       ),
     }),
+    columnHelper.accessor("artifactName", {
+      header: "Artifacts",
+      id: "artifactName",
+      cell: (row) => (
+        <ArtifactBadge key={row.getValue()} artifactName={row.getValue()} />
+      ),
+    }),
   ];
 
   const { data: components, isLoading } = useSWR<Paged<OrgDependency>>(
@@ -146,6 +150,13 @@ const OrgDependencySearch: FunctionComponent = () => {
             {flexRender(header.column.columnDef.header, header.getContext())}
           </Badge>
         );
+      case "artifactName":
+        return (
+          <Badge variant={"outline"}>
+            {flexRender(header.column.columnDef.header, header.getContext())}
+          </Badge>
+        );
+
       default:
         return flexRender(header.column.columnDef.header, header.getContext());
     }
@@ -162,10 +173,6 @@ const OrgDependencySearch: FunctionComponent = () => {
         title="Organization Dependencies"
       >
         <div className="flex flex-row items-center justify-between gap-2">
-          {/* <QueryArtifactSelector
-            unassignPossible
-            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-          /> */}
           <div className="relative flex-1">
             <Input
               onChange={(e) => handleSearch(e.target.value)}
@@ -244,13 +251,12 @@ const OrgDependencySearch: FunctionComponent = () => {
                   ))}
                 {table.getRowModel().rows.map((row, index, arr) => (
                   <tr
-                    //   onClick={() => dataPassthrough(row.original)}
                     className={classNames(
                       "relative cursor-pointer bg-background align-top transition-all ",
                       index === arr.length - 1 ? "" : "border-b",
                       index % 2 != 0 && "bg-card/50",
                     )}
-                    key={row.original.componentDependencyId}
+                    key={row.original.assetId}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td className="p-4" key={cell.id}>
@@ -267,11 +273,7 @@ const OrgDependencySearch: FunctionComponent = () => {
           </div>
         )}
         {components && <CustomPagination {...components} />}
-        <div className="flex flex-row justify-end">
-          {/* <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
-            Refresh Licenses
-          </AsyncButton> */}
-        </div>
+        <div className="flex flex-row justify-end"></div>
       </Section>
     </Page>
   );
