@@ -32,7 +32,6 @@ import {
 import { useSearchParams } from "next/dist/client/components/navigation";
 
 import { buildFilterSearchParams } from "@/utils/url";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -60,9 +59,11 @@ const OrgDependencySearch: FunctionComponent = () => {
       header: "Package",
       id: "dependencyPurl",
       cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          <EcosystemImage packageName={row.getValue()} />
-          {beautifyPurl(row.getValue())}
+        <span className="flex flex-row gap-2">
+          <div className="flex h-5 w-5 flex-row items-center justify-center">
+            <EcosystemImage packageName={row.getValue()} />
+          </div>
+          <div className="flex-1">{beautifyPurl(row.getValue())}</div>
         </span>
       ),
     }),
@@ -162,8 +163,6 @@ const OrgDependencySearch: FunctionComponent = () => {
     }
   };
 
-  console.log(components);
-
   return (
     <Page Menu={menu} Title={null} title="">
       <Section
@@ -256,7 +255,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                       index === arr.length - 1 ? "" : "border-b",
                       index % 2 != 0 && "bg-card/50",
                     )}
-                    key={row.original.assetId}
+                    key={row.id}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td className="p-4" key={cell.id}>
