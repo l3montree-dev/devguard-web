@@ -85,11 +85,16 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const [config, setConfig] = React.useState({
     "secret-scanning": true,
-    sca: true,
-    "container-scanning": true,
     sast: true,
     iac: true,
+    sca: true,
+    "container-scanning": true,
     build: true,
+    push: true,
+    sign: true,
+    attest: true,
+    sbom: true,
+    sarif: true,
   });
 
   // Manual integration state
