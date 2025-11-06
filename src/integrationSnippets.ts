@@ -1,4 +1,21 @@
+import { s } from "framer-motion/dist/types.d-Cjd591yU";
 import { config } from "./config";
+import { sign } from "crypto";
+import { Config } from "./types/common";
+
+type jobName =
+  | "secret-scanning"
+  | "sast"
+  | "iac"
+  | "sca"
+  | "container-scanning"
+  | "build"
+  | "push"
+  | "sign"
+  | "attest"
+  | "full"
+  | "sbom-upload"
+  | "sarif-upload";
 
 const generateWorkflowSnippet = (
   jobName: string,
@@ -19,7 +36,7 @@ const generateWorkflowSnippet = (
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
 const generateGitlabSnippet = (
-  jobName: string,
+  jobName: jobName,
   workflowFile: string,
   orgSlug: string,
   projectSlug: string,
@@ -27,13 +44,166 @@ const generateGitlabSnippet = (
   apiUrl: string,
   frontendUrl: string,
   devguardCIComponentBase: string,
-) => `
+  config: Config,
+) => {
+  let snippet = `
+# See all available inputs here: 
+# https://gitlab.com/l3montree/devguard/-/tree/main/templates/${workflowFile}
 - remote: "${devguardCIComponentBase}/templates/${workflowFile}"
   inputs:
-    asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-    token: "$DEVGUARD_TOKEN"
-    api_url: "${apiUrl}"
-    ${jobName === "build" ? "" : `web_ui: "${frontendUrl}"`}   `;
+    devguard_api_url: "${apiUrl}"
+    devguard_asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+    devguard_token: "$DEVGUARD_TOKEN"`;
+
+  switch (jobName) {
+    case "secret-scanning":
+      snippet += `
+    devguard_web_ui: "${frontendUrl}"
+    stage: "test"
+    `;
+      break;
+    case "sast":
+      snippet += `
+    devguard_web_ui: "${frontendUrl}"
+    stage: "test"
+    `;
+      break;
+    case "iac":
+      snippet += `
+    devguard_web_ui: "${frontendUrl}"
+    stage: "test"
+    `;
+      break;
+    case "sca":
+      snippet += `
+    devguard_web_ui: "${frontendUrl}"
+    stage: "test"
+    `;
+      break;
+    case "container-scanning":
+      snippet += `
+    devguard_web_ui: "${frontendUrl}"
+    stage: "oci-image"
+    image_tar_path: "image.tar"`;
+      if (config.build) {
+        snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image
+      `;
+      }
+      break;
+    case "build":
+      snippet += `
+    stage: "oci-image"
+    image: "image.tar"
+    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    build_args: "--context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile"`;
+      break;
+    case "push":
+      snippet += `
+    stage: "oci-image"
+    image: "image.tar"
+    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"`;
+      if (config["container-scanning"]) {
+        snippet += `
+    needs:
+      - devguard:container_scanning
+    dependencies:
+      - devguard:container_scanning
+    `;
+      } else if (config.build) {
+        snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image
+    `;
+      }
+      break;
+    case "sign":
+      snippet += `
+    stage: "attestation"
+    images:
+      - "$CI_REGISTRY_IMAGE:latest"`;
+      if (config.push) {
+        snippet += `
+    needs:
+      - devguard:push_oci_image
+    dependencies:
+      - devguard:push_oci_image`;
+      } else if (config["container-scanning"]) {
+        snippet += `
+    needs:
+      - devguard:container_scanning
+    dependencies:
+      - devguard:container_scanning`;
+      } else if (config.build) {
+        snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image`;
+      }
+      break;
+    case "attest":
+      snippet += `
+    stage: "attestation"
+    devguard_artifact_name: "pkg:oci/my-app"
+    image: "$CI_REGISTRY_IMAGE:latest"
+    attestations:
+      - source: "sbom.json"
+        predicate_type: "https://spdx.dev/Document"
+      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sbom"
+        predicate_type: "https://in-toto.io/attestation/scai/attribute-report/v0.2"`;
+      if (config.sign) {
+        snippet += `
+    needs:
+      - devguard:sign_oci_image
+    dependencies:
+      - devguard:sign_oci_image`;
+      } else if (config.push) {
+        snippet += `
+    needs:
+      - devguard:push_oci_image
+    dependencies:
+      - devguard:push_oci_image`;
+      } else if (config["container-scanning"]) {
+        snippet += `
+    needs:
+      - devguard:container_scanning
+    dependencies:
+      - devguard:container_scanning`;
+      } else if (config.build) {
+        snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image`;
+      }
+      break;
+    case "sarif-upload":
+      snippet += `
+    stage: "test"
+    sarif_file: "results.sarif"
+    `;
+      break;
+    case "sbom-upload":
+      snippet += `
+    stage: "test"
+    sbom_file: "results.sbom"
+    `;
+      break;
+    case "full":
+      snippet += `
+    devguard_web_ui: "https://app.devguard.org"
+    `;
+      break;
+  }
+
+  return snippet;
+};
 
 const generateDockerSnippet = (
   command: string,
@@ -76,6 +246,7 @@ export const integrationSnippets = ({
   frontendUrl,
   devguardCIComponentBase,
   token,
+  config,
 }: {
   orgSlug: string;
   projectSlug: string;
@@ -84,6 +255,7 @@ export const integrationSnippets = ({
   frontendUrl: string;
   devguardCIComponentBase: string;
   token?: string;
+  config: Config;
 }) => ({
   GitHub: {
     sca: generateWorkflowSnippet(
@@ -182,11 +354,47 @@ export const integrationSnippets = ({
                   web-ui: "${frontendUrl}"
               secrets:
                   devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
+    push: "",
+    sign: "",
+    attest: "",
   },
 
   Gitlab: {
+    "secret-scanning": generateGitlabSnippet(
+      "secret-scanning",
+      "secret-scanning.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      frontendUrl,
+      devguardCIComponentBase,
+      config,
+    ),
+    sast: generateGitlabSnippet(
+      "sast",
+      "sast.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      frontendUrl,
+      devguardCIComponentBase,
+      config,
+    ),
+    iac: generateGitlabSnippet(
+      "iac",
+      "infrastructure-as-code-scanning.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      frontendUrl,
+      devguardCIComponentBase,
+      config,
+    ),
     sca: generateGitlabSnippet(
-      "dependency-scanning",
+      "sca",
       "software-composition-analysis.yml",
       orgSlug,
       projectSlug,
@@ -194,6 +402,7 @@ export const integrationSnippets = ({
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
     "container-scanning": generateGitlabSnippet(
       "container-scanning",
@@ -204,29 +413,54 @@ export const integrationSnippets = ({
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
-    iac: generateGitlabSnippet(
-      "infrastructure-as-code-scanning",
-      "infrastructure-as-code-scanning.yml",
+    build: generateGitlabSnippet(
+      "build",
+      "build-oci-image.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
-    sast: generateGitlabSnippet(
-      "bad-practice-finder",
-      "sast.yml",
+    push: generateGitlabSnippet(
+      "push",
+      "push-oci-image.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
+    ),
+    sign: generateGitlabSnippet(
+      "sign",
+      "sign-oci-image.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      frontendUrl,
+      devguardCIComponentBase,
+      config,
+    ),
+    attest: generateGitlabSnippet(
+      "attest",
+      "attest.yml",
+      orgSlug,
+      projectSlug,
+      assetSlug,
+      apiUrl,
+      frontendUrl,
+      devguardCIComponentBase,
+      config,
     ),
     devsecops: generateGitlabSnippet(
-      "call-devsecops",
+      "full",
       "full.yml",
       orgSlug,
       projectSlug,
@@ -234,46 +468,30 @@ export const integrationSnippets = ({
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
-    "secret-scanning": generateGitlabSnippet(
-      "find-leaked-secrets",
-      "secret-scanning.yml",
+
+    sarif: generateGitlabSnippet(
+      "sarif-upload",
+      "sarif-upload.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
-    sarif: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
-include:
-    - remote: "${devguardCIComponentBase}/templates/upload-sarif.yml"
-      inputs:
-          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-          token: "$DEVGUARD_TOKEN"
-          api_url: ${apiUrl}
-          sarif_file: ./results.sarif # Path to SARIF file relative to the root of the repository
-          web_ui: ${frontendUrl}
-          `,
-    sbom: `# DevGuard CI/CD Component (https://gitlab.com/l3montree/devguard)
-include:
-    - remote: "${devguardCIComponentBase}/templates/upload-sbom.yml"
-      inputs:
-          asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-          token: "$DEVGUARD_TOKEN"
-          api_url: ${apiUrl}
-          sbom_file: ./results.sbom # Path to SBOM file relative to the root of the repository
-          web_ui: ${frontendUrl}
-          `,
-    build: generateGitlabSnippet(
-      "build",
-      "build.yml",
+    sbom: generateGitlabSnippet(
+      "sbom-upload",
+      "sbom-upload.yml",
       orgSlug,
       projectSlug,
       assetSlug,
       apiUrl,
       frontendUrl,
       devguardCIComponentBase,
+      config,
     ),
   },
 
