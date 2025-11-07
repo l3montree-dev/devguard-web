@@ -24,6 +24,7 @@ interface ScannerOptionsSelectionSlideProps {
   setConfig: React.Dispatch<React.SetStateAction<Config>>;
   api?: {
     scrollTo: (index: number) => void;
+    reInit: () => void;
   };
   tokenSlideIndex: number;
   prevIndex: number;
@@ -107,7 +108,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
           <Section forceVertical title="What should DevGuard do?">
             <Card>
               <div className="align-middle flex flex-col space-y-4 p-4">
-                <Collapsible>
+                <Collapsible onOpenChange={() => api?.reInit()}>
                   <div className="flex cursor-pointer flex-row items-center justify-between">
                     <div className="flex flex-row items-center space-x-4 ">
                       <Checkbox
@@ -252,7 +253,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                   </div>
                 </div>
 
-                <Collapsible>
+                <Collapsible onOpenChange={() => api?.reInit()}>
                   <div className="flex cursor-pointer flex-row items-center justify-between">
                     <div className="flex flex-row items-center space-x-4">
                       <Checkbox
@@ -364,7 +365,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                   </CollapsibleContent>
                 </Collapsible>
 
-                <Collapsible>
+                <Collapsible onOpenChange={() => api?.reInit()}>
                   <div className="flex cursor-pointer flex-row items-center justify-between">
                     <div className="flex flex-row items-center space-x-4">
                       <Checkbox
@@ -442,7 +443,10 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
               </div>
             </Card>
             <div className="flex flex-row gap-2 mb-4">
-              <Collapsible className="w-full">
+              <Collapsible
+                className="w-full"
+                onOpenChange={() => api?.reInit()}
+              >
                 <CollapsibleTrigger className="text-muted-foreground flex flex-row justify-between w-full mt-4 pb-2 cursor-pointer text-sm">
                   More Options
                   <CaretDownIcon className="ml-2 inline-block h-4 w-4 text-muted-foreground" />
