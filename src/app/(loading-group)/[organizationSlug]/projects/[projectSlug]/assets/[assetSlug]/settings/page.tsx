@@ -231,7 +231,6 @@ const Index: FunctionComponent = () => {
   };
 
   const handleUpdate = async (data: Partial<AssetFormValues>) => {
-    console.log("updating asset with data", data);
     const resp = await browserApiClient(
       "/organizations/" +
         activeOrg.slug +
