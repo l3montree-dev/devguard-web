@@ -88,7 +88,17 @@ jobs:`
         : "\ninclude:";
 
     let codeString = "";
-    if (Object.values(config).every((v) => v === true)) {
+    if (
+      config["secret-scanning"] &&
+      config.sast &&
+      config.iac &&
+      config.sca &&
+      config["container-scanning"] &&
+      config.build &&
+      config.push &&
+      config.sign &&
+      config.attest
+    ) {
       codeString = integrationSnippets({
         orgSlug,
         projectSlug,
@@ -98,6 +108,35 @@ jobs:`
         devguardCIComponentBase,
         config,
       })[gitInstance]["devsecops"];
+
+      if (config.sarif) {
+        codeString += `\n${
+          integrationSnippets({
+            orgSlug,
+            projectSlug,
+            assetSlug,
+            apiUrl,
+            frontendUrl,
+            devguardCIComponentBase,
+            config,
+          })[gitInstance]["sarif"]
+        }`;
+      }
+
+      if (config.sbom) {
+        codeString += `\n${
+          integrationSnippets({
+            orgSlug,
+            projectSlug,
+            assetSlug,
+            apiUrl,
+            frontendUrl,
+            devguardCIComponentBase,
+            config,
+          })[gitInstance]["sbom"]
+        }`;
+      }
+
       return base + codeString;
     } else {
       codeString = Object.entries(config)

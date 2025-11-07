@@ -8,8 +8,8 @@ type jobName =
   | "sast"
   | "iac"
   | "sca"
-  | "container-scanning"
   | "build"
+  | "container-scanning"
   | "push"
   | "sign"
   | "attest"
@@ -35,6 +35,161 @@ const generateWorkflowSnippet = (
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
+const yamlGitlab: Record<
+  jobName,
+  (config: Config & { frontendUrl: string }) => string
+> = {
+  "secret-scanning": (config) => `
+    devguard_web_ui: "${config.frontendUrl}"
+    stage: "test"
+    `,
+  sast: (config) => `
+    devguard_web_ui: "${config.frontendUrl}"
+    stage: "test"
+    `,
+  iac: (config) => `
+    devguard_web_ui: "${config.frontendUrl}"
+    stage: "test"
+    `,
+  sca: (config) => `
+    devguard_web_ui: "${config.frontendUrl}"
+    stage: "test"
+    `,
+  "container-scanning": (config) => {
+    let snippet = `
+    devguard_web_ui: "${config.frontendUrl}"
+    stage: "oci-image"
+    image_tar_path: "image.tar"`;
+    if (config.build) {
+      snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image
+      `;
+    }
+    return snippet;
+  },
+  build: (config) => `
+    stage: "oci-image"
+    image: "image.tar"
+    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+    build_args: "--context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile"`,
+  push: (config) => {
+    let snippet = `
+    stage: "oci-image"
+    image: "image.tar"
+    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"`;
+    if (config["container-scanning"]) {
+      snippet += `
+    needs:
+      - devguard:container_scanning
+    dependencies:
+      - devguard:container_scanning
+    `;
+    } else if (config.build) {
+      snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image
+    `;
+    }
+    return snippet;
+  },
+  sign: (config) => {
+    let snippet = `
+    stage: "attestation"
+    images:
+      - "$CI_REGISTRY_IMAGE:latest"`;
+    if (config.push) {
+      snippet += `
+    needs:
+      - devguard:push_oci_image
+    dependencies:
+      - devguard:push_oci_image`;
+    } else if (config["container-scanning"]) {
+      snippet += `
+    needs:
+      - devguard:container_scanning
+    dependencies:
+      - devguard:container_scanning`;
+    } else if (config.build) {
+      snippet += `
+    needs:
+      - devguard:build_oci_image
+    dependencies:
+      - devguard:build_oci_image`;
+    }
+    return snippet;
+  },
+  attest: (config) => {
+    let snippet = `
+    stage: "attestation"
+    devguard_artifact_name: "pkg:oci/my-app"
+    image: "$CI_REGISTRY_IMAGE:latest"`;
+
+    let attestations = [];
+    let needs = [];
+    if (
+      config["secret-scanning"] ||
+      config.sast ||
+      config.iac ||
+      config.sarif
+    ) {
+      attestations.push(`      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sarif.json"
+        predicate_type: "https://github.com/in-toto/attestation/blob/main/spec/predicates/cyclonedx.md"`);
+    }
+    if (config.sca || config["container-scanning"]) {
+      attestations.push(`      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sbom.json"
+        predicate_type: "https://github.com/in-toto/attestation/blob/main/spec/predicates/cyclonedx.md"`);
+    }
+
+    if (attestations.length > 0) {
+      snippet += `
+    attestations:
+${attestations.join("\n")}`;
+    }
+
+    if (config["secret-scanning"]) {
+      needs.push("devguard:secret_scanning");
+    }
+    if (config.sast) {
+      needs.push("devguard:sast");
+    }
+    if (config.iac) {
+      needs.push("devguard:iac");
+    }
+    if (config.sarif) {
+      needs.push("devguard:sarif_upload");
+    }
+    if (config.sca) {
+      needs.push("devguard:software_composition_analysis");
+    }
+    if (config["container-scanning"]) {
+      needs.push("devguard:container_scanning");
+    }
+
+    if (needs.length > 0) {
+      snippet += `
+    needs:
+${needs.map((n) => `      - ${n}`).join("\n")}`;
+    }
+    return snippet;
+  },
+  "sarif-upload": (config) => `
+    stage: "test"
+    sarif_file: "results.sarif"
+    `,
+  "sbom-upload": (config) => `
+    stage: "test"
+    sbom_file: "results.sbom"
+    `,
+  full: (config) => `
+    devguard_web_ui: "https://app.devguard.org"
+    `,
+};
+
 const generateGitlabSnippet = (
   jobName: jobName,
   workflowFile: string,
@@ -46,7 +201,7 @@ const generateGitlabSnippet = (
   devguardCIComponentBase: string,
   config: Config,
 ) => {
-  let snippet = `
+  const baseSnippet = `
 # See all available inputs here: 
 # https://gitlab.com/l3montree/devguard/-/tree/main/templates/${workflowFile}
 - remote: "${devguardCIComponentBase}/templates/${workflowFile}"
@@ -55,154 +210,12 @@ const generateGitlabSnippet = (
     devguard_asset_name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
     devguard_token: "$DEVGUARD_TOKEN"`;
 
-  switch (jobName) {
-    case "secret-scanning":
-      snippet += `
-    devguard_web_ui: "${frontendUrl}"
-    stage: "test"
-    `;
-      break;
-    case "sast":
-      snippet += `
-    devguard_web_ui: "${frontendUrl}"
-    stage: "test"
-    `;
-      break;
-    case "iac":
-      snippet += `
-    devguard_web_ui: "${frontendUrl}"
-    stage: "test"
-    `;
-      break;
-    case "sca":
-      snippet += `
-    devguard_web_ui: "${frontendUrl}"
-    stage: "test"
-    `;
-      break;
-    case "container-scanning":
-      snippet += `
-    devguard_web_ui: "${frontendUrl}"
-    stage: "oci-image"
-    image_tar_path: "image.tar"`;
-      if (config.build) {
-        snippet += `
-    needs:
-      - devguard:build_oci_image
-    dependencies:
-      - devguard:build_oci_image
-      `;
-      }
-      break;
-    case "build":
-      snippet += `
-    stage: "oci-image"
-    image: "image.tar"
-    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-    build_args: "--context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile"`;
-      break;
-    case "push":
-      snippet += `
-    stage: "oci-image"
-    image: "image.tar"
-    image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"`;
-      if (config["container-scanning"]) {
-        snippet += `
-    needs:
-      - devguard:container_scanning
-    dependencies:
-      - devguard:container_scanning
-    `;
-      } else if (config.build) {
-        snippet += `
-    needs:
-      - devguard:build_oci_image
-    dependencies:
-      - devguard:build_oci_image
-    `;
-      }
-      break;
-    case "sign":
-      snippet += `
-    stage: "attestation"
-    images:
-      - "$CI_REGISTRY_IMAGE:latest"`;
-      if (config.push) {
-        snippet += `
-    needs:
-      - devguard:push_oci_image
-    dependencies:
-      - devguard:push_oci_image`;
-      } else if (config["container-scanning"]) {
-        snippet += `
-    needs:
-      - devguard:container_scanning
-    dependencies:
-      - devguard:container_scanning`;
-      } else if (config.build) {
-        snippet += `
-    needs:
-      - devguard:build_oci_image
-    dependencies:
-      - devguard:build_oci_image`;
-      }
-      break;
-    case "attest":
-      snippet += `
-    stage: "attestation"
-    devguard_artifact_name: "pkg:oci/my-app"
-    image: "$CI_REGISTRY_IMAGE:latest"
-    attestations:
-      - source: "sbom.json"
-        predicate_type: "https://spdx.dev/Document"
-      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sbom"
-        predicate_type: "https://in-toto.io/attestation/scai/attribute-report/v0.2"`;
-      if (config.sign) {
-        snippet += `
-    needs:
-      - devguard:sign_oci_image
-    dependencies:
-      - devguard:sign_oci_image`;
-      } else if (config.push) {
-        snippet += `
-    needs:
-      - devguard:push_oci_image
-    dependencies:
-      - devguard:push_oci_image`;
-      } else if (config["container-scanning"]) {
-        snippet += `
-    needs:
-      - devguard:container_scanning
-    dependencies:
-      - devguard:container_scanning`;
-      } else if (config.build) {
-        snippet += `
-    needs:
-      - devguard:build_oci_image
-    dependencies:
-      - devguard:build_oci_image`;
-      }
-      break;
-    case "sarif-upload":
-      snippet += `
-    stage: "test"
-    sarif_file: "results.sarif"
-    `;
-      break;
-    case "sbom-upload":
-      snippet += `
-    stage: "test"
-    sbom_file: "results.sbom"
-    `;
-      break;
-    case "full":
-      snippet += `
-    devguard_web_ui: "https://app.devguard.org"
-    `;
-      break;
-  }
+  const jobSpecificConfig = {
+    ...config,
+    frontendUrl,
+  };
 
-  return snippet;
+  return baseSnippet + yamlGitlab[jobName](jobSpecificConfig);
 };
 
 const generateDockerSnippet = (
@@ -404,9 +417,9 @@ export const integrationSnippets = ({
       devguardCIComponentBase,
       config,
     ),
-    "container-scanning": generateGitlabSnippet(
-      "container-scanning",
-      "container-scanning.yml",
+    build: generateGitlabSnippet(
+      "build",
+      "build-oci-image.yml",
       orgSlug,
       projectSlug,
       assetSlug,
@@ -415,9 +428,9 @@ export const integrationSnippets = ({
       devguardCIComponentBase,
       config,
     ),
-    build: generateGitlabSnippet(
-      "build",
-      "build-oci-image.yml",
+    "container-scanning": generateGitlabSnippet(
+      "container-scanning",
+      "container-scanning.yml",
       orgSlug,
       projectSlug,
       assetSlug,

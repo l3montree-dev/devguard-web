@@ -88,13 +88,13 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     sast: true,
     iac: true,
     sca: true,
-    "container-scanning": true,
     build: true,
+    "container-scanning": true,
     push: true,
     sign: true,
     attest: true,
-    sbom: true,
-    sarif: true,
+    sbom: false,
+    sarif: false,
   });
 
   // Manual integration state
