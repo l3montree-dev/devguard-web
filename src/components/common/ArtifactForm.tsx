@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { classNames } from "../../utils/common";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
@@ -81,8 +82,8 @@ const ArtifactForm = ({
           const isInvalid = invalidUrls.includes(field.url);
           return (
             <div key={field.id} className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <div className="flex-1">
+              <div className="flex items-start space-x-2">
+                <div className="flex-1 flex-col flex">
                   <FormField
                     control={form.control}
                     name={`informationSources.${index}.url`}
@@ -91,11 +92,11 @@ const ArtifactForm = ({
                         <FormControl>
                           <Input
                             placeholder="Enter upstream URL (e.g., https://example.com/vex.json)"
-                            className={
+                            className={classNames(
                               isInvalid
                                 ? "border-red-500 focus-visible:ring-red-500"
-                                : ""
-                            }
+                                : "",
+                            )}
                             {...field}
                           />
                         </FormControl>
@@ -103,6 +104,33 @@ const ArtifactForm = ({
                       </FormItem>
                     )}
                   />
+
+                  {form
+                    .watch(`informationSources.${index}.url`)
+                    .endsWith("provider-metadata.json") && (
+                    <div className="mt-2 border-b pb-2">
+                      <FormField
+                        control={form.control}
+                        name={`informationSources.${index}.purl`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter Package URL (PURL) for this provider metadata"
+                                className={
+                                  isInvalid
+                                    ? "border-red-500 focus-visible:ring-red-500"
+                                    : ""
+                                }
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
                 </div>
                 <Button
                   type="button"

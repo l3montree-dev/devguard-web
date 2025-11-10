@@ -11,7 +11,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { AssetDTO } from "@/types/api/api";
 import { Modify } from "@/types/common";
-import { SubmitHandler, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import ListItem from "../common/ListItem";
 import Section from "../common/Section";
 import { Input } from "../ui/input";
@@ -28,10 +28,11 @@ import { classNames } from "@/utils/common";
 import Image from "next/image";
 import React from "react";
 import { useConfig } from "../../context/ConfigContext";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import { CopyCodeFragment } from "../common/CopyCode";
 import { AsyncButton, Button } from "../ui/button";
 import { InputWithButton } from "../ui/input-with-button";
 import { Label } from "../ui/label";
-import { CopyCodeFragment } from "../common/CopyCode";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -168,6 +169,9 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
   form,
   onUpdate: handleUpdate,
 }) => {
+  const devguardApiUrl = useConfig().devGuardApiUrl;
+  const org = useActiveOrg();
+
   return (
     <>
       <FormField
@@ -307,6 +311,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
   onUpdate: handleUpdate,
 }) => {
   const devguardApiUrl = useConfig().devguardApiUrlPublicInternet;
+  const org = useActiveOrg();
   return (
     <>
       <FormField
@@ -360,6 +365,20 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           "/api/v1/public/" +
                           assetId +
                           "/vex.json"
+                        }
+                      />
+                    </div>
+                    <div className="text-white mt-0">
+                      <InputWithButton
+                        label="CSAF-URL (Always up to date vulnerability informationen in CSAF format)"
+                        copyable
+                        nameKey="sbom-url"
+                        variant="onCard"
+                        value={
+                          devguardApiUrl +
+                          "/api/v1/organizations/" +
+                          org.slug +
+                          "/csaf/provider-metadata.json"
                         }
                       />
                     </div>

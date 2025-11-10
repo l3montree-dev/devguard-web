@@ -326,7 +326,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
-    informationSources: Array<string>;
+    informationSources: Array<{ url: string; purl?: string }>;
   }) => {
     // first create the asset version
     const resp = await browserApiClient(
