@@ -45,6 +45,32 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 
+const informationSourceToObject = (url: string) => {
+  // first remove vex: or sbom: prefixes
+  if (url.startsWith("vex:")) {
+    url = url.replace("vex:", "");
+  } else if (url.startsWith("sbom:")) {
+    url = url.replace("sbom:", "");
+  }
+  // check if purl is inside
+  if (url.startsWith("pkg:")) {
+    // split at protocol separator
+    let parts = url.split("https://");
+    if (parts.length === 2) {
+      const purl = parts[0].endsWith(":") ? parts[0].slice(0, -1) : parts[0];
+
+      return { url: "https://" + parts[1], purl };
+    } else {
+      parts = url.split("http://");
+      if (parts.length === 2) {
+        const purl = parts[0].endsWith(":") ? parts[0].slice(0, -1) : parts[0];
+        return { url: "http://" + parts[1], purl };
+      }
+    }
+  }
+  return { url };
+};
+
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
 
@@ -133,7 +159,7 @@ const Artifacts = () => {
       artifactName: artifact.artifactName,
       informationSources:
         rootNodes && artifact.artifactName in rootNodes
-          ? rootNodes[artifact.artifactName].map((url) => ({ url }))
+          ? rootNodes[artifact.artifactName].map(informationSourceToObject)
           : [],
     });
   };
@@ -204,7 +230,7 @@ const Artifacts = () => {
       method: "POST",
       body: JSON.stringify({
         artifactName: data.artifactName,
-        informationSources: data.informationSources.map((el) => el.url) || [],
+        informationSources: data.informationSources || [],
       }),
     });
 
@@ -231,8 +257,7 @@ const Artifacts = () => {
       method: "PUT",
       body: JSON.stringify({
         artifactName: artifact.artifactName,
-        informationSources:
-          artifact.informationSources.map((el) => el.url) || [],
+        informationSources: artifact.informationSources || [],
       }),
     });
     if (!response.ok) {
@@ -330,11 +355,17 @@ const Artifacts = () => {
                                       (node) =>
                                         node.startsWith("vex:") ? (
                                           <Badge variant={"success"} key={node}>
-                                            {node.replaceAll("vex:", "")}
+                                            {
+                                              informationSourceToObject(node)
+                                                .url
+                                            }
                                           </Badge>
                                         ) : node.startsWith("sbom:") ? (
                                           <Badge variant={"blue"} key={node}>
-                                            {node.replaceAll("sbom:", "")}
+                                            {
+                                              informationSourceToObject(node)
+                                                .url
+                                            }
                                           </Badge>
                                         ) : (
                                           <Badge variant={"outline"} key={node}>

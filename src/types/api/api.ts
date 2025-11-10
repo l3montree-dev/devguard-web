@@ -635,7 +635,7 @@ export interface LicenseRiskDTO extends BaseVulnDTO {
 
 export interface ArtifactCreateUpdateRequest {
   artifactName: string;
-  informationSources: { url: string }[]; // was upstreamUrls
+  informationSources: { url: string; purl?: string }[];
 }
 
 export interface ArtifactDTO {

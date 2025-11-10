@@ -4,9 +4,10 @@ import { getApiClientInRouteHandler } from "../../../../services/devGuardApiAppR
 
 export async function GET(request: Request) {
   const client = getApiClientInRouteHandler(request);
+
   // just do a fetch to the same route
   const response = await client(
-    "/.well-known/csaf-aggregator/aggregator.json",
+    "/.well-known/csaf-aggregator/aggregator.json/",
     {
       method: "GET",
     },

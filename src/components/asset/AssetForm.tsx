@@ -28,10 +28,11 @@ import { classNames } from "@/utils/common";
 import Image from "next/image";
 import React from "react";
 import { useConfig } from "../../context/ConfigContext";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
+import { CopyCodeFragment } from "../common/CopyCode";
 import { Button } from "../ui/button";
 import { InputWithButton } from "../ui/input-with-button";
 import { Label } from "../ui/label";
-import { CopyCodeFragment } from "../common/CopyCode";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -143,7 +144,8 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
   form,
   assetId,
 }) => {
-  const devguardApiUrl = useConfig().devguardApiUrlPublicInternet;
+  const devguardApiUrl = useConfig().devGuardApiUrl;
+  const org = useActiveOrg();
 
   return (
     <>
@@ -317,6 +319,20 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                           "/api/v1/public/" +
                           assetId +
                           "/vex.json"
+                        }
+                      />
+                    </div>
+                    <div className="text-white mt-0">
+                      <InputWithButton
+                        label="CSAF-URL (Always up to date vulnerability informationen in CSAF format)"
+                        copyable
+                        nameKey="sbom-url"
+                        variant="onCard"
+                        value={
+                          devguardApiUrl +
+                          "/api/v1/organizations/" +
+                          org.slug +
+                          "/csaf/provider-metadata.json"
                         }
                       />
                     </div>
