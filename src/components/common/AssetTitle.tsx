@@ -13,13 +13,9 @@ const AssetTitle = () => {
   const project = useActiveProject()!;
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
-  const params = useDecodedParams();
 
-  let assetVersionSlug = assetVersion?.slug;
-  if (!assetVersionSlug) {
-    assetVersionSlug = (params as { assetVersionSlug?: string })
-      .assetVersionSlug;
-  }
+  const params = useDecodedParams() as { assetVersionSlug?: string };
+  const assetVersionSlug = assetVersion?.slug || params?.assetVersionSlug;
 
   return (
     <span className="flex flex-row gap-2 min-w-0 overflow-hidden">
