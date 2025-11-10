@@ -10,7 +10,6 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Separator } from "../../ui/separator";
 import { Switch } from "../../ui/switch";
 import Section from "../../common/Section";
-import { c } from "framer-motion/dist/types.d-Cjd591yU";
 import {
   Collapsible,
   CollapsibleContent,

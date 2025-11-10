@@ -1,6 +1,4 @@
-import { s } from "framer-motion/dist/types.d-Cjd591yU";
 import { config } from "./config";
-import { sign } from "crypto";
 import { Config } from "./types/common";
 
 type jobName =
@@ -140,7 +138,7 @@ const yamlGitlab: Record<
       attestations.push(`      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sarif.json"
         predicate_type: "https://github.com/in-toto/attestation/blob/main/spec/predicates/cyclonedx.md"`);
     }
-    if (config.sca || config["container-scanning"]) {
+    if (config.sca || config["container-scanning"] || config.sbom) {
       attestations.push(`      - source: "https://api.devguard.org/api/v1/artifacts/ARTIFACT_NAME/sbom.json"
         predicate_type: "https://github.com/in-toto/attestation/blob/main/spec/predicates/cyclonedx.md"`);
     }
@@ -168,6 +166,10 @@ ${attestations.join("\n")}`;
     }
     if (config["container-scanning"]) {
       needs.push("devguard:container_scanning");
+    }
+
+    if (config.sbom) {
+      needs.push("devguard:sbom_upload");
     }
 
     if (needs.length > 0) {
