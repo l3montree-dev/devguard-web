@@ -58,6 +58,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("dependencyPurl", {
       header: "Package",
       id: "dependencyPurl",
+      enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row gap-2">
           <div className="flex h-5 w-5 flex-row items-center justify-center">
@@ -71,6 +72,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("componentVersion", {
       header: "Version",
       id: "componentVersion",
+      enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           <Badge variant={"secondary"}> {row.getValue()}</Badge>
@@ -80,6 +82,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("organizationName", {
       header: "Organization",
       id: "organizationName",
+      enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           {row.getValue()}
@@ -89,6 +92,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("projectName", {
       header: "Project",
       id: "projectName",
+      enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           {row.getValue()}
@@ -98,6 +102,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("assetName", {
       header: "Repository",
       id: "assetName",
+      enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
           {row.getValue()}
@@ -107,6 +112,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     columnHelper.accessor("artifactName", {
       header: "Artifacts",
       id: "artifactName",
+      enableSorting: false,
       cell: (row) => (
         <ArtifactBadge key={row.getValue()} artifactName={row.getValue()} />
       ),
