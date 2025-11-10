@@ -42,7 +42,7 @@ const columnsDef: ColumnDef<{ risk: RiskHistory; release: ReleaseDTO }, any>[] =
       id: "artifact_name",
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
-          {beautifyPurl(row.getValue())}
+          {row.getValue()}
         </span>
       ),
     }),

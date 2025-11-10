@@ -30,7 +30,7 @@ import React from "react";
 import { useConfig } from "../../context/ConfigContext";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { CopyCodeFragment } from "../common/CopyCode";
-import { Button } from "../ui/button";
+import { AsyncButton, Button } from "../ui/button";
 import { InputWithButton } from "../ui/input-with-button";
 import { Label } from "../ui/label";
 
@@ -38,6 +38,7 @@ interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
   assetId?: string;
   disable?: boolean;
+  onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
 }
 
 export type AssetFormValues = Modify<
@@ -51,6 +52,7 @@ export type AssetFormValues = Modify<
 export const AssetFormGeneral: FunctionComponent<Props> = ({
   form,
   disable,
+  onUpdate: handleUpdate,
 }) => {
   const gitInstance = form.watch("repositoryProvider");
   const externalEntityProviderId = form.watch("externalEntityProviderId");
@@ -101,7 +103,9 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 gitInstance === "github" && "border !border-primary",
               )}
               onClick={() => {
-                form.setValue("repositoryProvider", "github");
+                form.setValue("repositoryProvider", "github", {
+                  shouldDirty: true,
+                });
               }}
             >
               <Image
@@ -121,7 +125,9 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 gitInstance === "gitlab" && "!border-primary",
               )}
               onClick={() => {
-                form.setValue("repositoryProvider", "gitlab");
+                form.setValue("repositoryProvider", "gitlab", {
+                  shouldDirty: true,
+                });
               }}
             >
               <Image
@@ -136,13 +142,32 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           </div>
         </>
       )}
+      {handleUpdate && (
+        <div className="mt-4 flex flex-row justify-end">
+          <AsyncButton
+            type="button"
+            disabled={
+              !(
+                form.formState.dirtyFields?.name ||
+                form.formState.dirtyFields?.description ||
+                form.formState.dirtyFields?.repositoryProvider
+              )
+            }
+            onClick={async () => {
+              return await form.handleSubmit(handleUpdate)();
+            }}
+          >
+            Save
+          </AsyncButton>
+        </div>
+      )}
     </>
   );
 };
 
 export const AssetFormRequirements: FunctionComponent<Props> = ({
   form,
-  assetId,
+  onUpdate: handleUpdate,
 }) => {
   const devguardApiUrl = useConfig().devGuardApiUrl;
   const org = useActiveOrg();
@@ -231,42 +256,64 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
-        name="vulnAutoReopenAfterDays"
+        name="reachableFromInternet"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>
-              Automatically reopen accepted vulnerabilities after
-            </FormLabel>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value?.toString()}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a time range" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="30">30 Days</SelectItem>
-                <SelectItem value="60">2 Months</SelectItem>
-                <SelectItem value="120">4 Months</SelectItem>
-                <SelectItem value="180">6 Months</SelectItem>
-                <SelectItem value="360">1 Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormDescription>
-              Select the time period after which a vulnerability will be
-              automatically reopened if it was once accepted. PCI-DSS requires
-              vulnerabilities to be revalidated after 6 months, so this is a
-              good default.
-            </FormDescription>
+            <ListItem
+              Description={
+                "Is the repository publicly available. Does it have a static IP-Address assigned to it or a domain name?"
+              }
+              Title="Reachable from the internet"
+              Button={
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              }
+            />
             <FormMessage />
           </FormItem>
         )}
       />
 
+      {handleUpdate && (
+        <div className="mt-4 flex flex-row justify-end">
+          <AsyncButton
+            type="button"
+            disabled={
+              !(
+                form.formState.dirtyFields?.confidentialityRequirement ||
+                form.formState.dirtyFields?.integrityRequirement ||
+                form.formState.dirtyFields?.availabilityRequirement ||
+                form.formState.dirtyFields?.reachableFromInternet
+              )
+            }
+            onClick={async () => {
+              return await form.handleSubmit(handleUpdate)();
+            }}
+          >
+            Save
+          </AsyncButton>
+        </div>
+      )}
+    </>
+  );
+};
+
+export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
+  form,
+  assetId,
+  onUpdate: handleUpdate,
+}) => {
+  const devguardApiUrl = useConfig().devguardApiUrlPublicInternet;
+  const org = useActiveOrg();
+  return (
+    <>
       <FormField
         control={form.control}
         name="paranoidMode"
@@ -290,7 +337,6 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
           </FormItem>
         )}
       />
-
       {assetId && (
         <FormField
           control={form.control}
@@ -368,33 +414,77 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
           )}
         />
       )}
+
+      <EnableTicketRange form={form}></EnableTicketRange>
+
+      {form.watch("enableTicketRange") && (
+        <React.Fragment>
+          <SliderForm form={form}></SliderForm>
+          <RiskSliderForm form={form}></RiskSliderForm>
+        </React.Fragment>
+      )}
+
+      <FormField
+        control={form.control}
+        name="vulnAutoReopenAfterDays"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              Automatically reopen accepted vulnerabilities after
+            </FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value?.toString()}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a time range" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="30">30 Days</SelectItem>
+                <SelectItem value="60">2 Months</SelectItem>
+                <SelectItem value="120">4 Months</SelectItem>
+                <SelectItem value="180">6 Months</SelectItem>
+                <SelectItem value="360">1 Year</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              Select the time period after which a vulnerability will be
+              automatically reopened if it was once accepted. PCI-DSS requires
+              vulnerabilities to be revalidated after 6 months, so this is a
+              good default.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {handleUpdate && (
+        <div className="mt-4 flex flex-row justify-end">
+          <AsyncButton
+            type="button"
+            disabled={
+              !(
+                form.formState.dirtyFields?.paranoidMode ||
+                form.formState.dirtyFields?.sharesInformation ||
+                form.formState.dirtyFields?.vulnAutoReopenAfterDays ||
+                form.formState.dirtyFields?.enableTicketRange ||
+                form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
+                form.formState.dirtyFields?.riskAutomaticTicketThreshold
+              )
+            }
+            onClick={async () => {
+              return await form.handleSubmit(handleUpdate)();
+            }}
+          >
+            Save
+          </AsyncButton>
+        </div>
+      )}
     </>
   );
 };
-
-export const AssetFormMisc: FunctionComponent<Props> = ({ form }) => (
-  <FormField
-    control={form.control}
-    name="reachableFromTheInternet"
-    render={({ field }) => (
-      <FormItem>
-        <ListItem
-          Description={
-            "Is the repository publicly available. Does it have a static IP-Address assigned to it or a domain name?"
-          }
-          Title="Reachable from the internet"
-          Button={
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl>
-          }
-        />
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
 export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
   <FormField
     control={form.control}
@@ -411,9 +501,18 @@ export const EnableTicketRange: FunctionComponent<Props> = ({ form }) => (
               <Switch
                 checked={field.value}
                 onCheckedChange={(v) => {
-                  form.setValue("enableTicketRange", v);
-                  form.setValue("cvssAutomaticTicketThreshold", [8]);
-                  form.setValue("riskAutomaticTicketThreshold", [8]);
+                  form.setValue("enableTicketRange", v, { shouldDirty: true });
+                  if (v) {
+                    form.setValue("cvssAutomaticTicketThreshold", [8], {
+                      shouldDirty: true,
+                    });
+                    form.setValue("riskAutomaticTicketThreshold", [8], {
+                      shouldDirty: true,
+                    });
+                  } else {
+                    form.resetField("cvssAutomaticTicketThreshold");
+                    form.resetField("riskAutomaticTicketThreshold");
+                  }
                 }}
               />
             </FormControl>
@@ -486,20 +585,20 @@ const RiskSliderForm: FunctionComponent<Props> = ({ form }) => {
 export const AssetSettingsForm: FunctionComponent<
   Props & {
     forceVerticalSections?: boolean;
-    showReportingRange: boolean;
     disable?: boolean;
     showSecurityRequirements?: boolean;
-    showEnvironmentalInformation?: boolean;
+    showVulnsManagement?: boolean;
     assetId?: string;
+    onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
   }
 > = ({
   form,
   forceVerticalSections,
-  showReportingRange,
   disable,
   showSecurityRequirements = true,
-  showEnvironmentalInformation = true,
+  showVulnsManagement = true,
   assetId,
+  onUpdate,
 }) => {
   return (
     <>
@@ -508,7 +607,7 @@ export const AssetSettingsForm: FunctionComponent<
         title="General"
         description="General settings"
       >
-        <AssetFormGeneral disable={disable} form={form} />
+        <AssetFormGeneral disable={disable} form={form} onUpdate={onUpdate} />
       </Section>
       {showSecurityRequirements && (
         <>
@@ -519,40 +618,27 @@ export const AssetSettingsForm: FunctionComponent<
             description="
 Security requirements are specific criteria or conditions that an application, system, or organization must meet to ensure the protection of data, maintain integrity, confidentiality, and availability, and guard against threats and vulnerabilities. These requirements help to establish security policies, guide the development of secure systems, and ensure compliance with regulatory and industry standards."
           >
-            <AssetFormRequirements assetId={assetId} form={form} />
+            <AssetFormRequirements
+              assetId={assetId}
+              form={form}
+              onUpdate={onUpdate}
+            />
           </Section>
         </>
       )}
-      {showEnvironmentalInformation && (
+      {showVulnsManagement && (
         <>
           <hr />
           <Section
             forceVertical={forceVerticalSections}
-            description="Provide more information how the application is used and how it interacts with other systems. This information is used to calculate the risk score of the repository."
-            title="Environmental information"
+            title="Vulnerability Management"
+            description="Settings related to vulnerability reporting and management."
           >
-            <AssetFormMisc form={form} />
-          </Section>
-        </>
-      )}
-      {showReportingRange && (
-        <>
-          <hr />
-          <Section
-            forceVertical={forceVerticalSections}
-            description="CVSS-BTE is the latest Scoring System standard.
-        It combines multiple metrics into one, your defined range will automatically create tickets that 
-        "
-            title="Reporting range"
-          >
-            <EnableTicketRange form={form}></EnableTicketRange>
-
-            {form.watch("enableTicketRange") && (
-              <React.Fragment>
-                <SliderForm form={form}></SliderForm>
-                <RiskSliderForm form={form}></RiskSliderForm>
-              </React.Fragment>
-            )}
+            <AssetFormVulnsManagement
+              assetId={assetId}
+              form={form}
+              onUpdate={onUpdate}
+            />
           </Section>
         </>
       )}

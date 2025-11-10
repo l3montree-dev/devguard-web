@@ -43,6 +43,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import { documentationLinks } from "@/const/documentationLinks";
 
 interface ManualIntegrationSlideProps {
   api?: {
@@ -277,10 +278,10 @@ const ManualIntegrationSlide: FunctionComponent<
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
                 className="flex text-primary text-sm"
-                href="https://devguard.org/guides/explaining-sboms"
+                href={documentationLinks.sbomExplaining}
                 target="_blank"
               >
-                How do I get a SBOM and upload it to DevGuard?
+                What is an SBOM and how do I create one?
               </Link>
             </div>
           </TabsContent>
@@ -382,16 +383,6 @@ const ManualIntegrationSlide: FunctionComponent<
                   </div>
                 </div>
               )}
-            </div>
-            <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <Link
-                className="flex text-primary text-sm"
-                href="https://devguard.org/guides/explaining-sarif"
-                target="_blank"
-              >
-                How do I get a SARIF-Report and upload it to DevGuard?
-              </Link>
             </div>
           </TabsContent>
           <TabsContent value="vex" className="mt-2">
@@ -508,10 +499,10 @@ const ManualIntegrationSlide: FunctionComponent<
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
                 className="flex text-primary text-sm"
-                href="https://devguard.org/guides/explaining-sboms"
+                href={documentationLinks.vexExplaining}
                 target="_blank"
               >
-                How do I get a VEX and upload it to DevGuard?
+                What is VEX?
               </Link>
             </div>
           </TabsContent>

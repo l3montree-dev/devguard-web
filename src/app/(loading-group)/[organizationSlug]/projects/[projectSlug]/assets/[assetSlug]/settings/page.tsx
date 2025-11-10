@@ -89,7 +89,7 @@ const Index: FunctionComponent = () => {
   const form = useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
-
+      reachableFromInternet: asset.reachableFromInternet ?? false,
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],
@@ -311,21 +311,8 @@ const Index: FunctionComponent = () => {
               disable={Boolean(asset.externalEntityProviderId)}
               form={form}
               assetId={asset.id}
-              showReportingRange={
-                asset.repositoryId !== null ||
-                Boolean(asset.externalEntityProviderId)
-              }
+              onUpdate={handleUpdate}
             />
-            <div className="mt-4 flex flex-row justify-end">
-              <AsyncButton
-                type="button"
-                onClick={async () => {
-                  return await form.handleSubmit(handleUpdate)();
-                }}
-              >
-                Update
-              </AsyncButton>
-            </div>
           </form>
         </FormProvider>
       </div>
