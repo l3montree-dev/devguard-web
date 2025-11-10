@@ -32,6 +32,31 @@ interface YamlGeneratorSlideProps {
   };
   onClose: () => void;
 }
+const getGitlabStages = (config: Config) => {
+  let stages: string[] = [];
+  if (Object.values(config).every((v) => v === true)) {
+    stages = ["test", "oci-image", "attestation"];
+  } else {
+    if (
+      config.sca ||
+      config["secret-scanning"] ||
+      config.iac ||
+      config.sast ||
+      config.sarif ||
+      config.sbom
+    ) {
+      stages.push("test");
+    }
+    if (config["container-scanning"] || config.build || config.push) {
+      stages.push("oci-image");
+    }
+    if (config.sign || config.attest) {
+      stages.push("attestation");
+    }
+  }
+
+  return stages.map((stage) => `  - ${stage}`).join("\n");
+};
 
 const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
   gitInstance,
@@ -63,7 +88,17 @@ jobs:`
         : "\ninclude:";
 
     let codeString = "";
-    if (Object.values(config).every((v) => v === true)) {
+    if (
+      config["secret-scanning"] &&
+      config.sast &&
+      config.iac &&
+      config.sca &&
+      config["container-scanning"] &&
+      config.build &&
+      config.push &&
+      config.sign &&
+      config.attest
+    ) {
       codeString = integrationSnippets({
         orgSlug,
         projectSlug,
@@ -71,7 +106,37 @@ jobs:`
         apiUrl,
         frontendUrl,
         devguardCIComponentBase,
+        config,
       })[gitInstance]["devsecops"];
+
+      if (config.sarif) {
+        codeString += `\n${
+          integrationSnippets({
+            orgSlug,
+            projectSlug,
+            assetSlug,
+            apiUrl,
+            frontendUrl,
+            devguardCIComponentBase,
+            config,
+          })[gitInstance]["sarif"]
+        }`;
+      }
+
+      if (config.sbom) {
+        codeString += `\n${
+          integrationSnippets({
+            orgSlug,
+            projectSlug,
+            assetSlug,
+            apiUrl,
+            frontendUrl,
+            devguardCIComponentBase,
+            config,
+          })[gitInstance]["sbom"]
+        }`;
+      }
+
       return base + codeString;
     } else {
       codeString = Object.entries(config)
@@ -84,6 +149,7 @@ jobs:`
             apiUrl,
             frontendUrl,
             devguardCIComponentBase,
+            config,
           })[gitInstance][selectedOption as keyof Config];
         })
         .map((value) => value)
@@ -120,7 +186,7 @@ jobs:`
           codeString={
             gitInstance === "GitHub"
               ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
-              : `# .gitlab-ci.yml \nstages:\n- build\n- test\n- deploy\n ${codeStringBuilder()}`
+              : `# .gitlab-ci.yml \nstages:\n${getGitlabStages(config)} \n ${codeStringBuilder()}`
           }
         />
       </div>
