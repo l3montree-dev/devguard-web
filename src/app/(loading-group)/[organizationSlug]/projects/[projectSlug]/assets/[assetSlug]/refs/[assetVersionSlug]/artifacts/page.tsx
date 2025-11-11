@@ -332,7 +332,7 @@ const Artifacts = () => {
                                     {rootNodes![artifact.artifactName].map(
                                       (node) => (
                                         <Badge
-                                          key={node.purl}
+                                          key={node.url}
                                           variant={
                                             node.type === "vex"
                                               ? "success"
@@ -341,7 +341,7 @@ const Artifacts = () => {
                                                 : "outline"
                                           }
                                         >
-                                          {node.purl}
+                                          {node.url}
                                         </Badge>
                                       ),
                                     )}

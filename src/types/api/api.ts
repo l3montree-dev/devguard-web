@@ -639,8 +639,9 @@ export interface ArtifactCreateUpdateRequest {
 }
 
 export interface InformationSources {
+  url: string;
   type?: "csaf" | "vex" | "sbom";
-  purl: string;
+  purl?: string;
 }
 
 export interface ArtifactDTO {
