@@ -424,7 +424,7 @@ const OverviewPage = () => {
                           <div>
                             <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
                               <Tooltip>
-                                <TooltipTrigger className="text-left overflow-hidden  whitespace-nowrap max-w-100 flex-1 block">
+                                <TooltipTrigger className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-100 flex-1 block">
                                   <span className="text-foreground text-left">
                                     {r.artifactName || ""}
                                   </span>
