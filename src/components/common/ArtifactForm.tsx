@@ -65,7 +65,7 @@ const ArtifactForm = ({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append({ url: "" })}
+            onClick={() => append({ purl: "" })}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Upstream URL
@@ -79,14 +79,14 @@ const ArtifactForm = ({
         )}
 
         {fields.map((field, index) => {
-          const isInvalid = invalidUrls.includes(field.url);
+          const isInvalid = invalidUrls.includes(field.purl);
           return (
             <div key={field.id} className="space-y-1">
               <div className="flex items-start space-x-2">
                 <div className="flex-1 flex-col flex">
                   <FormField
                     control={form.control}
-                    name={`informationSources.${index}.url`}
+                    name={`informationSources.${index}.purl`}
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -104,33 +104,6 @@ const ArtifactForm = ({
                       </FormItem>
                     )}
                   />
-
-                  {form
-                    .watch(`informationSources.${index}.url`)
-                    .endsWith("provider-metadata.json") && (
-                    <div className="mt-2 border-b pb-2">
-                      <FormField
-                        control={form.control}
-                        name={`informationSources.${index}.purl`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                placeholder="Enter Package URL (PURL) for this provider metadata"
-                                className={
-                                  isInvalid
-                                    ? "border-red-500 focus-visible:ring-red-500"
-                                    : ""
-                                }
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
                 </div>
                 <Button
                   type="button"
