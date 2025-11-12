@@ -28,9 +28,6 @@ const AssetTitle = () => {
       setAssetVersionSlug(currentSlug);
     }
   }, [assetVersion?.slug, params?.assetVersionSlug]);
-
-  console.log("Rendering AssetTitle with assetVersionSlug:", assetVersionSlug);
-
   return (
     <span className="flex flex-row gap-2 min-w-0 overflow-hidden">
       <ProjectTitle />
