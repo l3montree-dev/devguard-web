@@ -16,24 +16,20 @@ const AssetTitle = () => {
 
   const params = useDecodedParams() as { assetVersionSlug?: string };
 
-  const [assetVersionSlug, setAssetVersionSlug] = useState<
-    string | undefined
-  >();
+  const [assetVersionSlug, setAssetVersionSlug] = useState<string | undefined>(
+    () => localStorage.getItem("lastViewedAssetVersionSlug") || undefined,
+  );
 
   useEffect(() => {
     const currentSlug = assetVersion?.slug ?? params?.assetVersionSlug;
 
     if (currentSlug) {
       localStorage.setItem("lastViewedAssetVersionSlug", currentSlug);
-      setAssetVersionSlug((prev) =>
-        prev === currentSlug ? prev : currentSlug,
-      );
-    } else {
-      const stored =
-        localStorage.getItem("lastViewedAssetVersionSlug") || undefined;
-      setAssetVersionSlug((prev) => prev ?? stored);
+      setAssetVersionSlug(currentSlug);
     }
   }, [assetVersion?.slug, params?.assetVersionSlug]);
+
+  console.log("Rendering AssetTitle with assetVersionSlug:", assetVersionSlug);
 
   return (
     <span className="flex flex-row gap-2 min-w-0 overflow-hidden">
