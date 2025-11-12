@@ -104,7 +104,6 @@ const ArtifactForm = ({
                       </FormItem>
                     )}
                   />
-
                   {form
                     .watch(`informationSources.${index}.url`)
                     .endsWith("provider-metadata.json") && (

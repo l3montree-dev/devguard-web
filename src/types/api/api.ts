@@ -635,7 +635,13 @@ export interface LicenseRiskDTO extends BaseVulnDTO {
 
 export interface ArtifactCreateUpdateRequest {
   artifactName: string;
-  informationSources: { url: string; purl?: string }[];
+  informationSources: InformationSources[];
+}
+
+export interface InformationSources {
+  url: string;
+  type?: "csaf" | "vex" | "sbom";
+  purl?: string;
 }
 
 export interface ArtifactDTO {

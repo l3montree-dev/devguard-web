@@ -10,7 +10,11 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
-import { ArtifactCreateUpdateRequest, ArtifactDTO } from "@/types/api/api";
+import {
+  ArtifactCreateUpdateRequest,
+  ArtifactDTO,
+  InformationSources,
+} from "@/types/api/api";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -45,32 +49,6 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 
-const informationSourceToObject = (url: string) => {
-  // first remove vex: or sbom: prefixes
-  if (url.startsWith("vex:")) {
-    url = url.replace("vex:", "");
-  } else if (url.startsWith("sbom:")) {
-    url = url.replace("sbom:", "");
-  }
-  // check if purl is inside
-  if (url.startsWith("pkg:")) {
-    // split at protocol separator
-    let parts = url.split("https://");
-    if (parts.length === 2) {
-      const purl = parts[0].endsWith(":") ? parts[0].slice(0, -1) : parts[0];
-
-      return { url: "https://" + parts[1], purl };
-    } else {
-      parts = url.split("http://");
-      if (parts.length === 2) {
-        const purl = parts[0].endsWith(":") ? parts[0].slice(0, -1) : parts[0];
-        return { url: "http://" + parts[1], purl };
-      }
-    }
-  }
-  return { url };
-};
-
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
 
@@ -103,7 +81,7 @@ const Artifacts = () => {
     isLoading,
     mutate,
   } = useSWR<{
-    [artifactName: string]: string[];
+    [artifactName: string]: InformationSources[];
   }>(
     "/organizations/" +
       params.organizationSlug +
@@ -159,7 +137,7 @@ const Artifacts = () => {
       artifactName: artifact.artifactName,
       informationSources:
         rootNodes && artifact.artifactName in rootNodes
-          ? rootNodes[artifact.artifactName].map(informationSourceToObject)
+          ? rootNodes[artifact.artifactName]
           : [],
     });
   };
@@ -352,26 +330,20 @@ const Artifacts = () => {
                                 rootNodes![artifact.artifactName].length > 0 ? (
                                   <div className="flex flex-row flex-wrap gap-2">
                                     {rootNodes![artifact.artifactName].map(
-                                      (node) =>
-                                        node.startsWith("vex:") ? (
-                                          <Badge variant={"success"} key={node}>
-                                            {
-                                              informationSourceToObject(node)
-                                                .url
-                                            }
-                                          </Badge>
-                                        ) : node.startsWith("sbom:") ? (
-                                          <Badge variant={"blue"} key={node}>
-                                            {
-                                              informationSourceToObject(node)
-                                                .url
-                                            }
-                                          </Badge>
-                                        ) : (
-                                          <Badge variant={"outline"} key={node}>
-                                            {node}
-                                          </Badge>
-                                        ),
+                                      (node) => (
+                                        <Badge
+                                          key={node.url}
+                                          variant={
+                                            node.type === "vex"
+                                              ? "success"
+                                              : node.type === "sbom"
+                                                ? "blue"
+                                                : "outline"
+                                          }
+                                        >
+                                          {node.url}
+                                        </Badge>
+                                      ),
                                     )}
                                   </div>
                                 ) : (
