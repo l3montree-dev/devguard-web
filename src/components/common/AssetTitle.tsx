@@ -25,9 +25,7 @@ const AssetTitle = () => {
 
     if (currentSlug) {
       localStorage.setItem("lastViewedAssetVersionSlug", currentSlug);
-      setAssetVersionSlug((prev) =>
-        prev === currentSlug ? prev : currentSlug,
-      );
+      setAssetVersionSlug(currentSlug);
     } else {
       const stored =
         localStorage.getItem("lastViewedAssetVersionSlug") || undefined;
