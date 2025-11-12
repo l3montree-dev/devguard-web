@@ -154,7 +154,25 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
               )
             }
             onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
+              const values: Partial<AssetFormValues> = {};
+              if (form.formState.dirtyFields?.name) {
+                values.name = form.getValues("name");
+              }
+              if (form.formState.dirtyFields?.description) {
+                values.description = form.getValues("description");
+              }
+              if (form.formState.dirtyFields?.repositoryProvider) {
+                values.repositoryProvider =
+                  form.getValues("repositoryProvider");
+              }
+              await handleUpdate(values);
+              form.resetField("name", { defaultValue: values.name });
+              form.resetField("description", {
+                defaultValue: values.description,
+              });
+              form.resetField("repositoryProvider", {
+                defaultValue: values.repositoryProvider,
+              });
             }}
           >
             Save
@@ -294,7 +312,40 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
               )
             }
             onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
+              const values: Partial<AssetFormValues> = {};
+              if (form.formState.dirtyFields?.confidentialityRequirement) {
+                values.confidentialityRequirement = form.getValues(
+                  "confidentialityRequirement",
+                );
+              }
+              if (form.formState.dirtyFields?.integrityRequirement) {
+                values.integrityRequirement = form.getValues(
+                  "integrityRequirement",
+                );
+              }
+              if (form.formState.dirtyFields?.availabilityRequirement) {
+                values.availabilityRequirement = form.getValues(
+                  "availabilityRequirement",
+                );
+              }
+              if (form.formState.dirtyFields?.reachableFromInternet) {
+                values.reachableFromInternet = form.getValues(
+                  "reachableFromInternet",
+                );
+              }
+              await handleUpdate(values);
+              form.resetField("confidentialityRequirement", {
+                defaultValue: values.confidentialityRequirement,
+              });
+              form.resetField("integrityRequirement", {
+                defaultValue: values.integrityRequirement,
+              });
+              form.resetField("availabilityRequirement", {
+                defaultValue: values.availabilityRequirement,
+              });
+              form.resetField("reachableFromInternet", {
+                defaultValue: values.reachableFromInternet,
+              });
             }}
           >
             Save
@@ -475,7 +526,50 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               )
             }
             onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
+              const values: Partial<AssetFormValues> = {};
+              if (form.formState.dirtyFields?.paranoidMode) {
+                values.paranoidMode = form.getValues("paranoidMode");
+              }
+              if (form.formState.dirtyFields?.sharesInformation) {
+                values.sharesInformation = form.getValues("sharesInformation");
+              }
+              if (form.formState.dirtyFields?.vulnAutoReopenAfterDays) {
+                values.vulnAutoReopenAfterDays = form.getValues(
+                  "vulnAutoReopenAfterDays",
+                );
+              }
+              if (
+                form.formState.dirtyFields?.enableTicketRange ||
+                form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
+                form.formState.dirtyFields?.riskAutomaticTicketThreshold
+              ) {
+                values.enableTicketRange = form.getValues("enableTicketRange");
+                values.cvssAutomaticTicketThreshold = form.getValues(
+                  "cvssAutomaticTicketThreshold",
+                );
+                values.riskAutomaticTicketThreshold = form.getValues(
+                  "riskAutomaticTicketThreshold",
+                );
+              }
+              await handleUpdate(values);
+              form.resetField("paranoidMode", {
+                defaultValue: values.paranoidMode,
+              });
+              form.resetField("sharesInformation", {
+                defaultValue: values.sharesInformation,
+              });
+              form.resetField("vulnAutoReopenAfterDays", {
+                defaultValue: values.vulnAutoReopenAfterDays,
+              });
+              form.resetField("enableTicketRange", {
+                defaultValue: values.enableTicketRange,
+              });
+              form.resetField("cvssAutomaticTicketThreshold", {
+                defaultValue: values.cvssAutomaticTicketThreshold,
+              });
+              form.resetField("riskAutomaticTicketThreshold", {
+                defaultValue: values.riskAutomaticTicketThreshold,
+              });
             }}
           >
             Save
