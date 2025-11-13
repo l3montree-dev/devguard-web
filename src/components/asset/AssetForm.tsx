@@ -53,6 +53,18 @@ const createUpdateHandler = <T extends keyof AssetFormValues>(
       if (form.formState.dirtyFields?.[field]) {
         values[field] = form.getValues(field);
       }
+      if (
+        field === "cvssAutomaticTicketThreshold" ||
+        field === "riskAutomaticTicketThreshold"
+      ) {
+        values["enableTicketRange"] = form.getValues("enableTicketRange");
+        values["cvssAutomaticTicketThreshold"] = form.getValues(
+          "cvssAutomaticTicketThreshold",
+        );
+        values["riskAutomaticTicketThreshold"] = form.getValues(
+          "riskAutomaticTicketThreshold",
+        );
+      }
     });
 
     try {
