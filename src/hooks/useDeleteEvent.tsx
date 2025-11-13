@@ -15,6 +15,8 @@ export const useDeleteEvent = () => {
       toast.error("Failed to delete event", {
         description: "Please try again later.",
       });
+    } else {
+      toast.success("Event deleted successfully");
     }
     return resp;
   };
