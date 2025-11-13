@@ -202,6 +202,30 @@ const Index = () => {
     setJustification("");
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/assets/" +
+        asset.slug +
+        "/refs/" +
+        assetVersion?.slug +
+        "/dependency-vulns/events/" +
+        eventId,
+      {
+        method: "DELETE",
+      },
+    );
+    if (!resp.ok) {
+      return toast("Failed to delete event", {
+        description: "Please try again later.",
+      });
+    }
+    mutate();
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -288,6 +312,7 @@ const Index = () => {
                   }
                   events={vuln.events}
                   page="code-risks"
+                  deleteEvent={handleDeleteEvent}
                 />
               </div>
               <div>

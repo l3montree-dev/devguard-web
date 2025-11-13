@@ -101,7 +101,7 @@ export default function RiskAssessmentFeed({
   vulnerabilityName: string;
   page: string;
   acceptUpstreamChange: (event: VulnEventDTO) => void;
-  deleteEvent?: (eventId: string) => void;
+  deleteEvent: (eventId: string) => void;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -232,6 +232,7 @@ export default function RiskAssessmentFeed({
                   </div>
                 </div>
                 <div className="ml-10 flex flex-row mt-2 text-xs font-normal text-muted-foreground whitespace-nowrap items-start">
+                  <FormatDate dateString={event.createdAt} />
                   {deleteEvent && currentUserRole === UserRole.Admin && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -258,7 +259,6 @@ export default function RiskAssessmentFeed({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   )}
-                  <FormatDate dateString={event.createdAt} />
                   {event.upstream === 2 && (
                     <div className="flex items-start flex-row justify-between w-full">
                       <Badge variant={"yellow"} className="ml-2">

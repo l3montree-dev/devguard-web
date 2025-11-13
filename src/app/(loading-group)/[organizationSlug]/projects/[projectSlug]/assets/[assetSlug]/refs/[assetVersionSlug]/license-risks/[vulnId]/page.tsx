@@ -209,6 +209,30 @@ const Index: FunctionComponent = () => {
     return <Err />;
   }
 
+  const handleDeleteEvent = async (eventId: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/assets/" +
+        asset.slug +
+        "/refs/" +
+        assetVersion?.slug +
+        "/dependency-vulns/events/" +
+        eventId,
+      {
+        method: "DELETE",
+      },
+    );
+    if (!resp.ok) {
+      return toast("Failed to delete event", {
+        description: "Please try again later.",
+      });
+    }
+    mutate();
+  };
+
   return (
     <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
       <div className="flex flex-row gap-4">
@@ -285,6 +309,7 @@ const Index: FunctionComponent = () => {
                   acceptUpstreamChange={() => {}}
                   events={vuln.events}
                   page="license-risks"
+                  deleteEvent={handleDeleteEvent}
                 />
               </div>
               <div>
