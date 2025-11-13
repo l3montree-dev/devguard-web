@@ -21,6 +21,7 @@ import { useActiveOrg } from "./useActiveOrg";
 import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
 import { useCurrentUserRole } from "./useUserRole";
+import { FolderSearch } from "lucide-react";
 
 export const useOrganizationMenu = () => {
   const pathName = usePathname() || "/";
@@ -57,6 +58,13 @@ export const useOrganizationMenu = () => {
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin
     ) {
+      menu.push({
+        title: "Package Search",
+        href: "/" + decodedOrgSlug + "/org-dependency-search",
+        Icon: FolderSearch,
+        isActive:
+          decodedPathName === "/" + decodedOrgSlug + "/org-dependency-search",
+      });
       menu.push({
         title: "Settings",
         href: "/" + decodedOrgSlug + "/settings",
