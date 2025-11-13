@@ -80,6 +80,7 @@ import { Skeleton } from "../../../../../../../../../../../components/ui/skeleto
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -389,6 +390,8 @@ const Index: FunctionComponent = () => {
   const asset = useActiveAsset()!;
   const assetVersion = useActiveAssetVersion();
 
+  const deleteEvent = useDeleteEvent();
+
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
@@ -467,26 +470,7 @@ const Index: FunctionComponent = () => {
   const { data: hints } = useSWR<DependencyVulnHints>(uri + "/hints", fetcher);
 
   const handleDeleteEvent = async (eventId: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project.slug +
-        "/assets/" +
-        asset.slug +
-        "/refs/" +
-        assetVersion?.slug +
-        "/dependency-vulns/events/" +
-        eventId,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!resp.ok) {
-      return toast("Failed to delete event", {
-        description: "Please try again later.",
-      });
-    }
+    await deleteEvent(eventId);
     mutate();
   };
 

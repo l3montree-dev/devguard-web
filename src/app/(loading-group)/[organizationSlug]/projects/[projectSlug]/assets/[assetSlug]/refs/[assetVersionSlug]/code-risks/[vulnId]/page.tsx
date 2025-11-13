@@ -43,6 +43,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -81,6 +82,7 @@ const Index = () => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+  const deleteEvent = useDeleteEvent();
 
   // Show loading skeleton if data is loading
   if (isLoading || !vuln) {
@@ -203,26 +205,7 @@ const Index = () => {
   };
 
   const handleDeleteEvent = async (eventId: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project.slug +
-        "/assets/" +
-        asset.slug +
-        "/refs/" +
-        assetVersion?.slug +
-        "/dependency-vulns/events/" +
-        eventId,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!resp.ok) {
-      return toast("Failed to delete event", {
-        description: "Please try again later.",
-      });
-    }
+    await deleteEvent(eventId);
     mutate();
   };
 

@@ -45,6 +45,7 @@ import EditorSkeleton from "../../../../../../../../../../../components/risk-ass
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -88,6 +89,7 @@ const Index: FunctionComponent = () => {
   const [updatedLicense, setUpdatedLicense] = useState<string>(
     vuln?.component.license ?? "unknown",
   );
+  const deleteEvent = useDeleteEvent();
 
   // Update updatedLicense when vuln data changes
   useEffect(() => {
@@ -210,26 +212,7 @@ const Index: FunctionComponent = () => {
   }
 
   const handleDeleteEvent = async (eventId: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project.slug +
-        "/assets/" +
-        asset.slug +
-        "/refs/" +
-        assetVersion?.slug +
-        "/dependency-vulns/events/" +
-        eventId,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!resp.ok) {
-      return toast("Failed to delete event", {
-        description: "Please try again later.",
-      });
-    }
+    await deleteEvent(eventId);
     mutate();
   };
 
