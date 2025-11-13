@@ -43,6 +43,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -81,6 +82,7 @@ const Index = () => {
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
+  const deleteEvent = useDeleteEvent();
 
   // Show loading skeleton if data is loading
   if (isLoading || !vuln) {
@@ -202,6 +204,11 @@ const Index = () => {
     setJustification("");
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    mutate();
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -288,6 +295,7 @@ const Index = () => {
                   }
                   events={vuln.events}
                   page="code-risks"
+                  deleteEvent={handleDeleteEvent}
                 />
               </div>
               <div>
