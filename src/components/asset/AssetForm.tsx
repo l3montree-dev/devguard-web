@@ -41,6 +41,30 @@ interface Props {
   onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
 }
 
+const createUpdateHandler = <T extends keyof AssetFormValues>(
+  form: UseFormReturn<AssetFormValues, any, AssetFormValues>,
+  fields: T[],
+  onUpdate: (values: Partial<AssetFormValues>) => Promise<void>,
+) => {
+  return async () => {
+    const values: Partial<AssetFormValues> = {};
+
+    fields.forEach((field) => {
+      if (form.formState.dirtyFields?.[field]) {
+        values[field] = form.getValues(field);
+      }
+    });
+
+    await onUpdate(values);
+
+    fields.forEach((field) => {
+      if (form.formState.dirtyFields?.[field]) {
+        form.resetField(field, { defaultValue: values[field] } as any);
+      }
+    });
+  };
+};
+
 export type AssetFormValues = Modify<
   AssetDTO,
   {
@@ -153,34 +177,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.repositoryProvider
               )
             }
-            onClick={async () => {
-              const values: Partial<AssetFormValues> = {};
-              if (form.formState.dirtyFields?.name) {
-                values.name = form.getValues("name");
-              }
-              if (form.formState.dirtyFields?.description) {
-                values.description = form.getValues("description");
-              }
-              if (form.formState.dirtyFields?.repositoryProvider) {
-                values.repositoryProvider =
-                  form.getValues("repositoryProvider");
-              }
-              await handleUpdate(values);
-
-              if (form.formState.dirtyFields?.name) {
-                form.resetField("name", { defaultValue: values.name });
-              }
-              if (form.formState.dirtyFields?.description) {
-                form.resetField("description", {
-                  defaultValue: values.description,
-                });
-              }
-              if (form.formState.dirtyFields?.repositoryProvider) {
-                form.resetField("repositoryProvider", {
-                  defaultValue: values.repositoryProvider,
-                });
-              }
-            }}
+            onClick={createUpdateHandler(
+              form,
+              ["name", "description", "repositoryProvider"],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
@@ -318,50 +319,16 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.reachableFromInternet
               )
             }
-            onClick={async () => {
-              const values: Partial<AssetFormValues> = {};
-              if (form.formState.dirtyFields?.confidentialityRequirement) {
-                values.confidentialityRequirement = form.getValues(
-                  "confidentialityRequirement",
-                );
-              }
-              if (form.formState.dirtyFields?.integrityRequirement) {
-                values.integrityRequirement = form.getValues(
-                  "integrityRequirement",
-                );
-              }
-              if (form.formState.dirtyFields?.availabilityRequirement) {
-                values.availabilityRequirement = form.getValues(
-                  "availabilityRequirement",
-                );
-              }
-              if (form.formState.dirtyFields?.reachableFromInternet) {
-                values.reachableFromInternet = form.getValues(
-                  "reachableFromInternet",
-                );
-              }
-              await handleUpdate(values);
-              if (form.formState.dirtyFields?.confidentialityRequirement) {
-                form.resetField("confidentialityRequirement", {
-                  defaultValue: values.confidentialityRequirement,
-                });
-              }
-              if (form.formState.dirtyFields?.integrityRequirement) {
-                form.resetField("integrityRequirement", {
-                  defaultValue: values.integrityRequirement,
-                });
-              }
-              if (form.formState.dirtyFields?.availabilityRequirement) {
-                form.resetField("availabilityRequirement", {
-                  defaultValue: values.availabilityRequirement,
-                });
-              }
-              if (form.formState.dirtyFields?.reachableFromInternet) {
-                form.resetField("reachableFromInternet", {
-                  defaultValue: values.reachableFromInternet,
-                });
-              }
-            }}
+            onClick={createUpdateHandler(
+              form,
+              [
+                "confidentialityRequirement",
+                "integrityRequirement",
+                "availabilityRequirement",
+                "reachableFromInternet",
+              ],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
@@ -540,64 +507,18 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.riskAutomaticTicketThreshold
               )
             }
-            onClick={async () => {
-              const values: Partial<AssetFormValues> = {};
-              if (form.formState.dirtyFields?.paranoidMode) {
-                values.paranoidMode = form.getValues("paranoidMode");
-              }
-              if (form.formState.dirtyFields?.sharesInformation) {
-                values.sharesInformation = form.getValues("sharesInformation");
-              }
-              if (form.formState.dirtyFields?.vulnAutoReopenAfterDays) {
-                values.vulnAutoReopenAfterDays = form.getValues(
-                  "vulnAutoReopenAfterDays",
-                );
-              }
-              if (
-                form.formState.dirtyFields?.enableTicketRange ||
-                form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.riskAutomaticTicketThreshold
-              ) {
-                values.enableTicketRange = form.getValues("enableTicketRange");
-                values.cvssAutomaticTicketThreshold = form.getValues(
-                  "cvssAutomaticTicketThreshold",
-                );
-                values.riskAutomaticTicketThreshold = form.getValues(
-                  "riskAutomaticTicketThreshold",
-                );
-              }
-              await handleUpdate(values);
-              if (form.formState.dirtyFields?.paranoidMode) {
-                form.resetField("paranoidMode", {
-                  defaultValue: values.paranoidMode,
-                });
-              }
-              if (form.formState.dirtyFields?.sharesInformation) {
-                form.resetField("sharesInformation", {
-                  defaultValue: values.sharesInformation,
-                });
-              }
-              if (form.formState.dirtyFields?.vulnAutoReopenAfterDays) {
-                form.resetField("vulnAutoReopenAfterDays", {
-                  defaultValue: values.vulnAutoReopenAfterDays,
-                });
-              }
-              if (
-                form.formState.dirtyFields?.enableTicketRange ||
-                form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.riskAutomaticTicketThreshold
-              ) {
-                form.resetField("enableTicketRange", {
-                  defaultValue: values.enableTicketRange,
-                });
-                form.resetField("cvssAutomaticTicketThreshold", {
-                  defaultValue: values.cvssAutomaticTicketThreshold,
-                });
-                form.resetField("riskAutomaticTicketThreshold", {
-                  defaultValue: values.riskAutomaticTicketThreshold,
-                });
-              }
-            }}
+            onClick={createUpdateHandler(
+              form,
+              [
+                "paranoidMode",
+                "sharesInformation",
+                "vulnAutoReopenAfterDays",
+                "enableTicketRange",
+                "cvssAutomaticTicketThreshold",
+                "riskAutomaticTicketThreshold",
+              ],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
