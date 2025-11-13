@@ -55,13 +55,17 @@ const createUpdateHandler = <T extends keyof AssetFormValues>(
       }
     });
 
-    await onUpdate(values);
+    try {
+      await onUpdate(values);
 
-    fields.forEach((field) => {
-      if (form.formState.dirtyFields?.[field]) {
-        form.resetField(field, { defaultValue: values[field] } as any);
-      }
-    });
+      fields.forEach((field) => {
+        if (form.formState.dirtyFields?.[field]) {
+          form.resetField(field, { defaultValue: values[field] } as any);
+        }
+      });
+    } catch (error) {
+      console.error("Error updating asset:", error);
+    }
   };
 };
 
