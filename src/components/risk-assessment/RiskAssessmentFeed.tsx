@@ -18,7 +18,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { UpstreamState, VulnEventDTO } from "@/types/api/api";
+import { UserRole, VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,
@@ -32,6 +32,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   ChatBubbleOvalLeftEllipsisIcon,
   CheckIcon,
+  EllipsisVerticalIcon,
   MagnifyingGlassIcon,
   SpeakerXMarkIcon,
   StopIcon,
@@ -51,6 +52,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import FormatDate from "./FormatDate";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import Alert from "../common/Alert";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -86,16 +95,19 @@ export default function RiskAssessmentFeed({
   vulnerabilityName,
   page,
   acceptUpstreamChange,
+  deleteEvent,
 }: {
   events: VulnEventDTO[];
   vulnerabilityName: string;
   page: string;
   acceptUpstreamChange: (event: VulnEventDTO) => void;
+  deleteEvent?: (eventId: string) => void;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
   const currentUser = useCurrentUser();
+  const currentUserRole = useCurrentUserRole();
 
   const activeAssetVersion = useActiveAssetVersion();
 
@@ -220,6 +232,32 @@ export default function RiskAssessmentFeed({
                   </div>
                 </div>
                 <div className="ml-10 flex flex-row mt-2 text-xs font-normal text-muted-foreground whitespace-nowrap items-start">
+                  {deleteEvent && currentUserRole === UserRole.Admin && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size={"icon"}
+                          className="h-4 w-4 p-0 m-0"
+                        >
+                          <EllipsisVerticalIcon className="h-4 w-4 text-muted-foreground p-0 m-0" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <Alert
+                          title="Are you sure to delete this event?"
+                          description="This action cannot be undone. All data associated with this event will be deleted."
+                          onConfirm={() => deleteEvent(event.id)}
+                        >
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </Alert>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <FormatDate dateString={event.createdAt} />
                   {event.upstream === 2 && (
                     <div className="flex items-start flex-row justify-between w-full">

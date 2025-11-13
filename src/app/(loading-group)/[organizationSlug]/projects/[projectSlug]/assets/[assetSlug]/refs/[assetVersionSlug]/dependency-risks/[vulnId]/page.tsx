@@ -466,6 +466,30 @@ const Index: FunctionComponent = () => {
 
   const { data: hints } = useSWR<DependencyVulnHints>(uri + "/hints", fetcher);
 
+  const handleDeleteEvent = async (eventId: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project.slug +
+        "/assets/" +
+        asset.slug +
+        "/refs/" +
+        assetVersion?.slug +
+        "/dependency-vulns/events/" +
+        eventId,
+      {
+        method: "DELETE",
+      },
+    );
+    if (!resp.ok) {
+      return toast("Failed to delete event", {
+        description: "Please try again later.",
+      });
+    }
+    mutate();
+  };
+
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
     justification?: string;
@@ -667,6 +691,7 @@ const Index: FunctionComponent = () => {
                     vulnerabilityName={vuln.cveID ?? ""}
                     events={vuln.events}
                     acceptUpstreamChange={handleAcceptUpstreamChange}
+                    deleteEvent={handleDeleteEvent}
                     page="dependency-risks"
                   />
                   <div>
