@@ -245,7 +245,7 @@ export default function RiskAssessmentFeed({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <Alert
-                          title="Are you sure to delete this event?"
+                          title="Are you sure you want to delete this event?"
                           description="This action cannot be undone. All data associated with this event will be deleted."
                           onConfirm={() => deleteEvent(event.id)}
                         >
