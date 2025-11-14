@@ -293,7 +293,8 @@ const Artifacts = () => {
       new Set(
         Object.values(rootNodes)
           .flat()
-          .map((node) => node.type),
+          .map((node) => node.type)
+          .filter(Boolean),
       ),
     );
   }, [rootNodes]);
@@ -322,7 +323,7 @@ const Artifacts = () => {
                 <div>
                   {nodesTypes.length > 0 && (
                     <div className="text-xs font-medium text-muted-foreground mb-2">
-                      <span className="mr-1">Legends</span>
+                      <span className="mr-1">Legend</span>
                       {nodesTypes.map((type) => (
                         <Badge
                           key={type}

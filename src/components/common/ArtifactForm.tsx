@@ -53,7 +53,7 @@ const ArtifactForm = ({
 
   // Sort types: csaf, vex, sbom, other
   const sortedTypes = Object.keys(groupedFields).sort((a, b) => {
-    const order = ["csaf", "vex", "sbom", "other"];
+    const order = ["sbom", "vex", "csaf", "other"];
     return order.indexOf(a) - order.indexOf(b);
   });
 
@@ -101,9 +101,13 @@ const ArtifactForm = ({
           <div key={type} className="space-y-3">
             <div className="text-xs font-medium text-muted-foreground">
               <span className="uppercase">
-                {type === "other" ? (isEditMode ? "new" : "") : type}{" "}
+                {type === "other" && isEditMode
+                  ? "new"
+                  : type !== "other"
+                    ? type
+                    : ""}
               </span>
-              {isEditMode ? "Sources:" : ""}
+              {isEditMode ? " Sources:" : ""}
             </div>
             {groupedFields[type].map(({ field, index }) => {
               const isInvalid = invalidUrls.includes(field.url);
