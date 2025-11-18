@@ -354,7 +354,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     <CopyCodeFragment codeString="?artifactName=<Name of the artifact url encoded>" />{" "}
                     to the URL to further scope the data. If none is provided,
                     the default branch and all artifacts are used.
-                    <div className="text-white mt-4">
+                    <div className="text-foreground mt-4">
                       <InputWithButton
                         label="VeX-URL (Always up to date vulnerability information)"
                         copyable
@@ -368,9 +368,9 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
-                    <div className="text-white mt-0">
+                    <div className="text-foreground mt-0">
                       <InputWithButton
-                        label="CSAF-URL (Always up to date vulnerability informationen in CSAF format)"
+                        label="CSAF-URL (Always up to date vulnerability information in CSAF format)"
                         copyable
                         nameKey="sbom-url"
                         variant="onCard"
@@ -382,7 +382,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
-                    <div className="text-white mt-0">
+                    <div className="text-foreground mt-0">
                       <InputWithButton
                         label="SBOM-URL (Always up to date SBOM information)"
                         copyable
