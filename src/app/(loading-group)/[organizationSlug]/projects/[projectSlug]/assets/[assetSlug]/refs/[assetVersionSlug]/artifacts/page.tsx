@@ -15,7 +15,7 @@ import {
   ArtifactDTO,
   InformationSources,
 } from "@/types/api/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
@@ -48,6 +48,14 @@ import useSWR from "swr";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
+
+const getInformationSourceBadgeVariant = (
+  type: InformationSources["type"],
+): "success" | "blue" | "outline" => {
+  if (type === "vex") return "success";
+  if (type === "sbom") return "blue";
+  return "outline";
+};
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -279,6 +287,18 @@ const Artifacts = () => {
 
   const { branches, tags } = useAssetBranchesAndTags();
 
+  const nodesTypes = useMemo(() => {
+    if (!rootNodes) return [];
+    return Array.from(
+      new Set(
+        Object.values(rootNodes)
+          .flat()
+          .map((node) => node.type)
+          .filter(Boolean),
+      ),
+    );
+  }, [rootNodes]);
+
   return (
     <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
       <div className="flex flex-row">
@@ -301,6 +321,20 @@ const Artifacts = () => {
                 />
               ) : (
                 <div>
+                  {nodesTypes.length > 0 && (
+                    <div className="text-xs font-medium text-muted-foreground mb-2">
+                      <span className="mr-1">Legend</span>
+                      {nodesTypes.map((type) => (
+                        <Badge
+                          key={type}
+                          variant={getInformationSourceBadgeVariant(type)}
+                          className="mr-1"
+                        >
+                          {type}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                   <div className="overflow-hidden rounded-lg border shadow-sm">
                     <div className="overflow-auto">
                       <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -333,13 +367,9 @@ const Artifacts = () => {
                                       (node) => (
                                         <Badge
                                           key={node.url}
-                                          variant={
-                                            node.type === "vex"
-                                              ? "success"
-                                              : node.type === "sbom"
-                                                ? "blue"
-                                                : "outline"
-                                          }
+                                          variant={getInformationSourceBadgeVariant(
+                                            node.type,
+                                          )}
                                         >
                                           {node.url}
                                         </Badge>
