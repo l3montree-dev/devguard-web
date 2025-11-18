@@ -370,7 +370,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     </div>
                     <div className="text-foreground mt-0">
                       <InputWithButton
-                        label="CSAF-URL (Always up to date vulnerability informationen in CSAF format)"
+                        label="CSAF-URL (Always up to date vulnerability information in CSAF format)"
                         copyable
                         nameKey="sbom-url"
                         variant="onCard"
