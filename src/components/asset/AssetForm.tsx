@@ -41,6 +41,46 @@ interface Props {
   onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
 }
 
+const createUpdateHandler = <T extends keyof AssetFormValues>(
+  form: UseFormReturn<AssetFormValues, any, AssetFormValues>,
+  fields: T[],
+  onUpdate: (values: Partial<AssetFormValues>) => Promise<void>,
+) => {
+  return async () => {
+    const values: Partial<AssetFormValues> = {};
+
+    fields.forEach((field) => {
+      if (form.formState.dirtyFields?.[field]) {
+        values[field] = form.getValues(field);
+      }
+      if (
+        field === "cvssAutomaticTicketThreshold" ||
+        field === "riskAutomaticTicketThreshold"
+      ) {
+        values["enableTicketRange"] = form.getValues("enableTicketRange");
+        values["cvssAutomaticTicketThreshold"] = form.getValues(
+          "cvssAutomaticTicketThreshold",
+        );
+        values["riskAutomaticTicketThreshold"] = form.getValues(
+          "riskAutomaticTicketThreshold",
+        );
+      }
+    });
+
+    try {
+      await onUpdate(values);
+
+      fields.forEach((field) => {
+        if (form.formState.dirtyFields?.[field]) {
+          form.resetField(field, { defaultValue: values[field] } as any);
+        }
+      });
+    } catch (error) {
+      console.error("Error updating asset:", error);
+    }
+  };
+};
+
 export type AssetFormValues = Modify<
   AssetDTO,
   {
@@ -153,9 +193,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.repositoryProvider
               )
             }
-            onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
-            }}
+            onClick={createUpdateHandler(
+              form,
+              ["name", "description", "repositoryProvider"],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
@@ -293,9 +335,16 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.reachableFromInternet
               )
             }
-            onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
-            }}
+            onClick={createUpdateHandler(
+              form,
+              [
+                "confidentialityRequirement",
+                "integrityRequirement",
+                "availabilityRequirement",
+                "reachableFromInternet",
+              ],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
@@ -474,9 +523,18 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.riskAutomaticTicketThreshold
               )
             }
-            onClick={async () => {
-              return await form.handleSubmit(handleUpdate)();
-            }}
+            onClick={createUpdateHandler(
+              form,
+              [
+                "paranoidMode",
+                "sharesInformation",
+                "vulnAutoReopenAfterDays",
+                "enableTicketRange",
+                "cvssAutomaticTicketThreshold",
+                "riskAutomaticTicketThreshold",
+              ],
+              handleUpdate,
+            )}
           >
             Save
           </AsyncButton>
