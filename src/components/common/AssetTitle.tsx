@@ -23,14 +23,13 @@ const AssetTitle = () => {
   useEffect(() => {
     const currentSlug = assetVersion?.slug ?? params?.assetVersionSlug;
 
-    if (typeof window !== "undefined" && window.localStorage) {
+    if (typeof window !== "undefined") {
       if (currentSlug) {
         localStorage.setItem("lastViewedAssetVersionSlug", currentSlug);
         setAssetVersionSlug(currentSlug);
       } else {
-        const stored =
-          localStorage.getItem("lastViewedAssetVersionSlug") ?? undefined;
-        setAssetVersionSlug(stored);
+        const stored = localStorage.getItem("lastViewedAssetVersionSlug");
+        setAssetVersionSlug(stored ?? undefined);
       }
     }
   }, [assetVersion?.slug, params?.assetVersionSlug]);
