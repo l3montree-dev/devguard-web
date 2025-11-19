@@ -407,6 +407,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                       <InputWithButton
                         label="VeX-URL (Always up to date vulnerability information)"
                         copyable
+                        copyToastDescription="The VeX-URL has been copied to your clipboard."
                         nameKey="vex-url"
                         variant="onCard"
                         value={
@@ -421,6 +422,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                       <InputWithButton
                         label="CSAF-URL (Always up to date vulnerability information in CSAF format)"
                         copyable
+                        copyToastDescription="The CSAF-URL has been copied to your clipboard."
                         nameKey="sbom-url"
                         variant="onCard"
                         value={
@@ -435,6 +437,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                       <InputWithButton
                         label="SBOM-URL (Always up to date SBOM information)"
                         copyable
+                        copyToastDescription="The SBOM-URL has been copied to your clipboard."
                         nameKey="sbom-url"
                         variant="onCard"
                         value={
