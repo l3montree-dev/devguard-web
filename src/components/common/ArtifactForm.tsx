@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { classNames } from "../../utils/common";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
@@ -36,6 +37,25 @@ const ArtifactForm = ({
       form.trigger("informationSources");
     }
   }, [invalidUrls, form]);
+
+  // Group and sort fields by type
+  const groupedFields = fields.reduce(
+    (acc, field, index) => {
+      const type = field.type || "other";
+      if (!acc[type]) {
+        acc[type] = [];
+      }
+      acc[type].push({ field, index });
+      return acc;
+    },
+    {} as Record<string, Array<{ field: (typeof fields)[0]; index: number }>>,
+  );
+
+  // Sort types: csaf, vex, sbom, other
+  const sortedTypes = Object.keys(groupedFields).sort((a, b) => {
+    const order = ["sbom", "vex", "csaf", "other"];
+    return order.indexOf(a) - order.indexOf(b);
+  });
 
   return (
     <>
@@ -77,50 +97,90 @@ const ArtifactForm = ({
           </p>
         )}
 
-        {fields.map((field, index) => {
-          const isInvalid = invalidUrls.includes(field.url);
-          return (
-            <div key={field.id} className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <div className="flex-1">
-                  <FormField
-                    control={form.control}
-                    name={`informationSources.${index}.url`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter upstream URL (e.g., https://example.com/vex.json)"
-                            className={
-                              isInvalid
-                                ? "border-red-500 focus-visible:ring-red-500"
-                                : ""
-                            }
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => remove(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              {isInvalid && (
-                <p className="text-sm text-red-500 pl-3">
-                  This URL is invalid or could not be reached
-                </p>
-              )}
+        {sortedTypes.map((type) => (
+          <div key={type} className="space-y-3">
+            <div className="text-xs font-medium text-muted-foreground">
+              <span className="uppercase">
+                {type === "other" && isEditMode
+                  ? "new"
+                  : type !== "other"
+                    ? type
+                    : ""}
+              </span>
+              {isEditMode ? " Sources:" : ""}
             </div>
-          );
-        })}
+            {groupedFields[type].map(({ field, index }) => {
+              const isInvalid = invalidUrls.includes(field.url);
+              return (
+                <div key={field.id} className="space-y-1 pl-3">
+                  <div className="flex items-start space-x-2">
+                    <div className="flex-1 flex-col flex">
+                      <FormField
+                        control={form.control}
+                        name={`informationSources.${index}.url`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter upstream URL (e.g., https://example.com/vex.json)"
+                                className={classNames(
+                                  isInvalid
+                                    ? "border-red-500 focus-visible:ring-red-500"
+                                    : "",
+                                )}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {form
+                        .watch(`informationSources.${index}.url`)
+                        .endsWith("provider-metadata.json") && (
+                        <div className="mt-2 border-b pb-2">
+                          <FormField
+                            control={form.control}
+                            name={`informationSources.${index}.purl`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Enter Package URL (PURL) for this provider metadata"
+                                    className={
+                                      isInvalid
+                                        ? "border-red-500 focus-visible:ring-red-500"
+                                        : ""
+                                    }
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => remove(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {isInvalid && (
+                    <p className="text-sm text-red-500 pl-3">
+                      This URL is invalid or could not be reached
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
         <span className="text-sm text-muted-foreground flex items-center">
           You can add several upstream VEX (Vulnerability Exploitability
           eXchange) or SBOM URLs here. DevGuard will sync the given

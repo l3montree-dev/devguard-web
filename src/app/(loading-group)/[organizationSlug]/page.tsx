@@ -62,6 +62,7 @@ import { ProjectBadge } from "../../../components/common/ProjectTitle";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
 import useRouterQuery from "../../../hooks/useRouterQuery";
+import { useUpdateOrganization } from "@/context/OrganizationContext";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -69,6 +70,8 @@ const OrganizationHomePage: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const [syncRunning, setSyncRunning] = useState(false);
   const searchParams = useSearchParams();
+
+  const updateOrganization = useUpdateOrganization();
 
   const currentUserRole = useCurrentUserRole();
 
@@ -115,6 +118,14 @@ const OrganizationHomePage: FunctionComponent = () => {
       `/organizations/${activeOrg.slug}/trigger-sync`,
     );
     if (resp.ok) {
+      const contentTreeResp = await browserApiClient(
+        `/organizations/${decodeURIComponent(activeOrg.slug)}/content-tree`,
+      );
+      const contentTree = await contentTreeResp.json();
+      updateOrganization((prev) => ({
+        ...prev,
+        contentTree: contentTree,
+      }));
       toast.success("Sync triggered successfully!");
       // reload the page to show the updated projects
       if (stillOnPage.current) {

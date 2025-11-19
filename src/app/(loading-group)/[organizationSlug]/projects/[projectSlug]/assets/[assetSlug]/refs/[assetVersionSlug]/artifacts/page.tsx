@@ -10,8 +10,12 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
-import { ArtifactCreateUpdateRequest, ArtifactDTO } from "@/types/api/api";
-import { useEffect, useState } from "react";
+import {
+  ArtifactCreateUpdateRequest,
+  ArtifactDTO,
+  InformationSources,
+} from "@/types/api/api";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
@@ -45,6 +49,14 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 
+const getInformationSourceBadgeVariant = (
+  type: InformationSources["type"],
+): "success" | "blue" | "outline" => {
+  if (type === "vex") return "success";
+  if (type === "sbom") return "blue";
+  return "outline";
+};
+
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
 
@@ -77,7 +89,7 @@ const Artifacts = () => {
     isLoading,
     mutate,
   } = useSWR<{
-    [artifactName: string]: string[];
+    [artifactName: string]: InformationSources[];
   }>(
     "/organizations/" +
       params.organizationSlug +
@@ -133,7 +145,7 @@ const Artifacts = () => {
       artifactName: artifact.artifactName,
       informationSources:
         rootNodes && artifact.artifactName in rootNodes
-          ? rootNodes[artifact.artifactName].map((url) => ({ url }))
+          ? rootNodes[artifact.artifactName]
           : [],
     });
   };
@@ -204,7 +216,7 @@ const Artifacts = () => {
       method: "POST",
       body: JSON.stringify({
         artifactName: data.artifactName,
-        informationSources: data.informationSources.map((el) => el.url) || [],
+        informationSources: data.informationSources || [],
       }),
     });
 
@@ -231,8 +243,7 @@ const Artifacts = () => {
       method: "PUT",
       body: JSON.stringify({
         artifactName: artifact.artifactName,
-        informationSources:
-          artifact.informationSources.map((el) => el.url) || [],
+        informationSources: artifact.informationSources || [],
       }),
     });
     if (!response.ok) {
@@ -276,6 +287,18 @@ const Artifacts = () => {
 
   const { branches, tags } = useAssetBranchesAndTags();
 
+  const nodesTypes = useMemo(() => {
+    if (!rootNodes) return [];
+    return Array.from(
+      new Set(
+        Object.values(rootNodes)
+          .flat()
+          .map((node) => node.type)
+          .filter(Boolean),
+      ),
+    );
+  }, [rootNodes]);
+
   return (
     <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
       <div className="flex flex-row">
@@ -298,6 +321,20 @@ const Artifacts = () => {
                 />
               ) : (
                 <div>
+                  {nodesTypes.length > 0 && (
+                    <div className="text-xs font-medium text-muted-foreground mb-2">
+                      <span className="mr-1">Legend</span>
+                      {nodesTypes.map((type) => (
+                        <Badge
+                          key={type}
+                          variant={getInformationSourceBadgeVariant(type)}
+                          className="mr-1"
+                        >
+                          {type}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                   <div className="overflow-hidden rounded-lg border shadow-sm">
                     <div className="overflow-auto">
                       <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -327,20 +364,16 @@ const Artifacts = () => {
                                 rootNodes![artifact.artifactName].length > 0 ? (
                                   <div className="flex flex-row flex-wrap gap-2">
                                     {rootNodes![artifact.artifactName].map(
-                                      (node) =>
-                                        node.startsWith("vex:") ? (
-                                          <Badge variant={"success"} key={node}>
-                                            {node.replaceAll("vex:", "")}
-                                          </Badge>
-                                        ) : node.startsWith("sbom:") ? (
-                                          <Badge variant={"blue"} key={node}>
-                                            {node.replaceAll("sbom:", "")}
-                                          </Badge>
-                                        ) : (
-                                          <Badge variant={"outline"} key={node}>
-                                            {node}
-                                          </Badge>
-                                        ),
+                                      (node) => (
+                                        <Badge
+                                          key={node.url}
+                                          variant={getInformationSourceBadgeVariant(
+                                            node.type,
+                                          )}
+                                        >
+                                          {node.url}
+                                        </Badge>
+                                      ),
                                     )}
                                   </div>
                                 ) : (

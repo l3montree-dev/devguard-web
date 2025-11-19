@@ -45,6 +45,7 @@ import EditorSkeleton from "../../../../../../../../../../../components/risk-ass
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -88,6 +89,7 @@ const Index: FunctionComponent = () => {
   const [updatedLicense, setUpdatedLicense] = useState<string>(
     vuln?.component.license ?? "unknown",
   );
+  const deleteEvent = useDeleteEvent();
 
   // Update updatedLicense when vuln data changes
   useEffect(() => {
@@ -209,6 +211,11 @@ const Index: FunctionComponent = () => {
     return <Err />;
   }
 
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    mutate();
+  };
+
   return (
     <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
       <div className="flex flex-row gap-4">
@@ -285,6 +292,7 @@ const Index: FunctionComponent = () => {
                   acceptUpstreamChange={() => {}}
                   events={vuln.events}
                   page="license-risks"
+                  deleteEvent={handleDeleteEvent}
                 />
               </div>
               <div>

@@ -19,7 +19,7 @@ interface SetupInformationSourceSlideProps {
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
-    informationSources: Array<string>;
+    informationSources: Array<{ url: string; purl?: string }>;
   }) => void;
 }
 
@@ -34,9 +34,12 @@ export const SetupInformationSourceSlide: FunctionComponent<
   });
 
   const sources = form.watch("informationSources");
+  // this is necessary since we sometimes add a purl and thus the form object changes
+  // we do this dynamically in the artifact form itself.
+  const sourceURLs = sources.reduce((acc, curr) => acc + curr.url, "");
   useEffect(() => {
     api?.reInit();
-  }, [api, sources]);
+  }, [api, sourceURLs]);
 
   const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
     if (data.informationSources.length === 0) {
@@ -58,7 +61,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
       isTag: false,
       artifactName: data.artifactName,
       isDefault: true,
-      informationSources: data.informationSources.map((el) => el.url) || [],
+      informationSources: data.informationSources || [],
     });
   };
 

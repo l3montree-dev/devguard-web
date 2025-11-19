@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM node:24.7.0@sha256:701c8a634cb3ddbc1dc9584725937619716882525356f0989f11816ba3747a22 as build-env
+FROM node:24.11.1@sha256:d5a23e0d0ee9d6ebb2f37aef0aaad77c5e1286b45475c5b6aa3216abaad98084 as build-env
 LABEL maintainer="L3montree & DevGuard contributors"
 
 # Disable telemetry
@@ -47,7 +47,7 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM registry.opencode.de/open-code/oci/nodejs:24@sha256:8b2e6bda94c1a452942f2adda9c25eb877fa6f646b3beb57a978a1366c696136
+FROM registry.opencode.de/open-code/oci/nodejs:24@sha256:7b44a820aa8e06cecf20492f042e546d2f99e87c615f7a7ddb9d1d52e8921902
 
 USER 53111
 

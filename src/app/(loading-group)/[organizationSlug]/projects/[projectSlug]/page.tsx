@@ -299,9 +299,8 @@ export default function RepositoriesPage() {
               <AssetForm
                 forceVerticalSections
                 form={form}
-                showReportingRange={false}
+                showVulnsManagement={false}
                 showSecurityRequirements={false}
-                showEnvironmentalInformation={false}
               />
               <DialogFooter>
                 <Button

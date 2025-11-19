@@ -271,7 +271,7 @@ const Index: FunctionComponent = () => {
             <div className="grid grid-cols-4 gap-4">
               <SeverityCard
                 variant="critical"
-                queryIntervalStart={9}
+                queryIntervalStart={8.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={10}
                 currentAmount={
@@ -283,9 +283,9 @@ const Index: FunctionComponent = () => {
               />
               <SeverityCard
                 variant="high"
-                queryIntervalStart={7}
+                queryIntervalStart={6.9}
                 isLoading={riskHistoryLoading}
-                queryIntervalEnd={8}
+                queryIntervalEnd={9}
                 currentAmount={
                   mode === "risk"
                     ? (latest?.high ?? 0)
@@ -295,7 +295,7 @@ const Index: FunctionComponent = () => {
               />
               <SeverityCard
                 variant="medium"
-                queryIntervalStart={4}
+                queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 isLoading={riskHistoryLoading}
                 currentAmount={
@@ -308,7 +308,7 @@ const Index: FunctionComponent = () => {
               <SeverityCard
                 variant="low"
                 queryIntervalStart={0}
-                queryIntervalEnd={3}
+                queryIntervalEnd={4}
                 isLoading={riskHistoryLoading}
                 currentAmount={
                   mode === "risk" ? (latest?.low ?? 0) : (latest?.lowCvss ?? 0)
@@ -322,74 +322,73 @@ const Index: FunctionComponent = () => {
                 mode={mode}
                 data={componentRisk}
               />
-              <div className="col-span-2 flex flex-col">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="relative w-full">
-                      Licenses
-                      <Link
-                        href={
-                          asset
-                            ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/dependencies`
-                            : "#"
-                        }
-                        className="absolute right-0 top-0 text-xs !text-muted-foreground"
-                      >
-                        See all
-                      </Link>
-                    </CardTitle>
-                    <CardDescription className="text-left">
-                      Displays the distribution of dependency licenses
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex -mt-4 flex-col">
-                      {licenseLoading
-                        ? Array.from(Array(5).keys()).map((_, i, arr) => (
-                            <Skeleton
-                              className={classNames(
-                                "h-[46px]",
-                                i === arr.length - 1 ? "mt-4" : "border-b my-4",
-                              )}
-                              key={i}
-                            />
-                          ))
-                        : (licenses || []).slice(0, 5).map((el, i, arr) => (
-                            <div
-                              className={
-                                i === arr.length - 1 ? "pt-4" : "border-b py-4"
-                              }
-                              key={el.license.licenseId}
-                            >
-                              <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                                <span className="capitalize">
-                                  {el.license.licenseId}
-                                </span>
-                                <div className="flex flex-row flex-wrap gap-2">
-                                  {el.license.isOsiApproved ? (
-                                    <Badge variant={"secondary"}>
-                                      <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
-                                      OSI Approved
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant={"secondary"}>
-                                      <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
-                                    </Badge>
-                                  )}
-                                </div>
+
+              <Card className="col-span-2 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="relative w-full">
+                    Licenses
+                    <Link
+                      href={
+                        asset
+                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/dependencies`
+                          : "#"
+                      }
+                      className="absolute right-0 top-0 text-xs !text-muted-foreground"
+                    >
+                      See all
+                    </Link>
+                  </CardTitle>
+                  <CardDescription className="text-left">
+                    Displays the distribution of dependency licenses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex -mt-4 flex-col">
+                    {licenseLoading
+                      ? Array.from(Array(5).keys()).map((_, i, arr) => (
+                          <Skeleton
+                            className={classNames(
+                              "h-[46px]",
+                              i === arr.length - 1 ? "mt-4" : "border-b my-4",
+                            )}
+                            key={i}
+                          />
+                        ))
+                      : (licenses || []).slice(0, 5).map((el, i, arr) => (
+                          <div
+                            className={
+                              i === arr.length - 1 ? "pt-4" : "border-b py-4"
+                            }
+                            key={el.license.licenseId}
+                          >
+                            <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                              <span className="capitalize">
+                                {el.license.licenseId}
+                              </span>
+                              <div className="flex flex-row flex-wrap gap-2">
+                                {el.license.isOsiApproved ? (
+                                  <Badge variant={"secondary"}>
+                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                                    OSI Approved
+                                  </Badge>
+                                ) : (
+                                  <Badge variant={"secondary"}>
+                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
+                                  </Badge>
+                                )}
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {el.license.name
-                                  ? el.license.name
-                                  : "Unknown license information"}
-                                , {el.count} dependencies
-                              </p>
                             </div>
-                          ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                            <p className="text-sm text-muted-foreground">
+                              {el.license.name
+                                ? el.license.name
+                                : "Unknown license information"}
+                              , {el.count} dependencies
+                            </p>
+                          </div>
+                        ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
             <RiskHistoryDistributionDiagram
               isLoading={riskHistoryLoading}

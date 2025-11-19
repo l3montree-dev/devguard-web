@@ -312,7 +312,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="critical"
                 currentAmount={criticalAmount}
-                queryIntervalStart={7}
+                queryIntervalStart={8.9}
                 queryIntervalEnd={10}
                 mode={mode}
               />
@@ -320,16 +320,16 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="high"
                 currentAmount={highAmount}
-                queryIntervalStart={4}
-                queryIntervalEnd={7}
+                queryIntervalStart={6.9}
+                queryIntervalEnd={9}
                 mode={mode}
               />
               <SeverityCard
                 isLoading={riskHistoryLoading}
                 variant="medium"
                 currentAmount={mediumAmount}
-                queryIntervalStart={1}
-                queryIntervalEnd={4}
+                queryIntervalStart={3.9}
+                queryIntervalEnd={7}
                 mode={mode}
               />
               <SeverityCard
@@ -337,7 +337,7 @@ const OverviewPage = () => {
                 variant="low"
                 currentAmount={lowAmount}
                 queryIntervalStart={0}
-                queryIntervalEnd={1}
+                queryIntervalEnd={4}
                 mode={mode}
               />
             </div>
@@ -421,12 +421,12 @@ const OverviewPage = () => {
                               avatar={asset?.avatar}
                             />
                           </div>
-                          <div className="w-full">
+                          <div>
                             <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
                               <Tooltip>
-                                <TooltipTrigger>
-                                  <span className="text-foreground text-left line-clamp-1">
-                                    {beautifyPurl(r.artifactName || "")}
+                                <TooltipTrigger className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-100 flex-1 block">
+                                  <span className="text-foreground text-left">
+                                    {r.artifactName || ""}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>

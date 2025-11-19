@@ -108,8 +108,18 @@ export const GitInstances: {
 
 export interface Config {
   "secret-scanning": boolean;
-  sca: boolean;
-  "container-scanning": boolean;
   sast: boolean;
   iac: boolean;
+
+  sca: boolean;
+
+  "container-scanning": boolean;
+  build: boolean;
+  push: boolean;
+
+  sign: boolean;
+  attest: boolean;
+
+  sbom: boolean;
+  sarif: boolean;
 }

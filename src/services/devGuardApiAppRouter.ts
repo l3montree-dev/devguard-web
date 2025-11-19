@@ -20,3 +20,15 @@ export const getApiClientInAppRouter = async () => {
   const sessionCookie = cookieStore.get("ory_kratos_session");
   return getApiClientFromCookies(sessionCookie?.value);
 };
+
+export const getApiClientInRouteHandler = (request: Request) => {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const sessionCookie = cookieHeader
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith("ory_kratos_session="));
+  const sessionCookieValue = sessionCookie
+    ? sessionCookie.split("=")[1]
+    : undefined;
+  return getApiClientFromCookies(sessionCookieValue);
+};

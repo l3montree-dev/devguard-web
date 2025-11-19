@@ -475,7 +475,7 @@ export interface AssetDTO {
   repositoryId?: string;
   repositoryName?: string;
 
-  reachableFromTheInternet: boolean;
+  reachableFromInternet: boolean;
   paranoidMode: boolean;
 
   lastSecretScan: string;
@@ -635,7 +635,13 @@ export interface LicenseRiskDTO extends BaseVulnDTO {
 
 export interface ArtifactCreateUpdateRequest {
   artifactName: string;
-  informationSources: { url: string }[]; // was upstreamUrls
+  informationSources: InformationSources[];
+}
+
+export interface InformationSources {
+  url: string;
+  type?: "csaf" | "vex" | "sbom";
+  purl?: string;
 }
 
 export interface ArtifactDTO {

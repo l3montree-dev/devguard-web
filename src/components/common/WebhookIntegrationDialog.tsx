@@ -257,6 +257,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       nameKey="webhook-integration-secret-token"
                       {...field}
                       copyable={true}
+                      copyToastDescription="The webhook secret has been copied to your clipboard."
                       mutable={true}
                       update={{
                         update: handleGenerateNewSecret,
