@@ -21,6 +21,7 @@ interface InputWithButtonProps
   message?: string;
   variant?: "default" | "onCard";
   copyable?: boolean;
+  copyToastDescription?: string;
   mutable?: boolean;
   update?: {
     update: () => void;
@@ -33,6 +34,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
   const {
     onClick,
     copyable,
+    copyToastDescription,
     update,
     label,
     message,
@@ -45,7 +47,8 @@ const InputWithButton = (props: InputWithButtonProps) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(props.value ?? "");
     toast("Copied to clipboard", {
-      description: "The code has been copied to your clipboard.",
+      description:
+        copyToastDescription ?? "The code has been copied to your clipboard.",
     });
   };
   return (

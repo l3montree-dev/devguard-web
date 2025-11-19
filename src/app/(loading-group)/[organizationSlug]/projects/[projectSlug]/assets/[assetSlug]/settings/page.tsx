@@ -356,6 +356,7 @@ const Index: FunctionComponent = () => {
               The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
               variant="onCard"
               copyable
+              copyToastDescription="The badge secret has been copied to your clipboard."
               update={{
                 update: () => handleGenerateNewSecret("badge"),
                 updateConfirmTitle:
@@ -386,6 +387,7 @@ const Index: FunctionComponent = () => {
               message="You can use the URL to send webhook requests to this endpoint."
               variant="onCard"
               copyable
+              copyToastDescription="The webhook URL has been copied to your clipboard."
             />
 
             <InputWithButton
@@ -394,6 +396,7 @@ const Index: FunctionComponent = () => {
               nameKey="settings-webhook-secret"
               message="This secret is used to authenticate the webhook requests. You need to set this secret in your webhook configuration."
               copyable
+              copyToastDescription="The webhook secret has been copied to your clipboard."
               variant="onCard"
               update={{
                 update: () => handleGenerateNewSecret("webhook"),

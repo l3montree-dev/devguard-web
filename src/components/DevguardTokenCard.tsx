@@ -21,6 +21,7 @@ const DevguardTokenCard = () => {
             label="Secret token"
             nameKey="devguard-secret-token"
             copyable={true}
+            copyToastDescription="The DevGuard token has been copied to your clipboard."
             mutable={true}
             variant="onCard"
             value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
