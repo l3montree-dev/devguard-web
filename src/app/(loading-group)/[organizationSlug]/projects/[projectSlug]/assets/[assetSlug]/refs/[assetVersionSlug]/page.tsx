@@ -271,7 +271,7 @@ const Index: FunctionComponent = () => {
             <div className="grid grid-cols-4 gap-4">
               <SeverityCard
                 variant="critical"
-                queryIntervalStart={9}
+                queryIntervalStart={8.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={10}
                 currentAmount={
@@ -283,9 +283,9 @@ const Index: FunctionComponent = () => {
               />
               <SeverityCard
                 variant="high"
-                queryIntervalStart={7}
+                queryIntervalStart={6.9}
                 isLoading={riskHistoryLoading}
-                queryIntervalEnd={8}
+                queryIntervalEnd={9}
                 currentAmount={
                   mode === "risk"
                     ? (latest?.high ?? 0)
@@ -295,7 +295,7 @@ const Index: FunctionComponent = () => {
               />
               <SeverityCard
                 variant="medium"
-                queryIntervalStart={4}
+                queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 isLoading={riskHistoryLoading}
                 currentAmount={
@@ -308,7 +308,7 @@ const Index: FunctionComponent = () => {
               <SeverityCard
                 variant="low"
                 queryIntervalStart={0}
-                queryIntervalEnd={3}
+                queryIntervalEnd={4}
                 isLoading={riskHistoryLoading}
                 currentAmount={
                   mode === "risk" ? (latest?.low ?? 0) : (latest?.lowCvss ?? 0)
