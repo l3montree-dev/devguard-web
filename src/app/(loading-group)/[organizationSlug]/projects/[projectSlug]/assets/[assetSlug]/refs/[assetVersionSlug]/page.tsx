@@ -273,7 +273,7 @@ const Index: FunctionComponent = () => {
                 variant="critical"
                 queryIntervalStart={8.9}
                 isLoading={riskHistoryLoading}
-                queryIntervalEnd={10.1}
+                queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"
                     ? (latest?.critical ?? 0)

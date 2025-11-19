@@ -313,7 +313,7 @@ const OverviewPage = () => {
                 variant="critical"
                 currentAmount={criticalAmount}
                 queryIntervalStart={8.9}
-                queryIntervalEnd={10.1}
+                queryIntervalEnd={10}
                 mode={mode}
               />
               <SeverityCard
