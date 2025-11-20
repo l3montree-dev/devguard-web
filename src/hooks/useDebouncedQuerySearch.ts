@@ -8,7 +8,7 @@ export default function useDebouncedQuerySearch() {
     () =>
       debounce((value: string) => {
         updateQueryParams({
-          search: value,
+          search: "%" + value + "%",
         });
       }, 500),
     [updateQueryParams],
