@@ -127,14 +127,14 @@ const ManualIntegrationSlide: FunctionComponent<
     const matchedBranch = branches.find(
       (branch) => branch.slug === branchOrTagName,
     );
-    if (matchedBranch) {
+    if (matchedBranch && branchOrTagName !== matchedBranch.name) {
       setBranchOrTagName(matchedBranch.name);
       setIsTag(false);
       return;
     }
 
     const matchedTag = tags.find((tag) => tag.slug === branchOrTagName);
-    if (matchedTag) {
+    if (matchedTag && branchOrTagName !== matchedTag.name) {
       setBranchOrTagName(matchedTag.name);
       setIsTag(true);
     }
