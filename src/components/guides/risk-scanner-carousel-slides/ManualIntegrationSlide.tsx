@@ -122,6 +122,24 @@ const ManualIntegrationSlide: FunctionComponent<
   const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isTag, setIsTag] = useState(false);
 
+  // Check if the selected branchOrTagName is in branches or tags and set isTag accordingly
+  useEffect(() => {
+    const matchedBranch = branches.find(
+      (branch) => branch.slug === branchOrTagName,
+    );
+    if (matchedBranch && branchOrTagName !== matchedBranch.name) {
+      setBranchOrTagName(matchedBranch.name);
+      setIsTag(false);
+      return;
+    }
+
+    const matchedTag = tags.find((tag) => tag.slug === branchOrTagName);
+    if (matchedTag && branchOrTagName !== matchedTag.name) {
+      setBranchOrTagName(matchedTag.name);
+      setIsTag(true);
+    }
+  }, [branchOrTagName, branches, tags]);
+
   // Update parent component when artifact changes
   React.useEffect(() => {
     if (setArtifactName) {
@@ -250,9 +268,10 @@ const ManualIntegrationSlide: FunctionComponent<
                     <BranchTagSelector
                       branches={branches}
                       tags={tags}
-                      disableNavigateToRefInsteadCall={(v) =>
-                        setBranchOrTagName(v.name)
-                      }
+                      disableNavigateToRefInsteadCall={(v) => {
+                        setBranchOrTagName(v.name);
+                        setIsTag(v.type === "tag");
+                      }}
                     />
                   </div>
                   <SimpleArtifactSelector
@@ -365,9 +384,10 @@ const ManualIntegrationSlide: FunctionComponent<
                     <BranchTagSelector
                       branches={branches}
                       tags={tags}
-                      disableNavigateToRefInsteadCall={(v) =>
-                        setBranchOrTagName(v.name)
-                      }
+                      disableNavigateToRefInsteadCall={(v) => {
+                        setBranchOrTagName(v.name);
+                        setIsTag(v.type === "tag");
+                      }}
                     />
                   </div>
                   <div className="w-full">
@@ -471,9 +491,10 @@ const ManualIntegrationSlide: FunctionComponent<
                     <BranchTagSelector
                       branches={branches}
                       tags={tags}
-                      disableNavigateToRefInsteadCall={(v) =>
-                        setBranchOrTagName(v.name)
-                      }
+                      disableNavigateToRefInsteadCall={(v) => {
+                        setBranchOrTagName(v.name);
+                        setIsTag(v.type === "tag");
+                      }}
                     />
                   </div>
                   <SimpleArtifactSelector
