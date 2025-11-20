@@ -26,6 +26,9 @@ const AssetTitle = () => {
     if (currentSlug) {
       localStorage.setItem("lastViewedAssetVersionSlug", currentSlug);
       setAssetVersionSlug(currentSlug);
+    } else {
+      const stored = localStorage.getItem("lastViewedAssetVersionSlug");
+      setAssetVersionSlug(stored ?? undefined);
     }
   }, [assetVersion?.slug, params?.assetVersionSlug]);
   return (
