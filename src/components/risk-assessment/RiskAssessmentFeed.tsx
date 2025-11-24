@@ -354,7 +354,7 @@ export default function RiskAssessmentFeed({
               </div>
 
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
-                {events.slice(0, events.length - 2).map((event, index) => {
+                {events.slice(0, events.length - 3).map((event, index) => {
                   return (
                     <RiskFeedItem
                       activeAssetVersion={activeAssetVersion}
