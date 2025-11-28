@@ -20,7 +20,7 @@ import {
   ListBulletIcon,
   ScaleIcon,
 } from "@heroicons/react/24/outline";
-import { ContainerIcon } from "lucide-react";
+import { ContainerIcon, FolderSearch } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
 import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
@@ -73,13 +73,28 @@ export const useProjectMenu = () => {
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin
     ) {
-      menu.push({
-        title: "Settings",
-        href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
-        Icon: CogIcon,
-        isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
-      });
+      menu.push(
+        ...[
+          {
+            title: "Package Search",
+            href:
+              "/" + orgSlug + "/projects/" + projectSlug + "/dependency-search",
+            Icon: FolderSearch,
+            isActive:
+              pathname ===
+              `/${orgSlug}/projects/${projectSlug}/dependency-search`,
+          },
+          {
+            title: "Settings",
+            href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
+            Icon: CogIcon,
+            isActive:
+              pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
+          },
+        ],
+      );
     }
   }
+
   return menu;
 };

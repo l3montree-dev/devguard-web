@@ -1,49 +1,50 @@
 "use client";
 
 import Section from "@/components/common/Section";
-import Page from "@/components/Page";
-import { ComponentPaged, OrgDependency, Paged, Policy } from "@/types/api/api";
-import { FunctionComponent, useMemo, useState } from "react";
-import { toast } from "sonner";
-import useSWR from "swr";
-import EmptyParty from "../../../../components/common/EmptyParty";
-import ListRenderer from "../../../../components/common/ListRenderer";
-import PolicyListItem from "../../../../components/common/PolicyListItem";
-import PolicyDialog from "../../../../components/PolicyDialog";
-import { Button } from "../../../../components/ui/button";
-import { fetcher } from "../../../../data-fetcher/fetcher";
-import useDecodedParams from "../../../../hooks/useDecodedParams";
-import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
-import { browserApiClient } from "../../../../services/devGuardApi";
-import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import { Skeleton } from "@/components/ui/skeleton";
-import useTable from "@/hooks/useTable";
-import { beautifyPurl, classNames } from "@/utils/common";
 import SortingCaret from "@/components/common/SortingCaret";
-import { Loader2 } from "lucide-react";
+import Page from "@/components/Page";
 import { Input } from "@/components/ui/input";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
+import { Skeleton } from "@/components/ui/skeleton";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import useTable from "@/hooks/useTable";
+import { Paged, ProjectDependency } from "@/types/api/api";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import {
-  flexRender,
   ColumnDef,
   createColumnHelper,
+  flexRender,
   Header,
 } from "@tanstack/react-table";
+import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";
+import { FunctionComponent, useMemo } from "react";
+import useSWR from "swr";
+import EmptyParty from "../../../../../../components/common/EmptyParty";
+import { fetcher } from "../../../../../../data-fetcher/fetcher";
+import useDecodedParams from "../../../../../../hooks/useDecodedParams";
+import { useOrganizationMenu } from "../../../../../../hooks/useOrganizationMenu";
 
-import { buildFilterSearchParams } from "@/utils/url";
-import { Badge } from "@/components/ui/badge";
-import EcosystemImage from "@/components/common/EcosystemImage";
-import CustomPagination from "@/components/common/CustomPagination";
 import ArtifactBadge from "@/components/ArtifactBadge";
+import CustomPagination from "@/components/common/CustomPagination";
+import EcosystemImage from "@/components/common/EcosystemImage";
+import { Badge } from "@/components/ui/badge";
+import { buildFilterSearchParams } from "@/utils/url";
+import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
-  const url = "/organizations/" + organizationSlug + "/dependency-components/";
+  const project = useActiveProject();
+  const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    project?.slug +
+    "/components";
   const handleSearch = useDebouncedQuerySearch();
+
   const searchParams = useSearchParams();
 
   const params = useMemo(() => {
@@ -52,9 +53,9 @@ const OrgDependencySearch: FunctionComponent = () => {
     return params;
   }, [searchParams]);
 
-  const columnHelper = createColumnHelper<OrgDependency>();
+  const columnHelper = createColumnHelper<ProjectDependency>();
 
-  const columnsDef: ColumnDef<OrgDependency, any>[] = [
+  const columnsDef: ColumnDef<ProjectDependency, any>[] = [
     columnHelper.accessor("dependencyPurl", {
       header: "Package",
       id: "dependencyPurl",
@@ -69,23 +70,13 @@ const OrgDependencySearch: FunctionComponent = () => {
       ),
     }),
 
-    columnHelper.accessor("componentVersion", {
+    columnHelper.accessor("dependencyPurl", {
       header: "Version",
-      id: "componentVersion",
+      id: "dependencyPurl",
       enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
-          <Badge variant={"secondary"}> {row.getValue()}</Badge>
-        </span>
-      ),
-    }),
-    columnHelper.accessor("organizationName", {
-      header: "Organization",
-      id: "organizationName",
-      enableSorting: false,
-      cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          {row.getValue()}
+          <Badge variant={"secondary"}> {extractVersion(row.getValue())}</Badge>
         </span>
       ),
     }),
@@ -119,7 +110,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     }),
   ];
 
-  const { data: components, isLoading } = useSWR<Paged<OrgDependency>>(
+  const { data: components, isLoading } = useSWR<Paged<ProjectDependency>>(
     url + "?" + params?.toString(),
     fetcher,
     {
@@ -133,41 +124,9 @@ const OrgDependencySearch: FunctionComponent = () => {
   );
 
   const { table } = useTable({
-    data: (components?.data ?? []) as Array<OrgDependency>,
+    data: (components?.data ?? []) as Array<ProjectDependency>,
     columnsDef,
   });
-
-  const renderHeaderCell = (header: Header<OrgDependency, unknown>) => {
-    switch (header.id) {
-      case "organizationName":
-        return (
-          <Badge variant={"outline"}>
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </Badge>
-        );
-      case "projectName":
-        return (
-          <Badge variant={"outline"}>
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </Badge>
-        );
-      case "assetName":
-        return (
-          <Badge variant={"outline"}>
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </Badge>
-        );
-      case "artifactName":
-        return (
-          <Badge variant={"outline"}>
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </Badge>
-        );
-
-      default:
-        return flexRender(header.column.columnDef.header, header.getContext());
-    }
-  };
 
   return (
     <Page Menu={menu} Title={null} title="">
@@ -175,7 +134,7 @@ const OrgDependencySearch: FunctionComponent = () => {
         primaryHeadline
         forceVertical
         description="Search for every Dependency in your Organization"
-        title="Organization Dependencies"
+        title="Project Dependencies"
       >
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="relative flex-1">
@@ -212,7 +171,10 @@ const OrgDependencySearch: FunctionComponent = () => {
                           className="flex flex-row items-center gap-2"
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {renderHeaderCell(header)}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                           <SortingCaret
                             sortDirection={header.column.getIsSorted()}
                           />
@@ -232,7 +194,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                         i === arr.length - 1 ? "" : "border-b",
                         i % 2 !== 0 && "bg-card/50",
                       )}
-                      key={el}
+                      key={i}
                     >
                       <td className="p-4">
                         <Skeleton className="w-2/3 h-[20px]" />
@@ -255,23 +217,24 @@ const OrgDependencySearch: FunctionComponent = () => {
                     </tr>
                   ))}
                 {table.getRowModel().rows.map((row, index, arr) => (
-                  <tr
+                  <a
+                    href={`/${organizationSlug}/projects/${project.slug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionName}/dependencies`}
                     className={classNames(
-                      "relative cursor-pointer bg-background align-top transition-all ",
+                      "relative cursor-pointer table-row bg-background align-top transition-all ",
                       index === arr.length - 1 ? "" : "border-b",
                       index % 2 != 0 && "bg-card/50",
                     )}
                     key={row.id}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <td className="p-4" key={cell.id}>
+                      <td className="p-4 text-foreground" key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),
                         )}
                       </td>
                     ))}
-                  </tr>
+                  </a>
                 ))}
               </tbody>
             </table>

@@ -698,11 +698,9 @@ export interface Component {
   published?: string;
 }
 
-export interface OrgDependency {
+export interface ProjectDependency {
   dependencyPurl: string;
   componentDependencyId: string;
-  organizationId: string;
-  organizationName: string;
   projectId: string;
   projectName: string;
   projectSlug: string;
@@ -710,8 +708,6 @@ export interface OrgDependency {
   assetName: string;
   assetSlug: string;
   assetVersionName: string;
-  componentPurl: string;
-  componentVersion: string;
   artifactName?: string;
   artifactAssetVersion?: string;
 }
