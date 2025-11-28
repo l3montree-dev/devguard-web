@@ -59,6 +59,13 @@ export const useOrganizationMenu = () => {
       currentUserRole === UserRole.Admin
     ) {
       menu.push({
+        title: "Package Search",
+        href: "/" + decodedOrgSlug + "/org-dependency-search",
+        Icon: FolderSearch,
+        isActive:
+          decodedPathName === "/" + decodedOrgSlug + "/org-dependency-search",
+      });
+      menu.push({
         title: "Settings",
         href: "/" + decodedOrgSlug + "/settings",
         Icon: CogIcon,
