@@ -1,5 +1,8 @@
 "use client";
 
+// TODO: Improve License Distribution UI (collapsible / shorter layout)
+
+
 import { redirect } from "next/navigation";
 import { useSession } from "../context/SessionContext";
 
