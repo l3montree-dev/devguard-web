@@ -663,14 +663,9 @@ const Index: FunctionComponent = () => {
                   </div>
                 )}
               </div>
-              <div className="mb-16 mt-4">
-                {vuln && (
-                  <Markdown>{vuln.message?.replaceAll("\n", "\n\n")}</Markdown>
-                )}
-              </div>
 
               {vuln ? (
-                <>
+                <div className="mt-10">
                   <RiskAssessmentFeed
                     vulnerabilityName={vuln.cveID ?? ""}
                     events={vuln.events}
@@ -926,7 +921,7 @@ const Index: FunctionComponent = () => {
                       </CardContent>
                     </Card>
                   </div>
-                </>
+                </div>
               ) : (
                 <>
                   <RiskAssessmentFeedSkeleton />

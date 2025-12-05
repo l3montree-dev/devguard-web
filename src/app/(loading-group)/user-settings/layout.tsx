@@ -9,10 +9,8 @@ export default async function RootLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ organizationSlug: string }>;
 }) {
   return (
     <ClientContextWrapper

@@ -698,6 +698,20 @@ export interface Component {
   published?: string;
 }
 
+export interface ProjectDependency {
+  dependencyPurl: string;
+  componentDependencyId: string;
+  projectId: string;
+  projectName: string;
+  projectSlug: string;
+  assetId: string;
+  assetName: string;
+  assetSlug: string;
+  assetVersionName: string;
+  artifactName?: string;
+  artifactAssetVersion?: string;
+}
+
 export interface Project {
   projectKey: string;
   starsCount: number;

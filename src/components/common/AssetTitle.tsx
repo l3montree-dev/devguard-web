@@ -17,7 +17,7 @@ const AssetTitle = () => {
   const params = useDecodedParams() as { assetVersionSlug?: string };
 
   const [assetVersionSlug, setAssetVersionSlug] = useState<string | undefined>(
-    () => localStorage.getItem("lastViewedAssetVersionSlug") || undefined,
+    undefined,
   );
 
   useEffect(() => {
@@ -26,6 +26,9 @@ const AssetTitle = () => {
     if (currentSlug) {
       localStorage.setItem("lastViewedAssetVersionSlug", currentSlug);
       setAssetVersionSlug(currentSlug);
+    } else {
+      const stored = localStorage.getItem("lastViewedAssetVersionSlug");
+      setAssetVersionSlug(stored ?? undefined);
     }
   }, [assetVersion?.slug, params?.assetVersionSlug]);
   return (
