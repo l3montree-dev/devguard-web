@@ -47,7 +47,7 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM registry.opencode.de/open-code/oci/nodejs:24@sha256:241757b4b5a2197f04e7aac0480a59f4e8ee3d428ae11e4c57410917a2b01eef
+FROM registry.opencode.de/open-code/oci/nodejs:24-minimal@sha256:241757b4b5a2197f04e7aac0480a59f4e8ee3d428ae11e4c57410917a2b01eef
 
 USER 53111
 
