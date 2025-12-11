@@ -108,6 +108,14 @@ const OrgDependencySearch: FunctionComponent = () => {
         <ArtifactBadge key={row.getValue()} artifactName={row.getValue()} />
       ),
     }),
+    columnHelper.accessor("assetVersionName", {
+      header: "Reference Name",
+      id: "assetVersionName",
+      enableSorting: false,
+      cell: (row) => (
+        <ArtifactBadge key={row.getValue()} artifactName={row.getValue()} />
+      ),
+    }),
   ];
 
   const { data: components, isLoading } = useSWR<Paged<ProjectDependency>>(
@@ -169,7 +177,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                       >
                         <div
                           className="flex flex-row items-center gap-2"
-                          onClick={header.column.getToggleSortingHandler()}
+                          // onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(
                             header.column.columnDef.header,
