@@ -33,6 +33,12 @@ import {
 import MembersTable from "../../../../../../../../components/MembersTable";
 import AssetMemberDialog from "../../../../../../../../components/AssetMemberDialog";
 import { Switch } from "../../../../../../../../components/ui/switch";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../../../../../../../../components/ui/collapsible";
+import DateString from "../../../../../../../../components/common/DateString";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -102,6 +108,31 @@ const Index: FunctionComponent = () => {
       ),
     },
   });
+
+  const handleTriggerBackgroundJobs = async () => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/projects/" +
+        project!.slug + // can never be null
+        "/assets/" +
+        asset.slug +
+        "/pipeline-trigger",
+      {
+        method: "POST",
+      },
+    );
+
+    if (resp.ok) {
+      toast.success("Background jobs triggered");
+    } else {
+      // error
+      // read the body
+      const errorBody = await resp.text();
+      console.error("Failed to trigger background jobs:", errorBody);
+      toast.error("Failed to trigger background jobs");
+    }
+  };
 
   const handleRemoveMember = async (id: string) => {
     const resp = await browserApiClient(
@@ -458,6 +489,25 @@ const Index: FunctionComponent = () => {
           </Section>
         </DangerZone>
       )}
+      <Collapsible>
+        <CollapsibleTrigger className="w-full text-muted-foreground text-right px-4 py-2 mt-4 rounded-md font-medium text-xs">
+          Debug
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div>
+            <Button onClick={handleTriggerBackgroundJobs} variant={"outline"}>
+              Trigger Background jobs
+            </Button>
+            <br />
+            <small className="mt-4 block text-muted-foreground">
+              Last Run: {asset.pipelineLastRun}
+              <br />
+              Error: <br />
+              {asset.pipelineError ?? "No errors"}
+            </small>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </Page>
   );
 };
