@@ -55,6 +55,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
     integration = "Jira Project";
   }
 
+  console.log(repositories, repos);
   return (
     <Section
       title="Connect to a repository"
