@@ -1,5 +1,5 @@
 import { debounce } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { browserApiClient } from "../services/devGuardApi";
 import { useActiveOrg } from "./useActiveOrg";
 
@@ -13,8 +13,16 @@ export default function useRepositorySearch(
   const [repos, setRepositories] = useState(repositories ?? []);
   const [searchLoading, setSearchLoading] = useState(false);
 
+  useEffect(() => {
+    setRepositories(repositories ?? []);
+  }, [repositories]);
+
   const debouncedSearch = useCallback(
     debounce(async (search: string) => {
+      if (search === "") {
+        setRepositories(repositories ?? []);
+        return;
+      }
       setSearchLoading(true);
       // fetch repositories from the server
       const repos = await browserApiClient(

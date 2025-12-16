@@ -478,17 +478,9 @@ export interface AssetDTO {
   reachableFromInternet: boolean;
   paranoidMode: boolean;
 
-  lastSecretScan: string;
-  lastSastScan: string;
-  lastScaScan: string;
-  lastIacScan: string;
-  lastContainerScan: string;
-  lastDastScan: string;
-
   signingPubKey?: string;
 
   enableTicketRange: boolean;
-  centralVulnManagement: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
 
@@ -510,6 +502,9 @@ export interface AssetDTO {
 
   isPublic: boolean;
   sharesInformation: boolean;
+
+  pipelineError?: string;
+  pipelineLastRun: string;
 }
 
 export interface DependencyTreeNode {
