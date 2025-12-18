@@ -56,6 +56,10 @@ import {
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { browserApiClient } from "../../../../../../services/devGuardApi";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -187,6 +191,8 @@ const OverviewPage = () => {
   const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
   const router = useRouter();
   const contentTree = useOrganization().contentTree;
 
@@ -264,32 +270,29 @@ const OverviewPage = () => {
   const pathname = usePathname();
 
   const downloadSBOMReport = async () => {
-    // try {
-    //   const response = await fetch(
-    //     `${pathname}/releases/ ${} /sbom.json`,
-    //     {
-    //       signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
-    //       method: "GET",
-    //     },
-    //   );
-    //   if (!response.ok) {
-    //     toast.error(
-    //       "Failed to download Vulnerability Report PDF. Please try again later.",
-    //     );
-    //     return;
-    //   }
-    //   const blob = await response.blob();
-    //   const url = window.URL.createObjectURL(blob);
-    //   const link = document.createElement("a");
-    //   link.href = url;
-    //   // add download attribute to the link
-    //   link.download = `vulnerability-report.pdf`;
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // } catch (error) {
-    //   toast.error("Failed to download SBOM PDF. Please try again later.");
-    // }
+    try {
+      const response = await browserApiClient(
+        `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}/sbom.json/`,
+        { method: "GET", signal: AbortSignal.timeout(60 * 8 * 1000) },
+      );
+      if (!response.ok) {
+        toast.error(
+          "Failed to download SBOM Report PDF. Please try again later.",
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // add download attribute to the link
+      link.download = `${releaseId}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error("Failed to download SBOM. Please try again later.");
+    }
   };
 
   if (releases?.data.length === 0) {
