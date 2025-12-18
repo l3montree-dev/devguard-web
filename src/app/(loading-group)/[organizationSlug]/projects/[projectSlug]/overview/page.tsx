@@ -1,7 +1,8 @@
 "use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import { groupBy, shuffle } from "lodash";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
@@ -54,6 +55,7 @@ import {
 } from "../../../../../../utils/view";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -258,6 +260,38 @@ const OverviewPage = () => {
     return latestRiskHistory.sort(sorter).slice(0, 7);
   }, [completeRiskHistory, mode]);
 
+  const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
+  const pathname = usePathname();
+
+  const downloadSBOMReport = async () => {
+    // try {
+    //   const response = await fetch(
+    //     `${pathname}/releases/ ${} /sbom.json`,
+    //     {
+    //       signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
+    //       method: "GET",
+    //     },
+    //   );
+    //   if (!response.ok) {
+    //     toast.error(
+    //       "Failed to download Vulnerability Report PDF. Please try again later.",
+    //     );
+    //     return;
+    //   }
+    //   const blob = await response.blob();
+    //   const url = window.URL.createObjectURL(blob);
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   // add download attribute to the link
+    //   link.download = `vulnerability-report.pdf`;
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // } catch (error) {
+    //   toast.error("Failed to download SBOM PDF. Please try again later.");
+    // }
+  };
+
   if (releases?.data.length === 0) {
     return (
       <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
@@ -290,11 +324,11 @@ const OverviewPage = () => {
         </div>
         <div className="flex relative flex-col">
           <AsyncButton
-            // disabled={selectedArtifact === undefined}
-            onClick={async () => console.log("Test")}
+            disabled={selectedArtifact === undefined}
+            onClick={downloadSBOMReport}
             variant={"secondary"}
           >
-            Download PDF-Report
+            Download SBOM-Report
           </AsyncButton>
         </div>
       </div>
