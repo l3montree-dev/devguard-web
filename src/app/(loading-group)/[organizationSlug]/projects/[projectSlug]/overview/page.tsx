@@ -14,7 +14,7 @@ import CVERainbowBadge from "../../../../../../components/CVERainbowBadge";
 import Page from "../../../../../../components/Page";
 import { RiskHistoryDistributionDiagram } from "../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../components/SeverityCard";
-import { Button } from "../../../../../../components/ui/button";
+import { AsyncButton, Button } from "../../../../../../components/ui/button";
 import {
   Card,
   CardContent,
@@ -282,10 +282,21 @@ const OverviewPage = () => {
 
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
-      <div className="mb-4">
-        <QueryArtifactSelector
-          artifacts={releases?.data?.map((r) => r.name) || []}
-        />
+      <div className="mb-4 flex flex-row items-start justify-between">
+        <div className="flex items-center gap-2">
+          <QueryArtifactSelector
+            artifacts={releases?.data?.map((r) => r.name) || []}
+          />
+        </div>
+        <div className="flex relative flex-col">
+          <AsyncButton
+            // disabled={selectedArtifact === undefined}
+            onClick={async () => console.log("Test")}
+            variant={"secondary"}
+          >
+            Download PDF-Report
+          </AsyncButton>
+        </div>
       </div>
 
       <Section
