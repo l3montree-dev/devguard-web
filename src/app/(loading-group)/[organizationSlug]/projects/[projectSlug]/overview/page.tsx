@@ -1,7 +1,8 @@
 "use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import { groupBy, shuffle } from "lodash";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
@@ -14,7 +15,7 @@ import CVERainbowBadge from "../../../../../../components/CVERainbowBadge";
 import Page from "../../../../../../components/Page";
 import { RiskHistoryDistributionDiagram } from "../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../components/SeverityCard";
-import { Button } from "../../../../../../components/ui/button";
+import { AsyncButton, Button } from "../../../../../../components/ui/button";
 import {
   Card,
   CardContent,
@@ -54,6 +55,11 @@ import {
 } from "../../../../../../utils/view";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import Link from "next/link";
+import { toast } from "sonner";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { browserApiClient } from "../../../../../../services/devGuardApi";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -185,6 +191,8 @@ const OverviewPage = () => {
   const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
   const router = useRouter();
   const contentTree = useOrganization().contentTree;
 
@@ -258,6 +266,35 @@ const OverviewPage = () => {
     return latestRiskHistory.sort(sorter).slice(0, 7);
   }, [completeRiskHistory, mode]);
 
+  const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
+  const pathname = usePathname();
+
+  const downloadSBOMReport = async () => {
+    try {
+      const response = await browserApiClient(
+        `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}/sbom.json/`,
+        { method: "GET", signal: AbortSignal.timeout(60 * 8 * 1000) },
+      );
+      if (!response.ok) {
+        toast.error(
+          "Failed to download SBOM report. Please try again later.",
+        );
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      // add download attribute to the link
+      link.download = `${releaseId}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error("Failed to download SBOM. Please try again later.");
+    }
+  };
+
   if (releases?.data.length === 0) {
     return (
       <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
@@ -282,10 +319,21 @@ const OverviewPage = () => {
 
   return (
     <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
-      <div className="mb-4">
-        <QueryArtifactSelector
-          artifacts={releases?.data?.map((r) => r.name) || []}
-        />
+      <div className="mb-4 flex flex-row items-start justify-between">
+        <div className="flex items-center gap-2">
+          <QueryArtifactSelector
+            artifacts={releases?.data?.map((r) => r.name) || []}
+          />
+        </div>
+        <div className="flex relative flex-col">
+          <AsyncButton
+            disabled={selectedArtifact === undefined}
+            onClick={downloadSBOMReport}
+            variant={"secondary"}
+          >
+            Download SBOM
+          </AsyncButton>
+        </div>
       </div>
 
       <Section
