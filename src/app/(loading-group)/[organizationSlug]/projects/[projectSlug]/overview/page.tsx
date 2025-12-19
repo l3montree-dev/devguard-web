@@ -277,7 +277,7 @@ const OverviewPage = () => {
       );
       if (!response.ok) {
         toast.error(
-          "Failed to download SBOM Report PDF. Please try again later.",
+          "Failed to download SBOM report. Please try again later.",
         );
         return;
       }
