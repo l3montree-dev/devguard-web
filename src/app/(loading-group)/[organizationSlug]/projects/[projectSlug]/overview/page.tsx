@@ -331,7 +331,7 @@ const OverviewPage = () => {
             onClick={downloadSBOMReport}
             variant={"secondary"}
           >
-            Download SBOM-Report
+            Download SBOM
           </AsyncButton>
         </div>
       </div>
