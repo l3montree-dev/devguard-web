@@ -8,11 +8,13 @@ import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
+import { useActiveAsset } from "./useActiveAsset";
 
 export const useCurrentUserRole = () => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+  const asset = useActiveAsset();
 
   const { projectSlug } = useDecodedParams() as {
     projectSlug: string;
@@ -24,6 +26,7 @@ export const useCurrentUserRole = () => {
       activeOrg as OrganizationDetailsDTO,
       projectSlug, // projectSlug from URL params
       project,
+      asset,
     );
   }, [currentUser, project, activeOrg, projectSlug]);
 };
@@ -33,9 +36,19 @@ export const getCurrentUserRole = (
   org: OrganizationDetailsDTO,
   projectSlug?: string | undefined,
   project?: ProjectDTO | null,
+  asset?: ReturnType<typeof useActiveAsset> | null,
 ): UserRole | null => {
   if (!currentUser) {
     return UserRole.Guest;
+  }
+
+  if (asset?.members) {
+    const assetMember = asset.members.find(
+      (member) => member.id === currentUser.id,
+    );
+    if (assetMember) {
+      return assetMember.role || UserRole.Member;
+    }
   }
 
   if (project?.members && projectSlug) {

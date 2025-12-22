@@ -88,6 +88,7 @@ export const useAssetMenu = () => {
   const activeAsset = useActiveAsset();
 
   const currentUserRole = useCurrentUserRole();
+  console.log(currentUserRole);
 
   const assetVersionSlug = existingAssetVersionSlug
     ? existingAssetVersionSlug
