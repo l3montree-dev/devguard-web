@@ -276,9 +276,7 @@ const OverviewPage = () => {
         { method: "GET", signal: AbortSignal.timeout(60 * 8 * 1000) },
       );
       if (!response.ok) {
-        toast.error(
-          "Failed to download SBOM report. Please try again later.",
-        );
+        toast.error("Failed to download SBOM report. Please try again later.");
         return;
       }
       const blob = await response.blob();
