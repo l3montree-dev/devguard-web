@@ -441,36 +441,36 @@ const Index: FunctionComponent = () => {
         </Section>
         <hr />
       </div>
-      {!asset.externalEntityProviderId && (
-        <DangerZone>
-          <Section
-            className="m-2"
-            title="Advanced"
-            description="These settings are for advanced users only. Please be careful when changing these settings."
-          >
-            <ListItem
-              Description={
-                "Setting this to true will make the repository visible to the public."
-              }
-              Title="Public Repository"
-              Button={
-                <Switch
-                  disabled={!project.isPublic}
-                  checked={asset.isPublic}
-                  onCheckedChange={(checked) =>
-                    handleUpdate({
-                      isPublic: checked,
-                    })
-                  }
-                />
-              }
-            />
-            {!project.isPublic && (
-              <small>
-                The project is not public. You can not make the repository
-                public.
-              </small>
-            )}
+
+      <DangerZone>
+        <Section
+          className="m-2"
+          title="Advanced"
+          description="These settings are for advanced users only. Please be careful when changing these settings."
+        >
+          <ListItem
+            Description={
+              "Setting this to true will make the repository visible to the public."
+            }
+            Title="Public Repository"
+            Button={
+              <Switch
+                disabled={!project.isPublic}
+                checked={asset.isPublic}
+                onCheckedChange={(checked) =>
+                  handleUpdate({
+                    isPublic: checked,
+                  })
+                }
+              />
+            }
+          />
+          {!project.isPublic && (
+            <small>
+              The project is not public. You can not make the repository public.
+            </small>
+          )}
+          {!asset.externalEntityProviderId && (
             <ListItem
               Title="Delete Repository"
               Description={
@@ -486,9 +486,10 @@ const Index: FunctionComponent = () => {
                 </Alert>
               }
             />
-          </Section>
-        </DangerZone>
-      )}
+          )}
+        </Section>
+      </DangerZone>
+
       <Collapsible>
         <CollapsibleTrigger className="w-full text-muted-foreground text-right px-4 py-2 mt-4 rounded-md font-medium text-xs">
           Debug

@@ -284,7 +284,6 @@ const Index: FunctionComponent = () => {
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm
-              disabled={Boolean(project.externalEntityProviderId)}
               onConfirmDelete={
                 Boolean(project.externalEntityProviderId)
                   ? undefined
@@ -294,9 +293,7 @@ const Index: FunctionComponent = () => {
               form={form}
             />
             <div className="mt-4 flex flex-row justify-end">
-              <Button disabled={Boolean(project.externalEntityProviderId)}>
-                Update
-              </Button>
+              <Button>Update</Button>
             </div>
           </form>
         </FormProvider>
