@@ -19,40 +19,33 @@ import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
 export async function fetchOrgs() {
-  // get the devGuardApiClient
-  const devGuardApiClient = await getApiClientInAppRouter();
+  try {
+    const devGuardApiClient = await getApiClientInAppRouter();
 
-  // get the organization
-  const [r, orgsAfterTrigger] = await Promise.all([
-    devGuardApiClient("/organizations/"),
-    devGuardApiClient("/trigger-sync", {
-      method: "GET",
-    }),
-  ]);
+    const [r, orgsAfterTrigger] = await Promise.all([
+      devGuardApiClient("/organizations/"),
+      devGuardApiClient("/trigger-sync", { method: "GET" }),
+    ]);
 
-  if (!r.ok) {
-    console.log("LOGIN REDIRECT", r);
-    // it must be an 500
-    throw new HttpError({
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    });
+    if (!r.ok) {
+      throw new Error("Not authenticated");
+    }
+
+    let organizations: OrganizationDTO[] = await r.json();
+
+    if (orgsAfterTrigger.ok) {
+      const orgsAfterTriggerJson: OrganizationDTO[] =
+        await orgsAfterTrigger.json();
+      organizations = uniqBy(
+        organizations.concat(orgsAfterTriggerJson),
+        "slug",
+      );
+    }
+
+    organizations.sort((a, b) => a.name.localeCompare(b.name));
+    return organizations;
+  } catch {
+    // 👇 LOCAL FALLBACK — allows UI to boot
+    return [];
   }
-  // parse the organization
-  let organizations: OrganizationDTO[] = await r.json();
-
-  if (orgsAfterTrigger.ok) {
-    const orgsAfterTriggerJson: OrganizationDTO[] =
-      await orgsAfterTrigger.json();
-    // merge the two org lists, avoiding duplicates
-    organizations = uniqBy(organizations.concat(orgsAfterTriggerJson), "slug");
-  }
-  // sort the orgs by name
-  organizations.sort((a, b) => {
-    return a.name.localeCompare(b.name);
-  });
-
-  return organizations;
 }

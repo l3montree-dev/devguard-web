@@ -103,54 +103,61 @@ export const maybeGetRedirectDestination = (
   organizationSlug: string,
   projectSlug: string,
   assetVersionSlug: string,
-) => {
-  const branches: string[] = [];
-  const tags: string[] = [];
+): { redirect: { destination: string; permanent: boolean } } | null => {
 
-  if (asset.refs.length !== 0) {
-    asset.refs.map((av: AssetVersionDTO) => {
-      if (av.type === "branch") {
-        branches.push(av.slug);
-      } else if (av.type === "tag") {
-        tags.push(av.slug);
-      } else {
-        throw new Error("Unknown asset version type " + av.type);
-      }
-    });
-    const assetVersionSlugString = assetVersionSlug as string;
-    if (
-      branches.includes(assetVersionSlugString) ||
-      tags.includes(assetVersionSlugString)
-    ) {
-    } else {
-      if (branches.includes("main")) {
-        assetVersionSlug = "main";
-        return {
-          redirect: {
-            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/main/dependency-risks`,
-            permanent: false,
-          },
-        };
-      } else if (branches.length > 0) {
-        assetVersionSlug = branches[0];
-        return {
-          redirect: {
-            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${branches[0]}/dependency-risks`,
-            permanent: false,
-          },
-        };
-      } else if (tags.length > 0) {
-        assetVersionSlug = tags[0];
-        return {
-          redirect: {
-            destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${tags[0]}/dependency-risks`,
-            permanent: false,
-          },
-        };
-      }
-    }
+  // No refs → nothing to redirect to
+  if (!asset.refs || asset.refs.length === 0) {
+    return null;
   }
+
+  // If requested ref already exists, do nothing
+  const requestedExists = asset.refs.some(
+    (ref) => ref.slug === assetVersionSlug,
+  );
+  if (requestedExists) {
+    return null;
+  }
+
+  // 1. Prefer default branch
+  const defaultBranch = asset.refs.find(
+    (ref) => ref.type === "branch" && ref.defaultBranch,
+  );
+
+  if (defaultBranch) {
+    return {
+      redirect: {
+        destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${defaultBranch.slug}/dependency-risks`,
+        permanent: false,
+      },
+    };
+  }
+
+  // 2. Fallback: first branch
+  const firstBranch = asset.refs.find((ref) => ref.type === "branch");
+  if (firstBranch) {
+    return {
+      redirect: {
+        destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${firstBranch.slug}/dependency-risks`,
+        permanent: false,
+      },
+    };
+  }
+
+  // 3. Fallback: first tag
+  const firstTag = asset.refs.find((ref) => ref.type === "tag");
+  if (firstTag) {
+    return {
+      redirect: {
+        destination: `/${organizationSlug}/projects/${projectSlug}/assets/${asset.slug}/refs/${firstTag.slug}/dependency-risks`,
+        permanent: false,
+      },
+    };
+  }
+
+  // 4. Nothing valid → NO redirect
+  return null;
 };
+
 
 export const filterEventTypesFromOtherBranches = [
   "detected",
