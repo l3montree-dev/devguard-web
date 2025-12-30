@@ -26,7 +26,6 @@ import {
 } from "../services/devGuardApi";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
-import { UseDevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/UseDevGuardCliSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 import GithubTokenSlide from "./guides/risk-scanner-carousel-slides/GithubTokenSlide";
 import GitLabIntegrationSlide from "./guides/risk-scanner-carousel-slides/GitLabIntegrationSlide";
@@ -655,7 +654,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
               onInformationSourceSetup={handleInformationSourceSetup}
             />
-            <DevGuardCliSlide api={api} prevIndex={prevIndex} />
+            <DevGuardCliSlide
+              onClose={() => onOpenChange(false)}
+              api={api}
+              prevIndex={prevIndex}
+            />
           </CarouselContent>
         </Carousel>
       </DialogContent>
