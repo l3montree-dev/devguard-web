@@ -18,12 +18,21 @@ interface ScannerSelectionSlideProps {
     scrollTo: (index: number) => void;
   };
   prevIndex: number;
-  selectedSetup?: "devguard-tools" | "own-setup" | "information-source";
+  selectedSetup?:
+    | "devguard-tools"
+    | "own-setup"
+    | "information-source"
+    | "devguard-cli";
   devguardToolsSlideIndex: number;
+  devguardCliSlideIndex: number;
   customSetupSlideIndex: number;
   informationSourceSlideIndex: number;
   setSelectedSetup: (
-    setup: "devguard-tools" | "own-setup" | "information-source",
+    setup:
+      | "devguard-tools"
+      | "own-setup"
+      | "information-source"
+      | "devguard-cli",
   ) => void;
 }
 
@@ -31,6 +40,7 @@ export default function ScannerSelectionSlide({
   api,
   selectedSetup,
   setSelectedSetup,
+  devguardCliSlideIndex,
   informationSourceSlideIndex,
   devguardToolsSlideIndex,
   customSetupSlideIndex,
@@ -60,7 +70,7 @@ export default function ScannerSelectionSlide({
                 height={20}
                 className="inline-block mr-2 w-4 h-4"
               />
-              Devguard Default Tools
+              Devguard CI/CD Integration
               <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
                 Recommended
               </Badge>
@@ -68,6 +78,35 @@ export default function ScannerSelectionSlide({
             <CardDescription>
               From our curated list of scans and scanners, select the ones you
               want to use.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <Card
+          className={classNames(
+            "cursor-pointer mt-2",
+            selectedSetup === "devguard-cli"
+              ? "border border-primary"
+              : "border border-transparent",
+          )}
+          onClick={() => setSelectedSetup("devguard-cli")}
+        >
+          <CardHeader>
+            <CardTitle className="text-lg flex flex-row items-center leading-tight">
+              <Image
+                src="/logo_icon.svg"
+                alt="Devguard Logo"
+                width={20}
+                height={20}
+                className="inline-block mr-2 w-4 h-4"
+              />
+              Devguard CLI
+              <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                Recommended
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              Use the devguard cli to run scans and upload the results to
+              Devguard.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -140,7 +179,9 @@ export default function ScannerSelectionSlide({
                 ? devguardToolsSlideIndex
                 : selectedSetup === "information-source"
                   ? informationSourceSlideIndex
-                  : customSetupSlideIndex,
+                  : selectedSetup === "devguard-cli"
+                    ? devguardCliSlideIndex
+                    : customSetupSlideIndex,
             ); // Forward to slide 3
           }}
         >

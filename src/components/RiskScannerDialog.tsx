@@ -1,6 +1,9 @@
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 
+import { useAutosetup } from "@/hooks/useAutosetup";
+import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import { useRouter } from "next/navigation";
 import React, {
   FunctionComponent,
   useCallback,
@@ -10,19 +13,20 @@ import React, {
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { useUpdateAsset } from "../context/AssetContext";
+import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import {
   browserApiClient,
   multipartBrowserApiClient,
 } from "../services/devGuardApi";
-import { useAutosetup } from "@/hooks/useAutosetup";
-import { useUpdateOrganization } from "../context/OrganizationContext";
-import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
+import { UseDevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/UseDevGuardCliSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
 import GithubTokenSlide from "./guides/risk-scanner-carousel-slides/GithubTokenSlide";
 import GitLabIntegrationSlide from "./guides/risk-scanner-carousel-slides/GitLabIntegrationSlide";
@@ -32,17 +36,14 @@ import ManualIntegrationSlide from "./guides/risk-scanner-carousel-slides/Manual
 import ProviderSetupSlide from "./guides/risk-scanner-carousel-slides/RepositoryConnectionSlide";
 import ScannerOptionsSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerOptionsSelectionSlide";
 import ScannerSelectionSlide from "./guides/risk-scanner-carousel-slides/ScannerSelectionSlide";
+import { SetupInformationSourceSlide } from "./guides/risk-scanner-carousel-slides/SetupInformationSourceSlide";
 import { SetupMethodSelectionSlide } from "./guides/risk-scanner-carousel-slides/SetupMethodSelectionSlide";
 import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import YamlGeneratorSlide from "./guides/risk-scanner-carousel-slides/YamlGeneratorSlide";
 import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSlide";
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
-import { useRouter } from "next/navigation";
-import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
-import { useUpdateAsset } from "../context/AssetContext";
-import { fetchAsset } from "../data-fetcher/fetchAsset";
-import { SetupInformationSourceSlide } from "./guides/risk-scanner-carousel-slides/SetupInformationSourceSlide";
+import { DevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/DevGuardCliSlide";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -76,7 +77,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const asset = useActiveAsset()!;
 
   const [selectedSetup, setSelectedSetup] = React.useState<
-    "devguard-tools" | "own-setup" | "information-source" | undefined
+    | "devguard-tools"
+    | "devguard-cli"
+    | "own-setup"
+    | "information-source"
+    | undefined
   >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
@@ -551,6 +556,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               setSelectedSetup={setSelectedSetup}
               prevIndex={prevIndex}
               informationSourceSlideIndex={15}
+              devguardCliSlideIndex={16}
               devguardToolsSlideIndex={7}
               customSetupSlideIndex={11}
             />
@@ -649,6 +655,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
               onInformationSourceSetup={handleInformationSourceSetup}
             />
+            <DevGuardCliSlide api={api} prevIndex={prevIndex} />
           </CarouselContent>
         </Carousel>
       </DialogContent>

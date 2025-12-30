@@ -30,7 +30,7 @@ export const config = {
   themeJsUrl: process.env.THEME_JS_URL || "",
   themeCssUrl: process.env.THEME_CSS_URL || "",
   imprintLink: process.env.IMPRINT_LINK || "https://devguard.org/imprint",
-  frontendUrl: process.env.FRONTEND_URL || "https://app.devguard.org",
+  frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
   accountDeletionMail:
     process.env.ACCOUNT_DELETION_MAIL || "community@devguard.org",
   devguardCIComponentBase:

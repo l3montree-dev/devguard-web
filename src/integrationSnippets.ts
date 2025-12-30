@@ -220,7 +220,7 @@ const generateGitlabSnippet = (
   return baseSnippet + yamlGitlab[jobName](jobSpecificConfig);
 };
 
-const generateDockerSnippet = (
+export const generateDockerSnippet = (
   command: string,
   orgSlug: string,
   projectSlug: string,
@@ -246,11 +246,28 @@ const generateDockerSnippet = (
     apiUrl = "http://host.docker.internal:8080";
   }
   return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard/scanner:${config.devguardScannerTag} \\
-devguard-scanner ${command} ${path} \\
+devguard-scanner ${command} \\
+    --path=${path} \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
     --token="${token ? token : "TOKEN"}" \\
-    --webUI="${frontendUrl}`;
+    --webUI="${frontendUrl}"`;
+};
+
+export const generateCliSnippet = (
+  command: string,
+  orgSlug: string,
+  projectSlug: string,
+  assetSlug: string,
+  apiUrl: string,
+  frontendUrl: string,
+  token?: string,
+) => {
+  return `devguard-scanner ${command} . \\
+    --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
+    --apiUrl="${apiUrl}" \\
+    --token="${token ? token : "TOKEN"}" \\
+    --webUI="${frontendUrl}"`;
 };
 
 export const integrationSnippets = ({
