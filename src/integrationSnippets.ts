@@ -320,7 +320,7 @@ export const integrationSnippets = ({
 
     sast: generateWorkflowSnippet(
       "bad-practice-finder",
-      "sast.yml",
+      "static-application-security-testing.yml",
       orgSlug,
       projectSlug,
       assetSlug,
@@ -405,7 +405,7 @@ export const integrationSnippets = ({
     ),
     sast: generateGitlabSnippet(
       "sast",
-      "sast.yml",
+      "static-application-security-testing.yml",
       orgSlug,
       projectSlug,
       assetSlug,
