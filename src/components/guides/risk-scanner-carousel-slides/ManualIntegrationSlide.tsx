@@ -64,6 +64,7 @@ interface ManualIntegrationSlideProps {
   onClose: () => void;
   handleUpload: (params: {
     branchOrTagName: string;
+    branchOrTagSlug: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
@@ -116,6 +117,10 @@ const ManualIntegrationSlide: FunctionComponent<
   const [branchOrTagName, setBranchOrTagName] = useState(
     params.assetVersionSlug || "main",
   );
+  const [branchOrTagSlug, setBranchOrTagSlug] = useState(
+    params.assetVersionSlug || "main",
+  );
+
   const [artifactName, setArtifactNameLocal] = useState(
     "pkg:devguard/" + params.organizationSlug + "/" + params.assetSlug,
   );
@@ -127,8 +132,10 @@ const ManualIntegrationSlide: FunctionComponent<
     const matchedBranch = branches.find(
       (branch) => branch.slug === branchOrTagName,
     );
+
     if (matchedBranch && branchOrTagName !== matchedBranch.name) {
       setBranchOrTagName(matchedBranch.name);
+      setBranchOrTagSlug(matchedBranch.slug);
       setIsTag(false);
       return;
     }
@@ -136,6 +143,7 @@ const ManualIntegrationSlide: FunctionComponent<
     const matchedTag = tags.find((tag) => tag.slug === branchOrTagName);
     if (matchedTag && branchOrTagName !== matchedTag.name) {
       setBranchOrTagName(matchedTag.name);
+      setBranchOrTagSlug(matchedTag.slug);
       setIsTag(true);
     }
   }, [branchOrTagName, branches, tags]);
@@ -216,7 +224,10 @@ const ManualIntegrationSlide: FunctionComponent<
                         <Label className="mb-2 block">Branch/Tag Name</Label>
                         <Input
                           value={branchOrTagName}
-                          onChange={(e) => setBranchOrTagName(e.target.value)}
+                          onChange={(e) => {
+                            setBranchOrTagName(e.target.value);
+                            setBranchOrTagSlug(e.target.value);
+                          }}
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
@@ -270,6 +281,7 @@ const ManualIntegrationSlide: FunctionComponent<
                       tags={tags}
                       disableNavigateToRefInsteadCall={(v) => {
                         setBranchOrTagName(v.name);
+                        setBranchOrTagSlug(v.slug);
                         setIsTag(v.type === "tag");
                       }}
                     />
@@ -338,7 +350,10 @@ const ManualIntegrationSlide: FunctionComponent<
                         <Label className="mb-2 block">Branch/Tag Name</Label>
                         <Input
                           value={branchOrTagName}
-                          onChange={(e) => setBranchOrTagName(e.target.value)}
+                          onChange={(e) => {
+                            setBranchOrTagName(e.target.value);
+                            setBranchOrTagSlug(e.target.value);
+                          }}
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
@@ -386,6 +401,7 @@ const ManualIntegrationSlide: FunctionComponent<
                       tags={tags}
                       disableNavigateToRefInsteadCall={(v) => {
                         setBranchOrTagName(v.name);
+                        setBranchOrTagSlug(v.slug);
                         setIsTag(v.type === "tag");
                       }}
                     />
@@ -439,7 +455,10 @@ const ManualIntegrationSlide: FunctionComponent<
                         <Label className="mb-2 block">Branch/Tag Name</Label>
                         <Input
                           value={branchOrTagName}
-                          onChange={(e) => setBranchOrTagName(e.target.value)}
+                          onChange={(e) => {
+                            setBranchOrTagName(e.target.value);
+                            setBranchOrTagSlug(e.target.value);
+                          }}
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
@@ -493,6 +512,7 @@ const ManualIntegrationSlide: FunctionComponent<
                       tags={tags}
                       disableNavigateToRefInsteadCall={(v) => {
                         setBranchOrTagName(v.name);
+                        setBranchOrTagSlug(v.slug);
                         setIsTag(v.type === "tag");
                       }}
                     />
@@ -543,6 +563,7 @@ const ManualIntegrationSlide: FunctionComponent<
             onClick={() =>
               handleUpload({
                 branchOrTagName,
+                branchOrTagSlug,
                 isTag,
                 artifactName:
                   selectedArtifact || artifactName || "unnamed-artifact",

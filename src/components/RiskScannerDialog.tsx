@@ -221,6 +221,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const updateAsset = useUpdateAsset();
   const uploadSBOM = async (params: {
     branchOrTagName: string;
+    branchOrTagSlug: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
@@ -251,7 +252,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     if (resp.ok) {
       await refreshAssetData();
       router.push(
-        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
+        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks/`,
       );
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
@@ -262,6 +263,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const uploadSARIF = async (params: {
     branchOrTagName: string;
+    branchOrTagSlug: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
@@ -284,18 +286,20 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
+      await refreshAssetData();
+      router.push(
+        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/code-risks/`,
+      );
       toast.success("SARIF report has successfully been sent!");
     } else {
       toast.error("SARIF report has not been sent successfully");
     }
     onOpenChange(false);
-    router.push(
-      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/main/code-risks/`,
-    );
   };
 
   const uploadVEX = async (params: {
     branchOrTagName: string;
+    branchOrTagSlug: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
@@ -320,14 +324,14 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
     if (resp.ok) {
       await refreshAssetData();
+      onOpenChange(false);
+      router.push(
+        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks/`,
+      );
       toast.success("VEX has successfully been sent!");
     } else {
       toast.error("VEX has not been sent successfully");
     }
-    onOpenChange(false);
-    router.push(
-      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagName}/dependency-risks/`,
-    );
   };
 
   const handleInformationSourceSetup = async (params: {
@@ -387,6 +391,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const handleUpload = (params: {
     branchOrTagName: string;
+    branchOrTagSlug: string;
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
