@@ -290,11 +290,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       router.push(
         `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/code-risks/`,
       );
+      onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
     } else {
       toast.error("SARIF report has not been sent successfully");
     }
-    onOpenChange(false);
   };
 
   const uploadVEX = async (params: {
