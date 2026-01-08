@@ -98,14 +98,16 @@ export function BranchTagSelector({
     );
     setFilter("");
     setSelected(newVersion.name);
-    pushAssetRef(newVersion.slug);
+    pushAssetRef(newVersion.slug, newVersion);
   };
 
-  const pushAssetRef = (refSlug: string) => {
+  const pushAssetRef = (refSlug: string, versionObj?: AssetVersionDTO) => {
     if (disableNavigateToRefInsteadCall) {
-      disableNavigateToRefInsteadCall(
-        branches.concat(tags).find((el) => el.slug === refSlug)!,
-      );
+      const version =
+        versionObj || branches.concat(tags).find((el) => el.slug === refSlug);
+      if (version) {
+        disableNavigateToRefInsteadCall(version);
+      }
       return;
     }
     if (!pathname) {
