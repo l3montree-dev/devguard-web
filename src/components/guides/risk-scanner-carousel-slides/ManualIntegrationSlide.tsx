@@ -122,7 +122,12 @@ const ManualIntegrationSlide: FunctionComponent<
   );
 
   const [artifactName, setArtifactNameLocal] = useState(
-    "pkg:devguard/" + params.organizationSlug + "/" + params.assetSlug,
+    "pkg:devguard/" +
+      params.organizationSlug +
+      "/" +
+      params.projectSlug +
+      "/" +
+      params.assetSlug,
   );
   const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isTag, setIsTag] = useState(false);
