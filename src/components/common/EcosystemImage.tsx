@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 const invertSvgOnDark = (ecosystem: string) =>
-  ["apk", "bitnami"].includes(ecosystem);
+  ["apk", "bitnami", "cargo"].includes(ecosystem);
 
 const EcosystemImage = ({
   packageName,
@@ -29,6 +29,7 @@ const EcosystemImage = ({
   packageName: string;
   size?: number;
 }) => {
+  console.log(packageName);
   if (
     [
       "golang",
@@ -36,6 +37,7 @@ const EcosystemImage = ({
       "apk",
       "pypi",
       "maven",
+      "cargo",
       "crates.io",
       "Packagist",
       "RubyGems",
@@ -49,8 +51,8 @@ const EcosystemImage = ({
         <TooltipTrigger>
           <Image
             alt={"Logo von " + getEcosystem(packageName)}
-            width={size ?? 20}
-            height={size ?? 20}
+            width={size ?? 24}
+            height={size ?? 24}
             className={classNames(
               "inline-block",
               invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
