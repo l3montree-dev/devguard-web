@@ -63,7 +63,7 @@ const VulnWithCveTableRow = ({
       </td>
       <td className="p-4 relative">
         <Link href={href} className="absolute inset-0" />
-        <span>{vuln.cveID}</span>
+        <Badge variant={"outline"}>{vuln.cveID}</Badge>
       </td>
       <td className="p-4  relative">
         <Link href={href} className="absolute inset-0" />
@@ -77,20 +77,6 @@ const VulnWithCveTableRow = ({
           <Severity gray risk={vuln.cve?.cvss ?? 0} />
         </div>
       </td>
-      <td className="p-4  relative">
-        <Link href={href} className="absolute inset-0" />
-        {vuln.componentFixedVersion ? (
-          <span>
-            <Badge variant={"secondary"}>{vuln.componentFixedVersion}</Badge>
-          </span>
-        ) : (
-          <span className="text-muted-foreground">No fix available</span>
-        )}
-      </td>
-      <td className="p-4 relative" colSpan={2}>
-        <Link href={href} className="absolute inset-0" />
-        <div className="line-clamp-3">{vuln.cve?.description}\u00a0</div>
-      </td>
     </tr>
   );
 };
@@ -101,7 +87,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   arrLength,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const router = useRouter();
   const pathname = useDecodedPathname();
   return (
     <>
@@ -146,23 +131,23 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   )}
                 >
                   <tr className="">
-                    <th className="w-32 p-4">State</th>
-                    <th className="w-32 p-4">Artifact</th>
-                    <th className="w-40 p-4">CVE</th>
-                    <th className="w-30 p-4">Risk</th>
-                    <th className="w-30 p-4">CVSS</th>
-                    <th className="w-40 p-4">Fixed in Version</th>
-                    <th className="w-full p-4">Description</th>
+                    <th className="w-40 p-4">State</th>
+                    <th className="p-4">Artifact</th>
+                    <th className="p-4">Vulnerability</th>
+                    <th className="p-4">Risk</th>
+                    <th className="p-4">CVSS</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {row.original.vulns?.map((vuln) => (
-                    <VulnWithCveTableRow
-                      vuln={vuln}
-                      key={vuln.id}
-                      href={pathname + "/../dependency-risks/" + vuln.id}
-                    />
-                  ))}
+                  {row.original.vulns
+                    ?.sort((a, b) => b.rawRiskAssessment - a.rawRiskAssessment)
+                    .map((vuln) => (
+                      <VulnWithCveTableRow
+                        vuln={vuln}
+                        key={vuln.id}
+                        href={pathname + "/../dependency-risks/" + vuln.id}
+                      />
+                    ))}
                 </tbody>
               </table>
             </div>

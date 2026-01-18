@@ -397,6 +397,11 @@ export interface Exploit {
   subscribers_count: number;
   stargazers_count: number;
 }
+
+export interface Relationship {
+  relationshipType: "upstream" | "alias";
+  targetCve: string;
+}
 export interface VulnWithCVE extends ScaVulnDTO {
   cve:
     | (Modify<
@@ -412,6 +417,7 @@ export interface VulnWithCVE extends ScaVulnDTO {
           withEnvironmentAndThreatIntelligence: number;
         };
         exploits: Array<Exploit>;
+        relationships: Array<Relationship>;
       })
     | null;
 }

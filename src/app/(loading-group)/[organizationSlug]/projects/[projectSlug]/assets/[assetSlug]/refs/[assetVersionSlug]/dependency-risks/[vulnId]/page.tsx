@@ -578,6 +578,7 @@ const Index: FunctionComponent = () => {
     );
   }
 
+  console.log(vuln);
   return (
     <Page
       Menu={assetMenu}
@@ -636,6 +637,7 @@ const Index: FunctionComponent = () => {
                 ) : (
                   <Skeleton className="w-10 h-4" />
                 )}
+                {}
                 {vuln?.artifacts.map((a) => (
                   <ArtifactBadge
                     key={a.artifactName + vuln.id}
@@ -1154,6 +1156,51 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
+                <div className="p-5">
+                  <h3 className="mb-2 text-sm font-semibold">
+                    Vulnerability Details{" "}
+                    <Image
+                      src={
+                        theme === "light"
+                          ? "/logos/osv-black.png"
+                          : "/logos/osv.png"
+                      }
+                      alt="OSV Logo"
+                      width={40}
+                      height={40}
+                      className="inline-block ml-2 mb-1"
+                    />
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    <div className="rounded-lg border bg-card p-4">
+                      {vuln.cve?.relationships && (
+                        <table className="w-full table-auto border-collapse">
+                          <tbody>
+                            {vuln.cve?.relationships?.map((rel) => (
+                              <tr
+                                className="text-sm"
+                                key={rel.relationshipType + rel.targetCve}
+                              >
+                                <td className="capitalize font-semibold">
+                                  {rel.relationshipType}
+                                </td>
+                                <td>{rel.targetCve}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                    <Link
+                      target="_blank"
+                      className="text-xs"
+                      href={"https://osv.dev/vulnerability/" + vuln.cveID}
+                    >
+                      See vulnerability on osv.dev
+                    </Link>
+                  </div>
+                </div>
+
                 {vuln.componentPurl !== null && (
                   <div className="p-5">
                     <h3 className="mb-2 text-sm font-semibold">
@@ -1236,7 +1283,7 @@ const Index: FunctionComponent = () => {
                     Management decisions across the organization
                   </h3>
                   {hints ? (
-                    <div className="flex flex-row justify-around mt-4">
+                    <div className="flex flex-row justify-between mt-4">
                       <Tooltip>
                         <TooltipTrigger>
                           <Badge variant={"secondary"}>

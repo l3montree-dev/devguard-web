@@ -29,7 +29,6 @@ const EcosystemImage = ({
   packageName: string;
   size?: number;
 }) => {
-  console.log(packageName);
   if (
     [
       "golang",
