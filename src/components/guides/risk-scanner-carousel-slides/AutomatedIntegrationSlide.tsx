@@ -54,6 +54,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
           <TabsList>
             <TabsTrigger value="sbom">SBOM</TabsTrigger>
             <TabsTrigger value="sarif">SARIF</TabsTrigger>
+            <TabsTrigger value="vex">VEX</TabsTrigger>
           </TabsList>
         </div>
 
@@ -88,6 +89,24 @@ const AutomatedIntegrationSlide: FunctionComponent<
               <CopyCode
                 language="shell"
                 codeString={`devguard-scanner sarif --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/report.sarif`}
+              />
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="vex" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-md">VEX Command</CardTitle>
+              <CardDescription>
+                Use the devguard-scanner CLI tool to upload VEX documents from
+                your security scanners.
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 pt-0">
+              <CopyCode
+                language="shell"
+                codeString={`devguard-scanner vex --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/vex.json`}
               />
             </div>
           </Card>
