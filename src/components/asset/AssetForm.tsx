@@ -448,6 +448,33 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
+                    <div className="text-foreground mt-4">
+                      <InputWithButton
+                        label="CVSS Badge URL"
+                        copyable
+                        value={
+                          devguardApiUrl +
+                          "/api/v1/public/" +
+                          assetId +
+                          "/badges/cvss"
+                        }
+                        nameKey="cvss-badge-url"
+                        message="You can use the URL to display this badge in your README or other documentation."
+                        variant="onCard"
+                        copyToastDescription="The CVSS Badge URL has been copied to your clipboard."
+                      />
+
+                      <img
+                        src={
+                          devguardApiUrl +
+                          "/api/v1/public/" +
+                          assetId +
+                          "/badges/cvss"
+                        }
+                        alt="CVSS Badge"
+                        className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+                      />
+                    </div>
                   </>
                 }
                 Title={"Enable public access to vulnerability data."}

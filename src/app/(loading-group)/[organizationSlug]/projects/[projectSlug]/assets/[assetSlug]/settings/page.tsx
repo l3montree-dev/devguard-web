@@ -47,7 +47,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
-type SecretType = "badge" | "webhook";
+type SecretType = "webhook";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -68,7 +68,6 @@ const Index: FunctionComponent = () => {
   };
 
   const { data: secrets, mutate: mutateSecrets } = useSWR<{
-    badgeSecret: string;
     webhookSecret: string;
   }>(
     "/organizations/" +
@@ -89,8 +88,6 @@ const Index: FunctionComponent = () => {
   const repositories = useMemo(() => {
     return convertRepos(repoResp || []);
   }, [repoResp]);
-
-  const apiBadgeUrl = config.devguardApiUrlPublicInternet + "/api/v1/badges/";
 
   const form = useForm<AssetFormValues>({
     defaultValues: {
@@ -194,9 +191,7 @@ const Index: FunctionComponent = () => {
 
   const handleGenerateNewSecret = async (type: SecretType) => {
     let bodyKey: string;
-    if (type === "badge") {
-      bodyKey = "badgeSecret";
-    } else {
+    if (type === "webhook") {
       bodyKey = "webhookSecret";
     }
     const secret = generateNewSecret();
@@ -218,9 +213,8 @@ const Index: FunctionComponent = () => {
         updateAsset(r);
         return {
           ...prev,
-          [bodyKey]: r[bodyKey as "badgeSecret" | "webhookSecret"],
+          [bodyKey]: r["webhookSecret"],
         } as {
-          badgeSecret: string;
           webhookSecret: string;
         };
       },
@@ -230,7 +224,6 @@ const Index: FunctionComponent = () => {
             ...currentData,
             [bodyKey]: secret,
           } as {
-            badgeSecret: string;
             webhookSecret: string;
           };
         },
@@ -374,38 +367,6 @@ const Index: FunctionComponent = () => {
         </>
       )}
       <div>
-        <Section
-          title="Badge Management"
-          description="The provided URL can be used to display the CVSS badge in your README or other documentation."
-        >
-          <div className="space-y-2 p-4 border rounded-xl bg-card mt-1">
-            <InputWithButton
-              label="Badge Secret"
-              value={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
-              nameKey="settings-badge-secret"
-              message="You can use the URL to display this badge in your README or other documentation.
-              The CVSS values in the badge are automatically updated based on the latest vulnerabilities in the default branch of the repository."
-              variant="onCard"
-              copyable
-              copyToastDescription="The badge secret has been copied to your clipboard."
-              update={{
-                update: () => handleGenerateNewSecret("badge"),
-                updateConfirmTitle:
-                  "Are you sure to generate a new badge secret?",
-                updateConfirmDescription:
-                  "This will generate a new badge secret. The badge URL will change and you need to update the badge URL in your documentation.",
-              }}
-            />
-            {secrets && (
-              <img
-                src={apiBadgeUrl + "cvss/" + secrets?.badgeSecret}
-                alt="CVSS Badge"
-                className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-              />
-            )}
-          </div>
-        </Section>
-
         <Section
           title="Webhook Management"
           description="Provides a webhook URL and secret for this repository."
