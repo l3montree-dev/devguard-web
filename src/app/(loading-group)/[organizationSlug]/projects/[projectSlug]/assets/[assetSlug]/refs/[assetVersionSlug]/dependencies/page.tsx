@@ -628,9 +628,10 @@ const Index: FunctionComponent = () => {
                 <tr
                   onClick={() => dataPassthrough(row.original)}
                   className={classNames(
-                    "relative cursor-pointer bg-background align-top transition-all ",
+                    "relative bg-background align-top transition-all ",
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
+                    row.original.dependency.projectId && "cursor-pointer",
                   )}
                   key={row.original.id}
                 >
