@@ -490,7 +490,6 @@ export interface AssetDTO {
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
 
-  badgeSecret: string;
   webhookSecret: string | null;
 
   externalEntityId?: string;
