@@ -469,7 +469,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           devguardApiUrl +
                           "/api/v1/public/" +
                           assetId +
-                          "/badges/cvss/"
+                          "/badges/cvss"
                         }
                         alt="CVSS Badge"
                         className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
