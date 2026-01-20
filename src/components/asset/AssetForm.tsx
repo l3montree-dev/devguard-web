@@ -36,59 +36,6 @@ import { Label } from "../ui/label";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { browserApiClient } from "@/services/devGuardApi";
 
-const BadgeImage: FunctionComponent<{
-  url: string;
-}> = ({ url }) => {
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    let currentObjectUrl: string | null = null;
-
-    const loadBadge = async () => {
-      const response = await browserApiClient(url, {
-        method: "GET",
-        headers: {
-          Accept: "image/svg+xml",
-        },
-      });
-      if (response.ok) {
-        const blob = await response.blob();
-        currentObjectUrl = URL.createObjectURL(blob);
-        setObjectUrl(currentObjectUrl);
-      }
-    };
-
-    loadBadge();
-
-    return () => {
-      if (currentObjectUrl) {
-        URL.revokeObjectURL(currentObjectUrl);
-      }
-    };
-  }, [url]);
-
-  if (objectUrl === null) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        aria-busy="true"
-        className="mt-2 text-sm text-muted-foreground"
-      >
-        Loading badge...
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={objectUrl}
-      alt="CVSS Badge"
-      className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
-    />
-  );
-};
-
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
   assetId?: string;
@@ -529,9 +476,9 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         copyToastDescription="The CVSS Badge URL has been copied to your clipboard."
                       />
 
-                      <BadgeImage
-                        url={
-                          `/organizations/` +
+                      <img
+                        src={
+                          `/api/devguard-tunnel/api/v1/organizations/` +
                           org.slug +
                           `/projects/` +
                           project?.slug +
@@ -539,6 +486,8 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           asset?.slug +
                           `/badges/cvss`
                         }
+                        alt="CVSS Badge"
+                        className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
                       />
                     </div>
                   </>
