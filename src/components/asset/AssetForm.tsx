@@ -45,7 +45,12 @@ const BadgeImage: FunctionComponent<{
     let currentObjectUrl: string | null = null;
 
     const loadBadge = async () => {
-      const response = await browserApiClient(url);
+      const response = await browserApiClient(url, {
+        method: "GET",
+        headers: {
+          Accept: "image/svg+xml",
+        },
+      });
       if (response.ok) {
         const blob = await response.blob();
         currentObjectUrl = URL.createObjectURL(blob);
@@ -63,7 +68,16 @@ const BadgeImage: FunctionComponent<{
   }, [url]);
 
   if (objectUrl === null) {
-    return <div>Loading badge...</div>;
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+        className="mt-2 text-sm text-muted-foreground"
+      >
+        Loading badge...
+      </div>
+    );
   }
 
   return (
@@ -447,7 +461,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     to the URL to further scope the data. If none is provided,
                     the default branch and all artifacts are used.
                     <div
-                      className={`${field.value ? "text-foreground" : ""} mt-0`}
+                      className={`${field.value ? "text-foreground" : ""} mt-4`}
                     >
                       <InputWithButton
                         label="VeX-URL (Always up to date vulnerability information)"
