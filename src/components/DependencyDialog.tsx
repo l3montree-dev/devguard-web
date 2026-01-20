@@ -152,7 +152,9 @@ const DependencyDialog: FunctionComponent<Props> = ({
                 <div className="text-xs flex flex-row text-muted-foreground items-center gap-2">
                   {scoreCard?.date && (
                     <div>
-                      <DateString date={new Date(scoreCard?.date)} />
+                      <DateString
+                        date={new Date(scoreCard?.date.replace(/ .*/, ""))}
+                      />
                     </div>
                   )}
                 </div>

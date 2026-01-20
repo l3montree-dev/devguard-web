@@ -350,11 +350,16 @@ const Settings: FunctionComponent = () => {
                     <>
                       Scopes: {pat.scopes}
                       <br />
-                      Created at: <DateString date={new Date(pat.createdAt)} />
+                      Created at:
+                      <DateString
+                        date={new Date(pat.createdAt.replace(/ .*/, ""))}
+                      />
                       <br />
                       Last used:{" "}
                       {pat.lastUsedAt ? (
-                        <DateString date={new Date(pat.lastUsedAt)} />
+                        <DateString
+                          date={new Date(pat.lastUsedAt.replace(/ .*/, ""))}
+                        />
                       ) : (
                         "Never"
                       )}

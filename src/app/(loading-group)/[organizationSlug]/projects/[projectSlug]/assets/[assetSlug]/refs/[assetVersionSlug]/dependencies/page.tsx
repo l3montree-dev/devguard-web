@@ -285,7 +285,7 @@ const columnsDef: ColumnDef<
       row.getValue() && (
         <div className="flex flex-row items-center gap-2">
           <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
-          <DateString date={new Date(row.getValue())} />
+          <DateString date={new Date(row.getValue().replace(/ .*/, ""))} />
         </div>
       ),
   }),

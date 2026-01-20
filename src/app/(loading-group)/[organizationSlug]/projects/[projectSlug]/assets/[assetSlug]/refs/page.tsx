@@ -150,7 +150,9 @@ const RefsPage = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-2">
-                      <DateString date={new Date(tag.lastAccessedAt)} />
+                      <DateString
+                        date={new Date(tag.lastAccessedAt.replace(/ .*/, ""))}
+                      />
                     </td>
                     <td className="px-4 py-2 flex flex-row justify-end">
                       <DropdownMenu>
@@ -226,7 +228,11 @@ const RefsPage = () => {
                         )}
                       </td>
                       <td className="px-4 py-2">
-                        <DateString date={new Date(branch.lastAccessedAt)} />
+                        <DateString
+                          date={
+                            new Date(branch.lastAccessedAt.replace(/ .*/, ""))
+                          }
+                        />
                       </td>
                       <td className="px-4 py-2 flex flex-row justify-end">
                         <DropdownMenu>
