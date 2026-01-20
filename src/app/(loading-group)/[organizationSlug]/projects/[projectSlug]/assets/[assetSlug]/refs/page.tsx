@@ -7,7 +7,9 @@ import React from "react";
 import { toast } from "sonner";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
-import DateString from "../../../../../../../../components/common/DateString";
+import DateString, {
+  parseDateOnly,
+} from "../../../../../../../../components/common/DateString";
 import Section from "../../../../../../../../components/common/Section";
 import {
   AlertDialog,
@@ -150,9 +152,7 @@ const RefsPage = () => {
                       </Badge>
                     </td>
                     <td className="px-4 py-2">
-                      <DateString
-                        date={new Date(tag.lastAccessedAt.replace(/ .*/, ""))}
-                      />
+                      <DateString date={parseDateOnly(tag.lastAccessedAt)} />
                     </td>
                     <td className="px-4 py-2 flex flex-row justify-end">
                       <DropdownMenu>
@@ -229,9 +229,7 @@ const RefsPage = () => {
                       </td>
                       <td className="px-4 py-2">
                         <DateString
-                          date={
-                            new Date(branch.lastAccessedAt.replace(/ .*/, ""))
-                          }
+                          date={parseDateOnly(branch.lastAccessedAt)}
                         />
                       </td>
                       <td className="px-4 py-2 flex flex-row justify-end">
