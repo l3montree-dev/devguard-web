@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import {
   FormControl,
   FormDescription,
@@ -33,6 +33,47 @@ import { CopyCodeFragment } from "../common/CopyCode";
 import { AsyncButton, Button } from "../ui/button";
 import { InputWithButton } from "../ui/input-with-button";
 import { Label } from "../ui/label";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { browserApiClient } from "@/services/devGuardApi";
+
+const BadgeImage: FunctionComponent<{
+  url: string;
+}> = ({ url }) => {
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let currentObjectUrl: string | null = null;
+
+    const loadBadge = async () => {
+      const response = await browserApiClient(url);
+      if (response.ok) {
+        const blob = await response.blob();
+        currentObjectUrl = URL.createObjectURL(blob);
+        setObjectUrl(currentObjectUrl);
+      }
+    };
+
+    loadBadge();
+
+    return () => {
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+      }
+    };
+  }, [url]);
+
+  if (objectUrl === null) {
+    return <div>Loading badge...</div>;
+  }
+
+  return (
+    <img
+      src={objectUrl}
+      alt="CVSS Badge"
+      className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
+    />
+  );
+};
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -361,6 +402,8 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 }) => {
   const devguardApiUrl = useConfig().devguardApiUrlPublicInternet;
   const org = useActiveOrg();
+  const project = useActiveProject();
+  const asset = project?.assets.find((a) => a.id === assetId);
   return (
     <>
       <FormField
@@ -403,10 +446,12 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     <CopyCodeFragment codeString="?artifactName=<Name of the artifact url encoded>" />{" "}
                     to the URL to further scope the data. If none is provided,
                     the default branch and all artifacts are used.
-                    <div className="text-foreground mt-4">
+                    <div
+                      className={`${field.value ? "text-foreground" : ""} mt-0`}
+                    >
                       <InputWithButton
                         label="VeX-URL (Always up to date vulnerability information)"
-                        copyable
+                        copyable={field.value}
                         copyToastDescription="The VeX-URL has been copied to your clipboard."
                         nameKey="vex-url"
                         variant="onCard"
@@ -418,10 +463,12 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
-                    <div className="text-foreground mt-0">
+                    <div
+                      className={`${field.value ? "text-foreground" : ""} mt-0`}
+                    >
                       <InputWithButton
                         label="CSAF-URL (Always up to date vulnerability information in CSAF format)"
-                        copyable
+                        copyable={field.value}
                         copyToastDescription="The CSAF-URL has been copied to your clipboard."
                         nameKey="sbom-url"
                         variant="onCard"
@@ -433,10 +480,12 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
-                    <div className="text-foreground mt-0">
+                    <div
+                      className={`${field.value ? "text-foreground" : ""} mt-0`}
+                    >
                       <InputWithButton
                         label="SBOM-URL (Always up to date SBOM information)"
-                        copyable
+                        copyable={field.value}
                         copyToastDescription="The SBOM-URL has been copied to your clipboard."
                         nameKey="sbom-url"
                         variant="onCard"
@@ -448,10 +497,12 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         }
                       />
                     </div>
-                    <div className="text-foreground mt-4">
+                    <div
+                      className={`${field.value ? "text-foreground" : ""} mt-0`}
+                    >
                       <InputWithButton
                         label="CVSS Badge URL"
-                        copyable
+                        copyable={field.value}
                         value={
                           devguardApiUrl +
                           "/api/v1/public/" +
@@ -464,15 +515,16 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                         copyToastDescription="The CVSS Badge URL has been copied to your clipboard."
                       />
 
-                      <img
-                        src={
-                          devguardApiUrl +
-                          "/api/v1/public/" +
-                          assetId +
-                          "/badges/cvss"
+                      <BadgeImage
+                        url={
+                          `/organizations/` +
+                          org.slug +
+                          `/projects/` +
+                          project?.slug +
+                          `/assets/` +
+                          asset?.slug +
+                          `/badges/cvss`
                         }
-                        alt="CVSS Badge"
-                        className="mt-2 rounded-md shadow-sm hover:shadow-md transition-shadow"
                       />
                     </div>
                   </>
