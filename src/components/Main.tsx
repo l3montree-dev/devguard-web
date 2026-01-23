@@ -86,8 +86,8 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
               Privacy
             </a>
           </div>
-          Copyright © {new Date().getFullYear()} L3montree GmbH and the
-          DevGuard Contributors. All rights reserved. Version{" "}
+          Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
+          Contributors. All rights reserved. Version{" "}
           {process.env.NEXT_PUBLIC_VERSION}
         </footer>
       </div>

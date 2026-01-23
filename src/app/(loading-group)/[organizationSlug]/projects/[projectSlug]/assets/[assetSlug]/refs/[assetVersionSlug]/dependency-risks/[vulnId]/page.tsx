@@ -1245,25 +1245,27 @@ const Index: FunctionComponent = () => {
                     />
                   </h3>
                   <div className="flex flex-col gap-2">
-                    {(vuln.cve?.relationships?.length ?? 0) > 0 && (<div className="rounded-lg border bg-card p-4">
-                      {vuln.cve?.relationships && (
-                        <table className="w-full table-auto border-collapse">
-                          <tbody>
-                            {vuln.cve?.relationships?.map((rel) => (
-                              <tr
-                                className="text-sm"
-                                key={rel.relationshipType + rel.targetCve}
-                              >
-                                <td className="capitalize font-semibold">
-                                  {rel.relationshipType}
-                                </td>
-                                <td>{rel.targetCve}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>)}
+                    {(vuln.cve?.relationships?.length ?? 0) > 0 && (
+                      <div className="rounded-lg border bg-card p-4">
+                        {vuln.cve?.relationships && (
+                          <table className="w-full table-auto border-collapse">
+                            <tbody>
+                              {vuln.cve?.relationships?.map((rel) => (
+                                <tr
+                                  className="text-sm"
+                                  key={rel.relationshipType + rel.targetCve}
+                                >
+                                  <td className="capitalize font-semibold">
+                                    {rel.relationshipType}
+                                  </td>
+                                  <td>{rel.targetCve}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    )}
                     <Link
                       target="_blank"
                       className="text-xs"

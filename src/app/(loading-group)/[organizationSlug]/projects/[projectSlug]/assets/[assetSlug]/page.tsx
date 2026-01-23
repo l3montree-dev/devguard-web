@@ -37,7 +37,7 @@ const Index: FunctionComponent = () => {
   };
   // check if we can redirect to the first ref
   const asset = useAsset();
-  
+
   useEffect(() => {
     if (!asset || asset.refs.length === 0) {
       return;
@@ -51,7 +51,13 @@ const Index: FunctionComponent = () => {
     }
     let destination = `/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${redirectTo.slug}`;
     router.replace(destination);
-  }, [asset, params.organizationSlug, params.projectSlug, params.assetSlug, router]);
+  }, [
+    asset,
+    params.organizationSlug,
+    params.projectSlug,
+    params.assetSlug,
+    router,
+  ]);
 
   if (!asset) {
     return null;

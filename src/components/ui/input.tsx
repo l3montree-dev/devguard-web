@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "default" | "onCard";
 }
 
@@ -11,10 +10,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, variant = "default", ...props }, ref) => {
     // ensure value is never undefined to prevent controlled/uncontrolled switching
     const inputProps = { ...props };
-    if ('value' in inputProps && inputProps.value === undefined) {
-      inputProps.value = '';
+    if ("value" in inputProps && inputProps.value === undefined) {
+      inputProps.value = "";
     }
-    
+
     return (
       <input
         type={type}

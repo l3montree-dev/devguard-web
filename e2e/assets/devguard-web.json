@@ -26420,9 +26420,7 @@
   "dependencies": [
     {
       "ref": "0d394c5c-bdc4-4ba1-a4a1-16bf75fddfb0",
-      "dependsOn": [
-        "pkg:npm/otpauth@9.4.1"
-      ]
+      "dependsOn": ["pkg:npm/otpauth@9.4.1"]
     },
     {
       "ref": "9eac311f-6847-47dc-beb1-ae16a2af69eb",
@@ -26613,9 +26611,7 @@
     },
     {
       "ref": "pkg:npm/%40babel/parser@7.27.2",
-      "dependsOn": [
-        "pkg:npm/%40babel/types@7.27.1"
-      ]
+      "dependsOn": ["pkg:npm/%40babel/types@7.27.1"]
     },
     {
       "ref": "pkg:npm/%40babel/runtime@7.27.1",
@@ -26910,9 +26906,7 @@
     },
     {
       "ref": "pkg:npm/%40codemirror/legacy-modes@6.5.1",
-      "dependsOn": [
-        "pkg:npm/%40codemirror/language@6.11.0"
-      ]
+      "dependsOn": ["pkg:npm/%40codemirror/language@6.11.0"]
     },
     {
       "ref": "pkg:npm/%40codemirror/lint@6.8.5",
@@ -26942,9 +26936,7 @@
     },
     {
       "ref": "pkg:npm/%40codemirror/state@6.5.2",
-      "dependsOn": [
-        "pkg:npm/%40marijn/find-cluster-break@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/%40marijn/find-cluster-break@1.0.2"]
     },
     {
       "ref": "pkg:npm/%40codemirror/view@6.36.8",
@@ -27000,9 +26992,7 @@
     },
     {
       "ref": "pkg:npm/%40dagrejs/dagre@1.1.5",
-      "dependsOn": [
-        "pkg:npm/%40dagrejs/graphlib@2.2.4"
-      ]
+      "dependsOn": ["pkg:npm/%40dagrejs/graphlib@2.2.4"]
     },
     {
       "ref": "pkg:npm/%40dagrejs/graphlib@2.2.4",
@@ -27025,15 +27015,11 @@
     },
     {
       "ref": "pkg:npm/%40emnapi/runtime@1.4.4",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/%40emnapi/wasi-threads@1.0.2",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/%40eslint-community/eslint-utils@4.7.0",
@@ -27060,15 +27046,11 @@
     },
     {
       "ref": "pkg:npm/%40eslint/core@0.14.0",
-      "dependsOn": [
-        "pkg:npm/%40types/json-schema@7.0.15"
-      ]
+      "dependsOn": ["pkg:npm/%40types/json-schema@7.0.15"]
     },
     {
       "ref": "pkg:npm/%40eslint/core@0.15.1",
-      "dependsOn": [
-        "pkg:npm/%40types/json-schema@7.0.15"
-      ]
+      "dependsOn": ["pkg:npm/%40types/json-schema@7.0.15"]
     },
     {
       "ref": "pkg:npm/%40eslint/eslintrc@3.3.1",
@@ -27094,16 +27076,11 @@
     },
     {
       "ref": "pkg:npm/%40eslint/plugin-kit@0.3.4",
-      "dependsOn": [
-        "pkg:npm/%40eslint/core@0.15.1",
-        "pkg:npm/levn@0.4.1"
-      ]
+      "dependsOn": ["pkg:npm/%40eslint/core@0.15.1", "pkg:npm/levn@0.4.1"]
     },
     {
       "ref": "pkg:npm/%40floating-ui/core@1.7.0",
-      "dependsOn": [
-        "pkg:npm/%40floating-ui/utils@0.2.9"
-      ]
+      "dependsOn": ["pkg:npm/%40floating-ui/utils@0.2.9"]
     },
     {
       "ref": "pkg:npm/%40floating-ui/dom@1.7.0",
@@ -27158,9 +27135,7 @@
     },
     {
       "ref": "pkg:npm/%40heroicons/react@2.2.0",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40hookform/resolvers@5.0.1",
@@ -27194,15 +27169,11 @@
     },
     {
       "ref": "pkg:npm/%40img/sharp-darwin-arm64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-darwin-x64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-darwin-x64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-darwin-x64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.0",
@@ -27242,51 +27213,35 @@
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-arm64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linux-arm64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linux-arm64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-arm@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linux-arm@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linux-arm@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-ppc64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linux-ppc64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linux-ppc64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-s390x@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linux-s390x@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linux-s390x@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-x64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linux-x64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linux-x64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linuxmusl-arm64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linuxmusl-x64@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-wasm32@0.34.3",
-      "dependsOn": [
-        "pkg:npm/%40emnapi/runtime@1.4.4"
-      ]
+      "dependsOn": ["pkg:npm/%40emnapi/runtime@1.4.4"]
     },
     {
       "ref": "pkg:npm/%40img/sharp-win32-arm64@0.34.3",
@@ -27367,23 +27322,15 @@
     },
     {
       "ref": "pkg:npm/%40lexical/dragon@0.32.1",
-      "dependsOn": [
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/hashtag@0.32.1",
-      "dependsOn": [
-        "pkg:npm/%40lexical/utils@0.32.1",
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/%40lexical/utils@0.32.1", "pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/history@0.32.1",
-      "dependsOn": [
-        "pkg:npm/%40lexical/utils@0.32.1",
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/%40lexical/utils@0.32.1", "pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/html@0.32.1",
@@ -27395,10 +27342,7 @@
     },
     {
       "ref": "pkg:npm/%40lexical/link@0.32.1",
-      "dependsOn": [
-        "pkg:npm/%40lexical/utils@0.32.1",
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/%40lexical/utils@0.32.1", "pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/list@0.32.1",
@@ -27410,10 +27354,7 @@
     },
     {
       "ref": "pkg:npm/%40lexical/mark@0.32.1",
-      "dependsOn": [
-        "pkg:npm/%40lexical/utils@0.32.1",
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/%40lexical/utils@0.32.1", "pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/markdown@0.32.1",
@@ -27429,15 +27370,11 @@
     },
     {
       "ref": "pkg:npm/%40lexical/offset@0.32.1",
-      "dependsOn": [
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/overflow@0.32.1",
-      "dependsOn": [
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/plain-text@0.32.1",
@@ -27484,9 +27421,7 @@
     },
     {
       "ref": "pkg:npm/%40lexical/selection@0.32.1",
-      "dependsOn": [
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/table@0.32.1",
@@ -27498,9 +27433,7 @@
     },
     {
       "ref": "pkg:npm/%40lexical/text@0.32.1",
-      "dependsOn": [
-        "pkg:npm/lexical@0.32.1"
-      ]
+      "dependsOn": ["pkg:npm/lexical@0.32.1"]
     },
     {
       "ref": "pkg:npm/%40lexical/utils@0.32.1",
@@ -27550,9 +27483,7 @@
     },
     {
       "ref": "pkg:npm/%40lezer/highlight@1.2.1",
-      "dependsOn": [
-        "pkg:npm/%40lezer/common@1.2.3"
-      ]
+      "dependsOn": ["pkg:npm/%40lezer/common@1.2.3"]
     },
     {
       "ref": "pkg:npm/%40lezer/html@1.3.10",
@@ -27588,9 +27519,7 @@
     },
     {
       "ref": "pkg:npm/%40lezer/lr@1.4.2",
-      "dependsOn": [
-        "pkg:npm/%40lezer/common@1.2.3"
-      ]
+      "dependsOn": ["pkg:npm/%40lezer/common@1.2.3"]
     },
     {
       "ref": "pkg:npm/%40lezer/markdown@1.4.3",
@@ -27714,10 +27643,7 @@
     },
     {
       "ref": "pkg:npm/%40mdxeditor/gurx@1.2.3",
-      "dependsOn": [
-        "pkg:npm/react-dom@19.1.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react-dom@19.1.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40mediapipe/tasks-vision@0.10.17",
@@ -27744,9 +27670,7 @@
     },
     {
       "ref": "pkg:npm/%40next/eslint-plugin-next@15.3.5",
-      "dependsOn": [
-        "pkg:npm/fast-glob@3.3.1"
-      ]
+      "dependsOn": ["pkg:npm/fast-glob@3.3.1"]
     },
     {
       "ref": "pkg:npm/%40next/swc-darwin-arm64@15.4.7",
@@ -27812,15 +27736,11 @@
     },
     {
       "ref": "pkg:npm/%40opentelemetry/api-logs@0.202.0",
-      "dependsOn": [
-        "pkg:npm/%40opentelemetry/api@1.9.0"
-      ]
+      "dependsOn": ["pkg:npm/%40opentelemetry/api@1.9.0"]
     },
     {
       "ref": "pkg:npm/%40opentelemetry/api-logs@0.57.2",
-      "dependsOn": [
-        "pkg:npm/%40opentelemetry/api@1.9.0"
-      ]
+      "dependsOn": ["pkg:npm/%40opentelemetry/api@1.9.0"]
     },
     {
       "ref": "pkg:npm/%40opentelemetry/api@1.9.0",
@@ -27828,15 +27748,11 @@
     },
     {
       "ref": "pkg:npm/%40opentelemetry/context-async-hooks@1.30.1",
-      "dependsOn": [
-        "pkg:npm/%40opentelemetry/api@1.9.0"
-      ]
+      "dependsOn": ["pkg:npm/%40opentelemetry/api@1.9.0"]
     },
     {
       "ref": "pkg:npm/%40opentelemetry/context-async-hooks@2.0.1",
-      "dependsOn": [
-        "pkg:npm/%40opentelemetry/api@1.9.0"
-      ]
+      "dependsOn": ["pkg:npm/%40opentelemetry/api@1.9.0"]
     },
     {
       "ref": "pkg:npm/%40opentelemetry/core@1.30.1",
@@ -28119,9 +28035,7 @@
     },
     {
       "ref": "pkg:npm/%40ory/client@1.20.11",
-      "dependsOn": [
-        "pkg:npm/axios@1.12.2"
-      ]
+      "dependsOn": ["pkg:npm/axios@1.12.2"]
     },
     {
       "ref": "pkg:npm/%40ory/integrations@1.3.1",
@@ -28351,17 +28265,11 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-compose-refs@1.1.2",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-context@1.1.2",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-dialog@1.1.15",
@@ -28388,10 +28296,7 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-direction@1.1.1",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-dismissable-layer@1.1.11",
@@ -28425,10 +28330,7 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-focus-guards@1.1.3",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-focus-scope@1.1.7",
@@ -28462,9 +28364,7 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-icons@1.3.2",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-id@1.1.1",
@@ -28829,10 +28729,7 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-use-callback-ref@1.1.1",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-use-controllable-state@1.2.2",
@@ -28869,17 +28766,11 @@
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-use-layout-effect@1.1.1",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-use-previous@1.1.1",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40radix-ui/react-use-rect@1.1.1",
@@ -28937,10 +28828,7 @@
     },
     {
       "ref": "pkg:npm/%40react-aria/ssr@3.9.8",
-      "dependsOn": [
-        "pkg:npm/%40swc/helpers@0.5.17",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40swc/helpers@0.5.17", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40react-aria/utils@3.28.2",
@@ -28965,22 +28853,15 @@
     },
     {
       "ref": "pkg:npm/%40react-hook/passive-layout-effect@1.2.1",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40react-stately/flags@3.1.1",
-      "dependsOn": [
-        "pkg:npm/%40swc/helpers@0.5.17"
-      ]
+      "dependsOn": ["pkg:npm/%40swc/helpers@0.5.17"]
     },
     {
       "ref": "pkg:npm/%40react-stately/utils@3.10.6",
-      "dependsOn": [
-        "pkg:npm/%40swc/helpers@0.5.17",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40swc/helpers@0.5.17", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40react-three/drei@10.1.2",
@@ -29056,9 +28937,7 @@
     },
     {
       "ref": "pkg:npm/%40react-types/shared@3.29.0",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/%40rollup/plugin-commonjs@28.0.1",
@@ -29168,15 +29047,11 @@
     },
     {
       "ref": "pkg:npm/%40sentry-internal/browser-utils@9.38.0",
-      "dependsOn": [
-        "pkg:npm/%40sentry/core@9.38.0"
-      ]
+      "dependsOn": ["pkg:npm/%40sentry/core@9.38.0"]
     },
     {
       "ref": "pkg:npm/%40sentry-internal/feedback@9.38.0",
-      "dependsOn": [
-        "pkg:npm/%40sentry/core@9.38.0"
-      ]
+      "dependsOn": ["pkg:npm/%40sentry/core@9.38.0"]
     },
     {
       "ref": "pkg:npm/%40sentry-internal/replay-canvas@9.38.0",
@@ -29393,15 +29268,11 @@
     },
     {
       "ref": "pkg:npm/%40swc/helpers@0.5.15",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/%40swc/helpers@0.5.17",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/%40tailwindcss/forms@0.5.10",
@@ -29440,15 +29311,11 @@
     },
     {
       "ref": "pkg:npm/%40tybys/wasm-util@0.9.0",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/%40types/connect@3.4.38",
-      "dependsOn": [
-        "pkg:npm/%40types/node@24.2.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/node@24.2.1"]
     },
     {
       "ref": "pkg:npm/%40types/d3-array@3.2.1",
@@ -29460,9 +29327,7 @@
     },
     {
       "ref": "pkg:npm/%40types/d3-drag@3.0.7",
-      "dependsOn": [
-        "pkg:npm/%40types/d3-selection@3.0.11"
-      ]
+      "dependsOn": ["pkg:npm/%40types/d3-selection@3.0.11"]
     },
     {
       "ref": "pkg:npm/%40types/d3-ease@3.0.2",
@@ -29470,9 +29335,7 @@
     },
     {
       "ref": "pkg:npm/%40types/d3-interpolate@3.0.4",
-      "dependsOn": [
-        "pkg:npm/%40types/d3-color@3.1.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/d3-color@3.1.3"]
     },
     {
       "ref": "pkg:npm/%40types/d3-path@3.1.1",
@@ -29480,9 +29343,7 @@
     },
     {
       "ref": "pkg:npm/%40types/d3-scale@4.0.9",
-      "dependsOn": [
-        "pkg:npm/%40types/d3-time@3.0.4"
-      ]
+      "dependsOn": ["pkg:npm/%40types/d3-time@3.0.4"]
     },
     {
       "ref": "pkg:npm/%40types/d3-selection@3.0.11",
@@ -29490,9 +29351,7 @@
     },
     {
       "ref": "pkg:npm/%40types/d3-shape@3.1.7",
-      "dependsOn": [
-        "pkg:npm/%40types/d3-path@3.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/d3-path@3.1.1"]
     },
     {
       "ref": "pkg:npm/%40types/d3-time@3.0.4",
@@ -29504,9 +29363,7 @@
     },
     {
       "ref": "pkg:npm/%40types/d3-transition@3.0.9",
-      "dependsOn": [
-        "pkg:npm/%40types/d3-selection@3.0.11"
-      ]
+      "dependsOn": ["pkg:npm/%40types/d3-selection@3.0.11"]
     },
     {
       "ref": "pkg:npm/%40types/d3-zoom@3.0.8",
@@ -29517,9 +29374,7 @@
     },
     {
       "ref": "pkg:npm/%40types/debug@4.1.12",
-      "dependsOn": [
-        "pkg:npm/%40types/ms@2.1.0"
-      ]
+      "dependsOn": ["pkg:npm/%40types/ms@2.1.0"]
     },
     {
       "ref": "pkg:npm/%40types/draco3d@1.4.10",
@@ -29541,9 +29396,7 @@
     },
     {
       "ref": "pkg:npm/%40types/estree-jsx@1.0.5",
-      "dependsOn": [
-        "pkg:npm/%40types/estree@1.0.8"
-      ]
+      "dependsOn": ["pkg:npm/%40types/estree@1.0.8"]
     },
     {
       "ref": "pkg:npm/%40types/estree@1.0.6",
@@ -29555,15 +29408,11 @@
     },
     {
       "ref": "pkg:npm/%40types/hast@2.3.10",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@2.0.11"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@2.0.11"]
     },
     {
       "ref": "pkg:npm/%40types/hast@3.0.4",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/%40types/json-schema@7.0.15",
@@ -29575,9 +29424,7 @@
     },
     {
       "ref": "pkg:npm/%40types/mdast@4.0.4",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/%40types/ms@2.1.0",
@@ -29585,15 +29432,11 @@
     },
     {
       "ref": "pkg:npm/%40types/mysql@2.15.26",
-      "dependsOn": [
-        "pkg:npm/%40types/node@24.2.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/node@24.2.1"]
     },
     {
       "ref": "pkg:npm/%40types/node@24.2.1",
-      "dependsOn": [
-        "pkg:npm/undici-types@7.10.0"
-      ]
+      "dependsOn": ["pkg:npm/undici-types@7.10.0"]
     },
     {
       "ref": "pkg:npm/%40types/offscreencanvas@2019.7.3",
@@ -29601,9 +29444,7 @@
     },
     {
       "ref": "pkg:npm/%40types/pg-pool@2.0.6",
-      "dependsOn": [
-        "pkg:npm/%40types/pg@8.6.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/pg@8.6.1"]
     },
     {
       "ref": "pkg:npm/%40types/pg@8.6.1",
@@ -29615,21 +29456,15 @@
     },
     {
       "ref": "pkg:npm/%40types/react-dom@19.1.9",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12"]
     },
     {
       "ref": "pkg:npm/%40types/react-reconciler@0.28.9",
-      "dependsOn": [
-        "pkg:npm/%40types/react@19.1.12"
-      ]
+      "dependsOn": ["pkg:npm/%40types/react@19.1.12"]
     },
     {
       "ref": "pkg:npm/%40types/react@19.1.12",
-      "dependsOn": [
-        "pkg:npm/csstype@3.1.3"
-      ]
+      "dependsOn": ["pkg:npm/csstype@3.1.3"]
     },
     {
       "ref": "pkg:npm/%40types/shimmer@1.2.0",
@@ -29641,9 +29476,7 @@
     },
     {
       "ref": "pkg:npm/%40types/tedious@4.0.14",
-      "dependsOn": [
-        "pkg:npm/%40types/node@24.2.1"
-      ]
+      "dependsOn": ["pkg:npm/%40types/node@24.2.1"]
     },
     {
       "ref": "pkg:npm/%40types/three@0.176.0",
@@ -29814,9 +29647,7 @@
     },
     {
       "ref": "pkg:npm/%40unrs/resolver-binding-wasm32-wasi@1.7.2",
-      "dependsOn": [
-        "pkg:npm/%40napi-rs/wasm-runtime@0.2.10"
-      ]
+      "dependsOn": ["pkg:npm/%40napi-rs/wasm-runtime@0.2.10"]
     },
     {
       "ref": "pkg:npm/%40unrs/resolver-binding-win32-arm64-msvc@1.7.2",
@@ -29883,15 +29714,11 @@
     },
     {
       "ref": "pkg:npm/%40webassemblyjs/ieee754@1.13.2",
-      "dependsOn": [
-        "pkg:npm/%40xtuc/ieee754@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/%40xtuc/ieee754@1.2.0"]
     },
     {
       "ref": "pkg:npm/%40webassemblyjs/leb128@1.13.2",
-      "dependsOn": [
-        "pkg:npm/%40xtuc/long@4.2.2"
-      ]
+      "dependsOn": ["pkg:npm/%40xtuc/long@4.2.2"]
     },
     {
       "ref": "pkg:npm/%40webassemblyjs/utf8@1.13.2",
@@ -29983,21 +29810,15 @@
     },
     {
       "ref": "pkg:npm/acorn-import-attributes@1.9.5",
-      "dependsOn": [
-        "pkg:npm/acorn@8.15.0"
-      ]
+      "dependsOn": ["pkg:npm/acorn@8.15.0"]
     },
     {
       "ref": "pkg:npm/acorn-import-phases@1.0.4",
-      "dependsOn": [
-        "pkg:npm/acorn@8.15.0"
-      ]
+      "dependsOn": ["pkg:npm/acorn@8.15.0"]
     },
     {
       "ref": "pkg:npm/acorn-jsx@5.3.2",
-      "dependsOn": [
-        "pkg:npm/acorn@8.15.0"
-      ]
+      "dependsOn": ["pkg:npm/acorn@8.15.0"]
     },
     {
       "ref": "pkg:npm/acorn@8.15.0",
@@ -30005,22 +29826,15 @@
     },
     {
       "ref": "pkg:npm/agent-base@6.0.2",
-      "dependsOn": [
-        "pkg:npm/debug@4.4.1"
-      ]
+      "dependsOn": ["pkg:npm/debug@4.4.1"]
     },
     {
       "ref": "pkg:npm/ajv-formats@2.1.1",
-      "dependsOn": [
-        "pkg:npm/ajv@8.17.1"
-      ]
+      "dependsOn": ["pkg:npm/ajv@8.17.1"]
     },
     {
       "ref": "pkg:npm/ajv-keywords@5.1.0",
-      "dependsOn": [
-        "pkg:npm/ajv@8.17.1",
-        "pkg:npm/fast-deep-equal@3.1.3"
-      ]
+      "dependsOn": ["pkg:npm/ajv@8.17.1", "pkg:npm/fast-deep-equal@3.1.3"]
     },
     {
       "ref": "pkg:npm/ajv@6.12.6",
@@ -30046,16 +29860,11 @@
     },
     {
       "ref": "pkg:npm/ansi-styles@4.3.0",
-      "dependsOn": [
-        "pkg:npm/color-convert@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/color-convert@2.0.1"]
     },
     {
       "ref": "pkg:npm/anymatch@3.1.3",
-      "dependsOn": [
-        "pkg:npm/normalize-path@3.0.0",
-        "pkg:npm/picomatch@2.3.1"
-      ]
+      "dependsOn": ["pkg:npm/normalize-path@3.0.0", "pkg:npm/picomatch@2.3.1"]
     },
     {
       "ref": "pkg:npm/argparse@2.0.1",
@@ -30063,9 +29872,7 @@
     },
     {
       "ref": "pkg:npm/aria-hidden@1.2.4",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/aria-query@5.3.2",
@@ -30073,10 +29880,7 @@
     },
     {
       "ref": "pkg:npm/array-buffer-byte-length@1.0.2",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/is-array-buffer@3.0.5"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/is-array-buffer@3.0.5"]
     },
     {
       "ref": "pkg:npm/array-includes@3.1.8",
@@ -30182,9 +29986,7 @@
     },
     {
       "ref": "pkg:npm/available-typed-arrays@1.0.7",
-      "dependsOn": [
-        "pkg:npm/possible-typed-array-names@1.1.0"
-      ]
+      "dependsOn": ["pkg:npm/possible-typed-array-names@1.1.0"]
     },
     {
       "ref": "pkg:npm/axe-core@4.10.3",
@@ -30216,9 +30018,7 @@
     },
     {
       "ref": "pkg:npm/bidi-js@1.0.3",
-      "dependsOn": [
-        "pkg:npm/require-from-string@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/require-from-string@2.0.2"]
     },
     {
       "ref": "pkg:npm/binary-extensions@2.3.0",
@@ -30226,28 +30026,19 @@
     },
     {
       "ref": "pkg:npm/binaryextensions@6.11.0",
-      "dependsOn": [
-        "pkg:npm/editions@6.22.0"
-      ]
+      "dependsOn": ["pkg:npm/editions@6.22.0"]
     },
     {
       "ref": "pkg:npm/brace-expansion@1.1.12",
-      "dependsOn": [
-        "pkg:npm/balanced-match@1.0.2",
-        "pkg:npm/concat-map@0.0.1"
-      ]
+      "dependsOn": ["pkg:npm/balanced-match@1.0.2", "pkg:npm/concat-map@0.0.1"]
     },
     {
       "ref": "pkg:npm/brace-expansion@2.0.2",
-      "dependsOn": [
-        "pkg:npm/balanced-match@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/balanced-match@1.0.2"]
     },
     {
       "ref": "pkg:npm/braces@3.0.3",
-      "dependsOn": [
-        "pkg:npm/fill-range@7.1.1"
-      ]
+      "dependsOn": ["pkg:npm/fill-range@7.1.1"]
     },
     {
       "ref": "pkg:npm/browserslist@4.24.5",
@@ -30264,17 +30055,11 @@
     },
     {
       "ref": "pkg:npm/buffer@6.0.3",
-      "dependsOn": [
-        "pkg:npm/base64-js@1.5.1",
-        "pkg:npm/ieee754@1.2.1"
-      ]
+      "dependsOn": ["pkg:npm/base64-js@1.5.1", "pkg:npm/ieee754@1.2.1"]
     },
     {
       "ref": "pkg:npm/call-bind-apply-helpers@1.0.2",
-      "dependsOn": [
-        "pkg:npm/es-errors@1.3.0",
-        "pkg:npm/function-bind@1.1.2"
-      ]
+      "dependsOn": ["pkg:npm/es-errors@1.3.0", "pkg:npm/function-bind@1.1.2"]
     },
     {
       "ref": "pkg:npm/call-bind@1.0.8",
@@ -30298,9 +30083,7 @@
     },
     {
       "ref": "pkg:npm/camera-controls@2.10.1",
-      "dependsOn": [
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/caniuse-lite@1.0.30001718",
@@ -30312,17 +30095,11 @@
     },
     {
       "ref": "pkg:npm/chalk@3.0.0",
-      "dependsOn": [
-        "pkg:npm/ansi-styles@4.3.0",
-        "pkg:npm/supports-color@7.2.0"
-      ]
+      "dependsOn": ["pkg:npm/ansi-styles@4.3.0", "pkg:npm/supports-color@7.2.0"]
     },
     {
       "ref": "pkg:npm/chalk@4.1.2",
-      "dependsOn": [
-        "pkg:npm/ansi-styles@4.3.0",
-        "pkg:npm/supports-color@7.2.0"
-      ]
+      "dependsOn": ["pkg:npm/ansi-styles@4.3.0", "pkg:npm/supports-color@7.2.0"]
     },
     {
       "ref": "pkg:npm/character-entities-html4@2.1.0",
@@ -30367,9 +30144,7 @@
     },
     {
       "ref": "pkg:npm/chokidar@4.0.3",
-      "dependsOn": [
-        "pkg:npm/readdirp@4.1.2"
-      ]
+      "dependsOn": ["pkg:npm/readdirp@4.1.2"]
     },
     {
       "ref": "pkg:npm/chrome-trace-event@1.0.4",
@@ -30381,9 +30156,7 @@
     },
     {
       "ref": "pkg:npm/class-variance-authority@0.7.1",
-      "dependsOn": [
-        "pkg:npm/clsx@2.1.1"
-      ]
+      "dependsOn": ["pkg:npm/clsx@2.1.1"]
     },
     {
       "ref": "pkg:npm/classcat@5.0.5",
@@ -30439,9 +30212,7 @@
     },
     {
       "ref": "pkg:npm/color-convert@2.0.1",
-      "dependsOn": [
-        "pkg:npm/color-name@1.1.4"
-      ]
+      "dependsOn": ["pkg:npm/color-name@1.1.4"]
     },
     {
       "ref": "pkg:npm/color-name@1.1.4",
@@ -30449,23 +30220,15 @@
     },
     {
       "ref": "pkg:npm/color-string@1.9.1",
-      "dependsOn": [
-        "pkg:npm/color-name@1.1.4",
-        "pkg:npm/simple-swizzle@0.2.2"
-      ]
+      "dependsOn": ["pkg:npm/color-name@1.1.4", "pkg:npm/simple-swizzle@0.2.2"]
     },
     {
       "ref": "pkg:npm/color@4.2.3",
-      "dependsOn": [
-        "pkg:npm/color-convert@2.0.1",
-        "pkg:npm/color-string@1.9.1"
-      ]
+      "dependsOn": ["pkg:npm/color-convert@2.0.1", "pkg:npm/color-string@1.9.1"]
     },
     {
       "ref": "pkg:npm/combined-stream@1.0.8",
-      "dependsOn": [
-        "pkg:npm/delayed-stream@1.0.0"
-      ]
+      "dependsOn": ["pkg:npm/delayed-stream@1.0.0"]
     },
     {
       "ref": "pkg:npm/comma-separated-tokens@1.0.8",
@@ -30505,9 +30268,7 @@
     },
     {
       "ref": "pkg:npm/cross-env@7.0.3",
-      "dependsOn": [
-        "pkg:npm/cross-spawn@7.0.6"
-      ]
+      "dependsOn": ["pkg:npm/cross-spawn@7.0.6"]
     },
     {
       "ref": "pkg:npm/cross-spawn@7.0.6",
@@ -30523,9 +30284,7 @@
     },
     {
       "ref": "pkg:npm/d3-array@3.2.4",
-      "dependsOn": [
-        "pkg:npm/internmap@2.0.3"
-      ]
+      "dependsOn": ["pkg:npm/internmap@2.0.3"]
     },
     {
       "ref": "pkg:npm/d3-color@3.1.0",
@@ -30537,10 +30296,7 @@
     },
     {
       "ref": "pkg:npm/d3-drag@3.0.0",
-      "dependsOn": [
-        "pkg:npm/d3-dispatch@3.0.1",
-        "pkg:npm/d3-selection@3.0.0"
-      ]
+      "dependsOn": ["pkg:npm/d3-dispatch@3.0.1", "pkg:npm/d3-selection@3.0.0"]
     },
     {
       "ref": "pkg:npm/d3-ease@3.0.1",
@@ -30552,9 +30308,7 @@
     },
     {
       "ref": "pkg:npm/d3-interpolate@3.0.1",
-      "dependsOn": [
-        "pkg:npm/d3-color@3.1.0"
-      ]
+      "dependsOn": ["pkg:npm/d3-color@3.1.0"]
     },
     {
       "ref": "pkg:npm/d3-path@3.1.0",
@@ -30576,21 +30330,15 @@
     },
     {
       "ref": "pkg:npm/d3-shape@3.2.0",
-      "dependsOn": [
-        "pkg:npm/d3-path@3.1.0"
-      ]
+      "dependsOn": ["pkg:npm/d3-path@3.1.0"]
     },
     {
       "ref": "pkg:npm/d3-time-format@4.1.0",
-      "dependsOn": [
-        "pkg:npm/d3-time@3.1.0"
-      ]
+      "dependsOn": ["pkg:npm/d3-time@3.1.0"]
     },
     {
       "ref": "pkg:npm/d3-time@3.1.0",
-      "dependsOn": [
-        "pkg:npm/d3-array@3.2.4"
-      ]
+      "dependsOn": ["pkg:npm/d3-array@3.2.4"]
     },
     {
       "ref": "pkg:npm/d3-timer@3.0.1",
@@ -30619,10 +30367,7 @@
     },
     {
       "ref": "pkg:npm/d@1.0.2",
-      "dependsOn": [
-        "pkg:npm/es5-ext@0.10.64",
-        "pkg:npm/type@2.7.3"
-      ]
+      "dependsOn": ["pkg:npm/es5-ext@0.10.64", "pkg:npm/type@2.7.3"]
     },
     {
       "ref": "pkg:npm/damerau-levenshtein@1.0.8",
@@ -30654,15 +30399,11 @@
     },
     {
       "ref": "pkg:npm/debug@3.2.7",
-      "dependsOn": [
-        "pkg:npm/ms@2.1.3"
-      ]
+      "dependsOn": ["pkg:npm/ms@2.1.3"]
     },
     {
       "ref": "pkg:npm/debug@4.4.1",
-      "dependsOn": [
-        "pkg:npm/ms@2.1.3"
-      ]
+      "dependsOn": ["pkg:npm/ms@2.1.3"]
     },
     {
       "ref": "pkg:npm/decimal.js-light@2.5.1",
@@ -30670,9 +30411,7 @@
     },
     {
       "ref": "pkg:npm/decode-named-character-reference@1.1.0",
-      "dependsOn": [
-        "pkg:npm/character-entities@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/character-entities@2.0.2"]
     },
     {
       "ref": "pkg:npm/deep-is@0.1.4",
@@ -30704,9 +30443,7 @@
     },
     {
       "ref": "pkg:npm/detect-gpu@5.0.70",
-      "dependsOn": [
-        "pkg:npm/webgl-constants@1.1.1"
-      ]
+      "dependsOn": ["pkg:npm/webgl-constants@1.1.1"]
     },
     {
       "ref": "pkg:npm/detect-libc@1.0.3",
@@ -30722,9 +30459,7 @@
     },
     {
       "ref": "pkg:npm/devlop@1.1.0",
-      "dependsOn": [
-        "pkg:npm/dequal@2.0.3"
-      ]
+      "dependsOn": ["pkg:npm/dequal@2.0.3"]
     },
     {
       "ref": "pkg:npm/diff@5.2.0",
@@ -30732,16 +30467,11 @@
     },
     {
       "ref": "pkg:npm/doctrine@2.1.0",
-      "dependsOn": [
-        "pkg:npm/esutils@2.0.3"
-      ]
+      "dependsOn": ["pkg:npm/esutils@2.0.3"]
     },
     {
       "ref": "pkg:npm/dom-helpers@5.2.1",
-      "dependsOn": [
-        "pkg:npm/%40babel/runtime@7.27.1",
-        "pkg:npm/csstype@3.1.3"
-      ]
+      "dependsOn": ["pkg:npm/%40babel/runtime@7.27.1", "pkg:npm/csstype@3.1.3"]
     },
     {
       "ref": "pkg:npm/dotenv@16.6.1",
@@ -30772,9 +30502,7 @@
     },
     {
       "ref": "pkg:npm/editions@6.22.0",
-      "dependsOn": [
-        "pkg:npm/version-range@4.15.0"
-      ]
+      "dependsOn": ["pkg:npm/version-range@4.15.0"]
     },
     {
       "ref": "pkg:npm/electron-to-chromium@1.5.155",
@@ -30782,15 +30510,11 @@
     },
     {
       "ref": "pkg:npm/embla-carousel-auto-height@8.6.0",
-      "dependsOn": [
-        "pkg:npm/embla-carousel@8.6.0"
-      ]
+      "dependsOn": ["pkg:npm/embla-carousel@8.6.0"]
     },
     {
       "ref": "pkg:npm/embla-carousel-fade@8.6.0",
-      "dependsOn": [
-        "pkg:npm/embla-carousel@8.6.0"
-      ]
+      "dependsOn": ["pkg:npm/embla-carousel@8.6.0"]
     },
     {
       "ref": "pkg:npm/embla-carousel-react@8.6.0",
@@ -30802,9 +30526,7 @@
     },
     {
       "ref": "pkg:npm/embla-carousel-reactive-utils@8.6.0",
-      "dependsOn": [
-        "pkg:npm/embla-carousel@8.6.0"
-      ]
+      "dependsOn": ["pkg:npm/embla-carousel@8.6.0"]
     },
     {
       "ref": "pkg:npm/embla-carousel@8.6.0",
@@ -30816,10 +30538,7 @@
     },
     {
       "ref": "pkg:npm/enhanced-resolve@5.18.3",
-      "dependsOn": [
-        "pkg:npm/graceful-fs@4.2.11",
-        "pkg:npm/tapable@2.2.2"
-      ]
+      "dependsOn": ["pkg:npm/graceful-fs@4.2.11", "pkg:npm/tapable@2.2.2"]
     },
     {
       "ref": "pkg:npm/es-abstract@1.23.9",
@@ -30912,9 +30631,7 @@
     },
     {
       "ref": "pkg:npm/es-object-atoms@1.1.1",
-      "dependsOn": [
-        "pkg:npm/es-errors@1.3.0"
-      ]
+      "dependsOn": ["pkg:npm/es-errors@1.3.0"]
     },
     {
       "ref": "pkg:npm/es-set-tostringtag@2.1.0",
@@ -30927,9 +30644,7 @@
     },
     {
       "ref": "pkg:npm/es-shim-unscopables@1.1.0",
-      "dependsOn": [
-        "pkg:npm/hasown@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/hasown@2.0.2"]
     },
     {
       "ref": "pkg:npm/es-to-primitive@1.3.0",
@@ -30958,10 +30673,7 @@
     },
     {
       "ref": "pkg:npm/es6-symbol@3.1.4",
-      "dependsOn": [
-        "pkg:npm/d@1.0.2",
-        "pkg:npm/ext@1.7.0"
-      ]
+      "dependsOn": ["pkg:npm/d@1.0.2", "pkg:npm/ext@1.7.0"]
     },
     {
       "ref": "pkg:npm/escalade@3.2.0",
@@ -31020,9 +30732,7 @@
     },
     {
       "ref": "pkg:npm/eslint-module-utils@2.12.0",
-      "dependsOn": [
-        "pkg:npm/debug@3.2.7"
-      ]
+      "dependsOn": ["pkg:npm/debug@3.2.7"]
     },
     {
       "ref": "pkg:npm/eslint-plugin-import@2.31.0",
@@ -31072,9 +30782,7 @@
     },
     {
       "ref": "pkg:npm/eslint-plugin-react-hooks@5.2.0",
-      "dependsOn": [
-        "pkg:npm/eslint@9.27.0"
-      ]
+      "dependsOn": ["pkg:npm/eslint@9.27.0"]
     },
     {
       "ref": "pkg:npm/eslint-plugin-react@7.37.5",
@@ -31102,17 +30810,11 @@
     },
     {
       "ref": "pkg:npm/eslint-scope@5.1.1",
-      "dependsOn": [
-        "pkg:npm/esrecurse@4.3.0",
-        "pkg:npm/estraverse@4.3.0"
-      ]
+      "dependsOn": ["pkg:npm/esrecurse@4.3.0", "pkg:npm/estraverse@4.3.0"]
     },
     {
       "ref": "pkg:npm/eslint-scope@8.3.0",
-      "dependsOn": [
-        "pkg:npm/esrecurse@4.3.0",
-        "pkg:npm/estraverse@5.3.0"
-      ]
+      "dependsOn": ["pkg:npm/esrecurse@4.3.0", "pkg:npm/estraverse@5.3.0"]
     },
     {
       "ref": "pkg:npm/eslint-visitor-keys@3.4.3",
@@ -31182,15 +30884,11 @@
     },
     {
       "ref": "pkg:npm/esquery@1.6.0",
-      "dependsOn": [
-        "pkg:npm/estraverse@5.3.0"
-      ]
+      "dependsOn": ["pkg:npm/estraverse@5.3.0"]
     },
     {
       "ref": "pkg:npm/esrecurse@4.3.0",
-      "dependsOn": [
-        "pkg:npm/estraverse@5.3.0"
-      ]
+      "dependsOn": ["pkg:npm/estraverse@5.3.0"]
     },
     {
       "ref": "pkg:npm/estraverse@4.3.0",
@@ -31221,10 +30919,7 @@
     },
     {
       "ref": "pkg:npm/event-emitter@0.3.5",
-      "dependsOn": [
-        "pkg:npm/d@1.0.2",
-        "pkg:npm/es5-ext@0.10.64"
-      ]
+      "dependsOn": ["pkg:npm/d@1.0.2", "pkg:npm/es5-ext@0.10.64"]
     },
     {
       "ref": "pkg:npm/eventemitter3@4.0.7",
@@ -31236,9 +30931,7 @@
     },
     {
       "ref": "pkg:npm/ext@1.7.0",
-      "dependsOn": [
-        "pkg:npm/type@2.7.3"
-      ]
+      "dependsOn": ["pkg:npm/type@2.7.3"]
     },
     {
       "ref": "pkg:npm/extend@3.0.2",
@@ -31286,33 +30979,23 @@
     },
     {
       "ref": "pkg:npm/fastq@1.19.1",
-      "dependsOn": [
-        "pkg:npm/reusify@1.1.0"
-      ]
+      "dependsOn": ["pkg:npm/reusify@1.1.0"]
     },
     {
       "ref": "pkg:npm/fault@1.0.4",
-      "dependsOn": [
-        "pkg:npm/format@0.2.2"
-      ]
+      "dependsOn": ["pkg:npm/format@0.2.2"]
     },
     {
       "ref": "pkg:npm/fault@2.0.1",
-      "dependsOn": [
-        "pkg:npm/format@0.2.2"
-      ]
+      "dependsOn": ["pkg:npm/format@0.2.2"]
     },
     {
       "ref": "pkg:npm/fdir@6.4.4",
-      "dependsOn": [
-        "pkg:npm/picomatch@4.0.2"
-      ]
+      "dependsOn": ["pkg:npm/picomatch@4.0.2"]
     },
     {
       "ref": "pkg:npm/fdir@6.4.6",
-      "dependsOn": [
-        "pkg:npm/picomatch@4.0.2"
-      ]
+      "dependsOn": ["pkg:npm/picomatch@4.0.2"]
     },
     {
       "ref": "pkg:npm/fflate@0.6.10",
@@ -31324,35 +31007,23 @@
     },
     {
       "ref": "pkg:npm/file-entry-cache@8.0.0",
-      "dependsOn": [
-        "pkg:npm/flat-cache@4.0.1"
-      ]
+      "dependsOn": ["pkg:npm/flat-cache@4.0.1"]
     },
     {
       "ref": "pkg:npm/file-selector@2.1.2",
-      "dependsOn": [
-        "pkg:npm/tslib@2.8.1"
-      ]
+      "dependsOn": ["pkg:npm/tslib@2.8.1"]
     },
     {
       "ref": "pkg:npm/fill-range@7.1.1",
-      "dependsOn": [
-        "pkg:npm/to-regex-range@5.0.1"
-      ]
+      "dependsOn": ["pkg:npm/to-regex-range@5.0.1"]
     },
     {
       "ref": "pkg:npm/find-up@5.0.0",
-      "dependsOn": [
-        "pkg:npm/locate-path@6.0.0",
-        "pkg:npm/path-exists@4.0.0"
-      ]
+      "dependsOn": ["pkg:npm/locate-path@6.0.0", "pkg:npm/path-exists@4.0.0"]
     },
     {
       "ref": "pkg:npm/flat-cache@4.0.1",
-      "dependsOn": [
-        "pkg:npm/flatted@3.3.3",
-        "pkg:npm/keyv@4.5.4"
-      ]
+      "dependsOn": ["pkg:npm/flatted@3.3.3", "pkg:npm/keyv@4.5.4"]
     },
     {
       "ref": "pkg:npm/flatted@3.3.3",
@@ -31368,9 +31039,7 @@
     },
     {
       "ref": "pkg:npm/for-each@0.3.5",
-      "dependsOn": [
-        "pkg:npm/is-callable@1.2.7"
-      ]
+      "dependsOn": ["pkg:npm/is-callable@1.2.7"]
     },
     {
       "ref": "pkg:npm/form-data@4.0.4",
@@ -31475,21 +31144,15 @@
     },
     {
       "ref": "pkg:npm/get-tsconfig@4.10.0",
-      "dependsOn": [
-        "pkg:npm/resolve-pkg-maps@1.0.0"
-      ]
+      "dependsOn": ["pkg:npm/resolve-pkg-maps@1.0.0"]
     },
     {
       "ref": "pkg:npm/glob-parent@5.1.2",
-      "dependsOn": [
-        "pkg:npm/is-glob@4.0.3"
-      ]
+      "dependsOn": ["pkg:npm/is-glob@4.0.3"]
     },
     {
       "ref": "pkg:npm/glob-parent@6.0.2",
-      "dependsOn": [
-        "pkg:npm/is-glob@4.0.3"
-      ]
+      "dependsOn": ["pkg:npm/is-glob@4.0.3"]
     },
     {
       "ref": "pkg:npm/glob-to-regexp@0.4.1",
@@ -31514,10 +31177,7 @@
     },
     {
       "ref": "pkg:npm/globalthis@1.0.4",
-      "dependsOn": [
-        "pkg:npm/define-properties@1.2.1",
-        "pkg:npm/gopd@1.2.0"
-      ]
+      "dependsOn": ["pkg:npm/define-properties@1.2.1", "pkg:npm/gopd@1.2.0"]
     },
     {
       "ref": "pkg:npm/glsl-noise@0.0.0",
@@ -31545,15 +31205,11 @@
     },
     {
       "ref": "pkg:npm/has-property-descriptors@1.0.2",
-      "dependsOn": [
-        "pkg:npm/es-define-property@1.0.1"
-      ]
+      "dependsOn": ["pkg:npm/es-define-property@1.0.1"]
     },
     {
       "ref": "pkg:npm/has-proto@1.2.0",
-      "dependsOn": [
-        "pkg:npm/dunder-proto@1.0.1"
-      ]
+      "dependsOn": ["pkg:npm/dunder-proto@1.0.1"]
     },
     {
       "ref": "pkg:npm/has-symbols@1.1.0",
@@ -31561,21 +31217,15 @@
     },
     {
       "ref": "pkg:npm/has-tostringtag@1.0.2",
-      "dependsOn": [
-        "pkg:npm/has-symbols@1.1.0"
-      ]
+      "dependsOn": ["pkg:npm/has-symbols@1.1.0"]
     },
     {
       "ref": "pkg:npm/hasown@2.0.2",
-      "dependsOn": [
-        "pkg:npm/function-bind@1.1.2"
-      ]
+      "dependsOn": ["pkg:npm/function-bind@1.1.2"]
     },
     {
       "ref": "pkg:npm/hast-util-is-element@3.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/hast@3.0.4"
-      ]
+      "dependsOn": ["pkg:npm/%40types/hast@3.0.4"]
     },
     {
       "ref": "pkg:npm/hast-util-parse-selector@2.2.5",
@@ -31603,9 +31253,7 @@
     },
     {
       "ref": "pkg:npm/hast-util-whitespace@3.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/hast@3.0.4"
-      ]
+      "dependsOn": ["pkg:npm/%40types/hast@3.0.4"]
     },
     {
       "ref": "pkg:npm/hastscript@6.0.0",
@@ -31631,9 +31279,7 @@
     },
     {
       "ref": "pkg:npm/hoist-non-react-statics@3.3.2",
-      "dependsOn": [
-        "pkg:npm/react-is@16.13.1"
-      ]
+      "dependsOn": ["pkg:npm/react-is@16.13.1"]
     },
     {
       "ref": "pkg:npm/html-url-attributes@3.0.1",
@@ -31641,10 +31287,7 @@
     },
     {
       "ref": "pkg:npm/https-proxy-agent@5.0.1",
-      "dependsOn": [
-        "pkg:npm/agent-base@6.0.2",
-        "pkg:npm/debug@4.4.1"
-      ]
+      "dependsOn": ["pkg:npm/agent-base@6.0.2", "pkg:npm/debug@4.4.1"]
     },
     {
       "ref": "pkg:npm/ieee754@1.2.1",
@@ -31668,10 +31311,7 @@
     },
     {
       "ref": "pkg:npm/import-fresh@3.3.1",
-      "dependsOn": [
-        "pkg:npm/parent-module@1.0.1",
-        "pkg:npm/resolve-from@4.0.0"
-      ]
+      "dependsOn": ["pkg:npm/parent-module@1.0.1", "pkg:npm/resolve-from@4.0.0"]
     },
     {
       "ref": "pkg:npm/import-in-the-middle@1.14.2",
@@ -31720,17 +31360,11 @@
     },
     {
       "ref": "pkg:npm/is-alphanumerical@1.0.4",
-      "dependsOn": [
-        "pkg:npm/is-alphabetical@1.0.4",
-        "pkg:npm/is-decimal@1.0.4"
-      ]
+      "dependsOn": ["pkg:npm/is-alphabetical@1.0.4", "pkg:npm/is-decimal@1.0.4"]
     },
     {
       "ref": "pkg:npm/is-alphanumerical@2.0.1",
-      "dependsOn": [
-        "pkg:npm/is-alphabetical@2.0.1",
-        "pkg:npm/is-decimal@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/is-alphabetical@2.0.1", "pkg:npm/is-decimal@2.0.1"]
     },
     {
       "ref": "pkg:npm/is-array-buffer@3.0.5",
@@ -31756,28 +31390,19 @@
     },
     {
       "ref": "pkg:npm/is-bigint@1.1.0",
-      "dependsOn": [
-        "pkg:npm/has-bigints@1.1.0"
-      ]
+      "dependsOn": ["pkg:npm/has-bigints@1.1.0"]
     },
     {
       "ref": "pkg:npm/is-binary-path@2.1.0",
-      "dependsOn": [
-        "pkg:npm/binary-extensions@2.3.0"
-      ]
+      "dependsOn": ["pkg:npm/binary-extensions@2.3.0"]
     },
     {
       "ref": "pkg:npm/is-boolean-object@1.2.2",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/has-tostringtag@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/has-tostringtag@1.0.2"]
     },
     {
       "ref": "pkg:npm/is-bun-module@2.0.0",
-      "dependsOn": [
-        "pkg:npm/semver@7.7.2"
-      ]
+      "dependsOn": ["pkg:npm/semver@7.7.2"]
     },
     {
       "ref": "pkg:npm/is-callable@1.2.7",
@@ -31785,9 +31410,7 @@
     },
     {
       "ref": "pkg:npm/is-core-module@2.16.1",
-      "dependsOn": [
-        "pkg:npm/hasown@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/hasown@2.0.2"]
     },
     {
       "ref": "pkg:npm/is-data-view@1.0.2",
@@ -31799,10 +31422,7 @@
     },
     {
       "ref": "pkg:npm/is-date-object@1.1.0",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/has-tostringtag@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/has-tostringtag@1.0.2"]
     },
     {
       "ref": "pkg:npm/is-decimal@1.0.4",
@@ -31818,9 +31438,7 @@
     },
     {
       "ref": "pkg:npm/is-finalizationregistry@1.1.1",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4"]
     },
     {
       "ref": "pkg:npm/is-generator-function@1.1.0",
@@ -31833,9 +31451,7 @@
     },
     {
       "ref": "pkg:npm/is-glob@4.0.3",
-      "dependsOn": [
-        "pkg:npm/is-extglob@2.1.1"
-      ]
+      "dependsOn": ["pkg:npm/is-extglob@2.1.1"]
     },
     {
       "ref": "pkg:npm/is-hexadecimal@1.0.4",
@@ -31851,10 +31467,7 @@
     },
     {
       "ref": "pkg:npm/is-number-object@1.1.1",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/has-tostringtag@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/has-tostringtag@1.0.2"]
     },
     {
       "ref": "pkg:npm/is-number@7.0.0",
@@ -31870,9 +31483,7 @@
     },
     {
       "ref": "pkg:npm/is-reference@1.2.1",
-      "dependsOn": [
-        "pkg:npm/%40types/estree@1.0.8"
-      ]
+      "dependsOn": ["pkg:npm/%40types/estree@1.0.8"]
     },
     {
       "ref": "pkg:npm/is-regex@1.2.1",
@@ -31889,16 +31500,11 @@
     },
     {
       "ref": "pkg:npm/is-shared-array-buffer@1.0.4",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4"]
     },
     {
       "ref": "pkg:npm/is-string@1.1.1",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/has-tostringtag@1.0.2"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/has-tostringtag@1.0.2"]
     },
     {
       "ref": "pkg:npm/is-symbol@1.1.1",
@@ -31910,9 +31516,7 @@
     },
     {
       "ref": "pkg:npm/is-typed-array@1.1.15",
-      "dependsOn": [
-        "pkg:npm/which-typed-array@1.1.19"
-      ]
+      "dependsOn": ["pkg:npm/which-typed-array@1.1.19"]
     },
     {
       "ref": "pkg:npm/is-weakmap@2.0.2",
@@ -31920,16 +31524,11 @@
     },
     {
       "ref": "pkg:npm/is-weakref@1.1.1",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4"]
     },
     {
       "ref": "pkg:npm/is-weakset@2.0.4",
-      "dependsOn": [
-        "pkg:npm/call-bound@1.0.4",
-        "pkg:npm/get-intrinsic@1.3.0"
-      ]
+      "dependsOn": ["pkg:npm/call-bound@1.0.4", "pkg:npm/get-intrinsic@1.3.0"]
     },
     {
       "ref": "pkg:npm/isarray@2.0.5",
@@ -31987,9 +31586,7 @@
     },
     {
       "ref": "pkg:npm/js-yaml@4.1.0",
-      "dependsOn": [
-        "pkg:npm/argparse@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/argparse@2.0.1"]
     },
     {
       "ref": "pkg:npm/jsesc@3.1.0",
@@ -32017,9 +31614,7 @@
     },
     {
       "ref": "pkg:npm/json5@1.0.2",
-      "dependsOn": [
-        "pkg:npm/minimist@1.2.8"
-      ]
+      "dependsOn": ["pkg:npm/minimist@1.2.8"]
     },
     {
       "ref": "pkg:npm/json5@2.2.3",
@@ -32036,9 +31631,7 @@
     },
     {
       "ref": "pkg:npm/keyv@4.5.4",
-      "dependsOn": [
-        "pkg:npm/json-buffer@3.0.1"
-      ]
+      "dependsOn": ["pkg:npm/json-buffer@3.0.1"]
     },
     {
       "ref": "pkg:npm/language-subtag-registry@0.3.23",
@@ -32046,16 +31639,11 @@
     },
     {
       "ref": "pkg:npm/language-tags@1.0.9",
-      "dependsOn": [
-        "pkg:npm/language-subtag-registry@0.3.23"
-      ]
+      "dependsOn": ["pkg:npm/language-subtag-registry@0.3.23"]
     },
     {
       "ref": "pkg:npm/levn@0.4.1",
-      "dependsOn": [
-        "pkg:npm/prelude-ls@1.2.1",
-        "pkg:npm/type-check@0.4.0"
-      ]
+      "dependsOn": ["pkg:npm/prelude-ls@1.2.1", "pkg:npm/type-check@0.4.0"]
     },
     {
       "ref": "pkg:npm/lexical@0.32.1",
@@ -32063,15 +31651,11 @@
     },
     {
       "ref": "pkg:npm/lib0@0.2.109",
-      "dependsOn": [
-        "pkg:npm/isomorphic.js@0.2.5"
-      ]
+      "dependsOn": ["pkg:npm/isomorphic.js@0.2.5"]
     },
     {
       "ref": "pkg:npm/lie@3.3.0",
-      "dependsOn": [
-        "pkg:npm/immediate@3.0.6"
-      ]
+      "dependsOn": ["pkg:npm/immediate@3.0.6"]
     },
     {
       "ref": "pkg:npm/loader-runner@4.3.0",
@@ -32079,9 +31663,7 @@
     },
     {
       "ref": "pkg:npm/locate-path@6.0.0",
-      "dependsOn": [
-        "pkg:npm/p-locate@5.0.0"
-      ]
+      "dependsOn": ["pkg:npm/p-locate@5.0.0"]
     },
     {
       "ref": "pkg:npm/lodash.merge@4.6.2",
@@ -32097,16 +31679,11 @@
     },
     {
       "ref": "pkg:npm/loose-envify@1.4.0",
-      "dependsOn": [
-        "pkg:npm/js-tokens@4.0.0"
-      ]
+      "dependsOn": ["pkg:npm/js-tokens@4.0.0"]
     },
     {
       "ref": "pkg:npm/lowlight@1.20.0",
-      "dependsOn": [
-        "pkg:npm/fault@1.0.4",
-        "pkg:npm/highlight.js@10.7.3"
-      ]
+      "dependsOn": ["pkg:npm/fault@1.0.4", "pkg:npm/highlight.js@10.7.3"]
     },
     {
       "ref": "pkg:npm/lru-cache@10.4.3",
@@ -32114,15 +31691,11 @@
     },
     {
       "ref": "pkg:npm/lru-cache@5.1.1",
-      "dependsOn": [
-        "pkg:npm/yallist@3.1.1"
-      ]
+      "dependsOn": ["pkg:npm/yallist@3.1.1"]
     },
     {
       "ref": "pkg:npm/lucide-react@0.511.0",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/lz-string@1.5.0",
@@ -32130,29 +31703,19 @@
     },
     {
       "ref": "pkg:npm/maath@0.10.8",
-      "dependsOn": [
-        "pkg:npm/%40types/three@0.176.0",
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/%40types/three@0.176.0", "pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/maath@0.6.0",
-      "dependsOn": [
-        "pkg:npm/%40types/three@0.176.0",
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/%40types/three@0.176.0", "pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/magic-string@0.30.17",
-      "dependsOn": [
-        "pkg:npm/%40jridgewell/sourcemap-codec@1.5.0"
-      ]
+      "dependsOn": ["pkg:npm/%40jridgewell/sourcemap-codec@1.5.0"]
     },
     {
       "ref": "pkg:npm/magic-string@0.30.8",
-      "dependsOn": [
-        "pkg:npm/%40jridgewell/sourcemap-codec@1.5.0"
-      ]
+      "dependsOn": ["pkg:npm/%40jridgewell/sourcemap-codec@1.5.0"]
     },
     {
       "ref": "pkg:npm/markdown-table@3.0.4",
@@ -32358,9 +31921,7 @@
     },
     {
       "ref": "pkg:npm/mdast-util-to-string@4.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/mdast@4.0.4"
-      ]
+      "dependsOn": ["pkg:npm/%40types/mdast@4.0.4"]
     },
     {
       "ref": "pkg:npm/merge-stream@2.0.0",
@@ -32372,9 +31933,7 @@
     },
     {
       "ref": "pkg:npm/meshline@3.3.1",
-      "dependsOn": [
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/meshoptimizer@0.18.1",
@@ -32467,9 +32026,7 @@
     },
     {
       "ref": "pkg:npm/micromark-extension-gfm-tagfilter@2.0.0",
-      "dependsOn": [
-        "pkg:npm/micromark-util-types@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-types@2.0.2"]
     },
     {
       "ref": "pkg:npm/micromark-extension-gfm-task-list-item@2.1.0",
@@ -32524,9 +32081,7 @@
     },
     {
       "ref": "pkg:npm/micromark-extension-mdx-md@2.0.0",
-      "dependsOn": [
-        "pkg:npm/micromark-util-types@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-types@2.0.2"]
     },
     {
       "ref": "pkg:npm/micromark-extension-mdxjs-esm@3.0.0",
@@ -32620,9 +32175,7 @@
     },
     {
       "ref": "pkg:npm/micromark-util-chunked@2.0.1",
-      "dependsOn": [
-        "pkg:npm/micromark-util-symbol@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-symbol@2.0.1"]
     },
     {
       "ref": "pkg:npm/micromark-util-classify-character@2.0.1",
@@ -32641,9 +32194,7 @@
     },
     {
       "ref": "pkg:npm/micromark-util-decode-numeric-character-reference@2.0.2",
-      "dependsOn": [
-        "pkg:npm/micromark-util-symbol@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-symbol@2.0.1"]
     },
     {
       "ref": "pkg:npm/micromark-util-decode-string@2.0.1",
@@ -32676,15 +32227,11 @@
     },
     {
       "ref": "pkg:npm/micromark-util-normalize-identifier@2.0.1",
-      "dependsOn": [
-        "pkg:npm/micromark-util-symbol@2.0.1"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-symbol@2.0.1"]
     },
     {
       "ref": "pkg:npm/micromark-util-resolve-all@2.0.1",
-      "dependsOn": [
-        "pkg:npm/micromark-util-types@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/micromark-util-types@2.0.2"]
     },
     {
       "ref": "pkg:npm/micromark-util-sanitize-uri@2.0.1",
@@ -32735,10 +32282,7 @@
     },
     {
       "ref": "pkg:npm/micromatch@4.0.8",
-      "dependsOn": [
-        "pkg:npm/braces@3.0.3",
-        "pkg:npm/picomatch@2.3.1"
-      ]
+      "dependsOn": ["pkg:npm/braces@3.0.3", "pkg:npm/picomatch@2.3.1"]
     },
     {
       "ref": "pkg:npm/mime-db@1.52.0",
@@ -32750,9 +32294,7 @@
     },
     {
       "ref": "pkg:npm/mime-types@2.1.35",
-      "dependsOn": [
-        "pkg:npm/mime-db@1.52.0"
-      ]
+      "dependsOn": ["pkg:npm/mime-db@1.52.0"]
     },
     {
       "ref": "pkg:npm/mini-svg-data-uri@1.4.4",
@@ -32760,21 +32302,15 @@
     },
     {
       "ref": "pkg:npm/minimatch@3.1.2",
-      "dependsOn": [
-        "pkg:npm/brace-expansion@1.1.12"
-      ]
+      "dependsOn": ["pkg:npm/brace-expansion@1.1.12"]
     },
     {
       "ref": "pkg:npm/minimatch@8.0.4",
-      "dependsOn": [
-        "pkg:npm/brace-expansion@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/brace-expansion@2.0.2"]
     },
     {
       "ref": "pkg:npm/minimatch@9.0.5",
-      "dependsOn": [
-        "pkg:npm/brace-expansion@2.0.2"
-      ]
+      "dependsOn": ["pkg:npm/brace-expansion@2.0.2"]
     },
     {
       "ref": "pkg:npm/minimist@1.2.8",
@@ -32794,9 +32330,7 @@
     },
     {
       "ref": "pkg:npm/motion-dom@12.23.12",
-      "dependsOn": [
-        "pkg:npm/motion-utils@12.23.6"
-      ]
+      "dependsOn": ["pkg:npm/motion-utils@12.23.6"]
     },
     {
       "ref": "pkg:npm/motion-utils@12.23.6",
@@ -32808,10 +32342,7 @@
     },
     {
       "ref": "pkg:npm/n8ao@1.9.6",
-      "dependsOn": [
-        "pkg:npm/postprocessing@6.37.3",
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/postprocessing@6.37.3", "pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/nanoid@3.3.11",
@@ -32831,10 +32362,7 @@
     },
     {
       "ref": "pkg:npm/next-themes@0.4.6",
-      "dependsOn": [
-        "pkg:npm/react-dom@19.1.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react-dom@19.1.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/next-tick@1.1.0",
@@ -32869,9 +32397,7 @@
     },
     {
       "ref": "pkg:npm/node-fetch@2.7.0",
-      "dependsOn": [
-        "pkg:npm/whatwg-url@5.0.0"
-      ]
+      "dependsOn": ["pkg:npm/whatwg-url@5.0.0"]
     },
     {
       "ref": "pkg:npm/node-releases@2.0.19",
@@ -32960,9 +32486,7 @@
     },
     {
       "ref": "pkg:npm/otpauth@9.4.1",
-      "dependsOn": [
-        "pkg:npm/%40noble/hashes@1.8.0"
-      ]
+      "dependsOn": ["pkg:npm/%40noble/hashes@1.8.0"]
     },
     {
       "ref": "pkg:npm/outvariant@1.4.0",
@@ -32978,21 +32502,15 @@
     },
     {
       "ref": "pkg:npm/p-limit@3.1.0",
-      "dependsOn": [
-        "pkg:npm/yocto-queue@0.1.0"
-      ]
+      "dependsOn": ["pkg:npm/yocto-queue@0.1.0"]
     },
     {
       "ref": "pkg:npm/p-locate@5.0.0",
-      "dependsOn": [
-        "pkg:npm/p-limit@3.1.0"
-      ]
+      "dependsOn": ["pkg:npm/p-limit@3.1.0"]
     },
     {
       "ref": "pkg:npm/parent-module@1.0.1",
-      "dependsOn": [
-        "pkg:npm/callsites@3.1.0"
-      ]
+      "dependsOn": ["pkg:npm/callsites@3.1.0"]
     },
     {
       "ref": "pkg:npm/parse-entities@2.0.0",
@@ -33031,10 +32549,7 @@
     },
     {
       "ref": "pkg:npm/path-scurry@1.11.1",
-      "dependsOn": [
-        "pkg:npm/lru-cache@10.4.3",
-        "pkg:npm/minipass@7.1.2"
-      ]
+      "dependsOn": ["pkg:npm/lru-cache@10.4.3", "pkg:npm/minipass@7.1.2"]
     },
     {
       "ref": "pkg:npm/pg-int8@1.0.1",
@@ -33104,15 +32619,11 @@
     },
     {
       "ref": "pkg:npm/postgres-interval@1.2.0",
-      "dependsOn": [
-        "pkg:npm/xtend@4.0.2"
-      ]
+      "dependsOn": ["pkg:npm/xtend@4.0.2"]
     },
     {
       "ref": "pkg:npm/postprocessing@6.37.3",
-      "dependsOn": [
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/potpack@1.0.2",
@@ -33136,10 +32647,7 @@
     },
     {
       "ref": "pkg:npm/promise-worker-transferable@1.0.4",
-      "dependsOn": [
-        "pkg:npm/is-promise@2.2.2",
-        "pkg:npm/lie@3.3.0"
-      ]
+      "dependsOn": ["pkg:npm/is-promise@2.2.2", "pkg:npm/lie@3.3.0"]
     },
     {
       "ref": "pkg:npm/prop-types@15.8.1",
@@ -33151,9 +32659,7 @@
     },
     {
       "ref": "pkg:npm/property-information@5.6.0",
-      "dependsOn": [
-        "pkg:npm/xtend@4.0.2"
-      ]
+      "dependsOn": ["pkg:npm/xtend@4.0.2"]
     },
     {
       "ref": "pkg:npm/property-information@7.1.0",
@@ -33177,22 +32683,15 @@
     },
     {
       "ref": "pkg:npm/randombytes@2.1.0",
-      "dependsOn": [
-        "pkg:npm/safe-buffer@5.2.1"
-      ]
+      "dependsOn": ["pkg:npm/safe-buffer@5.2.1"]
     },
     {
       "ref": "pkg:npm/react-devtools-inline@4.4.0",
-      "dependsOn": [
-        "pkg:npm/es6-symbol@3.1.4"
-      ]
+      "dependsOn": ["pkg:npm/es6-symbol@3.1.4"]
     },
     {
       "ref": "pkg:npm/react-dom@19.1.1",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1",
-        "pkg:npm/scheduler@0.26.0"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1", "pkg:npm/scheduler@0.26.0"]
     },
     {
       "ref": "pkg:npm/react-dropzone@14.3.8",
@@ -33205,16 +32704,11 @@
     },
     {
       "ref": "pkg:npm/react-error-boundary@3.1.4",
-      "dependsOn": [
-        "pkg:npm/%40babel/runtime@7.27.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/%40babel/runtime@7.27.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/react-hook-form@7.56.4",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/react-is@16.13.1",
@@ -33248,10 +32742,7 @@
     },
     {
       "ref": "pkg:npm/react-reconciler@0.31.0",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1",
-        "pkg:npm/scheduler@0.25.0"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1", "pkg:npm/scheduler@0.25.0"]
     },
     {
       "ref": "pkg:npm/react-remove-scroll-bar@2.3.8",
@@ -33318,10 +32809,7 @@
     },
     {
       "ref": "pkg:npm/react-use-measure@2.1.7",
-      "dependsOn": [
-        "pkg:npm/react-dom@19.1.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react-dom@19.1.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/react@19.1.1",
@@ -33329,9 +32817,7 @@
     },
     {
       "ref": "pkg:npm/readdirp@3.6.0",
-      "dependsOn": [
-        "pkg:npm/picomatch@2.3.1"
-      ]
+      "dependsOn": ["pkg:npm/picomatch@2.3.1"]
     },
     {
       "ref": "pkg:npm/readdirp@4.1.2",
@@ -33339,9 +32825,7 @@
     },
     {
       "ref": "pkg:npm/recharts-scale@0.4.5",
-      "dependsOn": [
-        "pkg:npm/decimal.js-light@2.5.1"
-      ]
+      "dependsOn": ["pkg:npm/decimal.js-light@2.5.1"]
     },
     {
       "ref": "pkg:npm/recharts@2.15.3",
@@ -33515,9 +32999,7 @@
     },
     {
       "ref": "pkg:npm/run-parallel@1.2.0",
-      "dependsOn": [
-        "pkg:npm/queue-microtask@1.2.3"
-      ]
+      "dependsOn": ["pkg:npm/queue-microtask@1.2.3"]
     },
     {
       "ref": "pkg:npm/safe-array-concat@1.1.3",
@@ -33535,10 +33017,7 @@
     },
     {
       "ref": "pkg:npm/safe-push-apply@1.0.0",
-      "dependsOn": [
-        "pkg:npm/es-errors@1.3.0",
-        "pkg:npm/isarray@2.0.5"
-      ]
+      "dependsOn": ["pkg:npm/es-errors@1.3.0", "pkg:npm/isarray@2.0.5"]
     },
     {
       "ref": "pkg:npm/safe-regex-test@1.1.0",
@@ -33584,9 +33063,7 @@
     },
     {
       "ref": "pkg:npm/serialize-javascript@6.0.2",
-      "dependsOn": [
-        "pkg:npm/randombytes@2.1.0"
-      ]
+      "dependsOn": ["pkg:npm/randombytes@2.1.0"]
     },
     {
       "ref": "pkg:npm/set-cookie-parser@2.7.1",
@@ -33652,9 +33129,7 @@
     },
     {
       "ref": "pkg:npm/shebang-command@2.0.0",
-      "dependsOn": [
-        "pkg:npm/shebang-regex@3.0.0"
-      ]
+      "dependsOn": ["pkg:npm/shebang-regex@3.0.0"]
     },
     {
       "ref": "pkg:npm/shebang-regex@3.0.0",
@@ -33666,10 +33141,7 @@
     },
     {
       "ref": "pkg:npm/side-channel-list@1.0.0",
-      "dependsOn": [
-        "pkg:npm/es-errors@1.3.0",
-        "pkg:npm/object-inspect@1.13.4"
-      ]
+      "dependsOn": ["pkg:npm/es-errors@1.3.0", "pkg:npm/object-inspect@1.13.4"]
     },
     {
       "ref": "pkg:npm/side-channel-map@1.0.1",
@@ -33702,16 +33174,11 @@
     },
     {
       "ref": "pkg:npm/simple-swizzle@0.2.2",
-      "dependsOn": [
-        "pkg:npm/is-arrayish@0.3.2"
-      ]
+      "dependsOn": ["pkg:npm/is-arrayish@0.3.2"]
     },
     {
       "ref": "pkg:npm/sonner@2.0.7",
-      "dependsOn": [
-        "pkg:npm/react-dom@19.1.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react-dom@19.1.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/source-map-js@1.2.1",
@@ -33719,10 +33186,7 @@
     },
     {
       "ref": "pkg:npm/source-map-support@0.5.21",
-      "dependsOn": [
-        "pkg:npm/buffer-from@1.1.2",
-        "pkg:npm/source-map@0.6.1"
-      ]
+      "dependsOn": ["pkg:npm/buffer-from@1.1.2", "pkg:npm/source-map@0.6.1"]
     },
     {
       "ref": "pkg:npm/source-map@0.6.1",
@@ -33742,9 +33206,7 @@
     },
     {
       "ref": "pkg:npm/stacktrace-parser@0.1.11",
-      "dependsOn": [
-        "pkg:npm/type-fest@0.7.1"
-      ]
+      "dependsOn": ["pkg:npm/type-fest@0.7.1"]
     },
     {
       "ref": "pkg:npm/static-browser-server@1.0.3",
@@ -33757,10 +33219,7 @@
     },
     {
       "ref": "pkg:npm/stats-gl@2.4.2",
-      "dependsOn": [
-        "pkg:npm/%40types/three@0.176.0",
-        "pkg:npm/three@0.170.0"
-      ]
+      "dependsOn": ["pkg:npm/%40types/three@0.176.0", "pkg:npm/three@0.170.0"]
     },
     {
       "ref": "pkg:npm/stats.js@0.17.0",
@@ -33853,34 +33312,23 @@
     },
     {
       "ref": "pkg:npm/style-to-js@1.1.16",
-      "dependsOn": [
-        "pkg:npm/style-to-object@1.0.8"
-      ]
+      "dependsOn": ["pkg:npm/style-to-object@1.0.8"]
     },
     {
       "ref": "pkg:npm/style-to-object@1.0.8",
-      "dependsOn": [
-        "pkg:npm/inline-style-parser@0.2.4"
-      ]
+      "dependsOn": ["pkg:npm/inline-style-parser@0.2.4"]
     },
     {
       "ref": "pkg:npm/styled-jsx@5.1.6",
-      "dependsOn": [
-        "pkg:npm/client-only@0.0.1",
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/client-only@0.0.1", "pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/supports-color@7.2.0",
-      "dependsOn": [
-        "pkg:npm/has-flag@4.0.0"
-      ]
+      "dependsOn": ["pkg:npm/has-flag@4.0.0"]
     },
     {
       "ref": "pkg:npm/supports-color@8.1.1",
-      "dependsOn": [
-        "pkg:npm/has-flag@4.0.0"
-      ]
+      "dependsOn": ["pkg:npm/has-flag@4.0.0"]
     },
     {
       "ref": "pkg:npm/supports-preserve-symlinks-flag@1.0.0",
@@ -33888,9 +33336,7 @@
     },
     {
       "ref": "pkg:npm/suspend-react@0.1.3",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/swr@2.3.6",
@@ -33910,9 +33356,7 @@
     },
     {
       "ref": "pkg:npm/tailwindcss-animate@1.0.7",
-      "dependsOn": [
-        "pkg:npm/tailwindcss@4.1.12"
-      ]
+      "dependsOn": ["pkg:npm/tailwindcss@4.1.12"]
     },
     {
       "ref": "pkg:npm/tailwindcss@4.1.12",
@@ -33944,15 +33388,11 @@
     },
     {
       "ref": "pkg:npm/textextensions@6.11.0",
-      "dependsOn": [
-        "pkg:npm/editions@6.22.0"
-      ]
+      "dependsOn": ["pkg:npm/editions@6.22.0"]
     },
     {
       "ref": "pkg:npm/three-mesh-bvh@0.8.3",
-      "dependsOn": [
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/three-stdlib@2.36.0",
@@ -33984,22 +33424,15 @@
     },
     {
       "ref": "pkg:npm/tinyglobby@0.2.13",
-      "dependsOn": [
-        "pkg:npm/fdir@6.4.4",
-        "pkg:npm/picomatch@4.0.2"
-      ]
+      "dependsOn": ["pkg:npm/fdir@6.4.4", "pkg:npm/picomatch@4.0.2"]
     },
     {
       "ref": "pkg:npm/tldjs@2.3.1",
-      "dependsOn": [
-        "pkg:npm/punycode@1.4.1"
-      ]
+      "dependsOn": ["pkg:npm/punycode@1.4.1"]
     },
     {
       "ref": "pkg:npm/to-regex-range@5.0.1",
-      "dependsOn": [
-        "pkg:npm/is-number@7.0.0"
-      ]
+      "dependsOn": ["pkg:npm/is-number@7.0.0"]
     },
     {
       "ref": "pkg:npm/tr46@0.0.3",
@@ -34021,9 +33454,7 @@
     },
     {
       "ref": "pkg:npm/troika-three-utils@0.52.4",
-      "dependsOn": [
-        "pkg:npm/three@0.176.0"
-      ]
+      "dependsOn": ["pkg:npm/three@0.176.0"]
     },
     {
       "ref": "pkg:npm/troika-worker-utils@0.52.0",
@@ -34035,9 +33466,7 @@
     },
     {
       "ref": "pkg:npm/ts-api-utils@2.1.0",
-      "dependsOn": [
-        "pkg:npm/typescript@5.8.3"
-      ]
+      "dependsOn": ["pkg:npm/typescript@5.8.3"]
     },
     {
       "ref": "pkg:npm/tsconfig-paths@3.15.0",
@@ -34054,15 +33483,11 @@
     },
     {
       "ref": "pkg:npm/tunnel-rat@0.1.2",
-      "dependsOn": [
-        "pkg:npm/zustand@4.5.7"
-      ]
+      "dependsOn": ["pkg:npm/zustand@4.5.7"]
     },
     {
       "ref": "pkg:npm/type-check@0.4.0",
-      "dependsOn": [
-        "pkg:npm/prelude-ls@1.2.1"
-      ]
+      "dependsOn": ["pkg:npm/prelude-ls@1.2.1"]
     },
     {
       "ref": "pkg:npm/type-fest@0.7.1",
@@ -34132,9 +33557,7 @@
     },
     {
       "ref": "pkg:npm/unidiff@1.0.4",
-      "dependsOn": [
-        "pkg:npm/diff@5.2.0"
-      ]
+      "dependsOn": ["pkg:npm/diff@5.2.0"]
     },
     {
       "ref": "pkg:npm/unified@11.0.5",
@@ -34150,27 +33573,19 @@
     },
     {
       "ref": "pkg:npm/unist-util-is@6.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/unist-util-position-from-estree@2.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/unist-util-position@5.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/unist-util-stringify-position@4.0.0",
-      "dependsOn": [
-        "pkg:npm/%40types/unist@3.0.3"
-      ]
+      "dependsOn": ["pkg:npm/%40types/unist@3.0.3"]
     },
     {
       "ref": "pkg:npm/unist-util-visit-parents@6.0.1",
@@ -34229,9 +33644,7 @@
     },
     {
       "ref": "pkg:npm/uri-js@4.4.1",
-      "dependsOn": [
-        "pkg:npm/punycode@2.3.1"
-      ]
+      "dependsOn": ["pkg:npm/punycode@2.3.1"]
     },
     {
       "ref": "pkg:npm/use-callback-ref@1.3.3",
@@ -34252,9 +33665,7 @@
     },
     {
       "ref": "pkg:npm/use-sync-external-store@1.5.0",
-      "dependsOn": [
-        "pkg:npm/react@19.1.1"
-      ]
+      "dependsOn": ["pkg:npm/react@19.1.1"]
     },
     {
       "ref": "pkg:npm/utility-types@3.11.0",
@@ -34364,10 +33775,7 @@
     },
     {
       "ref": "pkg:npm/whatwg-url@5.0.0",
-      "dependsOn": [
-        "pkg:npm/tr46@0.0.3",
-        "pkg:npm/webidl-conversions@3.0.1"
-      ]
+      "dependsOn": ["pkg:npm/tr46@0.0.3", "pkg:npm/webidl-conversions@3.0.1"]
     },
     {
       "ref": "pkg:npm/which-boxed-primitive@1.1.1",
@@ -34420,9 +33828,7 @@
     },
     {
       "ref": "pkg:npm/which@2.0.2",
-      "dependsOn": [
-        "pkg:npm/isexe@2.0.0"
-      ]
+      "dependsOn": ["pkg:npm/isexe@2.0.0"]
     },
     {
       "ref": "pkg:npm/word-wrap@1.2.5",
@@ -34438,9 +33844,7 @@
     },
     {
       "ref": "pkg:npm/yjs@13.6.27",
-      "dependsOn": [
-        "pkg:npm/lib0@0.2.109"
-      ]
+      "dependsOn": ["pkg:npm/lib0@0.2.109"]
     },
     {
       "ref": "pkg:npm/yocto-queue@0.1.0",

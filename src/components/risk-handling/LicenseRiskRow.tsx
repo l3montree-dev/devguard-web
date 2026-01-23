@@ -35,7 +35,8 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
       </td>
 
       <td className="p-4">
-        {!risk.component.license || risk.component.license.toLowerCase() === "unknown" ? (
+        {!risk.component.license ||
+        risk.component.license.toLowerCase() === "unknown" ? (
           <Badge className={getSeverityClassNames("MEDIUM", false)}>
             Unknown
           </Badge>

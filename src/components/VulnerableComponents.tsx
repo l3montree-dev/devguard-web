@@ -40,7 +40,7 @@ export function VulnerableComponents({
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
-  
+
   const d = useMemo(() => {
     if (!data) {
       return [];
@@ -83,9 +83,11 @@ export function VulnerableComponents({
                 />
               ))
             : d.slice(0, 5).map((item, i, arr) => {
-                const searchQuery = encodeURIComponent(beautifyPurl(item.componentName));
+                const searchQuery = encodeURIComponent(
+                  beautifyPurl(item.componentName),
+                );
                 const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks?search=${searchQuery}`;
-                
+
                 return (
                   <Link
                     key={item.componentName}
@@ -112,7 +114,9 @@ export function VulnerableComponents({
                           <div className="flex flex-row flex-wrap gap-2">
                             <CVERainbowBadge
                               low={
-                                mode === "risk" ? item.risk.low : item.risk.lowCvss
+                                mode === "risk"
+                                  ? item.risk.low
+                                  : item.risk.lowCvss
                               }
                               medium={
                                 mode === "risk"
