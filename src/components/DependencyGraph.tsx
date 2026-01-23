@@ -36,12 +36,6 @@ const isInfoSource = (name: string) => {
   return name.startsWith("sbom:") || name.startsWith("vex:");
 };
 
-const getInfoSourceType = (name: string): string | null => {
-  if (name.startsWith("sbom:")) return "sbom";
-  if (name.startsWith("vex:")) return "vex";
-  return null;
-};
-
 const addRecursive = (
   dagreGraph: graphlib.Graph,
   node: ViewDependencyTreeNode,
@@ -57,11 +51,10 @@ const addRecursive = (
       }
       // If child is an info source, track it but don't add to graph
       if (isInfoSource(dep.name)) {
-        const infoType = getInfoSourceType(dep.name)!;
         if (!infoSourceMap.has(node.name)) {
           infoSourceMap.set(node.name, new Set());
         }
-        infoSourceMap.get(node.name)!.add(infoType);
+        infoSourceMap.get(node.name)!.add(dep.name);
         // Continue processing grandchildren as if they were direct children
         dep.children.forEach((grandchild) => {
           if (grandchild.name !== "" && !isInfoSource(grandchild.name)) {

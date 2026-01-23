@@ -459,8 +459,6 @@ const Index: FunctionComponent = () => {
     return convertPathToTree(vuln?.vulnerabilityPath ?? []);
   }, [vuln?.vulnerabilityPath]);
 
-  console.log(graphData);
-
   const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
     if (!vuln) {
       return;
@@ -1113,7 +1111,9 @@ const Index: FunctionComponent = () => {
                           </span>
                           <div className="whitespace-nowrap">
                             <Badge variant="outline">
-                              {vuln.vulnerabilityPath.length === 1
+                              {vuln.vulnerabilityPath.filter((el) =>
+                                el.startsWith("pkg:"),
+                              ).length === 1
                                 ? "Direct"
                                 : "Transitive"}
                             </Badge>
@@ -1121,7 +1121,9 @@ const Index: FunctionComponent = () => {
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {componentDepthMessages(
-                            vuln.vulnerabilityPath.length ?? 0,
+                            vuln.vulnerabilityPath.filter((el) =>
+                              el.startsWith("pkg:"),
+                            ).length ?? 0,
                           )}
                         </p>
                       </div>

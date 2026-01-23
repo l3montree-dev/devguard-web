@@ -42,14 +42,25 @@ export interface DependencyGraphNodeProps {
   };
 }
 
-const nodeStyle = (type: string) => {
-  if (type === "sbom") {
-    return "bg-blue-100 border-blue-400 dark:border-blue-800 dark:bg-blue-900";
-  } else if (type === "vex") {
-    return "bg-green-100 dark:border-green-800 border-green-600 dark:bg-green-900";
+const beautifyInfoSource = (source: string) => {
+  if (source.startsWith("sbom:")) {
+    // return everything between the first ":" and the "@"
+    const atIndex = source.indexOf("@");
+    if (atIndex === -1) {
+      return source.substring(5);
+    }
+    return source.substring(5, atIndex);
   }
-  return "bg-card";
+  if (source.startsWith("vex:")) {
+    const atIndex = source.indexOf("@");
+    if (atIndex === -1) {
+      return source.substring(4);
+    }
+    return source.substring(4, atIndex);
+  }
+  return source;
 };
+
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
@@ -122,12 +133,12 @@ export const DependencyGraphNode: FunctionComponent<
                 variant="secondary"
                 className={classNames(
                   "text-[10px] px-1.5 py-0",
-                  source === "sbom"
+                  source.startsWith("sbom:")
                     ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                     : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
                 )}
               >
-                {source.toUpperCase()}
+                {beautifyInfoSource(source)}
               </Badge>
             ))}
           </div>
