@@ -30,6 +30,7 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
+import { useSession } from "../../../../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
 import { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
@@ -39,6 +40,7 @@ const RefsPage = () => {
   const assetMenu = useAssetMenu();
   const assetVersions = useAssetBranchesAndTags();
   const updateAsset = useUpdateAsset();
+  const { session } = useSession();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -110,7 +112,9 @@ const RefsPage = () => {
         forceVertical
         primaryHeadline
         Button={
-          <Button onClick={() => setCreateDialogOpen("tag")}>Create Tag</Button>
+          session ? (
+            <Button onClick={() => setCreateDialogOpen("tag")}>Create Tag</Button>
+          ) : undefined
         }
         title="Tags"
       >
@@ -152,20 +156,22 @@ const RefsPage = () => {
                     <td className="px-4 py-2">
                       <DateString date={new Date(tag.lastAccessedAt)} />
                     </td>
-                    <td className="px-4 py-2 flex flex-row justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size={"icon"} variant={"ghost"}>
-                            <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => setOpen(tag)}>
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
+                    {session && (
+                      <td className="px-4 py-2 flex flex-row justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size={"icon"} variant={"ghost"}>
+                              <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => setOpen(tag)}>
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -178,9 +184,11 @@ const RefsPage = () => {
         primaryHeadline
         title="Branches"
         Button={
-          <Button onClick={() => setCreateDialogOpen("branch")}>
-            Create Branch
-          </Button>
+          session ? (
+            <Button onClick={() => setCreateDialogOpen("branch")}>
+              Create Branch
+            </Button>
+          ) : undefined
         }
       >
         <div className="overflow-hidden rounded-lg border shadow-sm">
@@ -206,14 +214,13 @@ const RefsPage = () => {
                   </tr>
                 )}
                 {assetVersions.branches.map((branch, i) => (
-                  <>
-                    <tr
-                      key={branch.name}
-                      className={classNames(
-                        "border-b",
-                        i % 2 !== 0 && "bg-card/50",
-                      )}
-                    >
+                  <tr
+                    key={branch.name}
+                    className={classNames(
+                      "border-b",
+                      i % 2 !== 0 && "bg-card/50",
+                    )}
+                  >
                       <td className="px-4 py-2">
                         <Badge variant={"outline"}>
                           <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
@@ -228,29 +235,30 @@ const RefsPage = () => {
                       <td className="px-4 py-2">
                         <DateString date={new Date(branch.lastAccessedAt)} />
                       </td>
-                      <td className="px-4 py-2 flex flex-row justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size={"icon"} variant={"ghost"}>
-                              <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            {!branch.defaultBranch && (
-                              <DropdownMenuItem
-                                onClick={() => handleMakeDefault(branch)}
-                              >
-                                Make default
+                      {session && (
+                        <td className="px-4 py-2 flex flex-row justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size={"icon"} variant={"ghost"}>
+                                <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              {!branch.defaultBranch && (
+                                <DropdownMenuItem
+                                  onClick={() => handleMakeDefault(branch)}
+                                >
+                                  Make default
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => setOpen(branch)}>
+                                Delete
                               </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => setOpen(branch)}>
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      )}
                     </tr>
-                  </>
                 ))}
               </tbody>
             </table>

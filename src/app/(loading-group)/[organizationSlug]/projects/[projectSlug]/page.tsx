@@ -38,6 +38,7 @@ import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
+import { useSession } from "../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../services/devGuardApi";
 import {
   AssetDTO,
@@ -52,6 +53,7 @@ export default function RepositoriesPage() {
   const project = useProject()!;
   const assets = project.assets;
   const organization = useOrganization();
+  const { session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const { data: subgroups } = useSWR<Paged<ProjectDTO>>(
     () =>
@@ -151,7 +153,7 @@ export default function RepositoriesPage() {
             description="No repositories or subgroups found"
             title="Your Repositories will show up here!"
             Button={
-              !project.externalEntityProviderId && (
+              session && !project.externalEntityProviderId && (
                 <div className="flex flex-row justify-center gap-2">
                   <Button
                     variant={"secondary"}
@@ -170,7 +172,7 @@ export default function RepositoriesPage() {
         ) : (
           <Section
             Button={
-              !project.externalEntityProviderId && (
+              session && !project.externalEntityProviderId && (
                 <div className="flex flex-row gap-2">
                   <Button
                     disabled={
@@ -181,7 +183,7 @@ export default function RepositoriesPage() {
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
                   >
-                    New Subgroup
+                    Create New Subgroup
                   </Button>
                   <Button
                     disabled={
@@ -191,7 +193,7 @@ export default function RepositoriesPage() {
                     }
                     onClick={() => setShowModal(true)}
                   >
-                    New Repository
+                    Create New Repository
                   </Button>
                 </div>
               )

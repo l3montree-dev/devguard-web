@@ -428,7 +428,7 @@ const Index: FunctionComponent = () => {
           />
           {!project.isPublic && (
             <small>
-              The project is not public. You can not make the repository public.
+              The group is not public. You can not make the repository public.
             </small>
           )}
           {!asset.externalEntityProviderId && (

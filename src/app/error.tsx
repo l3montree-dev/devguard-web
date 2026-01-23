@@ -12,7 +12,7 @@ export default function InternalServerErrorPage({ error }: { error: Error }) {
         <div className="text-center">
           <Image
             src="/assets/investigation-gopher.png"
-            alt="404 Not Found"
+            alt="An Error Occurred"
             width={500}
             height={500}
             className="mx-auto h-48 w-auto"

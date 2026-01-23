@@ -19,6 +19,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useSession } from "@/context/SessionContext";
 import Link from "next/link";
 import { FunctionComponent, ReactNode, useMemo, useState } from "react";
 import Markdown from "react-markdown";
@@ -422,6 +423,8 @@ const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
   const assetVersion = useActiveAssetVersion();
+  
+  const { session } = useSession();
 
   const deleteEvent = useDeleteEvent();
 
@@ -484,7 +487,7 @@ const Index: FunctionComponent = () => {
       const path = filtered.join(">");
       return path === lookingForPath;
     });
-    console.log(path);
+
     if (!path) {
       return {
         name: "ROOT",
@@ -707,7 +710,7 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-10 h-4" />
                 )}
                 {}
-                {vuln?.artifacts.map((a) => (
+                {vuln?.artifacts?.map((a) => (
                   <ArtifactBadge
                     key={a.artifactName + vuln.id}
                     artifactName={a.artifactName}
@@ -742,17 +745,18 @@ const Index: FunctionComponent = () => {
                     deleteEvent={handleDeleteEvent}
                     page="dependency-risks"
                   />
-                  <div>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>
-                          {vuln.state === "open"
-                            ? "Add a comment"
-                            : "Reopen this vulnerability"}
-                        </CardTitle>
-                        <CardDescription></CardDescription>
-                      </CardHeader>
-                      <CardContent>
+                  {session && (
+                    <div>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>
+                            {vuln.state === "open"
+                              ? "Add a comment"
+                              : "Reopen this vulnerability"}
+                          </CardTitle>
+                          <CardDescription></CardDescription>
+                        </CardHeader>
+                        <CardContent>
                         {vuln.state === "open" ? (
                           <form
                             className="flex flex-col gap-4"
@@ -990,6 +994,7 @@ const Index: FunctionComponent = () => {
                       </CardContent>
                     </Card>
                   </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -1150,9 +1155,9 @@ const Index: FunctionComponent = () => {
                           </span>
                           <div className="whitespace-nowrap">
                             <Badge variant="outline">
-                              {vuln.vulnerabilityPath.filter((el) =>
+                              {(vuln?.vulnerabilityPath?.filter((el) =>
                                 el.startsWith("pkg:"),
-                              ).length === 1
+                              )?.length ?? 0) === 1
                                 ? "Direct"
                                 : "Transitive"}
                             </Badge>
@@ -1160,9 +1165,9 @@ const Index: FunctionComponent = () => {
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {componentDepthMessages(
-                            vuln.vulnerabilityPath.filter((el) =>
+                            vuln?.vulnerabilityPath?.filter((el) =>
                               el.startsWith("pkg:"),
-                            ).length ?? 0,
+                            )?.length ?? 0,
                           )}
                         </p>
                       </div>

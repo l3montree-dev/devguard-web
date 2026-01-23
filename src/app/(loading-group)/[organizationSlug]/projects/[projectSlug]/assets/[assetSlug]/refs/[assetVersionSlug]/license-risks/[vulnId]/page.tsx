@@ -9,6 +9,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useSession } from "@/context/SessionContext";
 import Image from "next/image";
 import Link from "next/link";
 import { FunctionComponent, useEffect, useState } from "react";
@@ -70,6 +71,7 @@ const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
   const assetVersion = useActiveAssetVersion()!;
+  const { session } = useSession();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -295,17 +297,18 @@ const Index: FunctionComponent = () => {
                   deleteEvent={handleDeleteEvent}
                 />
               </div>
-              <div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {vuln.state !== "open"
-                        ? "Reopen this vulnerability"
-                        : "Add a comment"}
-                    </CardTitle>
-                    <CardDescription></CardDescription>
-                  </CardHeader>
-                  <CardContent>
+              {session && (
+                <div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {vuln.state !== "open"
+                          ? "Reopen this risk"
+                          : "Add a comment"}
+                      </CardTitle>
+                      <CardDescription></CardDescription>
+                    </CardHeader>
+                    <CardContent>
                     {isOpen ? (
                       <form
                         className="flex flex-col gap-4"
@@ -516,6 +519,7 @@ const Index: FunctionComponent = () => {
                   </CardContent>
                 </Card>
               </div>
+              )}
             </div>
 
             <div className="col-span-1">

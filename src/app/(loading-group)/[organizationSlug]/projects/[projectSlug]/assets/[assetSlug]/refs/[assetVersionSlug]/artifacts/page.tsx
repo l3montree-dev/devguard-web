@@ -9,6 +9,7 @@ import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   ArtifactCreateUpdateRequest,
@@ -59,6 +60,7 @@ const getInformationSourceBadgeVariant = (
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
+  const { session } = useSession();
 
   const artifacts = useArtifacts();
   const updateAssetVersionState = useUpdateAssetVersionState();
@@ -310,7 +312,9 @@ const Artifacts = () => {
             title="Artifacts"
             forceVertical
             Button={
-              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+              session ? (
+                <Button onClick={openCreateDialog}>Create new Artifact</Button>
+              ) : undefined
             }
           >
             <div>
@@ -382,41 +386,43 @@ const Artifacts = () => {
                                   </span>
                                 )}
                               </td>
-                              <td className="px-4 py-2 content-start text-right">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger
-                                    className="artifact-options"
-                                    asChild
-                                  >
-                                    <Button variant="ghost" size={"icon"}>
-                                      <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem
-                                      onClick={() => openEditDialog(artifact)}
+                              {session && (
+                                <td className="px-4 py-2 content-start text-right">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger
+                                      className="artifact-options"
+                                      asChild
                                     >
-                                      Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        syncExternalSources(
-                                          artifact.artifactName,
-                                        )
-                                      }
-                                    >
-                                      Sync External Sources
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        setDeleteDialogOpen(artifact)
-                                      }
-                                    >
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
+                                      <Button variant="ghost" size={"icon"}>
+                                        <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                      <DropdownMenuItem
+                                        onClick={() => openEditDialog(artifact)}
+                                      >
+                                        Edit
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          syncExternalSources(
+                                            artifact.artifactName,
+                                          )
+                                        }
+                                      >
+                                        Sync External Sources
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          setDeleteDialogOpen(artifact)
+                                        }
+                                      >
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </td>
+                              )}
                             </tr>
                           ))}
                         </tbody>

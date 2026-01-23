@@ -2,6 +2,7 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useSession } from "@/context/SessionContext";
 
 import Page from "@/components/Page";
 import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
@@ -200,6 +201,7 @@ const Index: FunctionComponent = () => {
   const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const config = useConfig();
+  const { session } = useSession();
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -300,9 +302,11 @@ const Index: FunctionComponent = () => {
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Download VeX
           </Button>
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Risks
-          </Button>
+          {session && (
+            <Button onClick={() => setIsOpen(true)} variant="default">
+              Identify Risks
+            </Button>
+          )}
         </div>
       </div>
       <VexDownloadModal
