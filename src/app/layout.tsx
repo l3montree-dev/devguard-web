@@ -13,6 +13,7 @@ import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
 import { HttpError } from "../data-fetcher/http-error";
 import InternalServerErrorPage from "./error";
+import { OrganizationDTO } from "../types/api/api";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -41,7 +42,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   try {
-    const [session, orgs] = await Promise.all([fetchSession(), fetchOrgs()]);
+    const session = await fetchSession();
+    let orgs: OrganizationDTO[] = [];
+    if (session) {
+      orgs = await fetchOrgs();
+    }
 
     return (
       <html
