@@ -13,10 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import { beautifyPurl, classNames } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 import {
@@ -25,17 +24,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { VulnDTO } from "../types/api/api";
+
 import { useSearchParams } from "next/navigation";
 import useDecodedPathname from "../hooks/useDecodedPathname";
+import { DependencyVuln } from "../types/api/api";
+import { Badge } from "./ui/badge";
+import EcosystemImage from "./common/EcosystemImage";
 
 export interface DependencyGraphNodeProps {
   data: {
     label: string;
-    vuln: VulnDTO[];
+    vuln: DependencyVuln[];
     risk: number;
     nodeWidth: number;
     nodeHeight: number;
+    infoSources?: Set<string>;
   };
 }
 
@@ -57,49 +60,81 @@ export const DependencyGraphNode: FunctionComponent<
     beautifyPurl(searchParams?.get("pkg") as string) ===
     beautifyPurl(props.data.label);
 
-  const type = props.data.label.split(":")[0];
+  const hasVulnerabilities = props.data.vuln !== undefined;
+  const infoSources = props.data.infoSources
+    ? Array.from(props.data.infoSources)
+    : [];
+
   const Node = (
     <div
       style={{
         maxWidth: props.data.nodeWidth,
-        borderColor: props.data.vuln !== undefined ? color : undefined,
-        // backgroundColor: props.data.vuln !== undefined ? color : "white",
+        borderColor: hasVulnerabilities ? color : undefined,
+        boxShadow: hasVulnerabilities
+          ? `0 0 0 2px ${color}40`
+          : shouldFocus
+            ? "0 0 0 2px hsl(var(--primary))"
+            : undefined,
       }}
       className={classNames(
-        "relative  border rounded p-3 text-xs text-card-foreground",
-        shouldFocus ? "border-2 border-primary" : "",
-        // check if valid purl
-        nodeStyle(type),
+        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
+        shouldFocus ? "border-primary" : "border-border",
+        hasVulnerabilities ? "shadow-lg" : "shadow-md",
       )}
     >
       <Handle
-        className="rounded-full"
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
         type="target"
         position={Position.Right}
       />
-      <div className="flex flex-row items-start gap-2">
-        {props.data.vuln && (
-          <span className="relative mt-0.5 flex h-3 w-3">
-            <span
-              style={{
-                backgroundColor: color,
-              }}
-              className="absolute inline-flex h-full w-full animate-ping rounded-full  opacity-75"
-            ></span>
-            <span
-              style={{
-                backgroundColor: color,
-              }}
-              className="relative inline-flex h-3 w-3 rounded-full"
-            ></span>
-          </span>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-start gap-2">
+          {props.data.label.startsWith("pkg:") && (
+            <div className="flex-shrink-0 mt-0.5">
+              <EcosystemImage packageName={props.data.label} size={16} />
+            </div>
+          )}
+          {hasVulnerabilities && (
+            <span className="relative mt-0.5 flex h-3 w-3">
+              <span
+                style={{
+                  backgroundColor: color,
+                }}
+                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+              ></span>
+              <span
+                style={{
+                  backgroundColor: color,
+                }}
+                className="relative inline-flex h-3 w-3 rounded-full"
+              ></span>
+            </span>
+          )}
+          <label htmlFor="text" className="text-left font-medium leading-tight">
+            {props.data.label}
+          </label>
+        </div>
+        {infoSources.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {infoSources.map((source) => (
+              <Badge
+                key={source}
+                variant="secondary"
+                className={classNames(
+                  "text-[10px] px-1.5 py-0",
+                  source === "sbom"
+                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                    : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                )}
+              >
+                {source.toUpperCase()}
+              </Badge>
+            ))}
+          </div>
         )}
-        <label htmlFor="text" className="text-left">
-          {props.data.label.replace("sbom:", "").replace("vex:", "")}
-        </label>
       </div>
       <Handle
-        className="rounded-full"
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
         type="source"
         position={Position.Left}
         id="a"

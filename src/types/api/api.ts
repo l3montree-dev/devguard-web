@@ -172,7 +172,10 @@ export interface ProjectDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 }
-export type ExpandedVulnDTOState = VulnDTO["state"] | "not-found" | "detected";
+export type ExpandedVulnDTOState =
+  | DependencyVuln["state"]
+  | "not-found"
+  | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -180,12 +183,6 @@ export interface EnvDTO {
   id: string;
   position: number;
   lastReportTime: string;
-}
-
-export interface ScaVulnDTO extends DependencyVuln {
-  componentFixedVersion: string | null;
-  componentDepth: number;
-  componentPurl: string;
 }
 
 export interface BaseVulnDTO {
@@ -209,9 +206,10 @@ export interface DependencyVuln extends BaseVulnDTO {
   priority: number | null; // will be null, if not prioritized yet.
   rawRiskAssessment: number;
   riskRecalculatedAt: string;
+  componentFixedVersion: string | null;
+  componentPurl: string;
+  vulnerabilityPath: string[];
 }
-
-export type VulnDTO = ScaVulnDTO;
 
 export interface Paged<T> {
   data: T[];
@@ -402,7 +400,7 @@ export interface Relationship {
   relationshipType: "upstream" | "alias";
   targetCve: string;
 }
-export interface VulnWithCVE extends ScaVulnDTO {
+export interface VulnWithCVE extends DependencyVuln {
   cve:
     | (Modify<
         CVE,
