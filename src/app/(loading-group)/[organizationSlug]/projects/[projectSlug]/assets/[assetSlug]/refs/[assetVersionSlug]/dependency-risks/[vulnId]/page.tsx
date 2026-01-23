@@ -455,9 +455,48 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
-  const graphData = useMemo(() => {
-    return convertPathToTree(vuln?.vulnerabilityPath ?? []);
-  }, [vuln?.vulnerabilityPath]);
+  const { data: graphResponse, isLoading: graphLoading } = useSWR<
+    Array<Array<string>>
+  >(
+    vuln
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(vuln.componentPurl)}`
+      : null,
+    fetcher,
+  );
+
+  const graphData = useMemo<ViewDependencyTreeNode>(() => {
+    if (!graphResponse || graphResponse.length === 0) {
+      return {
+        name: "ROOT",
+        children: [],
+        risk: 0,
+        parent: null,
+        nodeType: "root",
+      };
+    }
+
+    // find the correct path based on the dependency vuln suffix
+    // there should only be a single path matching exactly that elements
+    const lookingForPath = vuln?.vulnerabilityPath.join(">");
+    const path = graphResponse.find((p) => {
+      // remove everything which is NOT a component
+      const filtered = p.filter((entry) => entry.startsWith("pkg:"));
+      const path = filtered.join(">");
+      return path === lookingForPath;
+    });
+    console.log(path);
+    if (!path) {
+      return {
+        name: "ROOT",
+        children: [],
+        risk: 0,
+        parent: null,
+        nodeType: "root",
+      };
+    }
+
+    return convertPathToTree(path);
+  }, [graphResponse, vuln]);
 
   const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
     if (!vuln) {
