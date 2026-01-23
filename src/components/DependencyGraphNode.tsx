@@ -58,6 +58,13 @@ const beautifyInfoSource = (source: string) => {
     }
     return source.substring(4, atIndex);
   }
+  if (source.startsWith("csaf:")) {
+    const atIndex = source.indexOf("@");
+    if (atIndex === -1) {
+      return source.substring(5);
+    }
+    return source.substring(5, atIndex);
+  }
   return source;
 };
 

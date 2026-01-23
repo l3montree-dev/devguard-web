@@ -25,7 +25,7 @@ export interface ViewDependencyTreeNode
 
 export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
   const parts = entry.split(":");
-  let nodeType: "root" | "artifact" | "component" | "infosource" = "component";
+  let nodeType: "root" | "artifact" | "component" | "infosource";
   let infoSourceType: "sbom" | "csaf" | "vex" | undefined = undefined;
   if (parts.length === 2) {
     const prefix = parts[0];

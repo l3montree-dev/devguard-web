@@ -33,7 +33,11 @@ import { useSearchParams } from "next/navigation";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 
 const isInfoSource = (name: string) => {
-  return name.startsWith("sbom:") || name.startsWith("vex:");
+  return (
+    name.startsWith("sbom:") ||
+    name.startsWith("vex:") ||
+    name.startsWith("csaf:")
+  );
 };
 
 const addRecursive = (
