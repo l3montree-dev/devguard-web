@@ -24,10 +24,14 @@ export interface ViewDependencyTreeNode
 }
 
 export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
+  if (!entry.includes(":")) {
+  }
   const parts = entry.split(":");
   let nodeType: "root" | "artifact" | "component" | "infosource";
   let infoSourceType: "sbom" | "csaf" | "vex" | undefined = undefined;
-  if (parts.length === 2) {
+  if (parts.length === 1) {
+    nodeType = "root";
+  } else {
     const prefix = parts[0];
     switch (prefix) {
       case "artifact":
@@ -48,9 +52,8 @@ export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
       default:
         nodeType = "component";
     }
-  } else {
-    nodeType = "root";
   }
+
   return {
     name: entry,
     children: [],
