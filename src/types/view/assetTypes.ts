@@ -19,4 +19,47 @@ export interface ViewDependencyTreeNode
   risk: number;
   parent: ViewDependencyTreeNode | null;
   children: ViewDependencyTreeNode[];
+  nodeType: "root" | "artifact" | "component" | "infosource";
+  infoSourceType?: "sbom" | "csaf" | "vex";
 }
+
+export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
+  if (!entry.includes(":")) {
+  }
+  const parts = entry.split(":");
+  let nodeType: "root" | "artifact" | "component" | "infosource";
+  let infoSourceType: "sbom" | "csaf" | "vex" | undefined = undefined;
+  if (parts.length === 1) {
+    nodeType = "root";
+  } else {
+    const prefix = parts[0];
+    switch (prefix) {
+      case "artifact":
+        nodeType = "artifact";
+        break;
+      case "sbom":
+        nodeType = "infosource";
+        infoSourceType = "sbom";
+        break;
+      case "vex":
+        nodeType = "infosource";
+        infoSourceType = "vex";
+        break;
+      case "csaf":
+        nodeType = "infosource";
+        infoSourceType = "csaf";
+        break;
+      default:
+        nodeType = "component";
+    }
+  }
+
+  return {
+    name: entry,
+    children: [],
+    risk: 0,
+    parent: null,
+    nodeType,
+    infoSourceType,
+  };
+};

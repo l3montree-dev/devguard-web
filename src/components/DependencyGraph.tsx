@@ -12,8 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { DependencyTreeNode, VulnDTO } from "@/types/api/api";
+import { DependencyVuln } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
@@ -33,27 +32,61 @@ import { useTheme } from "next-themes";
 import { useSearchParams } from "next/navigation";
 import { riskToSeverity, severityToColor } from "./common/Severity";
 
+const isInfoSource = (name: string) => {
+  return (
+    name.startsWith("sbom:") ||
+    name.startsWith("vex:") ||
+    name.startsWith("csaf:")
+  );
+};
+
 const addRecursive = (
   dagreGraph: graphlib.Graph,
-  node: DependencyTreeNode,
+  node: ViewDependencyTreeNode,
   nodeWidth: number,
   nodeHeight: number,
+  infoSourceMap: Map<string, Set<string>>,
 ) => {
-  if (node.name !== "") {
+  if (node.name !== "" && !isInfoSource(node.name)) {
     dagreGraph.setNode(node.name, { width: nodeWidth, height: nodeHeight });
     node.children.forEach((dep) => {
       if (dep.name === "") {
         return;
       }
-      dagreGraph.setNode(dep.name, { width: nodeWidth, height: nodeHeight });
-      dagreGraph.setEdge(node.name, dep.name);
-      addRecursive(dagreGraph, dep, nodeWidth, nodeHeight);
+      // If child is an info source, track it but don't add to graph
+      if (isInfoSource(dep.name)) {
+        if (!infoSourceMap.has(node.name)) {
+          infoSourceMap.set(node.name, new Set());
+        }
+        infoSourceMap.get(node.name)!.add(dep.name);
+        // Continue processing grandchildren as if they were direct children
+        dep.children.forEach((grandchild) => {
+          if (grandchild.name !== "" && !isInfoSource(grandchild.name)) {
+            dagreGraph.setNode(grandchild.name, {
+              width: nodeWidth,
+              height: nodeHeight,
+            });
+            dagreGraph.setEdge(node.name, grandchild.name);
+            addRecursive(
+              dagreGraph,
+              grandchild,
+              nodeWidth,
+              nodeHeight,
+              infoSourceMap,
+            );
+          }
+        });
+      } else {
+        dagreGraph.setNode(dep.name, { width: nodeWidth, height: nodeHeight });
+        dagreGraph.setEdge(node.name, dep.name);
+        addRecursive(dagreGraph, dep, nodeWidth, nodeHeight, infoSourceMap);
+      }
     });
   }
 };
 
 const recursiveEdges = (
-  node: DependencyTreeNode,
+  node: ViewDependencyTreeNode,
 ): Array<{ id: string; source: string; target: string }> => {
   if (node.children.length === 0) {
     return [];
@@ -81,7 +114,7 @@ const recursiveFlatten = (
 
 const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
-  flaws: Array<VulnDTO> = [],
+  flaws: Array<DependencyVuln> = [],
   direction = "LR",
   nodeWidth: number,
   nodeHeight: number,
@@ -100,7 +133,7 @@ const getLayoutedElements = (
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   // build a map of all affected packages
-  const flawMap = flaws.reduce(
+  const vulnMap = flaws.reduce(
     (acc, cur) => {
       if (!acc[cur.componentPurl!]) {
         acc[cur.componentPurl!] = [];
@@ -108,7 +141,7 @@ const getLayoutedElements = (
       acc[cur.componentPurl!].push(cur);
       return acc;
     },
-    {} as { [key: string]: VulnDTO[] },
+    {} as { [key: string]: DependencyVuln[] },
   );
 
   const riskMap = recursiveFlatten(tree).reduce(
@@ -121,7 +154,9 @@ const getLayoutedElements = (
 
   dagreGraph.setGraph({ rankdir: direction });
 
-  addRecursive(dagreGraph, tree, nodeWidth, nodeHeight);
+  const infoSourceMap = new Map<string, Set<string>>();
+
+  addRecursive(dagreGraph, tree, nodeWidth, nodeHeight, infoSourceMap);
 
   dagre.layout(dagreGraph);
 
@@ -145,9 +180,10 @@ const getLayoutedElements = (
       data: {
         label: el,
         risk: riskMap[el],
-        vuln: flawMap[el],
+        vuln: vulnMap[el],
         nodeWidth,
         nodeHeight,
+        infoSources: infoSourceMap.get(el),
       },
     };
   });
@@ -155,13 +191,14 @@ const getLayoutedElements = (
   const edges = dagreGraph.edges().map((el) => {
     const source = el.v;
     const target = el.w;
+    const targetRisk = riskMap[target];
+    const hasRisk = targetRisk > 0;
 
     return {
       id: `${source}-${target}`,
       target: source,
       source: target,
-      // type: "smoothstep",
-      animated: false,
+      animated: hasRisk,
       style: {
         stroke:
           riskMap[target] > 0
@@ -181,17 +218,14 @@ const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
   variant?: "compact";
-  flaws: Array<VulnDTO>;
+  flaws: Array<DependencyVuln>;
   graph: ViewDependencyTreeNode;
 }> = ({ graph, width, height, flaws, variant }) => {
-  const asset = useActiveAsset();
   const searchParams = useSearchParams();
 
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
 
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
-    graph.name = searchParams?.get("artifact") ?? asset?.name ?? "";
-
     const [nodes, edges] = getLayoutedElements(
       graph,
       flaws,
@@ -199,10 +233,11 @@ const DependencyGraph: FunctionComponent<{
       variant === "compact" ? 150 : 300,
       variant === "compact" ? 150 : 300,
     );
+
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, searchParams?.get("artifact"), asset?.name, variant, flaws]);
+  }, [graph, variant, flaws]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

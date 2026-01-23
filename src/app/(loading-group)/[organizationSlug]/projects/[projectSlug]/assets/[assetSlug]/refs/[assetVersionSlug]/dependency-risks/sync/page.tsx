@@ -355,8 +355,6 @@ const Index: FunctionComponent = () => {
     mutate();
   };
 
-  console.log("vulsn", vulns);
-
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">

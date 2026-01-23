@@ -81,6 +81,10 @@ import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../compone
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import {
+  pathEntryToViewNode,
+  ViewDependencyTreeNode,
+} from "../../../../../../../../../../../types/view/assetTypes";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -379,6 +383,35 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   );
 }
 
+const convertPathToTree = (path: string[]): ViewDependencyTreeNode => {
+  if (path.length === 0) {
+    return {
+      name: "ROOT",
+      children: [],
+      risk: 0,
+      parent: null,
+      nodeType: "root",
+    };
+  }
+
+  const root = pathEntryToViewNode(path[0]);
+  let currentNode = root;
+
+  for (const part of path.slice(1)) {
+    let childNode: ViewDependencyTreeNode | undefined =
+      currentNode.children.find((child) => child.name === part);
+    if (!childNode) {
+      childNode = pathEntryToViewNode(part);
+      // since we add our own root element, we filter out every root node types
+      childNode.parent = currentNode;
+      currentNode.children.push(childNode);
+    }
+    currentNode = childNode;
+  }
+
+  return root;
+};
+
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -421,12 +454,49 @@ const Index: FunctionComponent = () => {
     mutate,
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
-  const { data: graphData, isLoading: graphLoading } = useSWR<any>(
+
+  const { data: graphResponse, isLoading: graphLoading } = useSWR<
+    Array<Array<string>>
+  >(
     vuln
       ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(vuln.componentPurl)}`
       : null,
     fetcher,
   );
+
+  const graphData = useMemo<ViewDependencyTreeNode>(() => {
+    if (!graphResponse || graphResponse.length === 0) {
+      return {
+        name: "ROOT",
+        children: [],
+        risk: 0,
+        parent: null,
+        nodeType: "root",
+      };
+    }
+
+    // find the correct path based on the dependency vuln suffix
+    // there should only be a single path matching exactly that elements
+    const lookingForPath = vuln?.vulnerabilityPath.join(">");
+    const path = graphResponse.find((p) => {
+      // remove everything which is NOT a component
+      const filtered = p.filter((entry) => entry.startsWith("pkg:"));
+      const path = filtered.join(">");
+      return path === lookingForPath;
+    });
+    console.log(path);
+    if (!path) {
+      return {
+        name: "ROOT",
+        children: [],
+        risk: 0,
+        parent: null,
+        nodeType: "root",
+      };
+    }
+
+    return convertPathToTree(path);
+  }, [graphResponse, vuln]);
 
   const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
     if (!vuln) {
@@ -578,7 +648,6 @@ const Index: FunctionComponent = () => {
     );
   }
 
-  console.log(vuln);
   return (
     <Page
       Menu={assetMenu}
@@ -646,24 +715,22 @@ const Index: FunctionComponent = () => {
                 ))}
               </div>
               <div>
-                {graphData && (
-                  <div className="mt-10">
-                    <span className="font-semibold mb-2 block">
-                      Path to component
-                    </span>
-                    <div
-                      className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
-                    >
-                      <DependencyGraph
-                        variant="compact"
-                        width={100}
-                        height={200}
-                        flaws={[]}
-                        graph={graphData}
-                      />
-                    </div>
+                <div className="mt-10">
+                  <span className="font-semibold mb-2 block">
+                    Path to component
+                  </span>
+                  <div
+                    className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                  >
+                    <DependencyGraph
+                      variant="compact"
+                      width={100}
+                      height={200}
+                      graph={graphData}
+                      flaws={[]}
+                    />
                   </div>
-                )}
+                </div>
               </div>
 
               {vuln ? (
@@ -1083,14 +1150,20 @@ const Index: FunctionComponent = () => {
                           </span>
                           <div className="whitespace-nowrap">
                             <Badge variant="outline">
-                              {vuln.componentDepth === 1
+                              {vuln.vulnerabilityPath.filter((el) =>
+                                el.startsWith("pkg:"),
+                              ).length === 1
                                 ? "Direct"
                                 : "Transitive"}
                             </Badge>
                           </div>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {componentDepthMessages(vuln.componentDepth ?? 0)}
+                          {componentDepthMessages(
+                            vuln.vulnerabilityPath.filter((el) =>
+                              el.startsWith("pkg:"),
+                            ).length ?? 0,
+                          )}
                         </p>
                       </div>
                       <div className="w-full border-b pb-4">

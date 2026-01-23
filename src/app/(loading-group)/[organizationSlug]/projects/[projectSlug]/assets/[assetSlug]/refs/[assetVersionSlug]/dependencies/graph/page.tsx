@@ -23,13 +23,11 @@ import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
+import { DependencyTreeNode, DependencyVuln } from "@/types/api/api";
 import {
-  ArtifactDTO,
-  DependencyTreeNode,
-  ScaVulnDTO,
-  VulnDTO,
-} from "@/types/api/api";
-import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+  pathEntryToViewNode,
+  ViewDependencyTreeNode,
+} from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
 import {
   ArrowsPointingInIcon,
@@ -43,11 +41,11 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
+import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
+import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
-import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -82,7 +80,7 @@ const DependencyGraphPage: FunctionComponent = () => {
   // fetch a personal access token from the user
 
   const { data: affectedComponents, isLoading: affectedComponentsLoading } =
-    useSWR<ScaVulnDTO[]>(uri + "/affected-components/", fetcher);
+    useSWR<DependencyVuln[]>(uri + "/affected-components/", fetcher);
 
   const { data: graphData, isLoading: graphLoading } =
     useSWR<DependencyTreeNode>(
@@ -218,9 +216,9 @@ export default DependencyGraphPage;
 const RISK_INHERITANCE_FACTOR = 0.3;
 const recursiveAddRisk = (
   node: ViewDependencyTreeNode,
-  flaws: Array<VulnDTO>,
+  vulns: Array<DependencyVuln>,
 ) => {
-  const nodeFlaws = flaws.filter((p) => p.componentPurl === node.name);
+  const nodeFlaws = vulns.filter((p) => p.componentPurl === node.name);
 
   // if there are no children, the risk is the risk of the affected package
   if (nodeFlaws.length > 0) {
@@ -241,7 +239,7 @@ const recursiveAddRisk = (
       parent = parent.parent;
     }
   }
-  node.children.forEach((child) => recursiveAddRisk(child, flaws));
+  node.children.forEach((child) => recursiveAddRisk(child, vulns));
 
   return node;
 };
@@ -255,12 +253,8 @@ const convertGraph = (
   graph: DependencyTreeNode,
   parent: ViewDependencyTreeNode | null = null,
 ): ViewDependencyTreeNode => {
-  const convertedNode = {
-    name: graph.name,
-    children: [] as ViewDependencyTreeNode[],
-    risk: 0,
-    parent,
-  };
+  const convertedNode = pathEntryToViewNode(graph.name);
+  convertedNode.parent = parent;
   convertedNode.children = graph.children.map((child) =>
     convertGraph(child, convertedNode),
   );

@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
-import { ExpandedVulnDTOState, VulnDTO } from "../../types/api/api";
+import { ExpandedVulnDTOState } from "../../types/api/api";
 import { Scale } from "lucide-react";
 
 const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({

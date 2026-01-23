@@ -330,7 +330,7 @@ const Index: FunctionComponent = () => {
     const params = buildFilterSearchParams(searchParams);
     if (searchParams?.has("artifact")) {
       params.append(
-        "filterQuery[artifact_component_dependencies.artifact_artifact_name][is]",
+        "artifactName",
         encodeURIComponent(searchParams.get("artifact") as string),
       );
     }
