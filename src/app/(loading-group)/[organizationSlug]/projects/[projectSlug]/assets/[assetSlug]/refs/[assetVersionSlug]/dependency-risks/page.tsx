@@ -316,8 +316,8 @@ const Index: FunctionComponent = () => {
       <Section
         forceVertical
         primaryHeadline
-        title="Identified Risks"
-        description="This table shows all the identified risks for this repository."
+        title="Identified Dependency Risks"
+        description="This table shows all the identified dependency risks for this repository."
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">

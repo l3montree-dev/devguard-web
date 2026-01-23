@@ -7,7 +7,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useState, useEffect } from "react";
 import Autosetup from "../../../../../../../components/Autosetup";
 import ListItem from "../../../../../../../components/common/ListItem";
 import RiskScannerDialog from "../../../../../../../components/RiskScannerDialog";
@@ -37,12 +37,12 @@ const Index: FunctionComponent = () => {
   };
   // check if we can redirect to the first ref
   const asset = useAsset();
-  if (!asset) {
-    return null;
-  }
+  
+  useEffect(() => {
+    if (!asset || asset.refs.length === 0) {
+      return;
+    }
 
-  // check if there exists a ref on the asset
-  if (asset.refs.length > 0) {
     // redirect to the default ref
     let redirectTo = asset.refs.find((r) => r.defaultBranch);
     // if there is no default ref, redirect to the first one
@@ -51,6 +51,14 @@ const Index: FunctionComponent = () => {
     }
     let destination = `/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${redirectTo.slug}`;
     router.replace(destination);
+  }, [asset, params.organizationSlug, params.projectSlug, params.assetSlug, router]);
+
+  if (!asset) {
+    return null;
+  }
+
+  // Show loading state while redirecting
+  if (asset.refs.length > 0) {
     return null;
   }
 

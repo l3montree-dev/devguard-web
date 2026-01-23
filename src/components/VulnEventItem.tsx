@@ -141,9 +141,11 @@ const FoundIn: FunctionComponent<{
       );
     } else if (event.vulnType === "dependencyVuln") {
       found = (
-        <span className="inline-flex items-center gap-2 text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
           {" in "}
-          <EcosystemImage packageName={event.packageName ?? ""} />
+          <span className="inline-flex flex-shrink-0">
+            <EcosystemImage packageName={event.packageName ?? ""} size={16} />
+          </span>
           {beautifyPurl(event.packageName ?? "")}
         </span>
       );

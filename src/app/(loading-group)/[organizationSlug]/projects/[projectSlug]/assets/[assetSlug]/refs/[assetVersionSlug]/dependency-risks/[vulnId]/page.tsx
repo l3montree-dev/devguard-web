@@ -661,13 +661,13 @@ const Index: FunctionComponent = () => {
               <h1 className="text-2xl font-semibold">
                 {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
               </h1>
-              <p className="mt-4 text-muted-foreground">
+              <div className="mt-4 text-muted-foreground">
                 {vuln ? (
                   vuln.cve?.description
                 ) : (
                   <Skeleton className="w-full h-20" />
                 )}
-              </p>
+              </div>
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
                 {vuln?.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
@@ -1245,7 +1245,7 @@ const Index: FunctionComponent = () => {
                     />
                   </h3>
                   <div className="flex flex-col gap-2">
-                    <div className="rounded-lg border bg-card p-4">
+                    {(vuln.cve?.relationships?.length ?? 0) > 0 && (<div className="rounded-lg border bg-card p-4">
                       {vuln.cve?.relationships && (
                         <table className="w-full table-auto border-collapse">
                           <tbody>
@@ -1263,7 +1263,7 @@ const Index: FunctionComponent = () => {
                           </tbody>
                         </table>
                       )}
-                    </div>
+                    </div>)}
                     <Link
                       target="_blank"
                       className="text-xs"

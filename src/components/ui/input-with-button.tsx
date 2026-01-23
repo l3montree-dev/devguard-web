@@ -65,7 +65,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
             {...inputProps}
             value={props.value ?? ""}
             className={classNames("w-full bg-transparent focus:outline-none")}
-            readOnly={!mutable}
+            readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
           <div className="flex flex-row items-center gap-2">

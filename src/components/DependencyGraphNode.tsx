@@ -166,7 +166,7 @@ export const DependencyGraphNode: FunctionComponent<
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{Node}</DropdownMenuTrigger>
       <DropdownMenuContent className="text-xs">
         {props.data.vuln.map((vuln) => (
           <DropdownMenuItem key={vuln.id}>
