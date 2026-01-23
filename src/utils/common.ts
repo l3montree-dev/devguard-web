@@ -179,7 +179,7 @@ export const beautifyPurl = (purl: string) => {
     first = first.substring(slashIndex + 1);
   }
 
-  return first;
+  return first.replace("%40", "@");
 };
 
 export const extractVersion = (purl: string) => {

@@ -79,19 +79,24 @@ const DependencyGraphPage: FunctionComponent = () => {
 
   // fetch a personal access token from the user
 
-  const { data: affectedComponents, isLoading: affectedComponentsLoading } =
-    useSWR<DependencyVuln[]>(uri + "/affected-components/", fetcher);
+  const { data: affectedComponents } = useSWR<DependencyVuln[]>(
+    uri + "/affected-components/",
+    fetcher,
+  );
 
-  const { data: graphData, isLoading: graphLoading } =
-    useSWR<DependencyTreeNode>(
-      uri +
-        "/dependency-graph/?" +
-        toSearchParams({
-          artifactName: searchParams?.get("artifact") ?? undefined,
-          all: searchParams?.get("all") ? "1" : undefined,
-        }),
-      fetcher,
-    );
+  const { data: graphData } = useSWR<DependencyTreeNode>(
+    uri +
+      "/dependency-graph/?" +
+      toSearchParams({
+        artifactName: searchParams?.get("artifact") ?? undefined,
+        all: searchParams?.get("all") ? "1" : undefined,
+      }),
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+    },
+  );
 
   const graph = useMemo(() => {
     if (!graphData) {

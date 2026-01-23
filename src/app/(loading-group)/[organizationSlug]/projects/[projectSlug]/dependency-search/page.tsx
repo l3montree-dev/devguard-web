@@ -13,7 +13,6 @@ import {
   ColumnDef,
   createColumnHelper,
   flexRender,
-  Header,
 } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";

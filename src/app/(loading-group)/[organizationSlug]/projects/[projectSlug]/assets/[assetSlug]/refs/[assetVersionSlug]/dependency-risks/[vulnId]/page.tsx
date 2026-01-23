@@ -484,7 +484,7 @@ const Index: FunctionComponent = () => {
       const path = filtered.join(">");
       return path === lookingForPath;
     });
-    console.log(path);
+
     if (!path) {
       return {
         name: "ROOT",
@@ -715,22 +715,24 @@ const Index: FunctionComponent = () => {
                 ))}
               </div>
               <div>
-                <div className="mt-10">
-                  <span className="font-semibold mb-2 block">
-                    Path to component
-                  </span>
-                  <div
-                    className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
-                  >
-                    <DependencyGraph
-                      variant="compact"
-                      width={100}
-                      height={200}
-                      graph={graphData}
-                      flaws={[]}
-                    />
+                {!graphLoading && (
+                  <div className="mt-10">
+                    <span className="font-semibold mb-2 block">
+                      Path to component
+                    </span>
+                    <div
+                      className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                    >
+                      <DependencyGraph
+                        variant="compact"
+                        width={100}
+                        height={200}
+                        graph={graphData}
+                        flaws={[]}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {vuln ? (

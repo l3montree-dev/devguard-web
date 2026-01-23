@@ -25,11 +25,46 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-import { useSearchParams } from "next/navigation";
-import useDecodedPathname from "../hooks/useDecodedPathname";
+export const LoadMoreNode: FunctionComponent<{
+  data: {
+    parentId: string;
+    remainingCount: number;
+    nodeWidth: number;
+    nodeHeight: number;
+  };
+}> = (props) => {
+  return (
+    <div
+      style={{
+        maxWidth: props.data.nodeWidth,
+      }}
+      className="relative border-2 border-dashed border-primary/50 rounded-lg p-3 text-xs hover:bg-primary/10 transition-all cursor-pointer"
+    >
+      <Handle
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
+        type="target"
+        position={Position.Right}
+      />
+      <div className="flex flex-col gap-1 items-center justify-center text-center">
+        <PlusIcon className="w-4 h-4 text-primary" />
+        <span className="text-primary font-medium">
+          Show {props.data.remainingCount} more
+        </span>
+      </div>
+      <Handle
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
+        type="source"
+        position={Position.Left}
+      />
+    </div>
+  );
+};
+
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
-import { Badge } from "./ui/badge";
 import EcosystemImage from "./common/EcosystemImage";
+import { Badge } from "./ui/badge";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -39,6 +74,10 @@ export interface DependencyGraphNodeProps {
     nodeWidth: number;
     nodeHeight: number;
     infoSources?: Set<string>;
+    childCount?: number;
+    isExpanded?: boolean;
+    shownCount?: number;
+    hasMore?: boolean;
   };
 }
 
@@ -72,32 +111,26 @@ export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = severityToColor(riskToSeverity(props.data.risk));
-  const searchParams = useSearchParams();
-  const pathname = useDecodedPathname();
-  const shouldFocus =
-    beautifyPurl(searchParams?.get("pkg") as string) ===
-    beautifyPurl(props.data.label);
 
   const hasVulnerabilities = props.data.vuln !== undefined;
   const infoSources = props.data.infoSources
     ? Array.from(props.data.infoSources)
     : [];
+  const hasChildren = (props.data.childCount ?? 0) > 0;
+  const isExpanded = props.data.isExpanded ?? false;
 
   const Node = (
     <div
       style={{
         maxWidth: props.data.nodeWidth,
         borderColor: hasVulnerabilities ? color : undefined,
-        boxShadow: hasVulnerabilities
-          ? `0 0 0 2px ${color}40`
-          : shouldFocus
-            ? "0 0 0 2px hsl(var(--primary))"
-            : undefined,
+        boxShadow: hasVulnerabilities ? `0 0 0 2px ${color}40` : undefined,
       }}
       className={classNames(
         "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        shouldFocus ? "border-primary" : "border-border",
+        "border-border",
         hasVulnerabilities ? "shadow-lg" : "shadow-md",
+        hasChildren ? "cursor-pointer hover:border-primary/50" : "",
       )}
     >
       <Handle
@@ -106,7 +139,7 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row items-start gap-2">
+        <div className="flex items-center flex-row gap-2">
           {props.data.label.startsWith("pkg:") && (
             <div className="flex-shrink-0 mt-0.5">
               <EcosystemImage packageName={props.data.label} size={16} />
@@ -128,28 +161,42 @@ export const DependencyGraphNode: FunctionComponent<
               ></span>
             </span>
           )}
-          <label htmlFor="text" className="text-left font-medium leading-tight">
-            {props.data.label}
-          </label>
-        </div>
-        {infoSources.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {infoSources.map((source) => (
-              <Badge
-                key={source}
-                variant="secondary"
-                className={classNames(
-                  "text-[10px] px-1.5 py-0",
-                  source.startsWith("sbom:")
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                    : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                )}
-              >
-                {beautifyInfoSource(source)}
-              </Badge>
-            ))}
+          <div>
+            <label
+              htmlFor="text"
+              className="text-left font-medium leading-tight flex-1"
+            >
+              {beautifyPurl(props.data.label)}
+            </label>
+            {infoSources.length > 0 && (
+              <div className="flex mt-1 flex-wrap gap-1">
+                {infoSources.map((source) => (
+                  <Badge
+                    key={source}
+                    variant="secondary"
+                    className={classNames(
+                      "text-[10px] px-1.5 py-0",
+                      source.startsWith("sbom:")
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                        : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                    )}
+                  >
+                    {beautifyInfoSource(source)}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+          {hasChildren && (
+            <span className="ml-2 flex-shrink-0 text-muted-foreground flex items-center gap-1">
+              {isExpanded ? (
+                <ArrowLeft className="w-4 h-4" />
+              ) : (
+                <ArrowRight className="w-4 h-4" />
+              )}
+            </span>
+          )}
+        </div>
       </div>
       <Handle
         className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
@@ -172,7 +219,7 @@ export const DependencyGraphNode: FunctionComponent<
           <DropdownMenuItem key={vuln.id}>
             <Link
               className="!text-foreground hover:no-underline"
-              href={pathname + `/../../dependency-risks/${vuln.id}`}
+              href={`../dependency-risks/${vuln.id}`}
             >
               {vuln.cveID}
             </Link>
