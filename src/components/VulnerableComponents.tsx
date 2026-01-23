@@ -60,7 +60,7 @@ export function VulnerableComponents({
         <CardTitle className="relative w-full">
           Vulnerable Components
           <Link
-            href={`/${org.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
+            href={`/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
             className="absolute right-0 top-0 text-xs !text-muted-foreground"
           >
             See all
@@ -84,7 +84,7 @@ export function VulnerableComponents({
               ))
             : d.slice(0, 5).map((item, i, arr) => {
                 const searchQuery = encodeURIComponent(beautifyPurl(item.componentName));
-                const href = `/${org.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks?search=${searchQuery}`;
+                const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks?search=${searchQuery}`;
                 
                 return (
                   <Link
