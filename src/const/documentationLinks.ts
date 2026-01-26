@@ -4,4 +4,6 @@ export const documentationLinks = {
   sbomExplaining: "https://devguard.org/concept-guides/explaining-sboms",
   vexExplaining:
     "https://devguard.org/concepts/vulnerability-management/joint-vulnerability-management-vex",
+  acceptRisk:
+    "https://devguard.org/explanations/vulnerability-management/vulnerability-events#4-accept-risk",
 };

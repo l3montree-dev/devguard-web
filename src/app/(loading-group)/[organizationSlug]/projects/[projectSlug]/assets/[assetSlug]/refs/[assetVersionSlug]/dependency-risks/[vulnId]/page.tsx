@@ -1,8 +1,44 @@
 "use client";
 
 import Page from "@/components/Page";
+import AssetTitle from "@/components/common/AssetTitle";
+import CopyCode from "@/components/common/CopyCode";
+import EcosystemImage from "@/components/common/EcosystemImage";
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
+import FormatDate from "@/components/risk-assessment/FormatDate";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { Badge } from "@/components/ui/badge";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChartContainer } from "@/components/ui/chart";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   AssetDTO,
@@ -11,80 +47,55 @@ import {
   RequirementsLevel,
   VulnEventDTO,
 } from "@/types/api/api";
-import Image from "next/image";
-import { Label, Pie, PieChart } from "recharts";
-import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import Link from "next/link";
-import { FunctionComponent, ReactNode, useMemo, useState } from "react";
-import Markdown from "react-markdown";
-import { Badge } from "@/components/ui/badge";
-import { useTheme } from "next-themes";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  BugAntIcon,
-  InformationCircleIcon,
-  SpeakerXMarkIcon,
-  StopIcon,
-} from "@heroicons/react/24/outline";
-import AssetTitle from "@/components/common/AssetTitle";
-import CopyCode from "@/components/common/CopyCode";
-import EcosystemImage from "@/components/common/EcosystemImage";
-import FormatDate from "@/components/risk-assessment/FormatDate";
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
   vexOptionMessages,
 } from "@/utils/view";
+import {
+  BugAntIcon,
+  InformationCircleIcon,
+  ShareIcon,
+  SpeakerXMarkIcon,
+  StopIcon,
+} from "@heroicons/react/24/outline";
+
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { CheckCircleIcon, ChevronDown } from "lucide-react";
+import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FunctionComponent, ReactNode, useMemo, useState } from "react";
+import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
-import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
-import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
-import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
-import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
-import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
-import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
+import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../../../../../../../../../components/ui/dialog";
+import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
+import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
+import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import {
   pathEntryToViewNode,
   ViewDependencyTreeNode,
 } from "../../../../../../../../../../../types/view/assetTypes";
+import { documentationLinks } from "../../../../../../../../../../../const/documentationLinks";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -383,6 +394,33 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   );
 }
 
+const convertPathsToTree = (
+  paths: Array<Array<string>>,
+): ViewDependencyTreeNode => {
+  const root: ViewDependencyTreeNode = {
+    name: "ROOT",
+    children: [],
+    risk: 0,
+    parent: null,
+    nodeType: "root",
+  };
+  for (const path of paths) {
+    let currentNode = root;
+    for (const part of path) {
+      let childNode: ViewDependencyTreeNode | undefined =
+        currentNode.children.find((child) => child.name === part);
+      if (!childNode) {
+        childNode = pathEntryToViewNode(part);
+        // since we add our own root element, we filter out every root node types
+        childNode.parent = currentNode;
+        currentNode.children.push(childNode);
+      }
+      currentNode = childNode;
+    }
+  }
+  return root;
+};
+
 const convertPathToTree = (path: string[]): ViewDependencyTreeNode => {
   if (path.length === 0) {
     return {
@@ -433,6 +471,14 @@ const Index: FunctionComponent = () => {
     Object.keys(vexOptionMessages)[2],
   );
 
+  // Path pattern for false positive rules - stores the selected suffix of the vulnerability path
+  const [selectedPathPattern, setSelectedPathPattern] = useState<
+    string[] | null
+  >(null);
+  const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
+
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
     useDecodedParams();
@@ -475,28 +521,86 @@ const Index: FunctionComponent = () => {
       };
     }
 
-    // find the correct path based on the dependency vuln suffix
-    // there should only be a single path matching exactly that elements
-    const lookingForPath = vuln?.vulnerabilityPath.join(">");
-    const path = graphResponse.find((p) => {
-      // remove everything which is NOT a component
-      const filtered = p.filter((entry) => entry.startsWith("pkg:"));
-      const path = filtered.join(">");
-      return path === lookingForPath;
-    });
+    return convertPathsToTree(graphResponse);
+  }, [graphResponse]);
 
-    if (!path) {
-      return {
-        name: "ROOT",
-        children: [],
-        risk: 0,
-        parent: null,
-        nodeType: "root",
-      };
+  // Count of different paths to the same vulnerable component (same CVE, different paths)
+  const otherPathsCount = useMemo(() => {
+    if (!graphResponse) return 0;
+    // Each path in graphResponse represents a potential separate vulnerability record
+    // Subtract 1 because one of them is the current vuln
+    return Math.max(0, graphResponse.length - 1);
+  }, [graphResponse]);
+
+  // Helper function to check if a path ends with a given suffix
+  const pathEndsWith = (path: string[], suffix: string[]): boolean => {
+    if (path.length < suffix.length) return false;
+    const startIdx = path.length - suffix.length;
+    for (let i = 0; i < suffix.length; i++) {
+      if (path[startIdx + i] !== suffix[i]) return false;
+    }
+    return true;
+  };
+
+  // Generate path pattern options for the user to select
+  // Each option is a suffix of the vulnerability path with a count of matching paths
+  const pathPatternOptions = useMemo(() => {
+    if (!vuln?.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+      return [];
+    }
+    const path = vuln.vulnerabilityPath;
+    const options: {
+      label: string;
+      description: string;
+      value: string[];
+      matchCount: number;
+    }[] = [];
+
+    // Create options for different suffix lengths (from 2 elements to the full path)
+    // Skip single element (suffix.length === 1) because it's meaningless -
+    // all instances of this CVE end with the vulnerable component
+    for (let i = path.length - 2; i >= 0; i--) {
+      const suffix = path.slice(i);
+
+      // Count how many paths in graphResponse match this suffix
+      let matchCount = 0;
+      if (graphResponse) {
+        for (const graphPath of graphResponse) {
+          // Filter to only pkg: entries (components)
+          const componentPath = graphPath.filter((entry) =>
+            entry.startsWith("pkg:"),
+          );
+          if (pathEndsWith(componentPath, suffix)) {
+            matchCount++;
+          }
+        }
+      }
+
+      // Create a descriptive label explaining what the rule means
+      const beautifiedSuffix = suffix.map((p) =>
+        p === "ROOT" ? "My application" : beautifyPurl(p),
+      );
+      let label: string;
+      let description: string;
+      const vulnerableComponent = beautifiedSuffix[beautifiedSuffix.length - 1];
+
+      if (suffix.length === 2) {
+        // Two components - parent -> vulnerable
+        const parent = beautifiedSuffix[0];
+        label = `${parent} does not call ${vulnerableComponent}`;
+        description = `Marks as False Positive when ${parent} depends on ${vulnerableComponent}`;
+      } else {
+        // Multiple components - show the chain
+        const first = beautifiedSuffix[0];
+        label = `${first} → ... → ${vulnerableComponent}`;
+        description = `Marks as False Positive for the specific path: ${beautifiedSuffix.join(" → ")}`;
+      }
+
+      options.push({ label, description, value: suffix, matchCount });
     }
 
-    return convertPathToTree(path);
-  }, [graphResponse, vuln]);
+    return options;
+  }, [vuln?.vulnerabilityPath, graphResponse]);
 
   const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
     if (!vuln) {
@@ -548,12 +652,13 @@ const Index: FunctionComponent = () => {
     status?: VulnEventDTO["type"];
     justification?: string;
     mechanicalJustification?: string;
+    pathPattern?: string[];
   }) => {
     if (data.status === undefined || !vuln) {
       return;
     }
 
-    if (!Boolean(data.justification)) {
+    if (!Boolean(data.justification) && !Boolean(data.pathPattern)) {
       return toast("Please provide a justification", {
         description: "You need to provide a justification for your decision.",
       });
@@ -648,6 +753,7 @@ const Index: FunctionComponent = () => {
     );
   }
 
+  console.log(graphData);
   return (
     <Page
       Menu={assetMenu}
@@ -717,9 +823,32 @@ const Index: FunctionComponent = () => {
               <div>
                 {!graphLoading && (
                   <div className="mt-10">
-                    <span className="font-semibold mb-2 block">
-                      Path to component
-                    </span>
+                    <div className="flex flex-row items-center justify-between mb-2">
+                      <span className="font-semibold block">
+                        Path to component
+                      </span>
+                      {otherPathsCount > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Badge variant="secondary">
+                              <ShareIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                              {otherPathsCount} other{" "}
+                              {otherPathsCount === 1 ? "path" : "paths"}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-screen-sm font-normal">
+                            <p>
+                              This vulnerability exists in {otherPathsCount}{" "}
+                              other dependency{" "}
+                              {otherPathsCount === 1 ? "path" : "paths"} within
+                              this asset. When marking as false positive, you
+                              can apply a rule to automatically mark all paths
+                              with matching suffixes.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
                     <div
                       className={`h-80 w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
                     >
@@ -746,31 +875,12 @@ const Index: FunctionComponent = () => {
                   />
                   <div>
                     <Card>
-                      <CardHeader>
-                        <CardTitle>
-                          {vuln.state === "open"
-                            ? "Add a comment"
-                            : "Reopen this vulnerability"}
-                        </CardTitle>
-                        <CardDescription></CardDescription>
-                      </CardHeader>
-                      <CardContent>
+                      <CardContent className="mt-4">
                         {vuln.state === "open" ? (
                           <form
                             className="flex flex-col gap-4"
                             onSubmit={(e) => e.preventDefault()}
                           >
-                            <div>
-                              <label className="mb-2 block text-sm font-semibold">
-                                Comment
-                              </label>
-                              <MarkdownEditor
-                                placeholder="Add your comment here..."
-                                value={justification ?? ""}
-                                setValue={setJustification}
-                              />
-                            </div>
-
                             <div className="flex flex-row justify-end gap-1">
                               <div className="flex flex-row items-start gap-2 pt-2">
                                 {vuln.ticketId === null &&
@@ -860,86 +970,26 @@ const Index: FunctionComponent = () => {
                                       </div>
                                     </AsyncButton>
                                   )}
-                                <AsyncButton
+                                <Button
                                   onClick={() =>
-                                    handleSubmit({
-                                      status: "accepted",
-                                      justification,
-                                    })
+                                    setFalsePositiveDialogOpen(true)
                                   }
                                   variant={"secondary"}
                                 >
+                                  Mark as False Positive
+                                </Button>
+                                <Button
+                                  onClick={() => setAcceptRiskDialogOpen(true)}
+                                  variant={"secondary"}
+                                >
                                   Accept risk
-                                </AsyncButton>
-                                <div className="flex flex-col items-center">
-                                  <div className="flex flex-row items-center">
-                                    <AsyncButton
-                                      onClick={() =>
-                                        handleSubmit({
-                                          status: "falsePositive",
-                                          justification,
-                                          mechanicalJustification:
-                                            selectedOption,
-                                        })
-                                      }
-                                      variant={"secondary"}
-                                      className="mr-0 capitalize rounded-r-none pr-0"
-                                    >
-                                      {removeUnderscores(selectedOption)}
-                                    </AsyncButton>
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          variant={"secondary"}
-                                          className=" flex items-center rounded-l-none pl-1 pr-2"
-                                        >
-                                          <ChevronDown className="h-4 w-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-
-                                      <DropdownMenuContent align="end">
-                                        {Object.entries(vexOptionMessages).map(
-                                          ([option, description]) => (
-                                            <DropdownMenuItem
-                                              key={option}
-                                              onClick={() =>
-                                                setSelectedOption(option)
-                                              }
-                                            >
-                                              <div className="flex flex-col">
-                                                <span className="capitalize">
-                                                  {removeUnderscores(
-                                                    option,
-                                                  )}{" "}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                  {description}
-                                                </span>
-                                              </div>
-                                            </DropdownMenuItem>
-                                          ),
-                                        )}
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </div>
-                                  <div className="flex-1 w-full">
-                                    <span className=" text-left text-xs text-muted-foreground">
-                                      {"Mark as False Positive"}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                <AsyncButton
-                                  onClick={() =>
-                                    handleSubmit({
-                                      status: "comment",
-                                      justification,
-                                    })
-                                  }
+                                </Button>
+                                <Button
+                                  onClick={() => setCommentDialogOpen(true)}
                                   variant={"default"}
                                 >
                                   Comment
-                                </AsyncButton>
+                                </Button>
                               </div>
                             </div>
                           </form>
@@ -1430,6 +1480,256 @@ const Index: FunctionComponent = () => {
           </div>
         </div>
       </div>
+      <Dialog open={commentDialogOpen} onOpenChange={setCommentDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Comment</DialogTitle>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <label className="mb-2 block text-sm font-semibold">Comment</label>
+            <MarkdownEditor
+              className="!bg-card"
+              placeholder="Add your comment here..."
+              value={justification ?? ""}
+              setValue={setJustification}
+            />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setCommentDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <AsyncButton
+                onClick={() =>
+                  handleSubmit({
+                    status: "comment",
+                    justification,
+                  })
+                }
+              >
+                Add Comment
+              </AsyncButton>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={acceptRiskDialogOpen}
+        onOpenChange={setAcceptRiskDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accept Risk</DialogTitle>
+            <DialogDescription>
+              By accepting the risk, you acknowledge that you are aware of the
+              vulnerability and its potential impact on your project. This
+              action should only be taken after careful consideration and, if
+              applicable, consultation with relevant stakeholders. You can find
+              more information about accepting risks in our{" "}
+              <Link
+                href={documentationLinks.acceptRisk}
+                target="_blank"
+                className="underline hover:text-primary"
+              >
+                documentation
+              </Link>
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <label className="block text-sm font-semibold">Comment</label>
+            <MarkdownEditor
+              className="!bg-card"
+              placeholder="Add your comment here..."
+              value={justification ?? ""}
+              setValue={setJustification}
+            />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setAcceptRiskDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <AsyncButton
+                onClick={() =>
+                  handleSubmit({
+                    status: "accepted",
+                    justification,
+                  })
+                }
+              >
+                Accept Risk
+              </AsyncButton>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={falsePositiveDialogOpen}
+        onOpenChange={() => setFalsePositiveDialogOpen(false)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as False Positive</DialogTitle>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            {pathPatternOptions.length > 0 && vuln?.state === "open" && (
+              <div className="mt-4 p-4 rounded-lg border bg-card">
+                <div className="flex flex-row items-start gap-2">
+                  <InformationCircleIcon className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium mb-2">
+                      Apply false positive rule to matching paths
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Select a path suffix to automatically mark all
+                      vulnerabilities with matching dependency paths as false
+                      positive. This rule will also apply to future
+                      vulnerabilities with matching paths.
+                    </p>
+
+                    <Select
+                      value={
+                        selectedPathPattern
+                          ? JSON.stringify(selectedPathPattern)
+                          : "none"
+                      }
+                      onValueChange={(value) => {
+                        if (value === "none") {
+                          setSelectedPathPattern(null);
+                        } else {
+                          setSelectedPathPattern(JSON.parse(value));
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="bg-background w-full">
+                        <SelectValue placeholder="Select a rule" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          No rule (only this vulnerability)
+                        </SelectItem>
+                        {pathPatternOptions.map((option, index) => (
+                          <SelectItem
+                            key={index}
+                            value={JSON.stringify(option.value)}
+                          >
+                            {option.label} — {option.matchCount}{" "}
+                            {option.matchCount === 1 ? "match" : "matches"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedPathPattern && (
+                      <div className="mt-2 p-2 rounded bg-muted/50">
+                        <p className="text-xs text-muted-foreground">
+                          {
+                            pathPatternOptions.find(
+                              (o) =>
+                                JSON.stringify(o.value) ===
+                                JSON.stringify(selectedPathPattern),
+                            )?.description
+                          }
+                        </p>
+                        <p className="mt-1 text-xs text-primary font-medium">
+                          {pathPatternOptions.find(
+                            (o) =>
+                              JSON.stringify(o.value) ===
+                              JSON.stringify(selectedPathPattern),
+                          )?.matchCount ?? 0}{" "}
+                          {(pathPatternOptions.find(
+                            (o) =>
+                              JSON.stringify(o.value) ===
+                              JSON.stringify(selectedPathPattern),
+                          )?.matchCount ?? 0) === 1
+                            ? "vulnerability"
+                            : "vulnerabilities"}{" "}
+                          will be marked as false positive
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            <label className="mb-2 block text-sm font-semibold">Comment</label>
+            <MarkdownEditor
+              className="!bg-card"
+              placeholder="Add your comment here..."
+              value={justification ?? ""}
+              setValue={setJustification}
+            />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setFalsePositiveDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <div className="flex flex-row justify-end items-center">
+                <div className="flex flex-row items-center">
+                  <AsyncButton
+                    onClick={() =>
+                      handleSubmit({
+                        status: "falsePositive",
+                        justification,
+                        mechanicalJustification: selectedOption,
+                        pathPattern: selectedPathPattern ?? undefined,
+                      })
+                    }
+                    variant={"default"}
+                    className="mr-0 capitalize rounded-r-none pr-0"
+                  >
+                    {removeUnderscores(selectedOption)}
+                  </AsyncButton>
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={"default"}
+                      className=" flex items-center rounded-l-none pl-1 pr-2"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {Object.entries(vexOptionMessages).map(
+                      ([option, description]) => (
+                        <DropdownMenuItem
+                          key={option}
+                          onClick={() => setSelectedOption(option)}
+                        >
+                          <div className="flex flex-col">
+                            <span className="capitalize">
+                              {removeUnderscores(option)}{" "}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {description}
+                            </span>
+                          </div>
+                        </DropdownMenuItem>
+                      ),
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Page>
   );
 };

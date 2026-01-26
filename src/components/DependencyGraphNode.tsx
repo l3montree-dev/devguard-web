@@ -13,17 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { beautifyPurl, classNames } from "@/utils/common";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
-import Link from "next/link";
 import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 
 export const LoadMoreNode: FunctionComponent<{
   data: {
@@ -36,7 +29,7 @@ export const LoadMoreNode: FunctionComponent<{
   return (
     <div
       style={{
-        maxWidth: props.data.nodeWidth,
+        width: props.data.nodeWidth,
       }}
       className="relative border-2 border-dashed border-primary/50 rounded-lg p-3 text-xs hover:bg-primary/10 transition-all cursor-pointer"
     >
@@ -60,11 +53,11 @@ export const LoadMoreNode: FunctionComponent<{
   );
 };
 
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
-import { PlusIcon } from "@heroicons/react/24/outline";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -118,11 +111,12 @@ export const DependencyGraphNode: FunctionComponent<
     : [];
   const hasChildren = (props.data.childCount ?? 0) > 0;
   const isExpanded = props.data.isExpanded ?? false;
+  const version = extractVersion(props.data.label);
 
-  const Node = (
+  return (
     <div
       style={{
-        maxWidth: props.data.nodeWidth,
+        width: props.data.nodeWidth,
         borderColor: hasVulnerabilities ? color : undefined,
         boxShadow: hasVulnerabilities ? `0 0 0 2px ${color}40` : undefined,
       }}
@@ -139,53 +133,56 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        <div className="flex items-center flex-row gap-2">
-          {props.data.label.startsWith("pkg:") && (
-            <div className="flex-shrink-0 mt-0.5">
-              <EcosystemImage packageName={props.data.label} size={16} />
-            </div>
-          )}
-          {hasVulnerabilities && (
-            <span className="relative mt-0.5 flex h-3 w-3">
-              <span
-                style={{
-                  backgroundColor: color,
-                }}
-                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-              ></span>
-              <span
-                style={{
-                  backgroundColor: color,
-                }}
-                className="relative inline-flex h-3 w-3 rounded-full"
-              ></span>
-            </span>
-          )}
-          <div>
-            <label
-              htmlFor="text"
-              className="text-left font-medium leading-tight flex-1"
-            >
-              {beautifyPurl(props.data.label)}
-            </label>
-            {infoSources.length > 0 && (
-              <div className="flex mt-1 flex-wrap gap-1">
-                {infoSources.map((source) => (
-                  <Badge
-                    key={source}
-                    variant="secondary"
-                    className={classNames(
-                      "text-[10px] px-1.5 py-0",
-                      source.startsWith("sbom:")
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                        : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                    )}
-                  >
-                    {beautifyInfoSource(source)}
-                  </Badge>
-                ))}
+        <div className="flex items-center justify-between flex-row gap-2">
+          <div className="flex gap-2 flex-row items-start">
+            {props.data.label.startsWith("pkg:") && (
+              <div className="flex-shrink-0 mt-0.5">
+                <EcosystemImage packageName={props.data.label} size={16} />
               </div>
             )}
+            {hasVulnerabilities && (
+              <span className="relative mt-0.5 flex h-3 w-3">
+                <span
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+                ></span>
+                <span
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  className="relative inline-flex h-3 w-3 rounded-full"
+                ></span>
+              </span>
+            )}
+            <div>
+              <label
+                htmlFor="text"
+                className="text-left font-medium leading-tight flex-1"
+              >
+                {beautifyPurl(props.data.label)}
+                {version && <Badge variant={"outline"}>{version}</Badge>}
+              </label>
+              {infoSources.length > 0 && (
+                <div className="flex mt-1 flex-wrap gap-1">
+                  {infoSources.map((source) => (
+                    <Badge
+                      key={source}
+                      variant="secondary"
+                      className={classNames(
+                        "text-[10px] px-1.5 py-0",
+                        source.startsWith("sbom:")
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                          : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                      )}
+                    >
+                      {beautifyInfoSource(source)}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           {hasChildren && (
             <span className="ml-2 flex-shrink-0 text-muted-foreground flex items-center gap-1">
@@ -205,27 +202,5 @@ export const DependencyGraphNode: FunctionComponent<
         id="a"
       />
     </div>
-  );
-
-  if (!props.data.vuln) {
-    return Node;
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>{Node}</DropdownMenuTrigger>
-      <DropdownMenuContent className="text-xs">
-        {props.data.vuln.map((vuln) => (
-          <DropdownMenuItem key={vuln.id}>
-            <Link
-              className="!text-foreground hover:no-underline"
-              href={`../dependency-risks/${vuln.id}`}
-            >
-              {vuln.cveID}
-            </Link>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 };
