@@ -18,7 +18,7 @@ import { beautifyPurl, classNames } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
 import Link from "next/link";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import ArtifactBadge from "../ArtifactBadge";
 import Severity from "../common/Severity";
@@ -27,25 +27,42 @@ import { Badge } from "../ui/badge";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import EcosystemImage from "../common/EcosystemImage";
+import { groupBy } from "lodash";
+import { Checkbox } from "../ui/checkbox";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { Button } from "../ui/button";
 
 interface Props {
   row: Row<VulnByPackage>;
   index: number;
   arrLength: number;
+  selectedVulnIds: Set<string>;
+  onToggleVuln: (id: string) => void;
+  onToggleAll: (ids: string[]) => void;
 }
 
 const VulnWithCveTableRow = ({
   vuln,
   href,
+  selected,
+  onToggle,
 }: {
   vuln: VulnWithCVE;
   href: string;
+  selected: boolean;
+  onToggle: () => void;
 }) => {
   return (
     <tr
       className="border-b align-top hover:bg-gray-50 dark:hover:bg-accent"
       key={vuln.id}
     >
+      <td className="p-4 flex flex-row items-center justify-center relative">
+        <div className="mt-1 ml-2">
+          <Checkbox checked={selected} onCheckedChange={onToggle} />
+        </div>
+      </td>
       <td className="p-4 relative">
         <Link href={href} className="absolute inset-0" />
         <div className="flex flex-row">
@@ -63,10 +80,7 @@ const VulnWithCveTableRow = ({
           ))}
         </div>
       </td>
-      <td className="p-4 relative">
-        <Link href={href} className="absolute inset-0" />
-        <Badge variant={"outline"}>{vuln.cveID}</Badge>
-      </td>
+
       <td className="p-4 text-sm line-clamp-1 overflow-hidden text-overflow-ellipsis relative">
         <Tooltip>
           <TooltipTrigger className="w-full">
@@ -143,9 +157,18 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
   arrLength,
+  selectedVulnIds,
+  onToggleVuln,
+  onToggleAll,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = useDecodedPathname();
+  const vulnGroups = useMemo(
+    () => groupBy(row.original.vulns, "cveID"),
+    [row.original.vulns],
+  );
+
+  const { theme } = useTheme();
   return (
     <>
       <tr
@@ -180,35 +203,104 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           )}
         >
           <td colSpan={6}>
-            <div className="m-2 ml-12 overflow-hidden rounded-lg border">
-              <table className="w-full table-fixed">
-                <thead
-                  className={classNames(
-                    "w-full text-left",
-                    index % 2 == 0 ? "bg-card" : "bg-background",
-                  )}
-                >
-                  <tr className="">
-                    <th className="p-4">State</th>
-                    <th className="p-4">Artifact</th>
-                    <th className="p-4">Vulnerability</th>
-                    <th className="p-4 w-92">Path</th>
-                    <th className="p-4">Risk</th>
-                    <th className="p-4">CVSS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {row.original.vulns
-                    ?.sort((a, b) => b.rawRiskAssessment - a.rawRiskAssessment)
-                    .map((vuln) => (
-                      <VulnWithCveTableRow
-                        vuln={vuln}
-                        key={vuln.id}
-                        href={pathname + "/../dependency-risks/" + vuln.id}
-                      />
-                    ))}
-                </tbody>
-              </table>
+            <div className="ml-12 my-2 mr-4 overflow-hidden rounded-lg border">
+              {Object.entries(vulnGroups).map(([cveID, vulns]) => {
+                const cveVulnIds = vulns.map((v) => v.id);
+                const allSelected = cveVulnIds.every((id) =>
+                  selectedVulnIds.has(id),
+                );
+                const someSelected = cveVulnIds.some((id) =>
+                  selectedVulnIds.has(id),
+                );
+
+                return (
+                  <div key={cveID}>
+                    <div className="px-4 bg-card flex flex-col items-start gap-2 py-3 border-b">
+                      <Link
+                        target="_blank"
+                        href={"https://osv.dev/vulnerability/" + cveID}
+                        className="font-semibold !text-foreground text-lg"
+                      >
+                        {cveID}{" "}
+                        <Image
+                          src={
+                            theme === "light"
+                              ? "/logos/osv-black.png"
+                              : "/logos/osv.png"
+                          }
+                          alt="OSV Logo"
+                          width={34}
+                          height={34}
+                          className="inline-block ml-2 mb-1"
+                        />
+                      </Link>
+                      <div className="flex flex-row items-center justify-between w-full gap-2">
+                        <div className="flex flex-row items-center gap-2">
+                          <Checkbox
+                            checked={
+                              allSelected
+                                ? true
+                                : someSelected
+                                  ? "indeterminate"
+                                  : false
+                            }
+                            onCheckedChange={() => onToggleAll(cveVulnIds)}
+                          />{" "}
+                          <label className="text-sm font-semibold">
+                            Select all {vulns.length} paths for {cveID}
+                          </label>
+                        </div>
+
+                        <div
+                          className={classNames(
+                            "flex flex-row items-center gap-2 transition-all",
+                            someSelected ? "opacity-100" : "opacity-0",
+                          )}
+                        >
+                          <Button variant={"secondary"}>
+                            Mark selected as false positive
+                          </Button>
+                          <Button variant={"secondary"}>
+                            Accept selected risk
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <table className="w-full table-fixed">
+                      <thead className="w-full text-left bg-accent/50">
+                        <tr className="">
+                          <th className="w-10" />
+                          <th className="p-4">State</th>
+                          <th className="p-4">Artifact</th>
+                          <th className="p-4 w-92">
+                            Path to vulnerable component
+                          </th>
+                          <th className="p-4">Risk</th>
+                          <th className="p-4">CVSS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {vulns
+                          .sort(
+                            (a, b) => b.rawRiskAssessment - a.rawRiskAssessment,
+                          )
+                          .map((vuln) => (
+                            <VulnWithCveTableRow
+                              vuln={vuln}
+                              key={vuln.id}
+                              href={
+                                pathname + "/../dependency-risks/" + vuln.id
+                              }
+                              selected={selectedVulnIds.has(vuln.id)}
+                              onToggle={() => onToggleVuln(vuln.id)}
+                            />
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
             </div>
           </td>
         </tr>

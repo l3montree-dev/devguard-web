@@ -10,7 +10,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
 
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 
@@ -134,6 +134,30 @@ const Index: FunctionComponent = () => {
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedVulnIds, setSelectedVulnIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const handleToggleVuln = useCallback((id: string) => {
+    setSelectedVulnIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleToggleAll = useCallback((ids: string[]) => {
+    setSelectedVulnIds((prev) => {
+      const allSelected = ids.every((id) => prev.has(id));
+      const next = new Set(prev);
+      ids.forEach((id) => (allSelected ? next.delete(id) : next.add(id)));
+      return next;
+    });
+  }, []);
   const config = useConfig();
 
   const assetMenu = useAssetMenu();
@@ -418,6 +442,9 @@ const Index: FunctionComponent = () => {
                       index={i}
                       arrLength={arr.length}
                       key={row.original.packageName}
+                      selectedVulnIds={selectedVulnIds}
+                      onToggleVuln={handleToggleVuln}
+                      onToggleAll={handleToggleAll}
                     />
                   ))}
                 </tbody>
