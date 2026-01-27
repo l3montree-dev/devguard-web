@@ -96,6 +96,7 @@ import {
   ViewDependencyTreeNode,
 } from "../../../../../../../../../../../types/view/assetTypes";
 import { documentationLinks } from "../../../../../../../../../../../const/documentationLinks";
+import AffectedComponentDetails from "@/components/AffectedComponent";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -1281,108 +1282,12 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-                <div className="p-5">
-                  <h3 className="mb-2 text-sm font-semibold">
-                    Vulnerability Details{" "}
-                    <Image
-                      src={
-                        theme === "light"
-                          ? "/logos/osv-black.png"
-                          : "/logos/osv.png"
-                      }
-                      alt="OSV Logo"
-                      width={40}
-                      height={40}
-                      className="inline-block ml-2 mb-1"
-                    />
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    <div className="rounded-lg border bg-card p-4">
-                      {vuln.cve?.relationships && (
-                        <table className="w-full table-auto border-collapse">
-                          <tbody>
-                            {vuln.cve?.relationships?.map((rel) => (
-                              <tr
-                                className="text-sm"
-                                key={rel.relationshipType + rel.targetCve}
-                              >
-                                <td className="capitalize font-semibold">
-                                  {rel.relationshipType}
-                                </td>
-                                <td>{rel.targetCve}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
-                    </div>
-                    <Link
-                      target="_blank"
-                      className="text-xs"
-                      href={"https://osv.dev/vulnerability/" + vuln.cveID}
-                    >
-                      See vulnerability on osv.dev
-                    </Link>
-                  </div>
-                </div>
+
+                <AffectedComponentDetails vuln={vuln} />
 
                 {vuln.componentPurl !== null && (
                   <div className="p-5">
-                    <h3 className="mb-2 text-sm font-semibold">
-                      Affected component
-                    </h3>
                     <div className="flex flex-col gap-4">
-                      <div>
-                        <div className="rounded-lg border bg-card p-4">
-                          <p className="text-sm">
-                            <span className="flex flex-row gap-2">
-                              <EcosystemImage
-                                packageName={vuln.componentPurl}
-                              />{" "}
-                              <span className="flex-1">
-                                {beautifyPurl(vuln.componentPurl)}
-                              </span>
-                            </span>
-                          </p>
-                          <div className="mt-4 text-sm">
-                            <div className="mt-1 flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Installed version:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {extractVersion(vuln.componentPurl) ??
-                                  "unknown"}
-                              </Badge>
-                            </div>
-                            <div className="mt-1 flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Fixed in:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {Boolean(vuln.componentFixedVersion)
-                                  ? vuln.componentFixedVersion
-                                  : "no patch available"}
-                              </Badge>
-                            </div>
-                            <div className="mt-4">
-                              <Link
-                                className={buttonVariants({
-                                  variant: "outline",
-                                })}
-                                href={
-                                  pathname +
-                                  "/../../dependencies/graph?pkg=" +
-                                  vuln.componentPurl +
-                                  "&artifact=" +
-                                  vuln.artifacts[0].artifactName
-                                }
-                              >
-                                Show in dependency graph
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                       {vuln.componentFixedVersion !== null && (
                         <>
                           <Quickfix

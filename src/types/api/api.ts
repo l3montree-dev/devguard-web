@@ -816,3 +816,58 @@ export interface CandidatesDTO {
   releases: ReleaseDTO[];
   artifacts: Array<ArtifactDTO>;
 }
+
+type VersionInterpretationType =
+  | "EmptyVersion"
+  | "SemanticVersionString"
+  | "ExactVersionString"
+  | "EcosystemSpecificVersion";
+
+interface PackageURL {
+  Type: string;
+  Namespace: string;
+  Name: string;
+  Version: string;
+  Qualifiers: Record<string, string>;
+  Subpath: string;
+}
+
+interface PurlMatchContext {
+  SearchPurl: string;
+  NormalizedVersion: string;
+  HowToInterpretVersionString: VersionInterpretationType;
+  Qualifiers: Record<string, string>;
+  Namespace: string;
+}
+
+interface AffectedComponent {
+  id: string;
+  purl: string;
+  ecosystem: string;
+  scheme: string;
+  type: string;
+  name: string;
+  namespace: string | null;
+  qualifiers: Record<string, any>;
+  subpath: string | null;
+  version: string | null;
+  semverStart: string | null;
+  semverEnd: string | null;
+  versionIntroduced: string | null;
+  versionFixed: string | null;
+  cves: VulnWithCVE[];
+}
+
+export interface VulnInPackage {
+  CVEID: string;
+  CVE: VulnWithCVE;
+  Purl: PackageURL;
+  FixedVersion: string | null;
+}
+
+export interface PURLInspectResponse {
+  purl: PackageURL;
+  match_context: PurlMatchContext | null;
+  affected_components: AffectedComponent[];
+  vulns: VulnInPackage[];
+}
