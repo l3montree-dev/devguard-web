@@ -867,7 +867,7 @@ export interface VulnInPackage {
 
 export interface PURLInspectResponse {
   purl: PackageURL;
-  match_context: PurlMatchContext | null;
-  affected_components: AffectedComponent[];
+  matchContext: PurlMatchContext | null;
+  affectedComponents: AffectedComponent[];
   vulns: VulnInPackage[];
 }

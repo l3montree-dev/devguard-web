@@ -33,7 +33,8 @@ const AffectedComponentDetails: FunctionComponent<{
   const purl = vuln.componentPurl;
 
   const url = useMemo(
-    () => `/api/devguard-tunnel/api/v1/vulndb/purl-inspect/${purl}`,
+    () =>
+      `/api/devguard-tunnel/api/v1/vulndb/purl-inspect/${encodeURIComponent(purl ?? "")}`,
     [purl],
   );
 
@@ -174,10 +175,20 @@ const AffectedComponentDetails: FunctionComponent<{
                     Fixed in:{" "}
                   </span>
                   <Badge variant={"outline"}>
-                    {activeCVE?.FixedVersion ?? "no patch available"}
+                    {activeCVE?.FixedVersion ??
+                      vuln.componentFixedVersion ??
+                      "no patch available"}
                   </Badge>
                 </div>
                 <CollapsibleContent className="">
+                  <div className="mt-1 flex flex-row justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Search PURL:{" "}
+                    </span>
+                    <Badge variant={"outline"}>
+                      {data.matchContext?.SearchPurl ?? "unknown"}
+                    </Badge>
+                  </div>
                   <div className="mt-1 flex flex-row justify-between">
                     <span className="text-xs text-muted-foreground">
                       PURL Type:{" "}
@@ -207,7 +218,7 @@ const AffectedComponentDetails: FunctionComponent<{
                       Version Type:{" "}
                     </span>
                     <Badge variant={"outline"}>
-                      {data.match_context?.HowToInterpretVersionString ??
+                      {data.matchContext?.HowToInterpretVersionString ??
                         "unknown"}
                     </Badge>
                   </div>
@@ -215,16 +226,16 @@ const AffectedComponentDetails: FunctionComponent<{
                     Matched CVEs:
                   </span>
                   <div className="mt-1 flex flex-wrap justify-end gap-2">
-                    {data.affected_components
+                    {data.affectedComponents
                       .flatMap((component) => component.cves)
                       .map((cve) => (
                         <a
-                          key={cve.cveID}
-                          href={`https://osv.dev/vulnerability/${cve.cveID}`}
+                          key={cve.cve}
+                          href={`https://osv.dev/vulnerability/${cve.cve}`}
                           target="_blank"
                           className="text-xs"
                         >
-                          <Badge variant={"outline"}>{cve.cveID}</Badge>
+                          <Badge variant={"outline"}>{cve.cve}</Badge>
                         </a>
                       ))}
                   </div>
