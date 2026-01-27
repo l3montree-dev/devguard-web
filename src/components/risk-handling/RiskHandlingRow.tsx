@@ -14,17 +14,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
-import { classNames } from "@/utils/common";
+import { beautifyPurl, classNames } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
-import { useRouter } from "next/navigation";
-import React, { FunctionComponent } from "react";
 import Link from "next/link";
+import React, { FunctionComponent } from "react";
+import useDecodedPathname from "../../hooks/useDecodedPathname";
 import ArtifactBadge from "../ArtifactBadge";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
-import useDecodedPathname from "../../hooks/useDecodedPathname";
+import { Tooltip, TooltipContent } from "../ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import EcosystemImage from "../common/EcosystemImage";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -64,6 +66,62 @@ const VulnWithCveTableRow = ({
       <td className="p-4 relative">
         <Link href={href} className="absolute inset-0" />
         <Badge variant={"outline"}>{vuln.cveID}</Badge>
+      </td>
+      <td className="p-4 text-sm line-clamp-1 overflow-hidden text-overflow-ellipsis relative">
+        <Tooltip>
+          <TooltipTrigger className="w-full">
+            <div className="flex flex-row flex-wrap gap-2">
+              {vuln.vulnerabilityPath.length === 1 && (
+                <Badge variant={"outline"}>
+                  <div className="flex flex-row items-center gap-1">
+                    <span className="line-clamp-1">
+                      {beautifyPurl(vuln.vulnerabilityPath[0])}
+                    </span>
+                  </div>
+                </Badge>
+              )}
+              {vuln.vulnerabilityPath.length >= 2 && (
+                <div className="overflow-hidden text-ellipsis flex flex-wrap text-left flex-row gap-1">
+                  <Badge variant={"outline"}>
+                    <div className="flex flex-row items-center gap-1">
+                      <span className="line-clamp-1">
+                        {beautifyPurl(vuln.vulnerabilityPath[0])}
+                      </span>
+                    </div>
+                  </Badge>
+                  → ... →{" "}
+                  <Badge variant={"outline"}>
+                    <div className="flex flex-row items-center gap-1">
+                      <span className="line-clamp-1">
+                        {beautifyPurl(
+                          vuln.vulnerabilityPath[
+                            vuln.vulnerabilityPath.length - 1
+                          ],
+                        )}
+                      </span>
+                    </div>
+                  </Badge>
+                </div>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="flex flex-wrap flex-row items-start gap-2 break-all">
+              {vuln.vulnerabilityPath.map((el, i) => (
+                <span
+                  className="flex flex-row items-center text-ellipsis whitespace-nowrap gap-1"
+                  key={i}
+                >
+                  <div>
+                    <EcosystemImage size={12} packageName={el} />
+                  </div>
+                  {beautifyPurl(el)}
+                  {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
+                </span>
+              ))}
+            </div>
+          </TooltipContent>
+        </Tooltip>
       </td>
       <td className="p-4  relative">
         <Link href={href} className="absolute inset-0" />
@@ -121,7 +179,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             index % 2 != 0 && "bg-card/50",
           )}
         >
-          <td colSpan={7}>
+          <td colSpan={6}>
             <div className="m-2 ml-12 overflow-hidden rounded-lg border">
               <table className="w-full table-fixed">
                 <thead
@@ -131,9 +189,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   )}
                 >
                   <tr className="">
-                    <th className="w-40 p-4">State</th>
+                    <th className="p-4">State</th>
                     <th className="p-4">Artifact</th>
                     <th className="p-4">Vulnerability</th>
+                    <th className="p-4 w-92">Path</th>
                     <th className="p-4">Risk</th>
                     <th className="p-4">CVSS</th>
                   </tr>

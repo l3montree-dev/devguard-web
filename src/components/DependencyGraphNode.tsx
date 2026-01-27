@@ -16,7 +16,6 @@
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import { FunctionComponent } from "react";
-import { riskToSeverity, severityToColor } from "./common/Severity";
 
 export const LoadMoreNode: FunctionComponent<{
   data: {
@@ -71,6 +70,11 @@ export interface DependencyGraphNodeProps {
     isExpanded?: boolean;
     shownCount?: number;
     hasMore?: boolean;
+    isCritical?: boolean;
+    propagationCount?: number;
+    propagationRatio?: number;
+    impactLevel?: "critical" | "high" | "medium" | "low" | null;
+    flow?: number;
   };
 }
 
@@ -103,27 +107,26 @@ const beautifyInfoSource = (source: string) => {
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
-  const color = severityToColor(riskToSeverity(props.data.risk));
-
-  const hasVulnerabilities = props.data.vuln !== undefined;
   const infoSources = props.data.infoSources
     ? Array.from(props.data.infoSources)
     : [];
   const hasChildren = (props.data.childCount ?? 0) > 0;
   const isExpanded = props.data.isExpanded ?? false;
   const version = extractVersion(props.data.label);
+  const propagationRatio = props.data.propagationRatio || 0;
 
   return (
     <div
       style={{
         width: props.data.nodeWidth,
-        borderColor: hasVulnerabilities ? color : undefined,
-        boxShadow: hasVulnerabilities ? `0 0 0 2px ${color}40` : undefined,
       }}
       className={classNames(
         "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        "border-border",
-        hasVulnerabilities ? "shadow-lg" : "shadow-md",
+        props.data.vuln
+          ? "border-red-500 shadow-lg"
+          : props.data.isCritical
+            ? "border-orange-500 shadow-lg"
+            : "border-border",
         hasChildren ? "cursor-pointer hover:border-primary/50" : "",
       )}
     >
@@ -133,28 +136,35 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
+        {props.data.vuln ? (
+          <div className="absolute -top-2 -right-2 z-10">
+            <Badge
+              variant="outline"
+              className={`text-[10px] px-1.5 py-0 font-semibold shadow-md bg-red-500 text-white border-red-500`}
+              title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
+            >
+              Vulnerable
+            </Badge>
+          </div>
+        ) : (
+          props.data.isCritical && (
+            <div className="absolute -top-2 -right-2 z-10">
+              <Badge
+                variant="outline"
+                className={`text-[10px] px-1.5 py-0 font-semibold shadow-md bg-orange-500 text-white border-red-500`}
+                title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
+              >
+                High Impact
+              </Badge>
+            </div>
+          )
+        )}
         <div className="flex items-center justify-between flex-row gap-2">
           <div className="flex gap-2 flex-row items-start">
             {props.data.label.startsWith("pkg:") && (
               <div className="flex-shrink-0 mt-0.5">
                 <EcosystemImage packageName={props.data.label} size={16} />
               </div>
-            )}
-            {hasVulnerabilities && (
-              <span className="relative mt-0.5 flex h-3 w-3">
-                <span
-                  style={{
-                    backgroundColor: color,
-                  }}
-                  className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                ></span>
-                <span
-                  style={{
-                    backgroundColor: color,
-                  }}
-                  className="relative inline-flex h-3 w-3 rounded-full"
-                ></span>
-              </span>
             )}
             <div>
               <label

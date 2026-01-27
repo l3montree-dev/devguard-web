@@ -46,6 +46,7 @@ import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
+import { recursiveAddRisk } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -59,12 +60,8 @@ const DependencyGraphPage: FunctionComponent = () => {
       assetVersionSlug: string;
     };
 
-  const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
-    useState(false);
-
   const all = searchParams?.get("all") === "1";
   const menu = useAssetMenu();
-  const asset = useActiveAsset();
   const artifacts = useArtifacts();
 
   const uri =
@@ -106,37 +103,14 @@ const DependencyGraphPage: FunctionComponent = () => {
     let converted = convertGraph(graphData);
 
     recursiveAddRisk(converted, affectedComponents ?? []);
-    // we cannot return a circular data structure - remove the parent again
-    recursiveRemoveParent(converted);
 
     // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
     if (searchParams?.get("all") !== "1") {
       recursiveRemoveWithoutRisk(converted);
     }
 
-    // the first childrens are the detection targets.
-    // they might start with the asset id itself.
-    // if there is only a first level child, which starts with the asset id, we can remove the root node
-    if (
-      converted.children.length === 1 &&
-      converted.children[0].name.startsWith(asset.id)
-    ) {
-      converted = {
-        ...converted.children[0],
-        name: converted.children[0].name.replace(asset.id + "/", ""),
-        parent: null,
-      };
-    } else {
-      // check if thats the case, if so, remove the assetId prefix
-      converted.children = converted.children.map((c) => {
-        if (c.name.startsWith(asset.id)) {
-          c.name = c.name.replace(asset.id + "/", "");
-        }
-        return c;
-      });
-    }
     return converted;
-  }, [graphData, searchParams, affectedComponents, asset.id]);
+  }, [graphData, searchParams, affectedComponents]);
 
   const push = useRouterQuery();
 
@@ -183,7 +157,7 @@ const DependencyGraphPage: FunctionComponent = () => {
         >
           {graph ? (
             <DependencyGraph
-              flaws={affectedComponents ?? []}
+              vulns={affectedComponents ?? []}
               width={dimensions.width - SIDEBAR_WIDTH}
               height={dimensions.height - HEADER_HEIGHT - 85}
               graph={graph}
@@ -201,48 +175,13 @@ const DependencyGraphPage: FunctionComponent = () => {
 
 export default DependencyGraphPage;
 
-const RISK_INHERITANCE_FACTOR = 0.3;
-const recursiveAddRisk = (
-  node: ViewDependencyTreeNode,
-  vulns: Array<DependencyVuln>,
-) => {
-  const nodeFlaws = vulns.filter((p) => p.componentPurl === node.name);
-
-  // if there are no children, the risk is the risk of the affected package
-  if (nodeFlaws.length > 0) {
-    node.risk = nodeFlaws.reduce(
-      (acc, curr) => acc + curr.rawRiskAssessment,
-      0,
-    );
-    // update the parent node with the risk of this node
-    let parent = node.parent;
-    let i = 0;
-    while (parent != null) {
-      i++;
-      //   if (parent.name.startsWith("pkg:")) {
-      parent.risk = parent.risk
-        ? parent.risk + node.risk * (RISK_INHERITANCE_FACTOR / i)
-        : node.risk * (RISK_INHERITANCE_FACTOR / i);
-      // }
-      parent = parent.parent;
-    }
-  }
-  node.children.forEach((child) => recursiveAddRisk(child, vulns));
-
-  return node;
-};
-
-const recursiveRemoveParent = (node: ViewDependencyTreeNode) => {
-  node.parent = null;
-  node.children.forEach((child) => recursiveRemoveParent(child));
-};
-
 const convertGraph = (
   graph: DependencyTreeNode,
   parent: ViewDependencyTreeNode | null = null,
 ): ViewDependencyTreeNode => {
   const convertedNode = pathEntryToViewNode(graph.name);
-  convertedNode.parent = parent;
+  if (parent !== null && !convertedNode.parents.includes(parent))
+    convertedNode.parents.push(parent);
   convertedNode.children = graph.children.map((child) =>
     convertGraph(child, convertedNode),
   );

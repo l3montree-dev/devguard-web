@@ -55,41 +55,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 
-interface Props {
-  vulns: Paged<VulnByPackage>;
-}
-
 const columnHelper = createColumnHelper<VulnByPackage>();
-
-const getMaxSemverVersionAndRiskReduce = (vulns: VulnWithCVE[]) => {
-  // order the vulns by fixedVersion
-  const orderedVulns = vulns.sort((a, b) => {
-    if (a.componentFixedVersion && b.componentFixedVersion) {
-      return a.componentFixedVersion.localeCompare(b.componentFixedVersion);
-    }
-    return 0;
-  });
-
-  // remove all without fixed version
-  const filteredVulns = orderedVulns.filter(
-    (f) => f.componentFixedVersion !== null,
-  );
-
-  if (filteredVulns.length === 0) {
-    return null;
-  }
-  // aggregate the risk
-  const totalRisk = filteredVulns.reduce(
-    (acc, f) => acc + f.rawRiskAssessment,
-    0,
-  );
-
-  return {
-    version:
-      filteredVulns[filteredVulns.length - 1].componentFixedVersion ?? "",
-    riskReduction: totalRisk,
-  };
-};
 
 const columnsDef: ColumnDef<VulnByPackage, any>[] = [
   {
@@ -155,43 +121,12 @@ const columnsDef: ColumnDef<VulnByPackage, any>[] = [
       header: "Vulnerability Count",
       id: "dependency_vuln_count",
       enableSorting: true,
-      cell: (row) => row.getValue(),
-    }),
-  },
-
-  {
-    header: "Action",
-    id: "fixAvailable",
-    enableSorting: false,
-    cell: ({ row }: any) => {
-      const versionAndReduction = getMaxSemverVersionAndRiskReduce(
-        row.original.vulns,
-      );
-      if (versionAndReduction === null) {
-        return <span className="text-muted-foreground">No fix available</span>;
-      }
-
-      return (
-        <div>
-          <div className="relative rounded-lg">
-            <div className="rounded-lg border bg-card p-4 border  ">
-              <span>
-                <span className="text-muted-foreground">Update to version</span>{" "}
-                <span>
-                  <Badge variant={"secondary"}>
-                    {versionAndReduction.version}
-                  </Badge>
-                </span>{" "}
-                <span className="text-muted-foreground">
-                  to reduce total risk by
-                </span>{" "}
-                <span>{versionAndReduction.riskReduction.toFixed(1)}</span>
-              </span>
-            </div>
-          </div>
+      cell: (row) => (
+        <div className="flex">
+          <Badge variant={"outline"}>{row.getValue()}</Badge>
         </div>
-      );
-    },
+      ),
+    }),
   },
 ];
 
@@ -397,7 +332,7 @@ const Index: FunctionComponent = () => {
                       <th className="w-6" />
                       {headerGroup.headers.map((header) => (
                         <th
-                          className="w-40 cursor-pointer break-normal p-4 text-left"
+                          className="cursor-pointer break-normal p-4 text-left"
                           onClick={
                             header.column.columnDef.enableSorting
                               ? header.column.getToggleSortingHandler()
@@ -406,15 +341,7 @@ const Index: FunctionComponent = () => {
                           key={header.id}
                         >
                           <div className="flex flex-row items-center gap-2">
-                            {header.isPlaceholder ? null : header.id ===
-                              "fixAvailable" ? (
-                              <Badge className="">
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                              </Badge>
-                            ) : (
+                            {header.isPlaceholder ? null : (
                               <div>
                                 {flexRender(
                                   header.column.columnDef.header,

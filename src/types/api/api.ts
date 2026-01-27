@@ -617,7 +617,7 @@ export interface VulnByPackage {
   totalRisk: number;
   vulnCount: number;
   avgRisk: number;
-  vulns: VulnWithCVE[];
+  vulns: Array<VulnWithCVE>;
 }
 
 export interface LicenseRiskDTO extends BaseVulnDTO {

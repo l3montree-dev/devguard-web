@@ -69,7 +69,7 @@ const EcosystemImage = ({
   }
 
   return (
-    <span className="italic rounded-full text-sm">
+    <span className="italic block rounded-full text-sm">
       <QuestionMarkCircleIcon width={size ?? 20} height={size ?? 20} />
     </span>
   );

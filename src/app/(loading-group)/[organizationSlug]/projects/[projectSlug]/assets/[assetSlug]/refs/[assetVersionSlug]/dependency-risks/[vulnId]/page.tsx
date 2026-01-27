@@ -76,7 +76,9 @@ import useSWR from "swr";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
+import Callout from "../../../../../../../../../../../components/common/Callout";
 import Err from "../../../../../../../../../../../components/common/Err";
+import Markdown from "../../../../../../../../../../../components/common/Markdown";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import {
@@ -88,14 +90,12 @@ import {
   DialogTitle,
 } from "../../../../../../../../../../../components/ui/dialog";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
+import { documentationLinks } from "../../../../../../../../../../../const/documentationLinks";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import {
-  pathEntryToViewNode,
-  ViewDependencyTreeNode,
-} from "../../../../../../../../../../../types/view/assetTypes";
-import { documentationLinks } from "../../../../../../../../../../../const/documentationLinks";
+import { ViewDependencyTreeNode } from "../../../../../../../../../../../types/view/assetTypes";
+import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -394,62 +394,6 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
   );
 }
 
-const convertPathsToTree = (
-  paths: Array<Array<string>>,
-): ViewDependencyTreeNode => {
-  const root: ViewDependencyTreeNode = {
-    name: "ROOT",
-    children: [],
-    risk: 0,
-    parent: null,
-    nodeType: "root",
-  };
-  for (const path of paths) {
-    let currentNode = root;
-    for (const part of path) {
-      let childNode: ViewDependencyTreeNode | undefined =
-        currentNode.children.find((child) => child.name === part);
-      if (!childNode) {
-        childNode = pathEntryToViewNode(part);
-        // since we add our own root element, we filter out every root node types
-        childNode.parent = currentNode;
-        currentNode.children.push(childNode);
-      }
-      currentNode = childNode;
-    }
-  }
-  return root;
-};
-
-const convertPathToTree = (path: string[]): ViewDependencyTreeNode => {
-  if (path.length === 0) {
-    return {
-      name: "ROOT",
-      children: [],
-      risk: 0,
-      parent: null,
-      nodeType: "root",
-    };
-  }
-
-  const root = pathEntryToViewNode(path[0]);
-  let currentNode = root;
-
-  for (const part of path.slice(1)) {
-    let childNode: ViewDependencyTreeNode | undefined =
-      currentNode.children.find((child) => child.name === part);
-    if (!childNode) {
-      childNode = pathEntryToViewNode(part);
-      // since we add our own root element, we filter out every root node types
-      childNode.parent = currentNode;
-      currentNode.children.push(childNode);
-    }
-    currentNode = childNode;
-  }
-
-  return root;
-};
-
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -473,8 +417,8 @@ const Index: FunctionComponent = () => {
 
   // Path pattern for false positive rules - stores the selected suffix of the vulnerability path
   const [selectedPathPattern, setSelectedPathPattern] = useState<
-    string[] | null
-  >(null);
+    string | undefined
+  >();
   const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
@@ -510,97 +454,55 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
+  const { data: falsePositiveRules } = useSWR<
+    Array<{ id: string; pathPattern: Array<string> }>
+  >(
+    `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/false-positive-rules/`,
+    fetcher,
+  );
+
+  console.log(falsePositiveRules);
+
   const graphData = useMemo<ViewDependencyTreeNode>(() => {
     if (!graphResponse || graphResponse.length === 0) {
       return {
         name: "ROOT",
         children: [],
         risk: 0,
-        parent: null,
+        parents: [],
         nodeType: "root",
       };
     }
 
-    return convertPathsToTree(graphResponse);
-  }, [graphResponse]);
-
-  // Count of different paths to the same vulnerable component (same CVE, different paths)
-  const otherPathsCount = useMemo(() => {
-    if (!graphResponse) return 0;
-    // Each path in graphResponse represents a potential separate vulnerability record
-    // Subtract 1 because one of them is the current vuln
-    return Math.max(0, graphResponse.length - 1);
-  }, [graphResponse]);
-
-  // Helper function to check if a path ends with a given suffix
-  const pathEndsWith = (path: string[], suffix: string[]): boolean => {
-    if (path.length < suffix.length) return false;
-    const startIdx = path.length - suffix.length;
-    for (let i = 0; i < suffix.length; i++) {
-      if (path[startIdx + i] !== suffix[i]) return false;
-    }
-    return true;
-  };
+    return convertPathsToTree(graphResponse, vuln ? [vuln] : []);
+  }, [graphResponse, vuln]);
 
   // Generate path pattern options for the user to select
   // Each option is a suffix of the vulnerability path with a count of matching paths
   const pathPatternOptions = useMemo(() => {
-    if (!vuln?.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
-      return [];
-    }
-    const path = vuln.vulnerabilityPath;
-    const options: {
-      label: string;
-      description: string;
-      value: string[];
-      matchCount: number;
-    }[] = [];
-
-    // Create options for different suffix lengths (from 2 elements to the full path)
-    // Skip single element (suffix.length === 1) because it's meaningless -
-    // all instances of this CVE end with the vulnerable component
-    for (let i = path.length - 2; i >= 0; i--) {
-      const suffix = path.slice(i);
-
-      // Count how many paths in graphResponse match this suffix
-      let matchCount = 0;
-      if (graphResponse) {
-        for (const graphPath of graphResponse) {
-          // Filter to only pkg: entries (components)
-          const componentPath = graphPath.filter((entry) =>
-            entry.startsWith("pkg:"),
-          );
-          if (pathEndsWith(componentPath, suffix)) {
-            matchCount++;
-          }
+    // group the graphResponse by suffixes
+    if (!graphResponse) return [];
+    const suffixMap: { [key: string]: number } = {};
+    graphResponse.forEach((path) => {
+      for (let i = 1; i <= path.length; i++) {
+        const suffix = path.slice(-i);
+        const key = suffix.join(" > ");
+        if (suffixMap[key]) {
+          suffixMap[key] += 1;
+        } else {
+          suffixMap[key] = 1;
         }
       }
+    });
+    // create an array of suffixes
+    // make sure to sort it
 
-      // Create a descriptive label explaining what the rule means
-      const beautifiedSuffix = suffix.map((p) =>
-        p === "ROOT" ? "My application" : beautifyPurl(p),
-      );
-      let label: string;
-      let description: string;
-      const vulnerableComponent = beautifiedSuffix[beautifiedSuffix.length - 1];
+    const sortedSuffixes = Object.entries(suffixMap).sort(([x, a], [y, b]) => {
+      return b - a;
+    });
 
-      if (suffix.length === 2) {
-        // Two components - parent -> vulnerable
-        const parent = beautifiedSuffix[0];
-        label = `${parent} does not call ${vulnerableComponent}`;
-        description = `Marks as False Positive when ${parent} depends on ${vulnerableComponent}`;
-      } else {
-        // Multiple components - show the chain
-        const first = beautifiedSuffix[0];
-        label = `${first} → ... → ${vulnerableComponent}`;
-        description = `Marks as False Positive for the specific path: ${beautifiedSuffix.join(" → ")}`;
-      }
-
-      options.push({ label, description, value: suffix, matchCount });
-    }
-
-    return options;
-  }, [vuln?.vulnerabilityPath, graphResponse]);
+    return sortedSuffixes;
+  }, [graphResponse]);
 
   const handleAcceptUpstreamChange = async (event: VulnEventDTO) => {
     if (!vuln) {
@@ -753,7 +655,6 @@ const Index: FunctionComponent = () => {
     );
   }
 
-  console.log(graphData);
   return (
     <Page
       Menu={assetMenu}
@@ -769,7 +670,7 @@ const Index: FunctionComponent = () => {
               </h1>
               <p className="mt-4 text-muted-foreground">
                 {vuln ? (
-                  vuln.cve?.description
+                  <Markdown>{vuln.cve?.description}</Markdown>
                 ) : (
                   <Skeleton className="w-full h-20" />
                 )}
@@ -827,23 +728,24 @@ const Index: FunctionComponent = () => {
                       <span className="font-semibold block">
                         Path to component
                       </span>
-                      {otherPathsCount > 0 && (
+                      {(graphResponse?.length || 0) > 0 && (
                         <Tooltip>
                           <TooltipTrigger>
                             <Badge variant="secondary">
                               <ShareIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                              {otherPathsCount} other{" "}
-                              {otherPathsCount === 1 ? "path" : "paths"}
+                              Vulnerability is reachable through{" "}
+                              {graphResponse?.length}{" "}
+                              {graphResponse?.length === 1 ? "path" : "paths"}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent className="max-w-screen-sm font-normal">
                             <p>
-                              This vulnerability exists in {otherPathsCount}{" "}
-                              other dependency{" "}
-                              {otherPathsCount === 1 ? "path" : "paths"} within
-                              this asset. When marking as false positive, you
-                              can apply a rule to automatically mark all paths
-                              with matching suffixes.
+                              This vulnerability exists in{" "}
+                              {graphResponse?.length} other dependency{" "}
+                              {graphResponse?.length === 1 ? "path" : "paths"}{" "}
+                              within this asset. When marking as false positive,
+                              you can apply a rule to automatically mark all
+                              paths with matching suffixes.
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -857,8 +759,20 @@ const Index: FunctionComponent = () => {
                         width={100}
                         height={200}
                         graph={graphData}
-                        flaws={[]}
+                        vulns={vuln ? [vuln] : []}
                       />
+                    </div>
+                    <div className="mt-4">
+                      <Callout intent="info">
+                        You can interact with the graph by zooming in/out,
+                        clicking on edges to mark them as false positives and
+                        remove nodes that are not relevant for dependency
+                        propagation. You are trying to answer the question:{" "}
+                        <b>
+                          How does the vulnerability get inherited by my
+                          project?
+                        </b>
+                      </Callout>
                     </div>
                   </div>
                 )}
@@ -1281,6 +1195,7 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
+
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
                     Vulnerability Details{" "}
@@ -1298,23 +1213,25 @@ const Index: FunctionComponent = () => {
                   </h3>
                   <div className="flex flex-col gap-2">
                     <div className="rounded-lg border bg-card p-4">
-                      {vuln.cve?.relationships && (
-                        <table className="w-full table-auto border-collapse">
-                          <tbody>
-                            {vuln.cve?.relationships?.map((rel) => (
-                              <tr
-                                className="text-sm"
-                                key={rel.relationshipType + rel.targetCve}
-                              >
-                                <td className="capitalize font-semibold">
-                                  {rel.relationshipType}
-                                </td>
-                                <td>{rel.targetCve}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
+                      <table className="w-full table-auto border-collapse">
+                        <tbody>
+                          <tr className="text-sm">
+                            <td className="capitalize font-semibold">ID</td>
+                            <td>{vuln.cve?.cve}</td>
+                          </tr>
+                          {vuln.cve?.relationships?.map((rel) => (
+                            <tr
+                              className="text-sm"
+                              key={rel.relationshipType + rel.targetCve}
+                            >
+                              <td className="capitalize font-semibold">
+                                {rel.relationshipType}
+                              </td>
+                              <td>{rel.targetCve}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                     <Link
                       target="_blank"
@@ -1601,17 +1518,9 @@ const Index: FunctionComponent = () => {
                     </p>
 
                     <Select
-                      value={
-                        selectedPathPattern
-                          ? JSON.stringify(selectedPathPattern)
-                          : "none"
-                      }
+                      value={selectedPathPattern ?? "none"}
                       onValueChange={(value) => {
-                        if (value === "none") {
-                          setSelectedPathPattern(null);
-                        } else {
-                          setSelectedPathPattern(JSON.parse(value));
-                        }
+                        setSelectedPathPattern(value);
                       }}
                     >
                       <SelectTrigger className="bg-background w-full">
@@ -1621,45 +1530,15 @@ const Index: FunctionComponent = () => {
                         <SelectItem value="none">
                           No rule (only this vulnerability)
                         </SelectItem>
-                        {pathPatternOptions.map((option, index) => (
-                          <SelectItem
-                            key={index}
-                            value={JSON.stringify(option.value)}
-                          >
-                            {option.label} — {option.matchCount}{" "}
-                            {option.matchCount === 1 ? "match" : "matches"}
-                          </SelectItem>
-                        ))}
+                        {pathPatternOptions
+                          .slice(0, 10)
+                          .map(([suffix, count], index) => (
+                            <SelectItem key={index} value={suffix}>
+                              {suffix} — {count}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
-                    {selectedPathPattern && (
-                      <div className="mt-2 p-2 rounded bg-muted/50">
-                        <p className="text-xs text-muted-foreground">
-                          {
-                            pathPatternOptions.find(
-                              (o) =>
-                                JSON.stringify(o.value) ===
-                                JSON.stringify(selectedPathPattern),
-                            )?.description
-                          }
-                        </p>
-                        <p className="mt-1 text-xs text-primary font-medium">
-                          {pathPatternOptions.find(
-                            (o) =>
-                              JSON.stringify(o.value) ===
-                              JSON.stringify(selectedPathPattern),
-                          )?.matchCount ?? 0}{" "}
-                          {(pathPatternOptions.find(
-                            (o) =>
-                              JSON.stringify(o.value) ===
-                              JSON.stringify(selectedPathPattern),
-                          )?.matchCount ?? 0) === 1
-                            ? "vulnerability"
-                            : "vulnerabilities"}{" "}
-                          will be marked as false positive
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -1686,7 +1565,8 @@ const Index: FunctionComponent = () => {
                         status: "falsePositive",
                         justification,
                         mechanicalJustification: selectedOption,
-                        pathPattern: selectedPathPattern ?? undefined,
+                        pathPattern:
+                          selectedPathPattern?.split(" > ") ?? undefined,
                       })
                     }
                     variant={"default"}

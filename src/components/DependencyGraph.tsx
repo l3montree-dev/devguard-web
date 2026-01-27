@@ -15,7 +15,7 @@
 import { DependencyVuln } from "@/types/api/api";
 import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
 import { beautifyPurl, classNames } from "@/utils/common";
-import dagre, { graphlib } from "@dagrejs/dagre";
+
 import {
   MiniMap,
   ReactFlow,
@@ -31,17 +31,25 @@ import {
   useState,
 } from "react";
 
-import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
-
 // or if you just want basic styles
-import "@xyflow/react/dist/base.css";
-import { useTheme } from "next-themes";
-import { riskToSeverity, severityToColor } from "./common/Severity";
-import { Button } from "./ui/button";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
+import "@xyflow/react/dist/base.css";
+import { useTheme } from "next-themes";
+import {
+  autoExpandToMinimum,
+  getLayoutedElements,
+  INITIAL_CHILDREN_TO_SHOW,
+  MAX_CHILDREN_PER_PAGE,
+  populateChildCounts,
+  propagateHighlighting,
+  traverseDownward,
+  traverseUpward,
+} from "../utils/dependencyGraphHelpers";
+import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
+import { Button } from "./ui/button";
 
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
@@ -66,377 +74,6 @@ export interface VexSelection {
   nodeName?: string;
 }
 
-const isInfoSource = (name: string) => {
-  return (
-    name.startsWith("sbom:") ||
-    name.startsWith("vex:") ||
-    name.startsWith("csaf:")
-  );
-};
-
-// Pagination settings
-const MAX_CHILDREN_PER_PAGE = 50;
-const INITIAL_CHILDREN_TO_SHOW = 20;
-const MIN_VISIBLE_NODES = 2000;
-
-// Auto-expand nodes breadth-first until we have at least MIN_VISIBLE_NODES
-const autoExpandToMinimum = (
-  tree: ViewDependencyTreeNode,
-  childCountMap: Map<string, number>,
-  childrenLimitMap: Map<string, number>,
-): Set<string> => {
-  const expanded = new Set<string>();
-  expanded.add(tree.name);
-
-  let visibleCount = 1; // Start with root
-  const queue: ViewDependencyTreeNode[] = [tree];
-
-  while (queue.length > 0 && visibleCount < MIN_VISIBLE_NODES) {
-    const current = queue.shift()!;
-
-    if (!expanded.has(current.name)) {
-      continue;
-    }
-
-    // Get non-info children and sort them alphabetically
-    const children = current.children
-      .map((c) => (isInfoSource(c.name) ? c.children : [c]))
-      .flat()
-      .sort((a, b) => a.name.localeCompare(b.name));
-    console.log(current.children, children);
-
-    if (children.length === 0) {
-      continue;
-    }
-
-    // Add visible children (up to the limit)
-    const limit =
-      childrenLimitMap.get(current.name) || INITIAL_CHILDREN_TO_SHOW;
-    const childrenToShow = Math.min(limit, children.length);
-    visibleCount += childrenToShow;
-
-    // Add children to queue for potential expansion
-    children.slice(0, childrenToShow).forEach((child) => {
-      queue.push(child);
-      // Auto-expand first child if we still need more nodes
-      if (
-        visibleCount < MIN_VISIBLE_NODES &&
-        (childCountMap.get(child.name) || 0) > 0
-      ) {
-        expanded.add(child.name);
-      }
-    });
-
-    // Process info source children
-    current.children
-      .filter((c) => isInfoSource(c.name))
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .forEach((infoSource) => {
-        infoSource.children
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .forEach((grandchild) => {
-            if (!isInfoSource(grandchild.name)) {
-              queue.push(grandchild);
-            }
-          });
-      });
-  }
-
-  return expanded;
-};
-// Pre-populate child counts for all nodes in the tree
-const populateChildCounts = (
-  node: ViewDependencyTreeNode,
-  childCountMap: Map<string, number>,
-) => {
-  if (!node.name || isInfoSource(node.name)) return;
-
-  // count the number of children
-  // if it has an info source child, count its children instead
-  const count = node.children.reduce((acc, child) => {
-    if (isInfoSource(child.name)) {
-      return acc + child.children.length;
-    } else {
-      return acc + 1;
-    }
-  }, 0);
-  childCountMap.set(node.name, count);
-
-  // Recursively populate for all descendants (sorted for determinism)
-  [...node.children]
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .forEach((child) => {
-      if (!isInfoSource(child.name)) {
-        populateChildCounts(child, childCountMap);
-      } else {
-        // For info sources, process their children
-        [...child.children]
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .forEach((grandchild) => {
-            populateChildCounts(grandchild, childCountMap);
-          });
-      }
-    });
-};
-const addRecursive = (
-  dagreGraph: graphlib.Graph,
-  node: ViewDependencyTreeNode,
-  nodeWidth: number,
-  nodeHeight: number,
-  infoSourceMap: Map<string, Set<string>>,
-  expandedNodes: Set<string>,
-  childCountMap: Map<string, number>,
-  childrenLimitMap: Map<string, number>,
-  riskMap: Map<string, number>,
-) => {
-  if (node.name !== "" && !isInfoSource(node.name)) {
-    dagreGraph.setNode(node.name, {
-      width: nodeWidth,
-      height: nodeHeight,
-    });
-    // Store risk for this node
-    riskMap.set(node.name, node.risk ?? 0);
-
-    // Only process children if this node is expanded
-    const isExpanded = expandedNodes.has(node.name);
-
-    // Get the limit for how many children to show
-    const childLimit =
-      childrenLimitMap.get(node.name) || INITIAL_CHILDREN_TO_SHOW;
-    const totalChildren = childCountMap.get(node.name) || 0;
-    let childrenProcessed = 0;
-
-    // Sort children alphabetically for deterministic order
-    [...node.children]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .forEach((dep) => {
-        if (dep.name === "") {
-          return;
-        }
-        // If child is an info source, track it but don't add to graph
-        if (isInfoSource(dep.name)) {
-          if (!infoSourceMap.has(node.name)) {
-            infoSourceMap.set(node.name, new Set());
-          }
-          infoSourceMap.get(node.name)!.add(dep.name);
-          // Continue processing grandchildren as if they were direct children (if expanded)
-          if (isExpanded && childrenProcessed < childLimit) {
-            [...dep.children]
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .forEach((grandchild) => {
-                if (grandchild.name !== "" && !isInfoSource(grandchild.name)) {
-                  if (childrenProcessed >= childLimit) return;
-                  childrenProcessed++;
-
-                  dagreGraph.setNode(grandchild.name, {
-                    width: nodeWidth,
-                    height: nodeHeight,
-                  });
-                  dagreGraph.setEdge(node.name, grandchild.name);
-                  addRecursive(
-                    dagreGraph,
-                    grandchild,
-                    nodeWidth,
-                    nodeHeight,
-                    infoSourceMap,
-                    expandedNodes,
-                    childCountMap,
-                    childrenLimitMap,
-                    riskMap,
-                  );
-                }
-              });
-          }
-        } else if (isExpanded) {
-          // Check if we've reached the limit for this node
-          if (childrenProcessed >= childLimit) {
-            return;
-          }
-          childrenProcessed++;
-
-          // Only add child nodes if parent is expanded
-          dagreGraph.setNode(dep.name, {
-            width: nodeWidth,
-            height: nodeHeight,
-          });
-          dagreGraph.setEdge(node.name, dep.name);
-          addRecursive(
-            dagreGraph,
-            dep,
-            nodeWidth,
-            nodeHeight,
-            infoSourceMap,
-            expandedNodes,
-            childCountMap,
-            childrenLimitMap,
-            riskMap,
-          );
-        }
-      });
-
-    // Add "Show more" node if there are more children to display
-    if (isExpanded && childrenProcessed < totalChildren) {
-      const loadMoreId = `${node.name}__load_more`;
-      console.log(loadMoreId);
-      dagreGraph.setNode(loadMoreId, { width: nodeWidth, height: nodeHeight });
-      dagreGraph.setEdge(node.name, loadMoreId);
-      childCountMap.set(loadMoreId, 0); // Load more node has no children
-      riskMap.set(loadMoreId, 0);
-    }
-  }
-};
-
-const getLayoutedElements = (
-  tree: ViewDependencyTreeNode,
-  flaws: Array<DependencyVuln> = [],
-  direction = "LR",
-  nodeWidth: number,
-  nodeHeight: number,
-  expandedNodes: Set<string>,
-  childrenLimitMap: Map<string, number>,
-  previousNodes: Array<any> = [],
-): [
-  Array<{
-    id: string;
-    position: { x: number; y: number };
-    data: { label: string };
-  }>,
-  Array<{
-    id: string;
-    source: string;
-    target: string;
-    animated: boolean;
-    style: { stroke: string };
-  }>,
-] => {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  // build a map of all affected packages
-  const vulnMap = flaws.reduce(
-    (acc, cur) => {
-      if (!acc[cur.componentPurl!]) {
-        acc[cur.componentPurl!] = [];
-      }
-      acc[cur.componentPurl!].push(cur);
-      return acc;
-    },
-    {} as { [key: string]: DependencyVuln[] },
-  );
-
-  dagreGraph.setGraph({
-    rankdir: direction,
-    nodesep: 0,
-    ranksep: 100,
-    edgesep: 0,
-    marginx: 0,
-    marginy: 0,
-  });
-
-  const infoSourceMap = new Map<string, Set<string>>();
-  const childCountMap = new Map<string, number>();
-  const riskMap = new Map<string, number>();
-
-  // Pre-populate child counts for all nodes
-  populateChildCounts(tree, childCountMap);
-
-  addRecursive(
-    dagreGraph,
-    tree,
-    nodeWidth,
-    nodeHeight,
-    infoSourceMap,
-    expandedNodes,
-    childCountMap,
-    childrenLimitMap,
-    riskMap,
-  );
-
-  dagre.layout(dagreGraph, { width: 10, height: 10 });
-
-  // Create a map of previous positions
-  const previousPositions = new Map(
-    previousNodes.map((n) => [n.id, n.position]),
-  );
-
-  const nodes = dagreGraph.nodes().map((el) => {
-    const nodeWithPosition = dagreGraph.node(el);
-    const isLoadMoreNode = el.includes("__load_more");
-    const parentId = isLoadMoreNode ? el.replace("__load_more", "") : null;
-    const childCount = childCountMap.get(el) || 0;
-    const isExpanded = expandedNodes.has(el);
-    const shownCount = childrenLimitMap.get(el) || INITIAL_CHILDREN_TO_SHOW;
-
-    // Use previous position if it exists
-    // For load more nodes, preserve X but always update Y to position at bottom
-    const prevPos = previousPositions.get(el);
-    let position: { x: number; y: number };
-
-    if (isLoadMoreNode && prevPos) {
-      // Load more node with previous position: keep X, update Y, but only IF increased
-      position = {
-        x: prevPos.x,
-        y: Math.max(10 + nodeWithPosition.y, prevPos.y),
-      };
-    } else if (prevPos) {
-      // Regular node with previous position: keep both X and Y
-      position = prevPos;
-    } else {
-      // New node (including first-time load more): use dagre's calculated position
-      position = {
-        x: nodeWithPosition.x,
-        y: 10 + nodeWithPosition.y,
-      };
-    }
-
-    return {
-      id: el,
-      targetPosition: "right",
-      sourcePosition: "left",
-      type: isLoadMoreNode ? "loadMoreNode" : "customNode",
-      position,
-      data: {
-        label: el,
-        risk: riskMap.get(el) ?? 0,
-        vuln: vulnMap[el],
-        nodeWidth,
-        nodeHeight,
-        infoSources: infoSourceMap.get(el),
-        childCount,
-        isExpanded,
-        shownCount,
-        hasMore: childCount > shownCount,
-        isLoadMoreNode,
-        parentId,
-        remainingCount: parentId
-          ? (childCountMap.get(parentId) || 0) -
-            (childrenLimitMap.get(parentId) || INITIAL_CHILDREN_TO_SHOW)
-          : 0,
-      },
-    };
-  });
-
-  const edges = dagreGraph.edges().map((el) => {
-    const source = el.v;
-    const target = el.w;
-    const targetRisk = riskMap.get(target) ?? 0;
-    const hasRisk = targetRisk > 0;
-
-    return {
-      id: `${source}-${target}`,
-      target: source,
-      source: target,
-      animated: hasRisk,
-      style: {
-        stroke:
-          targetRisk > 0
-            ? severityToColor(riskToSeverity(targetRisk))
-            : "#a1a1aa",
-      },
-    };
-  });
-  return [nodes, edges];
-};
-
 const nodeTypes = {
   customNode: DependencyGraphNode,
   loadMoreNode: LoadMoreNode,
@@ -446,10 +83,10 @@ const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
   variant?: "compact";
-  flaws: Array<DependencyVuln>;
+  vulns: Array<DependencyVuln>;
   graph: ViewDependencyTreeNode;
   onVexSelect?: (selection: VexSelection) => void;
-}> = ({ graph, width, height, flaws, variant, onVexSelect }) => {
+}> = ({ graph, width, height, vulns, variant, onVexSelect }) => {
   const isFirstRender = useRef(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -486,7 +123,7 @@ const DependencyGraph: FunctionComponent<{
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     const [nodes, edges] = getLayoutedElements(
       graph,
-      flaws,
+      vulns,
       "LR",
       300,
       75,
@@ -499,7 +136,7 @@ const DependencyGraph: FunctionComponent<{
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, flaws, expandedNodes, childrenLimitMap]);
+  }, [graph, vulns, expandedNodes, childrenLimitMap]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -522,6 +159,7 @@ const DependencyGraph: FunctionComponent<{
   // Precompute edge lookup maps for O(1) access during hover
   const edgeMaps = useMemo(() => {
     const strokeMap = new Map<string, string>();
+    const strokeWidthMap = new Map<string, number>();
     // A node can have multiple parents in a DAG, so store all parent edges
     const childToParentEdges = new Map<
       string,
@@ -535,6 +173,7 @@ const DependencyGraph: FunctionComponent<{
 
     for (const edge of initialEdges) {
       strokeMap.set(edge.id, edge.style?.stroke || "#a1a1aa");
+      strokeWidthMap.set(edge.id, edge.style?.strokeWidth || 1);
 
       // child -> parent (for upward traversal)
       const existingParents = childToParentEdges.get(edge.source) || [];
@@ -547,7 +186,12 @@ const DependencyGraph: FunctionComponent<{
       parentToChildEdges.set(edge.target, existingChildren);
     }
 
-    return { strokeMap, childToParentEdges, parentToChildEdges };
+    return {
+      strokeMap,
+      strokeWidthMap,
+      childToParentEdges,
+      parentToChildEdges,
+    };
   }, [initialEdges]);
 
   const { theme } = useTheme();
@@ -630,76 +274,38 @@ const DependencyGraph: FunctionComponent<{
         }
       }
 
-      // Upward traversal - continue upward if the parent has only one outgoing edge
-      const visitedUp = new Set<string>();
-      const queueUp: string[] = [];
-
-      // Start upward traversal from all parents
+      // Collect nodes for upward traversal (parents with single outgoing edge)
+      const upwardStartNodes: string[] = [];
       if (incomingEdges) {
         for (const { parent } of incomingEdges) {
           const parentOutgoing = edgeMaps.parentToChildEdges.get(parent);
           if (parentOutgoing && parentOutgoing.length === 1) {
-            queueUp.push(parent);
+            upwardStartNodes.push(parent);
           }
         }
       }
+      traverseUpward(upwardStartNodes, pathEdgeIds, edgeMaps);
 
-      while (queueUp.length > 0) {
-        const currentUpNode = queueUp.shift()!;
-        if (visitedUp.has(currentUpNode)) continue;
-        visitedUp.add(currentUpNode);
-
-        const parentEdges = edgeMaps.childToParentEdges.get(currentUpNode);
-        if (parentEdges) {
-          for (const { edgeId, parent } of parentEdges) {
-            pathEdgeIds.add(edgeId);
-
-            // Continue upwards only if parent has a single outgoing edge
-            const parentOutgoing = edgeMaps.parentToChildEdges.get(parent);
-            if (parentOutgoing && parentOutgoing.length === 1) {
-              queueUp.push(parent);
-            }
-          }
-        }
-      }
-
-      // Downward traversal - continue downward if the child has only one incoming edge
-      const visitedDown = new Set<string>();
-      const queueDown: string[] = [];
-
-      // Start downward traversal from all children
+      // Collect nodes for downward traversal (children with single incoming edge)
+      const downwardStartNodes: string[] = [];
       if (outgoingEdges) {
         for (const { child } of outgoingEdges) {
           const childIncoming = edgeMaps.childToParentEdges.get(child);
           if (childIncoming && childIncoming.length === 1) {
-            queueDown.push(child);
+            downwardStartNodes.push(child);
           }
         }
       }
+      traverseDownward(downwardStartNodes, pathEdgeIds, edgeMaps);
 
-      while (queueDown.length > 0) {
-        const currentDownNode = queueDown.shift()!;
-        if (visitedDown.has(currentDownNode)) continue;
-        visitedDown.add(currentDownNode);
-
-        const childEdges = edgeMaps.parentToChildEdges.get(currentDownNode);
-        if (childEdges) {
-          for (const { edgeId, child } of childEdges) {
-            pathEdgeIds.add(edgeId);
-
-            // Continue downwards only if the child has a single incoming edge
-            const childIncoming = edgeMaps.childToParentEdges.get(child);
-            if (childIncoming && childIncoming.length === 1) {
-              queueDown.push(child);
-            }
-          }
-        }
-      }
+      // Propagate highlighting
+      propagateHighlighting(pathEdgeIds, edgeMaps);
 
       setEdges((currentEdges) =>
         currentEdges.map((e) => {
           const isOnPath = pathEdgeIds.has(e.id);
           const originalStroke = edgeMaps.strokeMap.get(e.id) || "#a1a1aa";
+          const originalStrokeWidth = edgeMaps.strokeWidthMap.get(e.id) || 1;
 
           if (isOnPath) {
             return {
@@ -707,7 +313,7 @@ const DependencyGraph: FunctionComponent<{
               style: {
                 ...e.style,
                 stroke: "#F8BD25",
-                strokeWidth: 3,
+                strokeWidth: originalStrokeWidth + 2,
               },
               zIndex: 1000,
             };
@@ -718,7 +324,7 @@ const DependencyGraph: FunctionComponent<{
             style: {
               ...e.style,
               stroke: originalStroke,
-              strokeWidth: 1,
+              strokeWidth: edgeMaps.strokeWidthMap.get(e.id) || 1,
             },
             zIndex: 0,
           };
@@ -733,12 +339,13 @@ const DependencyGraph: FunctionComponent<{
     setEdges((currentEdges) =>
       currentEdges.map((edge) => {
         const originalStroke = edgeMaps.strokeMap.get(edge.id) || "#a1a1aa";
+        const originalStrokeWidth = edgeMaps.strokeWidthMap.get(edge.id) || 1;
         return {
           ...edge,
           style: {
             ...edge.style,
             stroke: originalStroke,
-            strokeWidth: 1,
+            strokeWidth: originalStrokeWidth,
           },
           zIndex: 0,
         };
@@ -759,7 +366,6 @@ const DependencyGraph: FunctionComponent<{
       // The parent node of the hovered edge (where we start looking for incoming edges)
       const parentNode = edge.target;
       const childNode = edge.source;
-      const visited = new Set<string>();
 
       // if the parent only has this SINGLE outgoing edge, we highlight all incoming edges to it
       // since marking the hovered edge as false positive, would also imply the entire path to it is false positive
@@ -768,29 +374,8 @@ const DependencyGraph: FunctionComponent<{
         !parentOutgoing ||
         (parentOutgoing.length === 1 && parentOutgoing[0].child === childNode);
 
-      let queue: string[] = [];
       if (isOnlyChild) {
-        // Queue for recursive traversal
-        queue = [parentNode];
-      }
-      while (queue.length > 0) {
-        const currentNode = queue.shift()!;
-        if (visited.has(currentNode)) continue;
-        visited.add(currentNode);
-
-        const parentEdges = edgeMaps.childToParentEdges.get(currentNode);
-
-        // highlight all incoming edges to currentNode
-        if (parentEdges) {
-          for (const { edgeId } of parentEdges) {
-            pathEdgeIds.add(edgeId);
-          }
-          // if currentNode only has a single outgoing edge, continue upwards
-          const outgoing = edgeMaps.parentToChildEdges.get(currentNode);
-          if (outgoing && outgoing.length === 1) {
-            queue.push(currentNode);
-          }
-        }
+        traverseUpward([parentNode], pathEdgeIds, edgeMaps);
       }
 
       // if we would remove that edge, and the child node only has a single incoming edge (exactly this one), we can continue downwards as well
@@ -800,32 +385,17 @@ const DependencyGraph: FunctionComponent<{
         (childIncoming.length === 1 && childIncoming[0].parent === parentNode);
 
       if (isOnlyParent) {
-        // Downward traversal
-        const visitedDown = new Set<string>();
-        const queueDown: string[] = [childNode];
-        while (queueDown.length > 0) {
-          const currentNode = queueDown.shift()!;
-          if (visitedDown.has(currentNode)) continue;
-          visitedDown.add(currentNode);
-
-          const childEdges = edgeMaps.parentToChildEdges.get(currentNode);
-          if (childEdges) {
-            for (const { edgeId, child } of childEdges) {
-              pathEdgeIds.add(edgeId);
-              const incomingToChild = edgeMaps.childToParentEdges.get(child);
-              // Continue downwards only if the child has a single incoming edge
-              if (incomingToChild && incomingToChild.length === 1) {
-                queueDown.push(child);
-              }
-            }
-          }
-        }
+        traverseDownward([childNode], pathEdgeIds, edgeMaps);
       }
+
+      // Propagate highlighting
+      propagateHighlighting(pathEdgeIds, edgeMaps);
 
       setEdges((currentEdges) =>
         currentEdges.map((e) => {
           const isOnPath = pathEdgeIds.has(e.id);
           const originalStroke = edgeMaps.strokeMap.get(e.id) || "#a1a1aa";
+          const originalStrokeWidth = edgeMaps.strokeWidthMap.get(e.id) || 1;
 
           if (isOnPath) {
             return {
@@ -833,7 +403,7 @@ const DependencyGraph: FunctionComponent<{
               style: {
                 ...e.style,
                 stroke: "#F8BD25",
-                strokeWidth: 3,
+                strokeWidth: originalStrokeWidth + 2,
               },
               zIndex: 1000,
             };
@@ -844,7 +414,7 @@ const DependencyGraph: FunctionComponent<{
             style: {
               ...e.style,
               stroke: originalStroke,
-              strokeWidth: 1,
+              strokeWidth: edgeMaps.strokeWidthMap.get(e.id) || 1,
             },
             zIndex: 0,
           };
@@ -858,12 +428,13 @@ const DependencyGraph: FunctionComponent<{
     setEdges((currentEdges) =>
       currentEdges.map((edge) => {
         const originalStroke = edgeMaps.strokeMap.get(edge.id) || "#a1a1aa";
+        const originalStrokeWidth = edgeMaps.strokeWidthMap.get(edge.id) || 1;
         return {
           ...edge,
           style: {
             ...edge.style,
             stroke: originalStroke,
-            strokeWidth: 1,
+            strokeWidth: originalStrokeWidth,
           },
           zIndex: 0,
         };

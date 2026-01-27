@@ -135,7 +135,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
                 variant="compact"
                 width={100}
                 height={100}
-                flaws={[]}
+                vulns={[]}
                 graph={graphData}
               />
             </div>

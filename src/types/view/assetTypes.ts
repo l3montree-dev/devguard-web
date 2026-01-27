@@ -17,7 +17,7 @@ import { DependencyTreeNode } from "../api/api";
 export interface ViewDependencyTreeNode
   extends Omit<DependencyTreeNode, "children"> {
   risk: number;
-  parent: ViewDependencyTreeNode | null;
+  parents: Array<ViewDependencyTreeNode>;
   children: ViewDependencyTreeNode[];
   nodeType: "root" | "artifact" | "component" | "infosource";
   infoSourceType?: "sbom" | "csaf" | "vex";
@@ -58,7 +58,7 @@ export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
     name: entry,
     children: [],
     risk: 0,
-    parent: null,
+    parents: [],
     nodeType,
     infoSourceType,
   };
