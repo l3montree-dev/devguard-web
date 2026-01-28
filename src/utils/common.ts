@@ -16,6 +16,37 @@
 import { ExternalTicketProvider, State } from "@/types/common";
 import { defaultScanner } from "./view";
 import { UserRole } from "@/types/api/api";
+import {
+  pathEntryToViewNode,
+  ViewDependencyTreeNode,
+} from "@/types/view/assetTypes";
+
+export const convertPathsToTree = (
+  paths: Array<Array<string>>,
+): ViewDependencyTreeNode => {
+  const root: ViewDependencyTreeNode = {
+    name: "ROOT",
+    children: [],
+    risk: 0,
+    parent: null,
+    nodeType: "root",
+  };
+  for (const path of paths) {
+    let currentNode = root;
+    for (const part of path) {
+      let childNode: ViewDependencyTreeNode | undefined =
+        currentNode.children.find((child) => child.name === part);
+      if (!childNode) {
+        childNode = pathEntryToViewNode(part);
+        // since we add our own root element, we filter out every root node types
+        childNode.parent = currentNode;
+        currentNode.children.push(childNode);
+      }
+      currentNode = childNode;
+    }
+  }
+  return root;
+};
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");

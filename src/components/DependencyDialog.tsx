@@ -30,6 +30,8 @@ import OpenSsfScore from "./common/OpenSsfScore";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 import useDecodedParams from "../hooks/useDecodedParams";
+import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+import { convertPathsToTree } from "../utils/common";
 
 interface Props {
   open: boolean;
@@ -48,7 +50,9 @@ const DependencyDialog: FunctionComponent<Props> = ({
 }) => {
   const search = useSearchParams();
 
-  const [graphData, setGraphData] = useState<any>(null);
+  const [graphData, setGraphData] = useState<ViewDependencyTreeNode | null>(
+    null,
+  );
 
   //read artifactName from url query params
   const artifactName = (search?.get("artifact") as string) || "";
@@ -80,7 +84,8 @@ const DependencyDialog: FunctionComponent<Props> = ({
 
       if (resp.ok) {
         const json2 = await resp.json();
-        setGraphData(json2);
+        const graphData = convertPathsToTree(json2);
+        setGraphData(graphData);
       } else {
         toast.error("Could not fetch Graph Data from Endpoint");
       }

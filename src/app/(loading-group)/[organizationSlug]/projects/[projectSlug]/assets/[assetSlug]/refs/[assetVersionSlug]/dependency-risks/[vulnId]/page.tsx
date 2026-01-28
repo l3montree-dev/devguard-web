@@ -47,7 +47,12 @@ import {
   RequirementsLevel,
   VulnEventDTO,
 } from "@/types/api/api";
-import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
+import {
+  beautifyPurl,
+  convertPathsToTree,
+  extractVersion,
+  getEcosystem,
+} from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
@@ -393,33 +398,6 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
     </div>
   );
 }
-
-const convertPathsToTree = (
-  paths: Array<Array<string>>,
-): ViewDependencyTreeNode => {
-  const root: ViewDependencyTreeNode = {
-    name: "ROOT",
-    children: [],
-    risk: 0,
-    parent: null,
-    nodeType: "root",
-  };
-  for (const path of paths) {
-    let currentNode = root;
-    for (const part of path) {
-      let childNode: ViewDependencyTreeNode | undefined =
-        currentNode.children.find((child) => child.name === part);
-      if (!childNode) {
-        childNode = pathEntryToViewNode(part);
-        // since we add our own root element, we filter out every root node types
-        childNode.parent = currentNode;
-        currentNode.children.push(childNode);
-      }
-      currentNode = childNode;
-    }
-  }
-  return root;
-};
 
 const convertPathToTree = (path: string[]): ViewDependencyTreeNode => {
   if (path.length === 0) {
