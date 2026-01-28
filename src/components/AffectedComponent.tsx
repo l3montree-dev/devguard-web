@@ -235,7 +235,7 @@ const AffectedComponentDetails: FunctionComponent<{
                           target="_blank"
                           className="text-xs"
                         >
-                          <Badge variant={"outline"}>{cve.cve}</Badge>
+                          <Badge variant={"outline"}>{String(cve.cve)}</Badge>
                         </a>
                       ))}
                   </div>
