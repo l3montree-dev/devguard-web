@@ -230,7 +230,7 @@ const AffectedComponentDetails: FunctionComponent<{
                       .flatMap((component) => component.cves)
                       .map((cve) => (
                         <a
-                          key={cve.cve}
+                          key={cve.cveID}
                           href={`https://osv.dev/vulnerability/${cve.cve}`}
                           target="_blank"
                           className="text-xs"
