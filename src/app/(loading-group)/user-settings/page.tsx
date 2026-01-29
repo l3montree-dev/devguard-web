@@ -18,7 +18,6 @@ import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 import CopyCode from "@/components/common/CopyCode";
 import DateString, {
   parseDateOnly,
-  parseDateOnly,
 } from "@/components/common/DateString";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";

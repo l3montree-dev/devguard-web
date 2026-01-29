@@ -17,6 +17,7 @@ import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
 import React, { FunctionComponent } from "react";
+import { documentationLinks } from "@/const/documentationLinks";
 
 import { useConfig } from "../context/ConfigContext";
 import EntityProviderBanner from "./common/EntityProviderBanner";
@@ -51,10 +52,18 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
         {children}
       </div>
       <div className="bg-footer">
-        <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-footer-foreground lg:px-8">
+        <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-muted-foreground lg:px-8">
           <div className="mb-2 flex flex-row gap-5">
             <Link
-              className="!text-footer-foreground"
+              className="!text-muted-foreground hover:!text-foreground"
+              target="_blank"
+              rel="noopener noreferrer"
+              href={documentationLinks.docsIntroduction}
+            >
+              Documentation
+            </Link>
+            <Link
+              className="!text-muted-foreground hover:!text-foreground"
               target="_blank"
               rel="noopener noreferrer"
               href="https://github.com/l3montree-dev/devguard"
@@ -62,7 +71,7 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
               GitHub
             </Link>
             <Link
-              className="!text-footer-foreground"
+              className="!text-muted-foreground hover:!text-foreground"
               target="_blank"
               rel="noopener noreferrer"
               href={themeConfig.imprintLink}
@@ -70,7 +79,7 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
               Imprint
             </Link>
             <a
-              className="!text-footer-foreground"
+              className="!text-muted-foreground hover:!text-foreground"
               target="_blank"
               rel="noopener noreferrer"
               href={themeConfig.termsOfUseLink}
@@ -78,13 +87,21 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
               Terms of Use
             </a>
             <a
-              className="!text-footer-foreground"
+              className="!text-muted-foreground hover:!text-foreground"
               href={themeConfig.privacyPolicyLink}
               target="_blank"
               rel="noopener noreferrer"
             >
               Privacy
             </a>
+            <Link
+              className="!text-muted-foreground hover:!text-foreground"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/l3montree-dev/devguard/blob/main/LICENSE.txt"
+            >
+              AGPL-3.0-License
+            </Link>
           </div>
           Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
           Contributors. All rights reserved. Version{" "}
