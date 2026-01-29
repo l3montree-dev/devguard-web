@@ -21,15 +21,17 @@ import { Project, ScoreCard } from "@/types/api/api";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
+import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { GitBranch, ScaleIcon, StarIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import useDecodedParams from "../hooks/useDecodedParams";
 import { beautifyPurl } from "../utils/common";
 import OpenSsfDetails from "./OpenSsfDetails";
 import DateString from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import { useSearchParams } from "next/navigation";
-import useDecodedParams from "../hooks/useDecodedParams";
+import { convertPathsToTree } from "../utils/dependencyGraphHelpers";
 
 interface Props {
   open: boolean;
@@ -48,7 +50,9 @@ const DependencyDialog: FunctionComponent<Props> = ({
 }) => {
   const search = useSearchParams();
 
-  const [graphData, setGraphData] = useState<any>(null);
+  const [graphData, setGraphData] = useState<ViewDependencyTreeNode | null>(
+    null,
+  );
 
   //read artifactName from url query params
   const artifactName = (search?.get("artifact") as string) || "";
@@ -80,7 +84,8 @@ const DependencyDialog: FunctionComponent<Props> = ({
 
       if (resp.ok) {
         const json2 = await resp.json();
-        setGraphData(json2);
+        const graphData = convertPathsToTree(json2, []);
+        setGraphData(graphData);
       } else {
         toast.error("Could not fetch Graph Data from Endpoint");
       }
