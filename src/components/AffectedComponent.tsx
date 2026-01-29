@@ -153,7 +153,7 @@ const AffectedComponentDetails: FunctionComponent<{
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
-                    <span className="flex-1">{beautifyPurl(purl)}</span>
+                    <span className="flex-1 text-left">{beautifyPurl(purl)}</span>
                   </span>
                 </p>
                 <CaretDownIcon />
