@@ -358,9 +358,7 @@ const Index: FunctionComponent = () => {
       },
     },
   );
-  const { data: licenses, isLoading: licensesLoading } = useSWR<
-    LicenseResponse[]
-  >(
+  const { data: licenses } = useSWR<LicenseResponse[]>(
     url +
       "/licenses" +
       (searchParams?.has("artifact")
@@ -422,18 +420,6 @@ const Index: FunctionComponent = () => {
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
-
-  const licenseToPercentMapEntries = useMemo(() => {
-    if (!licenses || licenses.length === 0) {
-      return [];
-    }
-
-    const total = licenses.reduce((acc, curr) => acc + curr.count, 0);
-
-    return licenses
-      .map((license) => [license, (license.count / total) * 100] as const)
-      .sort(([_aLicense, a], [_bLicense, b]) => (b as number) - (a as number));
-  }, [licenses]);
 
   const handleLicenseRefresh = async () => {
     const resp = await browserApiClient(

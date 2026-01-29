@@ -166,7 +166,7 @@ const Index: FunctionComponent = () => {
 
   // Known risky/unknown license identifiers that should be highlighted as warnings
   const riskyLicenses = useMemo(
-    () => new Set(["unknown", "NOASSERTION", "UNLICENSED", ""]),
+    () => new Set(["unknown", "noassertion", "unlicensed", ""]),
     [],
   );
 
@@ -183,10 +183,11 @@ const Index: FunctionComponent = () => {
     const data = topLicenses.map((l) => ({
       license: l.license.licenseId || "Unknown",
       count: l.count,
-      fill: riskyLicenses.has(l.license.licenseId)
+      fill: riskyLicenses.has(l.license.licenseId.toLowerCase())
         ? "hsl(var(--warning))"
-        : osiLicenseHexColors[l.license.licenseId] || "hsl(var(--primary))",
-      isRisky: riskyLicenses.has(l.license.licenseId),
+        : osiLicenseHexColors[l.license.licenseId.toLowerCase()] ||
+          "hsl(var(--primary))",
+      isRisky: riskyLicenses.has(l.license.licenseId.toLowerCase()),
     }));
 
     if (otherCount > 0) {
@@ -220,7 +221,7 @@ const Index: FunctionComponent = () => {
   const unknownCount = useMemo(
     () =>
       licenses
-        ?.filter((l) => riskyLicenses.has(l.license.licenseId))
+        ?.filter((l) => riskyLicenses.has(l.license.licenseId.toLowerCase()))
         .reduce((acc, curr) => acc + curr.count, 0) ?? 0,
     [licenses, riskyLicenses],
   );

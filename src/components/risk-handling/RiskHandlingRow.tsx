@@ -280,13 +280,25 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 <td className="py-3 px-4 pl-10">
                   <div className="flex flex-row items-center gap-3">
                     {!pathExplosionOrOnlySinglePath && (
-                      <span className="p-0.5">
+                      <button
+                        className="p-0.5 hover:bg-muted rounded"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCve(cveID);
+                        }}
+                        aria-label={
+                          isCveExpanded
+                            ? `Collapse ${cveID} paths`
+                            : `Expand ${cveID} paths`
+                        }
+                        aria-expanded={isCveExpanded}
+                      >
                         {isCveExpanded ? (
                           <ChevronDownIcon className="w-4 h-4 text-muted-foreground" />
                         ) : (
                           <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
                         )}
-                      </span>
+                      </button>
                     )}
                     <Checkbox
                       className={pathExplosionOrOnlySinglePath ? "ml-8" : ""}
