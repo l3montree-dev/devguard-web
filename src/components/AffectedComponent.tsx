@@ -157,7 +157,9 @@ const AffectedComponentDetails: FunctionComponent<{
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
-                    <span className="flex-1 text-left">{beautifyPurl(purl)}</span>
+                    <span className="flex-1 text-left">
+                      {beautifyPurl(purl)}
+                    </span>
                   </span>
                 </p>
                 <CaretDownIcon />
@@ -200,9 +202,9 @@ const AffectedComponentDetails: FunctionComponent<{
                   <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
-                      .map((cve) => (
+                      .map((cve, index) => (
                         <Link
-                          key={cve.cveID}
+                          key={`${cve.cveID}-${index}`}
                           href={`https://osv.dev/vulnerability/${cve.cve}`}
                           target="_blank"
                           className="!text-xs"

@@ -135,11 +135,11 @@ const DependencyDialog: FunctionComponent<Props> = ({
         {graphData && (
           <div className="mt-4">
             <span className="font-semibold mb-2 block">Path to component</span>
-            <div className="h-40 w-full rounded-lg border bg-black">
+            <div className="h-72 w-full rounded-lg border bg-black">
               <DependencyGraph
                 variant="compact"
                 width={100}
-                height={100}
+                height={200}
                 vulns={[]}
                 graph={graphData}
               />

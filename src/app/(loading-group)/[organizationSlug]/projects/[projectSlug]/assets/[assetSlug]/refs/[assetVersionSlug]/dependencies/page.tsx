@@ -1,9 +1,10 @@
 "use client";
+
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import "@xyflow/react/dist/style.css";
-import { ChangeEvent, FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -15,7 +16,6 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
 import {
-  ArtifactDTO,
   Component,
   ComponentPaged,
   License,
@@ -23,7 +23,12 @@ import {
   Paged,
   ScoreCard,
 } from "@/types/api/api";
-import { beautifyPurl, classNames, licenses } from "@/utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+  licenses,
+} from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
 import {
   CalendarDateRangeIcon,
@@ -64,7 +69,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { debounce } from "lodash";
 import { GitBranchIcon, Loader2Icon } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -72,7 +76,6 @@ import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { osiLicenseHexColors } from "../../../../../../../../../../utils/view";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 
@@ -224,21 +227,17 @@ const columnsDef: ColumnDef<
     header: "Package",
     id: "dependency_purl",
     cell: (row) => (
-      <span className="flex flex-row items-start gap-2">
-        <span className="flex-shrink-0 mt-0.5">
-          <EcosystemImage packageName={row.getValue()} size={20} />
+      <span className="flex flex-row items-center gap-2">
+        <EcosystemImage packageName={row.getValue()} size={16} />
+        <span className="font-medium truncate">
+          {beautifyPurl(row.getValue())}
         </span>
-        <span className="break-words">{beautifyPurl(row.getValue())}</span>
+        <span className="text-xs text-muted-foreground">
+          {extractVersion(row.getValue())}
+        </span>
       </span>
     ),
   }),
-  columnHelper.accessor("dependency.version", {
-    header: "Version",
-    id: "dependency.version",
-    cell: (row) =>
-      row.getValue() && <Badge variant={"secondary"}>{row.getValue()}</Badge>,
-  }),
-
   columnHelper.accessor("license", {
     header: "License",
     id: "Dependency.license",
@@ -259,7 +258,11 @@ const columnsDef: ColumnDef<
       row.row.original.dependency?.project && (
         <div>
           <div className="mb-2">
-            <a href={`//${row.getValue()}`} target="_blank">
+            <a
+              href={`//${row.getValue()}`}
+              target="_blank"
+              className="block truncate"
+            >
               {row.getValue()}
             </a>
           </div>
@@ -355,9 +358,7 @@ const Index: FunctionComponent = () => {
       },
     },
   );
-  const { data: licenses, isLoading: licensesLoading } = useSWR<
-    LicenseResponse[]
-  >(
+  const { data: licenses } = useSWR<LicenseResponse[]>(
     url +
       "/licenses" +
       (searchParams?.has("artifact")
@@ -420,18 +421,6 @@ const Index: FunctionComponent = () => {
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
-  const licenseToPercentMapEntries = useMemo(() => {
-    if (!licenses || licenses.length === 0) {
-      return [];
-    }
-
-    const total = licenses.reduce((acc, curr) => acc + curr.count, 0);
-
-    return licenses
-      .map((license) => [license, (license.count / total) * 100] as const)
-      .sort(([_aLicense, a], [_bLicense, b]) => (b as number) - (a as number));
-  }, [licenses]);
-
   const handleLicenseRefresh = async () => {
     const resp = await browserApiClient(
       `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/components/licenses/refresh`,
@@ -493,63 +482,8 @@ const Index: FunctionComponent = () => {
       <Section
         primaryHeadline
         forceVertical
-        description="Dependencies of the asset"
-        title="Dependencies"
-        Button={
-          <div className="w-1/3">
-            <span className="text-xs text-muted-foreground">Licenses</span>
-            {licensesLoading ? (
-              <Skeleton className="w-full h-20" />
-            ) : (
-              <>
-                <span>
-                  <span className="flex flex-row overflow-hidden rounded-full">
-                    {licenseToPercentMapEntries.map(([el, percent], i, arr) => (
-                      <span
-                        key={el.license.licenseId}
-                        className={classNames(
-                          "h-2",
-                          i === arr.length - 1 ? "" : "border-r",
-                        )}
-                        style={{
-                          width: percent + "%",
-                          backgroundColor:
-                            osiLicenseHexColors[el.license.licenseId] ||
-                            "#eeeeee",
-                        }}
-                      />
-                    ))}
-                  </span>
-                  <span className="mt-2 flex flex-row flex-wrap gap-2">
-                    {licenseToPercentMapEntries
-                      .filter((el) => el[1] > 0.5)
-                      .map(([el, percent]) => (
-                        <span
-                          className="whitespace-nowrap text-xs capitalize"
-                          key={el.license.licenseId}
-                        >
-                          <span
-                            style={{
-                              backgroundColor:
-                                osiLicenseHexColors[el.license.licenseId] ??
-                                "#eeeeee",
-                            }}
-                            className={classNames(
-                              "mr-1 inline-block h-2 w-2 rounded-full text-xs ",
-                            )}
-                          />
-                          {el.license.licenseId}{" "}
-                          <span className="text-muted-foreground">
-                            {Math.round(percent as number)}%
-                          </span>
-                        </span>
-                      ))}
-                  </span>
-                </span>
-              </>
-            )}
-          </div>
-        }
+        description="All your Dependencies of the selected artifact on the selected reference (branch/tag)."
+        title="All Dependencies"
       >
         <div className="flex flex-row items-center justify-between gap-2">
           <QueryArtifactSelector
@@ -574,9 +508,13 @@ const Index: FunctionComponent = () => {
             <thead className="border-b bg-card text-foreground">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
+                  {headerGroup.headers.map((header, index) => (
                     <th
-                      className="cursor-pointer break-normal p-4 text-left"
+                      className={classNames(
+                        "cursor-pointer break-normal p-4 text-left",
+                        index === 0 && "w-[350px]",
+                        index === 2 && "w-[300px]",
+                      )}
                       key={header.id}
                     >
                       <div
@@ -615,9 +553,6 @@ const Index: FunctionComponent = () => {
                       <Skeleton className="w-1/2 h-[20px]" />
                     </td>
                     <td className="p-4">
-                      <Skeleton className="w-1/2 h-[20px]" />
-                    </td>
-                    <td className="p-4">
                       <Skeleton className="w-full h-[40px]" />
                     </td>
                     <td className="p-4">
@@ -632,10 +567,11 @@ const Index: FunctionComponent = () => {
                 <tr
                   onClick={() => dataPassthrough(row.original)}
                   className={classNames(
-                    "relative bg-background align-top transition-all ",
+                    "relative bg-background align-top transition-all",
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                     row.original.dependency.projectId && "cursor-pointer",
+                    "hover:bg-gray-50 dark:hover:bg-card",
                   )}
                   key={row.original.id}
                 >

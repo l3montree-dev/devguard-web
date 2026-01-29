@@ -1,8 +1,7 @@
 // components/license-risk/LicenseRiskRow.tsx
-import { beautifyPurl, classNames } from "@/utils/common";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { usePathname, useRouter } from "next/navigation";
 import { LicenseRiskDTO } from "../../types/api/api";
-import ArtifactBadge from "../ArtifactBadge";
 import EcosystemImage from "../common/EcosystemImage";
 import { Badge } from "../ui/badge";
 import { getSeverityClassNames } from "../common/Severity";
@@ -27,11 +26,14 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         "hover:bg-gray-50 dark:hover:bg-card",
       )}
     >
-      <td className="p-4 flex flex-row items-start gap-2">
-        <span className="flex-shrink-0 mt-0.5">
-          <EcosystemImage packageName={risk.componentPurl} size={20} />
+      <td className="p-4 flex flex-row items-center gap-2">
+        <EcosystemImage packageName={risk.componentPurl} size={16} />
+        <span className="font-medium truncate">
+          {beautifyPurl(risk.componentPurl)}
         </span>
-        <span className="break-words">{beautifyPurl(risk.componentPurl)}</span>
+        <span className="text-xs text-muted-foreground">
+          {extractVersion(risk.componentPurl)}
+        </span>
       </td>
 
       <td className="p-4">
@@ -43,14 +45,6 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         ) : (
           risk.component.license
         )}
-      </td>
-      <td className="p-4">
-        {risk.artifacts.map((artifact) => (
-          <ArtifactBadge
-            key={artifact.artifactName}
-            artifactName={artifact.artifactName}
-          />
-        ))}
       </td>
       <td className="p-4">
         {risk.finalLicenseDecision ?? (

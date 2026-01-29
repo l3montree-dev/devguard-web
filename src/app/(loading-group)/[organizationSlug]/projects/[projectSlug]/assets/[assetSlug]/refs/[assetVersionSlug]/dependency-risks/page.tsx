@@ -143,19 +143,6 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
 
-  const query = useMemo(() => {
-    const p = buildFilterSearchParams(searchParams);
-
-    if (searchParams?.has("artifact")) {
-      p.append(
-        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
-        searchParams.get("artifact") as string,
-      );
-    }
-
-    return p;
-  }, [searchParams]);
-
   const queryWithState = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
@@ -388,8 +375,8 @@ const Index: FunctionComponent = () => {
                   <col className="w-[220px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
-                  {/* Batch action row - shown when items are selected */}
-                  {selectedVulnIds.size > 0 && (
+                  {/* Batch action row - shown when items are selected and user is logged in */}
+                  {session && selectedVulnIds.size > 0 && (
                     <tr className="bg-muted/50">
                       <td colSpan={4} className="px-4 py-2">
                         <div className="flex flex-row items-center justify-end">
@@ -516,6 +503,7 @@ const Index: FunctionComponent = () => {
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
                       onBulkAction={handleBulkAction}
+                      hasSession={!!session}
                     />
                   ))}
                 </tbody>
