@@ -391,6 +391,7 @@ const Index: FunctionComponent = () => {
   const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
@@ -424,7 +425,7 @@ const Index: FunctionComponent = () => {
   );
 
   const graphData = useMemo<ViewDependencyTreeNode>(() => {
-    if (!graphResponse || graphResponse.length === 0) {
+    if (!graphResponse || graphResponse.length === 0 || !vuln) {
       return {
         name: "ROOT",
         children: [],
@@ -434,7 +435,7 @@ const Index: FunctionComponent = () => {
       };
     }
 
-    return convertPathsToTree([vuln.vulnerabilityPath], vuln ? [vuln] : []);
+    return convertPathsToTree([vuln.vulnerabilityPath], [vuln]);
   }, [graphResponse, vuln]);
 
   // Generate path pattern options for the user to select
@@ -632,7 +633,22 @@ const Index: FunctionComponent = () => {
               </h1>
               <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
-                  <Markdown>{vuln.cve?.description}</Markdown>
+                  <>
+                    <Markdown>
+                      {descriptionExpanded ||
+                      (vuln.cve?.description?.length ?? 0) <= 800
+                        ? vuln.cve?.description
+                        : vuln.cve?.description?.slice(0, 800) + "..."}
+                    </Markdown>
+                    {(vuln.cve?.description?.length ?? 0) > 800 && (
+                      <button
+                        onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                        className="text-sm text-primary hover:opacity-80 my-2"
+                      >
+                        {descriptionExpanded ? "Show less" : "Read more"}
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <Skeleton className="w-full h-20" />
                 )}

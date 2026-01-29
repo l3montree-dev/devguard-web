@@ -178,63 +178,33 @@ const AffectedComponentDetails: FunctionComponent<{
                       "no patch available"}
                   </Badge>
                 </div>
-                <CollapsibleContent className="">
-                  <div className="mt-1 flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Search PURL:{" "}
-                    </span>
-                    <Badge variant={"outline"}>
-                      {data.matchContext?.SearchPurl ?? "unknown"}
-                    </Badge>
+                <CollapsibleContent className="border-t pt-4 mt-4">
+                  <div className="mt-1 flex flex-col text-xs">
+                    <span className="text-muted-foreground">Search PURL:</span>
+                    <div>{data.matchContext?.SearchPurl ?? "unknown"}</div>
                   </div>
-                  <div className="mt-1 flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      PURL Type:{" "}
-                    </span>
-                    <Badge variant={"outline"}>
-                      {activeCVE?.Purl.Type ?? "unknown"}
-                    </Badge>
-                  </div>
-                  <div className="mt-1 flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Namespace:{" "}
-                    </span>
-                    <Badge variant={"outline"}>
-                      {activeCVE?.Purl.Namespace ?? "unknown"}
-                    </Badge>
-                  </div>
-                  <div className="mt-1 flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Name:{" "}
-                    </span>
-                    <Badge variant={"outline"}>
-                      {activeCVE?.Purl.Name ?? "unknown"}
-                    </Badge>
-                  </div>
-                  <div className="mt-1 flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Version Type:{" "}
-                    </span>
-                    <Badge variant={"outline"}>
+                  <div className="mt-3 flex flex-col text-xs">
+                    <span className="text-muted-foreground">Version Type:</span>
+                    <div>
                       {data.matchContext?.HowToInterpretVersionString ??
                         "unknown"}
-                    </Badge>
+                    </div>
                   </div>
-                  <span className="mt-2 text-sm text-muted-foreground">
-                    Matched CVEs:
-                  </span>
-                  <div className="mt-1 flex flex-wrap justify-end gap-2">
+                  <div className="mt-3 flex flex-col text-xs">
+                    <span className="text-muted-foreground">Matched CVEs:</span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
                       .map((cve) => (
-                        <a
+                        <Link
                           key={cve.cveID}
                           href={`https://osv.dev/vulnerability/${cve.cve}`}
                           target="_blank"
-                          className="text-xs"
+                          className="!text-xs"
                         >
-                          <Badge variant={"outline"}>{String(cve.cve)}</Badge>
-                        </a>
+                          {String(cve.cve)}
+                        </Link>
                       ))}
                   </div>
                 </CollapsibleContent>
@@ -242,6 +212,7 @@ const AffectedComponentDetails: FunctionComponent<{
             </div>
           </Collapsible>
         </div>
+        <div className="mt-1">
         <Link
           target="_blank"
           className="text-xs"
@@ -251,6 +222,7 @@ const AffectedComponentDetails: FunctionComponent<{
         >
           See how DevGuard matches vulnerabilities
         </Link>
+        </div>
       </div>
     </div>
   );
