@@ -16,7 +16,10 @@
 import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
 import CopyCode from "@/components/common/CopyCode";
-import DateString from "@/components/common/DateString";
+import DateString, {
+  parseDateOnly,
+  parseDateOnly,
+} from "@/components/common/DateString";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import {
@@ -350,11 +353,12 @@ const Settings: FunctionComponent = () => {
                     <>
                       Scopes: {pat.scopes}
                       <br />
-                      Created at: <DateString date={new Date(pat.createdAt)} />
+                      Created at:
+                      <DateString date={parseDateOnly(pat.createdAt)} />
                       <br />
                       Last used:{" "}
                       {pat.lastUsedAt ? (
-                        <DateString date={new Date(pat.lastUsedAt)} />
+                        <DateString date={parseDateOnly(pat.lastUsedAt)} />
                       ) : (
                         "Never"
                       )}

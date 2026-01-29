@@ -13,3 +13,7 @@ const DateString: FunctionComponent<Props> = ({ date }) => {
 };
 
 export default DateString;
+
+export const parseDateOnly = (dateString: string): Date => {
+  return new Date(dateString.split(" ")[0]);
+};

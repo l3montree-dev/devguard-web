@@ -38,7 +38,9 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDownIcon, GitBranch, Loader2 } from "lucide-react";
 import Link from "next/link";
-import DateString from "../../../../../../../../../../components/common/DateString";
+import DateString, {
+  parseDateOnly,
+} from "../../../../../../../../../../components/common/DateString";
 import SortingCaret from "../../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import {
@@ -287,7 +289,7 @@ const columnsDef: ColumnDef<
       row.getValue() && (
         <div className="flex flex-row items-center gap-2">
           <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
-          <DateString date={new Date(row.getValue())} />
+          <DateString date={parseDateOnly(row.getValue())} />
         </div>
       ),
   }),
