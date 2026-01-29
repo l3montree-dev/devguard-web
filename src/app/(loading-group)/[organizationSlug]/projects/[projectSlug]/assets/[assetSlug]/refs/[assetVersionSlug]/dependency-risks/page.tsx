@@ -2,7 +2,6 @@
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
-
 import Page from "@/components/Page";
 import { Paged, VulnByPackage } from "@/types/api/api";
 import {
@@ -11,7 +10,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
-
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -33,12 +31,12 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
+import { browserApiClient } from "@/services/devGuardApi";
 import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import { browserApiClient } from "@/services/devGuardApi";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";

@@ -211,6 +211,7 @@ export const getLayoutedElements = (
   expandedNodes: Set<string>,
   childrenLimitMap: Map<string, number>,
   previousNodes: Array<any> = [],
+  onExpansionToggle?: (nodeId: string) => void,
 ): [
   Array<{
     id: string;
@@ -328,6 +329,7 @@ export const getLayoutedElements = (
           ? (childCountMap.get(parentId) || 0) -
             (childrenLimitMap.get(parentId) || INITIAL_CHILDREN_TO_SHOW)
           : 0,
+        onExpansionToggle,
       },
     };
   });
