@@ -75,7 +75,9 @@ export interface DependencyGraphNodeProps {
     propagationRatio?: number;
     impactLevel?: "critical" | "high" | "medium" | "low" | null;
     flow?: number;
+    onExpansionToggle?: (nodeId: string) => void;
   };
+  id: string;
 }
 
 const beautifyInfoSource = (source: string) => {
@@ -115,6 +117,13 @@ export const DependencyGraphNode: FunctionComponent<
   const version = extractVersion(props.data.label);
   const propagationRatio = props.data.propagationRatio || 0;
 
+  const handleArrowClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (props.data.onExpansionToggle) {
+      props.data.onExpansionToggle(props.id);
+    }
+  };
+
   return (
     <div
       style={{
@@ -127,7 +136,6 @@ export const DependencyGraphNode: FunctionComponent<
           : props.data.isCritical
             ? "border-orange-500 shadow-lg"
             : "border-border",
-        hasChildren ? "cursor-pointer hover:border-primary/50" : "",
       )}
     >
       <Handle
@@ -195,13 +203,17 @@ export const DependencyGraphNode: FunctionComponent<
             </div>
           </div>
           {hasChildren && (
-            <span className="ml-2 flex-shrink-0 text-muted-foreground flex items-center gap-1">
+            <button
+              onClick={handleArrowClick}
+              className="ml-2 flex-shrink-0 text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors cursor-pointer p-1 -m-1 rounded hover:bg-accent"
+              title={isExpanded ? "Collapse" : "Expand"}
+            >
               {isExpanded ? (
                 <ArrowLeft className="w-4 h-4" />
               ) : (
                 <ArrowRight className="w-4 h-4" />
               )}
-            </span>
+            </button>
           )}
         </div>
       </div>

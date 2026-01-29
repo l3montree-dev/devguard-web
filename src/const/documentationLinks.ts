@@ -6,4 +6,6 @@ export const documentationLinks = {
     "https://devguard.org/concepts/vulnerability-management/joint-vulnerability-management-vex",
   acceptRisk:
     "https://devguard.org/explanations/vulnerability-management/vulnerability-events#4-accept-risk",
+  markFalsePositive:
+    "https://devguard.org/explanations/vulnerability-management/vulnerability-events#2-mark-as-false-positive",
 };

@@ -218,6 +218,11 @@ export interface Paged<T> {
   pageSize: number;
 }
 
+export interface MinimalDependencyTree {
+  nodes: string[];
+  dependencies: { [key: string]: string[] };
+}
+
 export interface RiskCalculationReport {
   epss: number;
   baseScore: number;

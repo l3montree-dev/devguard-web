@@ -1,8 +1,8 @@
 "use client";
 
 import SortingCaret from "@/components/common/SortingCaret";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
 import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
@@ -37,12 +37,12 @@ import {
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
+import { browserApiClient } from "@/services/devGuardApi";
 import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import useSWR, { useSWRConfig } from "swr";
-import { browserApiClient } from "@/services/devGuardApi";
+import useSWR from "swr";
 import Severity from "../../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
