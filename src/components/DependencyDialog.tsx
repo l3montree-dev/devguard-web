@@ -28,7 +28,7 @@ import { useSearchParams } from "next/navigation";
 import useDecodedParams from "../hooks/useDecodedParams";
 import { beautifyPurl } from "../utils/common";
 import OpenSsfDetails from "./OpenSsfDetails";
-import DateString from "./common/DateString";
+import DateString, { parseDateOnly } from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { convertPathsToTree } from "../utils/dependencyGraphHelpers";
