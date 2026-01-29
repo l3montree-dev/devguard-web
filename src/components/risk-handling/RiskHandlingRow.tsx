@@ -47,6 +47,7 @@ interface Props {
     justification: string;
     mechanicalJustification?: string;
   }) => Promise<void>;
+  hasSession: boolean;
 }
 
 const VulnWithCveTableRow = ({
@@ -55,12 +56,14 @@ const VulnWithCveTableRow = ({
   selectable,
   selected,
   onToggle,
+  hasSession,
 }: {
   vuln: VulnWithCVE;
   href: string;
   selectable: boolean;
   selected: boolean;
   onToggle: () => void;
+  hasSession: boolean;
 }) => {
   const router = useRouter();
   return (
@@ -80,7 +83,11 @@ const VulnWithCveTableRow = ({
         <div className="flex items-start gap-3">
           {selectable && (
             <div className="pt-0.5 ml-6" onClick={(e) => e.stopPropagation()}>
-              <Checkbox checked={selected} onCheckedChange={onToggle} />
+              <Checkbox
+                checked={selected}
+                onCheckedChange={onToggle}
+                disabled={!hasSession}
+              />
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -153,10 +160,12 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
+  hasSession,
 }) => {
   const [isPackageOpen, setIsPackageOpen] = useState(false);
   const [expandedCves, setExpandedCves] = useState<Set<string>>(new Set());
   const pathname = useDecodedPathname();
+  const router = useRouter();
   const vulnById = useMemo(
     () => new Map(row.original.vulns.map((v) => [v.id, v])),
     [row.original.vulns],
@@ -245,23 +254,39 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
 
+          const vulnDetailHref =
+            pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
+
           return (
             <React.Fragment key={cveID}>
               {/* CVE subheader */}
-              <tr className="bg-muted/30 border-b border-gray-100 dark:border-white/5">
+              <tr
+                className="bg-muted/30 border-b border-gray-100 dark:border-white/5 hover:bg-muted/50 cursor-pointer"
+                onClick={(e) => {
+                  // Don't act if clicking on checkbox or button
+                  if (
+                    (e.target as HTMLElement).closest(
+                      'button, input, [role="checkbox"]',
+                    )
+                  )
+                    return;
+                  if (pathExplosionOrOnlySinglePath) {
+                    router.push(vulnDetailHref);
+                  } else {
+                    toggleCve(cveID);
+                  }
+                }}
+              >
                 <td className="py-3 px-4 pl-10">
                   <div className="flex flex-row items-center gap-3">
                     {!pathExplosionOrOnlySinglePath && (
-                      <button
-                        onClick={() => toggleCve(cveID)}
-                        className="p-0.5 hover:bg-muted rounded"
-                      >
+                      <span className="p-0.5">
                         {isCveExpanded ? (
                           <ChevronDownIcon className="w-4 h-4 text-muted-foreground" />
                         ) : (
                           <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
                         )}
-                      </button>
+                      </span>
                     )}
                     <Checkbox
                       className={pathExplosionOrOnlySinglePath ? "ml-8" : ""}
@@ -273,29 +298,11 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                             : false
                       }
                       onCheckedChange={() => onToggleAll(selectableIds)}
+                      disabled={!hasSession}
                     />
-                    {isPathExplosion || selectableIds.length === 1 ? (
-                      <Link
-                        href={
-                          pathname +
-                          "/../dependency-risks/" +
-                          sortedVulns[0]?.id
-                        }
-                        className="font-medium !text-foreground cursor-pointer"
-                      >
-                        {cveID}
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleCve(cveID);
-                        }}
-                        className="font-medium text-foreground hover:underline cursor-pointer"
-                      >
-                        {cveID}
-                      </button>
-                    )}
+                    <span className="font-medium text-foreground">
+                      {cveID}
+                    </span>
 
                     {isPathExplosion ? (
                       <Tooltip>
@@ -343,6 +350,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     selectable={vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
+                    hasSession={hasSession}
                   />
                 ))}
             </React.Fragment>

@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use client";
+
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import DependencyGraph from "@/components/DependencyGraph";
 import Page from "@/components/Page";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
@@ -29,15 +29,8 @@ import {
   ViewDependencyTreeNode,
 } from "@/types/view/assetTypes";
 import { classNames, toSearchParams } from "@/utils/common";
-import {
-  ArrowsPointingInIcon,
-  ArrowsPointingOutIcon,
-} from "@heroicons/react/24/outline";
-
-import { FunctionComponent, useMemo, useState } from "react";
-
+import { FunctionComponent, useMemo } from "react";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";

@@ -200,9 +200,9 @@ const AffectedComponentDetails: FunctionComponent<{
                   <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
-                      .map((cve) => (
+                      .map((cve, index) => (
                         <Link
-                          key={cve.cveID}
+                          key={`${cve.cveID}-${index}`}
                           href={`https://osv.dev/vulnerability/${cve.cve}`}
                           target="_blank"
                           className="!text-xs"

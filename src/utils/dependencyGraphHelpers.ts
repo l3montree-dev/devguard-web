@@ -46,8 +46,13 @@ const isInfoSource = (name: string) => {
 export const populateChildCounts = (
   node: ViewDependencyTreeNode,
   childCountMap: Map<string, number>,
+  visited: Set<string> = new Set(),
 ) => {
   if (!node.name || isInfoSource(node.name)) return;
+
+  // Prevent infinite recursion due to circular dependencies
+  if (visited.has(node.name)) return;
+  visited.add(node.name);
 
   // count the number of children
   // if it has an info source child, count its children instead
@@ -65,13 +70,13 @@ export const populateChildCounts = (
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach((child) => {
       if (!isInfoSource(child.name)) {
-        populateChildCounts(child, childCountMap);
+        populateChildCounts(child, childCountMap, visited);
       } else {
         // For info sources, process their children
         [...child.children]
           .sort((a, b) => a.name.localeCompare(b.name))
           .forEach((grandchild) => {
-            populateChildCounts(grandchild, childCountMap);
+            populateChildCounts(grandchild, childCountMap, visited);
           });
       }
     });
@@ -86,8 +91,13 @@ export const addRecursive = (
   childCountMap: Map<string, number>,
   childrenLimitMap: Map<string, number>,
   riskMap: Map<string, number>,
+  visited: Set<string> = new Set(),
 ) => {
   if (node.name !== "" && !isInfoSource(node.name)) {
+    // Prevent infinite recursion due to circular dependencies
+    if (visited.has(node.name)) return;
+    visited.add(node.name);
+
     dagreGraph.setNode(node.name, {
       width: nodeWidth,
       height: nodeHeight,
@@ -141,6 +151,7 @@ export const addRecursive = (
                     childCountMap,
                     childrenLimitMap,
                     riskMap,
+                    visited,
                   );
                 }
               });
@@ -168,6 +179,7 @@ export const addRecursive = (
             childCountMap,
             childrenLimitMap,
             riskMap,
+            visited,
           );
         }
       });
