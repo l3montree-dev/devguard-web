@@ -13,23 +13,51 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { beautifyPurl, classNames } from "@/utils/common";
+import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
-import Link from "next/link";
 import { FunctionComponent } from "react";
 import { riskToSeverity, severityToColor } from "./common/Severity";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 
-import { useSearchParams } from "next/navigation";
-import useDecodedPathname from "../hooks/useDecodedPathname";
+export const LoadMoreNode: FunctionComponent<{
+  data: {
+    parentId: string;
+    remainingCount: number;
+    nodeWidth: number;
+    nodeHeight: number;
+  };
+}> = (props) => {
+  return (
+    <div
+      style={{
+        width: props.data.nodeWidth,
+      }}
+      className="relative border-2 border-dashed border-primary/50 rounded-lg p-3 text-xs hover:bg-primary/10 transition-all cursor-pointer"
+    >
+      <Handle
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
+        type="target"
+        position={Position.Right}
+      />
+      <div className="flex flex-col gap-1 items-center justify-center text-center">
+        <PlusIcon className="w-4 h-4 text-primary" />
+        <span className="text-primary font-medium">
+          Show {props.data.remainingCount} more
+        </span>
+      </div>
+      <Handle
+        className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
+        type="source"
+        position={Position.Left}
+      />
+    </div>
+  );
+};
+
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
-import { Badge } from "./ui/badge";
 import EcosystemImage from "./common/EcosystemImage";
+import { Badge } from "./ui/badge";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -39,6 +67,10 @@ export interface DependencyGraphNodeProps {
     nodeWidth: number;
     nodeHeight: number;
     infoSources?: Set<string>;
+    childCount?: number;
+    isExpanded?: boolean;
+    shownCount?: number;
+    hasMore?: boolean;
   };
 }
 
@@ -72,32 +104,27 @@ export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
   const color = severityToColor(riskToSeverity(props.data.risk));
-  const searchParams = useSearchParams();
-  const pathname = useDecodedPathname();
-  const shouldFocus =
-    beautifyPurl(searchParams?.get("pkg") as string) ===
-    beautifyPurl(props.data.label);
 
   const hasVulnerabilities = props.data.vuln !== undefined;
   const infoSources = props.data.infoSources
     ? Array.from(props.data.infoSources)
     : [];
+  const hasChildren = (props.data.childCount ?? 0) > 0;
+  const isExpanded = props.data.isExpanded ?? false;
+  const version = extractVersion(props.data.label);
 
-  const Node = (
+  return (
     <div
       style={{
-        maxWidth: props.data.nodeWidth,
+        width: props.data.nodeWidth,
         borderColor: hasVulnerabilities ? color : undefined,
-        boxShadow: hasVulnerabilities
-          ? `0 0 0 2px ${color}40`
-          : shouldFocus
-            ? "0 0 0 2px hsl(var(--primary))"
-            : undefined,
+        boxShadow: hasVulnerabilities ? `0 0 0 2px ${color}40` : undefined,
       }}
       className={classNames(
         "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        shouldFocus ? "border-primary" : "border-border",
+        "border-border",
         hasVulnerabilities ? "shadow-lg" : "shadow-md",
+        hasChildren ? "cursor-pointer hover:border-primary/50" : "",
       )}
     >
       <Handle
@@ -106,50 +133,67 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row items-start gap-2">
-          {props.data.label.startsWith("pkg:") && (
-            <div className="flex-shrink-0 mt-0.5">
-              <EcosystemImage packageName={props.data.label} size={16} />
+        <div className="flex items-center justify-between flex-row gap-2">
+          <div className="flex gap-2 flex-row items-start">
+            {props.data.label.startsWith("pkg:") && (
+              <div className="flex-shrink-0 mt-0.5">
+                <EcosystemImage packageName={props.data.label} size={16} />
+              </div>
+            )}
+            {hasVulnerabilities && (
+              <span className="relative mt-0.5 flex h-3 w-3">
+                <span
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+                ></span>
+                <span
+                  style={{
+                    backgroundColor: color,
+                  }}
+                  className="relative inline-flex h-3 w-3 rounded-full"
+                ></span>
+              </span>
+            )}
+            <div>
+              <label
+                htmlFor="text"
+                className="text-left font-medium leading-tight flex-1"
+              >
+                {beautifyPurl(props.data.label)}
+                {version && <Badge variant={"outline"}>{version}</Badge>}
+              </label>
+              {infoSources.length > 0 && (
+                <div className="flex mt-1 flex-wrap gap-1">
+                  {infoSources.map((source) => (
+                    <Badge
+                      key={source}
+                      variant="secondary"
+                      className={classNames(
+                        "text-[10px] px-1.5 py-0",
+                        source.startsWith("sbom:")
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                          : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+                      )}
+                    >
+                      {beautifyInfoSource(source)}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-          {hasVulnerabilities && (
-            <span className="relative mt-0.5 flex h-3 w-3">
-              <span
-                style={{
-                  backgroundColor: color,
-                }}
-                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-              ></span>
-              <span
-                style={{
-                  backgroundColor: color,
-                }}
-                className="relative inline-flex h-3 w-3 rounded-full"
-              ></span>
+          </div>
+          {hasChildren && (
+            <span className="ml-2 flex-shrink-0 text-muted-foreground flex items-center gap-1">
+              {isExpanded ? (
+                <ArrowLeft className="w-4 h-4" />
+              ) : (
+                <ArrowRight className="w-4 h-4" />
+              )}
             </span>
           )}
-          <label htmlFor="text" className="text-left font-medium leading-tight">
-            {props.data.label}
-          </label>
         </div>
-        {infoSources.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {infoSources.map((source) => (
-              <Badge
-                key={source}
-                variant="secondary"
-                className={classNames(
-                  "text-[10px] px-1.5 py-0",
-                  source.startsWith("sbom:")
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                    : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                )}
-              >
-                {beautifyInfoSource(source)}
-              </Badge>
-            ))}
-          </div>
-        )}
       </div>
       <Handle
         className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
@@ -158,27 +202,5 @@ export const DependencyGraphNode: FunctionComponent<
         id="a"
       />
     </div>
-  );
-
-  if (!props.data.vuln) {
-    return Node;
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{Node}</DropdownMenuTrigger>
-      <DropdownMenuContent className="text-xs">
-        {props.data.vuln.map((vuln) => (
-          <DropdownMenuItem key={vuln.id}>
-            <Link
-              className="!text-foreground hover:no-underline"
-              href={pathname + `/../../dependency-risks/${vuln.id}`}
-            >
-              {vuln.cveID}
-            </Link>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 };

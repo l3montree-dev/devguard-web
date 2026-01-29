@@ -79,19 +79,24 @@ const DependencyGraphPage: FunctionComponent = () => {
 
   // fetch a personal access token from the user
 
-  const { data: affectedComponents, isLoading: affectedComponentsLoading } =
-    useSWR<DependencyVuln[]>(uri + "/affected-components/", fetcher);
+  const { data: affectedComponents } = useSWR<DependencyVuln[]>(
+    uri + "/affected-components/",
+    fetcher,
+  );
 
-  const { data: graphData, isLoading: graphLoading } =
-    useSWR<DependencyTreeNode>(
-      uri +
-        "/dependency-graph/?" +
-        toSearchParams({
-          artifactName: searchParams?.get("artifact") ?? undefined,
-          all: searchParams?.get("all") ? "1" : undefined,
-        }),
-      fetcher,
-    );
+  const { data: graphData } = useSWR<DependencyTreeNode>(
+    uri +
+      "/dependency-graph/?" +
+      toSearchParams({
+        artifactName: searchParams?.get("artifact") ?? undefined,
+        all: searchParams?.get("all") ? "1" : undefined,
+      }),
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+    },
+  );
 
   const graph = useMemo(() => {
     if (!graphData) {
@@ -174,25 +179,8 @@ const DependencyGraphPage: FunctionComponent = () => {
         <div
           className={classNames(
             "h-screen w-full rounded-lg border bg-white dark:bg-black",
-            isDependencyGraphFullscreen
-              ? "absolute left-0 top-0 z-50 h-screen w-screen"
-              : "relative",
           )}
         >
-          <div className="absolute right-2 top-2 z-10 flex flex-row justify-end">
-            <Button
-              onClick={() => setIsDependencyGraphFullscreen((prev) => !prev)}
-              variant={"outline"}
-              size={"icon"}
-            >
-              {isDependencyGraphFullscreen ? (
-                <ArrowsPointingInIcon className="h-5 w-5" />
-              ) : (
-                <ArrowsPointingOutIcon className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-
           {graph ? (
             <DependencyGraph
               flaws={affectedComponents ?? []}

@@ -45,8 +45,9 @@ const MarkdownEditor: FunctionComponent<Props> = ({
     <MDXEditor
       ref={markdownRef}
       className={classNames(
-        "mdx-editor ring-primary focus:ring-2 focus-within:ring-2 rounded border",
+        "ring-primary focus:ring-2 focus-within:ring-2 rounded border",
         styles.mdxeditor,
+        rest.className || "",
       )}
       onChange={(value) => setValue(value)}
       placeholder={placeholder}

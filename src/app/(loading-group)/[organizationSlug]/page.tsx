@@ -238,7 +238,8 @@ const OrganizationHomePage: FunctionComponent = () => {
         <Section
           primaryHeadline
           Button={
-            session && !activeOrg.externalEntityProviderId && (
+            session &&
+            !activeOrg.externalEntityProviderId && (
               <Button
                 disabled={
                   currentUserRole !== UserRole.Owner &&

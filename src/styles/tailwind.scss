@@ -142,13 +142,14 @@ a {
   transform: rotate(180deg);
 }
 
-.mdx-editor {
-  [role="toolbar"] {
+.mdxeditor {
+    [role="toolbar"] {
     background-color: transparent;
   }
 }
 
 .mdx-editor-content {
+    
   h1 {
     @apply text-3xl font-bold mb-2;
   }

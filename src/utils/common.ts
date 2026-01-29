@@ -179,14 +179,7 @@ export const beautifyPurl = (purl: string) => {
     first = first.substring(slashIndex + 1);
   }
 
-  // decode URL-encoded characters (e.g., %40 -> @)
-  try {
-    first = decodeURIComponent(first);
-  } catch (e) {
-    // if decoding fails, return original
-  }
-
-  return first;
+  return first.replace("%40", "@");
 };
 
 export const extractVersion = (purl: string) => {

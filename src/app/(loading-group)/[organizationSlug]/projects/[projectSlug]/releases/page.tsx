@@ -116,7 +116,9 @@ const Releases = () => {
             forceVertical
             Button={
               session ? (
-                <Button onClick={() => setOpen(true)}>Create new Release</Button>
+                <Button onClick={() => setOpen(true)}>
+                  Create new Release
+                </Button>
               ) : undefined
             }
           >

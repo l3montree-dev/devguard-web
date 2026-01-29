@@ -153,7 +153,8 @@ export default function RepositoriesPage() {
             description="No repositories or subgroups found"
             title="Your Repositories will show up here!"
             Button={
-              session && !project.externalEntityProviderId && (
+              session &&
+              !project.externalEntityProviderId && (
                 <div className="flex flex-row justify-center gap-2">
                   <Button
                     variant={"secondary"}
@@ -172,7 +173,8 @@ export default function RepositoriesPage() {
         ) : (
           <Section
             Button={
-              session && !project.externalEntityProviderId && (
+              session &&
+              !project.externalEntityProviderId && (
                 <div className="flex flex-row gap-2">
                   <Button
                     disabled={
