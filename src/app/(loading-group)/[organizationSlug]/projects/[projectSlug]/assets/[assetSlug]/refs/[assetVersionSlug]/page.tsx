@@ -278,8 +278,8 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={10}
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.critical ?? 0)
-                    : (latest?.criticalCvss ?? 0)
+                    ? (latest?.cvePurlCritical ?? 0)
+                    : (latest?.cvePurlCriticalCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -290,8 +290,8 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={9}
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.high ?? 0)
-                    : (latest?.highCvss ?? 0)
+                    ? (latest?.cvePurlHigh ?? 0)
+                    : (latest?.cvePurlHighCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -302,8 +302,8 @@ const Index: FunctionComponent = () => {
                 isLoading={riskHistoryLoading}
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.medium ?? 0)
-                    : (latest?.mediumCvss ?? 0)
+                    ? (latest?.cvePurlMedium ?? 0)
+                    : (latest?.cvePurlMediumCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -313,7 +313,9 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={4}
                 isLoading={riskHistoryLoading}
                 currentAmount={
-                  mode === "risk" ? (latest?.low ?? 0) : (latest?.lowCvss ?? 0)
+                  mode === "risk"
+                    ? (latest?.cvePurlLow ?? 0)
+                    : (latest?.cvePurlLowCvss ?? 0)
                 }
                 mode={mode}
               />

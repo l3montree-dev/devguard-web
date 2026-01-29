@@ -206,12 +206,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.criticalCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlCriticalCvss ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.critical ?? 0),
+      (sum, r) => sum + (r?.cvePurlCritical ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -220,12 +220,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.highCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlHighCvss ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.high ?? 0),
+      (sum, r) => sum + (r?.cvePurlHigh ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -234,12 +234,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.mediumCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlMediumCvss ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.medium ?? 0),
+      (sum, r) => sum + (r?.cvePurlMedium ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -248,12 +248,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.lowCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlLowCvss ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.low ?? 0),
+      (sum, r) => sum + (r?.cvePurlLow ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
