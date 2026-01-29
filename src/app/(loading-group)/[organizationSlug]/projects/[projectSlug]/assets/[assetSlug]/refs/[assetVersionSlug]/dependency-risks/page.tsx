@@ -390,7 +390,12 @@ const Index: FunctionComponent = () => {
                                     actual risk a vulnerability poses
                                   </span>
                                   , not just its theoretical severity.{" "}
-                                  <Link href={documentationLinks.riskCalculation} target="_blank">Learn more about the risk calculation</Link>
+                                  <Link
+                                    href={documentationLinks.riskCalculation}
+                                    target="_blank"
+                                  >
+                                    Learn more about the risk calculation
+                                  </Link>
                                 </div>
                               </TooltipContent>
                             </Tooltip>

@@ -87,7 +87,10 @@ const VulnWithCveTableRow = ({
       key={vuln.id}
       onClick={(e) => {
         // Don't navigate if clicking on checkbox
-        if ((e.target as HTMLElement).closest('button, input, [role="checkbox"]')) return;
+        if (
+          (e.target as HTMLElement).closest('button, input, [role="checkbox"]')
+        )
+          return;
         router.push(href);
       }}
     >
@@ -99,34 +102,55 @@ const VulnWithCveTableRow = ({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            {vuln.state !== "open" && (<div className="flex mb-3 items-center gap-2 text-sm text-muted-foreground">
-              <span>State:</span>
-              <VulnState state={vuln.state} />
-            </div>)}
+            {vuln.state !== "open" && (
+              <div className="flex mb-3 items-center gap-2 text-sm text-muted-foreground">
+                <span>State:</span>
+                <VulnState state={vuln.state} />
+              </div>
+            )}
             <Tooltip>
               <TooltipTrigger className="text-left">
                 <div className="text-sm text-foreground truncate max-w-md">
-                  <span className="font-medium text-muted-foreground">Path: </span>
-                  {vuln.vulnerabilityPath.length === 1 &&
-                    beautifyPurl(vuln.vulnerabilityPath[0])}
-                  {vuln.vulnerabilityPath.length === 2 &&
-                    `${beautifyPurl(vuln.vulnerabilityPath[0])} → ${beautifyPurl(vuln.vulnerabilityPath[1])}`}
-                  {vuln.vulnerabilityPath.length > 2 &&
-                    `${beautifyPurl(vuln.vulnerabilityPath[0])} → ... → ${beautifyPurl(vuln.vulnerabilityPath[vuln.vulnerabilityPath.length - 1])}`}
-                  <Badge variant="outline" className="ml-2 text-xs">
-                    {vuln.vulnerabilityPath.length === 1 && "Direct"}
-                    {vuln.vulnerabilityPath.length > 1 && vuln.vulnerabilityPath.length}
-                    {vuln.vulnerabilityPath.length !== 1 ? " hops" : ""}
-                  </Badge>
+                  <span className="font-medium text-muted-foreground">
+                    Path:{" "}
+                  </span>
+
+                  {vuln.vulnerabilityPath.length <= 2 ? (
+                    <span>
+                      {vuln.vulnerabilityPath.map((p, i) => (
+                        <span key={i}>
+                          {i > 0 && " → "}
+                          <Badge variant="outline">{beautifyPurl(p)}</Badge>
+                        </span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span>
+                      <Badge variant="outline">
+                        {beautifyPurl(vuln.vulnerabilityPath[0])}
+                      </Badge>
+                      {" → ... → "}
+                      <Badge variant="outline">
+                        {beautifyPurl(
+                          vuln.vulnerabilityPath[
+                            vuln.vulnerabilityPath.length - 1
+                          ],
+                        )}
+                      </Badge>
+                    </span>
+                  )}
+
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {vuln.vulnerabilityPath.length === 1
+                      ? "Direct"
+                      : `${vuln.vulnerabilityPath.length} hops`}
+                  </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
                   {vuln.vulnerabilityPath.map((el, i) => (
-                    <span
-                      className="flex flex-row items-center gap-1"
-                      key={i}
-                    >
+                    <span className="flex flex-row items-center gap-1" key={i}>
                       <EcosystemImage size={12} packageName={el} />
                       {beautifyPurl(el)}
                       {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
@@ -149,8 +173,10 @@ const VulnWithCveTableRow = ({
           </div>
         </div>
       </td>
-      <td className="py-3 px-4 flex">
-        <Severity risk={vuln.rawRiskAssessment} />
+      <td className="py-3 px-4 flex-col">
+        <div className="flex">
+          <Severity risk={vuln.rawRiskAssessment} />
+        </div>
       </td>
       <td className="py-3 px-4">
         <span className="text-sm">{(vuln.cve?.cvss ?? 0).toFixed(1)}</span>
@@ -237,10 +263,14 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           <Severity risk={row.original.maxRisk} />
         </td>
         <td className="py-3 px-4">
-          <span className="text-sm">{(row.original.maxCvss ?? 0).toFixed(1)}</span>
+          <span className="text-sm">
+            {(row.original.maxCvss ?? 0).toFixed(1)}
+          </span>
         </td>
         <td className="py-3 px-4">
-          <Badge variant="outline" className="w-fit">{row.original.vulnCount}</Badge>
+          <Badge variant="outline" className="w-fit">
+            {row.original.vulnCount}
+          </Badge>
         </td>
       </tr>
 
@@ -337,66 +367,72 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   <Severity risk={sortedVulns[0]?.rawRiskAssessment ?? 0} />
                 </td>
                 <td className="py-2 px-4">
-                  <span className="text-sm">{(sortedVulns[0]?.cve?.cvss ?? 0).toFixed(1)}</span>
+                  <span className="text-sm">
+                    {(sortedVulns[0]?.cve?.cvss ?? 0).toFixed(1)}
+                  </span>
                 </td>
                 <td className="py-2 px-4">
                   <div className="flex flex-row items-center  gap-1.5">
-                    {selectedClosedIds.length > 0 && (<Button
-                      size="xs"
-                      variant="secondary"
-                      className={classNames(
-                        "transition-opacity",
-                        selectedClosedIds.length > 0 && someSelected
-                          ? "opacity-100"
-                          : "opacity-0 pointer-events-none",
-                      )}
-                      onClick={async () => {
-                        await onBulkAction({
-                          vulnIds: selectedClosedIds,
-                          status: "reopened",
-                          justification: "",
-                        });
-                        toast("Reopened", {
-                          description: `${selectedClosedIds.length} vulnerability path${selectedClosedIds.length !== 1 ? "s" : ""} reopened.`,
-                        });
-                      }}
-                    >
-                      Reopen
-                    </Button>)}
+                    {selectedClosedIds.length > 0 && (
+                      <Button
+                        size="xs"
+                        variant="secondary"
+                        className={classNames(
+                          "transition-opacity",
+                          selectedClosedIds.length > 0 && someSelected
+                            ? "opacity-100"
+                            : "opacity-0 pointer-events-none",
+                        )}
+                        onClick={async () => {
+                          await onBulkAction({
+                            vulnIds: selectedClosedIds,
+                            status: "reopened",
+                            justification: "",
+                          });
+                          toast("Reopened", {
+                            description: `${selectedClosedIds.length} vulnerability path${selectedClosedIds.length !== 1 ? "s" : ""} reopened.`,
+                          });
+                        }}
+                      >
+                        Reopen
+                      </Button>
+                    )}
                     {selectedOpenIds.length > 0 && (
                       <>
-                    <Button
-                      size="xs"
-                      variant="secondary"
-                      className={classNames(
-                        "transition-opacity",
-                        selectedOpenIds.length > 0 && someSelected
-                          ? "opacity-100"
-                          : "opacity-0 pointer-events-none",
-                      )}
-                      onClick={() => {
-                        setJustification("");
-                        setFalsePositiveDialogVulnIds(selectedOpenIds);
-                      }}
-                    >
-                      False positive
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="secondary"
-                      className={classNames(
-                        "transition-opacity",
-                        selectedOpenIds.length > 0 && someSelected
-                          ? "opacity-100"
-                          : "opacity-0 pointer-events-none",
-                      )}
-                      onClick={() => {
-                        setJustification("");
-                        setAcceptDialogVulnIds(selectedOpenIds);
-                      }}
-                    >
-                      Accept risk
-                    </Button></>)}
+                        <Button
+                          size="xs"
+                          variant="secondary"
+                          className={classNames(
+                            "transition-opacity",
+                            selectedOpenIds.length > 0 && someSelected
+                              ? "opacity-100"
+                              : "opacity-0 pointer-events-none",
+                          )}
+                          onClick={() => {
+                            setJustification("");
+                            setFalsePositiveDialogVulnIds(selectedOpenIds);
+                          }}
+                        >
+                          False positive
+                        </Button>
+                        <Button
+                          size="xs"
+                          variant="secondary"
+                          className={classNames(
+                            "transition-opacity",
+                            selectedOpenIds.length > 0 && someSelected
+                              ? "opacity-100"
+                              : "opacity-0 pointer-events-none",
+                          )}
+                          onClick={() => {
+                            setJustification("");
+                            setAcceptDialogVulnIds(selectedOpenIds);
+                          }}
+                        >
+                          Accept risk
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>
