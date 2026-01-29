@@ -328,14 +328,14 @@ export const reduceRiskHistories = (
   return histories.map((dayHistories) => {
     return dayHistories.reduce(
       (acc, curr) => {
-        acc.low += curr.low;
-        acc.medium += curr.medium;
-        acc.high += curr.high;
-        acc.critical += curr.critical;
-        acc.lowCvss += curr.lowCvss;
-        acc.mediumCvss += curr.mediumCvss;
-        acc.highCvss += curr.highCvss;
-        acc.criticalCvss += curr.criticalCvss;
+        acc.cvePurlLow += curr.cvePurlLow;
+        acc.cvePurlMedium += curr.cvePurlMedium;
+        acc.cvePurlHigh += curr.cvePurlHigh;
+        acc.cvePurlCritical += curr.cvePurlCritical;
+        acc.cvePurlLowCvss += curr.cvePurlLowCvss;
+        acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
+        acc.cvePurlHighCvss += curr.cvePurlHighCvss;
+        acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
         return acc;
       },
       {
@@ -343,14 +343,14 @@ export const reduceRiskHistories = (
         day: dayHistories[0]?.day || new Date(),
         assetId: dayHistories[0]?.assetId || "",
         artifactName: dayHistories[0]?.artifactName || "",
-        low: 0,
-        medium: 0,
-        high: 0,
-        critical: 0,
-        lowCvss: 0,
-        mediumCvss: 0,
-        highCvss: 0,
-        criticalCvss: 0,
+        cvePurlLow: 0,
+        cvePurlMedium: 0,
+        cvePurlHigh: 0,
+        cvePurlCritical: 0,
+        cvePurlLowCvss: 0,
+        cvePurlMediumCvss: 0,
+        cvePurlHighCvss: 0,
+        cvePurlCriticalCvss: 0,
       } as RiskHistory,
     );
   });
