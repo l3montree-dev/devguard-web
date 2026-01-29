@@ -3,13 +3,12 @@
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
 import CopyCode from "@/components/common/CopyCode";
-import EcosystemImage from "@/components/common/EcosystemImage";
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Badge } from "@/components/ui/badge";
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import {
@@ -47,7 +46,7 @@ import {
   RequirementsLevel,
   VulnEventDTO,
 } from "@/types/api/api";
-import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
+import { beautifyPurl, getEcosystem } from "@/utils/common";
 import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
   removeUnderscores,
@@ -73,6 +72,7 @@ import { FunctionComponent, ReactNode, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
+import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
@@ -1196,110 +1196,11 @@ const Index: FunctionComponent = () => {
                   </Collapsible>
                 </div>
 
-                <div className="p-5">
-                  <h3 className="mb-2 text-sm font-semibold">
-                    Vulnerability Details{" "}
-                    <Image
-                      src={
-                        theme === "light"
-                          ? "/logos/osv-black.png"
-                          : "/logos/osv.png"
-                      }
-                      alt="OSV Logo"
-                      width={40}
-                      height={40}
-                      className="inline-block ml-2 mb-1"
-                    />
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    <div className="rounded-lg border bg-card p-4">
-                      <table className="w-full table-auto border-collapse">
-                        <tbody>
-                          <tr className="text-sm">
-                            <td className="capitalize font-semibold">ID</td>
-                            <td>{vuln.cve?.cve}</td>
-                          </tr>
-                          {vuln.cve?.relationships?.map((rel) => (
-                            <tr
-                              className="text-sm"
-                              key={rel.relationshipType + rel.targetCve}
-                            >
-                              <td className="capitalize font-semibold">
-                                {rel.relationshipType}
-                              </td>
-                              <td>{rel.targetCve}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <Link
-                      target="_blank"
-                      className="text-xs"
-                      href={"https://osv.dev/vulnerability/" + vuln.cveID}
-                    >
-                      See vulnerability on osv.dev
-                    </Link>
-                  </div>
-                </div>
+                <AffectedComponentDetails vuln={vuln} />
 
                 {vuln.componentPurl !== null && (
                   <div className="p-5">
-                    <h3 className="mb-2 text-sm font-semibold">
-                      Affected component
-                    </h3>
                     <div className="flex flex-col gap-4">
-                      <div>
-                        <div className="rounded-lg border bg-card p-4">
-                          <p className="text-sm">
-                            <span className="flex flex-row gap-2">
-                              <EcosystemImage
-                                packageName={vuln.componentPurl}
-                              />{" "}
-                              <span className="flex-1">
-                                {beautifyPurl(vuln.componentPurl)}
-                              </span>
-                            </span>
-                          </p>
-                          <div className="mt-4 text-sm">
-                            <div className="mt-1 flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Installed version:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {extractVersion(vuln.componentPurl) ??
-                                  "unknown"}
-                              </Badge>
-                            </div>
-                            <div className="mt-1 flex flex-row justify-between">
-                              <span className="text-xs text-muted-foreground">
-                                Fixed in:{" "}
-                              </span>
-                              <Badge variant={"outline"}>
-                                {Boolean(vuln.componentFixedVersion)
-                                  ? vuln.componentFixedVersion
-                                  : "no patch available"}
-                              </Badge>
-                            </div>
-                            <div className="mt-4">
-                              <Link
-                                className={buttonVariants({
-                                  variant: "outline",
-                                })}
-                                href={
-                                  pathname +
-                                  "/../../dependencies/graph?pkg=" +
-                                  vuln.componentPurl +
-                                  "&artifact=" +
-                                  vuln.artifacts[0].artifactName
-                                }
-                              >
-                                Show in dependency graph
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                       {vuln.componentFixedVersion !== null && (
                         <>
                           <Quickfix
