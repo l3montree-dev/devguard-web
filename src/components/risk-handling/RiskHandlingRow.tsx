@@ -15,23 +15,41 @@
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
+import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { flexRender, Row } from "@tanstack/react-table";
 import Link from "next/link";
-import React, { FunctionComponent, useMemo } from "react";
+import React, { FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import ArtifactBadge from "../ArtifactBadge";
+import MarkdownEditor from "../common/MarkdownEditor";
 import Severity from "../common/Severity";
 import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
+import { AsyncButton, Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
-import { Checkbox } from "../ui/checkbox";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { Button } from "../ui/button";
+import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -40,16 +58,24 @@ interface Props {
   selectedVulnIds: Set<string>;
   onToggleVuln: (id: string) => void;
   onToggleAll: (ids: string[]) => void;
+  onBulkAction: (params: {
+    vulnIds: string[];
+    status: string;
+    justification: string;
+    mechanicalJustification?: string;
+  }) => Promise<void>;
 }
 
 const VulnWithCveTableRow = ({
   vuln,
   href,
+  selectable,
   selected,
   onToggle,
 }: {
   vuln: VulnWithCVE;
   href: string;
+  selectable: boolean;
   selected: boolean;
   onToggle: () => void;
 }) => {
@@ -60,7 +86,9 @@ const VulnWithCveTableRow = ({
     >
       <td className="p-4 flex flex-row items-center justify-center relative">
         <div className="mt-1 ml-2">
-          <Checkbox checked={selected} onCheckedChange={onToggle} />
+          {selectable && (
+            <Checkbox checked={selected} onCheckedChange={onToggle} />
+          )}
         </div>
       </td>
       <td className="p-4 relative">
@@ -81,7 +109,8 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
 
-      <td className="p-4 text-sm line-clamp-1 overflow-hidden text-overflow-ellipsis relative">
+      <td className="p-4 text-sm overflow-hidden text-overflow-ellipsis relative">
+        <Link href={href} className="absolute inset-0" />
         <Tooltip>
           <TooltipTrigger className="w-full">
             <div className="flex flex-row flex-wrap gap-2">
@@ -94,7 +123,26 @@ const VulnWithCveTableRow = ({
                   </div>
                 </Badge>
               )}
-              {vuln.vulnerabilityPath.length >= 2 && (
+              {vuln.vulnerabilityPath.length === 2 && (
+                <div className="overflow-hidden text-ellipsis flex flex-wrap text-left flex-row gap-1">
+                  <Badge variant={"outline"}>
+                    <div className="flex flex-row items-center gap-1">
+                      <span className="line-clamp-1">
+                        {beautifyPurl(vuln.vulnerabilityPath[0])}
+                      </span>
+                    </div>
+                  </Badge>
+                  →{" "}
+                  <Badge variant={"outline"}>
+                    <div className="flex flex-row items-center gap-1">
+                      <span className="line-clamp-1">
+                        {beautifyPurl(vuln.vulnerabilityPath[1])}
+                      </span>
+                    </div>
+                  </Badge>
+                </div>
+              )}
+              {vuln.vulnerabilityPath.length > 2 && (
                 <div className="overflow-hidden text-ellipsis flex flex-wrap text-left flex-row gap-1">
                   <Badge variant={"outline"}>
                     <div className="flex flex-row items-center gap-1">
@@ -137,13 +185,16 @@ const VulnWithCveTableRow = ({
           </TooltipContent>
         </Tooltip>
       </td>
+      <td className="p-4 relative">
+        <Badge variant="outline">{vuln.vulnerabilityPath.length}</Badge>
+      </td>
       <td className="p-4  relative">
         <Link href={href} className="absolute inset-0" />
         <div className="flex flex-row">
           <Severity risk={vuln.rawRiskAssessment} />
         </div>
       </td>
-      <td className="p-4  relative">
+      <td className="p-4 relative">
         <Link href={href} className="absolute inset-0" />
         <div className="flex flex-row justify-start">
           <Severity gray risk={vuln.cve?.cvss ?? 0} />
@@ -160,12 +211,29 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
+  onBulkAction,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = useDecodedPathname();
+  const vulnById = useMemo(
+    () => new Map(row.original.vulns.map((v) => [v.id, v])),
+    [row.original.vulns],
+  );
   const vulnGroups = useMemo(
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],
+  );
+
+  // bulk action dialog state
+  const [acceptDialogVulnIds, setAcceptDialogVulnIds] = useState<
+    string[] | null
+  >(null);
+  const [falsePositiveDialogVulnIds, setFalsePositiveDialogVulnIds] = useState<
+    string[] | null
+  >(null);
+  const [justification, setJustification] = useState("");
+  const [selectedVexOption, setSelectedVexOption] = useState(
+    "component_not_present",
   );
 
   const { theme } = useTheme();
@@ -203,19 +271,35 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           )}
         >
           <td colSpan={6}>
-            <div className="ml-12 my-2 mr-4 overflow-hidden rounded-lg border">
+            <div className="flex flex-col gap-4">
               {Object.entries(vulnGroups).map(([cveID, vulns]) => {
-                const cveVulnIds = vulns.map((v) => v.id);
-                const allSelected = cveVulnIds.every((id) =>
+                const selectableIds = vulns
+                  .filter((v) => v.state !== "fixed")
+                  .map((v) => v.id);
+                const allSelected =
+                  selectableIds.length > 0 &&
+                  selectableIds.every((id) => selectedVulnIds.has(id));
+                const someSelected = selectableIds.some((id) =>
                   selectedVulnIds.has(id),
                 );
-                const someSelected = cveVulnIds.some((id) =>
+                const selectedIds = selectableIds.filter((id) =>
                   selectedVulnIds.has(id),
                 );
+                const selectedOpenIds = selectedIds.filter((id) => {
+                  const state = vulnById.get(id)?.state;
+                  return state === "open";
+                });
+                const selectedClosedIds = selectedIds.filter((id) => {
+                  const state = vulnById.get(id)?.state;
+                  return state === "accepted" || state === "falsePositive";
+                });
 
                 return (
-                  <div key={cveID}>
-                    <div className="px-4 bg-card flex flex-col items-start gap-2 py-3 border-b">
+                  <div
+                    key={cveID}
+                    className="ml-6 my-2 mr-4 overflow-hidden rounded-lg border"
+                  >
+                    <div className="px-4 bg-card flex flex-row justify-between items-center gap-2 py-3 border-b">
                       <Link
                         target="_blank"
                         href={"https://osv.dev/vulnerability/" + cveID}
@@ -229,55 +313,90 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                               : "/logos/osv.png"
                           }
                           alt="OSV Logo"
-                          width={34}
-                          height={34}
+                          width={40}
+                          height={40}
                           className="inline-block ml-2 mb-1"
                         />
                       </Link>
-                      <div className="flex flex-row items-center justify-between w-full gap-2">
-                        <div className="flex flex-row items-center gap-2">
-                          <Checkbox
-                            checked={
-                              allSelected
-                                ? true
-                                : someSelected
-                                  ? "indeterminate"
-                                  : false
-                            }
-                            onCheckedChange={() => onToggleAll(cveVulnIds)}
-                          />{" "}
-                          <label className="text-sm font-semibold">
-                            Select all {vulns.length} paths for {cveID}
-                          </label>
-                        </div>
-
-                        <div
-                          className={classNames(
-                            "flex flex-row items-center gap-2 transition-all",
-                            someSelected ? "opacity-100" : "opacity-0",
-                          )}
-                        >
-                          <Button variant={"secondary"}>
-                            Mark selected as false positive
-                          </Button>
-                          <Button variant={"secondary"}>
-                            Accept selected risk
-                          </Button>
-                        </div>
+                      <div
+                        className={classNames(
+                          "flex flex-row items-center gap-2 transition-all",
+                          someSelected ? "opacity-100" : "opacity-0",
+                        )}
+                      >
+                        {selectedClosedIds.length > 0 && (
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <AsyncButton
+                              variant={"secondary"}
+                              onClick={async () => {
+                                await onBulkAction({
+                                  vulnIds: selectedClosedIds,
+                                  status: "reopened",
+                                  justification: "",
+                                });
+                                toast("Reopened", {
+                                  description: `${selectedClosedIds.length} vulnerability path${selectedClosedIds.length !== 1 ? "s" : ""} reopened.`,
+                                });
+                              }}
+                            >
+                              Reopen selected
+                            </AsyncButton>
+                          </div>
+                        )}
+                        {selectedOpenIds.length > 0 && (
+                          <>
+                            <Button
+                              variant={"secondary"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setJustification("");
+                                setFalsePositiveDialogVulnIds(selectedOpenIds);
+                              }}
+                            >
+                              Mark selected as false positive
+                            </Button>
+                            <Button
+                              variant={"secondary"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setJustification("");
+                                setAcceptDialogVulnIds(selectedOpenIds);
+                              }}
+                            >
+                              Accept selected risk
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
 
                     <table className="w-full table-fixed">
                       <thead className="w-full text-left bg-accent/50">
                         <tr className="">
-                          <th className="w-10" />
-                          <th className="p-4">State</th>
-                          <th className="p-4">Artifact</th>
-                          <th className="p-4 w-92">
-                            Path to vulnerable component
+                          <th className="w-10">
+                            {selectableIds.length > 0 && (
+                              <div className="flex flex-row items-center justify-center ml-2">
+                                <Checkbox
+                                  checked={
+                                    allSelected
+                                      ? true
+                                      : someSelected
+                                        ? "indeterminate"
+                                        : false
+                                  }
+                                  onCheckedChange={() =>
+                                    onToggleAll(selectableIds)
+                                  }
+                                />
+                              </div>
+                            )}
                           </th>
-                          <th className="p-4">Risk</th>
-                          <th className="p-4">CVSS</th>
+                          <th className="p-4 w-36">State</th>
+                          <th className="p-4 w-60">Artifact</th>
+                          <th className="p-4">Path to vulnerable component</th>
+                          <th className="p-4 w-30">Path length</th>
+                          <th className="p-4 w-30">Risk</th>
+                          <th className="p-4 w-34">CVSS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -292,6 +411,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                               href={
                                 pathname + "/../dependency-risks/" + vuln.id
                               }
+                              selectable={vuln.state !== "fixed"}
                               selected={selectedVulnIds.has(vuln.id)}
                               onToggle={() => onToggleVuln(vuln.id)}
                             />
@@ -305,6 +425,155 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           </td>
         </tr>
       )}
+
+      {/* Accept Risk Dialog */}
+      <Dialog
+        open={acceptDialogVulnIds !== null}
+        onOpenChange={(open) => {
+          if (!open) setAcceptDialogVulnIds(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accept Risk</DialogTitle>
+            <DialogDescription>
+              You are about to accept the risk for{" "}
+              {acceptDialogVulnIds?.length ?? 0} selected vulnerability path
+              {(acceptDialogVulnIds?.length ?? 0) !== 1 ? "s" : ""}. This
+              acknowledges you are aware of the vulnerability and its potential
+              impact.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <label className="block text-sm font-semibold">Justification</label>
+            <MarkdownEditor
+              className="!bg-card"
+              placeholder="Why are you accepting this risk?"
+              value={justification}
+              setValue={(v) => setJustification(v ?? "")}
+            />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setAcceptDialogVulnIds(null)}
+              >
+                Cancel
+              </Button>
+              <AsyncButton
+                onClick={async () => {
+                  if (!acceptDialogVulnIds) return;
+                  const count = acceptDialogVulnIds.length;
+                  await onBulkAction({
+                    vulnIds: acceptDialogVulnIds,
+                    status: "accepted",
+                    justification,
+                  });
+                  setAcceptDialogVulnIds(null);
+                  toast("Risk Accepted", {
+                    description: `${count} vulnerability path${count !== 1 ? "s" : ""} accepted.`,
+                  });
+                }}
+              >
+                Accept Risk
+              </AsyncButton>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* False Positive Dialog */}
+      <Dialog
+        open={falsePositiveDialogVulnIds !== null}
+        onOpenChange={(open) => {
+          if (!open) setFalsePositiveDialogVulnIds(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as False Positive</DialogTitle>
+            <DialogDescription>
+              You are about to mark {falsePositiveDialogVulnIds?.length ?? 0}{" "}
+              selected vulnerability path
+              {(falsePositiveDialogVulnIds?.length ?? 0) !== 1 ? "s" : ""} as
+              false positive.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <label className="block text-sm font-semibold">Justification</label>
+            <MarkdownEditor
+              className="!bg-card"
+              placeholder="Why is this a false positive?"
+              value={justification}
+              setValue={(v) => setJustification(v ?? "")}
+            />
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setFalsePositiveDialogVulnIds(null)}
+              >
+                Cancel
+              </Button>
+              <div className="flex flex-row items-center">
+                <AsyncButton
+                  onClick={async () => {
+                    if (!falsePositiveDialogVulnIds) return;
+                    const count = falsePositiveDialogVulnIds.length;
+                    await onBulkAction({
+                      vulnIds: falsePositiveDialogVulnIds,
+                      status: "falsePositive",
+                      justification,
+                      mechanicalJustification: selectedVexOption,
+                    });
+                    setFalsePositiveDialogVulnIds(null);
+                    toast("Marked as False Positive", {
+                      description: `${count} vulnerability path${count !== 1 ? "s" : ""} marked as false positive.`,
+                    });
+                  }}
+                  variant="default"
+                  className="rounded-r-none pr-0 capitalize"
+                >
+                  {removeUnderscores(selectedVexOption)}
+                </AsyncButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="default"
+                      className="rounded-l-none pl-1 pr-2"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {Object.entries(vexOptionMessages).map(
+                      ([option, description]) => (
+                        <DropdownMenuItem
+                          key={option}
+                          onClick={() => setSelectedVexOption(option)}
+                        >
+                          <div className="flex flex-col">
+                            <span className="capitalize">
+                              {removeUnderscores(option)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {description}
+                            </span>
+                          </div>
+                        </DropdownMenuItem>
+                      ),
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

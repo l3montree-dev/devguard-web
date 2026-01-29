@@ -783,6 +783,16 @@ export interface RiskHistory {
   artifactName: string;
   assetId: string;
   assetVersionName: string;
+
+  cvePurlLow: number;
+  cvePurlMedium: number;
+  cvePurlHigh: number;
+  cvePurlCritical: number;
+
+  cvePurlLowCvss: number;
+  cvePurlMediumCvss: number;
+  cvePurlHighCvss: number;
+  cvePurlCriticalCvss: number;
 }
 
 export type ReleaseRiskHistory = Omit<

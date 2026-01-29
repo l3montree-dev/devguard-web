@@ -20,7 +20,10 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
       return (
         <Badge
           variant={"default"}
-          className={classNames(defaultClasses, "bg-green-500 text-black")}
+          className={classNames(
+            defaultClasses,
+            "bg-secondary text-secondary-foreground",
+          )}
         >
           <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
           Fixed

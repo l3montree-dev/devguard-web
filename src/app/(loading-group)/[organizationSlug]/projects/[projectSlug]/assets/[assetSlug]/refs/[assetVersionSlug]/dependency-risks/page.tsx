@@ -40,7 +40,8 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
+import { browserApiClient } from "@/services/devGuardApi";
 import Severity from "../../../../../../../../../../components/common/Severity";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
@@ -222,18 +223,56 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/";
 
+  const vulnsSwrKey =
+    uri +
+    "refs/" +
+    assetVersionSlug +
+    "/" +
+    "dependency-vulns/?" +
+    queryWithState.toString();
+
   const {
     data: vulns,
     isLoading,
     error,
-  } = useSWR<Paged<VulnByPackage>>(
-    uri +
-      "refs/" +
-      assetVersionSlug +
-      "/" +
-      "dependency-vulns/?" +
-      queryWithState.toString(),
-    fetcher,
+    mutate: mutateVulns,
+  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher);
+
+  const handleBulkAction = useCallback(
+    async (params: {
+      vulnIds: string[];
+      status: string;
+      justification: string;
+      mechanicalJustification?: string;
+    }) => {
+      const resp = await browserApiClient(
+        uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            vulnIds: params.vulnIds,
+            status: params.status,
+            justification: params.justification,
+            mechanicalJustification: params.mechanicalJustification ?? "",
+          }),
+        },
+      );
+
+      if (!resp.ok) {
+        throw new Error("Bulk action failed");
+      }
+
+      // clear selection for the affected IDs
+      setSelectedVulnIds((prev) => {
+        const next = new Set(prev);
+        params.vulnIds.forEach((id) => next.delete(id));
+        return next;
+      });
+
+      // revalidate the data
+      await mutateVulns();
+    },
+    [uri, assetVersionSlug, mutateVulns],
   );
 
   const { data: vulnsToSync } = useSWR<Paged<VulnByPackage>>(
@@ -445,6 +484,7 @@ const Index: FunctionComponent = () => {
                       selectedVulnIds={selectedVulnIds}
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
+                      onBulkAction={handleBulkAction}
                     />
                   ))}
                 </tbody>
