@@ -58,11 +58,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 // Types for the context menu
@@ -629,7 +625,10 @@ const DependencyGraph: FunctionComponent<{
                     <span>Vulnerability path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 flex-shrink-0" style={{ backgroundColor: "#F8BD25" }}></div>
+                    <div
+                      className="w-8 h-0.5 flex-shrink-0"
+                      style={{ backgroundColor: "#F8BD25" }}
+                    ></div>
                     <span>Dependency path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">

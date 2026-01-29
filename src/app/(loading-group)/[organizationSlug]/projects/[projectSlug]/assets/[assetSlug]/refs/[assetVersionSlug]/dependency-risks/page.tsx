@@ -10,6 +10,8 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import AcceptRiskDialog from "@/components/AcceptRiskDialog";
+import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -18,7 +20,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -26,6 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -91,6 +94,10 @@ const Index: FunctionComponent = () => {
   const [selectedVulnIds, setSelectedVulnIds] = useState<Set<string>>(
     new Set(),
   );
+
+  // Batch action dialog state
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
 
   const handleToggleVuln = useCallback((id: string) => {
     setSelectedVulnIds((prev) => {
@@ -241,6 +248,35 @@ const Index: FunctionComponent = () => {
     data: vulns?.data || [],
   });
 
+  // Compute selected open/closed IDs for batch actions
+  const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
+    if (!vulns?.data) return { selectedOpenIds: [], selectedClosedIds: [] };
+
+    const vulnById = new Map<string, { state: string }>();
+    vulns.data.forEach((pkg) => {
+      pkg.vulns.forEach((v) => {
+        vulnById.set(v.id, { state: v.state });
+      });
+    });
+
+    const openIds: string[] = [];
+    const closedIds: string[] = [];
+
+    selectedVulnIds.forEach((id) => {
+      const vuln = vulnById.get(id);
+      if (vuln?.state === "open") {
+        openIds.push(id);
+      } else if (
+        vuln?.state === "accepted" ||
+        vuln?.state === "falsePositive"
+      ) {
+        closedIds.push(id);
+      }
+    });
+
+    return { selectedOpenIds: openIds, selectedClosedIds: closedIds };
+  }, [vulns?.data, selectedVulnIds]);
+
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
@@ -342,94 +378,149 @@ const Index: FunctionComponent = () => {
         </div>
       ) : (
         <div>
-          <div className="overflow-hidden rounded-lg border shadow-sm">
-            <table className="w-full text-left text-sm table-fixed">
-              <colgroup>
-                <col className="w-auto" />
-                <col className="w-[160px]" />
-                <col className="w-[110px]" />
-                <col className="w-[220px]" />
-              </colgroup>
-              <thead className="border-b bg-card text-foreground">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        className="cursor-pointer break-normal p-4 text-left"
-                        onClick={
-                          header.column.columnDef.enableSorting
-                            ? header.column.getToggleSortingHandler()
-                            : undefined
-                        }
-                        key={header.id}
-                      >
-                        <div className="flex flex-row items-center gap-2">
-                          {header.isPlaceholder ? null : (
-                            <div>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </div>
-                          )}
-                          {header.isPlaceholder ? null : header.id ===
-                            "max_risk" ? (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <CircleHelp className="w-4 h-4 text-gray-500" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <div className="relative font-normal">
-                                  Risk Value is a context-aware score that
-                                  adjusts the CVSS by factoring in real-world
-                                  exploitability and system relevance. It
-                                  reflects the{" "}
-                                  <span className="font-bold">
-                                    actual risk a vulnerability poses
-                                  </span>
-                                  , not just its theoretical severity.{" "}
-                                  <Link
-                                    href={documentationLinks.riskCalculation}
-                                    target="_blank"
-                                  >
-                                    Learn more about the risk calculation
-                                  </Link>
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          ) : null}
-                          <SortingCaret
-                            sortDirection={header.column.getIsSorted()}
-                          />
+          <div className="rounded-lg border shadow-sm">
+            <div>
+              <table className="w-full text-left text-sm table-fixed">
+                <colgroup>
+                  <col className="w-auto" />
+                  <col className="w-[160px]" />
+                  <col className="w-[110px]" />
+                  <col className="w-[220px]" />
+                </colgroup>
+                <thead className="border-b bg-card text-foreground sticky top-0 z-10">
+                  {/* Batch action row - shown when items are selected */}
+                  {selectedVulnIds.size > 0 && (
+                    <tr className="bg-muted/50">
+                      <td colSpan={4} className="px-4 py-2">
+                        <div className="flex flex-row items-center justify-end">
+                          <div className="flex flex-row items-center gap-2">
+                            {selectedClosedIds.length > 0 && (
+                              <AsyncButton
+                                variant="secondary"
+                                onClick={async () => {
+                                  const count = selectedClosedIds.length;
+                                  await handleBulkAction({
+                                    vulnIds: selectedClosedIds,
+                                    status: "reopened",
+                                    justification: "",
+                                  });
+                                  toast("Reopened", {
+                                    description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
+                                  });
+                                }}
+                              >
+                                Reopen ({selectedClosedIds.length})
+                              </AsyncButton>
+                            )}
+                            {selectedOpenIds.length > 0 && (
+                              <>
+                                <Button
+                                  variant="secondary"
+                                  onClick={() =>
+                                    setFalsePositiveDialogOpen(true)
+                                  }
+                                >
+                                  False Positive ({selectedOpenIds.length})
+                                </Button>
+                                <Button
+                                  variant="secondary"
+                                  onClick={() => setAcceptDialogOpen(true)}
+                                >
+                                  Accept Risk ({selectedOpenIds.length})
+                                </Button>
+                              </>
+                            )}
+                            <Button
+                              variant="ghost"
+                              onClick={() => setSelectedVulnIds(new Set())}
+                            >
+                              Clear
+                            </Button>
+                          </div>
                         </div>
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="text-sm text-foreground">
-                {isLoading &&
-                  Array.from(Array(5).keys()).map((el) => (
-                    <tr key={el} className="border-b">
-                      <td className="p-4" colSpan={4}>
-                        <Skeleton className="w-full h-[40px]" />
                       </td>
                     </tr>
+                  )}
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th
+                          className="cursor-pointer break-normal p-4 text-left bg-card"
+                          onClick={
+                            header.column.columnDef.enableSorting
+                              ? header.column.getToggleSortingHandler()
+                              : undefined
+                          }
+                          key={header.id}
+                        >
+                          <div className="flex flex-row items-center gap-2">
+                            {header.isPlaceholder ? null : (
+                              <div>
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </div>
+                            )}
+                            {header.isPlaceholder ? null : header.id ===
+                              "max_risk" ? (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="relative font-normal">
+                                    Risk Value is a context-aware score that
+                                    adjusts the CVSS by factoring in real-world
+                                    exploitability and system relevance. It
+                                    reflects the{" "}
+                                    <span className="font-bold">
+                                      actual risk a vulnerability poses
+                                    </span>
+                                    , not just its theoretical severity.{" "}
+                                    <Link
+                                      href={documentationLinks.riskCalculation}
+                                      target="_blank"
+                                    >
+                                      Learn more about the risk calculation
+                                    </Link>
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : null}
+                            <SortingCaret
+                              sortDirection={header.column.getIsSorted()}
+                            />
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                {table.getRowModel().rows.map((row, i, arr) => (
-                  <RiskHandlingRow
-                    row={row}
-                    index={i}
-                    arrLength={arr.length}
-                    key={row.original.packageName}
-                    selectedVulnIds={selectedVulnIds}
-                    onToggleVuln={handleToggleVuln}
-                    onToggleAll={handleToggleAll}
-                    onBulkAction={handleBulkAction}
-                  />
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-sm text-foreground">
+                  {isLoading &&
+                    Array.from(Array(5).keys()).map((el) => (
+                      <tr key={el} className="border-b">
+                        <td className="p-4" colSpan={4}>
+                          <Skeleton className="w-full h-[40px]" />
+                        </td>
+                      </tr>
+                    ))}
+                  {table.getRowModel().rows.map((row, i, arr) => (
+                    <RiskHandlingRow
+                      row={row}
+                      index={i}
+                      arrLength={arr.length}
+                      key={row.original.packageName}
+                      selectedVulnIds={selectedVulnIds}
+                      onToggleVuln={handleToggleVuln}
+                      onToggleAll={handleToggleAll}
+                      onBulkAction={handleBulkAction}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
@@ -450,6 +541,58 @@ const Index: FunctionComponent = () => {
         devguardCIComponentBase={config.devguardCIComponentBase}
         assetVersion={assetVersion}
         artifacts={artifacts || []}
+      />
+
+      <AcceptRiskDialog
+        open={acceptDialogOpen}
+        onOpenChange={setAcceptDialogOpen}
+        onSubmit={async (justification) => {
+          if (selectedOpenIds.length === 0) return false;
+          const count = selectedOpenIds.length;
+          await handleBulkAction({
+            vulnIds: selectedOpenIds,
+            status: "accepted",
+            justification,
+          });
+          toast("Risk Accepted", {
+            description: `${count} vulnerability path${count !== 1 ? "s" : ""} accepted.`,
+          });
+          return true;
+        }}
+        description={
+          <>
+            You are about to accept the risk for {selectedOpenIds.length}{" "}
+            selected vulnerability path
+            {selectedOpenIds.length !== 1 ? "s" : ""}. This acknowledges you are
+            aware of the vulnerability and its potential impact.
+          </>
+        }
+      />
+
+      <FalsePositiveDialog
+        open={falsePositiveDialogOpen}
+        onOpenChange={setFalsePositiveDialogOpen}
+        onSubmit={async (data) => {
+          if (selectedOpenIds.length === 0) return false;
+          const count = selectedOpenIds.length;
+          await handleBulkAction({
+            vulnIds: selectedOpenIds,
+            status: "falsePositive",
+            justification: data.justification,
+            mechanicalJustification: data.mechanicalJustification,
+          });
+          toast("Marked as False Positive", {
+            description: `${count} vulnerability path${count !== 1 ? "s" : ""} marked as false positive.`,
+          });
+          return true;
+        }}
+        description={
+          <>
+            You are about to mark {selectedOpenIds.length} selected
+            vulnerability path{selectedOpenIds.length !== 1 ? "s" : ""} as false
+            positive.
+          </>
+        }
       />
     </Page>
   );

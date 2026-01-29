@@ -88,19 +88,23 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Mark as False Positive</DialogTitle>
           <DialogDescription>
-            Mark this vulnerability as a false positive if it does not apply to
-            your project. This could be because the vulnerable code path is not
-            reachable, the vulnerability is not exploitable in your context, or
-            the detection is incorrect. You can find more information about
-            marking false positives in our{" "}
-            <Link
-              href={documentationLinks.markFalsePositive}
-              target="_blank"
-              className="underline hover:text-primary"
-            >
-              documentation
-            </Link>
-            .
+            {description ?? (
+              <>
+                Mark this vulnerability as a false positive if it does not apply
+                to your project. This could be because the vulnerable code path
+                is not reachable, the vulnerability is not exploitable in your
+                context, or the detection is incorrect. You can find more
+                information about marking false positives in our{" "}
+                <Link
+                  href={documentationLinks.markFalsePositive}
+                  target="_blank"
+                  className="underline hover:text-primary"
+                >
+                  documentation
+                </Link>
+                .
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
         <form

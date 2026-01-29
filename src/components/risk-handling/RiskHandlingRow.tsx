@@ -15,42 +15,23 @@
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
-import ArtifactBadge from "../ArtifactBadge";
-import MarkdownEditor from "../common/MarkdownEditor";
+import AcceptRiskDialog from "../AcceptRiskDialog";
+import FalsePositiveDialog from "../FalsePositiveDialog";
 import Severity from "../common/Severity";
-import VulnState from "../common/VulnState";
 import { Badge } from "../ui/badge";
-import { AsyncButton, Button } from "../ui/button";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
-import Image from "next/image";
-import { useTheme } from "next-themes";
-import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -169,11 +150,9 @@ const VulnWithCveTableRow = ({
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
-  arrLength,
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
-  onBulkAction,
 }) => {
   const [isPackageOpen, setIsPackageOpen] = useState(false);
   const [expandedCves, setExpandedCves] = useState<Set<string>>(new Set());
@@ -198,20 +177,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
       return next;
     });
   };
-
-  // bulk action dialog state
-  const [acceptDialogVulnIds, setAcceptDialogVulnIds] = useState<
-    string[] | null
-  >(null);
-  const [falsePositiveDialogVulnIds, setFalsePositiveDialogVulnIds] = useState<
-    string[] | null
-  >(null);
-  const [justification, setJustification] = useState("");
-  const [selectedVexOption, setSelectedVexOption] = useState(
-    "component_not_present",
-  );
-
-  const { theme } = useTheme();
 
   return (
     <>
@@ -268,14 +233,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const selectedIds = selectableIds.filter((id) =>
             selectedVulnIds.has(id),
           );
-          const selectedOpenIds = selectedIds.filter((id) => {
-            const state = vulnById.get(id)?.state;
-            return state === "open";
-          });
-          const selectedClosedIds = selectedIds.filter((id) => {
-            const state = vulnById.get(id)?.state;
-            return state === "accepted" || state === "falsePositive";
-          });
 
           const hasMultiplePaths = vulns.length > 1;
           const isCveExpanded = expandedCves.has(cveID);
@@ -356,11 +313,11 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                           </p>
                         </TooltipContent>
                       </Tooltip>
-                    ) : (
+                    ) : vulns.length > 1 ? (
                       <Badge variant="outline" className="text-xs">
                         {vulns.length} path{vulns.length !== 1 ? "s" : ""}
                       </Badge>
-                    )}
+                    ) : null}
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">
@@ -371,70 +328,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     {(sortedVulns[0]?.cve?.cvss ?? 0).toFixed(1)}
                   </span>
                 </td>
-                <td className="py-2 px-4">
-                  <div className="flex flex-row items-center  gap-1.5">
-                    {selectedClosedIds.length > 0 && (
-                      <Button
-                        size="xs"
-                        variant="secondary"
-                        className={classNames(
-                          "transition-opacity",
-                          selectedClosedIds.length > 0 && someSelected
-                            ? "opacity-100"
-                            : "opacity-0 pointer-events-none",
-                        )}
-                        onClick={async () => {
-                          await onBulkAction({
-                            vulnIds: selectedClosedIds,
-                            status: "reopened",
-                            justification: "",
-                          });
-                          toast("Reopened", {
-                            description: `${selectedClosedIds.length} vulnerability path${selectedClosedIds.length !== 1 ? "s" : ""} reopened.`,
-                          });
-                        }}
-                      >
-                        Reopen
-                      </Button>
-                    )}
-                    {selectedOpenIds.length > 0 && (
-                      <>
-                        <Button
-                          size="xs"
-                          variant="secondary"
-                          className={classNames(
-                            "transition-opacity",
-                            selectedOpenIds.length > 0 && someSelected
-                              ? "opacity-100"
-                              : "opacity-0 pointer-events-none",
-                          )}
-                          onClick={() => {
-                            setJustification("");
-                            setFalsePositiveDialogVulnIds(selectedOpenIds);
-                          }}
-                        >
-                          False positive
-                        </Button>
-                        <Button
-                          size="xs"
-                          variant="secondary"
-                          className={classNames(
-                            "transition-opacity",
-                            selectedOpenIds.length > 0 && someSelected
-                              ? "opacity-100"
-                              : "opacity-0 pointer-events-none",
-                          )}
-                          onClick={() => {
-                            setJustification("");
-                            setAcceptDialogVulnIds(selectedOpenIds);
-                          }}
-                        >
-                          Accept risk
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </td>
+                <td />
               </tr>
 
               {/* Individual vulnerability paths */}
@@ -454,155 +348,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             </React.Fragment>
           );
         })}
-
-      {/* Accept Risk Dialog */}
-      <Dialog
-        open={acceptDialogVulnIds !== null}
-        onOpenChange={(open) => {
-          if (!open) setAcceptDialogVulnIds(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Accept Risk</DialogTitle>
-            <DialogDescription>
-              You are about to accept the risk for{" "}
-              {acceptDialogVulnIds?.length ?? 0} selected vulnerability path
-              {(acceptDialogVulnIds?.length ?? 0) !== 1 ? "s" : ""}. This
-              acknowledges you are aware of the vulnerability and its potential
-              impact.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <label className="block text-sm font-semibold">Justification</label>
-            <MarkdownEditor
-              className="!bg-card"
-              placeholder="Why are you accepting this risk?"
-              value={justification}
-              setValue={(v) => setJustification(v ?? "")}
-            />
-            <DialogFooter>
-              <Button
-                variant="secondary"
-                onClick={() => setAcceptDialogVulnIds(null)}
-              >
-                Cancel
-              </Button>
-              <AsyncButton
-                onClick={async () => {
-                  if (!acceptDialogVulnIds) return;
-                  const count = acceptDialogVulnIds.length;
-                  await onBulkAction({
-                    vulnIds: acceptDialogVulnIds,
-                    status: "accepted",
-                    justification,
-                  });
-                  setAcceptDialogVulnIds(null);
-                  toast("Risk Accepted", {
-                    description: `${count} vulnerability path${count !== 1 ? "s" : ""} accepted.`,
-                  });
-                }}
-              >
-                Accept Risk
-              </AsyncButton>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* False Positive Dialog */}
-      <Dialog
-        open={falsePositiveDialogVulnIds !== null}
-        onOpenChange={(open) => {
-          if (!open) setFalsePositiveDialogVulnIds(null);
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Mark as False Positive</DialogTitle>
-            <DialogDescription>
-              You are about to mark {falsePositiveDialogVulnIds?.length ?? 0}{" "}
-              selected vulnerability path
-              {(falsePositiveDialogVulnIds?.length ?? 0) !== 1 ? "s" : ""} as
-              false positive.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <label className="block text-sm font-semibold">Justification</label>
-            <MarkdownEditor
-              className="!bg-card"
-              placeholder="Why is this a false positive?"
-              value={justification}
-              setValue={(v) => setJustification(v ?? "")}
-            />
-            <DialogFooter>
-              <Button
-                variant="secondary"
-                onClick={() => setFalsePositiveDialogVulnIds(null)}
-              >
-                Cancel
-              </Button>
-              <div className="flex flex-row items-center">
-                <AsyncButton
-                  onClick={async () => {
-                    if (!falsePositiveDialogVulnIds) return;
-                    const count = falsePositiveDialogVulnIds.length;
-                    await onBulkAction({
-                      vulnIds: falsePositiveDialogVulnIds,
-                      status: "falsePositive",
-                      justification,
-                      mechanicalJustification: selectedVexOption,
-                    });
-                    setFalsePositiveDialogVulnIds(null);
-                    toast("Marked as False Positive", {
-                      description: `${count} vulnerability path${count !== 1 ? "s" : ""} marked as false positive.`,
-                    });
-                  }}
-                  variant="default"
-                  className="rounded-r-none pr-0 capitalize"
-                >
-                  {removeUnderscores(selectedVexOption)}
-                </AsyncButton>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="default"
-                      className="rounded-l-none pl-1 pr-2"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {Object.entries(vexOptionMessages).map(
-                      ([option, description]) => (
-                        <DropdownMenuItem
-                          key={option}
-                          onClick={() => setSelectedVexOption(option)}
-                        >
-                          <div className="flex flex-col">
-                            <span className="capitalize">
-                              {removeUnderscores(option)}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {description}
-                            </span>
-                          </div>
-                        </DropdownMenuItem>
-                      ),
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };
