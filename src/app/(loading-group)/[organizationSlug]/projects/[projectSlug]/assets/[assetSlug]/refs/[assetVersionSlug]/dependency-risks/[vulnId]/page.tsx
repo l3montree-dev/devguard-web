@@ -434,7 +434,7 @@ const Index: FunctionComponent = () => {
       };
     }
 
-    return convertPathsToTree(graphResponse, vuln ? [vuln] : []);
+    return convertPathsToTree([vuln.vulnerabilityPath], vuln ? [vuln] : []);
   }, [graphResponse, vuln]);
 
   // Generate path pattern options for the user to select

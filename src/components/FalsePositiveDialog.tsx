@@ -149,18 +149,20 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                             className={`py-3 ${idx < arr.length - 1 ? "border-b" : ""}`}
                           >
                             <div className="flex flex-col gap-1.5 w-full">
+                              <span className="text-xs text-muted-foreground">
+                                Matches {count}{" "}
+                                {count === 1
+                                  ? "vulnerability"
+                                  : "vulnerabilities"}
+                              </span>
                               <div className="flex flex-wrap items-center gap-1">
                                 {suffix.split(" > ").map((el, idx, arr) => (
                                   <div
                                     key={el + idx}
                                     className="flex items-center gap-1"
                                   >
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs"
-                                    >
-                                      {beautifyPurl(el)}
-                                    </Badge>
+                                    {beautifyPurl(el)}
+
                                     {idx < arr.length - 1 && (
                                       <span className="text-xs text-muted-foreground">
                                         →
@@ -169,12 +171,6 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                                   </div>
                                 ))}
                               </div>
-                              <span className="text-xs text-muted-foreground">
-                                Matches {count}{" "}
-                                {count === 1
-                                  ? "vulnerability"
-                                  : "vulnerabilities"}
-                              </span>
                             </div>
                           </SelectItem>
                         ))}

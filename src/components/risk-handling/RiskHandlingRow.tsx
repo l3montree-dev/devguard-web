@@ -98,24 +98,20 @@ const VulnWithCveTableRow = ({
       <td className="py-3 pl-[72px] pr-4">
         <div className="flex items-start gap-3">
           {selectable && (
-            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+            <div className="pt-0.5 ml-6" onClick={(e) => e.stopPropagation()}>
               <Checkbox checked={selected} onCheckedChange={onToggle} />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            {vuln.state !== "open" && (
-              <div className="flex mb-3 items-center gap-2 text-sm text-muted-foreground">
-                <span>State:</span>
-                <VulnState state={vuln.state} />
-              </div>
-            )}
             <Tooltip>
               <TooltipTrigger className="text-left">
                 <div className="text-sm text-foreground truncate max-w-md">
-                  <span className="font-medium text-muted-foreground">
-                    Path:{" "}
+                  <span className="mr-2 text-xs text-muted-foreground">
+                    {vuln.state !== "open" && <>{vuln.state}, </>}
+                    {vuln.vulnerabilityPath.length === 1
+                      ? "Direct"
+                      : `${vuln.vulnerabilityPath.length} hops`}
                   </span>
-
                   {vuln.vulnerabilityPath.length <= 2 ? (
                     <span>
                       {vuln.vulnerabilityPath.map((p, i) => (
@@ -140,12 +136,6 @@ const VulnWithCveTableRow = ({
                       </Badge>
                     </span>
                   )}
-
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    {vuln.vulnerabilityPath.length === 1
-                      ? "Direct"
-                      : `${vuln.vulnerabilityPath.length} hops`}
-                  </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -160,17 +150,6 @@ const VulnWithCveTableRow = ({
                 </div>
               </TooltipContent>
             </Tooltip>
-            <div className="flex items-center gap-2 mt-1 flex-wrap text-muted-foreground">
-              In Artifact:
-              <div className="flex items-center gap-2 flex-wrap">
-                {vuln.artifacts.map((artifact) => (
-                  <ArtifactBadge
-                    key={vuln.id + artifact.artifactName}
-                    artifactName={artifact.artifactName}
-                  />
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </td>
@@ -303,7 +282,11 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const sortedVulns = vulns.sort(
             (a, b) => b.rawRiskAssessment - a.rawRiskAssessment,
           );
-          const isPathExplosion = sortedVulns[0]?.vulnerabilityPath?.length === 0;
+          const isPathExplosion =
+            sortedVulns[0]?.vulnerabilityPath?.length === 0;
+
+          const pathExplosionOrOnlySinglePath =
+            isPathExplosion || !hasMultiplePaths;
 
           return (
             <React.Fragment key={cveID}>
@@ -311,7 +294,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               <tr className="bg-muted/30 border-b border-gray-100 dark:border-white/5">
                 <td className="py-3 px-4 pl-10">
                   <div className="flex flex-row items-center gap-3">
-                    {!isPathExplosion && (
+                    {!pathExplosionOrOnlySinglePath && (
                       <button
                         onClick={() => toggleCve(cveID)}
                         className="p-0.5 hover:bg-muted rounded"
@@ -323,22 +306,25 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         )}
                       </button>
                     )}
-                    {!isPathExplosion && selectableIds.length > 0 && (
-                      <Checkbox
-                        checked={
-                          allSelected
-                            ? true
-                            : someSelected
-                              ? "indeterminate"
-                              : false
-                        }
-                        onCheckedChange={() => onToggleAll(selectableIds)}
-                      />
-                    )}
-                    {isPathExplosion ? (
+                    <Checkbox
+                      className={pathExplosionOrOnlySinglePath ? "ml-8" : ""}
+                      checked={
+                        allSelected
+                          ? true
+                          : someSelected
+                            ? "indeterminate"
+                            : false
+                      }
+                      onCheckedChange={() => onToggleAll(selectableIds)}
+                    />
+                    {isPathExplosion || selectableIds.length === 1 ? (
                       <Link
-                        href={pathname + "/../dependency-risks/" + sortedVulns[0]?.id}
-                        className="font-medium text-foreground hover:underline cursor-pointer"
+                        href={
+                          pathname +
+                          "/../dependency-risks/" +
+                          sortedVulns[0]?.id
+                        }
+                        className="font-medium !text-foreground cursor-pointer"
                       >
                         {cveID}
                       </Link>
@@ -353,24 +339,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         {cveID}
                       </button>
                     )}
-                    <Link
-                      target="_blank"
-                      href={"https://osv.dev/vulnerability/" + cveID}
-                      onClick={(e) => e.stopPropagation()}
-                      className="hover:opacity-80"
-                    >
-                      <Image
-                        src={
-                          theme === "light"
-                            ? "/logos/osv-black.png"
-                            : "/logos/osv.png"
-                        }
-                        alt="OSV Logo"
-                        width={20}
-                        height={20}
-                        className="opacity-50 hover:opacity-100 transition-opacity"
-                      />
-                    </Link>
+
                     {isPathExplosion ? (
                       <Tooltip>
                         <TooltipTrigger>
@@ -381,8 +350,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="max-w-xs">
-                            This vulnerability has too many dependency paths to display individually. 
-                            Click the CVE ID to view details and manage this vulnerability.
+                            This vulnerability has too many dependency paths to
+                            display individually. Click the CVE ID to view
+                            details and manage this vulnerability.
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -469,7 +439,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
 
               {/* Individual vulnerability paths */}
               {/* Show only when CVE is expanded and not a path explosion */}
-              {!isPathExplosion && isCveExpanded &&
+              {!isPathExplosion &&
+                isCveExpanded &&
                 sortedVulns.map((vuln) => (
                   <VulnWithCveTableRow
                     vuln={vuln}
