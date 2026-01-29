@@ -321,6 +321,7 @@ const OverviewPage = () => {
         <div className="flex items-center gap-2">
           <QueryArtifactSelector
             artifacts={releases?.data?.map((r) => r.name) || []}
+            isReleaseSelector={true}
           />
         </div>
         <div className="flex relative flex-col">
