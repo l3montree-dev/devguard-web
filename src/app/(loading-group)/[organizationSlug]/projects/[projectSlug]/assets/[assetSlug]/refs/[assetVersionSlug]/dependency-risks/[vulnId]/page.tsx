@@ -642,7 +642,9 @@ const Index: FunctionComponent = () => {
                     </Markdown>
                     {(vuln.cve?.description?.length ?? 0) > 800 && (
                       <button
-                        onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                        onClick={() =>
+                          setDescriptionExpanded(!descriptionExpanded)
+                        }
                         className="text-sm text-primary hover:opacity-80 my-2"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}

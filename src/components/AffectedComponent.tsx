@@ -213,15 +213,15 @@ const AffectedComponentDetails: FunctionComponent<{
           </Collapsible>
         </div>
         <div className="mt-1">
-        <Link
-          target="_blank"
-          className="text-xs"
-          href={
-            "https://devguard.org/explanations/vulnerability-management/vulnerability-matching"
-          }
-        >
-          See how DevGuard matches vulnerabilities
-        </Link>
+          <Link
+            target="_blank"
+            className="text-xs"
+            href={
+              "https://devguard.org/explanations/vulnerability-management/vulnerability-matching"
+            }
+          >
+            See how DevGuard matches vulnerabilities
+          </Link>
         </div>
       </div>
     </div>
