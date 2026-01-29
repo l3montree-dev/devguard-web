@@ -158,13 +158,15 @@ export function SimpleArtifactSelector({
             {artifact === "" ? "Default" : artifact}
           </DropdownMenuCheckboxItem>
         ))}
-        <Link
-          href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts`}
-        >
-          <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
-            View all artifacts
-          </DropdownMenuItem>
-        </Link>
+        {!isReleaseSelector && (
+          <Link
+            href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts`}
+          >
+            <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
+              View all artifacts
+            </DropdownMenuItem>
+          </Link>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
