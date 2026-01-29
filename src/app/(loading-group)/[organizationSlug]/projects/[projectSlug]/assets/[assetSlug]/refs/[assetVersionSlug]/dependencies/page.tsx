@@ -23,7 +23,12 @@ import {
   Paged,
   ScoreCard,
 } from "@/types/api/api";
-import { beautifyPurl, classNames, extractVersion, licenses } from "@/utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+  licenses,
+} from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
 import {
   CalendarDateRangeIcon,
@@ -253,8 +258,8 @@ const columnsDef: ColumnDef<
       row.row.original.dependency?.project && (
         <div>
           <div className="mb-2">
-            <a 
-              href={`//${row.getValue()}`} 
+            <a
+              href={`//${row.getValue()}`}
               target="_blank"
               className="block truncate"
             >

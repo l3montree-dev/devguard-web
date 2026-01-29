@@ -3,11 +3,7 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import {
-  LicenseResponse,
-  LicenseRiskDTO,
-  Paged,
-} from "@/types/api/api";
+import { LicenseResponse, LicenseRiskDTO, Paged } from "@/types/api/api";
 import {
   ColumnDef,
   createColumnHelper,
@@ -144,10 +140,7 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const {
-    data: vulns,
-    isLoading,
-  } = useSWR<Paged<LicenseRiskDTO>>(
+  const { data: vulns, isLoading } = useSWR<Paged<LicenseRiskDTO>>(
     uri +
       "refs/" +
       assetVersionSlug +

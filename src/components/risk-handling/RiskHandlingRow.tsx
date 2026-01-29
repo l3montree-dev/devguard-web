@@ -300,9 +300,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       onCheckedChange={() => onToggleAll(selectableIds)}
                       disabled={!hasSession}
                     />
-                    <span className="font-medium text-foreground">
-                      {cveID}
-                    </span>
+                    <span className="font-medium text-foreground">{cveID}</span>
 
                     {isPathExplosion ? (
                       <Tooltip>
