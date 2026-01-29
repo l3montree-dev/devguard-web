@@ -45,6 +45,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
 import Image from "next/image";
@@ -302,6 +303,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const sortedVulns = vulns.sort(
             (a, b) => b.rawRiskAssessment - a.rawRiskAssessment,
           );
+          const isPathExplosion = sortedVulns[0]?.vulnerabilityPath?.length === 0;
 
           return (
             <React.Fragment key={cveID}>
@@ -309,17 +311,19 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               <tr className="bg-muted/30 border-b border-gray-100 dark:border-white/5">
                 <td className="py-3 px-4 pl-10">
                   <div className="flex flex-row items-center gap-3">
-                    <button
-                      onClick={() => toggleCve(cveID)}
-                      className="p-0.5 hover:bg-muted rounded"
-                    >
-                      {isCveExpanded ? (
-                        <ChevronDownIcon className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
-                    {selectableIds.length > 0 && (
+                    {!isPathExplosion && (
+                      <button
+                        onClick={() => toggleCve(cveID)}
+                        className="p-0.5 hover:bg-muted rounded"
+                      >
+                        {isCveExpanded ? (
+                          <ChevronDownIcon className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+                    )}
+                    {!isPathExplosion && selectableIds.length > 0 && (
                       <Checkbox
                         checked={
                           allSelected
@@ -331,15 +335,24 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         onCheckedChange={() => onToggleAll(selectableIds)}
                       />
                     )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCve(cveID);
-                      }}
-                      className="font-medium text-foreground hover:underline cursor-pointer"
-                    >
-                      {cveID}
-                    </button>
+                    {isPathExplosion ? (
+                      <Link
+                        href={pathname + "/../dependency-risks/" + sortedVulns[0]?.id}
+                        className="font-medium text-foreground hover:underline cursor-pointer"
+                      >
+                        {cveID}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleCve(cveID);
+                        }}
+                        className="font-medium text-foreground hover:underline cursor-pointer"
+                      >
+                        {cveID}
+                      </button>
+                    )}
                     <Link
                       target="_blank"
                       href={"https://osv.dev/vulnerability/" + cveID}
@@ -358,9 +371,26 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         className="opacity-50 hover:opacity-100 transition-opacity"
                       />
                     </Link>
-                    <Badge variant="outline" className="text-xs">
-                      {vulns.length} path{vulns.length !== 1 ? "s" : ""}
-                    </Badge>
+                    {isPathExplosion ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <LinkBreak2Icon className="w-3 h-3" />
+                            Path Explosion
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">
+                            This vulnerability has too many dependency paths to display individually. 
+                            Click the CVE ID to view details and manage this vulnerability.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <Badge variant="outline" className="text-xs">
+                        {vulns.length} path{vulns.length !== 1 ? "s" : ""}
+                      </Badge>
+                    )}
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">
@@ -438,8 +468,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               </tr>
 
               {/* Individual vulnerability paths */}
-              {/* Show only when CVE is expanded */}
-              {isCveExpanded &&
+              {/* Show only when CVE is expanded and not a path explosion */}
+              {!isPathExplosion && isCveExpanded &&
                 sortedVulns.map((vuln) => (
                   <VulnWithCveTableRow
                     vuln={vuln}
