@@ -180,3 +180,9 @@
 .caret {
   transition: all 0.2s ease;
 }
+
+a {
+  &:hover {
+    @apply opacity-80;
+  }
+}
