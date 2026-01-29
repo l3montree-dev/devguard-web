@@ -15,11 +15,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        istextorbinary: "./src/lib/istextorbinary-wrapper.js",
-      },
+  turbopack: {
+    resolveAlias: {
+      istextorbinary: "./src/lib/istextorbinary-wrapper.js",
     },
   },
   webpack: (config) => {

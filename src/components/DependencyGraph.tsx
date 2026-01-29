@@ -103,7 +103,6 @@ const autoExpandToMinimum = (
       .map((c) => (isInfoSource(c.name) ? c.children : [c]))
       .flat()
       .sort((a, b) => a.name.localeCompare(b.name));
-    console.log(current.children, children);
 
     if (children.length === 0) {
       continue;
@@ -277,7 +276,6 @@ const addRecursive = (
     // Add "Show more" node if there are more children to display
     if (isExpanded && childrenProcessed < totalChildren) {
       const loadMoreId = `${node.name}__load_more`;
-      console.log(loadMoreId);
       dagreGraph.setNode(loadMoreId, { width: nodeWidth, height: nodeHeight });
       dagreGraph.setEdge(node.name, loadMoreId);
       childCountMap.set(loadMoreId, 0); // Load more node has no children

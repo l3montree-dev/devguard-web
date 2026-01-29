@@ -753,7 +753,6 @@ const Index: FunctionComponent = () => {
     );
   }
 
-  console.log(graphData);
   return (
     <Page
       Menu={assetMenu}
@@ -767,13 +766,13 @@ const Index: FunctionComponent = () => {
               <h1 className="text-2xl font-semibold">
                 {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
               </h1>
-              <p className="mt-4 text-muted-foreground">
+              <div className="mt-4 text-muted-foreground">
                 {vuln ? (
                   vuln.cve?.description
                 ) : (
                   <Skeleton className="w-full h-20" />
                 )}
-              </p>
+              </div>
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
                 {vuln?.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
