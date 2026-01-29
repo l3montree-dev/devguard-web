@@ -148,29 +148,29 @@ a {
   }
 }
 
-.mdx-editor-content {
+.mdx-editor-content, .cve-description {
     
   h1 {
-    @apply text-3xl font-bold mb-2;
+    @apply text-3xl font-bold mb-2 text-foreground mt-6;
   }
   h2 {
-    @apply text-2xl font-bold mb-2;
+    @apply text-2xl font-bold mb-2 text-foreground mt-6;
   }
 
   h3 {
-    @apply text-xl font-bold mb-2;
+    @apply text-xl font-bold mb-2 text-foreground mt-6;
   }
 
   h4 {
-    @apply text-lg font-bold mb-2;
+    @apply text-lg font-bold mb-2 text-foreground mt-6;
   }
 
   h5 {
-    @apply text-base font-bold mb-2;
+    @apply text-base font-bold mb-2 text-foreground mt-6;
   }
 
   h6 {
-    @apply text-sm font-bold mb-2;
+    @apply text-sm font-bold mb-2 text-foreground mt-6;
   }
 
   p {

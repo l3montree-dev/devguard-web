@@ -630,7 +630,7 @@ const Index: FunctionComponent = () => {
               <h1 className="text-2xl font-semibold">
                 {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
               </h1>
-              <div className="mt-4 text-muted-foreground">
+              <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <Markdown>{vuln.cve?.description}</Markdown>
                 ) : (
