@@ -2,6 +2,7 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useSession } from "@/context/SessionContext";
 
 import Page from "@/components/Page";
 import { FirstPartyVuln, Paged } from "@/types/api/api";
@@ -83,6 +84,7 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
 const Index: FunctionComponent = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { session } = useSession();
 
   let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -149,15 +151,17 @@ const Index: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <Button onClick={() => setIsOpen(true)} variant="default">
-          Identify Risks
-        </Button>
+        {session && (
+          <Button onClick={() => setIsOpen(true)} variant="default">
+            Identify Risks
+          </Button>
+        )}
       </div>
       <Section
         forceVertical
         primaryHeadline
-        title="Identified Risks"
-        description="This table shows all the identified risks for this repository."
+        title="Identified Code Risks"
+        description="This table shows all the identified code risks for this repository."
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-row gap-2">

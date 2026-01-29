@@ -223,8 +223,10 @@ const columnsDef: ColumnDef<
     id: "dependency_purl",
     cell: (row) => (
       <span className="flex flex-row items-start gap-2">
-        <EcosystemImage packageName={row.getValue()} />
-        {beautifyPurl(row.getValue())}
+        <span className="flex-shrink-0 mt-0.5">
+          <EcosystemImage packageName={row.getValue()} size={20} />
+        </span>
+        <span className="break-words">{beautifyPurl(row.getValue())}</span>
       </span>
     ),
   }),

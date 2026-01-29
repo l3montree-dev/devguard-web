@@ -50,6 +50,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Input } from "@/components/ui/input";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { useSession } from "@/context/SessionContext";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -68,6 +69,7 @@ const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
+  const { session } = useSession();
   const [syncRunning, setSyncRunning] = useState(false);
   const searchParams = useSearchParams();
 
@@ -236,6 +238,7 @@ const OrganizationHomePage: FunctionComponent = () => {
         <Section
           primaryHeadline
           Button={
+            session &&
             !activeOrg.externalEntityProviderId && (
               <Button
                 disabled={
@@ -244,7 +247,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 }
                 onClick={() => setOpen(true)}
               >
-                New Group
+                Create New Group
               </Button>
             )
           }

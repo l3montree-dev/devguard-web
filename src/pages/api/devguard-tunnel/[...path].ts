@@ -5,6 +5,8 @@ import { Readable } from "node:stream";
 export const config = {
   api: {
     bodyParser: false,
+    // dependency-graph >4MB possible
+    responseLimit: "12mb",
   },
 };
 

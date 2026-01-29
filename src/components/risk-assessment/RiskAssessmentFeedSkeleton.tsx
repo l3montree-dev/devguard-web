@@ -31,7 +31,7 @@ export default function RiskAssessmentFeedSkeleton() {
                 "opacity-75",
                 "relative flex flex-row items-start gap-4 transition-all",
               )}
-              key={event}
+              key={index}
             >
               <div
                 className={classNames(
@@ -46,9 +46,9 @@ export default function RiskAssessmentFeedSkeleton() {
                     <Skeleton className="rounded-full h-[30px] w-[30px]" />
                     <div className="w-full overflow-hidden rounded border">
                       <div className="w-full">
-                        <p className="w-full bg-card px-2 py-2 pr-20 font-medium">
+                        <div className="w-full bg-card px-2 py-2 pr-20 font-medium">
                           <Skeleton className="w-full h-10" />
-                        </p>
+                        </div>
                       </div>
 
                       <div className="mdx-editor-content p-2">

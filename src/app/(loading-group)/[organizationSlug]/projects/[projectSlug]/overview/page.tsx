@@ -59,10 +59,12 @@ import { toast } from "sonner";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 
 const OverviewPage = () => {
   const search = useSearchParams();
+  const { session } = useSession();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -299,15 +301,17 @@ const OverviewPage = () => {
         <EmptyParty
           title={"No data available for this group yet..."}
           Button={
-            <Button
-              onClick={() => {
-                router?.push(
-                  `/${activeOrg.slug}/projects/${project.slug}/releases`,
-                );
-              }}
-            >
-              Create new release
-            </Button>
+            session ? (
+              <Button
+                onClick={() => {
+                  router?.push(
+                    `/${activeOrg.slug}/projects/${project.slug}/releases`,
+                  );
+                }}
+              >
+                Create new release
+              </Button>
+            ) : undefined
           }
           description="Create a release to group multiple repository artifacts into their own release. This allows you to track and monitor your software over time."
         />

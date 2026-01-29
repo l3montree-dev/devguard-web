@@ -47,21 +47,23 @@ const EcosystemImage = ({
   ) {
     return (
       <Tooltip>
-        <TooltipTrigger>
-          <Image
-            alt={"Logo von " + getEcosystem(packageName)}
-            width={size ?? 24}
-            height={size ?? 24}
-            className={classNames(
-              "inline-block",
-              invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
-            )}
-            src={
-              "/logos/" +
-              getEcosystem(packageName).toLowerCase() +
-              "-svgrepo-com.svg"
-            }
-          />
+        <TooltipTrigger asChild>
+          <span>
+            <Image
+              alt={"Logo von " + getEcosystem(packageName)}
+              width={size ?? 24}
+              height={size ?? 24}
+              className={classNames(
+                "inline-block",
+                invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",
+              )}
+              src={
+                "/logos/" +
+                getEcosystem(packageName).toLowerCase() +
+                "-svgrepo-com.svg"
+              }
+            />
+          </span>
         </TooltipTrigger>
         <TooltipContent>{getEcosystem(packageName)}</TooltipContent>
       </Tooltip>

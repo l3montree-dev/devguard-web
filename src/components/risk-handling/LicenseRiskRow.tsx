@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { LicenseRiskDTO } from "../../types/api/api";
 import ArtifactBadge from "../ArtifactBadge";
 import EcosystemImage from "../common/EcosystemImage";
+import { Badge } from "../ui/badge";
+import { getSeverityClassNames } from "../common/Severity";
 
 type Props = {
   risk: LicenseRiskDTO;
@@ -25,12 +27,23 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         "hover:bg-gray-50 dark:hover:bg-card",
       )}
     >
-      <td className="p-4 flex flex-row items-center gap-2">
-        <EcosystemImage packageName={risk.componentPurl} />{" "}
-        {beautifyPurl(risk.componentPurl)}
+      <td className="p-4 flex flex-row items-start gap-2">
+        <span className="flex-shrink-0 mt-0.5">
+          <EcosystemImage packageName={risk.componentPurl} size={20} />
+        </span>
+        <span className="break-words">{beautifyPurl(risk.componentPurl)}</span>
       </td>
 
-      <td className="p-4">{risk.component.license}</td>
+      <td className="p-4">
+        {!risk.component.license ||
+        risk.component.license.toLowerCase() === "unknown" ? (
+          <Badge className={getSeverityClassNames("MEDIUM", false)}>
+            Unknown
+          </Badge>
+        ) : (
+          risk.component.license
+        )}
+      </td>
       <td className="p-4">
         {risk.artifacts.map((artifact) => (
           <ArtifactBadge

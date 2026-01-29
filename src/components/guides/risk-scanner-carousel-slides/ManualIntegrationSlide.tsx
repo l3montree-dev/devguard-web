@@ -131,6 +131,7 @@ const ManualIntegrationSlide: FunctionComponent<
   );
   const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isTag, setIsTag] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Check if the selected branchOrTagName is in branches or tags and set isTag accordingly
   useEffect(() => {
@@ -559,13 +560,16 @@ const ManualIntegrationSlide: FunctionComponent<
             variant="secondary"
             id="manual-integration-back"
             onClick={() => api?.scrollTo(prevIndex)}
+            disabled={isUploading}
           >
             Back
           </Button>
           <Button
-            disabled={isUploadDisabled}
+            disabled={isUploadDisabled || isUploading}
+            isSubmitting={isUploading}
             id="manual-integration-continue"
-            onClick={() =>
+            onClick={() => {
+              setIsUploading(true);
               handleUpload({
                 branchOrTagName,
                 branchOrTagSlug,
@@ -575,10 +579,10 @@ const ManualIntegrationSlide: FunctionComponent<
                 // lets mark the first one as default
                 isDefault: !isTag && branches.length + tags.length === 0,
                 origin,
-              })
-            }
+              });
+            }}
           >
-            Upload
+            {isUploading ? "Scanning your SBOM..." : "Upload"}
           </Button>
         </div>
       </div>

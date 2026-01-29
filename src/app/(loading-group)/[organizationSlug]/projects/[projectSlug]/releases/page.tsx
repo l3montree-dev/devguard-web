@@ -21,6 +21,7 @@ import {
 import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
+import { useSession } from "../../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 import {
   CandidatesDTO,
@@ -34,6 +35,7 @@ const Releases = () => {
   const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
+  const { session } = useSession();
   const { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -113,7 +115,11 @@ const Releases = () => {
             title="Releases"
             forceVertical
             Button={
-              <Button onClick={() => setOpen(true)}>Create new Release</Button>
+              session ? (
+                <Button onClick={() => setOpen(true)}>
+                  Create new Release
+                </Button>
+              ) : undefined
             }
           >
             <ListRenderer

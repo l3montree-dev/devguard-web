@@ -13,8 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../utils/common";
 import Alert from "../common/Alert";
-interface InputWithButtonProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   value: string;
   nameKey: string;
@@ -65,7 +64,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
             {...inputProps}
             value={props.value ?? ""}
             className={classNames("w-full bg-transparent focus:outline-none")}
-            readOnly={!mutable}
+            readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
           <div className="flex flex-row items-center gap-2">

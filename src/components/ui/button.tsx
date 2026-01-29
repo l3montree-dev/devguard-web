@@ -41,7 +41,8 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
@@ -49,20 +50,25 @@ export interface ButtonProps
 const Button = React.forwardRef<
   HTMLButtonElement,
   ButtonProps & { isSubmitting?: boolean }
->(({ className, variant, size, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "button";
-  return (
-    <Comp
-      className={cn(buttonVariants({ variant, size, className }))}
-      ref={ref}
-      {...props}
-      disabled={props.disabled || props.isSubmitting}
-    >
-      {props.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {props.children}
-    </Comp>
-  );
-});
+>(
+  (
+    { className, variant, size, asChild = false, isSubmitting, ...props },
+    ref,
+  ) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+        disabled={props.disabled || isSubmitting}
+      >
+        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {props.children}
+      </Comp>
+    );
+  },
+);
 Button.displayName = "Button";
 
 const AsyncButton = React.forwardRef<

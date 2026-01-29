@@ -8,8 +8,7 @@ import { Label } from "./label";
 import { Button, ButtonProps } from "./button";
 import { Input } from "./input";
 
-interface InputWithButtonProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   value: string;
   onClick: () => void;

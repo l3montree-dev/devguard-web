@@ -128,7 +128,7 @@ export function RiskHistoryDistributionDiagram({
                     );
                   })}
                 </defs>
-                {["low", "medium", "high", "critical"].map((level) => (
+                {["critical", "high", "medium", "low"].map((level) => (
                   <Area
                     key={level}
                     dataKey={mode === "risk" ? level : level + "Cvss"}
