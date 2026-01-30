@@ -103,8 +103,8 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
               AGPL-3.0-License
             </Link>
           </div>
-          Copyright © {new Date().getFullYear()} L3montree GmbH and the
-          DevGuard Contributors. All rights reserved. Version{" "}
+          Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
+          Contributors. All rights reserved. Version{" "}
           {process.env.NEXT_PUBLIC_VERSION}
         </footer>
       </div>

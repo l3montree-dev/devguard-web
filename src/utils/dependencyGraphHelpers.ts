@@ -776,8 +776,10 @@ export const convertPathsToTree = (
   return root;
 };
 
-export interface ViewDependencyTreeNode
-  extends Omit<DependencyTreeNode, "children"> {
+export interface ViewDependencyTreeNode extends Omit<
+  DependencyTreeNode,
+  "children"
+> {
   risk: number;
   parents: Array<ViewDependencyTreeNode>;
   children: ViewDependencyTreeNode[];
