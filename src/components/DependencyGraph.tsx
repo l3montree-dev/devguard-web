@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import { DependencyVuln } from "@/types/api/api";
-import { ViewDependencyTreeNode } from "@/types/view/assetTypes";
+
 import { beautifyPurl, classNames } from "@/utils/common";
 
 import {
@@ -35,6 +35,7 @@ import {
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import "@xyflow/react/dist/base.css";
 import { useTheme } from "next-themes";
@@ -47,6 +48,7 @@ import {
   propagateHighlighting,
   traverseDownward,
   traverseUpward,
+  ViewDependencyTreeNode,
 } from "../utils/dependencyGraphHelpers";
 import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
 import { Button } from "./ui/button";
@@ -54,12 +56,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
@@ -184,8 +183,6 @@ const DependencyGraph: FunctionComponent<{
 
   useEffect(() => {
     setNodes(initialNodes);
-    console.log(highlightPath);
-
     // Apply highlighting to vulnerability path
     const edgesWithHighlight = initialEdges.map((edge) => {
       if (!highlightPath || highlightPath.length === 0) return edge;

@@ -13,17 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DependencyVuln } from "../types/api/api";
-import {
-  pathEntryToViewNode,
-  ViewDependencyTreeNode,
-} from "../types/view/assetTypes";
-import {
-  DependencyGraphNode,
-  LoadMoreNode,
-} from "../components/DependencyGraphNode";
 import dagre, { graphlib } from "@dagrejs/dagre";
-
+import {
+  DependencyTreeNode,
+  DependencyVuln,
+  MinimalDependencyTree,
+} from "../types/api/api";
 // Pagination settings
 export const MAX_CHILDREN_PER_PAGE = 50;
 export const INITIAL_CHILDREN_TO_SHOW = 20;
@@ -670,11 +665,37 @@ export const recursiveAddRisk = (
   // Global visited set for risk propagation - ensures each node is updated only once
   const propagationVisited = new Set<ViewDependencyTreeNode>();
 
+  // Track recursion stack for cycle detection. We keep both an array (stack)
+  // for identifying cycle members and a set for O(1) membership checks.
+  const recursionStack: ViewDependencyTreeNode[] = [];
+  const recursionSet = new Set<string>();
+
+  const markCycleFromIndex = (startIdx: number) => {
+    for (let i = startIdx; i < recursionStack.length; i++) {
+      recursionStack[i].hasCycle = true;
+    }
+  };
+
   // Then recursively process the tree
   const processNode = (n: ViewDependencyTreeNode) => {
+    // If the node is already on the current recursion stack -> we've found a cycle
+    if (recursionSet.has(n.name)) {
+      const idx = recursionStack.findIndex((x) => x.name === n.name);
+      if (idx !== -1) {
+        // Mark all nodes that are part of the cycle
+        markCycleFromIndex(idx);
+      }
+      // Stop further traversal along this path to avoid infinite recursion
+      return;
+    }
+
     // Skip if already processed (handles diamond dependencies)
     if (processedNodes.has(n)) return;
     processedNodes.add(n);
+
+    // Push onto recursion stack
+    recursionSet.add(n.name);
+    recursionStack.push(n);
 
     const nodeFlaws = vulns.filter((p) => p.componentPurl === n.name);
 
@@ -688,7 +709,15 @@ export const recursiveAddRisk = (
     }
 
     // Recursively process all children
-    n.children.forEach((child) => processNode(child));
+    for (const child of n.children) {
+      // If child is already known to participate in a cycle, skip descending into it
+      if (child.hasCycle) continue;
+      processNode(child);
+    }
+
+    // Pop from recursion stack
+    recursionStack.pop();
+    recursionSet.delete(n.name);
   };
 
   processNode(node);
@@ -745,4 +774,137 @@ export const convertPathsToTree = (
   }
   recursiveAddRisk(root, vulns);
   return root;
+};
+
+export interface ViewDependencyTreeNode
+  extends Omit<DependencyTreeNode, "children"> {
+  risk: number;
+  parents: Array<ViewDependencyTreeNode>;
+  children: ViewDependencyTreeNode[];
+  nodeType: "root" | "artifact" | "component" | "infosource";
+  infoSourceType?: "sbom" | "csaf" | "vex";
+  // Optional flag that marks nodes participating in a cycle. Used to avoid infinite recursion and for UI highlighting.
+  hasCycle?: boolean;
+}
+
+export function minimalTreeToViewDependencyTreeNode(
+  tree?: MinimalDependencyTree,
+): ViewDependencyTreeNode {
+  if (!tree) {
+    return {
+      name: "ROOT",
+      risk: 0,
+      parents: [],
+      children: [],
+      nodeType: "component",
+    };
+  }
+
+  const nodes = new Map<string, ViewDependencyTreeNode>();
+
+  // Create all nodes
+  for (const entry of tree.nodes) {
+    nodes.set(entry, pathEntryToViewNode(entry));
+  }
+
+  // now recursively add children
+  for (const [parentEntry, childEntries] of Object.entries(tree.dependencies)) {
+    const parentNode = nodes.get(parentEntry);
+    if (parentNode) {
+      for (const childEntry of childEntries) {
+        const childNode = nodes.get(childEntry);
+        if (childNode) {
+          parentNode.children.push(childNode);
+          childNode.parents.push(parentNode);
+        }
+      }
+    }
+  }
+
+  return nodes.get("")!;
+}
+
+export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
+  if (!entry.includes(":")) {
+  }
+  const parts = entry.split(":");
+  let nodeType: "root" | "artifact" | "component" | "infosource";
+  let infoSourceType: "sbom" | "csaf" | "vex" | undefined = undefined;
+  if (parts.length === 1) {
+    nodeType = "root";
+  } else {
+    const prefix = parts[0];
+    switch (prefix) {
+      case "artifact":
+        nodeType = "artifact";
+        break;
+      case "sbom":
+        nodeType = "infosource";
+        infoSourceType = "sbom";
+        break;
+      case "vex":
+        nodeType = "infosource";
+        infoSourceType = "vex";
+        break;
+      case "csaf":
+        nodeType = "infosource";
+        infoSourceType = "csaf";
+        break;
+      default:
+        nodeType = "component";
+    }
+  }
+
+  return {
+    name: entry === "" ? "ROOT" : entry,
+    children: [],
+    risk: 0,
+    parents: [],
+    nodeType,
+    infoSourceType,
+  };
+};
+
+export const convertGraph = (
+  graph: DependencyTreeNode,
+  parent: ViewDependencyTreeNode | null = null,
+): ViewDependencyTreeNode => {
+  const convertedNode = pathEntryToViewNode(graph.name);
+  if (parent !== null && !convertedNode.parents.includes(parent))
+    convertedNode.parents.push(parent);
+  convertedNode.children = graph.children.map((child) =>
+    convertGraph(child, convertedNode),
+  );
+  return convertedNode;
+};
+
+export const recursiveRemoveWithoutRisk = (
+  node: ViewDependencyTreeNode,
+  recursionSet: Set<string> = new Set(),
+) => {
+  // Detect cycles by tracking nodes in the current recursion stack using their names.
+  if (recursionSet.has(node.name)) {
+    // Mark node as being part of a cycle so callers can handle it specially if needed
+    node.hasCycle = true;
+    // Stop further descent to avoid infinite recursion. Preserve the node (don't prune).
+    return node;
+  }
+
+  // Add current node to recursion set
+  recursionSet.add(node.name);
+
+  // If this node has no risk, prune it (and its subtree)
+  if (node.risk === 0) {
+    recursionSet.delete(node.name);
+    return null;
+  }
+
+  // Recurse into children safely, passing down the same recursion set
+  node.children = node.children
+    .map((c) => recursiveRemoveWithoutRisk(c, recursionSet))
+    .filter((n): n is ViewDependencyTreeNode => n !== null);
+
+  // Remove current node from recursion set before returning
+  recursionSet.delete(node.name);
+  return node;
 };

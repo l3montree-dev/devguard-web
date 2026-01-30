@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "use client";
 
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
@@ -23,23 +24,22 @@ import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDimensions from "@/hooks/useDimensions";
-import { DependencyTreeNode, DependencyVuln } from "@/types/api/api";
-import {
-  pathEntryToViewNode,
-  ViewDependencyTreeNode,
-} from "@/types/view/assetTypes";
+import { DependencyVuln, MinimalDependencyTree } from "@/types/api/api";
 import { classNames, toSearchParams } from "@/utils/common";
-import { FunctionComponent, useMemo } from "react";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { FunctionComponent, useMemo } from "react";
 import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
-import { recursiveAddRisk } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import {
+  minimalTreeToViewDependencyTreeNode,
+  recursiveAddRisk,
+  recursiveRemoveWithoutRisk,
+} from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -74,7 +74,7 @@ const DependencyGraphPage: FunctionComponent = () => {
     fetcher,
   );
 
-  const { data: graphData } = useSWR<DependencyTreeNode>(
+  const { data: graphData } = useSWR<MinimalDependencyTree>(
     uri +
       "/dependency-graph/?" +
       toSearchParams({
@@ -93,7 +93,7 @@ const DependencyGraphPage: FunctionComponent = () => {
       return null;
     }
 
-    let converted = convertGraph(graphData);
+    let converted = minimalTreeToViewDependencyTreeNode(graphData);
 
     recursiveAddRisk(converted, affectedComponents ?? []);
 
@@ -167,26 +167,3 @@ const DependencyGraphPage: FunctionComponent = () => {
 };
 
 export default DependencyGraphPage;
-
-const convertGraph = (
-  graph: DependencyTreeNode,
-  parent: ViewDependencyTreeNode | null = null,
-): ViewDependencyTreeNode => {
-  const convertedNode = pathEntryToViewNode(graph.name);
-  if (parent !== null && !convertedNode.parents.includes(parent))
-    convertedNode.parents.push(parent);
-  convertedNode.children = graph.children.map((child) =>
-    convertGraph(child, convertedNode),
-  );
-  return convertedNode;
-};
-
-const recursiveRemoveWithoutRisk = (node: ViewDependencyTreeNode) => {
-  if (node.risk === 0) {
-    return null;
-  }
-  node.children = node.children
-    .map(recursiveRemoveWithoutRisk)
-    .filter((n): n is ViewDependencyTreeNode => n !== null);
-  return node;
-};

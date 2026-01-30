@@ -13,7 +13,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../utils/common";
 import Alert from "../common/Alert";
-interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputWithButtonProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   value: string;
   nameKey: string;

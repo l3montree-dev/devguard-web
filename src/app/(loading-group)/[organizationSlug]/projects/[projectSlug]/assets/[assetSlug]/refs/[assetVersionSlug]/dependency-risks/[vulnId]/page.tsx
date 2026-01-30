@@ -71,8 +71,10 @@ import { Skeleton } from "../../../../../../../../../../../components/ui/skeleto
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import { ViewDependencyTreeNode } from "../../../../../../../../../../../types/view/assetTypes";
-import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import {
+  convertPathsToTree,
+  ViewDependencyTreeNode,
+} from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -526,6 +528,49 @@ const Index: FunctionComponent = () => {
         description: "You need to provide a justification for your decision.",
       });
       return false;
+    }
+
+    // If the user selects a path suffix, we should create a False Positive Rule via the dedicated endpoint
+    // instead of sending the pathPattern in the vulnerability event (the vuln model no longer accepts pathPattern).
+    if (
+      data.status === "falsePositive" &&
+      data.pathPattern &&
+      data.pathPattern.length > 0
+    ) {
+      const resp = await browserApiClient(
+        "/api/v1/organizations/" +
+          activeOrg.slug +
+          "/projects/" +
+          project.slug +
+          "/assets/" +
+          asset.slug +
+          "/false-positive-rules",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cveId: vuln?.cveID,
+            justification: data.justification ?? "",
+            mechanicalJustification: data.mechanicalJustification ?? "",
+            pathPattern: data.pathPattern,
+          }),
+        },
+        "",
+      );
+
+      if (!resp.ok) {
+        toast("Failed to create false positive rule", {
+          description: "Please try again later.",
+        });
+        return false;
+      }
+
+      // Refresh the vuln details to reflect the applied rule
+      await mutate();
+      setJustification("");
+      return true;
     }
 
     await mutate(async (prev) => {
