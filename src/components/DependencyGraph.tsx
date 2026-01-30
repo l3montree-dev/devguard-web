@@ -95,7 +95,9 @@ const DependencyGraph: FunctionComponent<{
   variant?: "compact";
   vulns: Array<DependencyVuln>;
   graph: ViewDependencyTreeNode;
-  onVexSelect?: (selection: VexSelection) => void;
+  // Handler for context-menu VEX actions. Can be async and should return `true` if it handled the action
+  // (for example by creating a false-positive rule). If it returns falsy / undefined, component will still close the menu.
+  onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
   highlightPath?: string[];
 }> = ({
   graph,
@@ -537,24 +539,40 @@ const DependencyGraph: FunctionComponent<{
 
   // Handle VEX selection from context menu
   const handleVexOptionClick = useCallback(
-    (justification: string) => {
-      if (!contextMenu || !onVexSelect) return;
+    async (justification: string) => {
+      if (!contextMenu) return;
 
-      if (contextMenu.type === "edge") {
-        onVexSelect({
-          type: "edge",
-          justification,
-          parentName: contextMenu.parentName,
-          childName: contextMenu.childName,
-        });
-      } else if (contextMenu.type === "node") {
-        onVexSelect({
-          type: "node",
-          justification,
-          nodeName: contextMenu.nodeName,
-        });
+      if (!onVexSelect) {
+        closeContextMenu();
+        return;
       }
 
+      const selection: VexSelection =
+        contextMenu.type === "edge"
+          ? {
+              type: "edge",
+              justification,
+              parentName: contextMenu.parentName,
+              childName: contextMenu.childName,
+            }
+          : {
+              type: "node",
+              justification,
+              nodeName: contextMenu.nodeName,
+            };
+
+      try {
+        const res = await onVexSelect(selection as VexSelection);
+        // If handler returned true (handled), close and don't do anything else
+        if (res === true) {
+          closeContextMenu();
+          return;
+        }
+      } catch (err) {
+        // swallow error and continue to close menu
+      }
+
+      // Ensure menu is closed in all cases
       closeContextMenu();
     },
     [contextMenu, onVexSelect, closeContextMenu],

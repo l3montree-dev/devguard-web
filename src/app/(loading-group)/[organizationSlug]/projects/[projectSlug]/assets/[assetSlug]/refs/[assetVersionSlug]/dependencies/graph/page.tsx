@@ -23,23 +23,19 @@ import Page from "@/components/Page";
 import { Switch } from "@/components/ui/switch";
 import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useDependencyGraph } from "@/hooks/useDependencyGraph";
 import useDimensions from "@/hooks/useDimensions";
 import { DependencyVuln, MinimalDependencyTree } from "@/types/api/api";
 import { classNames, toSearchParams } from "@/utils/common";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent } from "react";
 import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
-import {
-  minimalTreeToViewDependencyTreeNode,
-  recursiveAddRisk,
-  recursiveRemoveWithoutRisk,
-} from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -88,22 +84,11 @@ const DependencyGraphPage: FunctionComponent = () => {
     },
   );
 
-  const graph = useMemo(() => {
-    if (!graphData) {
-      return null;
-    }
-
-    let converted = minimalTreeToViewDependencyTreeNode(graphData);
-
-    recursiveAddRisk(converted, affectedComponents ?? []);
-
-    // this wont remove anything, if the root node has 0 risk - thats not a bug, its a feature :)
-    if (searchParams?.get("all") !== "1") {
-      recursiveRemoveWithoutRisk(converted);
-    }
-
-    return converted;
-  }, [graphData, searchParams, affectedComponents]);
+  const graph = useDependencyGraph(
+    graphData,
+    affectedComponents ?? [],
+    searchParams?.get("all") === "1",
+  );
 
   const push = useRouterQuery();
 

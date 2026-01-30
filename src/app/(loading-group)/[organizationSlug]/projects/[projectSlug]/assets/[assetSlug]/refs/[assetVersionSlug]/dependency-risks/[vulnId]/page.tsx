@@ -27,6 +27,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
+import { useCreateFalsePositiveRule } from "@/hooks/useCreateFalsePositiveRule";
 import {
   AssetDTO,
   DependencyVulnHints,
@@ -417,6 +418,15 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
+  // Handler to create false-positive rules from the dependency graph context menu
+  const createFalsePositive = useCreateFalsePositiveRule({
+    activeOrgSlug: activeOrg.slug,
+    projectSlug: project.slug,
+    assetSlug: asset.slug,
+    cveId: vuln?.cveID ?? null,
+    mutate: mutate ?? (() => Promise.resolve()),
+  });
+
   const { data: graphResponse, isLoading: graphLoading } = useSWR<
     Array<Array<string>>
   >(
@@ -793,6 +803,7 @@ const Index: FunctionComponent = () => {
                           graph={graphData}
                           vulns={[vuln]}
                           highlightPath={["ROOT", ...vuln.vulnerabilityPath]}
+                          onVexSelect={createFalsePositive}
                         />
                       )}
                     </div>
