@@ -13,13 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ExternalTicketProvider, State } from "@/types/common";
+import { State } from "@/types/common";
 import { defaultScanner } from "./view";
 import { UserRole } from "@/types/api/api";
-import {
-  pathEntryToViewNode,
-  ViewDependencyTreeNode,
-} from "@/types/view/assetTypes";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
