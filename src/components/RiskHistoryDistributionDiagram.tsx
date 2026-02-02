@@ -53,19 +53,35 @@ export function RiskHistoryDistributionDiagram({
           <ResponsiveContainer width="100%" height={300}>
             <ChartContainer
               config={{
-                critical: {
+                cvePurlCritical: {
                   label: "Critical",
                   color: severityToColor("CRITICAL"),
                 },
-                high: {
+                cvePurlCriticalCvss: {
+                  label: "Critical",
+                  color: severityToColor("CRITICAL"),
+                },
+                cvePurlHigh: {
                   label: "High",
                   color: severityToColor("HIGH"),
                 },
-                medium: {
+                cvePurlHighCvss: {
+                  label: "High",
+                  color: severityToColor("HIGH"),
+                },
+                cvePurlMedium: {
                   label: "Medium",
                   color: severityToColor("MEDIUM"),
                 },
-                low: {
+                cvePurlMediumCvss: {
+                  label: "Medium",
+                  color: severityToColor("MEDIUM"),
+                },
+                cvePurlLow: {
+                  label: "Low",
+                  color: severityToColor("LOW"),
+                },
+                cvePurlLowCvss: {
                   label: "Low",
                   color: severityToColor("LOW"),
                 },
