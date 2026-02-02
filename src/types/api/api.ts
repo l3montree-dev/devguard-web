@@ -905,6 +905,6 @@ export type VexRule = {
 
   // Indicates if the rule applies to any dependency vuln
   effectCount: number;
-}
+};
 
 export type VexRulesDTO = Paged<VexRule>;
