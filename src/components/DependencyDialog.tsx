@@ -180,9 +180,11 @@ const DependencyDialog: FunctionComponent<Props> = ({
                   the security practices of a project, helping maintainers
                   identify areas for improvement.
                 </div>
-                <hr className="pb-2" />
                 {scoreCard && (
-                  <OpenSsfDetails scoreCard={scoreCard}></OpenSsfDetails>
+                  <>
+                    <hr className="pb-2" />
+                    <OpenSsfDetails scoreCard={scoreCard}></OpenSsfDetails>
+                  </>
                 )}
               </div>
             }
