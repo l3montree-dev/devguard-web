@@ -6,6 +6,7 @@ import ArtifactForm from "@/components/common/ArtifactForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
+import Callout from "@/components/common/Callout";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
@@ -26,14 +27,6 @@ import {
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { classNames } from "../../../../../../../../../../utils/common";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../../../../../../../../../components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,16 +40,11 @@ import {
 import { TriangleAlert } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
-import { Badge } from "../../../../../../../../../../components/ui/badge";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
-
-const getInformationSourceBadgeVariant = (
-  type: InformationSources["type"],
-): "success" | "blue" | "outline" => {
-  if (type === "vex") return "success";
-  if (type === "sbom") return "blue";
-  return "outline";
-};
+import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
+import { documentationLinks } from "@/const/documentationLinks";
+import Link from "next/link";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -77,6 +65,10 @@ const Artifacts = () => {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<ArtifactDTO | null>(
     null,
+  );
+
+  const [selectedSourceUrls, setSelectedSourceUrls] = useState<Set<string>>(
+    new Set(),
   );
 
   const params = useDecodedParams() as {
@@ -301,133 +293,141 @@ const Artifacts = () => {
     );
   }, [rootNodes]);
 
+  const handleToggleSource = (url: string) => {
+    setSelectedSourceUrls((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) {
+        next.delete(url);
+      } else {
+        next.add(url);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleAllSources = (urls: string[]) => {
+    setSelectedSourceUrls((prev) => {
+      const next = new Set(prev);
+      const allSelected = urls.every((url) => next.has(url));
+      if (allSelected) {
+        urls.forEach((url) => next.delete(url));
+      } else {
+        urls.forEach((url) => next.add(url));
+      }
+      return next;
+    });
+  };
+
+  const handleBulkDeleteSources = async () => {
+    const urlsToDelete = Array.from(selectedSourceUrls);
+    toast.info(`Deleting ${urlsToDelete.length} SBOM source(s)...`);
+    // TODO: Implement actual bulk delete API call
+    setSelectedSourceUrls(new Set());
+    mutate();
+  };
+
   return (
-    <Page Menu={assetMenu} title={"Artifacts"} Title={<AssetTitle />}>
+    <Page Menu={assetMenu} title={"Manage Artifacts"} Title={<AssetTitle />}>
       <div className="flex flex-row">
         <div className="flex-1">
-          <BranchTagSelector branches={branches} tags={tags} />
+          <div className="mb-4 flex items-center justify-between">
+            <BranchTagSelector branches={branches} tags={tags} />
+            {session && (
+              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+            )}
+          </div>
           <Section
             primaryHeadline
-            description="Manage and view artifacts associated with this asset version."
-            title="Artifacts"
-            forceVertical
-            Button={
-              session ? (
-                <Button onClick={openCreateDialog}>Create new Artifact</Button>
-              ) : undefined
+            description={
+              <span>
+                Manage and view artifacts associated with this ref (branch or
+                tag). An artifact represents a build output or deliverable
+                linked to your repository (e.g. source code, binaries, container
+                images).{" "}
+                <Link
+                  className="text-primary text-sm inline-flex items-center gap-1"
+                  href={documentationLinks.artifactExplaining}
+                  target="_blank"
+                >
+                  <QuestionMarkCircleIcon className="w-3 h-3" />
+                  Learn more about artifacts.
+                </Link>
+              </span>
             }
+            title="Manage Artifacts"
+            forceVertical
           >
             <div>
               {artifacts.length === 0 ? (
                 <EmptyParty
                   title="No Artifacts Available"
-                  description="There are currently no artifacts associated with this asset version."
+                  description="There are currently no artifacts associated with this ref (branch or tag)."
                 />
               ) : (
-                <div>
-                  {nodesTypes.length > 0 && (
-                    <div className="text-xs font-medium text-muted-foreground mb-2">
-                      <span className="mr-1">Legend</span>
-                      {nodesTypes.map((type) => (
-                        <Badge
-                          key={type}
-                          variant={getInformationSourceBadgeVariant(type)}
-                          className="mr-1"
-                        >
-                          {type}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <div className="overflow-hidden rounded-lg border shadow-sm">
-                    <div className="overflow-auto">
-                      <table className="w-full table-fixed overflow-x-auto text-sm">
-                        <thead className="border-b bg-card text-foreground">
-                          <tr>
-                            <th className="p-4 text-left">Name</th>
-                            <th className="p-4 text-left">
-                              Information sources
-                            </th>
-                            <th />
+                <div className="overflow-hidden rounded-lg border shadow-sm">
+                  <div className="overflow-auto">
+                    <table className="w-full overflow-x-auto text-sm">
+                      <thead className="border-b bg-card text-foreground">
+                        {/* Bulk action row - shown when sources are selected and user is logged in */}
+                        {session && selectedSourceUrls.size > 0 && (
+                          <tr className="bg-muted/50">
+                            <td colSpan={3} className="px-4 py-2">
+                              <div className="flex flex-row items-center justify-between">
+                                <span className="text-sm mr-2">
+                                  {selectedSourceUrls.size} SBOM source
+                                  {selectedSourceUrls.size !== 1
+                                    ? "s"
+                                    : ""}{" "}
+                                  selected
+                                </span>
+                                <div className="flex flex-row items-center gap-2">
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={handleBulkDeleteSources}
+                                  >
+                                    Delete Selected
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      setSelectedSourceUrls(new Set())
+                                    }
+                                  >
+                                    Clear Selection
+                                  </Button>
+                                </div>
+                              </div>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {artifacts.map((artifact, i) => (
-                            <tr
-                              key={artifact.artifactName}
-                              className={classNames(
-                                "border-b",
-                                i % 2 !== 0 && "bg-card/50",
-                              )}
-                            >
-                              <td className="content-start p-4 text-left font-medium">
-                                {artifact.artifactName}
-                              </td>
-                              <td className="px-4 py-2">
-                                {artifact.artifactName in rootNodes! &&
-                                rootNodes![artifact.artifactName].length > 0 ? (
-                                  <div className="flex flex-row flex-wrap gap-2">
-                                    {rootNodes![artifact.artifactName].map(
-                                      (node) => (
-                                        <Badge
-                                          key={node.url}
-                                          variant={getInformationSourceBadgeVariant(
-                                            node.type,
-                                          )}
-                                        >
-                                          {node.url}
-                                        </Badge>
-                                      ),
-                                    )}
-                                  </div>
-                                ) : (
-                                  <span className="text-muted-foreground">
-                                    No upstream URLs
-                                  </span>
-                                )}
-                              </td>
-                              {session && (
-                                <td className="px-4 py-2 content-start text-right">
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger
-                                      className="artifact-options"
-                                      asChild
-                                    >
-                                      <Button variant="ghost" size={"icon"}>
-                                        <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem
-                                        onClick={() => openEditDialog(artifact)}
-                                      >
-                                        Edit
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          syncExternalSources(
-                                            artifact.artifactName,
-                                          )
-                                        }
-                                      >
-                                        Sync External Sources
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          setDeleteDialogOpen(artifact)
-                                        }
-                                      >
-                                        Delete
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </td>
-                              )}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                        )}
+                        <tr>
+                          <th className="p-4 text-left">Artifact Name</th>
+                          <th className="p-4 text-left">SBOM Sources</th>
+                          {session && <th className="w-12" />}
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm text-foreground">
+                        {artifacts.map((artifact, i) => (
+                          <ArtifactRow
+                            key={artifact.artifactName}
+                            artifact={artifact}
+                            index={i}
+                            rootNodes={rootNodes![artifact.artifactName] || []}
+                            hasSession={!!session}
+                            selectedSourceUrls={selectedSourceUrls}
+                            onToggleSource={handleToggleSource}
+                            onToggleAllSources={handleToggleAllSources}
+                            onEdit={() => openEditDialog(artifact)}
+                            onSync={() =>
+                              syncExternalSources(artifact.artifactName)
+                            }
+                            onDelete={() => setDeleteDialogOpen(artifact)}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}

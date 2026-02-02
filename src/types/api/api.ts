@@ -886,3 +886,25 @@ export interface PURLInspectResponse {
   affectedComponents: AffectedComponent[];
   vulns: VulnInPackage[];
 }
+
+export type VexRule = {
+  // Composite key fields
+  assetId: string;
+  cveId: string;
+  pathPatternHash: string;
+  vexSource: string;
+
+  // Rule data
+  justification: string;
+  mechanicalJustification: string;
+  eventType: VulnEventDTO;
+  pathPattern: string; // PathPattern type to be defined
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // Indicates if the rule applies to any dependency vuln
+  effectCount: number;
+}
+
+export type VexRulesDTO = Paged<VexRule>;

@@ -21,7 +21,7 @@ import {
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { CodeIcon, ScanText, TextSelect } from "lucide-react";
+import { CodeIcon, BookCheckIcon, ScanText, TextSelect } from "lucide-react";
 import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
@@ -107,24 +107,6 @@ export const useAssetMenu = () => {
 
   if ((activeAsset?.refs?.length ?? 0) > 0) {
     menu.unshift({
-      title: "Compliance",
-      href:
-        "/" +
-        orgSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/compliance",
-      Icon: ScaleIcon,
-      isActive: pathname.startsWith(
-        `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance`,
-      ),
-    });
-
-    menu.unshift({
       title: "Overview",
       href:
         "/" +
@@ -150,7 +132,7 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "Artifacts",
+        title: "Dependency Risks",
         href:
           "/" +
           orgSlug +
@@ -160,9 +142,9 @@ export const useAssetMenu = () => {
           assetSlug +
           "/refs/" +
           assetVersionSlug +
-          "/artifacts",
-        Icon: TextSelect,
-        isActive: pathname.includes("artifacts"),
+          "/dependency-risks",
+        Icon: WrenchScrewdriverIcon,
+        isActive: pathname.includes("dependency-risks"),
       },
       {
         title: "Code Risks",
@@ -180,21 +162,6 @@ export const useAssetMenu = () => {
         isActive: pathname.includes("code-risks"),
       },
       {
-        title: "Dependency Risks",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/dependency-risks",
-        Icon: WrenchScrewdriverIcon,
-        isActive: pathname.includes("dependency-risks"),
-      },
-      {
         title: "License Risks",
         href:
           "/" +
@@ -210,7 +177,7 @@ export const useAssetMenu = () => {
         isActive: pathname.includes("license-risks"),
       },
       {
-        title: "Dependencies",
+        title: "Dependency Insights",
         href:
           "/" +
           orgSlug +
@@ -223,6 +190,36 @@ export const useAssetMenu = () => {
           "/dependencies",
         Icon: ShareIcon,
         isActive: pathname.includes("dependencies"),
+      },
+      {
+        title: "VEX Rules",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/vex-rules",
+        Icon: BookCheckIcon,
+        isActive: pathname.includes("vex-rules"),
+      },
+      {
+        title: "Artifacts",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/artifacts",
+        Icon: TextSelect,
+        isActive: pathname.includes("artifacts"),
       },
     ]);
   } else {

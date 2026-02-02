@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 export const documentationLinks = {
   docsIntroduction: "https://devguard.org/introduction",
-  sbomExplaining: "https://devguard.org/concept-guides/explaining-sboms",
+  sbomExplaining: "https://devguard.org/explanations/explaining-sboms",
   vexExplaining:
-    "https://devguard.org/concepts/vulnerability-management/joint-vulnerability-management-vex",
+    "https://devguard.org/explanations/compliance/csaf-vex-explained",
+  artifactExplaining:
+    "https://devguard.org/explanations/core-concepts/artifacts",
   acceptRisk:
     "https://devguard.org/explanations/vulnerability-management/vulnerability-events#4-accept-risk",
   riskCalculation:
