@@ -320,10 +320,72 @@ const Artifacts = () => {
 
   const handleBulkDeleteSources = async () => {
     const urlsToDelete = Array.from(selectedSourceUrls);
+    if (urlsToDelete.length === 0) return;
+
+    // Group selected URLs by artifact
+    const artifactUpdates: Array<{
+      artifactName: string;
+      remainingSources: InformationSources[];
+    }> = [];
+    
+    for (const artifact of artifacts) {
+      const artifactSources = rootNodes?.[artifact.artifactName] || [];
+      const remainingSources = artifactSources.filter(
+        (source) => !urlsToDelete.includes(source.url)
+      );
+      
+      // Only include artifacts that have sources being deleted
+      if (remainingSources.length !== artifactSources.length) {
+        artifactUpdates.push({
+          artifactName: artifact.artifactName,
+          remainingSources,
+        });
+      }
+    }
+
+    if (artifactUpdates.length === 0) {
+      toast.info("No sources to delete");
+      return;
+    }
+
     toast.info(`Deleting ${urlsToDelete.length} SBOM source(s)...`);
-    // TODO: Implement actual bulk delete API call
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const { artifactName, remainingSources } of artifactUpdates) {
+      const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
+      
+      try {
+        const response = await browserApiClient(url, {
+          method: "PUT",
+          body: JSON.stringify({
+            artifactName,
+            informationSources: remainingSources,
+          }),
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          errorCount++;
+          console.error(`Failed to update artifact ${artifactName}:`, response.statusText);
+        }
+      } catch (error) {
+        errorCount++;
+        console.error(`Error updating artifact ${artifactName}:`, error);
+      }
+    }
+
+    if (successCount > 0) {
+      toast.success(`Successfully removed sources from ${successCount} artifact(s)`);
+      mutate();
+    }
+    if (errorCount > 0) {
+      toast.error(`Failed to update ${errorCount} artifact(s)`);
+    }
+
     setSelectedSourceUrls(new Set());
-    mutate();
   };
 
   return (

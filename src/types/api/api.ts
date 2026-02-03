@@ -241,8 +241,7 @@ interface EventArbitraryJsonData {
 
 export enum UpstreamState {
   Internal = 0,
-  AcceptedFromUpstream = 1,
-  PendingUpstream = 2,
+  Upstream = 2,
 }
 interface BaseVulnEventDTO {
   userId: string;
@@ -257,7 +256,7 @@ interface BaseVulnEventDTO {
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
-  upstream: number;
+  upstream: UpstreamState;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
@@ -643,7 +642,7 @@ export interface ArtifactCreateUpdateRequest {
 
 export interface InformationSources {
   url: string;
-  type?: "csaf" | "vex" | "sbom";
+  type: "csaf" | "vex" | "sbom";
   purl?: string;
 }
 
@@ -888,23 +887,33 @@ export interface PURLInspectResponse {
 }
 
 export type VexRule = {
-  // Composite key fields
+  // Primary key
+  id: string;
+
+  // Composite key components
   assetId: string;
   cveId: string;
-  pathPatternHash: string;
   vexSource: string;
 
   // Rule data
   justification: string;
   mechanicalJustification: string;
-  eventType: VulnEventDTO;
-  pathPattern: string; // PathPattern type to be defined
+  eventType: string;
+  pathPattern: string[];
   createdById: string;
   createdAt: string;
   updatedAt: string;
 
-  // Indicates if the rule applies to any dependency vuln
-  effectCount: number;
+  // Metrics - indicates how many dependency vulns this rule applies to
+  appliesToAmountOfDependencyVulns: number;
 };
 
 export type VexRulesDTO = Paged<VexRule>;
+
+export type ExternalReference = {
+  id: string;
+  assetId: string;
+  assetVersionName: string;
+  url: string;
+  type: string;
+}

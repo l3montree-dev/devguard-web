@@ -119,7 +119,7 @@ export const eventTypeMessages = (
     case "reopened":
       return "reopened " + flawName;
     case "accepted":
-      if (event.upstream === UpstreamState.AcceptedFromUpstream) {
+      if (event.upstream === UpstreamState.Upstream) {
         return "won't fix " + flawName;
       }
       return "accepted the risk of " + flawName;

@@ -7,6 +7,7 @@ interface UseCreateParams {
   activeOrgSlug: string;
   projectSlug: string;
   assetSlug: string;
+  assetVersionSlug: string;
   // vulnerability cve id
   cveId?: string | null;
   // mutate function to refresh vuln after creation
@@ -14,10 +15,11 @@ interface UseCreateParams {
 }
 
 // Returns an async handler that accepts the VEX selection and creates a false positive rule
-export function useCreateFalsePositiveRule({
+export function useCreateVexRule({
   activeOrgSlug,
   projectSlug,
   assetSlug,
+  assetVersionSlug,
   cveId,
   mutate,
 }: UseCreateParams) {
@@ -44,11 +46,11 @@ export function useCreateFalsePositiveRule({
 
       let pathPattern: string[] | undefined;
       if (selection.type === "node" && selection.nodeName) {
-        pathPattern = [selection.nodeName];
+        pathPattern = [selection.nodeName, "*"];
       } else if (selection.type === "edge" && selection.childName) {
-        pathPattern = [selection.childName];
+        pathPattern = [selection.childName, "*"];
       } else if (selection.type === "edge" && selection.parentName) {
-        pathPattern = [selection.parentName];
+        pathPattern = [selection.parentName, "*"];
       }
 
       if (!pathPattern || !cveId) {
@@ -62,10 +64,9 @@ export function useCreateFalsePositiveRule({
       const justificationText = `Marked as false positive via dependency graph: ${label}`;
 
       try {
-        const url = `/organizations/${activeOrgSlug}/projects/${projectSlug}/assets/${assetSlug}/false-positive-rules`;
+        const url = `/organizations/${activeOrgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`;
         const resp = await browserApiClient(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             cveId,
             justification: justificationText,
@@ -76,7 +77,7 @@ export function useCreateFalsePositiveRule({
 
         if (!resp.ok) {
           const body = await resp.text().catch(() => "");
-          toast("Failed to create false positive rule", {
+          toast("Failed to create VEX rule", {
             description: body ?? "",
           });
           return false;
@@ -89,12 +90,12 @@ export function useCreateFalsePositiveRule({
           // ignore mutate errors
         }
 
-        toast("False positive rule created", {
+        toast("VEX rule created", {
           description: "The rule will apply to matching vulnerabilities.",
         });
         return true;
       } catch (err) {
-        toast("Failed to create false positive rule", {
+        toast("Failed to create VEX rule", {
           description: "Please try again later.",
         });
         return false;

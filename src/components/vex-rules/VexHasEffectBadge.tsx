@@ -17,7 +17,7 @@ const VexHasEffectBadge: FunctionComponent<VexEffectBadgeProps> = ({
           : "bg-yellow-50 text-yellow-700 ring-yellow-600/20 dark:bg-yellow-500/10 dark:text-yellow-300 dark:ring-yellow-500/20",
       )}
     >
-      {effectCount > 0 ? `Applies to ${effectCount} findings` : "No effect"}
+      {effectCount > 0 ? `Applies to ${effectCount} finding${effectCount > 2 ? "s" : ""}` : "No effect"}
     </span>
   );
 };

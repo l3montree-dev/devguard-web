@@ -13,79 +13,113 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Loader2, MoreHorizontal, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-
-interface VexSource {
-  id: string;
-  url: string;
-  lastSynced: string;
-}
-
-// Mock data - will be replaced with real data from API
-const mockVexSources: VexSource[] = [
-  {
-    id: "1",
-    url: "https://example.com/vex/security-advisories.json",
-    lastSynced: "2026-02-02T10:30:00Z",
-  },
-  {
-    id: "2",
-    url: "https://supplier.example.org/vex/2026-02.csaf",
-    lastSynced: "2026-02-01T14:20:00Z",
-  },
-  {
-    id: "3",
-    url: "https://upstream-vendor.com/security/vex-data.json",
-    lastSynced: "2026-01-31T08:15:00Z",
-  },
-];
+import useSWR from "swr";
+import { fetcher } from "@/data-fetcher/fetcher";
+import useDecodedParams from "@/hooks/useDecodedParams";
+import { browserApiClient } from "@/services/devGuardApi";
+import { useSearchParams } from "next/navigation";
+import { ExternalReference } from "@/types/api/api";
 
 const SyncedUpstreamVexSources: FunctionComponent = () => {
-  const [sources, setSources] = useState<VexSource[]>(mockVexSources);
+  const params = useDecodedParams();
+  const searchParams = useSearchParams();
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    params;
   const [isOpen, setIsOpen] = useState(false);
+  const [newUrl, setNewUrl] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const selectedArtifact = searchParams?.get("artifact");
 
-  const handleTriggerSync = (source: VexSource) => {
-    toast.info(`Triggering sync for ${source.url}`);
-    // TODO: Implement actual sync trigger
-  };
+  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
 
-  const handleDelete = (source: VexSource) => {
-    setSources(sources.filter((s) => s.id !== source.id));
-    toast.success(`Removed ${source.url}`);
-    // TODO: Implement actual deletion
-  };
+  const { data: allRefs, error, mutate, isLoading } = useSWR<ExternalReference[]>(
+    apiUrl,
+    fetcher
+  );
 
-  const handleAddUrl = () => {
-    toast.info("Add URL dialog would open here");
-    // TODO: Implement add URL dialog
-  };
+  // Filter only VEX type references
+  const vexSources = allRefs?.filter((ref) => ref.type === "vex") || [];
 
-  const formatLastSynced = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+  const handleTriggerSync = async (source: ExternalReference) => {
+    if (!selectedArtifact) {
+      toast.error("Please select an artifact to sync");
+      return;
+    }
 
-    if (diffMins < 60) {
-      return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
-    } else {
-      return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/sync-external-sources/`;
+
+    try {
+      const response = await browserApiClient(syncUrl, { method: "POST" });
+      if (!response.ok) {
+        throw new Error(`Sync failed: ${response.statusText}`);
+      }
+      toast.success(`Syncing VEX data from ${source.url}`);
+      mutate();
+    } catch (error) {
+      toast.error("Failed to trigger sync");
     }
   };
+
+  const handleDelete = async (source: ExternalReference) => {
+    try {
+      const response = await browserApiClient(apiUrl, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error(`Delete failed: ${response.statusText}`);
+      }
+      toast.success(`Removed ${source.url}`);
+      mutate();
+    } catch (error) {
+      toast.error("Failed to delete VEX source");
+    }
+  };
+
+  const handleAddUrl = async () => {
+    if (!newUrl.trim()) {
+      toast.error("Please enter a URL");
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const response = await browserApiClient(`${apiUrl}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: newUrl.trim(), type: "vex" }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to add: ${response.statusText}`);
+      }
+
+      toast.success("VEX source added successfully");
+      setNewUrl("");
+      mutate();
+    } catch (error) {
+      toast.error("Failed to add VEX source");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <Card className="px-4 py-3">
+        <p className="text-sm text-destructive">Failed to load VEX sources</p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="px-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-2">
-        <div className="flex items-center justify-between">
+        <CollapsibleTrigger className="group flex items-center justify-between w-full rounded-md transition-colors p-2 -m-2">
           <div>
-            <h3 className="font-semibold flex items-center gap-2">
+            <h3 className="flex items-center gap-2">
               Synced Upstream VEX Sources
-              {sources.length > 0 && (
+              {vexSources.length > 0 && (
                 <span className="relative flex size-3">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
@@ -93,10 +127,10 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
               )}
             </h3>
           </div>
-          <CollapsibleTrigger className="p-2 hover:bg-muted rounded-md transition-colors">
-            <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 data-[state=closed]:rotate-[-90deg]" />
-          </CollapsibleTrigger>
-        </div>
+          <div className="hover:bg-muted/50 p-1 rounded-md transition-colors">
+          <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=closed]:rotate-[-90deg]" />
+              </div>
+        </CollapsibleTrigger>
         <CollapsibleContent className="mt-4">
           <span className="text-sm text-muted-foreground mb-6 block">
             Upstream VEX sources are URLs, usally provided by your suppliers,
@@ -108,13 +142,29 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
             results of the synced VEX data is transformed into VEX Rules that
             you can review and manage here.
           </span>
-          {sources.length === 0 ? (
+          {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p className="mb-4">No upstream VEX sources configured.</p>
-              <Button onClick={handleAddUrl} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add VEX Source URL
-              </Button>
+              Loading...
+            </div>
+          ) : vexSources.length === 0 ? (
+            <div className="py-4">
+              <p className="mb-4 text-muted-foreground">No upstream VEX sources configured.</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://example.com/vex.json"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddUrl()}
+                  className="flex-1"
+                />
+                <Button onClick={handleAddUrl} disabled={isAdding}>
+                  {isAdding ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -123,27 +173,21 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                   <thead className="border-b bg-muted/50">
                     <tr>
                       <th className="text-left p-3 font-medium">URL</th>
-                      <th className="text-left p-3 font-medium w-40">
-                        Last Synced
-                      </th>
                       <th className="w-12"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {sources.map((source, index) => (
+                    {vexSources.map((source, index) => (
                       <tr
                         key={source.id}
                         className={
-                          index !== sources.length - 1 ? "border-b" : ""
+                          index !== vexSources.length - 1 ? "border-b" : ""
                         }
                       >
                         <td className="p-3">
                           <span className="font-mono text-xs break-all">
                             {source.url}
                           </span>
-                        </td>
-                        <td className="p-3 text-muted-foreground">
-                          {formatLastSynced(source.lastSynced)}
                         </td>
                         <td className="p-3">
                           <DropdownMenu>
@@ -174,10 +218,20 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="flex justify-end">
-                <Button onClick={handleAddUrl} variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add VEX URL
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://supplier.example.com/vex.json"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddUrl()}
+                  className="flex-1"
+                />
+                <Button onClick={handleAddUrl} disabled={isAdding} size="sm">
+                  {isAdding ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

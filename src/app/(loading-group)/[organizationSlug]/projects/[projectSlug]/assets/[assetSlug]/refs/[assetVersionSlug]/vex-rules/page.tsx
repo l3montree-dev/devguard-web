@@ -2,11 +2,10 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { Paged, VexRule } from "@/types/api/api";
-import { FunctionComponent, useMemo, useState } from "react";
+import { VexRule } from "@/types/api/api";
+import React, { FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
-import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
 import Section from "@/components/common/Section";
@@ -14,7 +13,6 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSession } from "@/context/SessionContext";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -37,11 +35,8 @@ import VexRuleResult from "@/components/vex-rules/VexRuleResult";
 import VexRulesRow from "@/components/vex-rules/VexRulesRow";
 import SyncedUpstreamVexSources from "@/components/vex-rules/SyncedUpstreamVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
-import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
-import DependencyRiskScannerDialog from "@/components/RiskScannerDialog";
 import { useArtifacts } from "@/context/AssetVersionContext";
-import { useConfig } from "@/context/ConfigContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import {
   DropdownMenu,
@@ -51,23 +46,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { browserApiClient } from "@/services/devGuardApi";
-
-// TODO: Remove mock imports when backend is ready
-import {
-  mockVexRulesData,
-  mockVexRulesEmpty,
-} from "./__mocks__/vexRulesMockData";
 import Callout from "@/components/common/Callout";
-
-// Toggle this to test empty state
-const USE_EMPTY_MOCK = false;
+import useSWR from "swr";
+import { fetcher } from "@/data-fetcher/fetcher";
+import Link from "next/link";
 
 const columnHelper = createColumnHelper<VexRule>();
 
-const columnsDef: ColumnDef<VexRule, any>[] = [
+const baseColumnsDef: ColumnDef<VexRule, any>[] = [
   columnHelper.accessor("cveId", {
     header: "CVE ID",
-    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+    cell: (info) => {
+      const cveId = info.getValue();
+      const params = info.table.options.meta as {
+        organizationSlug: string;
+        projectSlug: string;
+        assetSlug: string;
+        assetVersionSlug: string;
+      };
+      
+      return (
+        <Link
+          href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/dependency-risks?search=${encodeURIComponent(cveId)}&state=closed`}
+          className=""
+        >
+          {cveId}
+        </Link>
+      );
+    },
   }),
   columnHelper.accessor("pathPattern", {
     header: "Path Pattern",
@@ -75,40 +81,16 @@ const columnsDef: ColumnDef<VexRule, any>[] = [
   }),
   columnHelper.accessor("eventType", {
     header: "Rule Result",
-    cell: (info) => <VexRuleResult eventType={info.getValue()} />,
+    cell: (info) => (
+      <VexRuleResult
+        eventType={info.getValue()}
+        mechanicalJustification={info.row.original.mechanicalJustification}
+      />
+    ),
   }),
-  columnHelper.accessor("effectCount", {
+  columnHelper.accessor("appliesToAmountOfDependencyVulns", {
     header: "Has Effect",
     cell: (info) => <VexHasEffectBadge effectCount={info.getValue()} />,
-  }),
-  columnHelper.display({
-    id: "actions",
-    header: "",
-    cell: (info) => {
-      const handleDelete = () => {
-        toast.success(`Deleted VEX rule for ${info.row.original.cveId}`);
-        // TODO: Implement actual deletion
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={handleDelete}
-              className="text-red-600 dark:text-red-400"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
   }),
 ];
 
@@ -146,23 +128,90 @@ const VexRulesPage: FunctionComponent = () => {
     "/vex-rules/?" +
     query.toString();
 
-  // TODO: Replace mock data with real API call when backend is ready
   // Fetch VEX rules data using SWR
-  // const {
-  //   data: vexRules,
-  //   error,
-  //   isLoading,
-  // } = useSWR<Paged<VexRule>>(url, fetcher);
+  const {
+    data: vexRules,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<VexRule[]>(url, fetcher);
 
-  // Mock data - remove when backend is ready
-  const vexRules = USE_EMPTY_MOCK ? mockVexRulesEmpty : mockVexRulesData;
-  const error = null;
-  const isLoading = false;
+  // Create actions column with access to params and mutate
+  const actionsColumn: ColumnDef<VexRule, any> = columnHelper.display({
+    id: "actions",
+    header: "",
+    cell: (info) => {
+      const [isDeleting, setIsDeleting] = React.useState(false);
 
-  const { table } = useTable({
-    columnsDef,
-    data: vexRules?.data || [],
+      const handleDelete = async () => {
+        const rule = info.row.original;
+        setIsDeleting(true);
+
+        try {
+          const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
+
+          const response = await browserApiClient(deleteUrl, {
+            method: "DELETE",
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to delete VEX rule");
+          }
+
+          toast.success(`Deleted VEX rule for ${rule.cveId}`);
+          mutate();
+        } catch (error) {
+          toast.error("Failed to delete VEX rule");
+        } finally {
+          setIsDeleting(false);
+        }
+      };
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" disabled={isDeleting}>
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MoreHorizontal className="h-4 w-4" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="text-red-600 dark:text-red-400"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   });
+
+  const columnsDef = useMemo(
+    () => [...baseColumnsDef, actionsColumn],
+    [actionsColumn],
+  );
+
+  const { table } = useTable(
+    {
+      columnsDef,
+      data: vexRules || [],
+    },
+    {
+      meta: {
+        organizationSlug,
+        projectSlug,
+        assetSlug,
+        assetVersionSlug,
+      },
+    },
+  );
 
   const handleSearch = useDebouncedQuerySearch();
 
@@ -175,15 +224,20 @@ const VexRulesPage: FunctionComponent = () => {
     branchOrTagSlug: string;
     isTag: boolean;
   }) => {
-    const formData = new FormData();
-    formData.append("vex", params.file);
-
-    const uploadUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${params.branchOrTagSlug}/vex/`;
-
     try {
-      const response = await browserApiClient(uploadUrl, {
+      // Read file content as text (VEX is JSON)
+      const fileContent = await params.file.text();
+
+      const response = await browserApiClient(`/vex`, {
         method: "POST",
-        body: formData,
+        body: fileContent,
+        headers: {
+          "X-Tag": params.isTag ? "1" : "0",
+          "X-Asset-Ref": params.branchOrTagName,
+          "X-Asset-Default-Branch": "",
+          "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
+          "X-Origin": "vex-upload",
+        },
       });
 
       if (!response.ok) {
@@ -191,7 +245,7 @@ const VexRulesPage: FunctionComponent = () => {
       }
 
       toast.success("VEX file uploaded successfully");
-      // TODO: Trigger data refresh when real API is connected
+      mutate();
     } catch (error) {
       toast.error("Failed to upload VEX file");
       throw error;
@@ -246,7 +300,7 @@ const VexRulesPage: FunctionComponent = () => {
       >
         <SyncedUpstreamVexSources />
         <div>
-          <Callout intent={"info"} showIcon>
+          <Callout intent={"neutral"} showIcon>
             <span className="text-sm flex items-center">
               Note: VEX rule are created by handling a dependency risk using the
               given graph based assessment option on a dependency risks details
@@ -268,15 +322,12 @@ const VexRulesPage: FunctionComponent = () => {
         </div>
       </Section>
 
-      {!vexRules?.data.length ? (
+      {!vexRules?.length ? (
         <div>
           <EmptyParty
             title="No VEX rules found."
             description="VEX (Vulnerability Exploitability eXchange) rules define how vulnerabilities should be handled based on their context. Rules can be created automatically from upstream sources or manually configured."
           />
-          <div className="mt-4">
-            {vexRules && <CustomPagination {...vexRules} />}
-          </div>
         </div>
       ) : (
         <div>
@@ -344,9 +395,6 @@ const VexRulesPage: FunctionComponent = () => {
                 </tbody>
               </table>
             </div>
-          </div>
-          <div className="mt-4">
-            <CustomPagination {...vexRules} />
           </div>
         </div>
       )}

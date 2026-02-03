@@ -27,7 +27,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useCreateFalsePositiveRule } from "@/hooks/useCreateFalsePositiveRule";
+import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import {
   AssetDTO,
   DependencyVulnHints,
@@ -419,10 +419,11 @@ const Index: FunctionComponent = () => {
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
   // Handler to create false-positive rules from the dependency graph context menu
-  const createFalsePositive = useCreateFalsePositiveRule({
+  const createFalsePositive = useCreateVexRule({
     activeOrgSlug: activeOrg.slug,
     projectSlug: project.slug,
     assetSlug: asset.slug,
+    assetVersionSlug: assetVersion?.slug ?? "",
     cveId: vuln?.cveID ?? null,
     mutate: mutate ?? (() => Promise.resolve()),
   });
@@ -548,18 +549,17 @@ const Index: FunctionComponent = () => {
       data.pathPattern.length > 0
     ) {
       const resp = await browserApiClient(
-        "/api/v1/organizations/" +
+        "/organizations/" +
           activeOrg.slug +
           "/projects/" +
           project.slug +
           "/assets/" +
           asset.slug +
-          "/false-positive-rules",
+          "/refs/" +
+          assetVersion?.slug +
+          "/vex-rules",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             cveId: vuln?.cveID,
             justification: data.justification ?? "",
@@ -567,7 +567,6 @@ const Index: FunctionComponent = () => {
             pathPattern: data.pathPattern,
           }),
         },
-        "",
       );
 
       if (!resp.ok) {
@@ -587,7 +586,7 @@ const Index: FunctionComponent = () => {
       let json: any;
       if (data.status === "mitigate") {
         const resp = await browserApiClient(
-          "/api/v1/organizations/" +
+          "/organizations/" +
             activeOrg.slug +
             "/projects/" +
             project.slug +
@@ -607,12 +606,11 @@ const Index: FunctionComponent = () => {
               comment: data.justification,
             }),
           },
-          "",
         );
         json = await resp.json();
       } else {
         const resp = await browserApiClient(
-          "/api/v1/organizations/" +
+          "/organizations/" +
             activeOrg.slug +
             "/projects/" +
             project.slug +
@@ -629,7 +627,6 @@ const Index: FunctionComponent = () => {
             },
             body: JSON.stringify(data),
           },
-          "",
         );
         json = await resp.json();
       }
@@ -817,7 +814,7 @@ const Index: FunctionComponent = () => {
                           marking paths as false positives.
                         </Callout>
                       ) : (
-                        <Callout intent="info">
+                        <Callout showIcon intent="neutral">
                           You can interact with the graph by zooming in/out,
                           clicking on edges to mark them as false positives and
                           remove nodes that are not relevant for dependency
@@ -825,7 +822,15 @@ const Index: FunctionComponent = () => {
                           <b>
                             How does the vulnerability get inherited by my
                             project?
-                          </b>
+                          </b>{" "}
+                          This will create{" "}
+                          <Link
+                            href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
+                            className=""
+                          >
+                            VEX rules
+                          </Link>
+                          .
                         </Callout>
                       )}
                     </div>
@@ -1390,6 +1395,7 @@ const Index: FunctionComponent = () => {
           vuln?.vulnerabilityPath.length === 0 ? [] : pathPatternOptions
         }
         vulnState={vuln?.state ?? ""}
+        vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
       />
     </Page>
   );

@@ -1,12 +1,20 @@
 import { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
+import { vexOptionMessages } from "@/utils/view";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface VexRuleResultProps {
   eventType: any; // VulnEventDTO or string
+  mechanicalJustification?: string;
 }
 
 const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   eventType,
+  mechanicalJustification,
 }) => {
   // Extract the type string - handle both object and string cases
   const typeString =
@@ -22,7 +30,11 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   const isAccepted = typeString === "accepted";
 
   if (isFalsePositive) {
-    return (
+    const tooltipMessage = mechanicalJustification
+      ? vexOptionMessages[mechanicalJustification]
+      : null;
+
+    const badge = (
       <span
         className={classNames(
           "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
@@ -32,6 +44,19 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
         False Positive
       </span>
     );
+
+    if (tooltipMessage) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>{badge}</TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">{tooltipMessage}</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return badge;
   }
 
   if (isAccepted) {
