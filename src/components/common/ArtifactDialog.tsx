@@ -34,7 +34,6 @@ const ArtifactDialog = ({
   invalidUrls = [],
 }: Props) => {
   const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
-    console.log("Submitting artifact data:", data);
     if (onSubmit) {
       await onSubmit(data);
     }
