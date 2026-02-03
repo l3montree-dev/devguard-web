@@ -134,7 +134,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-4">
           <span className="text-sm text-muted-foreground mb-6 block">
-            Upstream VEX sources are URLs, usally provided by your suppliers,
+            Upstream VEX sources are URLs, usually provided by your suppliers,
             that contain latest VEX data relevant to the components used in your
             software. By syncing these VEX URLs, DevGuard can automatically
             incorporate the latest VEX information into your vulnerability
