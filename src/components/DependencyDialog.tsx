@@ -154,7 +154,13 @@ const DependencyDialog: FunctionComponent<Props> = ({
               <div className="flex items-center gap-2 justify-between flex-row">
                 <div className="flex flex-row gap-2">
                   <div>OpenSSF Scorecard</div>
-                  <OpenSsfScore score={scoreCard?.overallScore ?? 0} />
+                  {scoreCard?.overallScore !== undefined ? (
+                    <OpenSsfScore score={scoreCard?.overallScore} />
+                  ) : (
+                    <Badge variant={"outline"}>
+                      No Scorecard Data available
+                    </Badge>
+                  )}
                 </div>
                 <div className="text-xs flex flex-row text-muted-foreground items-center gap-2">
                   {scoreCard?.date && (
@@ -174,8 +180,12 @@ const DependencyDialog: FunctionComponent<Props> = ({
                   the security practices of a project, helping maintainers
                   identify areas for improvement.
                 </div>
-                <hr className="pb-2" />
-                <OpenSsfDetails scoreCard={scoreCard}></OpenSsfDetails>
+                {scoreCard?.overallScore && (
+                  <>
+                    <hr className="pb-2" />
+                    <OpenSsfDetails scoreCard={scoreCard}></OpenSsfDetails>
+                  </>
+                )}
               </div>
             }
           />
