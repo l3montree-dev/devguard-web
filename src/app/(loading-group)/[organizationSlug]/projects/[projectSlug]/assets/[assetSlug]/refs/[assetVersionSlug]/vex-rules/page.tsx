@@ -258,7 +258,7 @@ const VexRulesPage: FunctionComponent = () => {
         <div>
           <Callout intent={"neutral"} showIcon>
             <span className="text-sm flex items-center">
-              Note: VEX rule are created by handling a dependency risk using the
+              Note: VEX rules are created by handling a dependency risk using the
               given graph based assessment option on a dependency risks details
               page.
             </span>
