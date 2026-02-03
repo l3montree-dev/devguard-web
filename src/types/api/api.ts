@@ -916,4 +916,4 @@ export type ExternalReference = {
   assetVersionName: string;
   url: string;
   type: string;
-}
+};

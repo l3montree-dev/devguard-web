@@ -126,14 +126,10 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                     Select a path pattern to automatically mark all
                     vulnerabilities with matching dependency paths as false
                     positive. This rule will also apply to future
-                    vulnerabilities with matching paths in your repository.
-                    You can manage VEX rules in the{" "}
+                    vulnerabilities with matching paths in your repository. You
+                    can manage VEX rules in the{" "}
                     {vexRulesUrl ? (
-                      <Link
-                        href={vexRulesUrl}
-                      >
-                        VEX rules page
-                      </Link>
+                      <Link href={vexRulesUrl}>VEX rules page</Link>
                     ) : (
                       <span>VEX rules page</span>
                     )}

@@ -148,9 +148,7 @@ const RiskFeedItem = ({
       />
       <div
         className={classNames(
-          event.upstream === 2
-            ? "bg-secondary"
-            : evTypeBackground[event.type],
+          event.upstream === 2 ? "bg-secondary" : evTypeBackground[event.type],
           "h-7 w-7 rounded-full text-white border-2 flex flex-row items-center z-10 justify-center border-background p-1",
         )}
       >

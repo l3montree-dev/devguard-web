@@ -327,13 +327,13 @@ const Artifacts = () => {
       artifactName: string;
       remainingSources: InformationSources[];
     }> = [];
-    
+
     for (const artifact of artifacts) {
       const artifactSources = rootNodes?.[artifact.artifactName] || [];
       const remainingSources = artifactSources.filter(
-        (source) => !urlsToDelete.includes(source.url)
+        (source) => !urlsToDelete.includes(source.url),
       );
-      
+
       // Only include artifacts that have sources being deleted
       if (remainingSources.length !== artifactSources.length) {
         artifactUpdates.push({
@@ -355,7 +355,7 @@ const Artifacts = () => {
 
     for (const { artifactName, remainingSources } of artifactUpdates) {
       const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
-      
+
       try {
         const response = await browserApiClient(url, {
           method: "PUT",
@@ -369,7 +369,10 @@ const Artifacts = () => {
           successCount++;
         } else {
           errorCount++;
-          console.error(`Failed to update artifact ${artifactName}:`, response.statusText);
+          console.error(
+            `Failed to update artifact ${artifactName}:`,
+            response.statusText,
+          );
         }
       } catch (error) {
         errorCount++;
@@ -378,7 +381,9 @@ const Artifacts = () => {
     }
 
     if (successCount > 0) {
-      toast.success(`Successfully removed sources from ${successCount} artifact(s)`);
+      toast.success(
+        `Successfully removed sources from ${successCount} artifact(s)`,
+      );
       mutate();
     }
     if (errorCount > 0) {

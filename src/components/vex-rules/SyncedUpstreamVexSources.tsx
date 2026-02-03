@@ -26,8 +26,7 @@ import { ExternalReference } from "@/types/api/api";
 const SyncedUpstreamVexSources: FunctionComponent = () => {
   const params = useDecodedParams();
   const searchParams = useSearchParams();
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    params;
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
   const [isOpen, setIsOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -35,10 +34,12 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
   const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
 
-  const { data: allRefs, error, mutate, isLoading } = useSWR<ExternalReference[]>(
-    apiUrl,
-    fetcher
-  );
+  const {
+    data: allRefs,
+    error,
+    mutate,
+    isLoading,
+  } = useSWR<ExternalReference[]>(apiUrl, fetcher);
 
   // Filter only VEX type references
   const vexSources = allRefs?.filter((ref) => ref.type === "vex") || [];
@@ -128,8 +129,8 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
             </h3>
           </div>
           <div className="hover:bg-muted/50 p-1 rounded-md transition-colors">
-          <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=closed]:rotate-[-90deg]" />
-              </div>
+            <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=closed]:rotate-[-90deg]" />
+          </div>
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-4">
           <span className="text-sm text-muted-foreground mb-6 block">
@@ -148,7 +149,9 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
             </div>
           ) : vexSources.length === 0 ? (
             <div className="py-4">
-              <p className="mb-4 text-muted-foreground">No upstream VEX sources configured.</p>
+              <p className="mb-4 text-muted-foreground">
+                No upstream VEX sources configured.
+              </p>
               <div className="flex gap-2">
                 <Input
                   placeholder="https://example.com/vex.json"

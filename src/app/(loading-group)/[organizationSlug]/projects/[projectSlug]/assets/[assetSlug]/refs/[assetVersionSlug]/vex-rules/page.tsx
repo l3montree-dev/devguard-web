@@ -64,7 +64,7 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
         assetSlug: string;
         assetVersionSlug: string;
       };
-      
+
       return (
         <Link
           href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/dependency-risks?search=${encodeURIComponent(cveId)}&state=closed`}
