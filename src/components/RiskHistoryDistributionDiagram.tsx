@@ -53,19 +53,35 @@ export function RiskHistoryDistributionDiagram({
           <ResponsiveContainer width="100%" height={300}>
             <ChartContainer
               config={{
-                critical: {
+                cvePurlCritical: {
                   label: "Critical",
                   color: severityToColor("CRITICAL"),
                 },
-                high: {
+                cvePurlCriticalCvss: {
+                  label: "Critical",
+                  color: severityToColor("CRITICAL"),
+                },
+                cvePurlHigh: {
                   label: "High",
                   color: severityToColor("HIGH"),
                 },
-                medium: {
+                cvePurlHighCvss: {
+                  label: "High",
+                  color: severityToColor("HIGH"),
+                },
+                cvePurlMedium: {
                   label: "Medium",
                   color: severityToColor("MEDIUM"),
                 },
-                low: {
+                cvePurlMediumCvss: {
+                  label: "Medium",
+                  color: severityToColor("MEDIUM"),
+                },
+                cvePurlLow: {
+                  label: "Low",
+                  color: severityToColor("LOW"),
+                },
+                cvePurlLowCvss: {
                   label: "Low",
                   color: severityToColor("LOW"),
                 },
@@ -128,15 +144,20 @@ export function RiskHistoryDistributionDiagram({
                     );
                   })}
                 </defs>
-                {["critical", "high", "medium", "low"].map((level) => (
+                {[
+                  { dataKey: "cvePurlCritical", severity: "critical" },
+                  { dataKey: "cvePurlHigh", severity: "high" },
+                  { dataKey: "cvePurlMedium", severity: "medium" },
+                  { dataKey: "cvePurlLow", severity: "low" },
+                ].map(({ dataKey, severity }) => (
                   <Area
-                    key={level}
-                    dataKey={mode === "risk" ? level : level + "Cvss"}
+                    key={dataKey}
+                    dataKey={mode === "risk" ? dataKey : dataKey + "Cvss"}
                     type="monotone"
                     stackId="1"
-                    stroke={severityToColor(level.toUpperCase())}
+                    stroke={severityToColor(severity.toUpperCase())}
                     strokeWidth={2}
-                    fill={`url(#fill-${level})`}
+                    fill={`url(#fill-${severity})`}
                     fillOpacity={0.8}
                     dot={false}
                   />
