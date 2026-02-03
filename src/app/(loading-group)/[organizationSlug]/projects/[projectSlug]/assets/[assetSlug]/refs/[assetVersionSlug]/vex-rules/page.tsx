@@ -27,7 +27,7 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
 import VexPathPattern from "@/components/vex-rules/VexPathPattern";
@@ -38,18 +38,13 @@ import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { useArtifacts } from "@/context/AssetVersionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { browserApiClient } from "@/services/devGuardApi";
 import Callout from "@/components/common/Callout";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import Link from "next/link";
+import VexRuleActionsCell from "@/components/vex-rules/VexRuleActionsCell";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -141,54 +136,15 @@ const VexRulesPage: FunctionComponent = () => {
     id: "actions",
     header: "",
     cell: (info) => {
-      const [isDeleting, setIsDeleting] = React.useState(false);
-
-      const handleDelete = async () => {
-        const rule = info.row.original;
-        setIsDeleting(true);
-
-        try {
-          const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
-
-          const response = await browserApiClient(deleteUrl, {
-            method: "DELETE",
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to delete VEX rule");
-          }
-
-          toast.success(`Deleted VEX rule for ${rule.cveId}`);
-          mutate();
-        } catch (error) {
-          toast.error("Failed to delete VEX rule");
-        } finally {
-          setIsDeleting(false);
-        }
-      };
+      const rule = info.row.original;
+      const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" disabled={isDeleting}>
-              {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <MoreHorizontal className="h-4 w-4" />
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="text-red-600 dark:text-red-400"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <VexRuleActionsCell
+          rule={rule}
+          deleteUrl={deleteUrl}
+          onDeleted={() => mutate()}
+        />
       );
     },
   });

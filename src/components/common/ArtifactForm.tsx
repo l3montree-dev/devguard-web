@@ -85,7 +85,7 @@ const ArtifactForm = ({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append({ url: "" })}
+            onClick={() => append({ url: "", type: "sbom" })}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add SBOM URL
