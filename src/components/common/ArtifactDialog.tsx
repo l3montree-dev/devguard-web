@@ -48,8 +48,8 @@ const ArtifactDialog = ({
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Update the artifact details and upstream URLs."
-              : "Create a new artifact to associate with this asset version."}
+              ? "Update the artifact details and external SBOM URLs."
+              : "Create a new artifact to associate with this repository."}
           </DialogDescription>
         </DialogHeader>
         <hr />

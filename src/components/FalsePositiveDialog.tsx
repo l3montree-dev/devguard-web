@@ -51,6 +51,8 @@ interface FalsePositiveDialogProps {
   vulnState?: string;
   /** Optional custom description for bulk actions */
   description?: React.ReactNode;
+  /** Optional URL to the VEX rules page */
+  vexRulesUrl?: string;
 }
 
 const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
@@ -60,6 +62,7 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
   pathPatternOptions = [],
   vulnState = "",
   description,
+  vexRulesUrl,
 }) => {
   const [justification, setJustification] = useState<string>("");
   const [selectedPathPattern, setSelectedPathPattern] = useState<
@@ -117,13 +120,20 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                 <InformationCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="mb-2 text-sm font-medium">
-                    Apply false positive rule to matching paths
+                    Apply VEX rules to matching paths
                   </p>
                   <p className="mb-3 text-xs text-muted-foreground">
-                    Select a path suffix to automatically mark all
+                    Select a path pattern to automatically mark all
                     vulnerabilities with matching dependency paths as false
                     positive. This rule will also apply to future
-                    vulnerabilities with matching paths.
+                    vulnerabilities with matching paths in your repository. You
+                    can manage VEX rules in the{" "}
+                    {vexRulesUrl ? (
+                      <Link href={vexRulesUrl}>VEX rules page</Link>
+                    ) : (
+                      <span>VEX rules page</span>
+                    )}
+                    .
                   </p>
 
                   <Select

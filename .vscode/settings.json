@@ -1,10 +1,9 @@
 {
   "licenser.license": "AGPLv3",
-  "sarif-viewer.connectToGithubCodeScanning": "off",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "licenser.author": "L3montree GmbH and the DevGuard Contributors",
   "licenser.useSPDXLicenseFormat": true,

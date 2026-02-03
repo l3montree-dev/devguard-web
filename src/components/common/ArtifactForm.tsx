@@ -15,6 +15,7 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { classNames } from "../../utils/common";
+import Callout from "./Callout";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
@@ -79,15 +80,15 @@ const ArtifactForm = ({
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <FormLabel>Information Sources (Upstream URLs)</FormLabel>
+          <FormLabel>SBOM Sources/ Origins</FormLabel>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append({ url: "" })}
+            onClick={() => append({ url: "", type: "sbom" })}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Upstream URL
+            Add SBOM URL
           </Button>
         </div>
 
@@ -96,6 +97,18 @@ const ArtifactForm = ({
             No upstream URLs added yet. Click &quot;Add URL&quot; to add one.
           </p>
         )}
+
+        <Callout intent={"info"} showIcon>
+          <span className="text-sm flex items-center">
+            To manage SBOMs inside your repository effectively, you can have
+            several artifacts. For each artifact, there can be various SBOM
+            sources or sometimes called origins (set during SBOM upload). You
+            can add external SBOM URLs here to have DevGuard periodically fetch
+            and sync SBOMs from these locations. External SBOMs are added as
+            SBOM source/ origin to one artifact. The SBOM URL must be publicly
+            reachable.
+          </span>
+        </Callout>
 
         {sortedTypes.map((type) => (
           <div key={type} className="space-y-3">
@@ -122,7 +135,7 @@ const ArtifactForm = ({
                           <FormItem>
                             <FormControl>
                               <Input
-                                placeholder="Enter upstream URL (e.g., https://example.com/vex.json)"
+                                placeholder="Enter upstream URL (e.g., https://example.com/sbom.json)"
                                 className={classNames(
                                   isInvalid
                                     ? "border-red-500 focus-visible:ring-red-500"
@@ -165,7 +178,6 @@ const ArtifactForm = ({
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
                       onClick={() => remove(index)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -181,14 +193,6 @@ const ArtifactForm = ({
             })}
           </div>
         ))}
-        <span className="text-sm text-muted-foreground flex items-center">
-          You can add several upstream VEX (Vulnerability Exploitability
-          eXchange) or SBOM URLs here. DevGuard will sync the given
-          vulnerability assessment results of these VEX Documents to your
-          dependency vulnerabilities. This is useful if your supplier already
-          offers you with this standard exchange format for vulnerability
-          assessments. Currently, this has to be a public reachable URL.
-        </span>
       </div>
     </>
   );

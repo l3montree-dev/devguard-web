@@ -1,16 +1,36 @@
 import { classNames } from "@/utils/common";
+import {
+  AlertCircle,
+  CheckCircle,
+  InfoIcon,
+  TriangleAlert,
+  Lightbulb,
+} from "lucide-react";
 import { FunctionComponent } from "react";
 
 interface CalloutProps {
-  intent: "info" | "success" | "warning" | "danger";
-
+  intent: "info" | "success" | "warning" | "danger" | "neutral";
+  showIcon?: boolean;
   children: React.ReactNode;
 }
-const Callout: FunctionComponent<CalloutProps> = ({ children, intent }) => {
+const Callout: FunctionComponent<CalloutProps> = ({
+  children,
+  intent,
+  showIcon = false,
+}) => {
+  const Icon = {
+    info: InfoIcon,
+    success: CheckCircle,
+    warning: TriangleAlert,
+    danger: AlertCircle,
+    neutral: Lightbulb,
+  }[intent];
+
   return (
     <div
       className={classNames(
-        "rounded-lg border p-2 text-sm",
+        "rounded-lg border p-3 text-sm",
+        showIcon && "flex items-start gap-3",
         intent === "info" &&
           "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-100",
         intent === "success" &&
@@ -19,9 +39,12 @@ const Callout: FunctionComponent<CalloutProps> = ({ children, intent }) => {
           " border-yellow-300 bg-yellow-500/20 text-yellow-950 dark:border-yellow-700 dark:text-yellow-100",
         intent === "danger" &&
           " border-red-500 bg-red-500/20  text-red-950 dark:text-red-100",
+        intent === "neutral" &&
+          "border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-700 dark:bg-gray-500/20 dark:text-gray-100",
       )}
     >
-      {children}
+      {showIcon && <Icon className="h-5 w-5 flex-shrink-0" />}
+      <div className={showIcon ? "flex-1" : ""}>{children}</div>
     </div>
   );
 };

@@ -16,7 +16,9 @@ const useRouterQuery = () => {
         newSearchParams.set(k, String(v));
       }
     });
-    router.push(pathname + "?" + newSearchParams.toString());
+    router.replace(pathname + "?" + newSearchParams.toString(), {
+      scroll: false,
+    });
   };
 };
 
