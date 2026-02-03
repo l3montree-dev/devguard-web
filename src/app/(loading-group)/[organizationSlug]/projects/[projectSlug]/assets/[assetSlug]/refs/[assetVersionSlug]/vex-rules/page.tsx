@@ -132,26 +132,30 @@ const VexRulesPage: FunctionComponent = () => {
   } = useSWR<VexRule[]>(url, fetcher);
 
   // Create actions column with access to params and mutate
-  const actionsColumn: ColumnDef<VexRule, any> = columnHelper.display({
-    id: "actions",
-    header: "",
-    cell: (info) => {
-      const rule = info.row.original;
-      const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
+  const actionsColumn: ColumnDef<VexRule, any> = useMemo(
+    () =>
+      columnHelper.display({
+        id: "actions",
+        header: "",
+        cell: (info) => {
+          const rule = info.row.original;
+          const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
 
-      return (
-        <VexRuleActionsCell
-          rule={rule}
-          deleteUrl={deleteUrl}
-          onDeleted={() => mutate()}
-        />
-      );
-    },
-  });
+          return (
+            <VexRuleActionsCell
+              rule={rule}
+              deleteUrl={deleteUrl}
+              onDeleted={() => mutate()}
+            />
+          );
+        },
+      }),
+    [mutate, organizationSlug, projectSlug, assetSlug, assetVersionSlug],
+  );
 
   const columnsDef = useMemo(
     () => [...baseColumnsDef, actionsColumn],
-    [actionsColumn],
+    [baseColumnsDef, actionsColumn],
   );
 
   const { table } = useTable(
