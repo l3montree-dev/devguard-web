@@ -18,7 +18,7 @@ const VexHasEffectBadge: FunctionComponent<VexEffectBadgeProps> = ({
       )}
     >
       {effectCount > 0
-        ? `Applies to ${effectCount} finding${effectCount > 2 ? "s" : ""}`
+        ? `Applies to ${effectCount} finding${effectCount > 1 ? "s" : ""}`
         : "No effect"}
     </span>
   );
