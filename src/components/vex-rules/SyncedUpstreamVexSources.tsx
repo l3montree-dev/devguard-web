@@ -66,7 +66,9 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
   const handleDelete = async (source: ExternalReference) => {
     try {
-      const response = await browserApiClient(apiUrl, { method: "DELETE" });
+      const response = await browserApiClient(apiUrl + "/" + source.id, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         throw new Error(`Delete failed: ${response.statusText}`);
       }
@@ -154,11 +156,12 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
               </p>
               <div className="flex gap-2">
                 <Input
-                  placeholder="https://example.com/vex.json"
+                  placeholder="https://supplier.example.com/vex.json"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddUrl()}
                   className="flex-1"
+                  variant="onCard"
                 />
                 <Button onClick={handleAddUrl} disabled={isAdding}>
                   {isAdding ? (

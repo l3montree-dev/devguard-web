@@ -642,7 +642,7 @@ export interface ArtifactCreateUpdateRequest {
 
 export interface InformationSources {
   url: string;
-  type: "csaf" | "vex" | "sbom";
+  type: "sbom";
   purl?: string;
 }
 

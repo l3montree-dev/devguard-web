@@ -2,7 +2,7 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { VexRule } from "@/types/api/api";
+import { Paged, VexRule } from "@/types/api/api";
 import React, { FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -125,11 +125,12 @@ const VexRulesPage: FunctionComponent = () => {
 
   // Fetch VEX rules data using SWR
   const {
-    data: vexRules,
+    data: vexRulesResponse,
     error,
     isLoading,
     mutate,
-  } = useSWR<VexRule[]>(url, fetcher);
+  } = useSWR<Paged<VexRule>>(url, fetcher);
+  const vexRules = vexRulesResponse?.data;
 
   // Create actions column with access to params and mutate
   const actionsColumn: ColumnDef<VexRule, any> = useMemo(
@@ -161,7 +162,7 @@ const VexRulesPage: FunctionComponent = () => {
   const { table } = useTable(
     {
       columnsDef,
-      data: vexRules || [],
+      data: vexRules ?? [],
     },
     {
       meta: {
@@ -174,7 +175,6 @@ const VexRulesPage: FunctionComponent = () => {
   );
 
   const handleSearch = useDebouncedQuerySearch();
-
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -213,7 +213,7 @@ const VexRulesPage: FunctionComponent = () => {
   };
 
   // Show loading skeleton if data is loading
-  if (isLoading && !vexRules) {
+  if (isLoading && !vexRulesResponse) {
     return (
       <Page title="Loading VEX Rules...">
         <div className="space-y-4">
@@ -262,16 +262,16 @@ const VexRulesPage: FunctionComponent = () => {
         <div>
           <Callout intent={"neutral"} showIcon>
             <span className="text-sm flex items-center">
-              Note: VEX rules are created by handling a dependency risk using the
-              given graph based assessment option on a dependency risks details
-              page.
+              Note: VEX rules are created by handling a dependency risk using
+              the given graph based assessment option on a dependency risks
+              details page.
             </span>
           </Callout>
         </div>
         <div className="relative flex flex-row gap-2">
           <Input
             onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={searchParams?.get("search") ?? ""}
+            defaultValue={searchParams?.get("search") as string}
             placeholder="Search for CVE ID, justification or source..."
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2">
