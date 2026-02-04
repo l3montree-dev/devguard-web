@@ -206,13 +206,27 @@ const Settings: FunctionComponent = () => {
       scopes += "manage";
     }
 
-    const createdToken = await onCreatePat({
-      description: data.description,
-      scopes,
-    });
-    setNewToken(createdToken);
-    setShowNewTokenDialog(true);
-    reset();
+    if (!scopes) {
+      toast.error("Please select at least one scope", {
+        description: "A token must have at least one permission scope.",
+      });
+      return;
+    }
+
+    try {
+      const createdToken = await onCreatePat({
+        description: data.description,
+        scopes,
+      });
+      setNewToken(createdToken);
+      setShowNewTokenDialog(true);
+      reset();
+    } catch (error) {
+      toast.error("Failed to create token", {
+        description:
+          "An error occurred while creating the token. Please try again.",
+      });
+    }
   };
 
   const handleLogout = LogoutLink();

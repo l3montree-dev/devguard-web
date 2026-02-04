@@ -45,14 +45,14 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium">Description</label>
+            <div className="text-sm font-medium">Description</div>
             <p className="text-sm text-muted-foreground">
               {token.description || "No description"}
             </p>
           </div>
 
           <div>
-            <label className="text-sm font-medium">Scopes</label>
+            <div className="text-sm font-medium">Scopes</div>
             <div className="mt-1 flex flex-wrap gap-1">
               {token.scopes.split(" ").filter((scope) => scope.trim() !== "")
                 .length > 0 ? (
@@ -71,7 +71,7 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
           </div>
 
           <div>
-            <label className="text-sm font-medium">Token</label>
+            <div className="text-sm font-medium">Token</div>
             <div className="mt-1">
               <CopyInput value={token.privKey} />
             </div>
