@@ -1,9 +1,9 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
-import { uniqBy } from "lodash";
+import { uniqBy, isEqual } from "lodash";
 
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
@@ -12,6 +12,21 @@ export default function usePersonalAccessToken(
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
     Array<PersonalAccessTokenDTO | PatWithPrivKey>
   >(existingPats ?? []);
+  const prevExistingPatsRef = useRef<PersonalAccessTokenDTO[] | undefined>(
+    undefined,
+  );
+
+  // ync with existingPats when SWR data loads or changes
+  useEffect(() => {
+    if (existingPats && !isEqual(prevExistingPatsRef.current, existingPats)) {
+      prevExistingPatsRef.current = existingPats;
+      setPersonalAccessTokens((prev) => {
+        // merge existing pats with newly created ones (privKey)
+        const newlyCreated = prev.filter((p) => "privKey" in p);
+        return uniqBy([...existingPats, ...newlyCreated], "fingerprint");
+      });
+    }
+  }, [existingPats]);
 
   useEffect(() => {
     const pat = sessionStorage.getItem("pat");

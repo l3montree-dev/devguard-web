@@ -13,11 +13,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
-import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 
-import CopyCode from "@/components/common/CopyCode";
-import DateString, { parseDateOnly } from "@/components/common/DateString";
-import ListItem from "@/components/common/ListItem";
+import { SettingsFlow, UpdateSettingsFlowBody } from "@ory/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,17 +41,16 @@ import { toast } from "sonner";
 import Page from "../../../components/Page";
 import Section from "../../../components/common/Section";
 import { Flow, Methods } from "../../../components/kratos/Flow";
-
-import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
+import ManagePatsDialog from "@/components/ManagePatsDialog";
+import NewTokenDialog from "@/components/NewTokenDialog";
 import { Switch } from "@/components/ui/switch";
 import { uniq } from "lodash";
 import { LogoutLink } from "../../../hooks/logoutLink";
-
 import useSWR from "swr";
 import { useConfig } from "../../../context/ConfigContext";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import { handleFlowError, ory } from "../../../services/ory";
-import { PersonalAccessTokenDTO } from "../../../types/api/api";
+import { PatWithPrivKey, PersonalAccessTokenDTO } from "../../../types/api/api";
 import CopyInput from "../../../components/common/CopyInput";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
 
@@ -84,6 +80,7 @@ function SettingsCard({
 }
 const Settings: FunctionComponent = () => {
   const [flow, setFlow] = useState<SettingsFlow>();
+  const [newToken, setNewToken] = useState<PatWithPrivKey | null>(null);
 
   // Get ?flow=... from the URL
   const router = useRouter();
@@ -208,11 +205,26 @@ const Settings: FunctionComponent = () => {
       scopes += "manage";
     }
 
-    await onCreatePat({
-      description: data.description,
-      scopes,
-    });
-    reset();
+    if (!scopes) {
+      toast.error("Please select at least one scope", {
+        description: "A token must have at least one permission scope.",
+      });
+      return;
+    }
+
+    try {
+      const createdToken = await onCreatePat({
+        description: data.description,
+        scopes,
+      });
+      setNewToken(createdToken);
+      reset();
+    } catch (error) {
+      toast.error("Failed to create token", {
+        description:
+          "An error occurred while creating the token. Please try again.",
+      });
+    }
   };
 
   const handleLogout = LogoutLink();
@@ -331,65 +343,26 @@ const Settings: FunctionComponent = () => {
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
-                <div className="mt-6 flex flex-row justify-end">
+              <CardFooter className="flex justify-between">
+                <ManagePatsDialog
+                  personalAccessTokens={personalAccessTokens}
+                  onDeletePat={onDeletePat}
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={personalAccessTokens.length === 0}
+                    className="disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    Manage Existing Tokens ({personalAccessTokens.length})
+                  </Button>
+                </ManagePatsDialog>
+                <div className="flex flex-row justify-end">
                   <Button type="submit">Create</Button>
                 </div>
               </CardFooter>
             </form>
           </Card>
-
-          <div className="mb-6 flex flex-col gap-4">
-            {personalAccessTokens
-              .filter((p) => "pubKey" in p)
-              .map((pat) => (
-                <ListItem
-                  key={pat.id}
-                  Title={pat.description}
-                  Description={
-                    <>
-                      Scopes: {pat.scopes}
-                      <br />
-                      Created at:
-                      <DateString date={parseDateOnly(pat.createdAt)} />
-                      <br />
-                      Last used:{" "}
-                      {pat.lastUsedAt ? (
-                        <DateString date={parseDateOnly(pat.lastUsedAt)} />
-                      ) : (
-                        "Never"
-                      )}
-                      {"privKey" in pat && (
-                        <>
-                          <CopyCode
-                            codeString={pat.privKey}
-                            language="shell"
-                          ></CopyCode>
-                          <span className="mt-2 block text-sm text-destructive">
-                            Make sure to copy the token. You won&apos;t be able
-                            to see it ever again
-                          </span>
-                        </>
-                      )}
-                    </>
-                  }
-                  Button={
-                    <ConfirmTokenDeletion
-                      Button={
-                        <Button
-                          variant="destructive"
-                          onClick={() => onDeletePat(pat)}
-                        >
-                          Yes
-                        </Button>
-                      }
-                    >
-                      <Button variant={"destructiveOutline"}>Delete</Button>
-                    </ConfirmTokenDeletion>
-                  }
-                />
-              ))}
-          </div>
         </Section>
 
         {availableMethods.includes("oidc") && (
@@ -525,6 +498,14 @@ const Settings: FunctionComponent = () => {
           </Button>
         </div>
       </div>
+
+      <NewTokenDialog
+        token={newToken}
+        open={!!newToken}
+        onClose={() => {
+          setNewToken(null);
+        }}
+      />
     </Page>
   );
 };

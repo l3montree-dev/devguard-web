@@ -16,6 +16,7 @@
 import { FunctionComponent } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
+import { Copy } from "lucide-react";
 
 interface Props {
   value: string;
@@ -31,12 +32,12 @@ const CopyInput: FunctionComponent<Props> = (props) => {
     <div className="relative w-full overflow-hidden">
       <button
         onClick={handleCopy}
-        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-gray-700 p-1 px-2 text-xs text-white transition-all hover:bg-white/40"
+        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-gray-700 p-2 text-xs text-white transition-all hover:opacity-80"
       >
-        Copy
+        <Copy className="h-4 w-4" />
       </button>
       <div className="relative">
-        <Input className="bg-muted" value={props.value} />
+        <Input className="bg-muted" value={props.value} readOnly />
       </div>
     </div>
   );
