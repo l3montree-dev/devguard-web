@@ -53,10 +53,6 @@ import { handleFlowError, ory } from "../../../services/ory";
 import { PatWithPrivKey, PersonalAccessTokenDTO } from "../../../types/api/api";
 import CopyInput from "../../../components/common/CopyInput";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
-import ConfirmTokenDeletion from "@/components/common/ConfirmTokenDeletion";
-import CopyCode from "@/components/common/CopyCode";
-import DateString, { parseDateOnly } from "@/components/common/DateString";
-import ListItem from "@/components/common/ListItem";
 
 interface Props {
   flow?: SettingsFlow;

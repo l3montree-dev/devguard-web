@@ -13,8 +13,8 @@ import {
 import { PatWithPrivKey } from "@/types/api/api";
 import { Button } from "./ui/button";
 import CopyInput from "./common/CopyInput";
-import { AlertTriangle } from "lucide-react";
 import { Badge } from "./ui/badge";
+import Callout from "./common/Callout";
 
 interface Props {
   token: PatWithPrivKey | null;
@@ -35,20 +35,13 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-500" />
-            <div className="text-sm">
-              <p className="font-medium text-yellow-500">
-                Make sure to copy your token now!
-              </p>
-              <p className="mt-1 text-muted-foreground">
-                You won&apos;t be able to see it again. Store it securely as it
-                provides access to your account.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Callout intent="warning" showIcon>
+          <p className="font-medium">Make sure to copy your token now!</p>
+          <p className="mt-1">
+            You won&apos;t be able to see it again. Store it securely as it
+            provides access to your account.
+          </p>
+        </Callout>
 
         <div className="space-y-4">
           <div>
