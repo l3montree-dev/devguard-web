@@ -13,6 +13,17 @@ export default function usePersonalAccessToken(
     Array<PersonalAccessTokenDTO | PatWithPrivKey>
   >(existingPats ?? []);
 
+  // Sync with existingPats when SWR data loads or changes
+  useEffect(() => {
+    if (existingPats && existingPats.length > 0) {
+      setPersonalAccessTokens((prev) => {
+        // Merge existing pats with any newly created ones (that have privKey)
+        const newlyCreated = prev.filter((p) => "privKey" in p);
+        return uniqBy([...existingPats, ...newlyCreated], "fingerprint");
+      });
+    }
+  }, [existingPats]);
+
   useEffect(() => {
     const pat = sessionStorage.getItem("pat");
     if (pat) {
