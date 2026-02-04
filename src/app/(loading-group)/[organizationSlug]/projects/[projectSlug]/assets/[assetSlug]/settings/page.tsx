@@ -16,11 +16,9 @@ import { FunctionComponent, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
-import ConnectToRepoSection from "../../../../../../../../components/ConnectToRepoSection";
 import Alert from "../../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../../components/common/DangerZone";
 import ListItem from "../../../../../../../../components/common/ListItem";
-import Section from "../../../../../../../../components/common/Section";
 import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
@@ -30,8 +28,6 @@ import {
   generateNewSecret,
   getParentRepositoryIdAndName,
 } from "../../../../../../../../utils/view";
-import MembersTable from "../../../../../../../../components/MembersTable";
-import AssetMemberDialog from "../../../../../../../../components/AssetMemberDialog";
 import { Switch } from "../../../../../../../../components/ui/switch";
 import {
   Collapsible,
@@ -39,6 +35,7 @@ import {
   CollapsibleTrigger,
 } from "../../../../../../../../components/ui/collapsible";
 import DateString from "../../../../../../../../components/common/DateString";
+import Section from "@/components/common/Section";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -57,8 +54,6 @@ const Index: FunctionComponent = () => {
   const updateAsset = useUpdateAsset();
   const router = useRouter();
   const config = useConfig();
-
-  const [memberDialogOpen, setMemberDialogOpen] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
@@ -93,6 +88,7 @@ const Index: FunctionComponent = () => {
     defaultValues: {
       ...asset,
       reachableFromInternet: asset.reachableFromInternet ?? false,
+      vulnAutoReopenAfterDays: asset.vulnAutoReopenAfterDays ?? -1,
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],
@@ -271,7 +267,7 @@ const Index: FunctionComponent = () => {
           ),
           vulnAutoReopenAfterDays: data.vulnAutoReopenAfterDays
             ? +data.vulnAutoReopenAfterDays
-            : undefined,
+            : -1,
           riskAutomaticTicketThreshold: firstOrUndefined(
             data.riskAutomaticTicketThreshold,
           ),
@@ -316,19 +312,6 @@ const Index: FunctionComponent = () => {
         <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold">Repository Settings</h1>
         </div>
-        {!asset.externalEntityProviderId && (
-          <ConnectToRepoSection
-            parentRepositoryId={parentRepositoryId}
-            parentRepositoryName={parentRepositoryName}
-            repositoryName={asset.repositoryName}
-            repositoryId={asset.repositoryId}
-            repositories={repositories}
-            onUpdate={handleUpdate}
-          />
-        )}
-      </div>
-      <hr />
-      <div>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <AssetForm
@@ -336,42 +319,25 @@ const Index: FunctionComponent = () => {
               form={form}
               assetId={asset.id}
               onUpdate={handleUpdate}
+              repositories={repositories}
+              parentRepositoryId={parentRepositoryId}
+              parentRepositoryName={parentRepositoryName}
+              repositoryName={asset.repositoryName}
+              repositoryId={asset.repositoryId}
+              members={asset.members}
+              onRemoveMember={handleRemoveMember}
+              onChangeMemberRole={handleChangeMemberRole}
             />
           </form>
         </FormProvider>
       </div>
-      {!asset.externalEntityProviderId && (
-        <>
-          <hr className="mt-10" />
-          <Section
-            title="Member"
-            description="Manage the members of your organization"
-          >
-            <MembersTable
-              onChangeMemberRole={handleChangeMemberRole}
-              onRemoveMember={handleRemoveMember}
-              members={asset.members}
-            />
-            <AssetMemberDialog
-              isOpen={memberDialogOpen}
-              onOpenChange={setMemberDialogOpen}
-            />
-
-            <div className="flex flex-row justify-end">
-              <Button onClick={() => setMemberDialogOpen(true)}>
-                Add Member
-              </Button>
-            </div>
-          </Section>
-          <hr />
-        </>
-      )}
+      <hr />
       <div>
         <Section
-          title="Webhook Management"
-          description="Provides a webhook URL and secret for this repository."
+          title="Incoming Webhook Management"
+          description="Details for configuring incoming webhooks to receive for example issue updates from your issue tracker."
         >
-          <div className="space-y-2 p-4 border rounded-xl bg-card mt-1">
+          <div className="space-y-2 pt-4 pb-6 px-6 border rounded-xl bg-card mt-1">
             <InputWithButton
               label="Webhook URL"
               value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}

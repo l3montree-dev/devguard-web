@@ -181,7 +181,7 @@ export default function SelectRepoSlide({
             </div>
           }
           Description={
-            "Select a repository to connect this repository to. This will enable to open and handle issues in the target repository. The list contains all repositories of all GitHub App, Gitlab and Jira integrations in this organization."
+            "Select a repository to connect this repository to. This will enable you to open and handle issues in the target repository. The list contains all repositories of all GitHub App, GitLab and Jira integrations in this organization."
           }
         />
       </div>

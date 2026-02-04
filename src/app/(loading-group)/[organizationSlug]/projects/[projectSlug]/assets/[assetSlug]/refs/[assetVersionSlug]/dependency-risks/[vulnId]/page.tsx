@@ -437,15 +437,9 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
-  const graphData = useMemo<ViewDependencyTreeNode>(() => {
-    if (!graphResponse || graphResponse.length === 0 || !vuln) {
-      return {
-        name: "ROOT",
-        children: [],
-        risk: 0,
-        parents: [],
-        nodeType: "root",
-      };
+  const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
+    if (!vuln || vuln.vulnerabilityPath.length === 0) {
+      return null;
     }
 
     return convertPathsToTree([vuln.vulnerabilityPath], [vuln]);
@@ -756,62 +750,75 @@ const Index: FunctionComponent = () => {
               <div>
                 {!graphLoading && (
                   <div className="mt-10">
-                    <div className="flex flex-row items-center justify-between mb-2">
-                      <span className="font-semibold block">
-                        Path to component
-                      </span>
-                      {(vuln?.vulnerabilityPath.length || 0) > 0 &&
-                        (graphResponse?.length || 0) > 0 && (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Badge variant="secondary">
-                                <ShareIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                                Vulnerability is reachable through{" "}
-                                {graphResponse?.length}{" "}
-                                {graphResponse?.length === 1 ? "path" : "paths"}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-screen-sm font-normal">
-                              <p>
-                                This vulnerability exists in{" "}
-                                {graphResponse?.length} other dependency{" "}
-                                {graphResponse?.length === 1 ? "path" : "paths"}{" "}
-                                within this asset. When marking as false
-                                positive, you can apply a rule to automatically
-                                mark all paths with matching suffixes.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                    </div>
-                    <div
-                      style={{ height: 400 }}
-                      className={`w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
-                    >
-                      {vuln && (
-                        <DependencyGraph
-                          variant="compact"
-                          width={100}
-                          height={400}
-                          enableContextMenu={
-                            vuln.vulnerabilityPath.length !== 0 &&
-                            vuln.state === "open"
-                          }
-                          graph={graphData}
-                          vulns={[vuln]}
-                          highlightPath={["ROOT", ...vuln.vulnerabilityPath]}
-                          onVexSelect={createFalsePositive}
-                        />
-                      )}
-                    </div>
+                    {graphData && vuln && (
+                      <>
+                        <div className="flex flex-row items-center justify-between mb-2">
+                          <span className="font-semibold block">
+                            Path to component
+                          </span>
+                          {(vuln?.vulnerabilityPath.length || 0) > 0 &&
+                            (graphResponse?.length || 0) > 0 && (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge variant="secondary">
+                                    <ShareIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                                    Vulnerability is reachable through{" "}
+                                    {graphResponse?.length}{" "}
+                                    {graphResponse?.length === 1
+                                      ? "path"
+                                      : "paths"}
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    This vulnerability exists in{" "}
+                                    {graphResponse?.length} other dependency{" "}
+                                    {graphResponse?.length === 1
+                                      ? "path"
+                                      : "paths"}{" "}
+                                    within this asset. When marking as false
+                                    positive, you can apply a rule to
+                                    automatically mark all paths with matching
+                                    suffixes.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                        </div>
+                        <div
+                          style={{ height: 400 }}
+                          className={`w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                        >
+                          {graphData && vuln && (
+                            <DependencyGraph
+                              variant="compact"
+                              width={100}
+                              height={400}
+                              enableContextMenu={
+                                vuln.vulnerabilityPath.length !== 0 &&
+                                vuln.state === "open"
+                              }
+                              graph={graphData}
+                              vulns={[vuln]}
+                              highlightPath={[
+                                "ROOT",
+                                ...vuln.vulnerabilityPath,
+                              ]}
+                              onVexSelect={createFalsePositive}
+                            />
+                          )}
+                        </div>
+                      </>
+                    )}
                     <div className="mt-4">
                       {(vuln?.vulnerabilityPath.length || 0) === 0 ? (
-                        <Callout intent="warning">
+                        <Callout intent="warning" showIcon>
                           There are more than 12 different paths which lead to
-                          this vulnerability in your dependency tree. To avoid
-                          clutter, only the first 12 paths are shown in the
-                          graph above. This vulnerability cannot be handled by
-                          marking paths as false positives.
+                          this vulnerability in your dependency tree. Therefore
+                          the graph is not displayed by default to avoid
+                          performance issues. You can still mark this
+                          vulnerability as false positive or accept the risk
+                          using the buttons below.
                         </Callout>
                       ) : (
                         <Callout showIcon intent="neutral">

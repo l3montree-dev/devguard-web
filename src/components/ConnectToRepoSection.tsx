@@ -145,14 +145,12 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             }
           />
         </div>
-      ) : repositories && editRepo ? (
+      ) : repositories && editRepo && hasIntegration ? (
         <div>
           <ListItem
             Title={
               <div className="flex flex-row gap-2">
-                <div
-                  className={`flex-1  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
-                >
+                <div className="flex-1">
                   <Combobox
                     onValueChange={handleSearchRepos}
                     placeholder="Search repository..."
@@ -178,39 +176,36 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                       setEditRepo(false);
                     }
                   }}
-                  disabled={!Boolean(selectedRepo) || !hasIntegration}
-                  variant={hasIntegration ? "default" : "secondary"}
+                  disabled={!Boolean(selectedRepo)}
                 >
                   Connect
                 </Button>
               </div>
             }
             Description={
-              "Select a repository to connect this repository to. This will enable to open and handle issues in the target repository. The list contains all repositories of all GitHub App, Gitlab and Jira integrations in this organization."
+              "Select a repository to connect this repository to. This will enable you to open and handle issues in the target repository. The list contains all repositories of all GitHub App, GitLab and Jira integrations in this organization."
             }
           />
-          {!hasIntegration && (
-            <div className="mt-4">
-              <Callout intent="warning">
-                You need to install the DevGuard GitHub App, a GitLab, or a Jira
-                integration in the organization settings to connect a
-                repository.
-              </Callout>
-              <div className="flex flex-row justify-end">
-                <Button
-                  variant="outline"
-                  className="mt-2"
-                  onClick={() => {
-                    setEditRepo(false);
-                    router.replace(`/${activeOrg.slug}/settings`);
-                  }}
-                >
-                  Go to Organization Settings
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
+      ) : !hasIntegration ? (
+        <Callout intent="neutral">
+          <div className="flex items-center gap-4">
+            <div>
+              To connect this repository to a GitHub, GitLab, or Jira
+              integration, you need to configure an integration in your
+              organization settings first.
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                router.push(`/${activeOrg.slug}/settings`);
+              }}
+            >
+              Go to Organization Settings
+            </Button>
+          </div>
+        </Callout>
       ) : (
         <>
           <ListItem
