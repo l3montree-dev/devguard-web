@@ -12,7 +12,9 @@ export default function usePersonalAccessToken(
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
     Array<PersonalAccessTokenDTO | PatWithPrivKey>
   >(existingPats ?? []);
-  const prevExistingPatsRef = useRef<PersonalAccessTokenDTO[] | undefined>(undefined);
+  const prevExistingPatsRef = useRef<PersonalAccessTokenDTO[] | undefined>(
+    undefined,
+  );
 
   // ync with existingPats when SWR data loads or changes
   useEffect(() => {
