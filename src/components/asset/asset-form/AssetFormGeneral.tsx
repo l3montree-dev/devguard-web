@@ -107,12 +107,12 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
             >
               <Image
                 src="/assets/gitlab.svg"
-                alt="GitHub Logo"
+                alt="GitLab Logo"
                 className="mr-2"
                 width={24}
                 height={24}
               />
-              Gitlab
+              GitLab
             </Button>
           </div>
         </>

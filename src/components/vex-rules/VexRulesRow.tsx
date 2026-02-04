@@ -35,7 +35,6 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
   const [isGroupOpen, setIsGroupOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
   const vexSource = row.original.vexSource;
-  const isGroupHeader = vexRulesInGroup.length > 0;
 
   const handleDeleteGroup = async (e: React.MouseEvent) => {
     e.stopPropagation();

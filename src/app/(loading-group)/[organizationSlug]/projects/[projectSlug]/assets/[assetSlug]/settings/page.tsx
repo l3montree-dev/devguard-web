@@ -335,7 +335,7 @@ const Index: FunctionComponent = () => {
       <div>
         <Section
           title="Incoming Webhook Management"
-          description="Details for configuring incoming webhooks to recieve for example issue updates from your issue tracker."
+          description="Details for configuring incoming webhooks to receive for example issue updates from your issue tracker."
         >
           <div className="space-y-2 pt-4 pb-6 px-6 border rounded-xl bg-card mt-1">
             <InputWithButton

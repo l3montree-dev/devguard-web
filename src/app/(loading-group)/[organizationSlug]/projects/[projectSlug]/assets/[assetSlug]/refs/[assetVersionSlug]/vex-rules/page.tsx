@@ -201,8 +201,6 @@ const VexRulesPage: FunctionComponent = () => {
     },
   );
 
-  console.log("vexRules", vexRules);
-
   // Group vex rules by vexSource and create list of unique sources in a single memo
   const { groupedVexRules, vexSourceGroups } = useMemo(() => {
     if (!vexRules) return { groupedVexRules: {}, vexSourceGroups: [] };
@@ -212,8 +210,6 @@ const VexRulesPage: FunctionComponent = () => {
       vexSourceGroups: Object.keys(grouped),
     };
   }, [vexRules]);
-
-  console.log("groupedVexRules", groupedVexRules);
 
   const handleSearch = useDebouncedQuerySearch();
   const assetMenu = useAssetMenu();
