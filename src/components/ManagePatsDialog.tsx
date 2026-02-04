@@ -64,8 +64,8 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
                         <span className="text-muted-foreground text-sm">
                           Scopes:
                         </span>
-                        {pat.scopes.split(" ").map((scope) => (
-                          <Badge key={scope} variant="secondary">
+                        {pat.scopes.split(" ").map((scope, index) => (
+                          <Badge key={`${scope}-${index}`} variant="secondary">
                             {scope}
                           </Badge>
                         ))}

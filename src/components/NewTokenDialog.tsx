@@ -54,11 +54,19 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
           <div>
             <label className="text-sm font-medium">Scopes</label>
             <div className="mt-1 flex flex-wrap gap-1">
-              {token.scopes.split(" ").map((scope) => (
-                <Badge key={scope} variant="secondary">
-                  {scope}
-                </Badge>
-              ))}
+              {token.scopes.split(" ").filter((scope) => scope.trim() !== "")
+                .length > 0 ? (
+                token.scopes
+                  .split(" ")
+                  .filter((scope) => scope.trim() !== "")
+                  .map((scope, index) => (
+                    <Badge key={`${scope}-${index}`} variant="secondary">
+                      {scope}
+                    </Badge>
+                  ))
+              ) : (
+                <span className="text-sm text-muted-foreground">No scopes</span>
+              )}
             </div>
           </div>
 
