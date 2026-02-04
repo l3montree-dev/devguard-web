@@ -81,7 +81,6 @@ function SettingsCard({
 const Settings: FunctionComponent = () => {
   const [flow, setFlow] = useState<SettingsFlow>();
   const [newToken, setNewToken] = useState<PatWithPrivKey | null>(null);
-  const [showNewTokenDialog, setShowNewTokenDialog] = useState(false);
 
   // Get ?flow=... from the URL
   const router = useRouter();
@@ -219,7 +218,6 @@ const Settings: FunctionComponent = () => {
         scopes,
       });
       setNewToken(createdToken);
-      setShowNewTokenDialog(true);
       reset();
     } catch (error) {
       toast.error("Failed to create token", {
@@ -503,9 +501,8 @@ const Settings: FunctionComponent = () => {
 
       <NewTokenDialog
         token={newToken}
-        open={showNewTokenDialog}
+        open={!!newToken}
         onClose={() => {
-          setShowNewTokenDialog(false);
           setNewToken(null);
         }}
       />
