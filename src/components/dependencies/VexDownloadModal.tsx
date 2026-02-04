@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import Callout from "../common/Callout";
 
 interface VexDownloadModalProps {
   showVexModal: boolean;
@@ -83,22 +84,30 @@ export default function VexDownloadModal({
       <DialogContent setOpen={setShowVexModal}>
         <DialogHeader>
           <DialogTitle>
-            Download VeX for &quot;{assetName}&quot;{" "}
+            Download VEX File for &quot;{assetName}&quot;{" "}
             <Badge variant={"outline"} className="ml-1">
               <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
               {assetVersionName}
             </Badge>
           </DialogTitle>
           <DialogDescription>
-            You can download the VeX (Vulnerability Exploitability eXchange) in
+            You can download the VEX (Vulnerability Exploitability eXchange) in
             machine readable formats and an accessible PDF if available.
+            <div className="mt-4">
+              <Callout intent="neutral">
+                <span>
+                  <strong>Note:</strong> You can share the standard VEX for any
+                  of your artifacts. That does not export your VEX Rules.
+                </span>
+              </Callout>
+            </div>
           </DialogDescription>
         </DialogHeader>
         <div>
           <hr />
           <h4 className="font-semibold mt-4">Artifact</h4>
           <p className="text-sm mb-4 text-muted-foreground">
-            Select the artifact for which you want to download the VeX.
+            Select the artifact for which you want to download the VEX.
           </p>
           <SimpleArtifactSelector
             unassignPossible={false}

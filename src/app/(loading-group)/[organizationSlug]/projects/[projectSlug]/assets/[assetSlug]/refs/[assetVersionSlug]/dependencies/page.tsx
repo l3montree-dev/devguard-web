@@ -447,10 +447,10 @@ const Index: FunctionComponent = () => {
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
-            Download SBOM
+            Share your SBOM
           </Button>
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
-            Download VeX
+            Share your VEX
           </Button>
 
           <Link
