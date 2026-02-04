@@ -543,7 +543,7 @@ const ManualIntegrationSlide: FunctionComponent<
               )}
             </div>
             <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2" />
+              <QuestionMarkCircleIcon className="flex w-4 m-2 text-primary" />
               <Link
                 className="flex text-primary text-sm"
                 href={documentationLinks.vexExplaining}

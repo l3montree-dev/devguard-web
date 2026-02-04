@@ -497,8 +497,10 @@ export interface AssetDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 
-  vulnAutoReopenAfterDays?: number;
+  vulnAutoReopenAfterDays: number | null;
   repositoryProvider?: "github" | "gitlab";
+
+  keepOriginalSbomRootComponent: boolean;
 
   members: Array<{
     id: string;

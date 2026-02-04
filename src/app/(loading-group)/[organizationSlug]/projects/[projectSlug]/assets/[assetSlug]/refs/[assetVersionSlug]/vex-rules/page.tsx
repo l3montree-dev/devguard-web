@@ -45,6 +45,12 @@ import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import Link from "next/link";
 import VexRuleActionsCell from "@/components/vex-rules/VexRuleActionsCell";
+import { groupBy } from "lodash";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -73,6 +79,27 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
   columnHelper.accessor("pathPattern", {
     header: "Path Pattern",
     cell: (info) => <VexPathPattern pathPattern={info.getValue()} />,
+  }),
+  columnHelper.accessor("justification", {
+    header: "Justification",
+    cell: (info) => {
+      const justification = info.getValue();
+      if (!justification) {
+        return <span className="text-muted-foreground">-</span>;
+      }
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="block max-w-[200px] truncate cursor-default">
+              {justification}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[400px]">
+            <p className="whitespace-pre-wrap">{justification}</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+    },
   }),
   columnHelper.accessor("eventType", {
     header: "Rule Result",
@@ -174,6 +201,20 @@ const VexRulesPage: FunctionComponent = () => {
     },
   );
 
+  console.log("vexRules", vexRules);
+
+  // Group vex rules by vexSource and create list of unique sources in a single memo
+  const { groupedVexRules, vexSourceGroups } = useMemo(() => {
+    if (!vexRules) return { groupedVexRules: {}, vexSourceGroups: [] };
+    const grouped = groupBy(vexRules, "vexSource");
+    return {
+      groupedVexRules: grouped,
+      vexSourceGroups: Object.keys(grouped),
+    };
+  }, [vexRules]);
+
+  console.log("groupedVexRules", groupedVexRules);
+
   const handleSearch = useDebouncedQuerySearch();
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
@@ -242,14 +283,9 @@ const VexRulesPage: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Manage VEX Rules"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <div className="flex flex-row gap-2">
-          <Button variant={"secondary"} onClick={() => setUploadVexModal(true)}>
-            Upload a VEX
-          </Button>
-          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
-            Share your VEX
-          </Button>
-        </div>
+        <Button variant={"secondary"} onClick={() => setUploadVexModal(true)}>
+          Upload a VEX
+        </Button>
       </div>
       <Section
         description="Manage VEX (Vulnerability Exploitability eXchange) rules for this repository ref (branches/ tags). VEX rules define how vulnerabilities should be handled based on their context."
@@ -293,7 +329,15 @@ const VexRulesPage: FunctionComponent = () => {
         <div>
           <div className="overflow-hidden rounded-lg border shadow-sm">
             <div className="overflow-auto">
-              <table className="w-full overflow-x-auto text-sm">
+              <table className="w-full overflow-x-auto text-sm table-fixed">
+                <colgroup>
+                  <col className="w-[120px]" />
+                  <col className="w-[170px]" />
+                  <col className="w-[100px]" />
+                  <col className="w-[70px]" />
+                  <col className="w-[100px]" />
+                  <col className="w-[40px]" />
+                </colgroup>
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
@@ -342,16 +386,30 @@ const VexRulesPage: FunctionComponent = () => {
                       </tr>
                     ))}
                   {!isLoading &&
-                    table
-                      .getRowModel()
-                      .rows.map((row, i, arr) => (
+                    vexSourceGroups.map((vexSource, groupIndex) => {
+                      const rulesInGroup = groupedVexRules[vexSource];
+                      // Find the first row for this group to use for rendering
+                      const firstRuleInGroup = rulesInGroup[0];
+                      const rowForGroup = table
+                        .getRowModel()
+                        .rows.find(
+                          (r) => r.original.id === firstRuleInGroup.id,
+                        );
+
+                      if (!rowForGroup) return null;
+
+                      return (
                         <VexRulesRow
-                          key={row.id}
-                          row={row}
-                          index={i}
-                          isLast={i === arr.length - 1}
+                          key={vexSource}
+                          row={rowForGroup}
+                          index={groupIndex}
+                          isLast={groupIndex === vexSourceGroups.length - 1}
+                          vexRulesInGroup={rulesInGroup}
+                          deleteUrlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+                          onDeleted={() => mutate()}
                         />
-                      ))}
+                      );
+                    })}
                 </tbody>
               </table>
             </div>

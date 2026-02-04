@@ -15,7 +15,8 @@ interface VexPathPatternProps {
 const PathSegment: FunctionComponent<{
   segment: string;
   showIcon?: boolean;
-}> = ({ segment, showIcon = false }) => {
+  truncate?: boolean;
+}> = ({ segment, showIcon = false, truncate = false }) => {
   if (segment === "*") return <span>*</span>;
 
   const version = extractVersion(segment);
@@ -24,9 +25,13 @@ const PathSegment: FunctionComponent<{
   return (
     <>
       {showIcon && <EcosystemImage size={12} packageName={segment} />}
-      <span>{packageName}</span>
+      <span className={truncate ? "truncate max-w-[150px]" : ""}>
+        {packageName}
+      </span>
       {version && (
-        <span className="text-xs text-muted-foreground">@{version}</span>
+        <span className="text-xs text-muted-foreground flex-shrink-0">
+          @{version}
+        </span>
       )}
     </>
   );
@@ -39,10 +44,16 @@ const VexPathPattern: FunctionComponent<VexPathPatternProps> = ({
     <Tooltip>
       <TooltipTrigger className="text-left">
         <div className="text-sm text-foreground truncate max-w-md">
+          <span className="inline-flex items-center">
+            <Badge variant="outline" className="gap-1">
+              <span>*</span>
+            </Badge>
+            <span className="mx-1">→</span>
+          </span>
           {pathPattern.map((segment, index) => (
             <span key={index} className="inline-flex items-center">
-              <Badge variant="outline" className="gap-1">
-                <PathSegment segment={segment} />
+              <Badge variant="outline" className="gap-1 min-w-0">
+                <PathSegment segment={segment} truncate={true} />
               </Badge>
               {index < pathPattern.length - 1 && (
                 <span className="mx-1">→</span>
@@ -53,6 +64,10 @@ const VexPathPattern: FunctionComponent<VexPathPatternProps> = ({
       </TooltipTrigger>
       <TooltipContent>
         <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
+          <span className="flex flex-row items-center gap-1">
+            <span>*</span>
+            <span>→</span>
+          </span>
           {pathPattern.map((segment, index) => (
             <span key={index} className="flex flex-row items-center gap-1">
               <PathSegment segment={segment} showIcon={segment !== "*"} />

@@ -597,12 +597,12 @@ const DependencyGraph: FunctionComponent<{
     >
       <div
         className={classNames(
-          "absolute z-10 flex flex-row gap-2 justify-end bg-black/100",
+          "absolute z-10 flex flex-row gap-2 justify-end",
           isDependencyGraphFullscreen ? "right-8 top-4" : "right-2 top-2",
         )}
       >
         <Popover>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild className="bg-background">
             <Button variant={"outline"} size={"icon"}>
               <InformationCircleIcon className="h-5 w-5" />
             </Button>
@@ -659,6 +659,7 @@ const DependencyGraph: FunctionComponent<{
           onClick={() => setIsDependencyGraphFullscreen((prev) => !prev)}
           variant={"outline"}
           size={"icon"}
+          className="bg-background"
         >
           {isDependencyGraphFullscreen ? (
             <ArrowsPointingInIcon className="h-5 w-5" />
