@@ -27,9 +27,12 @@ interface Props {
 }
 
 const trimOriginUrl = (url: string): string => {
+  // Remove "sbom:" prefix if it exists
+  let trimmedUrl = url.startsWith("sbom:") ? url.substring(5) : url;
+
   // Extract the part before @ if it exists
-  const atIndex = url.indexOf("@");
-  return atIndex !== -1 ? url.substring(0, atIndex) : url;
+  const atIndex = trimmedUrl.indexOf("@");
+  return atIndex !== -1 ? trimmedUrl.substring(0, atIndex) : trimmedUrl;
 };
 
 const ArtifactRow: FunctionComponent<Props> = ({
