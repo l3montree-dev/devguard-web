@@ -97,7 +97,7 @@ const Index: FunctionComponent = () => {
         : [],
       enableTicketRange: Boolean(
         isNumber(asset.riskAutomaticTicketThreshold) ||
-        isNumber(asset.cvssAutomaticTicketThreshold),
+          isNumber(asset.cvssAutomaticTicketThreshold),
       ),
     },
   });
@@ -418,7 +418,7 @@ const Index: FunctionComponent = () => {
       </DangerZone>
 
       <Collapsible>
-        <CollapsibleTrigger className="w-full text-muted-foreground text-right px-4 py-2 mt-4 rounded-md font-medium text-xs">
+        <CollapsibleTrigger className="w-full cursor-pointer text-muted-foreground text-right px-4 py-2 mt-4 rounded-md font-medium text-xs">
           Debug
         </CollapsibleTrigger>
         <CollapsibleContent>

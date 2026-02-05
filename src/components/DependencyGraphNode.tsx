@@ -69,10 +69,8 @@ export interface DependencyGraphNodeProps {
     isExpanded?: boolean;
     shownCount?: number;
     hasMore?: boolean;
-    isCritical?: boolean;
     propagationCount?: number;
     propagationRatio?: number;
-    impactLevel?: "critical" | "high" | "medium" | "low" | null;
     flow?: number;
     onExpansionToggle?: (nodeId: string) => void;
   };
@@ -101,11 +99,7 @@ export const DependencyGraphNode: FunctionComponent<
       }}
       className={classNames(
         "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        props.data.vuln
-          ? "border-red-500 shadow-lg"
-          : props.data.isCritical
-            ? "border-orange-500 shadow-lg"
-            : "border-border",
+        props.data.vuln ? "border-red-500 shadow-lg" : "border-border",
       )}
     >
       <Handle
@@ -114,7 +108,7 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        {props.data.vuln ? (
+        {props.data.vuln && (
           <div className="absolute -top-2 -right-2 z-10">
             <Badge
               variant="outline"
@@ -124,18 +118,6 @@ export const DependencyGraphNode: FunctionComponent<
               Vulnerable
             </Badge>
           </div>
-        ) : (
-          props.data.isCritical && (
-            <div className="absolute -top-2 -right-2 z-10">
-              <Badge
-                variant="outline"
-                className={`text-[10px] px-1.5 py-0 font-semibold shadow-md bg-orange-500 text-white border-red-500`}
-                title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
-              >
-                High Impact
-              </Badge>
-            </div>
-          )
         )}
         <div className="flex items-center justify-between flex-row gap-2">
           <div className="flex gap-2 flex-row items-start">

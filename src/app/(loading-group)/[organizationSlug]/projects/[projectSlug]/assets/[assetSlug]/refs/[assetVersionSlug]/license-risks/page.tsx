@@ -257,7 +257,7 @@ const Index: FunctionComponent = () => {
               <div>
                 <h3 className="font-semibold">License Distribution</h3>
               </div>
-              <CollapsibleTrigger className="p-2 hover:bg-muted rounded-md transition-colors">
+              <CollapsibleTrigger className="p-2 hover:bg-muted cursor-pointer rounded-md transition-colors">
                 <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
               </CollapsibleTrigger>
             </div>

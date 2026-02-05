@@ -141,7 +141,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         </span>
                       </label>
                     </div>
-                    <CollapsibleTrigger className="flex-1 text-right">
+                    <CollapsibleTrigger className="flex-1 cursor-pointer text-right">
                       <CaretDownIcon className="inline-block h-4 w-4 " />
                     </CollapsibleTrigger>
                   </div>
@@ -283,7 +283,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         <span>Scan and Build your Container Images</span>
                       </label>
                     </div>
-                    <CollapsibleTrigger className="flex-1 text-right">
+                    <CollapsibleTrigger className="flex-1 cursor-pointer text-right">
                       <CaretDownIcon className="inline-block h-4 w-4 " />
                     </CollapsibleTrigger>
                   </div>
@@ -388,7 +388,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
                         <span>Sign and Attest your Container Images</span>
                       </label>
                     </div>
-                    <CollapsibleTrigger className="flex-1 text-right">
+                    <CollapsibleTrigger className="flex-1 cursor-pointer text-right">
                       <CaretDownIcon className="inline-block h-4 w-4 " />
                     </CollapsibleTrigger>
                   </div>

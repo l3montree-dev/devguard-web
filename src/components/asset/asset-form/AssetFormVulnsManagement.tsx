@@ -477,7 +477,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     the default branch and all artifacts are used.
                     {field.value && (
                       <Collapsible defaultOpen={false} className="mt-4">
-                        <CollapsibleTrigger className="text-foreground flex w-full items-center justify-between rounded-md border bg-background px-4 py-2 text-sm font-medium hover:opacity-80">
+                        <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between rounded-md border bg-background px-4 py-2 text-sm font-medium hover:opacity-80">
                           <span>Public URLs</span>
                           <ChevronDown className="h-4 w-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
                         </CollapsibleTrigger>

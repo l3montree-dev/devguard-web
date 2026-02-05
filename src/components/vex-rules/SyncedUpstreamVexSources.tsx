@@ -118,7 +118,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   return (
     <Card className="px-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-2">
-        <CollapsibleTrigger className="group flex items-center justify-between w-full rounded-md transition-colors p-2 -m-2">
+        <CollapsibleTrigger className="group flex cursor-pointer items-center justify-between w-full rounded-md transition-colors p-2 -m-2">
           <div>
             <h3 className="flex items-center gap-2">
               Synced Upstream VEX Sources

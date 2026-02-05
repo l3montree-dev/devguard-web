@@ -153,7 +153,7 @@ const AffectedComponentDetails: FunctionComponent<{
         <div className="flex flex-col gap-4">
           <Collapsible>
             <div className="rounded-lg border bg-card p-4">
-              <CollapsibleTrigger className="flex w-full flex-row items-center justify-between text-sm font-semibold">
+              <CollapsibleTrigger className="flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}

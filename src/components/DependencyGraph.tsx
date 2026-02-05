@@ -616,10 +616,6 @@ const DependencyGraph: FunctionComponent<{
                     <span>Vulnerable - Contains known vulnerability</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-orange-500 rounded bg-card flex-shrink-0"></div>
-                    <span>High Impact - Critical to dependency tree</span>
-                  </div>
-                  <div className="flex items-center gap-2">
                     <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
                     <span>Normal - Standard dependency</span>
                   </div>

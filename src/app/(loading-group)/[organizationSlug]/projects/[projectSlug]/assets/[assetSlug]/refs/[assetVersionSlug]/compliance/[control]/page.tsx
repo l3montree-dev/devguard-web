@@ -115,7 +115,7 @@ const Index = () => {
 
               <div>
                 <Collapsible className="bg-secondary border rounded-lg mt-4">
-                  <CollapsibleTrigger className="w-full flex justify-between items-center text-left font-semibold rounded-lg px-2 py-1 ">
+                  <CollapsibleTrigger className="w-full cursor-pointer flex justify-between items-center text-left font-semibold rounded-lg px-2 py-1 ">
                     <span>Expand policy as code</span>
                     <ChevronDownIcon className="h-4 w-4 ml-2 inline-block" />
                   </CollapsibleTrigger>

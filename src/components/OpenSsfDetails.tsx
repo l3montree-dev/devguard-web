@@ -88,7 +88,7 @@ const OpenSsfDetails: FunctionComponent<Props> = ({ scoreCard }) => {
 
   return (
     <Collapsible onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex text-secondary-foreground w-full mb-2 flex-row font-medium justify-between">
+      <CollapsibleTrigger className="flex text-secondary-foreground cursor-pointer w-full pb-2 flex-row font-medium justify-between">
         More Details{" "}
         {isOpen ? (
           <ChevronDownIcon className="relative w-4 text-muted-foreground" />

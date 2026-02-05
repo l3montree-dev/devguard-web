@@ -365,18 +365,6 @@ export const getLayoutedElements = (
     parentToChildEdges.set(source, existingChildren);
   });
 
-  // mark all 95 percentile nodes as critical
-  // only focus on nodes which are real components
-  const riskValues = Array.from(
-    riskMap
-      .entries()
-      .filter(([id]) => id.startsWith("pkg:"))
-      .map(([_, v]) => v)
-      .filter((r) => r > 0),
-  );
-
-  const criticalThreshold = percentile(0.95, riskValues);
-
   const edges = dagreGraph.edges().map((el) => {
     const source = el.v; // parent
     const target = el.w; // child
@@ -402,12 +390,7 @@ export const getLayoutedElements = (
   const updatedNodes = nodes.map((node) => {
     return {
       ...node,
-      data: {
-        ...node.data,
-        isCritical:
-          node.id.startsWith("pkg:") &&
-          (node.data.risk || 0) >= criticalThreshold,
-      },
+      data: node.data,
     };
   });
 
