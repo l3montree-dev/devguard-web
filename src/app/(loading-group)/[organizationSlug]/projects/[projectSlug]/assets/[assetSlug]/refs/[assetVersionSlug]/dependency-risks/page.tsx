@@ -222,7 +222,7 @@ const Index: FunctionComponent = () => {
     },
     [uri, assetVersionSlug, mutateVulns],
   );
-  
+
   const handleSearch = useDebouncedQuerySearch();
 
   const { table } = useTable({
