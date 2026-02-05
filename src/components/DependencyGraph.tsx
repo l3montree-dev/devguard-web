@@ -769,7 +769,8 @@ const DependencyGraph: FunctionComponent<{
                         Uncontrollable by Attacker
                       </span>
                       <span className="text-xs text-muted-foreground leading-snug">
-                        Vulnerable code cannot be exploited in this context
+                        {getDisplayName(contextMenu.parentName)} makes sure,
+                        that vulnerable code cannot be exploited in this context
                       </span>
                     </DropdownMenuItem>
                   </>
