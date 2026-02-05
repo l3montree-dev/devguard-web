@@ -256,7 +256,7 @@ interface BaseVulnEventDTO {
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;
-  upstream: UpstreamState;
+  createdByVexRule: boolean;
 }
 
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {

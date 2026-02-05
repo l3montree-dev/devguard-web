@@ -105,8 +105,6 @@ const RiskFeedItem = ({
   currentUser,
   activeAssetVersion,
   currentUserRole,
-  index,
-  lastStateChangingEventIndex,
   vulnerabilityName,
   deleteEvent,
   page,
@@ -122,8 +120,6 @@ const RiskFeedItem = ({
   vulnerabilityName: string;
   deleteEvent?: (eventId: string) => void;
   page: number;
-  index: number;
-  lastStateChangingEventIndex: number;
 }) => {
   const user = findUser(event.userId, org, currentUser);
 
@@ -140,13 +136,15 @@ const RiskFeedItem = ({
     >
       <div
         className={classNames(
-          event.upstream === 2 ? "border-dashed border" : "",
+          event.createdByVexRule ? "border-dashed border" : "",
           "absolute left-[13px] h-full border-l border-r -bottom-[35px]",
         )}
       />
       <div
         className={classNames(
-          event.upstream === 2 ? "bg-secondary" : evTypeBackground[event.type],
+          event.createdByVexRule
+            ? "bg-secondary"
+            : evTypeBackground[event.type],
           "h-7 w-7 rounded-full text-white border-2 flex flex-row items-center z-10 justify-center border-background p-1",
         )}
       >
@@ -155,7 +153,7 @@ const RiskFeedItem = ({
       <div className={classNames("w-full")}>
         <div className="flex w-full flex-col">
           <div className="flex flex-row items-start gap-2">
-            {event.upstream != 0 ? (
+            {event.createdByVexRule ? (
               <Avatar>
                 <AvatarFallback className="bg-secondary">
                   <GitPullRequestCreateArrowIcon className="w-5 h-5 text-muted-foreground" />
@@ -185,7 +183,7 @@ const RiskFeedItem = ({
             <div className="w-full overflow-hidden rounded border">
               <div className="w-full">
                 <p className="w-full bg-card px-2 py-2 pr-20 font-medium">
-                  {event.upstream > 0
+                  {event.createdByVexRule
                     ? "VEX Rule"
                     : findUser(event.userId, org, currentUser).displayName}{" "}
                   {eventTypeMessages(event, vulnerabilityName, events)}
@@ -276,11 +274,6 @@ export default function RiskAssessmentFeed({
 
   const activeAssetVersion = useActiveAssetVersion();
 
-  const lastStateChangingEventIndex = events.findLastIndex(
-    (event) =>
-      ["accepted", "fixed", "falsePositive", "mitigate"].includes(event.type) &&
-      event.upstream !== 2,
-  );
   const [isOpen, setIsOpen] = useState(false);
 
   const deleteHistory = () => {
@@ -339,8 +332,6 @@ export default function RiskAssessmentFeed({
                       vulnerabilityName={vulnerabilityName}
                       deleteEvent={deleteEvent}
                       page={page as unknown as number}
-                      lastStateChangingEventIndex={lastStateChangingEventIndex}
-                      index={index}
                       org={org}
                       project={project}
                       asset={asset}
@@ -366,8 +357,6 @@ export default function RiskAssessmentFeed({
                   vulnerabilityName={vulnerabilityName}
                   deleteEvent={deleteEvent}
                   page={page as unknown as number}
-                  lastStateChangingEventIndex={lastStateChangingEventIndex}
-                  index={events.length - 2 + index}
                   org={org}
                   project={project}
                   asset={asset}
