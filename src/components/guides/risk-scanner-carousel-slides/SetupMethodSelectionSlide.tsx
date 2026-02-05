@@ -98,7 +98,8 @@ export const SetupMethodSelectionSlide: FunctionComponent<
             </Badge>
           </CardTitle>
           <CardDescription>
-            Explicitly select which scans to integrate, or use your own scanner.
+            Explicitly select which scans to integrate, use your own scanner or
+            upload a SBOM file.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -114,13 +115,13 @@ export const SetupMethodSelectionSlide: FunctionComponent<
         <CardHeader>
           <CardTitle className="text-lg items-center flex flex-row leading-tight">
             <LinkIcon className="inline-block mr-2 w-4 h-4" />
-            Setup from external information source
+            Supplier provided SBOM (URL)
             <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
               Expert
             </Badge>
           </CardTitle>
           <CardDescription>
-            Provide VeX or SBOM URLs to setup Devguard based on external data
+            Provide an SBOM URLs to setup Devguard based on external data
             sources. This data will be periodically fetched and updated.
           </CardDescription>
         </CardHeader>

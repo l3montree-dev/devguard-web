@@ -176,8 +176,6 @@ const Index: FunctionComponent = () => {
     return reduceRiskHistories(completeRiskHistory);
   }, [riskHistoryResp]);
 
-  console.log(riskHistoryResp);
-
   const project = activeProject;
   const asset = activeAsset;
 

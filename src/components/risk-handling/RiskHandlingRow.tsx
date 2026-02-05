@@ -17,22 +17,18 @@ import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Row } from "@tanstack/react-table";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
-import AcceptRiskDialog from "../AcceptRiskDialog";
-import FalsePositiveDialog from "../FalsePositiveDialog";
 import Severity from "../common/Severity";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
-import { toast } from "sonner";
+import Link from "next/link";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -93,38 +89,40 @@ const VulnWithCveTableRow = ({
           <div className="flex-1 min-w-0">
             <Tooltip>
               <TooltipTrigger className="text-left">
-                <div className="text-sm text-foreground truncate max-w-md">
-                  <span className="mr-2 text-xs text-muted-foreground">
-                    {vuln.state !== "open" && <>{vuln.state}, </>}
-                    {vuln.vulnerabilityPath.length === 1
-                      ? "Direct"
-                      : `${vuln.vulnerabilityPath.length} hops`}
-                  </span>
-                  {vuln.vulnerabilityPath.length <= 2 ? (
-                    <span>
-                      {vuln.vulnerabilityPath.map((p, i) => (
-                        <span key={i}>
-                          {i > 0 && " → "}
-                          <Badge variant="outline">{beautifyPurl(p)}</Badge>
-                        </span>
-                      ))}
+                <Link href={href}>
+                  <div className="text-sm text-foreground truncate max-w-md">
+                    <span className="mr-2 text-xs text-muted-foreground">
+                      {vuln.state !== "open" && <>{vuln.state}, </>}
+                      {vuln.vulnerabilityPath.length === 1
+                        ? "Direct"
+                        : `${vuln.vulnerabilityPath.length} hops`}
                     </span>
-                  ) : (
-                    <span>
-                      <Badge variant="outline">
-                        {beautifyPurl(vuln.vulnerabilityPath[0])}
-                      </Badge>
-                      {" → ... → "}
-                      <Badge variant="outline">
-                        {beautifyPurl(
-                          vuln.vulnerabilityPath[
-                            vuln.vulnerabilityPath.length - 1
-                          ],
-                        )}
-                      </Badge>
-                    </span>
-                  )}
-                </div>
+                    {vuln.vulnerabilityPath.length <= 2 ? (
+                      <span>
+                        {vuln.vulnerabilityPath.map((p, i) => (
+                          <span key={i}>
+                            {i > 0 && " → "}
+                            <Badge variant="outline">{beautifyPurl(p)}</Badge>
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span>
+                        <Badge variant="outline">
+                          {beautifyPurl(vuln.vulnerabilityPath[0])}
+                        </Badge>
+                        {" → ... → "}
+                        <Badge variant="outline">
+                          {beautifyPurl(
+                            vuln.vulnerabilityPath[
+                              vuln.vulnerabilityPath.length - 1
+                            ],
+                          )}
+                        </Badge>
+                      </span>
+                    )}
+                  </div>
+                </Link>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
@@ -166,10 +164,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const [expandedCves, setExpandedCves] = useState<Set<string>>(new Set());
   const pathname = useDecodedPathname();
   const router = useRouter();
-  const vulnById = useMemo(
-    () => new Map(row.original.vulns.map((v) => [v.id, v])),
-    [row.original.vulns],
-  );
   const vulnGroups = useMemo(
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],

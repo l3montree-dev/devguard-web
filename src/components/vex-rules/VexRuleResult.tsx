@@ -1,6 +1,5 @@
 import { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
-import { vexOptionMessages } from "@/utils/view";
 import {
   Tooltip,
   TooltipContent,
@@ -20,44 +19,8 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   const typeString =
     typeof eventType === "string" ? eventType : eventType?.type || "unknown";
 
-  // Determine if it's a false positive variant
-  const isFalsePositive =
-    typeString === "falsePositive" ||
-    typeString === "markedForTransfer" ||
-    typeString === "detectedOnAnotherBranch";
-
   // Accepted leads to comment but doesn't close vulns
   const isAccepted = typeString === "accepted";
-
-  if (isFalsePositive) {
-    const tooltipMessage = mechanicalJustification
-      ? vexOptionMessages[mechanicalJustification]
-      : null;
-
-    const badge = (
-      <span
-        className={classNames(
-          "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
-          "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400 dark:ring-purple-500/20",
-        )}
-      >
-        False Positive
-      </span>
-    );
-
-    if (tooltipMessage) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>{badge}</TooltipTrigger>
-          <TooltipContent>
-            <p className="max-w-xs">{tooltipMessage}</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-
-    return badge;
-  }
 
   if (isAccepted) {
     return (
@@ -72,16 +35,26 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
     );
   }
 
-  // Fallback for other types
-  return (
+  const badge = (
     <span
       className={classNames(
         "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
-        "bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20",
+        "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400 dark:ring-purple-500/20",
       )}
     >
-      {typeString}
+      False Positive
     </span>
+  );
+
+  return !!mechanicalJustification ? (
+    <Tooltip>
+      <TooltipTrigger asChild>{badge}</TooltipTrigger>
+      <TooltipContent>
+        <p className="max-w-xs">{mechanicalJustification}</p>
+      </TooltipContent>
+    </Tooltip>
+  ) : (
+    badge
   );
 };
 

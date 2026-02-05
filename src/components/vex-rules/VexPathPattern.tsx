@@ -25,7 +25,7 @@ const PathSegment: FunctionComponent<{
   return (
     <>
       {showIcon && <EcosystemImage size={12} packageName={segment} />}
-      <span className={truncate ? "truncate max-w-[150px]" : ""}>
+      <span className={truncate ? "truncate max-w-[50px]" : ""}>
         {packageName}
       </span>
       {version && (

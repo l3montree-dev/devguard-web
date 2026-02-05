@@ -25,8 +25,9 @@ export class HttpError extends Error {
             notFound: true;
           };
     },
+    message = "HTTP Error",
   ) {
-    super("HTTP Error");
+    super(message);
     this.instructions = instructions;
   }
 }

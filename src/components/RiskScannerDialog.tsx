@@ -251,9 +251,14 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
     if (resp.ok) {
       await refreshAssetData();
-      router.push(
-        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks/`,
-      );
+      // This was a total upfuck...
+      // When you are reading this farytail of a shit show your will be enlightet...
+      // When you have a fresh repository (asset) next catches a 404 and seems to store that in their beautiful cache, a very beautiful cache.
+      // https://nextjs.org/docs/app/getting-started/fetching-data
+      // You can see we added a better error tracking in the AssetLayout to make that visible.
+      // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
+      // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks`;
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {
@@ -287,9 +292,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
     if (resp.ok) {
       await refreshAssetData();
-      router.push(
-        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/code-risks/`,
-      );
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/code-risks/`;
       onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
     } else {
@@ -325,9 +328,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     if (resp.ok) {
       await refreshAssetData();
       onOpenChange(false);
-      router.push(
-        `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks/`,
-      );
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
     } else {
       toast.error("VEX has not been sent successfully");

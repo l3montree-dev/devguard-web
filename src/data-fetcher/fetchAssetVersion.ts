@@ -25,16 +25,19 @@ export async function fetchAssetVersion(
   const devGuardApiClient = await getApiClientInAppRouter();
 
   const url = `/organizations/${decodeURIComponent(orgSlug)}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`;
-  // console.log(url);
+
   const r = await devGuardApiClient(url);
 
   if (!r.ok) {
-    throw new HttpError({
-      redirect: {
-        destination: "/" + orgSlug + "/projects/" + projectSlug,
-        permanent: false,
+    throw new HttpError(
+      {
+        redirect: {
+          destination: "/" + orgSlug + "/projects/" + projectSlug,
+          permanent: false,
+        },
       },
-    });
+      `Failed to fetch asset version: ${r.status} ${r.statusText} ${Date.now()}`,
+    );
   }
   // parse the organization
   const assetVersion: AssetVersionDTO = await r.json();

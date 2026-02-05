@@ -327,7 +327,7 @@ const VexRulesPage: FunctionComponent = () => {
             <div className="overflow-auto">
               <table className="w-full overflow-x-auto text-sm table-fixed">
                 <colgroup>
-                  <col className="w-[120px]" />
+                  <col className="w-[130px]" />
                   <col className="w-[170px]" />
                   <col className="w-[100px]" />
                   <col className="w-[70px]" />

@@ -126,13 +126,14 @@ export default function ScannerSelectionSlide({
                 height={20}
                 className="inline-block mr-2 w-4 h-4"
               />
-              Use your own Scanner
+              Use your own Scanner or manually upload
               <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
                 Expert
               </Badge>
             </CardTitle>
             <CardDescription>
-              You already have a Scanner and want to just Upload your results...
+              You already have a Scanner or an SBOM file and want to just upload
+              your results...
             </CardDescription>
           </CardHeader>
         </Card>
@@ -148,13 +149,13 @@ export default function ScannerSelectionSlide({
           <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <LinkIcon className="inline-block mr-2 w-4 h-4" />
-              Setup from external information source
+              Supplier provided SBOM (URL)
               <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
                 Expert
               </Badge>
             </CardTitle>
             <CardDescription>
-              Provide VeX or SBOM URLs to setup Devguard based on external data
+              Provide an SBOM URLs to setup Devguard based on external data
               sources. This data will be periodically fetched and updated.
             </CardDescription>
           </CardHeader>
