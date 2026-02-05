@@ -291,7 +291,6 @@ const Index: FunctionComponent = () => {
                   vulnerabilityName={
                     emptyThenNull(vuln.componentPurl) ?? "Unknown"
                   }
-                  acceptUpstreamChange={() => {}}
                   events={vuln.events}
                   page="license-risks"
                   deleteEvent={handleDeleteEvent}

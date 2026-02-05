@@ -45,10 +45,10 @@
         "@tailwindcss/forms": "^0.5.11",
         "@tanstack/react-table": "^8.21.3",
         "@types/node": "25.0.10",
-        "@types/react": "19.2.10",
+        "@types/react": "19.2.13",
         "@types/react-dom": "19.2.3",
         "@xyflow/react": "^12.6.4",
-        "autoprefixer": "10.4.23",
+        "autoprefixer": "10.4.24",
         "axios": "^1.13.4",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -86,7 +86,7 @@
         "tinycolor2": "^1.6.0",
         "typescript": "5.9.3",
         "zod": "^3.24.4",
-        "zustand": "^5.0.10"
+        "zustand": "^5.0.11"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.3",

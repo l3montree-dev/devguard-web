@@ -108,7 +108,6 @@ const RiskFeedItem = ({
   index,
   lastStateChangingEventIndex,
   vulnerabilityName,
-  acceptUpstreamChange,
   deleteEvent,
   page,
 }: {
@@ -121,7 +120,6 @@ const RiskFeedItem = ({
   activeAssetVersion: ReturnType<typeof useActiveAssetVersion>;
   currentUserRole: UserRole | null;
   vulnerabilityName: string;
-  acceptUpstreamChange: (event: VulnEventDTO) => void;
   deleteEvent?: (eventId: string) => void;
   page: number;
   index: number;
@@ -253,21 +251,6 @@ const RiskFeedItem = ({
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {event.upstream === 2 && (
-            <div className="flex items-start flex-row justify-between w-full">
-              <Badge variant={"yellow"} className="ml-2">
-                Not accepted upstream event
-              </Badge>
-              {index >= lastStateChangingEventIndex && (
-                <Button
-                  onClick={() => acceptUpstreamChange(event)}
-                  variant={"outline"}
-                >
-                  Accept upstream change
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </li>
@@ -278,13 +261,11 @@ export default function RiskAssessmentFeed({
   events,
   vulnerabilityName,
   page,
-  acceptUpstreamChange,
   deleteEvent,
 }: {
   events: VulnEventDTO[];
   vulnerabilityName: string;
   page: string;
-  acceptUpstreamChange: (event: VulnEventDTO) => void;
   deleteEvent: (eventId: string) => Promise<void>;
 }) {
   const org = useActiveOrg();
@@ -356,7 +337,6 @@ export default function RiskAssessmentFeed({
                     <RiskFeedItem
                       activeAssetVersion={activeAssetVersion}
                       vulnerabilityName={vulnerabilityName}
-                      acceptUpstreamChange={acceptUpstreamChange}
                       deleteEvent={deleteEvent}
                       page={page as unknown as number}
                       lastStateChangingEventIndex={lastStateChangingEventIndex}
@@ -384,7 +364,6 @@ export default function RiskAssessmentFeed({
                 <RiskFeedItem
                   activeAssetVersion={activeAssetVersion}
                   vulnerabilityName={vulnerabilityName}
-                  acceptUpstreamChange={acceptUpstreamChange}
                   deleteEvent={deleteEvent}
                   page={page as unknown as number}
                   lastStateChangingEventIndex={lastStateChangingEventIndex}

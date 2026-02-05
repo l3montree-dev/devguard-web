@@ -289,7 +289,6 @@ const Index = () => {
               </div>
               <div className="mt-16">
                 <RiskAssessmentFeed
-                  acceptUpstreamChange={() => {}}
                   vulnerabilityName={
                     emptyThenNull(vuln.ruleName) ??
                     emptyThenNull(vuln.ruleId) ??
