@@ -97,7 +97,7 @@ const Index: FunctionComponent = () => {
         : [],
       enableTicketRange: Boolean(
         isNumber(asset.riskAutomaticTicketThreshold) ||
-          isNumber(asset.cvssAutomaticTicketThreshold),
+        isNumber(asset.cvssAutomaticTicketThreshold),
       ),
     },
   });
