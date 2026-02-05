@@ -1,11 +1,13 @@
 {
-  "licenser.license": "AGPLv3",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "editor.formatOnSave": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "licenser.author": "L3montree GmbH and the DevGuard Contributors",
-  "licenser.useSPDXLicenseFormat": true,
-  "cSpell.words": ["devguard"]
+    "licenser.license": "AGPLv3",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.formatOnSave": false,
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "licenser.author": "L3montree GmbH and the DevGuard Contributors",
+    "licenser.useSPDXLicenseFormat": true,
+    "cSpell.words": [
+        "devguard"
+    ]
 }
