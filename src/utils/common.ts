@@ -162,6 +162,9 @@ export const isNumber = (v: any): v is number => {
 };
 
 export const beautifyPurl = (purl: string) => {
+  if (purl === "ROOT") {
+    return "Your application";
+  }
   if (!purl) {
     return "";
   }

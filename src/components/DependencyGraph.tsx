@@ -580,10 +580,7 @@ const DependencyGraph: FunctionComponent<{
 
   // Helper to beautify node names for display
   const getDisplayName = (name: string) => {
-    if (name.startsWith("pkg:")) {
-      return beautifyPurl(name);
-    }
-    return name;
+    return beautifyPurl(name);
   };
 
   return (

@@ -65,7 +65,6 @@ export interface DependencyGraphNodeProps {
     risk: number;
     nodeWidth: number;
     nodeHeight: number;
-    infoSources?: Set<string>;
     childCount?: number;
     isExpanded?: boolean;
     shownCount?: number;
@@ -80,38 +79,9 @@ export interface DependencyGraphNodeProps {
   id: string;
 }
 
-const beautifyInfoSource = (source: string) => {
-  if (source.startsWith("sbom:")) {
-    // return everything between the first ":" and the "@"
-    const atIndex = source.indexOf("@");
-    if (atIndex === -1) {
-      return source.substring(5);
-    }
-    return source.substring(5, atIndex);
-  }
-  if (source.startsWith("vex:")) {
-    const atIndex = source.indexOf("@");
-    if (atIndex === -1) {
-      return source.substring(4);
-    }
-    return source.substring(4, atIndex);
-  }
-  if (source.startsWith("csaf:")) {
-    const atIndex = source.indexOf("@");
-    if (atIndex === -1) {
-      return source.substring(5);
-    }
-    return source.substring(5, atIndex);
-  }
-  return source;
-};
-
 export const DependencyGraphNode: FunctionComponent<
   DependencyGraphNodeProps
 > = (props) => {
-  const infoSources = props.data.infoSources
-    ? Array.from(props.data.infoSources)
-    : [];
   const hasChildren = (props.data.childCount ?? 0) > 0;
   const isExpanded = props.data.isExpanded ?? false;
   const version = extractVersion(props.data.label);
@@ -182,24 +152,6 @@ export const DependencyGraphNode: FunctionComponent<
                 {beautifyPurl(props.data.label)}
                 {version && <Badge variant={"outline"}>{version}</Badge>}
               </label>
-              {infoSources.length > 0 && (
-                <div className="flex mt-1 flex-wrap gap-1">
-                  {infoSources.map((source) => (
-                    <Badge
-                      key={source}
-                      variant="secondary"
-                      className={classNames(
-                        "text-[10px] px-1.5 py-0",
-                        source.startsWith("sbom:")
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                          : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-                      )}
-                    >
-                      {beautifyInfoSource(source)}
-                    </Badge>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
           {hasChildren && (
