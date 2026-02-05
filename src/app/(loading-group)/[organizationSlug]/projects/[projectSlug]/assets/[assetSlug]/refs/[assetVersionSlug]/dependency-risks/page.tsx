@@ -222,12 +222,7 @@ const Index: FunctionComponent = () => {
     },
     [uri, assetVersionSlug, mutateVulns],
   );
-
-  const { data: vulnsToSync } = useSWR<Paged<VulnByPackage>>(
-    uri + "refs/" + assetVersionSlug + "/" + "dependency-vulns/sync/",
-    fetcher,
-  );
-
+  
   const handleSearch = useDebouncedQuerySearch();
 
   const { table } = useTable({
@@ -342,19 +337,6 @@ const Index: FunctionComponent = () => {
           </div>
         </div>
       </Section>
-      {vulnsToSync && vulnsToSync.data.length > 0 && (
-        <div className="mb-4 flex flex-row justify-center">
-          <Link
-            href={pathname + "/sync/"}
-            className={buttonVariants({
-              variant: "secondary",
-            })}
-          >
-            There are new Events from a upstream source. Click here to handle
-            them.
-          </Link>
-        </div>
-      )}
       {!vulns?.data?.length ? (
         <div>
           <EmptyParty
