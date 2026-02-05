@@ -47,10 +47,11 @@ export function useCreateVexRule({
       let pathPattern: string[] | undefined;
       if (selection.type === "node" && selection.nodeName) {
         pathPattern = [selection.nodeName, "*"];
-      } else if (selection.type === "edge" && selection.childName) {
-        pathPattern = [selection.childName, "*"];
       } else if (selection.type === "edge" && selection.parentName) {
         pathPattern = [selection.parentName, "*"];
+      } else {
+        toast("Invalid selection for creating VEX rule");
+        return false;
       }
 
       if (!pathPattern || !cveId) {
