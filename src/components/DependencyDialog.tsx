@@ -25,7 +25,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { GitBranch, ScaleIcon, StarIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import useDecodedParams from "../hooks/useDecodedParams";
-import { beautifyPurl } from "../utils/common";
+import { beautifyPurl, classNames } from "../utils/common";
 import OpenSsfDetails from "./OpenSsfDetails";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ListItem from "./common/ListItem";
@@ -34,6 +34,7 @@ import {
   convertPathsToTree,
   ViewDependencyTreeNode,
 } from "../utils/dependencyGraphHelpers";
+import { useTheme } from "next-themes";
 
 interface Props {
   open: boolean;
@@ -56,6 +57,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
     null,
   );
 
+  const { theme } = useTheme();
   //read artifactName from url query params
   const artifactName = (search?.get("artifact") as string) || "";
 
@@ -137,7 +139,12 @@ const DependencyDialog: FunctionComponent<Props> = ({
         {graphData && (
           <div className="mt-4">
             <span className="font-semibold mb-2 block">Path to component</span>
-            <div className="h-72 w-full rounded-lg border bg-black">
+            <div
+              className={classNames(
+                "h-72 w-full rounded-lg border",
+                theme === "light" ? "bg-gray-50" : "bg-black",
+              )}
+            >
               <DependencyGraph
                 variant="compact"
                 width={100}

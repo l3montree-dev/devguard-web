@@ -36,6 +36,7 @@ import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
+import { useTheme } from "next-themes";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -48,6 +49,8 @@ const DependencyGraphPage: FunctionComponent = () => {
       assetSlug: string;
       assetVersionSlug: string;
     };
+
+  const { theme } = useTheme();
 
   const all = searchParams?.get("all") === "1";
   const menu = useAssetMenu();
@@ -130,7 +133,8 @@ const DependencyGraphPage: FunctionComponent = () => {
 
         <div
           className={classNames(
-            "h-screen w-full rounded-lg border bg-white dark:bg-black",
+            "h-screen w-full rounded-lg border bg-background",
+            theme === "light" ? "bg-gray-50" : "bg-black",
           )}
         >
           {graph ? (

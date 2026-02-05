@@ -588,7 +588,7 @@ const DependencyGraph: FunctionComponent<{
       ref={containerRef}
       className={
         isDependencyGraphFullscreen
-          ? "fixed bg-black left-0 top-0 z-50 h-screen w-screen"
+          ? "fixed bg-background left-0 top-0 z-50 h-screen w-screen"
           : "relative h-full w-full"
       }
     >
