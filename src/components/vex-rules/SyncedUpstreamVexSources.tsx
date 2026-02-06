@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2, MoreHorizontal, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
@@ -29,6 +29,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
   const [isOpen, setIsOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
+  const [csafPackageScope, setCsafPackageScope] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const selectedArtifact = searchParams?.get("artifact");
 
@@ -79,18 +80,54 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     }
   };
 
+  const csafTypeDetection = (newUrl: string) => {
+    if (newUrl.includes("provider-metadata")) {
+      return "cyclonedxvex";
+    } else {
+      return "csaf";
+    }
+  };
+
+  const isPurlValid = (purl: string): boolean => {
+    const purlRegex = /^pkg:[a-z][a-z0-9-]*\/.+/i;
+    return purlRegex.test(purl);
+  };
+
   const handleAddUrl = async () => {
     if (!newUrl.trim()) {
       toast.error("Please enter a URL");
       return;
     }
 
+    const detectedType = csafTypeDetection(newUrl);
+
+    if (detectedType === "csaf" && !csafPackageScope.trim()) {
+      toast.error("Please enter a CSAF package scope (PURL)");
+      return;
+    }
+
+    if (detectedType === "csaf" && !isPurlValid(csafPackageScope.trim())) {
+      toast.error(
+        "Invalid PURL format. Must start with 'pkg:' (e.g., pkg:npm/express@4.0.0)",
+      );
+      return;
+    }
+
     setIsAdding(true);
     try {
+      const requestBody: any = {
+        url: newUrl.trim(),
+        type: detectedType,
+      };
+
+      if (detectedType === "csaf" && csafPackageScope.trim()) {
+        requestBody.csafPackageScope = csafPackageScope.trim();
+      }
+
       const response = await browserApiClient(`${apiUrl}/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: newUrl.trim(), type: "vex" }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -99,6 +136,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
       toast.success("VEX source added successfully");
       setNewUrl("");
+      setCsafPackageScope("");
       mutate();
     } catch (error) {
       toast.error("Failed to add VEX source");
@@ -232,14 +270,38 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                   onKeyDown={(e) => e.key === "Enter" && handleAddUrl()}
                   className="flex-1"
                 />
-                <Button onClick={handleAddUrl} disabled={isAdding} size="sm">
-                  {isAdding ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                </Button>
+                {csafTypeDetection(newUrl) !== "cyclonedxvex" && (
+                  <Button onClick={handleAddUrl} disabled={isAdding} size="sm">
+                    {isAdding ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
               </div>
+              {csafTypeDetection(newUrl) === "cyclonedxvex" && (
+                <>
+                  <div className="flex gap-2 ">
+                    <Input
+                      placeholder="pkg:npm/express@4.0.0 (Package URL - PURL)"
+                      value={csafPackageScope}
+                      onChange={(e) => setCsafPackageScope(e.target.value)}
+                    />
+                    <Button
+                      onClick={handleAddUrl}
+                      disabled={isAdding}
+                      size="sm"
+                    >
+                      {isAdding ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Plus className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </CollapsibleContent>
