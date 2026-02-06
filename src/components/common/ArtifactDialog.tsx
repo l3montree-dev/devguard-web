@@ -9,10 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  ArtifactCreateUpdateRequest,
-  ExternalReferenceErrorDTO,
-} from "@/types/api/api";
+import { ArtifactCreateUpdateRequest } from "@/types/api/api";
 import { UseFormReturn } from "react-hook-form";
 import ArtifactForm from "./ArtifactForm";
 import { Form } from "../ui/form";

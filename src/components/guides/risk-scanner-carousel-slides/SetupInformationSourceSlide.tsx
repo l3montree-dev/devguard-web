@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  ArtifactCreateUpdateRequest,
-  ExternalReferenceErrorDTO,
-} from "@/types/api/api";
+import { ArtifactCreateUpdateRequest } from "@/types/api/api";
 import { FunctionComponent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
