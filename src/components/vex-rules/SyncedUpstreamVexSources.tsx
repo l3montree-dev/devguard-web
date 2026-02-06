@@ -287,6 +287,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                       placeholder="pkg:npm/express@4.0.0 (Package URL - PURL)"
                       value={csafPackageScope}
                       onChange={(e) => setCsafPackageScope(e.target.value)}
+                      variant="onCard"
                     />
                     <Button
                       onClick={handleAddUrl}
