@@ -358,24 +358,24 @@ export const integrationSnippets = ({
 
     sarif: `
     sarif-risk-identification:
-        uses: ./.github/workflows/code-risk-identification.yml
+        uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
             sarif-file: "./results.sarif"
             web-ui: "${frontendUrl}"
         secrets:
-            devguard-token: \${{ secrets.DEVGUARD_TOKEN }}`,
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     sbom: `
     sbom-risk-identification:
-        uses: ./.github/workflows/sbom-risk-identification.yml
+        uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
             sbom-file: "./results.sbom"
             web-ui: "${frontendUrl}"
         secrets:
-            devguard-token: \${{ secrets.DEVGUARD_TOKEN }}`,
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     push: "",
     sign: "",
     attest: "",
