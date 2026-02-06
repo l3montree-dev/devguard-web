@@ -9,7 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import {
+  ArtifactCreateUpdateRequest,
+  ExternalReferenceErrorDTO,
+} from "@/types/api/api";
 import { UseFormReturn } from "react-hook-form";
 import ArtifactForm from "./ArtifactForm";
 import { Form } from "../ui/form";
@@ -22,7 +25,6 @@ interface Props {
   onSubmit?: (data: ArtifactCreateUpdateRequest) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   isEditMode?: boolean;
-  invalidUrls?: string[];
 }
 
 const ArtifactDialog = ({
@@ -31,7 +33,6 @@ const ArtifactDialog = ({
   onOpenChange,
   onSubmit,
   isEditMode = false,
-  invalidUrls = [],
 }: Props) => {
   const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
     if (onSubmit) {
@@ -58,11 +59,7 @@ const ArtifactDialog = ({
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <ArtifactForm
-              form={form}
-              invalidUrls={invalidUrls}
-              isEditMode={isEditMode}
-            />
+            <ArtifactForm form={form} isEditMode={isEditMode} />
             <DialogFooter>
               <div className="flex w-full flex-col justify-end gap-4 items-end">
                 <div className="flex gap-2">

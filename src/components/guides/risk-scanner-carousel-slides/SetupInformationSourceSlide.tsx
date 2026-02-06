@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import {
+  ArtifactCreateUpdateRequest,
+  ExternalReferenceErrorDTO,
+} from "@/types/api/api";
 import { FunctionComponent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,7 +23,7 @@ interface SetupInformationSourceSlideProps {
     artifactName: string;
     isDefault: boolean;
     informationSources: Array<{ url: string; purl?: string }>;
-  }) => void;
+  }) => Promise<void>;
 }
 
 export const SetupInformationSourceSlide: FunctionComponent<
@@ -56,7 +59,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
       return;
     }
 
-    return onInformationSourceSetup({
+    await onInformationSourceSetup({
       branchOrTagName: "main",
       isTag: false,
       artifactName: data.artifactName,

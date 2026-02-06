@@ -4,6 +4,7 @@ import { AssetVersionProvider } from "../../../../../../../../../context/AssetVe
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { HttpError } from "@/data-fetcher/http-error";
+import { notFound } from "next/navigation";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -49,8 +50,7 @@ const AssetLayout = async ({
       </ClientContextWrapper>
     );
   } catch (error) {
-    console.error("Error in AssetLayout:", (error as HttpError).message);
-    return <div>Error loading asset version data.</div>;
+    notFound();
   }
 };
 
