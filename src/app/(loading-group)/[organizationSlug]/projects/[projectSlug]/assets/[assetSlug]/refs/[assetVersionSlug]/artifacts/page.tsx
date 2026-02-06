@@ -2,31 +2,31 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import ArtifactForm from "@/components/common/ArtifactForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
-import Callout from "@/components/common/Callout";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { documentationLinks } from "@/const/documentationLinks";
 import { useSession } from "@/context/SessionContext";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   ArtifactCreateUpdateRequest,
   ArtifactDTO,
+  ExternalReferenceErrorDTO,
   InformationSources,
 } from "@/types/api/api";
-import { useEffect, useMemo, useState } from "react";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import useSWR from "swr";
+import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
-import {
-  useArtifacts,
-  useUpdateAssetVersionState,
-} from "../../../../../../../../../../context/AssetVersionContext";
-import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
-import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,14 +37,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../../../../../../../../components/ui/alert-dialog";
-import { TriangleAlert } from "lucide-react";
-import useSWR from "swr";
+import {
+  useArtifacts,
+  useUpdateAssetVersionState,
+} from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
-import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
-import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
-import { documentationLinks } from "@/const/documentationLinks";
-import Link from "next/link";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
+import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -99,8 +98,6 @@ const Artifacts = () => {
       fallbackData: {},
     },
   );
-
-  const [invalidUrls, setInvalidUrls] = useState<string[]>([]);
 
   const artifactForm = useForm<ArtifactCreateUpdateRequest>({
     defaultValues: {
@@ -247,15 +244,14 @@ const Artifacts = () => {
 
     interface UpdateArtifactResponse {
       artifact: ArtifactDTO;
-      invalidURLs: string[];
+      invalidURLs: ExternalReferenceErrorDTO[];
     }
     const resp = (await response.json()) as UpdateArtifactResponse;
     const updatedArtifact = resp.artifact;
 
     if (resp.invalidURLs && resp.invalidURLs.length > 0) {
-      setInvalidUrls(resp.invalidURLs);
       toast.error(
-        `Some upstream URLs were invalid: ${resp.invalidURLs.join(", ")}`,
+        `Some upstream URLs were invalid: ${resp.invalidURLs.map((r) => r.url + ": " + r.reason).join(", ")}`,
       );
       return false;
     }
@@ -268,30 +264,10 @@ const Artifacts = () => {
     }));
     mutate();
     toast.success("Artifact updated");
-    setInvalidUrls([]);
     return true;
   };
 
-  useEffect(() => {
-    // Reset invalid URLs whenever the dialog is opened
-    if (dialogState.isOpen) {
-      setInvalidUrls([]);
-    }
-  }, [dialogState.isOpen]);
-
   const { branches, tags } = useAssetBranchesAndTags();
-
-  const nodesTypes = useMemo(() => {
-    if (!rootNodes) return [];
-    return Array.from(
-      new Set(
-        Object.values(rootNodes)
-          .flat()
-          .map((node) => node.type)
-          .filter(Boolean),
-      ),
-    );
-  }, [rootNodes]);
 
   const handleToggleSource = (url: string) => {
     setSelectedSourceUrls((prev) => {
@@ -510,7 +486,6 @@ const Artifacts = () => {
         onSubmit={handleSubmit}
         onDelete={dialogState.mode === "edit" ? handleDelete : undefined}
         isEditMode={dialogState.mode === "edit"}
-        invalidUrls={invalidUrls}
       />
       <AlertDialog
         open={Boolean(deleteDialogOpen)}

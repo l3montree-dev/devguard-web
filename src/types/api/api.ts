@@ -259,6 +259,10 @@ interface BaseVulnEventDTO {
   createdByVexRule: boolean;
 }
 
+export interface ExternalReferenceErrorDTO {
+  url: string;
+  reason: string;
+}
 export interface TicketClosedEventDTO extends BaseVulnEventDTO {
   type: "ticketClosed";
 }
@@ -644,8 +648,6 @@ export interface ArtifactCreateUpdateRequest {
 
 export interface InformationSources {
   url: string;
-  type: "sbom";
-  purl?: string;
 }
 
 export interface ArtifactDTO {

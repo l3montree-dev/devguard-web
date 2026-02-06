@@ -262,7 +262,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {
-      toast.error("SBOM has not been sent successfully");
+      // check if there is an error message
+      const msg = await resp.text();
+      toast.error("SBOM has not been sent successfully. Reason: " + msg);
     }
   };
 
@@ -340,7 +342,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     isTag: boolean;
     artifactName: string;
     isDefault: boolean;
-    informationSources: Array<{ url: string; purl?: string }>;
+    informationSources: Array<{ url: string }>;
   }) => {
     // first create the asset version
     const resp = await browserApiClient(
@@ -385,12 +387,21 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
         );
         onOpenChange(false);
       } else {
-        toast.error("Artifact could not be created successfully");
+        // read the body, we get external reference error dtos here, we can show the user which urls were invalid and why
+        const errorBody = await artifactResp.json();
+        if (errorBody && Array.isArray(errorBody)) {
+          const errorMessage = errorBody
+            .map((el: any) => `${el.url}: ${el.reason}`)
+            .join(", ");
+          toast.error(`Some information sources were invalid: ${errorMessage}`);
+        } else {
+          toast.error("Information source setup was not created successfully");
+        }
       }
     }
   };
 
-  const handleUpload = (params: {
+  const handleUpload = async (params: {
     branchOrTagName: string;
     branchOrTagSlug: string;
     isTag: boolean;
@@ -399,11 +410,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     origin: string;
   }) => {
     if (tab === "sbom") {
-      uploadSBOM(params);
+      await uploadSBOM(params);
     } else if (tab === "sarif") {
-      uploadSARIF(params);
+      await uploadSARIF(params);
     } else {
-      uploadVEX(params);
+      await uploadVEX(params);
     }
   };
 
