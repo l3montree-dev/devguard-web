@@ -101,7 +101,7 @@ export function NodeInputDefault<T>(props: NodeInputProps) {
                   <Check className="size-4 text-green-500" />
                 )}
               </div>
-              <p>Passwords must be longer than 8 characters</p>
+              <p>Passwords must be at least 8 characters</p>
             </div>
             <div className="flex items-center space-x-4 py-2">
               <div>

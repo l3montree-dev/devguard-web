@@ -97,13 +97,13 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="My GitLab/ openCode Personal Access Token"
+                  placeholder="My GitLab Personal Access Token"
                   autoComplete="url"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                A name to identify the token later on.
+                A name to help identify the token later on.
               </FormDescription>
             </FormItem>
           )}
@@ -126,11 +126,9 @@ export default function GitLabIntegrationForm({
                 />
               </FormControl>
               <FormDescription>
-                Ensure that you provide only the{" "}
-                <strong>base URL of your GitLab instance </strong> (e.g.,
-                https://gitlab.example.com) without any repository paths.
-                Including the full URL with the repository path may result in an
-                error.{" "}
+                Ensure that you provide <strong>only the{" "}
+                base URL of your GitLab instance </strong> 
+                (e.g. https://gitlab.example.com) without any repository paths.
               </FormDescription>
             </FormItem>
           )}
@@ -145,23 +143,16 @@ export default function GitLabIntegrationForm({
                 <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
               </FormControl>
               <FormDescription>
-                DevGuard uses this token to <strong>create issues</strong> in
-                your repository. Thus the token needs to have{" "}
-                <strong>at least reporter access</strong>.<br />
-                There are features in DevGuard, that require higher access
-                levels. For example, DevGuard can automatically create merge
-                requests for you. In this case, the token needs to have{" "}
-                <strong>developer access</strong>.
+                To later use the <strong>Auto Setup Feature</strong> the token needs <strong>at least the maintainer role</strong>.<br/>
+                Otherwise the token only needs <strong>reporter role</strong> permissions.<br/>
+                Additionally the api scope is needed for the seamless integration of DevGuard.
               </FormDescription>
             </FormItem>
           )}
         />
-        <div className="w-full border rounded overflow-hidden relative h-[120px]">
-          <ImageZoom src={imageSrc} alt="GitLab Scope selection" fill />
-        </div>
-        <div className="flex flex-row justify-end">
+        <div className="flex flex-row justify-end mt-4">
           <div className="flex flex-col items-end justify-end gap-2">
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-3">
               {backButtonClick && (
                 <Button
                   type="button"
@@ -176,10 +167,6 @@ export default function GitLabIntegrationForm({
                 Test and Save
               </Button>
             </div>
-            <small className="text-muted-foreground">
-              Checks if the provided access token is valid and has at least
-              Reporter-Access.
-            </small>
           </div>
         </div>
       </form>
