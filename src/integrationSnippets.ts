@@ -357,7 +357,7 @@ export const integrationSnippets = ({
     ),
 
     sarif: `
-    sarif-risk-identification:
+    code-risk-identification:
         uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
@@ -367,8 +367,8 @@ export const integrationSnippets = ({
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     sbom: `
-    sbom-risk-identification:
-        uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
+    dependency-risk-identification:
+        uses: l3montree-dev/devguard-action/.github/workflows/dependency-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
