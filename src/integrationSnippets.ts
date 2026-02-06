@@ -356,36 +356,26 @@ export const integrationSnippets = ({
       frontendUrl,
     ),
 
-    sarif: `jobs:
-    code-risk-identification: # what you want to name the job
-        steps:
-            # ...
-            # generate the SARIF file
-            # ...
-            - uses: l3montree-dev/devguard-action/.github/workflows/upload-sarif.yml@main
-              with:
-                  # Path to SARIF file relative to the root of the repository
-                  sarif-file: ./results.sarif
-                  asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: "${apiUrl}"
-                  web-ui: "${frontendUrl}"
-              secrets:
-                  devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create`,
-    sbom: `jobs:
-    code-risk-identification: # what you want to name the job
-        steps:
-            # ...
-            # generate the SBOM file
-            # ...
-            - uses: l3montree-dev/devguard-action/.github/workflows/upload-sbom.yml@main
-              with:
-                  # Path to SBOM file relative to the root of the repository
-                  sbom-file: ./results.sbom
-                  asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-                  api-url: "${apiUrl}"
-                  web-ui: "${frontendUrl}"
-              secrets:
-                  devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`,
+    sarif: `
+    code-risk-identification:
+        uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
+        with:
+            asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+            api-url: "${apiUrl}"
+            sarif-file: "./results.sarif"
+            web-ui: "${frontendUrl}"
+        secrets:
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
+    sbom: `
+    dependency-risk-identification:
+        uses: l3montree-dev/devguard-action/.github/workflows/dependency-risk-identification.yml@main
+        with:
+            asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+            api-url: "${apiUrl}"
+            sbom-file: "./results.sbom"
+            web-ui: "${frontendUrl}"
+        secrets:
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     push: "",
     sign: "",
     attest: "",
