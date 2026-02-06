@@ -5,10 +5,10 @@ jobs:
   naming_convention_check:
     uses: l3montree-dev/devguard-action/.github/workflows/naming-convention.yml@add-documentation-policy
     with:
-      repositories: "l3montree-dev/devguard,l3montree-dev/devguard-documentation"
+      repositories: "l3montree-dev/devguard,l3montree-dev/devguard-documentation,l3montree-dev/devguard-web"
       ticket_repo: "l3montree-dev/devguard"
   documentation_check:
     uses: l3montree-dev/devguard-action/.github/workflows/docu-policy.yml@add-documentation-policy
     with:
       documentation_repo: "l3montree-dev/devguard-documentation"
-      production_repo: "l3montree-dev/devguard"
+      production_repo: "l3montree-dev/devguard-web"
