@@ -262,7 +262,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {
-      toast.error("SBOM has not been sent successfully");
+      // check if there is an error message
+      const msg = await resp.text();
+      toast.error("SBOM has not been sent successfully. Reason: " + msg);
     }
   };
 

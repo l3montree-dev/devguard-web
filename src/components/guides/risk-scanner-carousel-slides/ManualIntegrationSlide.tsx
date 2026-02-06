@@ -69,7 +69,7 @@ interface ManualIntegrationSlideProps {
     artifactName: string;
     isDefault: boolean;
     origin: string;
-  }) => void;
+  }) => Promise<void>;
   assetVersionName?: string;
   artifacts?: Array<ArtifactDTO>;
 }
@@ -568,9 +568,9 @@ const ManualIntegrationSlide: FunctionComponent<
             disabled={isUploadDisabled || isUploading}
             isSubmitting={isUploading}
             id="manual-integration-continue"
-            onClick={() => {
+            onClick={async () => {
               setIsUploading(true);
-              handleUpload({
+              await handleUpload({
                 branchOrTagName,
                 branchOrTagSlug,
                 isTag,
@@ -580,6 +580,7 @@ const ManualIntegrationSlide: FunctionComponent<
                 isDefault: !isTag && branches.length + tags.length === 0,
                 origin,
               });
+              setIsUploading(false);
             }}
           >
             {isUploading ? "Scanning your SBOM..." : "Upload"}
