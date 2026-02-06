@@ -365,7 +365,7 @@ export const integrationSnippets = ({
             sarif-file: "./results.sarif"
             web-ui: "${frontendUrl}"
         secrets:
-            devguard-token: \${{ secrets.DEVGUARD_TOKEN }}`,
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     sbom: `
     sbom-risk-identification:
         uses: ./.github/workflows/sbom-risk-identification.yml
@@ -375,7 +375,7 @@ export const integrationSnippets = ({
             sbom-file: "./results.sbom"
             web-ui: "${frontendUrl}"
         secrets:
-            devguard-token: \${{ secrets.DEVGUARD_TOKEN }}`,
+            devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     push: "",
     sign: "",
     attest: "",
