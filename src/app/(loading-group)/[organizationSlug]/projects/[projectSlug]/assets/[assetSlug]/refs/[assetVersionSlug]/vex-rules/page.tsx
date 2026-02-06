@@ -221,32 +221,30 @@ const VexRulesPage: FunctionComponent = () => {
     branchOrTagSlug: string;
     isTag: boolean;
   }) => {
-    try {
-      // Read file content as text (VEX is JSON)
-      const fileContent = await params.file.text();
+    // Read file content as text (VEX is JSON)
+    const fileContent = await params.file.text();
 
-      const response = await browserApiClient(`/vex`, {
-        method: "POST",
-        body: fileContent,
-        headers: {
-          "X-Tag": params.isTag ? "1" : "0",
-          "X-Asset-Ref": params.branchOrTagName,
-          "X-Asset-Default-Branch": "",
-          "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
-          "X-Origin": "vex-upload",
-        },
-      });
+    const response = await browserApiClient(`/vex`, {
+      method: "POST",
+      body: fileContent,
+      headers: {
+        "X-Tag": params.isTag ? "1" : "0",
+        "X-Asset-Ref": params.branchOrTagName,
+        "X-Asset-Default-Branch": "",
+        "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
+        "X-Origin": "vex-upload",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
-      }
-
-      toast.success("VEX file uploaded successfully");
-      mutate();
-    } catch (error) {
-      toast.error("Failed to upload VEX file");
-      throw error;
+    if (!response.ok) {
+      // read the body for error details
+      const errorText = await response.text();
+      toast.error("Failed to upload VEX file: " + errorText);
+      throw new Error("Failed to upload VEX file: " + errorText);
     }
+
+    toast.success("VEX file uploaded successfully");
+    mutate();
   };
 
   // Show loading skeleton if data is loading
