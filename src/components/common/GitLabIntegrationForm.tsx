@@ -126,8 +126,8 @@ export default function GitLabIntegrationForm({
                 />
               </FormControl>
               <FormDescription>
-                Ensure that you provide <strong>only the{" "}
-                base URL of your GitLab instance </strong> 
+                Ensure that you provide{" "}
+                <strong>only the base URL of your GitLab instance </strong>
                 (e.g. https://gitlab.example.com) without any repository paths.
               </FormDescription>
             </FormItem>
@@ -143,9 +143,15 @@ export default function GitLabIntegrationForm({
                 <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
               </FormControl>
               <FormDescription>
-                To later use the <strong>Auto Setup Feature</strong> the token needs <strong>at least the maintainer role</strong>.<br/>
-                Otherwise the token only needs <strong>reporter role</strong> permissions.<br/>
-                Additionally the api scope is needed for the seamless integration of DevGuard.
+                To later use the <strong>Auto Setup Feature</strong> the token
+                needs <strong>at least the maintainer role</strong>.<br />
+                Otherwise the token only needs <strong>
+                  reporter role
+                </strong>{" "}
+                permissions.
+                <br />
+                Additionally the api scope is needed for the seamless
+                integration of DevGuard.
               </FormDescription>
             </FormItem>
           )}
