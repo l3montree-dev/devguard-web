@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2, MoreHorizontal, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
