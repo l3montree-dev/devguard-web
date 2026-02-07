@@ -66,9 +66,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const [api, setApi] = React.useState<{
     reInit: () => void;
     scrollTo: (index: number) => void;
+    updateLayout: () => void;
   }>({
     reInit: () => {},
     scrollTo: () => {},
+    updateLayout: () => {},
   });
 
   const router = useRouter();
@@ -492,6 +494,10 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           }
           return [...prev, index];
         });
+      },
+      updateLayout: () => {
+        if (!api) return;
+        api.reInit({ startIndex: api.selectedScrollSnap() });
       },
     });
   }, []);
