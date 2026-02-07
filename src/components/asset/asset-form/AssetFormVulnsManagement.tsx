@@ -354,8 +354,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
                             />
                           </FormControl>
                           <FormDescription>
-                            CVSS-BTE [Base] from experts [T] adapted
-                            [E]nvironment = adapted Score given by experts
+                          CVSS-BTE Score: Combines standard Base metrics with expert Temporal assessment and Environmental factors customized to your organization's risk profile.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
