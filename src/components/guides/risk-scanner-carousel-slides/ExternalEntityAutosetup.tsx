@@ -53,7 +53,11 @@ const ExternalEntityAutosetup: FunctionComponent<Props> = ({
   const asset = useActiveAsset();
 
   useEffect(() => {
-    api?.updateLayout?.();
+    // debounce likely layout shift
+    const t = setTimeout(() => {
+      api?.updateLayout?.();
+    }, 100);
+    return () => clearTimeout(t);
   }, [progress, api]);
 
   return (
