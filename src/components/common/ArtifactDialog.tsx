@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { ArtifactCreateUpdateRequest } from "@/types/api/api";
 import { UseFormReturn } from "react-hook-form";
-import ArtifactForm from "./ArtifactForm";
-import { Form } from "../ui/form";
 import { Button } from "../ui/button";
+import { Form } from "../ui/form";
+import ArtifactForm from "./ArtifactForm";
 
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;

@@ -33,13 +33,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ChevronDown, AlertTriangle } from "lucide-react";
 import React from "react";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 
 import { cn } from "@/lib/utils";
+import { validateArtifactNameAndVersion } from "@/utils/common";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 
 interface Props {
@@ -462,6 +464,17 @@ const PublicUrlsSection: FunctionComponent<{
     setSelectedArtifact("");
   }, [selectedVersionSlug]);
 
+  // Get the selected version to check validation
+  const selectedVersion = refs.find((ref) => ref.slug === selectedVersionSlug);
+
+  // Validate artifact name + version creates a valid PURL
+  const purlValidation = React.useMemo(() => {
+    if (selectedArtifact && selectedVersion?.version) {
+      return validateArtifactNameAndVersion(selectedArtifact);
+    }
+    return { isValid: true };
+  }, [selectedArtifact, selectedVersion?.version]);
+
   const basePath =
     selectedVersionSlug && selectedArtifact
       ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
@@ -552,6 +565,13 @@ const PublicUrlsSection: FunctionComponent<{
           </Select>
         </div>
       </div>
+
+      {selectedArtifact && selectedVersion && !purlValidation.isValid && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{purlValidation.warning}</AlertDescription>
+        </Alert>
+      )}
 
       {urls.map((url) => (
         <div

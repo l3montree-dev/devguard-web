@@ -50,6 +50,7 @@ const Artifacts = () => {
   const { session } = useSession();
 
   const artifacts = useArtifacts();
+
   const updateAssetVersionState = useUpdateAssetVersionState();
 
   const [dialogState, setDialogState] = useState<{
@@ -77,11 +78,7 @@ const Artifacts = () => {
     assetVersionSlug: string;
   };
 
-  const {
-    data: rootNodes,
-    isLoading,
-    mutate,
-  } = useSWR<{
+  const { data: rootNodes, mutate } = useSWR<{
     [artifactName: string]: InformationSources[];
   }>(
     "/organizations/" +

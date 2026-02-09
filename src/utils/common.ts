@@ -213,6 +213,69 @@ export const extractVersion = (purl: string) => {
   return version;
 };
 
+export const isValidPackagePurl = (purl: string): boolean => {
+  if (!purl) return false;
+  // PURL format: pkg:<type>/<namespace?>/<name>@<version?>?<qualifiers?>#<subpath?>
+  // Type: lowercase alphanumeric with +, ., -
+  // Name/namespace: alphanumeric with ., _, -, %, ~, @, /
+  const purlRegex =
+    /^pkg:[a-z][a-z0-9+.-]*\/[a-zA-Z0-9._~%@/-]+[a-zA-Z0-9](?:[@?#].*)?$/;
+  return purlRegex.test(purl);
+};
+
+export const validateArtifactNameAgainstPurlSpec = (
+  artifactName: string,
+): { isValid: boolean; warning?: string } => {
+  if (!artifactName) {
+    return { isValid: true };
+  }
+
+  // Artifact name should be a PURL without version
+  if (!artifactName.startsWith("pkg:")) {
+    return {
+      isValid: false,
+      warning:
+        "Your artifact name is not a valid PURL. This makes it hard for your downstream consumers to match vulnerabilities against your application name. A valid PURL looks like: pkg:npm/express or pkg:maven/org.apache/commons-lang3",
+    };
+  }
+
+  // Try to construct a full PURL with the version
+  // Replace any existing version in the artifact name with the new one
+  let testPurl = artifactName;
+
+  // If artifact name already contains a version (@), replace it
+  const atIndex = testPurl.lastIndexOf("@");
+  const hashIndex = testPurl.indexOf("#");
+  const questionIndex = testPurl.indexOf("?");
+
+  let insertIndex = testPurl.length;
+  if (
+    atIndex !== -1 &&
+    (hashIndex === -1 || atIndex > hashIndex) &&
+    (questionIndex === -1 || atIndex > questionIndex)
+  ) {
+    // There's a version after the last @, replace it
+    insertIndex = atIndex;
+    testPurl = testPurl.substring(0, atIndex);
+  } else {
+    // No version found, append one
+    insertIndex = testPurl.length;
+  }
+
+  testPurl = `${testPurl}@1.0.0`;
+
+  // Validate the constructed PURL
+  if (!isValidPackagePurl(testPurl)) {
+    return {
+      isValid: false,
+      warning:
+        "Your artifact name is not a valid PURL. This makes it hard for your downstream consumers to match vulnerabilities against your application name. PURL format: pkg:<type>/<namespace>/<name> (e.g., pkg:npm/express, pkg:maven/org.apache/commons-lang3)",
+    };
+  }
+
+  return { isValid: true };
+};
+
 export function allowedActionsCheck(
   currentUserRole: UserRole | null,
   memberRole?: UserRole | string,

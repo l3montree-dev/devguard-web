@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { ArtifactCreateUpdateRequest } from "@/types/api/api";
-import { Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { Button } from "../ui/button";
@@ -17,6 +17,9 @@ import {
 import { Input } from "../ui/input";
 import Callout from "./Callout";
 
+import { validateArtifactNameAgainstPurlSpec } from "../../utils/common";
+import { Alert, AlertDescription } from "../ui/alert";
+
 interface Props {
   form: UseFormReturn<ArtifactCreateUpdateRequest>;
   isEditMode?: boolean;
@@ -27,6 +30,10 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
     control: form.control,
     name: "informationSources" as const,
   });
+
+  const artifactName = form.watch("artifactName");
+
+  const purlValidation = validateArtifactNameAgainstPurlSpec(artifactName);
 
   return (
     <>
@@ -51,13 +58,31 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
               >
                 Package-URLs
               </Link>{" "}
-              without the Version Information. Any Qualifiers can be added
-              straight to the artifact name.
+              without the Version Information. Format:{" "}
+              <code className="text-xs bg-muted px-1 rounded">
+                pkg:&lt;type&gt;/&lt;namespace&gt;/&lt;name&gt;
+              </code>
+              {" (e.g., "}
+              <code className="text-xs bg-muted px-1 rounded">
+                pkg:npm/express
+              </code>
+              {", "}
+              <code className="text-xs bg-muted px-1 rounded">
+                pkg:maven/org.apache/commons
+              </code>
+              {"). Any Qualifiers can be added straight to the artifact name."}
             </FormDescription>
             <FormMessage />
           </FormItem>
         )}
       />
+
+      {!purlValidation.isValid && (
+        <Alert variant={"default"}>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{purlValidation.warning}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">

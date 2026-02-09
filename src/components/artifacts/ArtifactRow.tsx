@@ -1,17 +1,26 @@
 import { ArtifactDTO, InformationSources } from "@/types/api/api";
-import { classNames } from "@/utils/common";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import {
+  classNames,
+  validateArtifactNameAgainstPurlSpec,
+} from "@/utils/common";
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
+import { Tooltip } from "@radix-ui/react-tooltip";
+import { AlertTriangle } from "lucide-react";
 import { FunctionComponent, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { Checkbox } from "../ui/checkbox";
+import { TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface Props {
   artifact: ArtifactDTO;
@@ -59,6 +68,8 @@ const ArtifactRow: FunctionComponent<Props> = ({
   const someSelected =
     hasUpstreamUrls && sourceUrls.some((url) => selectedSourceUrls.has(url));
 
+  const valid = validateArtifactNameAgainstPurlSpec(artifact.artifactName);
+
   return (
     <>
       {/* Artifact name row - clickable to expand/collapse */}
@@ -101,6 +112,14 @@ const ArtifactRow: FunctionComponent<Props> = ({
               </div>
             )}
             <span className="font-medium">{artifact.artifactName}</span>
+            {!valid.isValid && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <AlertTriangle className="h-4 text-primary w-4" />
+                </TooltipTrigger>
+                <TooltipContent>{valid.warning}</TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </td>
         <td className="py-3 px-4">
