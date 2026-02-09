@@ -563,7 +563,7 @@ const PublicUrlsSection: FunctionComponent<{
       </div>
 
       {selectedArtifact && selectedVersion && !purlValidation.isValid && (
-        <Alert variant="destructive">
+        <Alert variant="default">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{purlValidation.warning}</AlertDescription>
         </Alert>
