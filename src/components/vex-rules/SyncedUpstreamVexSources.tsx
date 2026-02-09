@@ -20,13 +20,11 @@ import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useSearchParams } from "next/navigation";
 import { ExternalReference } from "@/types/api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SyncedUpstreamVexSources: FunctionComponent = () => {
   const params = useDecodedParams();
-  const searchParams = useSearchParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
   const [isOpen, setIsOpen] = useState(false);
   const [newVexUrl, setNewVexUrl] = useState("");
@@ -35,7 +33,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] =
     useState<ExternalReference["type"]>("cyclonedxvex");
-  const selectedArtifact = searchParams?.get("artifact");
 
   const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
 
