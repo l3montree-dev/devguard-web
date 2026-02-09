@@ -20,13 +20,11 @@ import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useSearchParams } from "next/navigation";
 import { ExternalReference } from "@/types/api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SyncedUpstreamVexSources: FunctionComponent = () => {
   const params = useDecodedParams();
-  const searchParams = useSearchParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
   const [isOpen, setIsOpen] = useState(false);
   const [newVexUrl, setNewVexUrl] = useState("");
@@ -35,7 +33,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] =
     useState<ExternalReference["type"]>("cyclonedxvex");
-  const selectedArtifact = searchParams?.get("artifact");
 
   const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
 
@@ -53,15 +50,12 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     ) || [];
 
   const handleTriggerSync = async (source: ExternalReference) => {
-    if (!selectedArtifact) {
-      toast.error("Please select an artifact to sync");
-      return;
-    }
-
-    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/sync-external-sources/`;
+    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references/sync/`;
 
     try {
-      const response = await browserApiClient(syncUrl, { method: "POST" });
+      const response = await browserApiClient(syncUrl, {
+        method: "POST",
+      });
       if (!response.ok) {
         throw new Error(`Sync failed: ${response.statusText}`);
       }
