@@ -124,11 +124,11 @@ const RiskFeedItem = ({
   const user = findUser(event.userId, org, currentUser);
 
   const msg = eventMessages(event);
+
   return (
     <li
       className={classNames(
-        event.assetVersionName !== activeAssetVersion?.name &&
-          "opacity-75 hover:opacity-100",
+        event.originalAssetVersionName && "opacity-75 hover:opacity-100",
 
         "relative flex flex-row items-start gap-4 transition-all",
       )}
@@ -194,18 +194,16 @@ const RiskFeedItem = ({
                       ).toLowerCase()}
                 </p>
 
-                {/*<div className="absolute right-2 top-2">
-                  <div>
-                    <Link
-                      href={`/${org.slug}/projects/${project.slug}/assets/${asset!.slug}/refs/${event.assetVersionName}/${page}/${event.vulnId}`}
-                    >
+                {event.originalAssetVersionName && (
+                  <div className="absolute right-2 top-2">
+                    <div>
                       <Badge variant={"outline"}>
                         <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                        {event.assetVersionName}
+                        {event.originalAssetVersionName}
                       </Badge>
-                    </Link>
+                    </div>
                   </div>
-                </div>*/}
+                )}
               </div>
 
               {Boolean(msg) && (

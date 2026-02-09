@@ -252,7 +252,7 @@ interface BaseVulnEventDTO {
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
-  assetVersionName: string;
+  originalAssetVersionName: string;
   arbitraryJSONData: EventArbitraryJsonData;
   packageName: string | null;
   uri: string | null;

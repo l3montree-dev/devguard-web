@@ -198,7 +198,7 @@ const Index = () => {
         events: current.events.concat([
           {
             ...json.events.slice(-1)[0],
-            assetVersionName: assetVersion?.name,
+            originalAssetVersionName: assetVersion?.name,
           },
         ]),
       };

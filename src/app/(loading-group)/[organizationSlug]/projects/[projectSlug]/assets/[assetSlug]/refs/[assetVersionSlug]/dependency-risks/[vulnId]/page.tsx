@@ -598,7 +598,7 @@ const Index: FunctionComponent = () => {
         events: prev?.events.concat([
           {
             ...json.events.slice(-1)[0],
-            assetVersionName: assetVersion?.name ?? "",
+            originalAssetVersionName: assetVersion?.name ?? "",
           },
         ]),
       };
