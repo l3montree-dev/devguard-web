@@ -1,31 +1,23 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { AsyncButton } from "@/components/ui/button";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-} from "@/components/ui/form";
-import { useConfig } from "@/context/ConfigContext";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { Switch } from "@/components/ui/switch";
-import { FunctionComponent, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { AssetFormValues, createUpdateHandler } from "../AssetForm";
 import ListItem from "@/components/common/ListItem";
-import { InputWithButton } from "@/components/ui/input-with-button";
-import { Slider } from "@/components/ui/slider";
-import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AsyncButton } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { InputWithButton } from "@/components/ui/input-with-button";
 import {
   Select,
   SelectContent,
@@ -33,16 +25,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ChevronDown, AlertTriangle } from "lucide-react";
-import React from "react";
-import useSWR from "swr";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { useConfig } from "@/context/ConfigContext";
 import { fetcher } from "@/data-fetcher/fetcher";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import { AlertTriangle, ChevronDown } from "lucide-react";
+import React, { FunctionComponent, useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import useSWR from "swr";
+import { AssetFormValues, createUpdateHandler } from "../AssetForm";
+import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
 import { cn } from "@/lib/utils";
-import { validateArtifactNameAndVersion } from "@/utils/common";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
+import { validateArtifactNameAgainstPurlSpec } from "../../../utils/common";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -469,11 +468,8 @@ const PublicUrlsSection: FunctionComponent<{
 
   // Validate artifact name + version creates a valid PURL
   const purlValidation = React.useMemo(() => {
-    if (selectedArtifact && selectedVersion?.version) {
-      return validateArtifactNameAndVersion(selectedArtifact);
-    }
-    return { isValid: true };
-  }, [selectedArtifact, selectedVersion?.version]);
+    return validateArtifactNameAgainstPurlSpec(selectedArtifact);
+  }, [selectedArtifact]);
 
   const basePath =
     selectedVersionSlug && selectedArtifact
