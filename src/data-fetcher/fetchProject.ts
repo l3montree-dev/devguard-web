@@ -28,11 +28,11 @@ export async function fetchProject(
   const r = await devGuardApiClient(url);
 
   if (!r.ok) {
-    throw new HttpError({
-      redirect: {
-        destination: "/" + organizationSlug,
-        permanent: false,
-      },
+    throw new HttpError("Could not fetch group", {
+      statusCode: r.status,
+      title: "Failed to load group",
+      description: `An error occurred while fetching the group. Please try again later. (${r.status} ${r.statusText})`,
+      homeLink: `/${organizationSlug}`, // link to the project list
     });
   }
   // parse the organization

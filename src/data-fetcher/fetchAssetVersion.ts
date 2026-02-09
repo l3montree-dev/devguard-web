@@ -29,15 +29,13 @@ export async function fetchAssetVersion(
   const r = await devGuardApiClient(url);
 
   if (!r.ok) {
-    throw new HttpError(
-      {
-        redirect: {
-          destination: "/" + orgSlug + "/projects/" + projectSlug,
-          permanent: false,
-        },
-      },
-      `Failed to fetch asset version: ${r.status} ${r.statusText} ${Date.now()}`,
-    );
+    throw new HttpError("Asset version not found", {
+      statusCode: 404,
+      title: "Asset Version Not Found",
+      description:
+        "The asset version you're looking for doesn't exist or has been removed.",
+      homeLink: `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
+    });
   }
   // parse the organization
   const assetVersion: AssetVersionDTO = await r.json();

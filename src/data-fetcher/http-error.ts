@@ -14,20 +14,31 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class HttpError extends Error {
+  statusCode?: number;
+  title?: string;
+  description?: string;
+  homeLink?: string;
+
   constructor(
-    public instructions: {
-      redirect:
-        | {
-            destination: string;
-            permanent: boolean;
-          }
-        | {
-            notFound: true;
-          };
-    },
     message = "HTTP Error",
+    options?: {
+      statusCode?: number;
+      title?: string;
+      description?: string;
+      homeLink?: string;
+    },
   ) {
-    super(message);
-    this.instructions = instructions;
+    // Encode error context in the message so it survives serialization to client
+    const contextData = {
+      statusCode: options?.statusCode,
+      title: options?.title,
+      description: options?.description,
+      homeLink: options?.homeLink,
+    };
+    super(JSON.stringify({ message, context: contextData }));
+    this.statusCode = options?.statusCode;
+    this.title = options?.title;
+    this.description = options?.description;
+    this.homeLink = options?.homeLink;
   }
 }

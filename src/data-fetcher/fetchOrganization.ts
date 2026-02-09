@@ -34,12 +34,7 @@ export async function fetchOrganization(organizationSlug: string) {
     if (!org.ok) {
       console.log("LOGIN REDIRECT", org);
       // it must be an 500
-      throw new HttpError({
-        redirect: {
-          destination: "/login",
-          permanent: false,
-        },
-      });
+      throw new HttpError();
     }
     // parse the organization
     const organization: OrganizationDetailsDTO = await org.json();

@@ -52,11 +52,12 @@ export async function fetchSession() {
         return null;
       }
     }
-    throw new HttpError({
-      redirect: {
-        destination: "/login?return_to=" + requestedUrl,
-        permanent: false,
-      },
+    throw new HttpError("Failed to fetch session", {
+      statusCode: 500,
+      title: "Failed to load session",
+      description:
+        "An error occurred while fetching the session. Please try to login again.",
+      homeLink: "/login?return_to=" + requestedUrl,
     });
   }
 }

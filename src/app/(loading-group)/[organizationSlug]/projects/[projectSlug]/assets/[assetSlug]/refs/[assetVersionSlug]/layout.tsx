@@ -3,8 +3,6 @@ import React from "react";
 import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
-import { HttpError } from "@/data-fetcher/http-error";
-import { notFound } from "next/navigation";
 
 const AssetLayout = async ({
   // Layouts must accept a children prop.
@@ -20,38 +18,34 @@ const AssetLayout = async ({
     assetVersionSlug: string;
   }>;
 }) => {
-  try {
-    const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-      await params;
-    const [assetVersion, artifacts] = await Promise.all([
-      fetchAssetVersion(
-        decodeURIComponent(organizationSlug),
-        projectSlug,
-        assetSlug,
-        assetVersionSlug,
-      ),
-      fetchArtifacts(
-        decodeURIComponent(organizationSlug),
-        projectSlug,
-        assetSlug,
-        assetVersionSlug,
-      ),
-    ]);
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    await params;
+  const [assetVersion, artifacts] = await Promise.all([
+    fetchAssetVersion(
+      decodeURIComponent(organizationSlug),
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    ),
+    fetchArtifacts(
+      decodeURIComponent(organizationSlug),
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    ),
+  ]);
 
-    return (
-      <ClientContextWrapper
-        Provider={AssetVersionProvider}
-        value={{
-          artifacts,
-          assetVersion,
-        }}
-      >
-        {children}
-      </ClientContextWrapper>
-    );
-  } catch (error) {
-    notFound();
-  }
+  return (
+    <ClientContextWrapper
+      Provider={AssetVersionProvider}
+      value={{
+        artifacts,
+        assetVersion,
+      }}
+    >
+      {children}
+    </ClientContextWrapper>
+  );
 };
 
 export default AssetLayout;
