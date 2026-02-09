@@ -330,7 +330,7 @@ const VexRulesPage: FunctionComponent = () => {
                   <col className="w-[100px]" />
                   <col className="w-[70px]" />
                   <col className="w-[100px]" />
-                  <col className="w-[40px]" />
+                  <col className="w-[30px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (

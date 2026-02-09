@@ -344,3 +344,12 @@ export const licenses = [
   { value: "zpl-2.0", label: "ZPL-2.0" },
   { value: "zpl-2.1", label: "ZPL-2.1" },
 ];
+
+const regexpNonAuthorizedChars = /[^a-zA-Z0-9-_]/g;
+const regexpMultipleDashes = /-+/g;
+
+export const ensureValidBranchOrTagSlug = (name: string) => {
+  return name
+    .replaceAll(regexpNonAuthorizedChars, "-")
+    .replaceAll(regexpMultipleDashes, "-");
+};

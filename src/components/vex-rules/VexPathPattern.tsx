@@ -43,7 +43,7 @@ const VexPathPattern: FunctionComponent<VexPathPatternProps> = ({
   return (
     <Tooltip>
       <TooltipTrigger className="text-left">
-        <div className="text-sm text-foreground truncate max-w-md">
+        <div className="text-sm text-foreground truncate max-w-md flex flex-wrap items-center gap-1">
           <span className="inline-flex items-center">
             <Badge variant="outline" className="gap-1">
               <span>*</span>

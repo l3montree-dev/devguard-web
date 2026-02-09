@@ -43,6 +43,7 @@ import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSl
 import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { DevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/DevGuardCliSlide";
+import { ensureValidBranchOrTagSlug } from "@/utils/common";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -258,7 +259,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       // You can see we added a better error tracking in the AssetLayout to make that visible.
       // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
       // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/dependency-risks`;
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks`;
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {
@@ -294,7 +295,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
     if (resp.ok) {
       await refreshAssetData();
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/code-risks/`;
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/code-risks/`;
       onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
     } else {
@@ -330,7 +331,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     if (resp.ok) {
       await refreshAssetData();
       onOpenChange(false);
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${params.branchOrTagSlug}/vex-rules/`;
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
     } else {
       toast.error("VEX has not been sent successfully");
