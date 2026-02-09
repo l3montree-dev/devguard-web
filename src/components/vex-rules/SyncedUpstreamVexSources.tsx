@@ -53,22 +53,27 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     ) || [];
 
   const handleTriggerSync = async (source: ExternalReference) => {
-    if (!selectedArtifact) {
-      toast.error("Please select an artifact to sync");
-      return;
-    }
-
-    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/sync-external-sources/`;
+    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references/sync/`;
 
     try {
-      const response = await browserApiClient(syncUrl, { method: "POST" });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const response = await browserApiClient(syncUrl, {
+        method: "POST",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
       if (!response.ok) {
         throw new Error(`Sync failed: ${response.statusText}`);
       }
       toast.success(`Syncing VEX data from ${source.url}`);
       mutate();
     } catch (error) {
-      toast.error("Failed to trigger sync");
+      if (error instanceof DOMException && error.name === "AbortError") {
+        toast.error("Sync request timed out after 8 seconds");
+      } else {
+        toast.error("Failed to trigger sync");
+      }
     }
   };
 
