@@ -14,11 +14,10 @@ import { useConfig } from "@/context/ConfigContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { Switch } from "@/components/ui/switch";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { AssetFormValues, createUpdateHandler } from "../AssetForm";
 import ListItem from "@/components/common/ListItem";
-import { CopyCodeFragment } from "@/components/common/CopyCode";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { Slider } from "@/components/ui/slider";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
@@ -27,10 +26,21 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChevronDown } from "lucide-react";
 import React from "react";
+import useSWR from "swr";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 
 import { cn } from "@/lib/utils";
+import { useActiveAsset } from "../../../hooks/useActiveAsset";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -419,6 +429,157 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
+const PublicUrlsSection: FunctionComponent<{
+  assetId: string;
+  devguardApiUrl: string;
+  orgSlug: string;
+  projectSlug?: string;
+  assetSlug?: string;
+  refs: AssetVersionDTO[];
+  copyable: boolean;
+}> = ({
+  assetId,
+  devguardApiUrl,
+  orgSlug,
+  projectSlug,
+  assetSlug,
+  copyable,
+}) => {
+  const [selectedVersionSlug, setSelectedVersionSlug] = useState<string>("");
+  const [selectedArtifact, setSelectedArtifact] = useState<string>("");
+
+  const refs = useActiveAsset().refs;
+
+  const { data: artifacts } = useSWR<ArtifactDTO[]>(
+    selectedVersionSlug && assetSlug && projectSlug
+      ? `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${selectedVersionSlug}/artifacts`
+      : null,
+    fetcher,
+  );
+
+  // Reset artifact selection when version changes
+  React.useEffect(() => {
+    setSelectedArtifact("");
+  }, [selectedVersionSlug]);
+
+  const basePath =
+    selectedVersionSlug && selectedArtifact
+      ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
+      : undefined;
+
+  const urls = [
+    {
+      label: "VeX-URL (Always up to date vulnerability information)",
+      nameKey: "vex-url",
+      value: basePath ? `${basePath}/vex.json/` : "",
+      copyToastDescription: "The VeX-URL has been copied to your clipboard.",
+    },
+    {
+      label:
+        "CSAF-URL (Always up to date vulnerability information in CSAF format)",
+      nameKey: "csaf-url",
+      value: `${devguardApiUrl}/api/v1/organizations/${orgSlug}/csaf/provider-metadata.json/`,
+      copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
+    },
+    {
+      label: "SBOM-URL (Always up to date SBOM information)",
+      nameKey: "sbom-url",
+      value: basePath ? `${basePath}/sbom.json/` : "",
+      copyToastDescription: "The SBOM-URL has been copied to your clipboard.",
+    },
+    {
+      label: "CVSS Badge URL",
+      nameKey: "cvss-badge-url",
+      value: basePath ? `${basePath}/badges/cvss/` : "",
+      copyToastDescription:
+        "The CVSS Badge URL has been copied to your clipboard.",
+      message:
+        "You can use the URL to display this badge in your README or other documentation.",
+    },
+  ];
+
+  return (
+    <>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium">Branch / Tag</label>
+          <Select
+            value={selectedVersionSlug}
+            onValueChange={setSelectedVersionSlug}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a version" />
+            </SelectTrigger>
+            <SelectContent>
+              {refs.map((ref) => (
+                <SelectItem key={ref.slug} value={ref.slug}>
+                  {ref.name}
+                  {ref.defaultBranch ? " (default)" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium">Artifact</label>
+          <Select
+            value={selectedArtifact}
+            onValueChange={setSelectedArtifact}
+            disabled={!selectedVersionSlug || !artifacts?.length}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  !selectedVersionSlug
+                    ? "Select a version first"
+                    : !artifacts?.length
+                      ? "No artifacts available"
+                      : "Select an artifact"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {artifacts?.map((artifact) => (
+                <SelectItem
+                  key={artifact.artifactName}
+                  value={artifact.artifactName}
+                >
+                  {artifact.artifactName || "Default"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {urls.map((url) => (
+        <div
+          key={url.nameKey}
+          className={copyable ? "text-foreground" : "text-muted-foreground"}
+        >
+          <InputWithButton
+            label={url.label}
+            copyable={copyable && !!url.value}
+            copyToastDescription={url.copyToastDescription}
+            nameKey={url.nameKey}
+            variant="onCard"
+            value={url.value}
+            message={url.message}
+          />
+        </div>
+      ))}
+      {basePath && (
+        <img
+          src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+          alt="CVSS Badge"
+          className="mt-4 rounded-md shadow-sm hover:shadow-md transition-shadow"
+        />
+      )}
+    </>
+  );
+};
+
 export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
   form,
   assetId,
@@ -468,13 +629,8 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 Description={
                   <>
                     By enabling this option, your vulnerability endpoints are
-                    made publicly accessible. You can add the two query
-                    parameters{" "}
-                    <CopyCodeFragment codeString="?ref=<Branch slug | Tag slug>" />{" "}
-                    and{" "}
-                    <CopyCodeFragment codeString="?artifactName=<Name of the artifact url encoded>" />{" "}
-                    to the URL to further scope the data. If none is provided,
-                    the default branch and all artifacts are used.
+                    made publicly accessible. Select an asset version and
+                    artifact below to construct the public URLs.
                     {field.value && (
                       <Collapsible defaultOpen={false} className="mt-4">
                         <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between rounded-md border bg-background px-4 py-2 text-sm font-medium hover:opacity-80">
@@ -482,64 +638,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           <ChevronDown className="h-4 w-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
                         </CollapsibleTrigger>
                         <CollapsibleContent className="p-4 border rounded-md bg-background space-y-2">
-                          {[
-                            {
-                              label:
-                                "VeX-URL (Always up to date vulnerability information)",
-                              nameKey: "vex-url",
-                              value: `${devguardApiUrl}/api/v1/public/${assetId}/vex.json`,
-                              copyToastDescription:
-                                "The VeX-URL has been copied to your clipboard.",
-                            },
-                            {
-                              label:
-                                "CSAF-URL (Always up to date vulnerability information in CSAF format)",
-                              nameKey: "csaf-url",
-                              value: `${devguardApiUrl}/api/v1/organizations/${org.slug}/csaf/provider-metadata.json`,
-                              copyToastDescription:
-                                "The CSAF-URL has been copied to your clipboard.",
-                            },
-                            {
-                              label:
-                                "SBOM-URL (Always up to date SBOM information)",
-                              nameKey: "sbom-url",
-                              value: `${devguardApiUrl}/api/v1/public/${assetId}/sbom.json`,
-                              copyToastDescription:
-                                "The SBOM-URL has been copied to your clipboard.",
-                            },
-                            {
-                              label: "CVSS Badge URL",
-                              nameKey: "cvss-badge-url",
-                              value: `${devguardApiUrl}/api/v1/public/${assetId}/badges/cvss`,
-                              copyToastDescription:
-                                "The CVSS Badge URL has been copied to your clipboard.",
-                              message:
-                                "You can use the URL to display this badge in your README or other documentation.",
-                            },
-                          ].map((url) => (
-                            <div
-                              key={url.nameKey}
-                              className={
-                                field.value
-                                  ? "text-foreground"
-                                  : "text-muted-foreground"
-                              }
-                            >
-                              <InputWithButton
-                                label={url.label}
-                                copyable={field.value}
-                                copyToastDescription={url.copyToastDescription}
-                                nameKey={url.nameKey}
-                                variant="onCard"
-                                value={url.value}
-                                message={url.message}
-                              />
-                            </div>
-                          ))}
-                          <img
-                            src={`/api/devguard-tunnel/api/v1/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}/badges/cvss`}
-                            alt="CVSS Badge"
-                            className="mt-4 rounded-md shadow-sm hover:shadow-md transition-shadow"
+                          <PublicUrlsSection
+                            assetId={assetId!}
+                            devguardApiUrl={devguardApiUrl}
+                            orgSlug={org.slug}
+                            projectSlug={project?.slug}
+                            assetSlug={asset?.slug}
+                            refs={asset?.refs ?? []}
+                            copyable={field.value}
                           />
                         </CollapsibleContent>
                       </Collapsible>

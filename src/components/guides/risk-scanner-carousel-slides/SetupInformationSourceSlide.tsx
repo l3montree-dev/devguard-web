@@ -86,7 +86,11 @@ export const SetupInformationSourceSlide: FunctionComponent<
             >
               Back
             </Button>
-            <Button id="setup-information-sources-create" type="submit">
+            <Button
+              isSubmitting={form.formState.isSubmitting}
+              id="setup-information-sources-create"
+              type="submit"
+            >
               Create
             </Button>
           </div>
