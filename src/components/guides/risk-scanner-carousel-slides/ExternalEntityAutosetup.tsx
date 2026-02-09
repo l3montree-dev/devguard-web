@@ -16,7 +16,7 @@ import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
@@ -25,6 +25,7 @@ import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 interface Props {
   api?: {
     scrollTo: (index: number) => void;
+    updateLayout?: () => void;
   };
   handleAutosetup: (pendingAutosetup: false) => Promise<void>;
   progress: {
@@ -50,6 +51,15 @@ const ExternalEntityAutosetup: FunctionComponent<Props> = ({
   isReallyLoading,
 }) => {
   const asset = useActiveAsset();
+
+  useEffect(() => {
+    // debounce likely layout shift
+    const t = setTimeout(() => {
+      api?.updateLayout?.();
+    }, 100);
+    return () => clearTimeout(t);
+  }, [progress, api]);
+
   return (
     <CarouselItem>
       <DialogHeader>
