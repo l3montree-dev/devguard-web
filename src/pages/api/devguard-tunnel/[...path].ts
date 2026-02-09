@@ -26,7 +26,7 @@ const buffer = (req: NextApiRequest) => {
   });
 };
 
-const discardBodyMethods = ["GET", "HEAD", "OPTIONS"];
+const discardBodyMethods = ["GET", "HEAD", "OPTIONS", "DELETE"];
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

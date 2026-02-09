@@ -547,6 +547,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               org={activeOrg}
               prevIndex={prevIndex}
               isLoadingRepositories={isLoadingRepositories}
+              onClose={() => onOpenChange(false)}
             />
             <SelectRepoSlide
               api={api}

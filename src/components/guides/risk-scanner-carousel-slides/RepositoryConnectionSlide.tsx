@@ -29,6 +29,7 @@ interface RepositoryConnectionSlideProps {
   selectRepoSlideIndex: number;
   providerIntegrationSlideIndex: number;
   prevIndex: number;
+  onClose?: () => void;
 }
 
 const ProviderSetupSlide: FunctionComponent<RepositoryConnectionSlideProps> = ({
@@ -39,6 +40,7 @@ const ProviderSetupSlide: FunctionComponent<RepositoryConnectionSlideProps> = ({
   selectRepoSlideIndex,
   providerIntegrationSlideIndex,
   isLoadingRepositories,
+  onClose
 }) => {
   return (
     <CarouselItem>
@@ -59,6 +61,7 @@ const ProviderSetupSlide: FunctionComponent<RepositoryConnectionSlideProps> = ({
           selectRepoSlideIndex={selectRepoSlideIndex}
           providerIntegrationSlideIndex={providerIntegrationSlideIndex}
           isLoadingRepositories={isLoadingRepositories}
+          onClose={onClose}
         />
       </div>
     </CarouselItem>

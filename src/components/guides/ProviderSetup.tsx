@@ -7,7 +7,11 @@ import { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useUpdateSession } from "../../context/SessionContext";
+import {
+  useUpdateOrganization,
+  isOrganization,
+} from "../../context/OrganizationContext";
+import { useActiveOrg } from "../../hooks/useActiveOrg";
 
 interface ProviderSetupProps {
   selectedProvider: ExternalTicketProvider;
@@ -19,18 +23,25 @@ interface ProviderSetupProps {
   selectRepoSlideIndex: number;
   prevIndex: number;
   providerIntegrationSlideIndex: number;
+  onClose?: () => void;
 }
 
 export default function ProviderSetup({
   selectedProvider,
-  activeOrg,
+  activeOrg: activeOrgProp,
   api,
   providerIntegrationSlideIndex,
   prevIndex,
   selectRepoSlideIndex,
   isLoadingRepositories,
+  onClose,
 }: ProviderSetupProps) {
-  const updateOrganization = useUpdateSession();
+  // Use hook to get reactive organization from context.
+  const activeOrgFromContext = useActiveOrg();
+  const updateOrganization = useUpdateOrganization();
+  
+  // Use context value if available, otherwise fallback to prop (for backward compatibility)
+  const activeOrg = activeOrgFromContext || activeOrgProp;
 
   const handleDelete = async (id: string) => {
     const resp = await browserApiClient(
@@ -41,13 +52,23 @@ export default function ProviderSetup({
     );
 
     if (resp.ok) {
-      updateOrganization((prev) => ({
-        ...prev,
-        ...activeOrg,
-        gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
-          (i) => i.id !== id,
-        ),
-      }));
+      // Update the organization context with the filtered integrations
+      updateOrganization((prev) => {
+        if (!isOrganization(prev.organization)) {
+          return prev; // Don't update if organization is invalid
+        }
+        return {
+          ...prev,
+          organization: {
+            ...prev.organization,
+            gitLabIntegrations: prev.organization.gitLabIntegrations.filter(
+              (i) => i.id !== id,
+            ),
+          },
+        };
+      });
+      // Close modal after successful deletion
+      onClose?.();
     }
   };
 
