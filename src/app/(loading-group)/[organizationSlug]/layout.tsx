@@ -38,15 +38,7 @@ export default async function OrganizationLayout({
       </ClientContextWrapper>
     );
   } catch (error) {
-    if (
-      error instanceof HttpError &&
-      error.instructions &&
-      "redirect" in error.instructions
-    ) {
-      if ("notFound" in error.instructions.redirect) {
-        return notFound();
-      }
-      redirect(error.instructions.redirect.destination);
-    }
+    // redirect to /
+    redirect("/");
   }
 }

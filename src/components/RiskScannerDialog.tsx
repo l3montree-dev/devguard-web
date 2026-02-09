@@ -67,9 +67,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const [api, setApi] = React.useState<{
     reInit: () => void;
     scrollTo: (index: number) => void;
+    updateLayout: () => void;
   }>({
     reInit: () => {},
     scrollTo: () => {},
+    updateLayout: () => {},
   });
 
   const router = useRouter();
@@ -480,11 +482,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const prevIndex = slideHistory[slideHistory.length - 2] || 0;
 
-  const setProxyApi = useCallback((api: CarouselApi) => {
+  const setProxyApi = useCallback((emblaApi: CarouselApi) => {
     return setApi({
-      reInit: api ? api.reInit : () => {},
+      reInit: emblaApi ? emblaApi.reInit : () => {},
       scrollTo: (index: number) => {
-        api?.scrollTo(index);
+        emblaApi?.scrollTo(index);
         // if the current slide is not in the history, update the history
         setSlideHistory((prev) => {
           // check if the previous slide is already in the history
@@ -493,6 +495,10 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           }
           return [...prev, index];
         });
+      },
+      updateLayout: () => {
+        if (!emblaApi) return;
+        emblaApi.reInit({ startIndex: emblaApi.selectedScrollSnap() });
       },
     });
   }, []);

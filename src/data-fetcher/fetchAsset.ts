@@ -29,10 +29,11 @@ export async function fetchAsset(
   const r = await devGuardApiClient(url);
 
   if (!r.ok) {
-    throw new HttpError({
-      redirect: {
-        notFound: true,
-      },
+    throw new HttpError(`Failed to fetch asset: ${r.status} ${r.statusText}`, {
+      statusCode: r.status,
+      title: "Failed to load asset",
+      description: `An error occurred while fetching the asset. Please try again later. (${r.status} ${r.statusText})`,
+      homeLink: `/${organizationSlug}/projects/${projectSlug}/assets`, // link to the asset list
     });
   }
   // parse the organization
