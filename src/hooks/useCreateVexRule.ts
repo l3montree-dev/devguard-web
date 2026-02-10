@@ -46,7 +46,12 @@ export function useCreateVexRule({
 
       let pathPattern: string[] | undefined;
       if (selection.type === "node" && selection.nodeName) {
-        pathPattern = [selection.nodeName, "*"];
+        if (selection.isLastNode) {
+          // if it's the last node, match the full path to avoid over-applying rules
+          pathPattern = [selection.nodeName];
+        } else {
+          pathPattern = [selection.nodeName, "*"];
+        }
       } else if (selection.type === "edge" && selection.parentName) {
         pathPattern = [selection.parentName, "*"];
       } else {

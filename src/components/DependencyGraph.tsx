@@ -72,16 +72,23 @@ interface ContextMenuState {
   childName?: string;
   // For node menu
   nodeName?: string;
+  isLastNode?: boolean;
 }
 
 // VEX justification options
-export interface VexSelection {
-  type: "edge" | "node";
-  justification: string;
-  parentName?: string;
-  childName?: string;
-  nodeName?: string;
-}
+export type VexSelection =
+  | {
+      type: "edge";
+      justification: string;
+      parentName: string;
+      childName: string;
+    }
+  | {
+      type: "node";
+      justification: string;
+      nodeName: string;
+      isLastNode: boolean;
+    };
 
 const nodeTypes = {
   customNode: DependencyGraphNode,
@@ -378,11 +385,13 @@ const DependencyGraph: FunctionComponent<{
     }
     if (!enableContextMenu) return;
     // Show context menu for regular nodes
+    const hasChildren = edgeMaps.parentToChildEdges.has(node.id);
     setContextMenu({
       type: "node",
       x: event.clientX,
       y: event.clientY,
       nodeName: node.id,
+      isLastNode: !hasChildren,
     });
   };
 
@@ -522,14 +531,16 @@ const DependencyGraph: FunctionComponent<{
       // Don't show menu for load more nodes
       if (node.data.isLoadMoreNode || !enableContextMenu) return;
 
+      const hasChildren = edgeMaps.parentToChildEdges.has(node.id);
       setContextMenu({
         type: "node",
         x: event.clientX,
         y: event.clientY,
         nodeName: node.id,
+        isLastNode: !hasChildren,
       });
     },
-    [],
+    [enableContextMenu, edgeMaps],
   );
 
   // Close context menu
@@ -552,17 +563,18 @@ const DependencyGraph: FunctionComponent<{
           ? {
               type: "edge",
               justification,
-              parentName: contextMenu.parentName,
-              childName: contextMenu.childName,
+              parentName: contextMenu.parentName!,
+              childName: contextMenu.childName!,
             }
           : {
               type: "node",
               justification,
-              nodeName: contextMenu.nodeName,
+              nodeName: contextMenu.nodeName!,
+              isLastNode: contextMenu.isLastNode ?? false,
             };
 
       try {
-        const res = await onVexSelect(selection as VexSelection);
+        const res = await onVexSelect(selection);
         // If handler returned true (handled), close and don't do anything else
         if (res === true) {
           closeContextMenu();
