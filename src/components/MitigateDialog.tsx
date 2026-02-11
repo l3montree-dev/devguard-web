@@ -1,9 +1,11 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+"use client";
+
 import { FunctionComponent, useState } from "react";
 import Image from "next/image";
-import MarkdownEditor from "./common/MarkdownEditor";
+
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,14 @@ import {
 } from "./ui/dialog";
 import { AsyncButton, Button } from "./ui/button";
 import GitProviderIcon from "./GitProviderIcon";
+import dynamic from "next/dynamic";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/common/MarkdownEditor"),
+  {
+    ssr: false,
+  },
+);
 
 interface MitigateDialogProps {
   open: boolean;
@@ -44,7 +54,7 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Ticket </DialogTitle>
+          <DialogTitle>Create Ticket</DialogTitle>
           <DialogDescription>
             Create a ticket in your integrated issue tracker to track the
             mitigation of this vulnerability.

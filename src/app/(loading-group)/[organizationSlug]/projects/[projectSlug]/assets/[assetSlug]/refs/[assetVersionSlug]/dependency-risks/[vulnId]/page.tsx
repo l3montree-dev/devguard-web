@@ -614,6 +614,12 @@ const Index: FunctionComponent = () => {
     cvssVectorObj,
   );
 
+  const integrationName = useMemo(
+    () =>
+      getIntegrationNameFromRepositoryIdOrExternalProviderId(asset, project),
+    [asset, project],
+  );
+
   // Show error state
   if (error) {
     return (
@@ -827,20 +833,14 @@ const Index: FunctionComponent = () => {
                             <div className="flex flex-row justify-end gap-1">
                               <div className="flex flex-row items-start gap-2 pt-2">
                                 {vuln.ticketId === null &&
-                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                    asset,
-                                    project,
-                                  ) !== null && (
+                                  integrationName !== null && (
                                     <Button
                                       variant={"secondary"}
                                       onClick={() =>
                                         setMitigateDialogOpen(true)
                                       }
                                     >
-                                      {getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                        asset,
-                                        project,
-                                      ) === "gitlab" && (
+                                      {integrationName === "gitlab" && (
                                         <GitProviderIcon
                                           externalEntityProviderIdOrRepositoryId={
                                             asset.externalEntityProviderId ??
@@ -848,10 +848,7 @@ const Index: FunctionComponent = () => {
                                           }
                                         />
                                       )}
-                                      {getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                        asset,
-                                        project,
-                                      ) === "github" && (
+                                      {integrationName === "github" && (
                                         <Image
                                           alt="GitHub Logo"
                                           width={15}
@@ -860,10 +857,7 @@ const Index: FunctionComponent = () => {
                                           src={"/assets/github.svg"}
                                         />
                                       )}
-                                      {getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                        asset,
-                                        project,
-                                      ) === "jira" && (
+                                      {integrationName === "jira" && (
                                         <Image
                                           alt="Jira Logo"
                                           width={15}
@@ -1309,12 +1303,7 @@ const Index: FunctionComponent = () => {
             justification,
           });
         }}
-        integrationType={
-          getIntegrationNameFromRepositoryIdOrExternalProviderId(
-            asset,
-            project,
-          ) ?? undefined
-        }
+        integrationType={integrationName ?? undefined}
         gitlabIntegration={asset.externalEntityProviderId ?? "gitlab"}
       />
 
