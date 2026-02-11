@@ -76,6 +76,7 @@ import {
   convertPathsToTree,
   ViewDependencyTreeNode,
 } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import MitigateDialog from "@/components/MitigateDialog";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -394,6 +395,7 @@ const Index: FunctionComponent = () => {
   const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
+  const [mitigateDialogOpen, setMitigateDialogOpen] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   // fetch the project
@@ -612,6 +614,12 @@ const Index: FunctionComponent = () => {
     cvssVectorObj,
   );
 
+  const integrationName = useMemo(
+    () =>
+      getIntegrationNameFromRepositoryIdOrExternalProviderId(asset, project),
+    [asset, project],
+  );
+
   // Show error state
   if (error) {
     return (
@@ -825,91 +833,42 @@ const Index: FunctionComponent = () => {
                             <div className="flex flex-row justify-end gap-1">
                               <div className="flex flex-row items-start gap-2 pt-2">
                                 {vuln.ticketId === null &&
-                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                    asset,
-                                    project,
-                                  ) === "gitlab" && (
-                                    <AsyncButton
+                                  integrationName !== null && (
+                                    <Button
                                       variant={"secondary"}
                                       onClick={() =>
-                                        handleSubmit({
-                                          status: "mitigate",
-                                          justification,
-                                        })
+                                        setMitigateDialogOpen(true)
                                       }
                                     >
-                                      <div className="flex flex-col">
-                                        <div className="flex flex-row items-center">
-                                          <div className="mr-2">
-                                            <GitProviderIcon
-                                              externalEntityProviderIdOrRepositoryId={
-                                                asset.externalEntityProviderId ??
-                                                "gitlab"
-                                              }
-                                            />
-                                          </div>
-                                          Create Ticket
-                                        </div>
-                                      </div>
-                                    </AsyncButton>
-                                  )}
-
-                                {vuln.ticketId === null &&
-                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                    asset,
-                                    project,
-                                  ) === "github" && (
-                                    <AsyncButton
-                                      variant={"secondary"}
-                                      onClick={() =>
-                                        handleSubmit({
-                                          status: "mitigate",
-                                          justification,
-                                        })
-                                      }
-                                    >
-                                      <div className="flex flex-col">
-                                        <div className="flex">
-                                          <Image
-                                            alt="GitLab Logo"
-                                            width={15}
-                                            height={15}
-                                            className="mr-2 dark:invert"
-                                            src={"/assets/github.svg"}
-                                          />
-                                          Create GitHub Ticket
-                                        </div>
-                                      </div>
-                                    </AsyncButton>
-                                  )}
-
-                                {vuln.ticketId === null &&
-                                  getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                    asset,
-                                    project,
-                                  ) === "jira" && (
-                                    <AsyncButton
-                                      variant={"secondary"}
-                                      onClick={() =>
-                                        handleSubmit({
-                                          status: "mitigate",
-                                          justification,
-                                        })
-                                      }
-                                    >
-                                      <div className="flex flex-col">
-                                        <div className="flex">
-                                          <Image
-                                            alt="Jira Logo"
-                                            width={15}
-                                            height={15}
-                                            className="mr-2"
-                                            src={"/assets/jira-svgrepo-com.svg"}
-                                          />
-                                          Create Jira Ticket
-                                        </div>
-                                      </div>
-                                    </AsyncButton>
+                                      {integrationName === "gitlab" && (
+                                        <GitProviderIcon
+                                          externalEntityProviderIdOrRepositoryId={
+                                            asset.externalEntityProviderId ??
+                                            "gitlab"
+                                          }
+                                        />
+                                      )}
+                                      {integrationName === "github" && (
+                                        <Image
+                                          alt="GitHub Logo"
+                                          width={15}
+                                          height={15}
+                                          className="dark:invert"
+                                          src={"/assets/github.svg"}
+                                        />
+                                      )}
+                                      {integrationName === "jira" && (
+                                        <Image
+                                          alt="Jira Logo"
+                                          width={15}
+                                          height={15}
+                                          src={"/assets/jira-svgrepo-com.svg"}
+                                        />
+                                      )}
+                                      <span className="ml-1">
+                                        Create Ticket{" "}
+                                      </span>
+                                    </Button>
                                   )}
                                 <Button
                                   onClick={() =>
@@ -1334,6 +1293,18 @@ const Index: FunctionComponent = () => {
             justification,
           });
         }}
+      />
+      <MitigateDialog
+        open={mitigateDialogOpen}
+        onOpenChange={setMitigateDialogOpen}
+        onSubmit={async (justification) => {
+          return handleSubmit({
+            status: "mitigate",
+            justification,
+          });
+        }}
+        integrationType={integrationName ?? undefined}
+        gitlabIntegration={asset.externalEntityProviderId ?? "gitlab"}
       />
 
       <AcceptRiskDialog
