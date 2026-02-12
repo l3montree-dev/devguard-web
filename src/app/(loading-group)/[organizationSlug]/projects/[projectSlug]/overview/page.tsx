@@ -464,10 +464,12 @@ const OverviewPage = () => {
                             "flex items-center flex-row gap-4",
                           )}
                         >
-                          <div className="flex-1">
+                          <div className="justify-left">
                             <Avatar
                               name={
-                                asset?.name ? asset.name : r.artifactName || ""
+                                asset?.name
+                                  ? asset.name
+                                  : beautifyPurl(r.artifactName || "")
                               }
                               avatar={asset?.avatar}
                             />
