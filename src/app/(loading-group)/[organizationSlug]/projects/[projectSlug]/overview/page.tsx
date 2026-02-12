@@ -61,6 +61,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
+import EcosystemImage from "@/components/common/EcosystemImage";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -465,14 +466,12 @@ const OverviewPage = () => {
                           )}
                         >
                           <div className="justify-left">
-                            <Avatar
-                              name={
-                                asset?.name
-                                  ? asset.name
-                                  : beautifyPurl(r.artifactName || "")
-                              }
-                              avatar={asset?.avatar}
-                            />
+                            <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
+                              <EcosystemImage
+                                size={20}
+                                packageName={r.artifactName || ""}
+                              />
+                            </div>
                           </div>
                           <div>
                             <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
