@@ -384,7 +384,8 @@ const Home = () => {
             Button={
               <GithubAppInstallationAlert
                 Button={
-                  <Link
+                  <a
+                    target="_blank"
                     className={cn(
                       buttonVariants({ variant: "default" }),
                       "!text-primary-foreground hover:no-underline",
@@ -398,7 +399,7 @@ const Home = () => {
                     }
                   >
                     Install GitHub App
-                  </Link>
+                  </a>
                 }
               >
                 <Button variant={"secondary"}>Install GitHub App</Button>
