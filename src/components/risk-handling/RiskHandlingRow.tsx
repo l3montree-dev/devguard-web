@@ -212,7 +212,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         </td>
         <td className="py-3 px-4">
           <span className="text-sm">
-            {(row.original.maxCvss ?? 0).toFixed(1)}
+            {row.original.maxCvss == null || row.original.maxCvss === -1
+              ? "N/A"
+              : row.original.maxCvss.toFixed(1)}
           </span>
         </td>
         <td className="py-3 px-4">
@@ -336,7 +338,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 </td>
                 <td className="py-2 px-4">
                   <span className="text-sm">
-                    {(sortedVulns[0]?.cve?.cvss ?? 0).toFixed(1)}
+                    {sortedVulns[0]?.cve?.cvss == null ||
+                    sortedVulns[0]?.cve?.cvss === -1
+                      ? "N/A"
+                      : sortedVulns[0]?.cve?.cvss.toFixed(1)}
                   </span>
                 </td>
                 <td />
