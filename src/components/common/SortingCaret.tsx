@@ -1,4 +1,10 @@
-import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronUpIcon,
+  ArrowsUpDownIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+} from "@heroicons/react/24/outline";
+import { Arrow } from "@radix-ui/react-tooltip";
 import React, { FunctionComponent } from "react";
 
 interface Props {
@@ -8,11 +14,11 @@ interface Props {
 const SortingCaret: FunctionComponent<Props> = ({ sortDirection }) => {
   switch (sortDirection) {
     case false:
-      return null;
+      return <ArrowsUpDownIcon className="black h-4 w-4 opacity-30" />;
     case "asc":
-      return <ChevronUpIcon className="black h-4 w-4" />;
+      return <ArrowUpIcon className="black h-4 w-4" />;
     case "desc":
-      return <ChevronUpIcon className="black h-4 w-4 rotate-180 transform" />;
+      return <ArrowDownIcon className="black h-4 w-4" />;
   }
 };
 
