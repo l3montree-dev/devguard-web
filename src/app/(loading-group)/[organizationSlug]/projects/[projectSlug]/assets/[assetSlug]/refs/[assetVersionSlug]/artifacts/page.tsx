@@ -39,6 +39,7 @@ import {
 } from "../../../../../../../../../../components/ui/alert-dialog";
 import {
   useArtifacts,
+  useRootNodes,
   useUpdateAssetVersionState,
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
@@ -78,23 +79,7 @@ const Artifacts = () => {
     assetVersionSlug: string;
   };
 
-  const { data: rootNodes, mutate } = useSWR<{
-    [artifactName: string]: InformationSources[];
-  }>(
-    "/organizations/" +
-      params.organizationSlug +
-      "/projects/" +
-      params.projectSlug +
-      "/assets/" +
-      params.assetSlug +
-      "/refs/" +
-      params.assetVersionSlug +
-      "/artifact-root-nodes",
-    fetcher,
-    {
-      fallbackData: {},
-    },
-  );
+  const { rootNodes, mutate } = useRootNodes();
 
   const artifactForm = useForm<ArtifactCreateUpdateRequest>({
     defaultValues: {
