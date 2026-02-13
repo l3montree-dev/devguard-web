@@ -164,10 +164,7 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                           >
                             <div className="flex flex-col gap-1.5 w-full">
                               <span className="text-xs text-muted-foreground">
-                                Matches {count}{" "}
-                                {count === 1
-                                  ? "vulnerability"
-                                  : "vulnerabilities"}
+                                Matches {count} {count === 1 ? "path" : "paths"}
                               </span>
                               <div className="flex flex-wrap items-center gap-1">
                                 {suffix.split(" > ").map((el, idx, arr) => (
