@@ -61,7 +61,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
-import EcosystemImage from "@/components/common/EcosystemImage";
 
 const OverviewPage = () => {
   const search = useSearchParams();
