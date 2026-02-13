@@ -463,15 +463,20 @@ const DependencyGraph: FunctionComponent<{
     (_event: React.MouseEvent, edge: any) => {
       const pathEdgeIds = new Set<string>();
 
-      // Always add the hovered edge itself
+      // When a highlight path is active, only highlight the single hovered edge (and only if it's blue)
+      if (highlightPath && highlightPath.length > 0) {
+        if (!edgeMaps.highlightPathEdges.has(edge.id)) return;
+        pathEdgeIds.add(edge.id);
+        applyHoverHighlight(pathEdgeIds);
+        return;
+      }
+
+      // No highlight path: use full traversal behavior
       pathEdgeIds.add(edge.id);
 
-      // The parent node of the hovered edge (where we start looking for incoming edges)
       const parentNode = edge.target;
       const childNode = edge.source;
 
-      // if the parent only has this SINGLE outgoing edge, we highlight all incoming edges to it
-      // since marking the hovered edge as false positive, would also imply the entire path to it is false positive
       const parentOutgoing = edgeMaps.parentToChildEdges.get(parentNode);
       const isOnlyChild =
         !parentOutgoing ||
@@ -481,7 +486,6 @@ const DependencyGraph: FunctionComponent<{
         traverseUpward([parentNode], pathEdgeIds, edgeMaps);
       }
 
-      // if we would remove that edge, and the child node only has a single incoming edge (exactly this one), we can continue downwards as well
       const childIncoming = edgeMaps.childToParentEdges.get(childNode);
       const isOnlyParent =
         !childIncoming ||
@@ -491,12 +495,11 @@ const DependencyGraph: FunctionComponent<{
         traverseDownward([childNode], pathEdgeIds, edgeMaps);
       }
 
-      // Propagate highlighting
       propagateHighlighting(pathEdgeIds, edgeMaps);
 
       applyHoverHighlight(pathEdgeIds);
     },
-    [edgeMaps, applyHoverHighlight],
+    [edgeMaps, applyHoverHighlight, highlightPath],
   );
 
   const handleEdgeMouseLeave = useCallback(() => {
