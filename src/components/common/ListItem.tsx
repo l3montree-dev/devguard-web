@@ -25,7 +25,7 @@ const ListItem: FunctionComponent<Props> = ({
   return (
     <Card
       className={classNames(
-        "flex flex-row items-start justify-between",
+        "flex flex-row items-center justify-between",
         reactOnHover && "transition-all hover:bg-accent",
         className,
       )}
@@ -38,7 +38,9 @@ const ListItem: FunctionComponent<Props> = ({
       </CardHeader>
       {Boolean(Button) && (
         <CardContent className="p-6">
-          <div className="flex flex-none items-center gap-x-4">{Button}</div>
+          <div className="flex flex-none items-center gap-x-4 whitespace-nowrap">
+            {Button}
+          </div>
         </CardContent>
       )}
     </Card>

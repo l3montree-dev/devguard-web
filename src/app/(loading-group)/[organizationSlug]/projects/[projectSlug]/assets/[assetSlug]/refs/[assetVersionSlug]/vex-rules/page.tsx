@@ -33,7 +33,6 @@ import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
 import VexPathPattern from "@/components/vex-rules/VexPathPattern";
 import VexRuleResult from "@/components/vex-rules/VexRuleResult";
 import VexRulesRow from "@/components/vex-rules/VexRulesRow";
-import SyncedUpstreamVexSources from "@/components/vex-rules/SyncedUpstreamVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { useArtifacts } from "@/context/AssetVersionContext";
@@ -79,27 +78,6 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
   columnHelper.accessor("pathPattern", {
     header: "Path Pattern",
     cell: (info) => <VexPathPattern pathPattern={info.getValue()} />,
-  }),
-  columnHelper.accessor("justification", {
-    header: "Justification",
-    cell: (info) => {
-      const justification = info.getValue();
-      if (!justification) {
-        return <span className="text-muted-foreground">-</span>;
-      }
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="block max-w-[200px] truncate cursor-default">
-              {justification}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-[400px]">
-            <p className="whitespace-pre-wrap">{justification}</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    },
   }),
   columnHelper.accessor("eventType", {
     header: "Rule Result",
@@ -183,7 +161,7 @@ const VexRulesPage: FunctionComponent = () => {
 
   const columnsDef = useMemo(
     () => [...baseColumnsDef, actionsColumn],
-    [baseColumnsDef, actionsColumn],
+    [actionsColumn],
   );
 
   const { table } = useTable(
@@ -277,8 +255,8 @@ const VexRulesPage: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Manage VEX Rules"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <Button variant={"secondary"} onClick={() => setUploadVexModal(true)}>
-          Upload a VEX
+        <Button onClick={() => setUploadVexModal(true)}>
+          Upload a VEX-File or add a VEX-URL
         </Button>
       </div>
       <Section
@@ -288,7 +266,6 @@ const VexRulesPage: FunctionComponent = () => {
         title="Manage VEX Rules"
         className="mb-4 mt-4"
       >
-        <SyncedUpstreamVexSources />
         <div>
           <Callout intent={"neutral"} showIcon>
             <span className="text-sm flex items-center">
@@ -325,9 +302,8 @@ const VexRulesPage: FunctionComponent = () => {
             <div className="overflow-auto">
               <table className="w-full overflow-x-auto text-sm table-fixed">
                 <colgroup>
-                  <col className="w-[130px]" />
-                  <col className="w-[170px]" />
                   <col className="w-[100px]" />
+                  <col className="w-[170px]" />
                   <col className="w-[70px]" />
                   <col className="w-[100px]" />
                   <col className="w-[30px]" />
@@ -397,10 +373,13 @@ const VexRulesPage: FunctionComponent = () => {
                           key={vexSource}
                           row={rowForGroup}
                           index={groupIndex}
-                          isLast={groupIndex === vexSourceGroups.length - 1}
                           vexRulesInGroup={rulesInGroup}
                           deleteUrlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
                           onDeleted={() => mutate()}
+                          organizationSlug={organizationSlug}
+                          projectSlug={projectSlug}
+                          assetSlug={assetSlug}
+                          assetVersionSlug={assetVersionSlug}
                         />
                       );
                     })}

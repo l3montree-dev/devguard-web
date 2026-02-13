@@ -14,26 +14,35 @@ import {
 import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
+import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 
 interface VexRulesRowProps {
   row: Row<VexRule>;
   index: number;
-  isLast: boolean;
   vexRulesInGroup: VexRule[];
   deleteUrlBase: string;
   onDeleted: () => void;
+  organizationSlug?: string;
+  projectSlug?: string;
+  assetSlug?: string;
+  assetVersionSlug?: string;
 }
 
 const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
   row,
   index,
-  isLast,
   vexRulesInGroup,
   deleteUrlBase,
   onDeleted,
+  organizationSlug,
+  projectSlug,
+  assetSlug,
+  assetVersionSlug,
 }) => {
   const [isGroupOpen, setIsGroupOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+  const [selectedRule, setSelectedRule] = useState<VexRule | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const vexSource = row.original.vexSource;
 
   const handleDeleteGroup = async (e: React.MouseEvent) => {
@@ -134,11 +143,14 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
             <tr
               key={vexRule.id}
               className={classNames(
-                "relative align-center transition-all",
+                "relative align-center transition-all cursor-pointer hover:bg-muted/50",
                 !isLastInGroup &&
                   "border-b border-gray-100 dark:border-white/5",
-                "hover:bg-muted/30",
               )}
+              onClick={() => {
+                setSelectedRule(vexRule);
+                setIsDialogOpen(true);
+              }}
             >
               {row.getVisibleCells().map((cell, cellIndex) => {
                 // For the first cell, wrap content with indentation
@@ -181,6 +193,18 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
             </tr>
           );
         })}
+
+      <VexRuleDetailsDialog
+        vexRule={selectedRule}
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        organizationSlug={organizationSlug}
+        projectSlug={projectSlug}
+        assetSlug={assetSlug}
+        assetVersionSlug={assetVersionSlug}
+        deleteUrlBase={deleteUrlBase}
+        onDeleted={onDeleted}
+      />
     </>
   );
 };
