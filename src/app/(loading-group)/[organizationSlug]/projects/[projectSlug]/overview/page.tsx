@@ -466,19 +466,21 @@ const OverviewPage = () => {
                           )}
                         >
                           <div className="justify-left">
-                            <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
-                              <EcosystemImage
-                                size={20}
-                                packageName={r.artifactName || ""}
-                              />
-                            </div>
+                            <Avatar
+                              name={
+                                r.artifactName
+                                  ? beautifyPurl(r.artifactName)
+                                  : "P"
+                              }
+                              avatar={asset?.avatar}
+                            />
                           </div>
                           <div>
                             <div className="mb-1 flex flex-row items-center gap-4 text-sm font-semibold">
                               <Tooltip>
                                 <TooltipTrigger className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-100 flex-1 block">
                                   <span className="text-foreground text-left">
-                                    {r.artifactName || ""}
+                                    {beautifyPurl(r.artifactName || "")}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
