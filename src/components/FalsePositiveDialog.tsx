@@ -148,9 +148,8 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                     <SelectContent className="max-w-2xl">
                       <SelectItem value="none" className="border-b pb-3 mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">No rule</span>
-                          <span className="text-xs text-muted-foreground">
-                            (only this vulnerability)
+                          <span className="font-medium">
+                            Handle only this path
                           </span>
                         </div>
                       </SelectItem>
@@ -164,12 +163,15 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                           >
                             <div className="flex flex-col gap-1.5 w-full">
                               <span className="text-xs text-muted-foreground">
-                                Matches {count}{" "}
-                                {count === 1
-                                  ? "vulnerability"
-                                  : "vulnerabilities"}
+                                Matches {count} {count === 1 ? "path" : "paths"}
                               </span>
                               <div className="flex flex-wrap items-center gap-1">
+                                <span className="pt-1 text-xs text-muted-foreground">
+                                  *
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  →
+                                </span>
                                 {suffix.split(" > ").map((el, idx, arr) => (
                                   <div
                                     key={el + idx}
