@@ -353,7 +353,7 @@ const Index: FunctionComponent = () => {
                 <colgroup>
                   <col className="w-auto" />
                   <col className="w-[160px]" />
-                  <col className="w-[110px]" />
+                  <col className="w-[130px]" />
                   <col className="w-[220px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
