@@ -464,10 +464,12 @@ const OverviewPage = () => {
                             "flex items-center flex-row gap-4",
                           )}
                         >
-                          <div className="flex-1">
+                          <div className="justify-left">
                             <Avatar
                               name={
-                                asset?.name ? asset.name : r.artifactName || ""
+                                r.artifactName
+                                  ? beautifyPurl(r.artifactName)
+                                  : "P"
                               }
                               avatar={asset?.avatar}
                             />
@@ -477,7 +479,7 @@ const OverviewPage = () => {
                               <Tooltip>
                                 <TooltipTrigger className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-100 flex-1 block">
                                   <span className="text-foreground text-left">
-                                    {r.artifactName || ""}
+                                    {beautifyPurl(r.artifactName || "")}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
