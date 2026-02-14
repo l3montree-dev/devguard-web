@@ -98,8 +98,12 @@ export const DependencyGraphNode: FunctionComponent<
         width: props.data.nodeWidth,
       }}
       className={classNames(
-        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        props.data.vuln ? "border-red-500 shadow-lg" : "border-border",
+        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all cursor-pointer active:cursor-grabbing",
+        props.data.vuln
+          ? props.data.vuln.every((v) => v.state === "falsePositive")
+            ? "border-gray-500/50 shadow-md"
+            : "border-red-500 shadow-lg"
+          : "border-border",
       )}
     >
       <Handle
@@ -110,13 +114,22 @@ export const DependencyGraphNode: FunctionComponent<
       <div className="flex flex-col gap-2">
         {props.data.vuln && (
           <div className="absolute -top-2 -right-2 z-10">
-            <Badge
-              variant="outline"
-              className={`text-[10px] px-1.5 py-0 font-semibold shadow-md bg-red-500 text-white border-red-500`}
-              title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
-            >
-              Vulnerable
-            </Badge>
+            {props.data.vuln.every((v) => v.state === "falsePositive") ? (
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-gray-500/80 text-white border-gray-500/80"
+              >
+                False Positive
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-red-500 text-white border-red-500"
+                title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
+              >
+                Vulnerable
+              </Badge>
+            )}
           </div>
         )}
         <div className="flex items-center justify-between flex-row gap-2">
@@ -129,7 +142,7 @@ export const DependencyGraphNode: FunctionComponent<
             <div>
               <label
                 htmlFor="text"
-                className="text-left font-medium leading-tight flex-1"
+                className="text-left font-medium leading-tight flex-1 cursor-[inherit]"
               >
                 {beautifyPurl(props.data.label)}
                 {version && <Badge variant={"outline"}>{version}</Badge>}

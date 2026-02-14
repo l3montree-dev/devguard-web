@@ -38,9 +38,7 @@ const ListItem: FunctionComponent<Props> = ({
       </CardHeader>
       {Boolean(Button) && (
         <CardContent className="p-6">
-          <div className="flex flex-none items-center gap-x-4 whitespace-nowrap">
-            {Button}
-          </div>
+          <div className="flex flex-none items-center gap-x-4">{Button}</div>
         </CardContent>
       )}
     </Card>

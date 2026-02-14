@@ -32,8 +32,9 @@ interface VexRuleDetailsDialogProps {
   projectSlug?: string;
   assetSlug?: string;
   assetVersionSlug?: string;
-  deleteUrlBase?: string;
+  urlBase?: string;
   onDeleted?: () => void;
+  onReapplied?: () => void;
 }
 
 const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
@@ -44,10 +45,12 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   projectSlug,
   assetSlug,
   assetVersionSlug,
-  deleteUrlBase,
+  urlBase: deleteUrlBase,
   onDeleted,
+  onReapplied,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isReapplying, setIsReapplying] = useState(false);
 
   const { theme } = useTheme();
 
@@ -84,6 +87,26 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleReapply = async () => {
+    if (!deleteUrlBase) return;
+
+    setIsReapplying(true);
+
+    const resp = await browserApiClient(
+      `${deleteUrlBase}/${vexRule.id}/reapply`,
+      {
+        method: "POST",
+      },
+    );
+    if (!resp.ok) {
+      toast.error("Failed to reapply VEX rule");
+    } else {
+      toast.success("VEX rule reapplied successfully");
+      onReapplied?.();
+    }
+    setIsReapplying(false);
   };
 
   return (
@@ -177,11 +200,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             <ListItem
               Title="VEX Source"
               Description="The source or document that defines this VEX rule"
-              Button={
-                <Badge variant="outline" className="whitespace-nowrap">
-                  {vexRule.vexSource}
-                </Badge>
-              }
+              Button={<Badge variant="outline">{vexRule.vexSource}</Badge>}
             />
           )}
 
@@ -214,19 +233,29 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             Cancel
           </Button>
           {deleteUrlBase && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="gap-2"
-            >
-              {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-              Delete Rule
-            </Button>
+            <>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="gap-2"
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Delete Rule
+              </Button>
+              <Button
+                onClick={handleReapply}
+                disabled={isReapplying}
+                className="gap-2"
+              >
+                {isReapplying && <Loader2 className="h-4 w-4 animate-spin" />}
+                Reapply
+              </Button>
+            </>
           )}
         </DialogFooter>
       </DialogContent>

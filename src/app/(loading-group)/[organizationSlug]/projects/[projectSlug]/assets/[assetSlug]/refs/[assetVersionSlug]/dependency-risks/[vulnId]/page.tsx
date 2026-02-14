@@ -33,6 +33,7 @@ import {
   DependencyVulnHints,
   DetailedDependencyVulnDTO,
   RequirementsLevel,
+  VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
 import { beautifyPurl, getEcosystem } from "@/utils/common";
@@ -62,6 +63,8 @@ import ArtifactBadge from "../../../../../../../../../../../components/ArtifactB
 import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import FalsePositiveDialog from "../../../../../../../../../../../components/FalsePositiveDialog";
+import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
+import VexRuleResult from "../../../../../../../../../../../components/vex-rules/VexRuleResult";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
 import Callout from "../../../../../../../../../../../components/common/Callout";
 import Err from "../../../../../../../../../../../components/common/Err";
@@ -397,6 +400,8 @@ const Index: FunctionComponent = () => {
   const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
   const [mitigateDialogOpen, setMitigateDialogOpen] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [selectedVexRule, setSelectedVexRule] = useState<VexRule | null>(null);
+  const [vexRuleDialogOpen, setVexRuleDialogOpen] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
@@ -420,6 +425,14 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
+  // Fetch VEX rules for the current CVE to show FP edges in the graph
+  const { data: vexRulesData, mutate: mutateVexRules } = useSWR<VexRule[]>(
+    vuln
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?vulnId=${encodeURIComponent(vuln.id)}`
+      : null,
+    fetcher,
+  );
+
   // Handler to create false-positive rules from the dependency graph context menu
   const createFalsePositive = useCreateVexRule({
     activeOrgSlug: activeOrg.slug,
@@ -427,7 +440,10 @@ const Index: FunctionComponent = () => {
     assetSlug: asset.slug,
     assetVersionSlug: assetVersion?.slug ?? "",
     cveId: vuln?.cveID ?? null,
-    mutate: mutate ?? (() => Promise.resolve()),
+    mutate: async () => {
+      mutate?.();
+      mutateVexRules?.();
+    },
   });
 
   const { data: graphResponse, isLoading: graphLoading } = useSWR<
@@ -774,6 +790,7 @@ const Index: FunctionComponent = () => {
                                 ...vuln.vulnerabilityPath,
                               ]}
                               onVexSelect={createFalsePositive}
+                              vexRules={vexRulesData}
                             />
                           )}
                         </div>
@@ -810,6 +827,47 @@ const Index: FunctionComponent = () => {
                         </Callout>
                       )}
                     </div>
+
+                    {/* VEX Rules applied to this vulnerability */}
+                    {vexRulesData && vexRulesData.length > 0 && (
+                      <div className="mt-6">
+                        <span className="font-semibold block mb-2">
+                          VEX Rules ({vexRulesData.length})
+                        </span>
+                        <div className="flex flex-col gap-2">
+                          {vexRulesData.map((rule) => (
+                            <button
+                              key={rule.id}
+                              onClick={() => {
+                                setSelectedVexRule(rule);
+                                setVexRuleDialogOpen(true);
+                              }}
+                              className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted/50 transition-colors cursor-pointer"
+                            >
+                              <div className="flex flex-col gap-1 min-w-0">
+                                <span className="font-medium truncate">
+                                  {rule.pathPattern?.join(" > ") ||
+                                    "No pattern"}
+                                </span>
+                                {rule.justification && (
+                                  <span className="text-xs text-muted-foreground truncate">
+                                    {rule.justification}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <VexRuleResult
+                                  eventType={rule.eventType}
+                                  mechanicalJustification={
+                                    rule.mechanicalJustification
+                                  }
+                                />
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1334,6 +1392,25 @@ const Index: FunctionComponent = () => {
         }
         vulnState={vuln?.state ?? ""}
         vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
+      />
+
+      <VexRuleDetailsDialog
+        vexRule={selectedVexRule}
+        isOpen={vexRuleDialogOpen}
+        onOpenChange={setVexRuleDialogOpen}
+        organizationSlug={organizationSlug}
+        projectSlug={projectSlug}
+        assetSlug={assetSlug}
+        assetVersionSlug={assetVersionSlug}
+        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        onDeleted={() => {
+          mutateVexRules();
+          mutate();
+        }}
+        onReapplied={() => {
+          mutateVexRules();
+          mutate();
+        }}
       />
     </Page>
   );

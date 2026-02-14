@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { DependencyVuln } from "@/types/api/api";
+import { DependencyVuln, VexRule } from "@/types/api/api";
 
 import { beautifyPurl, classNames } from "@/utils/common";
 
@@ -106,6 +106,7 @@ const DependencyGraph: FunctionComponent<{
   // (for example by creating a false-positive rule). If it returns falsy / undefined, component will still close the menu.
   onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
   highlightPath?: string[];
+  vexRules?: VexRule[];
 }> = ({
   graph,
   width,
@@ -115,6 +116,7 @@ const DependencyGraph: FunctionComponent<{
   onVexSelect,
   enableContextMenu,
   highlightPath,
+  vexRules,
 }) => {
   const isFirstRender = useRef(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,64 +192,12 @@ const DependencyGraph: FunctionComponent<{
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  useEffect(() => {
-    setNodes(initialNodes);
-    // Apply highlighting to vulnerability path
-    const edgesWithHighlight = initialEdges.map((edge) => {
-      if (!highlightPath || highlightPath.length === 0) return edge;
-
-      // Check if this edge is part of the vulnerability path
-      const parentIndex = highlightPath.indexOf(edge.target);
-      const childIndex = highlightPath.indexOf(edge.source);
-
-      // Edge is in path if both nodes are in path and parent comes before child
-      const isInPath =
-        parentIndex !== -1 &&
-        childIndex !== -1 &&
-        parentIndex === childIndex - 1;
-
-      if (isInPath) {
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: "#3b82f6", // blue-500
-            strokeWidth: 3,
-          },
-          zIndex: 999,
-        };
-      }
-
-      return edge;
-    });
-
-    setEdges(edgesWithHighlight);
-
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      // just use the root node
-      setViewPort({
-        x: -rootNode.position.x + 10,
-        y: -rootNode.position.y + height / 2,
-        zoom: 1,
-      });
-    }
-  }, [
-    initialNodes,
-    initialEdges,
-    setNodes,
-    setEdges,
-    rootNode,
-    height,
-    width,
-    highlightPath,
-  ]);
-
   // Precompute edge lookup maps for O(1) access during hover
   const edgeMaps = useMemo(() => {
     const strokeMap = new Map<string, string>();
     const strokeWidthMap = new Map<string, number>();
     const highlightPathEdges = new Set<string>();
+    const falsePositiveEdges = new Set<string>();
 
     // A node can have multiple parents in a DAG, so store all parent edges
     const childToParentEdges = new Map<
@@ -259,6 +209,22 @@ const DependencyGraph: FunctionComponent<{
       string,
       Array<{ edgeId: string; child: string }>
     >();
+
+    // Build a set of VEX rule parent patterns for quick lookup
+    // pathPattern [parentName, "*"] -> mark all edges FROM parentName
+    // pathPattern [nodeName] -> mark all edges TO nodeName
+    const vexParentPatterns = new Set<string>();
+    const vexNodePatterns = new Set<string>();
+    if (vexRules) {
+      for (const rule of vexRules) {
+        if (!rule.pathPattern || rule.pathPattern.length === 0) continue;
+        if (rule.pathPattern.length >= 2 && rule.pathPattern[1] === "*") {
+          vexParentPatterns.add(rule.pathPattern[0]);
+        } else if (rule.pathPattern.length === 1) {
+          vexNodePatterns.add(rule.pathPattern[0]);
+        }
+      }
+    }
 
     for (const edge of initialEdges) {
       // Check if edge is in highlight path
@@ -275,10 +241,26 @@ const DependencyGraph: FunctionComponent<{
         }
       }
 
+      // Check if edge matches a VEX rule (false positive)
+      // edge.target = parent node, edge.source = child node
+      if (
+        vexParentPatterns.has(edge.target) ||
+        vexNodePatterns.has(edge.source)
+      ) {
+        falsePositiveEdges.add(edge.id);
+      }
+
+      // Determine base stroke based on FP/highlight status
+      const isFp = falsePositiveEdges.has(edge.id);
+
       // Store original or highlighted stroke
       strokeMap.set(
         edge.id,
-        isHighlightEdge ? "#3b82f6" : edge.style?.stroke || "#a1a1aa",
+        isFp
+          ? "#a1a1aa"
+          : isHighlightEdge
+            ? "#3b82f6"
+            : edge.style?.stroke || "#a1a1aa",
       );
       strokeWidthMap.set(
         edge.id,
@@ -302,8 +284,78 @@ const DependencyGraph: FunctionComponent<{
       childToParentEdges,
       parentToChildEdges,
       highlightPathEdges,
+      falsePositiveEdges,
     };
-  }, [initialEdges, highlightPath]);
+  }, [initialEdges, highlightPath, vexRules]);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+    // Apply highlighting and FP styling to edges
+    const styledEdges = initialEdges.map((edge) => {
+      const isFp = edgeMaps.falsePositiveEdges.has(edge.id);
+
+      // Check if this edge is part of the vulnerability path
+      let isInPath = false;
+      if (highlightPath && highlightPath.length > 0) {
+        const parentIndex = highlightPath.indexOf(edge.target);
+        const childIndex = highlightPath.indexOf(edge.source);
+        isInPath =
+          parentIndex !== -1 &&
+          childIndex !== -1 &&
+          parentIndex === childIndex - 1;
+      }
+
+      if (isFp) {
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: "#a1a1aa",
+            strokeWidth: 2,
+            strokeDasharray: "6 4",
+            opacity: 0.7,
+          },
+          zIndex: isInPath ? 999 : 0,
+        };
+      }
+
+      if (isInPath) {
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: "#3b82f6", // blue-500
+            strokeWidth: 3,
+          },
+          zIndex: 999,
+        };
+      }
+
+      return edge;
+    });
+
+    setEdges(styledEdges);
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      // just use the root node
+      setViewPort({
+        x: -rootNode.position.x + 10,
+        y: -rootNode.position.y + height / 2,
+        zoom: 1,
+      });
+    }
+  }, [
+    initialNodes,
+    initialEdges,
+    setNodes,
+    setEdges,
+    rootNode,
+    height,
+    width,
+    highlightPath,
+    edgeMaps.falsePositiveEdges,
+  ]);
 
   const { theme } = useTheme();
 
@@ -314,6 +366,7 @@ const DependencyGraph: FunctionComponent<{
         currentEdges.map((e) => {
           const isOnPath = pathEdgeIds.has(e.id);
           const isHighlightPath = edgeMaps.highlightPathEdges.has(e.id);
+          const isFp = edgeMaps.falsePositiveEdges.has(e.id);
           const originalStroke = edgeMaps.strokeMap.get(e.id) || "#a1a1aa";
           const originalStrokeWidth = edgeMaps.strokeWidthMap.get(e.id) || 1;
 
@@ -325,6 +378,8 @@ const DependencyGraph: FunctionComponent<{
                 // Use purple for highlighted path on hover, yellow for normal hover
                 stroke: isHighlightPath ? "#a855f7" : "#F8BD25",
                 strokeWidth: originalStrokeWidth + 2,
+                strokeDasharray: isFp ? "6 4" : undefined,
+                opacity: isFp ? 0.7 : undefined,
               },
               zIndex: 1000,
             };
@@ -336,6 +391,8 @@ const DependencyGraph: FunctionComponent<{
               ...e.style,
               stroke: originalStroke,
               strokeWidth: edgeMaps.strokeWidthMap.get(e.id) || 1,
+              strokeDasharray: isFp ? "6 4" : undefined,
+              opacity: isFp ? 0.7 : undefined,
             },
             zIndex: isHighlightPath ? 999 : 0,
           };
@@ -350,6 +407,7 @@ const DependencyGraph: FunctionComponent<{
     setEdges((currentEdges) =>
       currentEdges.map((edge) => {
         const isHighlightPath = edgeMaps.highlightPathEdges.has(edge.id);
+        const isFp = edgeMaps.falsePositiveEdges.has(edge.id);
         const originalStroke = edgeMaps.strokeMap.get(edge.id) || "#a1a1aa";
         const originalStrokeWidth = edgeMaps.strokeWidthMap.get(edge.id) || 1;
         return {
@@ -358,6 +416,8 @@ const DependencyGraph: FunctionComponent<{
             ...edge.style,
             stroke: originalStroke,
             strokeWidth: originalStrokeWidth,
+            strokeDasharray: isFp ? "6 4" : undefined,
+            opacity: isFp ? 0.7 : undefined,
           },
           zIndex: isHighlightPath ? 999 : 0,
         };
@@ -397,6 +457,8 @@ const DependencyGraph: FunctionComponent<{
 
   const handleNodeMouseEnter = useCallback(
     (_event: React.MouseEvent, node: any) => {
+      if (!enableContextMenu) return;
+
       const pathEdgeIds = new Set<string>();
 
       // Don't highlight for load more nodes
@@ -449,18 +511,21 @@ const DependencyGraph: FunctionComponent<{
 
       applyHoverHighlight(pathEdgeIds);
     },
-    [edgeMaps, applyHoverHighlight],
+    [edgeMaps, applyHoverHighlight, enableContextMenu],
   );
 
   const handleNodeMouseLeave = useCallback(() => {
+    if (!enableContextMenu) return;
     resetEdgesToOriginal();
-  }, [resetEdgesToOriginal]);
+  }, [resetEdgesToOriginal, enableContextMenu]);
 
   // Edge hover handler - highlight incoming edges recursively
   // Always highlight all incoming edges to the parent of the hovered edge
   // Then recursively continue for grandparents only if they have one outgoing edge
   const handleEdgeMouseEnter = useCallback(
     (_event: React.MouseEvent, edge: any) => {
+      if (!enableContextMenu) return;
+
       const pathEdgeIds = new Set<string>();
 
       // When a highlight path is active, only highlight the single hovered edge (and only if it's blue)
@@ -499,12 +564,13 @@ const DependencyGraph: FunctionComponent<{
 
       applyHoverHighlight(pathEdgeIds);
     },
-    [edgeMaps, applyHoverHighlight, highlightPath],
+    [edgeMaps, applyHoverHighlight, highlightPath, enableContextMenu],
   );
 
   const handleEdgeMouseLeave = useCallback(() => {
+    if (!enableContextMenu) return;
     resetEdgesToOriginal();
-  }, [resetEdgesToOriginal]);
+  }, [resetEdgesToOriginal, enableContextMenu]);
 
   // Edge click handler - show context menu
   const handleEdgeClick = useCallback(
@@ -578,7 +644,6 @@ const DependencyGraph: FunctionComponent<{
 
       try {
         const res = await onVexSelect(selection);
-        // If handler returned true (handled), close and don't do anything else
         if (res === true) {
           closeContextMenu();
           return;
@@ -634,6 +699,10 @@ const DependencyGraph: FunctionComponent<{
                     <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
                     <span>Normal - Standard dependency</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 border-2 border-gray-500 rounded bg-card flex-shrink-0"></div>
+                    <span>False positive - Marked as not exploitable</span>
+                  </div>
                 </div>
 
                 {/* Edge Colors */}
@@ -657,6 +726,18 @@ const DependencyGraph: FunctionComponent<{
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-0.5 bg-zinc-400 flex-shrink-0"></div>
                     <span>Normal edge</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-8 flex-shrink-0"
+                      style={{
+                        height: 2,
+                        backgroundImage:
+                          "repeating-linear-gradient(to right, #6b7280 0, #6b7280 6px, transparent 6px, transparent 10px)",
+                        opacity: 0.7,
+                      }}
+                    ></div>
+                    <span>False positive (VEX rule applied)</span>
                   </div>
                 </div>
               </div>

@@ -26,7 +26,7 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
     return (
       <span
         className={classNames(
-          "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+          "inline-flex items-center whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
           "bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400 dark:ring-blue-500/20",
         )}
       >
@@ -38,7 +38,7 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   const badge = (
     <span
       className={classNames(
-        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+        "inline-flex items-center rounded-md whitespace-nowrap px-2 py-1 text-xs font-medium ring-1 ring-inset",
         "bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400 dark:ring-purple-500/20",
       )}
     >

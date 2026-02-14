@@ -202,7 +202,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
         projectSlug={projectSlug}
         assetSlug={assetSlug}
         assetVersionSlug={assetVersionSlug}
-        deleteUrlBase={deleteUrlBase}
+        urlBase={deleteUrlBase}
         onDeleted={onDeleted}
       />
     </>
