@@ -37,7 +37,7 @@ export default function ProviderSetup({
   // Use hook to get reactive organization from context.
   const activeOrgFromContext = useActiveOrg();
   const updateOrganization = useUpdateOrganization();
-  
+
   // Use context value if available, otherwise fallback to prop (for backward compatibility)
   const activeOrg = activeOrgFromContext || activeOrgProp;
 
@@ -65,8 +65,6 @@ export default function ProviderSetup({
           },
         };
       });
-      // Redirect to previous step after successful deletion
-      api?.scrollTo(prevIndex);
     }
   };
 
