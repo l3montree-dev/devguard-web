@@ -78,6 +78,7 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import RootNodeSelector from "@/components/RootNodeSelector";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -340,6 +341,12 @@ const Index: FunctionComponent = () => {
         "artifactName",
         encodeURIComponent(searchParams.get("artifact") as string),
       );
+      if (searchParams?.has("origin")) {
+        params.append(
+          "origin",
+          encodeURIComponent(searchParams.get("origin") as string),
+        );
+      }
     }
     return params;
   }, [searchParams]);
@@ -490,6 +497,7 @@ const Index: FunctionComponent = () => {
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
+          <RootNodeSelector />
           <div className="relative flex-1">
             <Input
               onChange={(e) => handleSearch(e.target.value)}
