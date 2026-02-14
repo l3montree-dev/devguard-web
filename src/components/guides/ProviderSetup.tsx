@@ -23,7 +23,6 @@ interface ProviderSetupProps {
   selectRepoSlideIndex: number;
   prevIndex: number;
   providerIntegrationSlideIndex: number;
-  onClose?: () => void;
 }
 
 export default function ProviderSetup({
@@ -34,7 +33,6 @@ export default function ProviderSetup({
   prevIndex,
   selectRepoSlideIndex,
   isLoadingRepositories,
-  onClose,
 }: ProviderSetupProps) {
   // Use hook to get reactive organization from context.
   const activeOrgFromContext = useActiveOrg();
@@ -67,8 +65,8 @@ export default function ProviderSetup({
           },
         };
       });
-      // Close modal after successful deletion
-      onClose?.();
+      // Redirect to previous step after successful deletion
+      api?.scrollTo(prevIndex);
     }
   };
 
