@@ -17,8 +17,8 @@ import { Skeleton } from "./ui/skeleton";
 
 interface Props {
   currentAmount: number;
-  queryIntervalStart: number;
-  queryIntervalEnd: number;
+  queryIntervalStart?: number;
+  queryIntervalEnd?: number;
   variant: "high" | "medium" | "low" | "critical";
   mode?: "risk" | "cvss";
   isLoading: boolean;
@@ -41,29 +41,37 @@ const SeverityCard: FunctionComponent<Props> = ({
     variant: Props["variant"],
   ): { [key: string]: string } => {
     const property = mode === "risk" ? "raw_risk_assessment" : "CVE.cvss";
+    const result: { [key: string]: string } = {};
 
     switch (variant) {
       case "low":
-        return {
-          [`filterQuery[${property}][is less than]`]:
-            queryIntervalEnd.toString(),
-        };
+        if (queryIntervalEnd !== undefined) {
+          result[`filterQuery[${property}][is less than]`] =
+            queryIntervalEnd.toString();
+        }
+        break;
 
       case "high":
       case "medium":
-        return {
-          [`filterQuery[${property}][is less than]`]:
-            queryIntervalEnd.toString(),
-          [`filterQuery[${property}][is greater than]`]:
-            queryIntervalStart.toString(),
-        };
+        if (queryIntervalEnd !== undefined) {
+          result[`filterQuery[${property}][is less than]`] =
+            queryIntervalEnd.toString();
+        }
+        if (queryIntervalStart !== undefined) {
+          result[`filterQuery[${property}][is greater than]`] =
+            queryIntervalStart.toString();
+        }
+        break;
 
       case "critical":
-        return {
-          [`filterQuery[${property}][is greater than]`]:
-            queryIntervalStart.toString(),
-        };
+        if (queryIntervalStart !== undefined) {
+          result[`filterQuery[${property}][is greater than]`] =
+            queryIntervalStart.toString();
+        }
+        break;
     }
+
+    return result;
   };
 
   if (isLoading) {

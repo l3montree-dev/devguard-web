@@ -490,22 +490,22 @@ const OverviewPage = () => {
                                 <CVERainbowBadge
                                   low={
                                     mode === "risk"
-                                      ? (r?.low ?? 0)
+                                      ? (r?.lowRisk ?? 0)
                                       : (r?.lowCvss ?? 0)
                                   }
                                   medium={
                                     mode === "risk"
-                                      ? (r?.medium ?? 0)
+                                      ? (r?.mediumRisk ?? 0)
                                       : (r?.mediumCvss ?? 0)
                                   }
                                   high={
                                     mode === "risk"
-                                      ? (r?.high ?? 0)
+                                      ? (r?.highRisk ?? 0)
                                       : (r?.highCvss ?? 0)
                                   }
                                   critical={
                                     mode === "risk"
-                                      ? (r?.critical ?? 0)
+                                      ? (r?.criticalRisk ?? 0)
                                       : (r?.criticalCvss ?? 0)
                                   }
                                 />

@@ -190,7 +190,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             <DialogTitle>Create new Group</DialogTitle>
             <DialogDescription>
               A project groups multiple software projects (repositories) inside
-              a single enitity. Something like: frontend and backend
+              a single entity. Something like: frontend and backend
             </DialogDescription>
           </DialogHeader>
           <hr />

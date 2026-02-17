@@ -73,21 +73,6 @@ const Index: FunctionComponent = () => {
     };
   const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
 
-  const { data: events, isLoading: eventsLoading } = useSWR<
-    Paged<VulnEventDTO>
-  >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/events/?pageSize=4",
-    fetcher,
-  );
-
   const url =
     "/organizations/" +
     organizationSlug +
@@ -97,6 +82,16 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/refs/" +
     assetVersionSlug;
+
+  const { data: events, isLoading: eventsLoading } = useSWR<
+    Paged<VulnEventDTO>
+  >(
+    url +
+    "/events/?pageSize=4",
+    fetcher,
+  );
+
+  
 
   const urlQueryAppendixForArtifact = selectedArtifact
     ? "?artifactName=" + encodeURIComponent(selectedArtifact)
@@ -154,14 +149,7 @@ const Index: FunctionComponent = () => {
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
   >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
+      url +
       "/components/licenses/" +
       urlQueryAppendixForArtifact,
     fetcher,
