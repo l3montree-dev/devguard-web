@@ -46,6 +46,14 @@ interface Props {
   hasSession: boolean;
 }
 
+const stateLabels: Record<string, string> = {
+  open: "Open",
+  fixed: "Fixed",
+  accepted: "Accepted",
+  falsePositive: "False Positive",
+  markedForTransfer: "Marked for Transfer",
+};
+
 const VulnWithCveTableRow = ({
   vuln,
   href,
@@ -92,7 +100,9 @@ const VulnWithCveTableRow = ({
                 <Link href={href}>
                   <div className="text-sm text-foreground truncate max-w-md">
                     <span className="mr-2 text-xs text-muted-foreground">
-                      {vuln.state !== "open" && <>{vuln.state}, </>}
+                      {vuln.state !== "open" && (
+                        <>{stateLabels[vuln.state] ?? vuln.state}, </>
+                      )}
                       {vuln.vulnerabilityPath.length === 1
                         ? "Direct"
                         : `${vuln.vulnerabilityPath.length} hops`}
