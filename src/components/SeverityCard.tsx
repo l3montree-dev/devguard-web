@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   currentAmount: number;
@@ -36,6 +37,8 @@ const SeverityCard: FunctionComponent<Props> = ({
   const project = useActiveProject();
   const asset = useActiveAsset();
   const activeAssetVersion = useActiveAssetVersion();
+  const searchParams = useSearchParams();
+  const artifactName = searchParams?.get("artifact") ?? "";
 
   const applySQLFilter = (
     variant: Props["variant"],
@@ -84,7 +87,10 @@ const SeverityCard: FunctionComponent<Props> = ({
             <Link
               href={
                 `/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${activeAssetVersion?.slug}/dependency-risks?` +
-                new URLSearchParams(applySQLFilter(variant))
+                new URLSearchParams({
+                  ...applySQLFilter(variant),
+                  artifact: artifactName,
+                })
               }
               className="text-xs !text-muted-foreground"
             >

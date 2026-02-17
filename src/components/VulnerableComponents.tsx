@@ -19,6 +19,7 @@ import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
+import { useSearchParams } from "next/navigation";
 
 export interface ChartConfig {
   [key: string]: {
@@ -41,6 +42,9 @@ export function VulnerableComponents({
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
+  const searchParams = useSearchParams();
+  const artifactName = searchParams?.get("artifact") ?? "";
+
   const d = useMemo(() => {
     if (!data) {
       return [];
@@ -60,7 +64,10 @@ export function VulnerableComponents({
         <CardTitle className="relative w-full">
           Vulnerable Components
           <Link
-            href={`/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks`}
+            href={
+              `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks` +
+              (artifactName ? `?artifact=${artifactName}` : "")
+            }
             className="absolute right-0 top-0 text-xs !text-muted-foreground"
           >
             See all
