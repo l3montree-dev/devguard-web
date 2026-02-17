@@ -78,6 +78,7 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import RootNodeSelector from "@/components/RootNodeSelector";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -336,10 +337,10 @@ const Index: FunctionComponent = () => {
   const params = useMemo(() => {
     const params = buildFilterSearchParams(searchParams);
     if (searchParams?.has("artifact")) {
-      params.append(
-        "artifactName",
-        encodeURIComponent(searchParams.get("artifact") as string),
-      );
+      params.append("artifactName", searchParams.get("artifact") as string);
+      if (searchParams?.has("origin")) {
+        params.append("origin", searchParams.get("origin") as string);
+      }
     }
     return params;
   }, [searchParams]);
@@ -461,16 +462,24 @@ const Index: FunctionComponent = () => {
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams(
-                searchParams?.has("artifact")
-                  ? {
+                (() => {
+                  if (searchParams?.has("artifact")) {
+                    const params: Record<string, string> = {
                       artifact: searchParams.get("artifact") as string,
+                    };
+                    if (searchParams?.has("origin")) {
+                      params.origin = searchParams.get("origin") as string;
                     }
-                  : artifacts && artifacts.length > 0
-                    ? {
-                        artifact: artifacts[0].artifactName,
-                      }
-                    : ({} as Record<string, string>),
-              )
+                    return params;
+                  } else if (artifacts && artifacts.length > 0) {
+                    return {
+                      artifact: artifacts[0].artifactName,
+                    };
+                  } else {
+                    return {};
+                  }
+                })(),
+              ).toString()
             }
           >
             <GitBranchIcon className="mr-2 h-4 w-4" />
@@ -490,6 +499,7 @@ const Index: FunctionComponent = () => {
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
           />
+          <RootNodeSelector />
           <div className="relative flex-1">
             <Input
               onChange={(e) => handleSearch(e.target.value)}
