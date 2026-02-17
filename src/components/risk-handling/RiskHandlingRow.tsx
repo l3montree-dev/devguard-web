@@ -14,7 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+  stateLabels,
+} from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -45,14 +50,6 @@ interface Props {
   }) => Promise<void>;
   hasSession: boolean;
 }
-
-const stateLabels: Record<string, string> = {
-  open: "Open",
-  fixed: "Fixed",
-  accepted: "Accepted",
-  falsePositive: "False Positive",
-  markedForTransfer: "Marked for Transfer",
-};
 
 const VulnWithCveTableRow = ({
   vuln,
