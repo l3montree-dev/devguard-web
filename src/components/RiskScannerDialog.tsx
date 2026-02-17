@@ -44,6 +44,7 @@ import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { DevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/DevGuardCliSlide";
 import { ensureValidBranchOrTagSlug } from "@/utils/common";
+import { URLSearchParams } from "url";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -261,7 +262,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       // You can see we added a better error tracking in the AssetLayout to make that visible.
       // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
       // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks`;
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks?${new URLSearchParams({ artifact: params.artifactName })}`;
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
     } else {

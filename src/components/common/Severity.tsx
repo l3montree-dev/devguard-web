@@ -45,7 +45,8 @@ export const riskToSeverity = (risk: number) => {
 };
 
 const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
-  const cls = getSeverityClassNames(riskToSeverity(risk), Boolean(gray));
+  const rounded = Math.floor(risk * 10) / 10;
+  const cls = getSeverityClassNames(riskToSeverity(rounded), Boolean(gray));
 
   return (
     <span
@@ -54,7 +55,7 @@ const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
         cls,
       )}
     >
-      {riskToSeverity(risk)} ({risk.toFixed(1)})
+      {riskToSeverity(rounded)} ({rounded.toFixed(1)})
     </span>
   );
 };

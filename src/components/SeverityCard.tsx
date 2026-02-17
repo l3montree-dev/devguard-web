@@ -40,8 +40,6 @@ const SeverityCard: FunctionComponent<Props> = ({
   const searchParams = useSearchParams();
   const artifactName = searchParams?.get("artifact") ?? "";
 
-  console.log("artifactName", artifactName);
-
   const applySQLFilter = (
     variant: Props["variant"],
   ): { [key: string]: string } => {
@@ -89,8 +87,10 @@ const SeverityCard: FunctionComponent<Props> = ({
             <Link
               href={
                 `/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${activeAssetVersion?.slug}/dependency-risks?` +
-                new URLSearchParams(applySQLFilter(variant)) +
-                (artifactName ? `&artifact=${artifactName}` : "")
+                new URLSearchParams({
+                  ...applySQLFilter(variant),
+                  artifact: artifactName,
+                })
               }
               className="text-xs !text-muted-foreground"
             >
