@@ -337,15 +337,9 @@ const Index: FunctionComponent = () => {
   const params = useMemo(() => {
     const params = buildFilterSearchParams(searchParams);
     if (searchParams?.has("artifact")) {
-      params.append(
-        "artifactName",
-        encodeURIComponent(searchParams.get("artifact") as string),
-      );
+      params.append("artifactName", searchParams.get("artifact") as string);
       if (searchParams?.has("origin")) {
-        params.append(
-          "origin",
-          encodeURIComponent(searchParams.get("origin") as string),
-        );
+        params.append("origin", searchParams.get("origin") as string);
       }
     }
     return params;
