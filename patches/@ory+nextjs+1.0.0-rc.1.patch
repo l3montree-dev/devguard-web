@@ -1,0 +1,72 @@
+diff --git a/node_modules/@ory/nextjs/dist/app/index.js b/node_modules/@ory/nextjs/dist/app/index.js
+index d4ade92..e13174f 100644
+--- a/node_modules/@ory/nextjs/dist/app/index.js
++++ b/node_modules/@ory/nextjs/dist/app/index.js
+@@ -42,15 +42,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
+       return process.env["__NEXT_PRIVATE_ORIGIN"].replace(/\/$/, "");
+     }
+   }
++  if (options == null ? void 0 : options.knownProxiedUrl) {
++    return options.knownProxiedUrl;
++  }
+   if (isProduction()) {
+     return orySdkUrl();
+   }
+   if (typeof window !== "undefined") {
+     return window.location.origin;
+   }
+-  if (options == null ? void 0 : options.knownProxiedUrl) {
+-    return options.knownProxiedUrl;
+-  }
+   const final = orySdkUrl();
+   console.warn(
+     `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
+diff --git a/node_modules/@ory/nextjs/dist/app/index.mjs b/node_modules/@ory/nextjs/dist/app/index.mjs
+index da6b254..812ecc8 100644
+--- a/node_modules/@ory/nextjs/dist/app/index.mjs
++++ b/node_modules/@ory/nextjs/dist/app/index.mjs
+@@ -40,15 +40,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
+       return process.env["__NEXT_PRIVATE_ORIGIN"].replace(/\/$/, "");
+     }
+   }
++  if (options == null ? void 0 : options.knownProxiedUrl) {
++    return options.knownProxiedUrl;
++  }
+   if (isProduction()) {
+     return orySdkUrl();
+   }
+   if (typeof window !== "undefined") {
+     return window.location.origin;
+   }
+-  if (options == null ? void 0 : options.knownProxiedUrl) {
+-    return options.knownProxiedUrl;
+-  }
+   const final = orySdkUrl();
+   console.warn(
+     `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
+diff --git a/node_modules/@ory/nextjs/dist/middleware/index.js b/node_modules/@ory/nextjs/dist/middleware/index.js
+index 3dc5747..678571d 100644
+--- a/node_modules/@ory/nextjs/dist/middleware/index.js
++++ b/node_modules/@ory/nextjs/dist/middleware/index.js
+@@ -29,7 +29,7 @@ var defaultOmitHeaders = [
+ 
+ // src/utils/sdk.ts
+ function getEnv(name) {
+-  return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
++  return process.env[name] || process.env[`NEXT_PUBLIC_${name}`];
+ }
+ function orySdkUrl() {
+   const baseUrl = getEnv("ORY_SDK_URL");
+diff --git a/node_modules/@ory/nextjs/dist/middleware/index.mjs b/node_modules/@ory/nextjs/dist/middleware/index.mjs
+index f82e947..1b5fbf2 100644
+--- a/node_modules/@ory/nextjs/dist/middleware/index.mjs
++++ b/node_modules/@ory/nextjs/dist/middleware/index.mjs
+@@ -27,7 +27,7 @@ var defaultOmitHeaders = [
+ 
+ // src/utils/sdk.ts
+ function getEnv(name) {
+-  return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
++  return process.env[name] || process.env[`NEXT_PUBLIC_${name}`];
+ }
+ function orySdkUrl() {
+   const baseUrl = getEnv("ORY_SDK_URL");
