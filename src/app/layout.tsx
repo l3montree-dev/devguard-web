@@ -3,17 +3,16 @@ import "focus-visible";
 
 import { ThemeProvider } from "next-themes";
 import { Inter, Lexend, Merriweather } from "next/font/google";
-import { redirect } from "next/navigation";
 import React from "react";
+import { Toaster } from "sonner";
 import { config } from "../config";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
-import { HttpError } from "../data-fetcher/http-error";
-import InternalServerErrorPage from "./error";
 import { OrganizationDTO } from "../types/api/api";
+import InternalServerErrorPage from "./error";
 
 export const lexend = Lexend({
   subsets: ["latin"],
@@ -90,6 +89,7 @@ export default async function RootLayout({
                 }}
               >
                 {children}
+                <Toaster />
               </ClientContextWrapper>
             </ClientContextWrapper>
           </ThemeProvider>
@@ -128,6 +128,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <InternalServerErrorPage error={error as Error} />
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

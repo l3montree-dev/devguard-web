@@ -13,51 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ory } from "../services/ory";
-
 import { User } from "@/types/auth";
-import { isAxiosError } from "axios";
-import { cookies, headers } from "next/headers";
-import { HttpError } from "./http-error";
+import { getServerSession } from "@ory/nextjs/app";
 
 export async function fetchSession() {
-  const c = await cookies();
-  const requestedUrl = (await headers()).get("referer") || "/";
-  const orySessionCookie = c.get("ory_kratos_session");
-
-  if (!orySessionCookie) {
-    return null;
-  }
-  // get the latest session
-  try {
-    const session = await ory.toSession(
-      {
-        cookie: "ory_kratos_session=" + orySessionCookie.value + ";",
-      },
-      {
-        baseURL: "http://localhost:3000",
-      },
-    );
-
-    if (!session.data) {
-      return null;
-    }
-
-    // call the initial endpoint with the latest information available
-    return session.data as { identity: User };
-  } catch (e: unknown) {
-    console.error(e);
-    if (isAxiosError(e)) {
-      if (e.response?.status === 401) {
-        return null;
-      }
-    }
-    throw new HttpError("Failed to fetch session", {
-      statusCode: 500,
-      title: "Failed to load session",
-      description:
-        "An error occurred while fetching the session. Please try to login again.",
-      homeLink: "/login?return_to=" + requestedUrl,
-    });
-  }
+  const session = await getServerSession();
+  return session as { identity: User } | null;
 }

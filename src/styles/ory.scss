@@ -1,0 +1,80 @@
+.ory-card {
+    button {
+        @apply cursor-pointer;
+    }
+    header {
+        h1 {
+            display: none;
+        }
+
+        h2 {
+            @apply font-display;
+        }
+
+        p {
+            @apply text-sm text-muted-foreground block mb-4;
+        }
+        a.group {
+            @apply py-2 px-2 mb-4 rounded-md bg-background;
+        }
+    }
+
+    form {
+        hr {
+            display: none;
+        }
+
+        label {
+            @apply text-sm font-medium text-foreground;
+        }
+
+    }
+
+    a {
+        @apply text-sm text-primary font-medium;
+        text-decoration: none;
+    }
+
+    span {
+        @apply text-sm;
+    }
+    form div.grid.gap-8 {
+        gap: 1rem!important;
+    }
+    form {
+        @apply mb-4
+    }
+    [data-testid="ory/message/4000029"] {
+        @apply hidden;
+    }
+
+    .text-interface-foreground-validation-danger {
+        @apply text-sm bg-red-500/10 px-4 py-2 rounded-md border-red-500 border text-red-50 mt-2;
+    }
+
+    .text-button-link-brand-brand {
+        @apply text-sm text-primary font-medium;
+        text-decoration: none;
+    }
+}
+
+.ory-elements {
+    .md\:max-w-\[712px\] {
+        @apply hidden;
+    }
+    form {
+        @apply w-full flex flex-col gap-4;
+        .bg-card > div:not([class]) {
+            @apply hidden
+        }
+        .bg-card .bg-button-social-background-default {
+            @apply px-4 py-2 rounded-md bg-secondary text-sm
+        }
+        .grid {
+            @apply block;
+        }
+    }
+    label {
+        @apply text-sm font-medium text-foreground;
+    }
+}

@@ -1,4 +1,4 @@
-import { DropzoneState } from "react-dropzone/.";
+import { DropzoneState } from "react-dropzone";
 
 interface Props {
   dropzone: DropzoneState;
