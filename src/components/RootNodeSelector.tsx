@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Button } from "./ui/button";
 import useRouterQuery from "../hooks/useRouterQuery";
 
@@ -26,19 +26,17 @@ export default function RootNodeSelector() {
   const [open, setOpen] = useState(false);
 
   const artifactName = searchParams?.get("artifact") ?? "";
-  const rootnodeParam = searchParams?.get("origin");
+  const rootNodeParam = searchParams?.get("origin");
 
   const [selectedRootNode, setSelectedRootNode] = useState(
-    getRootNodeName(rootnodeParam),
+    getRootNodeName(rootNodeParam),
   );
 
   useEffect(() => {
-    setSelectedRootNode(getRootNodeName(rootnodeParam));
-  }, [rootnodeParam]);
+    setSelectedRootNode(getRootNodeName(rootNodeParam));
+  }, [rootNodeParam]);
 
-  useEffect(() => {
-    handleSelect(undefined);
-  }, [artifactName]);
+  const prevArtifactNameRef = useRef<string | undefined>(undefined);
 
   const nodes = useMemo(
     () => rootNodes[artifactName] ?? [],
@@ -54,11 +52,21 @@ export default function RootNodeSelector() {
     [pushQueryParameter],
   );
 
+  useEffect(() => {
+    if (
+      prevArtifactNameRef.current !== undefined &&
+      prevArtifactNameRef.current !== artifactName
+    ) {
+      handleSelect(undefined);
+    }
+    prevArtifactNameRef.current = artifactName;
+  }, [artifactName, handleSelect]);
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          <div className="flex w-42 items-center justify-between h-4">
+          <div className="flex w-40 items-center justify-between h-4">
             <span className="flex-1 overflow-hidden text-left text-ellipsis">
               {selectedRootNode || "Select Origin"}
             </span>
@@ -68,25 +76,41 @@ export default function RootNodeSelector() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="z-50 w-56">
-        <DropdownMenuCheckboxItem
-          checked={!selectedRootNode}
-          onClick={() => handleSelect(undefined)}
-        >
-          <span className="text-muted-foreground">Clear selection</span>
-        </DropdownMenuCheckboxItem>
+        {artifactName === "" ? (
+          <div className="px-4 py-2 text-sm text-muted-foreground">
+            Select an artifact first
+          </div>
+        ) : (
+          <>
+            {nodes.length === 0 ? (
+              <div className="px-4 py-2 text-sm text-muted-foreground">
+                No SBOM data yet
+              </div>
+            ) : (
+              <>
+                <DropdownMenuCheckboxItem
+                  checked={!selectedRootNode}
+                  onClick={() => handleSelect(undefined)}
+                >
+                  <span className="text-muted-foreground">Clear selection</span>
+                </DropdownMenuCheckboxItem>
 
-        {nodes.map((source) => {
-          const nodeName = getRootNodeName(source?.url);
-          return (
-            <DropdownMenuCheckboxItem
-              key={source.url ?? nodeName}
-              checked={selectedRootNode === nodeName}
-              onClick={() => handleSelect(source.url)}
-            >
-              {nodeName}
-            </DropdownMenuCheckboxItem>
-          );
-        })}
+                {nodes.map((source) => {
+                  const nodeName = getRootNodeName(source?.url);
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={source.url ?? nodeName}
+                      checked={selectedRootNode === nodeName}
+                      onClick={() => handleSelect(source.url)}
+                    >
+                      {nodeName}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+              </>
+            )}
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -468,16 +468,24 @@ const Index: FunctionComponent = () => {
             href={
               `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
               new URLSearchParams(
-                searchParams?.has("artifact")
-                  ? {
+                (() => {
+                  if (searchParams?.has("artifact")) {
+                    const params: Record<string, string> = {
                       artifact: searchParams.get("artifact") as string,
+                    };
+                    if (searchParams?.has("origin")) {
+                      params.origin = searchParams.get("origin") as string;
                     }
-                  : artifacts && artifacts.length > 0
-                    ? {
-                        artifact: artifacts[0].artifactName,
-                      }
-                    : ({} as Record<string, string>),
-              )
+                    return params;
+                  } else if (artifacts && artifacts.length > 0) {
+                    return {
+                      artifact: artifacts[0].artifactName,
+                    };
+                  } else {
+                    return {};
+                  }
+                })(),
+              ).toString()
             }
           >
             <GitBranchIcon className="mr-2 h-4 w-4" />

@@ -23,7 +23,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import useSWR from "swr";
 import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
@@ -71,13 +70,6 @@ const Artifacts = () => {
   const [selectedSourceUrls, setSelectedSourceUrls] = useState<Set<string>>(
     new Set(),
   );
-
-  const params = useDecodedParams() as {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-    assetVersionSlug: string;
-  };
 
   const { rootNodes, mutate } = useRootNodes();
 
