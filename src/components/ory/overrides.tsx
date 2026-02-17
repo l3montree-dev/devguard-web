@@ -24,6 +24,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
+import { Checkbox } from "../ui/checkbox";
 
 function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
   const label = node.meta.label?.text ?? "";
@@ -159,17 +160,18 @@ function OryCodeInput({ node, attributes, onClick }: OryNodeInputProps) {
 function OryCheckbox({ node, attributes }: OryNodeInputProps) {
   const { register } = useFormContext();
   const { value, name, ...rest } = attributes;
-
+  const { onChange, ...formProps } = register(name);
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
+      <Checkbox
         defaultChecked={Boolean(value)}
-        className="peer size-4 shrink-0 rounded-[4px] border border-primary shadow-xs transition-shadow checked:bg-primary checked:text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         id={name}
         required={rest.required}
         disabled={rest.disabled}
-        {...register(name)}
+        onCheckedChange={(value) => {
+          onChange({ target: { name, value } });
+        }}
+        {...formProps}
       />
       {node.meta.label?.text && (
         <Label htmlFor={name} className="leading-none">
