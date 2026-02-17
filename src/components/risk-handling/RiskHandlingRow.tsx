@@ -14,7 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+  stateLabels,
+} from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -92,7 +97,9 @@ const VulnWithCveTableRow = ({
                 <Link href={href}>
                   <div className="text-sm text-foreground truncate max-w-md">
                     <span className="mr-2 text-xs text-muted-foreground">
-                      {vuln.state !== "open" && <>{vuln.state}, </>}
+                      {vuln.state !== "open" && (
+                        <>{stateLabels[vuln.state] ?? vuln.state}, </>
+                      )}
                       {vuln.vulnerabilityPath.length === 1
                         ? "Direct"
                         : `${vuln.vulnerabilityPath.length} hops`}
