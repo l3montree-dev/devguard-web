@@ -1,5 +1,5 @@
 diff --git a/node_modules/@ory/nextjs/dist/app/index.js b/node_modules/@ory/nextjs/dist/app/index.js
-index d4ade92..e13174f 100644
+index d4ade92..0332398 100644
 --- a/node_modules/@ory/nextjs/dist/app/index.js
 +++ b/node_modules/@ory/nextjs/dist/app/index.js
 @@ -42,15 +42,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
@@ -21,8 +21,17 @@ index d4ade92..e13174f 100644
    const final = orySdkUrl();
    console.warn(
      `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
+@@ -82,7 +82,7 @@ async function toGetFlowParameter(params) {
+ }
+ async function getPublicUrl() {
+   const h = await headers.headers();
+-  const host = h.get("host");
++  const host = h.get("x-forwarded-host") || h.get("host");
+   const protocol = h.get("x-forwarded-proto") || "http";
+   return `${protocol}://${host}`;
+ }
 diff --git a/node_modules/@ory/nextjs/dist/app/index.mjs b/node_modules/@ory/nextjs/dist/app/index.mjs
-index da6b254..812ecc8 100644
+index da6b254..b3cd25b 100644
 --- a/node_modules/@ory/nextjs/dist/app/index.mjs
 +++ b/node_modules/@ory/nextjs/dist/app/index.mjs
 @@ -40,15 +40,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
@@ -44,6 +53,15 @@ index da6b254..812ecc8 100644
    const final = orySdkUrl();
    console.warn(
      `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
+@@ -80,7 +80,7 @@ async function toGetFlowParameter(params) {
+ }
+ async function getPublicUrl() {
+   const h = await headers();
+-  const host = h.get("host");
++  const host = h.get("x-forwarded-host") || h.get("host");
+   const protocol = h.get("x-forwarded-proto") || "http";
+   return `${protocol}://${host}`;
+ }
 diff --git a/node_modules/@ory/nextjs/dist/middleware/index.js b/node_modules/@ory/nextjs/dist/middleware/index.js
 index 3dc5747..678571d 100644
 --- a/node_modules/@ory/nextjs/dist/middleware/index.js
