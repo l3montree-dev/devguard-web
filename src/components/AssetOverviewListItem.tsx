@@ -7,8 +7,7 @@ import Avatar from "./Avatar";
 import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";
 import { Badge } from "./ui/badge";
-import { checkDeletedProject } from "@/app/(loading-group)/[organizationSlug]/projects/[projectSlug]/page";
-
+import { checkDeletedProject } from "../lib/utils";
 interface Props {
   asset: AssetDTO;
 }

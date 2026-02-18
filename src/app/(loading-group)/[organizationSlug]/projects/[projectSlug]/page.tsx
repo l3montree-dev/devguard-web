@@ -48,6 +48,7 @@ import {
   RequirementsLevel,
   UserRole,
 } from "../../../../../types/api/api";
+import { checkDeletedProject } from "@/lib/utils";
 
 export default function RepositoriesPage() {
   const project = useProject()!;
@@ -324,8 +325,4 @@ export default function RepositoriesPage() {
       </Dialog>
     </>
   );
-}
-
-export function checkDeletedProject(projectName: string): boolean {
-  return projectName.includes("-deletion_scheduled-");
 }
