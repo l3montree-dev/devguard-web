@@ -518,6 +518,8 @@ export interface AssetDTO {
 
   pipelineError?: string;
   pipelineLastRun: string;
+
+  archived: boolean;
 }
 
 export interface DependencyTreeNode {
