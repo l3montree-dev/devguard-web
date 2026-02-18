@@ -64,7 +64,7 @@ import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
 import useRouterQuery from "../../../hooks/useRouterQuery";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
-import { checkDeletedProject } from "./projects/[projectSlug]/page";
+import { checkDeletedProject } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 const OrganizationHomePage: FunctionComponent = () => {
