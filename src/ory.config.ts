@@ -1,6 +1,9 @@
 import type { OryClientConfiguration } from "@ory/elements-react";
 
 const config: OryClientConfiguration = {
+  sdk: {
+    url: process.env.ORY_SDK_PUBLIC_URL ?? "",
+  },
   project: {
     default_redirect_url: "/",
     error_ui_url: "/error",

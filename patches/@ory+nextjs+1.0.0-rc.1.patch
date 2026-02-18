@@ -1,90 +1,56 @@
 diff --git a/node_modules/@ory/nextjs/dist/app/index.js b/node_modules/@ory/nextjs/dist/app/index.js
-index d4ade92..0332398 100644
+index d4ade92..ed211cf 100644
 --- a/node_modules/@ory/nextjs/dist/app/index.js
 +++ b/node_modules/@ory/nextjs/dist/app/index.js
-@@ -42,15 +42,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
+@@ -17,10 +17,10 @@ function getEnv(name) {
+   return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
+ }
+ function orySdkUrl() {
+-  const baseUrl = getEnv("ORY_SDK_URL");
++  const baseUrl = process.env["ORY_SDK_URL"];
+   if (!baseUrl) {
+     throw new Error(
+-      "You need to set environment variable `NEXT_PUBLIC_ORY_SDK_URL` to your Ory Network SDK URL."
++      "You need to set environment variable `ORY_SDK_URL` to your Ory SDK URL."
+     );
+   }
+   return baseUrl.replace(/\/$/, "");
+@@ -42,6 +42,10 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
        return process.env["__NEXT_PRIVATE_ORIGIN"].replace(/\/$/, "");
      }
    }
-+  if (options == null ? void 0 : options.knownProxiedUrl) {
-+    return options.knownProxiedUrl;
++  var publicUrl = process.env["ORY_SDK_PUBLIC_URL"];
++  if (publicUrl) {
++    return publicUrl.replace(/\/$/, "");
 +  }
    if (isProduction()) {
      return orySdkUrl();
    }
-   if (typeof window !== "undefined") {
-     return window.location.origin;
-   }
--  if (options == null ? void 0 : options.knownProxiedUrl) {
--    return options.knownProxiedUrl;
--  }
-   const final = orySdkUrl();
-   console.warn(
-     `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
-@@ -82,7 +82,7 @@ async function toGetFlowParameter(params) {
- }
- async function getPublicUrl() {
-   const h = await headers.headers();
--  const host = h.get("host");
-+  const host = h.get("x-forwarded-host") || h.get("host");
-   const protocol = h.get("x-forwarded-proto") || "http";
-   return `${protocol}://${host}`;
- }
 diff --git a/node_modules/@ory/nextjs/dist/app/index.mjs b/node_modules/@ory/nextjs/dist/app/index.mjs
-index da6b254..b3cd25b 100644
+index da6b254..daf80f0 100644
 --- a/node_modules/@ory/nextjs/dist/app/index.mjs
 +++ b/node_modules/@ory/nextjs/dist/app/index.mjs
-@@ -40,15 +40,15 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
+@@ -15,10 +15,10 @@ function getEnv(name) {
+   return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
+ }
+ function orySdkUrl() {
+-  const baseUrl = getEnv("ORY_SDK_URL");
++  const baseUrl = process.env["ORY_SDK_URL"];
+   if (!baseUrl) {
+     throw new Error(
+-      "You need to set environment variable `NEXT_PUBLIC_ORY_SDK_URL` to your Ory Network SDK URL."
++      "You need to set environment variable `ORY_SDK_URL` to your Ory SDK URL."
+     );
+   }
+   return baseUrl.replace(/\/$/, "");
+@@ -40,6 +40,10 @@ function guessPotentiallyProxiedOrySdkUrl(options) {
        return process.env["__NEXT_PRIVATE_ORIGIN"].replace(/\/$/, "");
      }
    }
-+  if (options == null ? void 0 : options.knownProxiedUrl) {
-+    return options.knownProxiedUrl;
++  var publicUrl = process.env["ORY_SDK_PUBLIC_URL"];
++  if (publicUrl) {
++    return publicUrl.replace(/\/$/, "");
 +  }
    if (isProduction()) {
      return orySdkUrl();
    }
-   if (typeof window !== "undefined") {
-     return window.location.origin;
-   }
--  if (options == null ? void 0 : options.knownProxiedUrl) {
--    return options.knownProxiedUrl;
--  }
-   const final = orySdkUrl();
-   console.warn(
-     `Unable to determine a suitable SDK URL for setting up the Next.js integration of Ory Elements. Will proceed using default Ory SDK URL "${final}". This is likely not what you want for local development and your authentication and login may not work.`
-@@ -80,7 +80,7 @@ async function toGetFlowParameter(params) {
- }
- async function getPublicUrl() {
-   const h = await headers();
--  const host = h.get("host");
-+  const host = h.get("x-forwarded-host") || h.get("host");
-   const protocol = h.get("x-forwarded-proto") || "http";
-   return `${protocol}://${host}`;
- }
-diff --git a/node_modules/@ory/nextjs/dist/middleware/index.js b/node_modules/@ory/nextjs/dist/middleware/index.js
-index 3dc5747..678571d 100644
---- a/node_modules/@ory/nextjs/dist/middleware/index.js
-+++ b/node_modules/@ory/nextjs/dist/middleware/index.js
-@@ -29,7 +29,7 @@ var defaultOmitHeaders = [
- 
- // src/utils/sdk.ts
- function getEnv(name) {
--  return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
-+  return process.env[name] || process.env[`NEXT_PUBLIC_${name}`];
- }
- function orySdkUrl() {
-   const baseUrl = getEnv("ORY_SDK_URL");
-diff --git a/node_modules/@ory/nextjs/dist/middleware/index.mjs b/node_modules/@ory/nextjs/dist/middleware/index.mjs
-index f82e947..1b5fbf2 100644
---- a/node_modules/@ory/nextjs/dist/middleware/index.mjs
-+++ b/node_modules/@ory/nextjs/dist/middleware/index.mjs
-@@ -27,7 +27,7 @@ var defaultOmitHeaders = [
- 
- // src/utils/sdk.ts
- function getEnv(name) {
--  return process.env[`NEXT_PUBLIC_${name}`] || process.env[name];
-+  return process.env[name] || process.env[`NEXT_PUBLIC_${name}`];
- }
- function orySdkUrl() {
-   const baseUrl = getEnv("ORY_SDK_URL");
