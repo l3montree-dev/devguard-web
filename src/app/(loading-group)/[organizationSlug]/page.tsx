@@ -64,6 +64,8 @@ import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
 import useRouterQuery from "../../../hooks/useRouterQuery";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
+import { checkDeletedProject } from "./projects/[projectSlug]/page";
+import { Badge } from "@/components/ui/badge";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
@@ -277,6 +279,9 @@ const OrganizationHomePage: FunctionComponent = () => {
                     <div className="flex flex-row items-center gap-2">
                       <Avatar {...project} />
                       <span>{project.name}</span>
+                      {checkDeletedProject(project.name) && (
+                        <Badge variant={"destructive"}>Pending deletion</Badge>
+                      )}
                     </div>
                   }
                   Description={

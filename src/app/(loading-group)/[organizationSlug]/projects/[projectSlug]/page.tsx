@@ -226,6 +226,9 @@ export default function RepositoriesPage() {
                         {subgroup.name.replace(project.name + " /", "")}
                       </span>
                       <Badge variant={"outline"}>Subgroup</Badge>
+                      {checkDeletedProject(subgroup.name) && (
+                        <Badge variant={"destructive"}>Pending deletion</Badge>
+                      )}
                       {subgroup.type === "kubernetesNamespace" && (
                         <Badge variant={"outline"}>
                           <Image
@@ -321,4 +324,8 @@ export default function RepositoriesPage() {
       </Dialog>
     </>
   );
+}
+
+export function checkDeletedProject(projectName: string): boolean {
+  return projectName.includes("-deletion_scheduled-");
 }
