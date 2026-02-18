@@ -75,15 +75,6 @@ const LoginPage = async (props: OryPageParams) => {
               flow={flow}
               components={oryComponentOverrides}
             />
-            <p className="mt-4 text-sm/6 text-muted-foreground flex justify-end">
-              <Link
-                href="/recovery"
-                passHref
-                className="font-semibold hover:underline"
-              >
-                Need to recover your account?
-              </Link>
-            </p>
             <div className="mt-12 flex flex-col items-center">
               <p className="text-sm/6 text-muted-foreground text-center max-w-sm">
                 By using DevGuard you agree to our <TermsOfUseLink /> and{" "}

@@ -52,7 +52,7 @@
     }
 
     .text-interface-foreground-validation-danger {
-        @apply text-sm bg-red-500/10 px-4 py-2 rounded-md border-red-500 border text-red-50 mt-2;
+        @apply text-sm bg-red-500/10 px-4 py-2 rounded-md border-red-500 border text-red-50 mt-2 block mb-2;
     }
 
     .text-button-link-brand-brand {
