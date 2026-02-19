@@ -765,6 +765,8 @@ const DependencyGraph: FunctionComponent<{
           You can interact with this graph
         </span>
       </div>
+      {/* Todo: Find a better way to disable edge cursor pointer when context menu
+      is disabled. This is a bit hacky but works for now. */}
       {!enableContextMenu && (
         <style>{`.react-flow__edge.selectable { cursor: grab !important; }`}</style>
       )}
