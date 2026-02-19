@@ -347,7 +347,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
           ecosystemUpdate: ``,
         };
     }
-  }, []);
+  }, [props.vuln, props.package, props.version]);
 
   return globalUpdate === "" && ecosystemUpdate === "" ? null : (
     <div className="relative">
@@ -659,9 +659,12 @@ const Index: FunctionComponent = () => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">
-                {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
-              </h1>
+              <div className="flex flex-row items-center gap-4">
+                <h1 className="text-2xl font-semibold">
+                  {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
+                </h1>
+                <VulnState state={vuln?.state ?? "open"} />
+              </div>
               <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
@@ -676,7 +679,7 @@ const Index: FunctionComponent = () => {
                         onClick={() =>
                           setDescriptionExpanded(!descriptionExpanded)
                         }
-                        className="text-sm text-primary hover:opacity-80 my-2"
+                        className="text-sm dark:text-primary text-blue-600 hover:opacity-80 my-2 cursor-pointer"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}
                       </button>
@@ -714,11 +717,6 @@ const Index: FunctionComponent = () => {
                   </Link>
                 )}
 
-                {vuln ? (
-                  <VulnState state={vuln.state} />
-                ) : (
-                  <Skeleton className="w-10 h-4" />
-                )}
                 {vuln ? (
                   <Severity risk={vuln.rawRiskAssessment} />
                 ) : (
