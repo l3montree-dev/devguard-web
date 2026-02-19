@@ -12,17 +12,13 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import React from "react";
-
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
-  oryKratosUrl: process.env.ORY_KRATOS_URL,
   devguardApiUrlPublicInternet:
     process.env.DEVGUARD_API_URL_PUBLIC_INTERNET || "https://api.devguard.org",
   devguardScannerTag: "main-latest",
   retryInterval: 3000,
-  oidcOnly: process.env.OIDC_ONLY === "true" || false,
   privacyPolicyLink:
     process.env.PRIVACY_POLICY_LINK || "https://devguard.org/privacy-policy",
   termsOfUseLink:

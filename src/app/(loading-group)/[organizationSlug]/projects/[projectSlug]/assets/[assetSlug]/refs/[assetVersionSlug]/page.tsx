@@ -167,6 +167,9 @@ const Index: FunctionComponent = () => {
   const project = activeProject;
   const asset = activeAsset;
 
+  const searchParams = useSearchParams();
+  const artifactName = searchParams?.get("artifact") ?? "";
+
   const pathname = usePathname();
 
   const downloadPdfReport = async () => {
@@ -320,7 +323,8 @@ const Index: FunctionComponent = () => {
                     <Link
                       href={
                         asset
-                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/dependencies`
+                          ? `/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersionSlug}/dependencies` +
+                            (artifactName ? `?artifact=${artifactName}` : "")
                           : "#"
                       }
                       className="absolute right-0 top-0 text-xs !text-muted-foreground"

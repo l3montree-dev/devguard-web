@@ -23,7 +23,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import useSWR from "swr";
 import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
@@ -39,6 +38,7 @@ import {
 } from "../../../../../../../../../../components/ui/alert-dialog";
 import {
   useArtifacts,
+  useRootNodes,
   useUpdateAssetVersionState,
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
@@ -71,30 +71,7 @@ const Artifacts = () => {
     new Set(),
   );
 
-  const params = useDecodedParams() as {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-    assetVersionSlug: string;
-  };
-
-  const { data: rootNodes, mutate } = useSWR<{
-    [artifactName: string]: InformationSources[];
-  }>(
-    "/organizations/" +
-      params.organizationSlug +
-      "/projects/" +
-      params.projectSlug +
-      "/assets/" +
-      params.assetSlug +
-      "/refs/" +
-      params.assetVersionSlug +
-      "/artifact-root-nodes",
-    fetcher,
-    {
-      fallbackData: {},
-    },
-  );
+  const { rootNodes, mutate } = useRootNodes();
 
   const artifactForm = useForm<ArtifactCreateUpdateRequest>({
     defaultValues: {

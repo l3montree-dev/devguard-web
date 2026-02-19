@@ -12,119 +12,20 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"use client";
-
-import { UpdateVerificationFlowBody, VerificationFlow } from "@ory/client";
-
-import { AxiosError } from "axios";
-import type { NextPage } from "next";
-import { useRouter, useSearchParams } from "next/navigation";
 import Head from "next/head";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Verification } from "@ory/elements-react/theme";
+import { getVerificationFlow, OryPageParams } from "@ory/nextjs/app";
 import Image from "next/image";
-import { ory } from "../../services/ory";
-import { Flow } from "../../components/kratos/Flow";
+import oryConfig from "../../ory.config";
+import { oryComponentOverrides } from "../../components/ory/overrides";
 
-const Verification: NextPage = () => {
-  const [flow, setFlow] = useState<VerificationFlow>();
-
-  // Get ?flow=... from the URL
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const flowId = searchParams?.get("flow");
-  const returnTo = searchParams?.get("return_to");
-
-  useEffect(() => {
-    // If the router is not ready yet, or we already have a flow, do nothing.
-    if (flow) {
-      return;
-    }
-
-    // If ?flow=.. was in the URL, we fetch it
-    if (flowId) {
-      ory
-        .getVerificationFlow({ id: String(flowId) })
-        .then(({ data }) => {
-          setFlow(data);
-        })
-        .catch((err: AxiosError) => {
-          switch (err.response?.status) {
-            case 410:
-            // Status code 410 means the request has expired - so let's load a fresh flow!
-            case 403:
-              // Status code 403 implies some other issue (e.g. CSRF) - let's reload!
-              return router.push("/verification");
-          }
-
-          throw err;
-        });
-      return;
-    }
-
-    // Otherwise we initialize it
-    ory
-      .createBrowserVerificationFlow({
-        returnTo: returnTo ? String(returnTo) : undefined,
-      })
-      .then(({ data }) => {
-        setFlow(data);
-      })
-      .catch((err: AxiosError) => {
-        switch (err.response?.status) {
-          case 400:
-            // Status code 400 implies the user is already signed in
-            return router.push("/");
-        }
-
-        throw err;
-      });
-  }, [flowId, router, returnTo, flow]);
-
-  const onSubmit = async (values: UpdateVerificationFlowBody) => {
-    router
-      // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
-      // their data when they reload the page.
-      .push(`/verification?flow=${flow?.id}`);
-
-    ory
-      .updateVerificationFlow({
-        flow: String(flow?.id),
-        updateVerificationFlowBody: values,
-      })
-      .then(({ data }) => {
-        // Form submission was successful, show the message to the user!
-        setFlow(data);
-      })
-      .catch((err: AxiosError) => {
-        switch (err.response?.status) {
-          case 400:
-            // Status code 400 implies the form validation had an error
-            //@ts-expect-error
-            setFlow(err.response?.data);
-            return;
-          case 410:
-            // @ts-expect-error
-            const newFlowID = err.response.data.use_flow_id;
-            router
-              // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
-              // their data when they reload the page.
-              .push(`/verification?flow=${newFlowID}`);
-
-            ory
-              .getVerificationFlow({ id: newFlowID })
-              .then(({ data }) => setFlow(data));
-            return;
-        }
-
-        throw err;
-      });
-  };
-
+const VerificationPage = async (props: OryPageParams) => {
+  const flow = await getVerificationFlow(oryConfig, props.searchParams);
+  if (!flow) {
+    return null;
+  }
   return (
     <>
       <Head>
@@ -149,21 +50,13 @@ const Verification: NextPage = () => {
                 width={300}
                 height={300}
               />
-              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
-                Verify your E-Mail
-              </h2>
-              <Card className="mt-10 pt-6 sm:mx-auto sm:w-full sm:max-w-lg">
-                <CardContent>
-                  <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-                    <Flow onSubmit={onSubmit} flow={flow} />
-                  </div>
-                  <div className="mt-4 flex flex-row justify-end text-sm">
-                    <Link href="/">
-                      <Button variant={"secondary"}>Go back</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-10">
+                <Verification
+                  flow={flow}
+                  config={oryConfig}
+                  components={oryComponentOverrides}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -173,4 +66,4 @@ const Verification: NextPage = () => {
   );
 };
 
-export default Verification;
+export default VerificationPage;

@@ -60,7 +60,6 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           </aside>
         )}
       </div>
-      <Toaster />
     </>
   );
 };

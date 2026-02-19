@@ -37,6 +37,7 @@ import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
 import { useTheme } from "next-themes";
+import RootNodeSelector from "@/components/RootNodeSelector";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -78,6 +79,7 @@ const DependencyGraphPage: FunctionComponent = () => {
       "/dependency-graph/?" +
       toSearchParams({
         artifactName: searchParams?.get("artifact") ?? undefined,
+        origin: searchParams?.get("origin") ?? undefined,
         all: searchParams?.get("all") ? "1" : undefined,
       }),
     fetcher,
@@ -110,6 +112,8 @@ const DependencyGraphPage: FunctionComponent = () => {
               unassignPossible={true}
               artifacts={(artifacts ?? []).map((a) => a.artifactName)}
             />
+
+            <RootNodeSelector />
           </div>
           <div className="flex flex-row items-center gap-4">
             {graph && graph.risk !== 0 && (
