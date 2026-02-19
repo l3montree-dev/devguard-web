@@ -182,6 +182,7 @@ const DependencyGraph: FunctionComponent<{
       childrenLimitMap,
       previousNodesRef.current,
       handleExpansionToggle,
+      enableContextMenu,
     );
     previousNodesRef.current = nodes;
 
@@ -764,6 +765,9 @@ const DependencyGraph: FunctionComponent<{
           You can interact with this graph
         </span>
       </div>
+      {!enableContextMenu && (
+        <style>{`.react-flow__edge.selectable { cursor: grab !important; }`}</style>
+      )}
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
