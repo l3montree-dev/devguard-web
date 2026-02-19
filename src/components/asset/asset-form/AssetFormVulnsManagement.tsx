@@ -432,52 +432,118 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const PublicUrlsSection: FunctionComponent<{
+const ArtifactInputCVSSBadge: FunctionComponent<{
   assetId: string;
   devguardApiUrl: string;
   orgSlug: string;
   projectSlug?: string;
   assetSlug?: string;
+  selectedVersionSlug: string;
+  selectedArtifact: string;
+  setSelectedVersionSlug: (v: string) => void;
+  setSelectedArtifact: (v: string) => void;
   refs: AssetVersionDTO[];
-  copyable: boolean;
+  artifacts?: ArtifactDTO[];
+  selectedVersion?: AssetVersionDTO;
+  purlValidation: { isValid: boolean; warning?: string };
+  basePath?: string;
 }> = ({
   assetId,
   devguardApiUrl,
   orgSlug,
   projectSlug,
   assetSlug,
-  copyable,
+  selectedVersionSlug,
+  selectedArtifact,
+  setSelectedVersionSlug,
+  setSelectedArtifact,
+  refs,
+  artifacts,
+  selectedVersion,
+  purlValidation,
+  basePath,
 }) => {
-  const [selectedVersionSlug, setSelectedVersionSlug] = useState<string>("");
-  const [selectedArtifact, setSelectedArtifact] = useState<string>("");
+  return (
+    <div className="flex flex-row gap-8 mt-4">
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium">Branch / Tag</label>
+        <Select
+          value={selectedVersionSlug}
+          onValueChange={setSelectedVersionSlug}
+        >
+          <SelectTrigger className="bg-muted/50">
+            <SelectValue placeholder="Select a version" />
+          </SelectTrigger>
+          <SelectContent>
+            {refs.map((ref) => (
+              <SelectItem key={ref.slug} value={ref.slug}>
+                {ref.name}
+                {ref.defaultBranch ? " (default)" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-  const refs = useActiveAsset().refs;
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium">Artifact</label>
+        <Select
+          value={selectedArtifact}
+          onValueChange={setSelectedArtifact}
+          disabled={!selectedVersionSlug || !artifacts?.length}
+        >
+          <SelectTrigger className="bg-muted/50">
+            <SelectValue
+              placeholder={
+                !selectedVersionSlug
+                  ? "Select a version first"
+                  : !artifacts?.length
+                    ? "No artifacts available"
+                    : "Select an artifact"
+              }
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {artifacts?.map((artifact) => (
+              <SelectItem
+                key={artifact.artifactName}
+                value={artifact.artifactName}
+              >
+                {artifact.artifactName || "Default"}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-  const { data: artifacts } = useSWR<ArtifactDTO[]>(
-    selectedVersionSlug && assetSlug && projectSlug
-      ? `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${selectedVersionSlug}/artifacts`
-      : null,
-    fetcher,
+      {selectedArtifact && selectedVersion && !purlValidation.isValid && (
+        <Alert variant="default">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{purlValidation.warning}</AlertDescription>
+        </Alert>
+      )}
+
+      {basePath && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium">CVSS-Badge</label>
+          <img
+            src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+            alt="CVSS Badge"
+            className="rounded-md shadow-sm hover:shadow-md transition-shadow"
+          />
+        </div>
+      )}
+    </div>
   );
+};
 
-  // Reset artifact selection when version changes
-  React.useEffect(() => {
-    setSelectedArtifact("");
-  }, [selectedVersionSlug]);
-
-  // Get the selected version to check validation
-  const selectedVersion = refs.find((ref) => ref.slug === selectedVersionSlug);
-
-  // Validate artifact name + version creates a valid PURL
-  const purlValidation = React.useMemo(() => {
-    return validateArtifactNameAgainstPurlSpec(selectedArtifact);
-  }, [selectedArtifact]);
-
-  const basePath =
-    selectedVersionSlug && selectedArtifact
-      ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
-      : undefined;
-
+const PublicUrlsSection: FunctionComponent<{
+  assetId: string;
+  devguardApiUrl: string;
+  orgSlug: string;
+  copyable: boolean;
+  basePath?: string;
+}> = ({ devguardApiUrl, orgSlug, copyable, basePath }) => {
   const urls = [
     {
       label: "VeX-URL (Always up to date vulnerability information)",
@@ -511,66 +577,6 @@ const PublicUrlsSection: FunctionComponent<{
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Branch / Tag</label>
-          <Select
-            value={selectedVersionSlug}
-            onValueChange={setSelectedVersionSlug}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a version" />
-            </SelectTrigger>
-            <SelectContent>
-              {refs.map((ref) => (
-                <SelectItem key={ref.slug} value={ref.slug}>
-                  {ref.name}
-                  {ref.defaultBranch ? " (default)" : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">Artifact</label>
-          <Select
-            value={selectedArtifact}
-            onValueChange={setSelectedArtifact}
-            disabled={!selectedVersionSlug || !artifacts?.length}
-          >
-            <SelectTrigger>
-              <SelectValue
-                placeholder={
-                  !selectedVersionSlug
-                    ? "Select a version first"
-                    : !artifacts?.length
-                      ? "No artifacts available"
-                      : "Select an artifact"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {artifacts?.map((artifact) => (
-                <SelectItem
-                  key={artifact.artifactName}
-                  value={artifact.artifactName}
-                >
-                  {artifact.artifactName || "Default"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {selectedArtifact && selectedVersion && !purlValidation.isValid && (
-        <Alert variant="default">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{purlValidation.warning}</AlertDescription>
-        </Alert>
-      )}
-
       {urls.map((url) => (
         <div
           key={url.nameKey}
@@ -587,13 +593,6 @@ const PublicUrlsSection: FunctionComponent<{
           />
         </div>
       ))}
-      {basePath && (
-        <img
-          src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
-          alt="CVSS Badge"
-          className="mt-4 rounded-md shadow-sm hover:shadow-md transition-shadow"
-        />
-      )}
     </>
   );
 };
@@ -607,6 +606,43 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = project?.assets.find((a) => a.id === assetId);
+  const refs = useActiveAsset().refs;
+  const defaultBranch = refs.find((ref) => ref.defaultBranch);
+  const [selectedVersionSlug, setSelectedVersionSlug] = useState(
+    defaultBranch?.slug ?? "",
+  );
+  const [selectedArtifact, setSelectedArtifact] = useState("");
+  const orgSlug = org.slug;
+  const projectSlug = project?.slug;
+  const assetSlug = asset?.slug;
+  const { data: artifacts } = useSWR<ArtifactDTO[]>(
+    selectedVersionSlug && assetSlug && projectSlug
+      ? `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${selectedVersionSlug}/artifacts`
+      : null,
+    fetcher,
+  );
+
+  // Auto-select first artifact when artifacts load or version changes
+  React.useEffect(() => {
+    if (artifacts?.length) {
+      setSelectedArtifact(artifacts[0].artifactName);
+    } else {
+      setSelectedArtifact("");
+    }
+  }, [artifacts]);
+
+  // Get the selected version to check validation
+  const selectedVersion = refs.find((ref) => ref.slug === selectedVersionSlug);
+
+  // Validate artifact name + version creates a valid PURL
+  const purlValidation = React.useMemo(() => {
+    return validateArtifactNameAgainstPurlSpec(selectedArtifact);
+  }, [selectedArtifact]);
+
+  const basePath =
+    selectedVersionSlug && selectedArtifact
+      ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
+      : undefined;
   return (
     <>
       <div className="rounded-lg border bg-card p-4">
@@ -649,6 +685,22 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     By enabling this option, your vulnerability endpoints are
                     made publicly accessible. Select an asset version and
                     artifact below to construct the public URLs.
+                    <ArtifactInputCVSSBadge
+                      assetId={assetId!}
+                      orgSlug={orgSlug}
+                      projectSlug={projectSlug}
+                      assetSlug={assetSlug}
+                      devguardApiUrl={devguardApiUrl}
+                      selectedVersionSlug={selectedVersionSlug}
+                      selectedArtifact={selectedArtifact}
+                      setSelectedVersionSlug={setSelectedVersionSlug}
+                      setSelectedArtifact={setSelectedArtifact}
+                      refs={refs}
+                      artifacts={artifacts}
+                      selectedVersion={selectedVersion}
+                      purlValidation={purlValidation}
+                      basePath={basePath}
+                    />
                     {field.value && (
                       <Collapsible defaultOpen={false} className="mt-4">
                         <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between rounded-md border bg-background px-4 py-2 text-sm font-medium hover:opacity-80">
@@ -659,11 +711,9 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           <PublicUrlsSection
                             assetId={assetId!}
                             devguardApiUrl={devguardApiUrl}
-                            orgSlug={org.slug}
-                            projectSlug={project?.slug}
-                            assetSlug={asset?.slug}
-                            refs={asset?.refs ?? []}
+                            orgSlug={orgSlug}
                             copyable={field.value}
+                            basePath={basePath}
                           />
                         </CollapsibleContent>
                       </Collapsible>
