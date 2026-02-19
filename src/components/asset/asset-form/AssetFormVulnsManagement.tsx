@@ -32,7 +32,12 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import {
+  ClipboardDocumentIcon,
+  ClipboardDocumentCheckIcon,
+} from "@heroicons/react/24/outline";
 import { AlertTriangle, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import React, { FunctionComponent, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
@@ -471,7 +476,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           value={selectedVersionSlug}
           onValueChange={setSelectedVersionSlug}
         >
-          <SelectTrigger className="bg-muted/50">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200">
             <SelectValue placeholder="Select a version" />
           </SelectTrigger>
           <SelectContent>
@@ -492,7 +497,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           onValueChange={setSelectedArtifact}
           disabled={!selectedVersionSlug || !artifacts?.length}
         >
-          <SelectTrigger className="bg-muted/50">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200/30">
             <SelectValue
               placeholder={
                 !selectedVersionSlug
@@ -526,11 +531,26 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
       {basePath && (
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium">CVSS-Badge</label>
-          <img
-            src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
-            alt="CVSS Badge"
-            className="rounded-md shadow-sm hover:shadow-md transition-shadow"
-          />
+          <div className="flex flex-row items-center gap-2">
+            <img
+              src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+              alt="CVSS Badge"
+              className="rounded-md shadow-sm hover:shadow-md transition-shadow"
+            />
+            <button
+              type="button"
+              className="cursor-pointer transition-all hover:opacity-100"
+              onClick={() => {
+                navigator.clipboard.writeText(`${basePath}/badges/cvss/`);
+                toast("Copied to clipboard", {
+                  description:
+                    "The CVSS Badge URL has been copied to your clipboard. Enable public access to use the Badge in your README or other documentation.",
+                });
+              }}
+            >
+              <ClipboardDocumentIcon className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -643,6 +663,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
     selectedVersionSlug && selectedArtifact
       ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
       : undefined;
+
   return (
     <>
       <div className="rounded-lg border bg-card p-4">
