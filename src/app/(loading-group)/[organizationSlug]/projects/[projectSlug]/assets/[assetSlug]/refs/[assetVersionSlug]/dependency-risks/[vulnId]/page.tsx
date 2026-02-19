@@ -47,7 +47,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { CheckCircleIcon } from "lucide-react";
+import { Bug, CheckCircleIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -659,9 +659,16 @@ const Index: FunctionComponent = () => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">
-                {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
-              </h1>
+              <div className="flex flex-row items-center gap-4">
+                <h1 className="text-2xl font-semibold">
+                  {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
+                </h1>
+                {vuln ? (
+                  <VulnState state={vuln?.state ?? "open"} />
+                ) : (
+                  <Skeleton className="w-20 h-6 rounded-full" />
+                )}
+              </div>
               <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
@@ -676,7 +683,7 @@ const Index: FunctionComponent = () => {
                         onClick={() =>
                           setDescriptionExpanded(!descriptionExpanded)
                         }
-                        className="text-sm text-primary hover:opacity-80 my-2"
+                        className="text-sm dark:text-primary text-blue-600 hover:opacity-80 my-2 cursor-pointer"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}
                       </button>
@@ -714,11 +721,6 @@ const Index: FunctionComponent = () => {
                   </Link>
                 )}
 
-                {vuln ? (
-                  <VulnState state={vuln.state} />
-                ) : (
-                  <Skeleton className="w-10 h-4" />
-                )}
                 {vuln ? (
                   <Severity risk={vuln.rawRiskAssessment} />
                 ) : (
@@ -1274,7 +1276,7 @@ const Index: FunctionComponent = () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <Badge variant={"secondary"}>
-                            <BugAntIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            <Bug className="-ml-1 mr-1 inline-block h-4 w-4" />
                             {hints.amountOpen}
                           </Badge>
                         </TooltipTrigger>

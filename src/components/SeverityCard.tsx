@@ -89,7 +89,7 @@ const SeverityCard: FunctionComponent<Props> = ({
                 `/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${activeAssetVersion?.slug}/dependency-risks?` +
                 new URLSearchParams({
                   ...applySQLFilter(variant),
-                  ...(artifactName && {artifact: artifactName}),
+                  ...(artifactName && { artifact: artifactName }),
                 })
               }
               className="text-xs !text-muted-foreground"
