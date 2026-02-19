@@ -761,7 +761,7 @@ const DependencyGraph: FunctionComponent<{
       <div className="absolute z-10 left-2 top-2">
         <span className="text-sm text-muted-foreground/60 flex items-center gap-1">
           <Move className="h-3 w-3" />
-          You can interact with graph
+          You can interact with this graph
         </span>
       </div>
       <ReactFlow
