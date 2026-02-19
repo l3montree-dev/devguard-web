@@ -72,6 +72,7 @@ export interface DependencyGraphNodeProps {
     propagationCount?: number;
     propagationRatio?: number;
     flow?: number;
+    enableContextMenu?: boolean;
     onExpansionToggle?: (nodeId: string) => void;
   };
   id: string;
@@ -98,7 +99,10 @@ export const DependencyGraphNode: FunctionComponent<
         width: props.data.nodeWidth,
       }}
       className={classNames(
-        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all cursor-pointer active:cursor-grabbing",
+        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
+        props.data.enableContextMenu
+          ? "cursor-pointer active:cursor-grabbing"
+          : "cursor-grab active:cursor-grabbing",
         props.data.vuln
           ? props.data.vuln.every((v) => v.state === "falsePositive")
             ? "border-gray-500/50 shadow-md"
