@@ -47,7 +47,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { CheckCircleIcon } from "lucide-react";
+import { Bug, CheckCircleIcon, Crosshair } from "lucide-react";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -663,7 +663,11 @@ const Index: FunctionComponent = () => {
                 <h1 className="text-2xl font-semibold">
                   {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
                 </h1>
-                <VulnState state={vuln?.state ?? "open"} />
+                {vuln ? (
+                  <VulnState state={vuln?.state ?? "open"} />
+                ) : (
+                  <Skeleton className="w-20 h-6 rounded-full" />
+                )}
               </div>
               <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
@@ -1272,7 +1276,7 @@ const Index: FunctionComponent = () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <Badge variant={"secondary"}>
-                            <BugAntIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            <Bug className="-ml-1 mr-1 inline-block h-4 w-4" />
                             {hints.amountOpen}
                           </Badge>
                         </TooltipTrigger>
@@ -1311,7 +1315,7 @@ const Index: FunctionComponent = () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <Badge variant={"secondary"}>
-                            <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            <Crosshair className="-ml-1 mr-1 inline-block h-4 w-4" />
                             {hints.amountFalsePositive}
                           </Badge>
                         </TooltipTrigger>

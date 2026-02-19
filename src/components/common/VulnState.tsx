@@ -8,7 +8,7 @@ import {
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
 import { ExpandedVulnDTOState } from "../../types/api/api";
-import { Scale } from "lucide-react";
+import { Scale, Bug, Crosshair } from "lucide-react";
 
 const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
   state,
@@ -22,7 +22,7 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "bg-secondary text-secondary-foreground outline outline-1 outline-purple-500/50 ",
           )}
         >
           <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
@@ -36,7 +36,7 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "bg-secondary text-secondary-foreground outline outline-1 outline-green-500/50",
           )}
         >
           <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
@@ -50,10 +50,10 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "bg-secondary text-secondary-foreground outline outline-1 outline-orange-500/50",
           )}
         >
-          <StopIcon className="-ml-1 inline-block h-4 w-4" />
+          <Crosshair className="-ml-1 inline-block h-4 w-4" />
           False Positive
         </Badge>
       );
@@ -64,7 +64,7 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "bg-secondary text-secondary-foreground outline outline-1 outline-grey-500/50",
           )}
         >
           <Scale className="-ml-1 inline-block h-4 w-4" />
@@ -79,10 +79,10 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "bg-secondary text-secondary-foreground outline outline-1 outline-blue-500/50",
           )}
         >
-          <BugAntIcon className="-ml-1 inline-block h-4 w-4" />
+          <Bug className="-ml-1 inline-block h-4 w-4" />
           Open
         </Badge>
       );
