@@ -171,6 +171,8 @@ export interface ProjectDTO {
 
   externalEntityId?: string;
   externalEntityProviderId?: string;
+
+  state: string;
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
@@ -519,7 +521,7 @@ export interface AssetDTO {
   pipelineError?: string;
   pipelineLastRun: string;
 
-  archived: boolean;
+  state: string;
 }
 
 export interface DependencyTreeNode {

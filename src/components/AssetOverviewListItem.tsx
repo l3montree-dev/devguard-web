@@ -7,7 +7,7 @@ import Avatar from "./Avatar";
 import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";
 import { Badge } from "./ui/badge";
-import { checkDeletedProject } from "../lib/utils";
+
 interface Props {
   asset: AssetDTO;
 }
@@ -33,8 +33,10 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           <div className="flex flex-row items-center gap-2">
             <Avatar avatar={asset.avatar} name={asset.name} />
             {asset.name}
-            {asset.archived && <Badge variant={"outline"}>Archived</Badge>}
-            {checkDeletedProject(asset.name) && (
+            {asset.state === "archived" && (
+              <Badge variant={"outline"}>Archived</Badge>
+            )}
+            {asset.state === "deleted" && (
               <Badge variant={"destructive"}>Pending deletion</Badge>
             )}
           </div>
