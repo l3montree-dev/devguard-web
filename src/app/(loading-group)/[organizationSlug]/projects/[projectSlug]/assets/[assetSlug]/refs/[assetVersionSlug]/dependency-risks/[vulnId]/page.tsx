@@ -47,7 +47,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { Bug, CheckCircleIcon, Crosshair } from "lucide-react";
+import { Bug, CheckCircleIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -347,7 +347,7 @@ function Quickfix(props: { vuln: string; version?: string; package?: string }) {
           ecosystemUpdate: ``,
         };
     }
-  }, [props.vuln, props.package, props.version]);
+  }, []);
 
   return globalUpdate === "" && ecosystemUpdate === "" ? null : (
     <div className="relative">
@@ -1315,7 +1315,7 @@ const Index: FunctionComponent = () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <Badge variant={"secondary"}>
-                            <Crosshair className="-ml-1 mr-1 inline-block h-4 w-4" />
+                            <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
                             {hints.amountFalsePositive}
                           </Badge>
                         </TooltipTrigger>

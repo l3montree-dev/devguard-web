@@ -8,7 +8,7 @@ import {
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
 import { ExpandedVulnDTOState } from "../../types/api/api";
-import { Scale, Bug, Crosshair } from "lucide-react";
+import { Scale, Bug } from "lucide-react";
 
 const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
   state,
@@ -53,7 +53,7 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
             "bg-secondary text-secondary-foreground outline outline-1 outline-orange-500/50",
           )}
         >
-          <Crosshair className="-ml-1 inline-block h-4 w-4" />
+          <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
         </Badge>
       );
