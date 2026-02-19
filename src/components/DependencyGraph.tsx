@@ -59,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Move } from "lucide-react";
 
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
@@ -756,6 +757,12 @@ const DependencyGraph: FunctionComponent<{
             <ArrowsPointingOutIcon className="h-5 w-5" />
           )}
         </Button>
+      </div>
+      <div className="absolute z-10 left-2 top-2">
+        <span className="text-sm text-muted-foreground/60 flex items-center gap-1">
+          <Move className="h-3 w-3" />
+          You can interact with graph
+        </span>
       </div>
       <ReactFlow
         nodes={nodes}
