@@ -10,12 +10,13 @@ import {
   TabsTrigger,
 } from "src/components/ui/tabs";
 
-import { RiskHistory } from "src/types/api/api";
+import { RiskHistory, OrgStructure } from "src/types/api/api";
 import { fetcher } from "src/data-fetcher/fetcher";
 import { useActiveOrg } from "src/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import  Section  from "src/components/common/Section";
 import SeverityCard from "src/components/SeverityCard";
+import StructureCard from "src/components/organization/StructureCard"
 import useSWR from "swr";
 
 
@@ -26,11 +27,17 @@ const OrganizationOverview: FunctionComponent  = () => {
 
     const orgMenu = useOrganizationMenu();
     const [mode, setMode] = useViewMode("devguard-org-view-mode");
-    
+        
     const {data : vulnDistribution, isLoading : isVulnLoading} = useSWR<RiskHistory>(url + "/stats/vuln-statistics/",fetcher)
-    
+    const {data : orgStructure, isLoading : isStructureLoading} = useSWR<OrgStructure>(url + "/stats/org-structure/",fetcher)
+    console.log(orgStructure)
     return (
         <Page Menu={orgMenu} title="Overview" description="Displays an overview about the stats of the org" Title={null} >
+            <div className="flex mt-4 gap-12 justify-center mb-16">
+                <StructureCard isLoading={isStructureLoading} mode="Projects" currentAmount={orgStructure?.numProjects ?? 0}/>
+                <StructureCard isLoading={isStructureLoading} mode="Assets" currentAmount={orgStructure?.numAssets ?? 0}/>
+                <StructureCard isLoading={isStructureLoading} mode="Artifacts" currentAmount={orgStructure?.numArtifacts ?? 0}/>
+            </div>
             <Section
                 primaryHeadline
                 forceVertical

@@ -919,5 +919,11 @@ export type ExternalReference = {
   assetId: string;
   assetVersionName: string;
   url: string;
-  type: "cyclonedxvex" | "csaf";
+  type: "cyclonedxvex" | "csaf"; 
 };
+
+export type OrgStructure = {
+    numProjects : number
+    numAssets: number
+    numArtifacts : number
+}
