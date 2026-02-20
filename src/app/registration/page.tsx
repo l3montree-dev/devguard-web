@@ -24,6 +24,7 @@ import { oryComponentOverrides } from "../../components/ory/overrides";
 import oryConfig from "../../ory.config";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
+import { rewriteFlow } from "../../types/auth";
 
 // Renders the registration page
 const RegistrationPage = async (props: OryPageParams) => {
@@ -71,7 +72,7 @@ const RegistrationPage = async (props: OryPageParams) => {
               </p>
             </div>
             <Registration
-              flow={flow}
+              flow={rewriteFlow(flow)}
               config={oryConfig}
               components={oryComponentOverrides}
             />
