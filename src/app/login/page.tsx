@@ -20,6 +20,7 @@ import Link from "next/link";
 import { Login } from "@ory/elements-react/theme";
 import { getLoginFlow, OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "../../ory.config";
+import { config } from "../../config";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
 import { oryComponentOverrides } from "../../components/ory/overrides";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
@@ -59,16 +60,18 @@ const LoginPage = async (props: OryPageParams) => {
               <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight">
                 Sign in to your Account
               </h2>
-              <p className="mt-2 text-sm/6 text-muted-foreground">
-                Don&quot;t have an Account?{" "}
-                <Link
-                  data-testid="cta-link"
-                  href="/registration"
-                  className="font-semibold hover:underline"
-                >
-                  Sign up for free
-                </Link>
-              </p>
+              {config.registrationEnabled && (
+                <p className="mt-2 text-sm/6 text-muted-foreground">
+                  Don&quot;t have an Account?{" "}
+                  <Link
+                    data-testid="cta-link"
+                    href="/registration"
+                    className="font-semibold hover:underline"
+                  >
+                    Sign up for free
+                  </Link>
+                </p>
+              )}
             </div>
             <Login
               config={oryConfig}

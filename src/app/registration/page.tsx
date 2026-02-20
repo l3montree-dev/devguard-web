@@ -25,9 +25,15 @@ import oryConfig from "../../ory.config";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import { rewriteFlow } from "../../types/auth";
+import { config } from "../../config";
+import { redirect } from "next/navigation";
 
 // Renders the registration page
 const RegistrationPage = async (props: OryPageParams) => {
+  if (!config.registrationEnabled) {
+    redirect("/login");
+  }
+
   const flow = await getRegistrationFlow(oryConfig, props.searchParams);
   if (!flow) {
     return null;

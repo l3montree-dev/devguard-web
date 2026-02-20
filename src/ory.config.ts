@@ -8,7 +8,7 @@ const config: OryClientConfiguration = {
     default_redirect_url: "/",
     error_ui_url: "/error",
     name: "devguard-web",
-    registration_enabled: true,
+    registration_enabled: process.env.REGISTRATION_ENABLED !== "false",
     verification_enabled: true,
     recovery_enabled: true,
     registration_ui_url: "/registration",

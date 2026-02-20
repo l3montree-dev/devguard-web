@@ -42,4 +42,5 @@ export const config = {
     | "dark"
     | false,
   errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
+  registrationEnabled: process.env.REGISTRATION_ENABLED !== "false",
 };
