@@ -172,7 +172,7 @@ export interface ProjectDTO {
   externalEntityId?: string;
   externalEntityProviderId?: string;
 
-  state: "active" | "archived";
+  state: "active" | "deleted";
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
