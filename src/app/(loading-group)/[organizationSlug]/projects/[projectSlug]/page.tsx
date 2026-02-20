@@ -57,7 +57,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import CustomPagination from "@/components/common/CustomPagination";
 
 function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
-  return "assets" in d;
+  return "type" in d && (d as ProjectDTO).type === "project";
 }
 function checkType(data: SubGroupsAndAssets): {
   assets: AssetDTO[];
@@ -80,7 +80,9 @@ function checkType(data: SubGroupsAndAssets): {
 type SubGroupsAndAssets = Array<AssetDTO | ProjectDTO>;
 
 export default function RepositoriesPage() {
-  const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
+  const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
+    "active",
+  );
   const project = useProject()!;
   const organization = useOrganization();
   const { session } = useSession();
@@ -125,7 +127,8 @@ export default function RepositoriesPage() {
   });
 
   const { assets, subgroups } = useMemo(() => {
-    if (!subgroupsWithAssets) return { assets: [], subgroups: [] };
+    if (!subgroupsWithAssets || !subgroupsWithAssets.data)
+      return { assets: [], subgroups: [] };
     return checkType(subgroupsWithAssets.data.flat());
   }, [subgroupsWithAssets]);
 
@@ -152,7 +155,7 @@ export default function RepositoriesPage() {
   );
 
   const handleSetTabValue = (value: string) => {
-    if (value === "all" || value === "inactive") {
+    if (value === "active" || value === "inactive") {
       setViewedProject(value);
       pushQuery({ state: value === "inactive" ? "inactive" : undefined });
     }
@@ -281,12 +284,12 @@ export default function RepositoriesPage() {
             title={project.name}
           >
             <Tabs
-              defaultValue="all"
+              defaultValue="active"
               value={viewedProject}
               onValueChange={handleSetTabValue}
             >
               <TabsList>
-                <TabsTrigger value="all">
+                <TabsTrigger value="active">
                   {project.externalEntityProviderId
                     ? "Repositories"
                     : "Subgroups & Repositories"}
