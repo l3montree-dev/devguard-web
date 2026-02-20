@@ -10,7 +10,7 @@ import {
   TabsTrigger,
 } from "src/components/ui/tabs";
 
-import { RiskHistory, OrgStructure } from "src/types/api/api";
+import { OrgOverview } from "src/types/api/api";
 import { fetcher } from "src/data-fetcher/fetcher";
 import { useActiveOrg } from "src/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
@@ -18,6 +18,11 @@ import  Section  from "src/components/common/Section";
 import SeverityCard from "src/components/SeverityCard";
 import StructureCard from "src/components/organization/StructureCard"
 import useSWR from "swr";
+
+import {
+  Card,
+} from "src/components/ui/card";
+import { Skeleton } from "src/components/ui/skeleton";
 
 
 const OrganizationOverview: FunctionComponent  = () => {
@@ -28,15 +33,15 @@ const OrganizationOverview: FunctionComponent  = () => {
     const orgMenu = useOrganizationMenu();
     const [mode, setMode] = useViewMode("devguard-org-view-mode");
         
-    const {data : vulnDistribution, isLoading : isVulnLoading} = useSWR<RiskHistory>(url + "/stats/vuln-statistics/",fetcher)
-    const {data : orgStructure, isLoading : isStructureLoading} = useSWR<OrgStructure>(url + "/stats/org-structure/",fetcher)
-    console.log(orgStructure)
+    const {data : orgStatistics, isLoading : isStatisticsLoading} = useSWR<OrgOverview>(url + "/stats/vuln-statistics/",fetcher)
+    console.log(orgStatistics)
+
     return (
         <Page Menu={orgMenu} title="Overview" description="Displays an overview about the stats of the org" Title={null} >
-            <div className="flex mt-4 gap-12 justify-center mb-16">
-                <StructureCard isLoading={isStructureLoading} mode="Projects" currentAmount={orgStructure?.numProjects ?? 0}/>
-                <StructureCard isLoading={isStructureLoading} mode="Assets" currentAmount={orgStructure?.numAssets ?? 0}/>
-                <StructureCard isLoading={isStructureLoading} mode="Artifacts" currentAmount={orgStructure?.numArtifacts ?? 0}/>
+            <div className="flex mt-4 gap-12 justify-center mb-16 items-start">
+                <StructureCard topEntries={orgStatistics?.topProjects ?? []} isLoading={isStatisticsLoading} mode="Projects" currentAmount={orgStatistics?.structure.numProjects ?? 0}/>
+                <StructureCard topEntries={orgStatistics?.topAssets ?? []} isLoading={isStatisticsLoading} mode="Assets" currentAmount={orgStatistics?.structure.numAssets ?? 0}/>
+                <StructureCard topEntries={orgStatistics?.topArtifacts ?? []} isLoading={isStatisticsLoading} mode="Artifacts" currentAmount={orgStatistics?.structure.numArtifacts ?? 0}/>
             </div>
             <Section
                 primaryHeadline
@@ -59,26 +64,26 @@ const OrganizationOverview: FunctionComponent  = () => {
                         <div className="grid grid-cols-4 gap-4">
                             <SeverityCard
                             variant="critical"
-                            isLoading={isVulnLoading}
-                            currentAmount={(mode === "risk" ? vulnDistribution?.criticalRisk : vulnDistribution?.criticalCvss) ??  0}
+                            isLoading={isStatisticsLoading}
+                            currentAmount={(mode === "risk" ? orgStatistics?.vulnDistribution.riskDistribution.criticalRisk : orgStatistics?.vulnDistribution.cvssDistribution.criticalCVSS) ??  0}
                             mode={mode}
                             />
                             <SeverityCard
                             variant="high"
-                            isLoading={isVulnLoading}
-                            currentAmount={(mode === "risk" ? vulnDistribution?.highRisk : vulnDistribution?.highCvss) ?? 0}
+                            isLoading={isStatisticsLoading}
+                            currentAmount={(mode === "risk" ? orgStatistics?.vulnDistribution.riskDistribution.highRisk : orgStatistics?.vulnDistribution.cvssDistribution.highCVSS) ?? 0}
                             mode={mode}
                             />
                             <SeverityCard
                             variant="medium"
-                            isLoading={isVulnLoading}
-                            currentAmount={(mode === "risk" ? vulnDistribution?.mediumRisk : vulnDistribution?.mediumCvss) ?? 0}
+                            isLoading={isStatisticsLoading}
+                            currentAmount={(mode === "risk" ? orgStatistics?.vulnDistribution.riskDistribution.mediumRisk : orgStatistics?.vulnDistribution.cvssDistribution.mediumCVSS) ?? 0}
                             mode={mode}
                             />
                             <SeverityCard
                             variant="low"
-                            isLoading={isVulnLoading}
-                            currentAmount={(mode === "risk" ? vulnDistribution?.lowRisk : vulnDistribution?.lowCvss) ?? 0}
+                            isLoading={isStatisticsLoading}
+                            currentAmount={(mode === "risk" ? orgStatistics?.vulnDistribution.riskDistribution.lowRisk : orgStatistics?.vulnDistribution.cvssDistribution.lowCVSS) ?? 0}
                             mode={mode}
                             />
                         </div>

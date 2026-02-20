@@ -927,3 +927,42 @@ export type OrgStructure = {
     numAssets: number
     numArtifacts : number
 }
+
+export type VulnRiskDistribution = {
+    lowRisk: number
+    mediumRisk: number
+    highRisk: number
+    criticalRisk: number
+}
+
+export type VulnCVSSDistribution = {
+    lowCVSS: number
+    mediumCVSS: number
+    highCVSS: number
+    criticalCVSS: number
+}
+
+export type ProjectVulnDistribution = VulnRiskDistribution & {
+    projectName: string
+    total: number
+}
+
+export type AssetVulnDistribution = VulnRiskDistribution & {
+    assetName: string
+    total: number
+}
+
+export type ArtifactVulnDistribution = VulnRiskDistribution & {
+    artifactName: string
+    total: number
+}
+
+export type VulnDistribution = VulnRiskDistribution & VulnCVSSDistribution
+
+export type OrgOverview = {
+    structure : OrgStructure;
+    vulnDistribution: VulnDistribution
+    topProjects: ProjectVulnDistribution[]
+    topAssets: AssetVulnDistribution[]
+    topArtifacts: ArtifactVulnDistribution[]
+}
