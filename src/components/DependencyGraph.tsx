@@ -189,7 +189,14 @@ const DependencyGraph: FunctionComponent<{
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, vulns, expandedNodes, childrenLimitMap, handleExpansionToggle]);
+  }, [
+    graph,
+    vulns,
+    expandedNodes,
+    childrenLimitMap,
+    handleExpansionToggle,
+    enableContextMenu,
+  ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
