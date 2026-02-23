@@ -58,10 +58,10 @@ const columnsDef: ColumnDef<{ risk: RiskHistory; release: ReleaseDTO }, any>[] =
                 <CVERainbowBadge {...row.row.original.risk} />
               ) : (
                 <CVERainbowBadge
-                  low={row.row.original.risk.lowCvss}
-                  medium={row.row.original.risk.mediumCvss}
-                  high={row.row.original.risk.highCvss}
-                  critical={row.row.original.risk.criticalCvss}
+                  low={row.row.original.risk.lowCVSS}
+                  medium={row.row.original.risk.mediumCVSS}
+                  high={row.row.original.risk.highCVSS}
+                  critical={row.row.original.risk.criticalCVSS}
                 />
               )}
             </div>

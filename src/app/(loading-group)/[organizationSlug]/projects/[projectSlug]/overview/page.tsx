@@ -491,22 +491,22 @@ const OverviewPage = () => {
                                   low={
                                     mode === "risk"
                                       ? (r?.lowRisk ?? 0)
-                                      : (r?.lowCvss ?? 0)
+                                      : (r?.lowCVSS ?? 0)
                                   }
                                   medium={
                                     mode === "risk"
                                       ? (r?.mediumRisk ?? 0)
-                                      : (r?.mediumCvss ?? 0)
+                                      : (r?.mediumCVSS ?? 0)
                                   }
                                   high={
                                     mode === "risk"
                                       ? (r?.highRisk ?? 0)
-                                      : (r?.highCvss ?? 0)
+                                      : (r?.highCVSS ?? 0)
                                   }
                                   critical={
                                     mode === "risk"
                                       ? (r?.criticalRisk ?? 0)
-                                      : (r?.criticalCvss ?? 0)
+                                      : (r?.criticalCVSS ?? 0)
                                   }
                                 />
                               </div>

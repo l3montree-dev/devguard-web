@@ -46,10 +46,10 @@ export function RiskHistoryChart({
             [label]:
               mode === "risk"
                 ? data[i].history[j].sumOpenRisk
-                : data[i].history[j].criticalCvss +
-                  data[i].history[j].highCvss +
-                  data[i].history[j].mediumCvss +
-                  data[i].history[j].lowCvss,
+                : data[i].history[j].criticalCVSS +
+                  data[i].history[j].highCVSS +
+                  data[i].history[j].mediumCVSS +
+                  data[i].history[j].lowCVSS,
             day: data[i].history[j].day,
           };
         } else {
@@ -59,10 +59,10 @@ export function RiskHistoryChart({
             [label]:
               mode === "risk"
                 ? data[i].history[j].sumOpenRisk
-                : data[i].history[j].criticalCvss +
-                  data[i].history[j].highCvss +
-                  data[i].history[j].mediumCvss +
-                  data[i].history[j].lowCvss,
+                : data[i].history[j].criticalCVSS +
+                  data[i].history[j].highCVSS +
+                  data[i].history[j].mediumCVSS +
+                  data[i].history[j].lowCVSS,
           };
         }
       }

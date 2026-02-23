@@ -6,23 +6,37 @@ import {
   Card,
 } from "src/components/ui/card";
 import { Skeleton } from "src/components/ui/skeleton";
-import {ProjectVulnDistribution, AssetVulnDistribution,ArtifactVulnDistribution} from "src/types/api/api"
-
+import {VulnDistributionInStructure} from "src/types/api/api"
+import CVERainbowBadge from "src/components/CVERainbowBadge";
+import { truncateMiddle} from "src/utils/common"
+import useDecodedPathname from "src/hooks/useDecodedPathname";
+import { useRouter } from "next/navigation";
 interface Props {
   currentAmount: number;
-  mode: "Projects" | "Assets" | "Artifacts";
-  topEntries:  ProjectVulnDistribution[] | AssetVulnDistribution[] | ArtifactVulnDistribution[];
-  isLoading: boolean;
+  type: "Projects" | "Assets" | "Artifacts"
+  mode: "risk" | "cvss"
+  topEntries:  VulnDistributionInStructure[] 
+  isLoading: boolean
 }
 
 const StructureCard : FunctionComponent<Props> = ({
   currentAmount,
   isLoading,
   topEntries,
+  type,
   mode,
 }) => {
   const activeOrg = useActiveOrg();
   const [expanded, setExpanded] = useState<boolean>(false)
+  const router = useRouter()
+
+  const pathname = useDecodedPathname();
+
+  var maxLen = 20
+  if (type === "Artifacts"){
+    maxLen = 40
+  }
+
   console.log(topEntries)
   if (isLoading) {
     return (
@@ -33,10 +47,10 @@ const StructureCard : FunctionComponent<Props> = ({
   }
     
     return (   
-    <Card className="rounded-full hover:bg-muted" onClick={() => setExpanded(!expanded)}>
+    <Card className={`${!expanded ? "rounded-full hover:bg-muted" : ""} `} onClick={() => setExpanded(!expanded)}>
          <div className="font-semibold flex items-baseline  gap-4 py-6 px-8">
             <div className="text-5xl">{currentAmount}</div>
-            <div className="text-3xl text-muted-foreground">{mode}</div>
+            <div className="text-3xl text-muted-foreground">{type}</div>
             {!expanded ? (
                 <ChevronLeftIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             ):(
@@ -44,20 +58,19 @@ const StructureCard : FunctionComponent<Props> = ({
             )}
          </div>
          {expanded && topEntries.map((entry, index) => {
-          const name = 
-            mode === "Projects" ? (entry as ProjectVulnDistribution).projectName :
-            mode === "Assets" ? (entry as AssetVulnDistribution).assetName :
-            (entry as ArtifactVulnDistribution).artifactName
+          entry = (entry as VulnDistributionInStructure)
           
           return (
-            <div key={name || index} className="flex items-center justify-between py-2 px-8 border-t">
-              <span className="text-sm">{name}</span>
-              <div className="flex gap-2 text-xs">
-                <span className="text-red-500">{entry.criticalRisk} critical</span>
-                <span className="text-orange-500">{entry.highRisk} high</span>
-                <span className="text-yellow-500">{entry.mediumRisk} medium</span>
-                <span className="text-green-500">{entry.lowRisk} low</span>
-              </div>
+            <div key={entry.name || index} className="hover:bg-muted flex items-center justify-between gap-8 py-2 px-8 border-t" 
+            onClick={(e) => {
+                e.stopPropagation()
+                const detailHref = type === "Projects" ? pathname + "/../projects/" + entry.slug :
+                type === "Assets" ?  pathname + "/../projects/" + entry.projectSlug + "/assets/" + entry.slug :
+                pathname + "/../projects/" + entry.projectSlug + "/assets/" + entry.assetSlug + "/refs/" + entry.assetVersionName + "?artifact=" + encodeURI(entry.name);
+                router.push(detailHref)
+            }}>
+              <span className="text-sm">{truncateMiddle(entry.name,maxLen)}</span>
+              <CVERainbowBadge low={mode === "risk" ? entry.lowRisk : entry.lowCVSS} medium={mode === "risk" ? entry.mediumRisk : entry.mediumCVSS} high={mode === "risk" ? entry.highRisk : entry.highCVSS} critical={mode === "risk" ? entry.criticalRisk : entry.criticalCVSS}/>
             </div>
               );
             })}

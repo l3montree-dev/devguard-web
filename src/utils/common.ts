@@ -424,3 +424,14 @@ export const stateLabels: Record<DependencyVuln["state"], string> = {
   falsePositive: "False Positive",
   markedForTransfer: "Marked for Transfer",
 };
+
+
+// Utility function to truncate text in the middle with ellipsis
+export const truncateMiddle = (text: string, maxLength: number = 20): string => {
+  if (text.length <= maxLength) return text;
+
+  const start = Math.ceil((maxLength - 3) / 2);
+  const end = Math.floor((maxLength - 3) / 2);
+
+  return text.slice(0, start) + "..." + text.slice(-end);
+};

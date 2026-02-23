@@ -77,10 +77,10 @@ export function padRiskHistory<T extends RiskHistoryEl>(
           highRisk: 0,
           criticalRisk: 0,
 
-          lowCvss: 0,
-          mediumCvss: 0,
-          highCvss: 0,
-          criticalCvss: 0,
+          lowCVSS: 0,
+          mediumCVSS: 0,
+          highCVSS: 0,
+          criticalCVSS: 0,
 
           cvePurlLow: 0,
           cvePurlMedium: 0,

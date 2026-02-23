@@ -5,16 +5,7 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { Badge } from "../ui/badge";
 import { ProjectDTO } from "../../types/api/api";
 import Image from "next/image";
-
-// Utility function to truncate text in the middle with ellipsis
-const truncateMiddle = (text: string, maxLength: number = 20): string => {
-  if (text.length <= maxLength) return text;
-
-  const start = Math.ceil((maxLength - 3) / 2);
-  const end = Math.floor((maxLength - 3) / 2);
-
-  return text.slice(0, start) + "..." + text.slice(-end);
-};
+import {truncateMiddle} from "src/utils/common"
 
 export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
   if (type === "kubernetesNamespace") {
