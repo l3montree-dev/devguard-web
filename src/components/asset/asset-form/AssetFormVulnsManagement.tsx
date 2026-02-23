@@ -32,10 +32,7 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
-import {
-  ClipboardDocumentIcon,
-  ClipboardDocumentCheckIcon,
-} from "@heroicons/react/24/outline";
+import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 import { AlertTriangle, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import React, { FunctionComponent, useState } from "react";
@@ -476,7 +473,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           value={selectedVersionSlug}
           onValueChange={setSelectedVersionSlug}
         >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200 cursor-pointer">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-grey-200 cursor-pointer">
             <SelectValue placeholder="Select a version" />
           </SelectTrigger>
           <SelectContent>
@@ -497,7 +494,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           onValueChange={setSelectedArtifact}
           disabled={!selectedVersionSlug || !artifacts?.length}
         >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200/30 cursor-pointer">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-grey-200 cursor-pointer">
             <SelectValue
               placeholder={
                 !selectedVersionSlug
@@ -522,10 +519,12 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
       </div>
 
       {selectedArtifact && selectedVersion && !purlValidation.isValid && (
-        <Alert variant="default">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{purlValidation.warning}</AlertDescription>
-        </Alert>
+        <div className="w-full">
+          <Alert variant="default">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{purlValidation.warning}</AlertDescription>
+          </Alert>
+        </div>
       )}
 
       {basePath && (

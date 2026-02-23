@@ -63,7 +63,9 @@ const InputWithButton = (props: InputWithButtonProps) => {
           <input
             {...inputProps}
             value={props.value ?? ""}
-            className={classNames("min-w-0 flex-1 truncate bg-transparent focus:outline-none")}
+            className={classNames(
+              "min-w-0 flex-1 truncate bg-transparent focus:outline-none",
+            )}
             readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
