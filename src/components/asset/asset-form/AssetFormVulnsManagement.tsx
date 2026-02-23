@@ -724,19 +724,23 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                     />
                     {field.value && (
                       <Collapsible defaultOpen={false} className="mt-4">
-                        <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between rounded-md border bg-background px-4 py-2 text-sm font-medium hover:opacity-80">
-                          <span>Public URLs</span>
-                          <ChevronDown className="h-4 w-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="p-4 border rounded-md bg-background space-y-2">
-                          <PublicUrlsSection
-                            assetId={assetId!}
-                            devguardApiUrl={devguardApiUrl}
-                            orgSlug={orgSlug}
-                            copyable={field.value}
-                            basePath={basePath}
-                          />
-                        </CollapsibleContent>
+                        <div className="rounded-lg border bg-background overflow-hidden">
+                          <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
+                            <span>Public URLs</span>
+                            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="border-t px-4 py-4 space-y-2">
+                              <PublicUrlsSection
+                                assetId={assetId!}
+                                devguardApiUrl={devguardApiUrl}
+                                orgSlug={orgSlug}
+                                copyable={field.value}
+                                basePath={basePath}
+                              />
+                            </div>
+                          </CollapsibleContent>
+                        </div>
                       </Collapsible>
                     )}
                   </>
