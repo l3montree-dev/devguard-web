@@ -450,8 +450,6 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
   purlValidation: { isValid: boolean; warning?: string };
   basePath?: string;
 }> = ({
-  assetId,
-  devguardApiUrl,
   orgSlug,
   projectSlug,
   assetSlug,
@@ -539,12 +537,22 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
             <button
               type="button"
               className="cursor-pointer transition-all hover:opacity-100"
-              onClick={() => {
-                navigator.clipboard.writeText(`${basePath}/badges/cvss/`);
-                toast("Copied to clipboard", {
-                  description:
-                    "The CVSS Badge URL has been copied to your clipboard. Enable public access to use the Badge in your README or other documentation.",
-                });
+              aria-label="Copy CVSS badge URL"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(
+                    `${basePath}/badges/cvss/`,
+                  );
+                  toast("Copied to clipboard", {
+                    description:
+                      "The CVSS Badge URL has been copied to your clipboard. Enable public access to use the Badge in your README or other documentation.",
+                  });
+                } catch (error) {
+                  toast("Failed to copy to clipboard", {
+                    description:
+                      "We couldn't access your clipboard. Please copy the CVSS Badge URL manually.",
+                  });
+                }
               }}
             >
               <ClipboardDocumentIcon className="h-5 w-5" />
@@ -557,7 +565,6 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
 };
 
 const PublicUrlsSection: FunctionComponent<{
-  assetId: string;
   devguardApiUrl: string;
   orgSlug: string;
   copyable: boolean;
@@ -641,14 +648,26 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
     fetcher,
   );
 
-  // Auto-select first artifact when artifacts load or version changes
+  // Clear selected artifact whenever the selected version changes
   React.useEffect(() => {
-    if (artifacts?.length) {
-      setSelectedArtifact(artifacts[0].artifactName);
-    } else {
+    setSelectedArtifact("");
+  }, [selectedVersionSlug]);
+
+  // Auto-select first artifact when artifacts load, but only if there is no valid selection
+  React.useEffect(() => {
+    if (!artifacts || artifacts.length === 0) {
       setSelectedArtifact("");
+      return;
     }
-  }, [artifacts]);
+
+    const hasCurrentSelection =
+      !!selectedArtifact &&
+      artifacts.some((artifact) => artifact.artifactName === selectedArtifact);
+
+    if (!hasCurrentSelection) {
+      setSelectedArtifact(artifacts[0].artifactName);
+    }
+  }, [artifacts, selectedArtifact]);
 
   // Get the selected version to check validation
   const selectedVersion = refs.find((ref) => ref.slug === selectedVersionSlug);
@@ -731,7 +750,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           <CollapsibleContent>
                             <div className="border-t px-4 py-4 space-y-2">
                               <PublicUrlsSection
-                                assetId={assetId!}
                                 devguardApiUrl={devguardApiUrl}
                                 orgSlug={orgSlug}
                                 copyable={field.value}
