@@ -476,7 +476,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           value={selectedVersionSlug}
           onValueChange={setSelectedVersionSlug}
         >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200 cursor-pointer">
             <SelectValue placeholder="Select a version" />
           </SelectTrigger>
           <SelectContent>
@@ -497,7 +497,7 @@ const ArtifactInputCVSSBadge: FunctionComponent<{
           onValueChange={setSelectedArtifact}
           disabled={!selectedVersionSlug || !artifacts?.length}
         >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200/30">
+          <SelectTrigger className="bg-muted/50 outline outline-1 outline-white-200/30 cursor-pointer">
             <SelectValue
               placeholder={
                 !selectedVersionSlug
