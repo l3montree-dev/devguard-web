@@ -55,13 +55,18 @@ const columnsDef: ColumnDef<{ risk: RiskHistory; release: ReleaseDTO }, any>[] =
           row.getValue() && (
             <div className="w-fit">
               {mode === "risk" ? (
-                <CVERainbowBadge {...row.row.original.risk} />
+                <CVERainbowBadge
+                  low={row.row.original.risk.cvePurlLow}
+                  medium={row.row.original.risk.cvePurlMedium}
+                  high={row.row.original.risk.cvePurlHigh}
+                  critical={row.row.original.risk.cvePurlCritical}
+                />
               ) : (
                 <CVERainbowBadge
-                  low={row.row.original.risk.lowCvss}
-                  medium={row.row.original.risk.mediumCvss}
-                  high={row.row.original.risk.highCvss}
-                  critical={row.row.original.risk.criticalCvss}
+                  low={row.row.original.risk.cvePurlLowCvss}
+                  medium={row.row.original.risk.cvePurlMediumCvss}
+                  high={row.row.original.risk.cvePurlHighCvss}
+                  critical={row.row.original.risk.cvePurlCriticalCvss}
                 />
               )}
             </div>

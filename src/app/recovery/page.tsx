@@ -12,106 +12,30 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"use client";
 
-import { RecoveryFlow, UpdateRecoveryFlowBody } from "@ory/client";
-
-import { AxiosError } from "axios";
-import type { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-import Image from "next/image";
 import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
-import { useSearchParams } from "next/navigation";
-import { handleFlowError, ory } from "../../services/ory";
+import { Recovery } from "@ory/elements-react/theme";
+import { getRecoveryFlow, OryPageParams } from "@ory/nextjs/app";
+import Image from "next/image";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
 } from "../../components/ui/card";
-import { Flow } from "../../components/kratos/Flow";
-import { Button } from "../../components/ui/button";
+import oryConfig from "../../ory.config";
+import { oryComponentOverrides } from "../../components/ory/overrides";
 
-const Recovery: NextPage = () => {
-  const [flow, setFlow] = useState<RecoveryFlow>();
+const RecoveryPage = async (props: OryPageParams) => {
+  const flow = await getRecoveryFlow(oryConfig, props.searchParams);
 
-  // Get ?flow=... from the URL
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const flowId = searchParams?.get("flow");
-  const returnTo = searchParams?.get("return_to");
-
-  useEffect(() => {
-    // If the router is not ready yet, or we already have a flow, do nothing.
-    if (flow) {
-      return;
-    }
-
-    // If ?flow=.. was in the URL, we fetch it
-    if (flowId) {
-      ory
-        .getRecoveryFlow({ id: String(flowId) })
-        .then(({ data }) => {
-          setFlow(data);
-        })
-        .catch(handleFlowError(router, "recovery", setFlow));
-      return;
-    }
-
-    // Otherwise we initialize it
-    ory
-      .createBrowserRecoveryFlow({
-        returnTo: String(returnTo || ""),
-      })
-      .then(({ data }) => {
-        setFlow(data);
-      })
-      .catch(handleFlowError(router, "recovery", setFlow))
-      .catch((err: AxiosError) => {
-        // If the previous handler did not catch the error it's most likely a form validation error
-        if (err.response?.status === 400) {
-          // Yup, it is!
-          //@ts-expect-error
-          setFlow(err.response?.data);
-          return;
-        }
-
-        return Promise.reject(err);
-      });
-  }, [flowId, router, returnTo, flow]);
-
-  const onSubmit = async (values: UpdateRecoveryFlowBody) => {
-    router
-      // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
-      // his data when she/he reloads the page.
-      .push(`/recovery?flow=${flow?.id}`);
-
-    ory
-      .updateRecoveryFlow({
-        flow: String(flow?.id),
-        updateRecoveryFlowBody: values,
-      })
-      .then(({ data }) => {
-        // Form submission was successful, show the message to the user!
-        setFlow(data);
-      })
-      .catch(handleFlowError(router, "recovery", setFlow))
-      .catch((err: AxiosError) => {
-        switch (err.response?.status) {
-          case 400:
-            // Status code 400 implies the form validation had an error
-            //@ts-expect-error
-            setFlow(err.response?.data);
-            return;
-        }
-
-        throw err;
-      });
-  };
+  if (!flow) {
+    return null;
+  }
 
   return (
     <>
@@ -136,34 +60,13 @@ const Recovery: NextPage = () => {
                 width={300}
                 height={300}
               />
-              <h2 className="mt-10 text-left font-display text-2xl font-bold leading-9 tracking-tight">
-                Recover your account
-              </h2>
-              <Card className="mt-10 sm:mx-auto sm:w-full sm:max-w-lg">
-                <CardHeader>
-                  <Image
-                    src="/assets/gopher-lost-keys.png"
-                    alt="A gopher that has lost its keys"
-                    width={200}
-                    height={200}
-                    className="mx-auto mb-4 h-26 w-auto dark:block"
-                  />
-                  <CardDescription>
-                    Enter your email address to receive a recovery link.
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="sm:mx-auto sm:w-full sm:max-w-lg">
-                    <Flow onSubmit={onSubmit} flow={flow} />
-                  </div>
-                  <div className="mt-4 flex flex-row justify-end text-sm">
-                    <Link href="/">
-                      <Button variant={"outline"}>Go back</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-10">
+                <Recovery
+                  flow={flow}
+                  config={oryConfig}
+                  components={oryComponentOverrides}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -173,4 +76,4 @@ const Recovery: NextPage = () => {
   );
 };
 
-export default Recovery;
+export default RecoveryPage;

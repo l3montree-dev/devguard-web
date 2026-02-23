@@ -155,7 +155,7 @@ export interface ProjectDTO {
   parentId: string | null;
   parent: ProjectDTO | null;
 
-  type: "default" | "kubernetesNamespace" | "kubernetesCluster";
+  type: "default" | "kubernetesNamespace" | "kubernetesCluster" | "project";
 
   repositoryId?: string;
   repositoryName?: string;
@@ -171,6 +171,8 @@ export interface ProjectDTO {
 
   externalEntityId?: string;
   externalEntityProviderId?: string;
+
+  state: "active" | "deleted";
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
@@ -518,6 +520,8 @@ export interface AssetDTO {
 
   pipelineError?: string;
   pipelineLastRun: string;
+
+  state: "active" | "archived" | "deleted";
 }
 
 export interface DependencyTreeNode {

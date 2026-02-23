@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM node:24.11.1@sha256:d5a23e0d0ee9d6ebb2f37aef0aaad77c5e1286b45475c5b6aa3216abaad98084 as build-env
+FROM node:24.13.0@sha256:1de022d8459f896fff2e7b865823699dc7a8d5567507e8b87b14a7442e07f206 as build-env
 LABEL maintainer="L3montree & DevGuard contributors"
 
 # Disable telemetry
@@ -33,6 +33,7 @@ ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
 
 COPY package-lock.json .
 COPY package.json .
+COPY patches/ ./patches/
 
 RUN npm ci
 
@@ -47,7 +48,7 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM registry.opencode.de/open-code/oci/nodejs:24-minimal@sha256:241757b4b5a2197f04e7aac0480a59f4e8ee3d428ae11e4c57410917a2b01eef
+FROM registry.opencode.de/open-code/oci/nodejs:24-minimal@sha256:fa2e475214d03e1bf2027aa01fa094cf0648da360318e94268aa64c591a9910b
 
 USER 53111
 

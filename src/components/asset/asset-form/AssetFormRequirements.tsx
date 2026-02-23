@@ -65,6 +65,7 @@ const RequirementSlider: FunctionComponent<{
         step={1}
         value={valueToIndex(value)}
         onValueChange={(v) => onChange(indexToValue(v))}
+        showBadge={false}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>Low</span>

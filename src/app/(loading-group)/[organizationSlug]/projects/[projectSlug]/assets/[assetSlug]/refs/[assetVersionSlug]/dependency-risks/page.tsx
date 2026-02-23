@@ -353,7 +353,7 @@ const Index: FunctionComponent = () => {
                 <colgroup>
                   <col className="w-auto" />
                   <col className="w-[160px]" />
-                  <col className="w-[110px]" />
+                  <col className="w-[130px]" />
                   <col className="w-[220px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
@@ -453,6 +453,24 @@ const Index: FunctionComponent = () => {
                                     >
                                       Learn more about the risk calculation
                                     </Link>
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : null}
+                            {header.isPlaceholder ? null : header.id ===
+                              "max_cvss" ? (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="relative font-normal">
+                                    CVSS (Common Vulnerability Scoring System)
+                                    is a standardized framework that rates
+                                    security vulnerabilities on a scale from
+                                    0-10. It measures the theoretical severity
+                                    of a vulnerability, based on factors like
+                                    attack complexity and impact.
                                   </div>
                                 </TooltipContent>
                               </Tooltip>

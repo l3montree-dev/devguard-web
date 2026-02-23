@@ -44,6 +44,7 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { documentationLinks } from "@/const/documentationLinks";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ManualIntegrationSlideProps {
   api?: {
@@ -237,27 +238,40 @@ const ManualIntegrationSlide: FunctionComponent<
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "" : "border bg-card",
-                            )}
-                            onClick={() => setIsTag(false)}
-                          >
-                            <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "border bg-card" : "",
-                            )}
-                            onClick={() => setIsTag(true)}
-                          >
-                            <TagIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <span className="text-muted-foreground text-xs">
-                            Select the type
-                          </span>
+                          <ToggleGroup className="w-full" type="single">
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="branch"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "" : "border bg-card",
+                                )}
+                                onClick={() => setIsTag(false)}
+                              >
+                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Branch</span>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="tag"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "border bg-card" : "",
+                                )}
+                                onClick={() => setIsTag(true)}
+                              >
+                                <TagIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Tag</span>
+                            </ToggleGroupItem>
+                          </ToggleGroup>
                         </div>
                       </div>
                       <div className="w-full">
@@ -363,27 +377,40 @@ const ManualIntegrationSlide: FunctionComponent<
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "" : "border bg-card",
-                            )}
-                            onClick={() => setIsTag(false)}
-                          >
-                            <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "border bg-card" : "",
-                            )}
-                            onClick={() => setIsTag(true)}
-                          >
-                            <TagIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <span className="text-muted-foreground text-xs">
-                            Select the type
-                          </span>
+                          <ToggleGroup className="w-full" type="single">
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="branch"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "" : "border bg-card",
+                                )}
+                                onClick={() => setIsTag(false)}
+                              >
+                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Branch</span>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="tag"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "border bg-card" : "",
+                                )}
+                                onClick={() => setIsTag(true)}
+                              >
+                                <TagIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Tag</span>
+                            </ToggleGroupItem>
+                          </ToggleGroup>
                         </div>
                       </div>
                       <div className="w-full">
@@ -468,27 +495,40 @@ const ManualIntegrationSlide: FunctionComponent<
                           placeholder="Enter branch or tag name"
                         />
                         <div className="flex items-center mt-2 gap-1 flex-row">
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "" : "border bg-card",
-                            )}
-                            onClick={() => setIsTag(false)}
-                          >
-                            <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <button
-                            className={classNames(
-                              "p-1 rounded",
-                              isTag ? "border bg-card" : "",
-                            )}
-                            onClick={() => setIsTag(true)}
-                          >
-                            <TagIcon className="h-4 w-4 text-muted-foreground" />
-                          </button>
-                          <span className="text-muted-foreground text-xs">
-                            Select the type
-                          </span>
+                          <ToggleGroup className="w-full" type="single">
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="branch"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "" : "border bg-card",
+                                )}
+                                onClick={() => setIsTag(false)}
+                              >
+                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Branch</span>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                              className="w-full cursor-pointer justify-start"
+                              variant="outline"
+                              value="tag"
+                            >
+                              <button
+                                className={classNames(
+                                  "p-1 rounded",
+                                  isTag ? "border bg-card" : "",
+                                )}
+                                onClick={() => setIsTag(true)}
+                              >
+                                <TagIcon className="h-4 w-4 text-muted-foreground" />
+                              </button>
+                              <span>Tag</span>
+                            </ToggleGroupItem>
+                          </ToggleGroup>
                         </div>
                       </div>
                       <div className="w-full">

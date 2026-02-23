@@ -7,22 +7,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { Button } from "../../components/ui/button";
+import { Button, buttonVariants } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import { LogoutLink } from "../../hooks/logoutLink";
+import { getLogoutUrl } from "@/server/actions/logout";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();
 
-  const handleLogout = LogoutLink();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    const logoutUrl = await getLogoutUrl();
+    window.location.href = logoutUrl;
+  };
 
   useEffect(() => {
     (async function () {

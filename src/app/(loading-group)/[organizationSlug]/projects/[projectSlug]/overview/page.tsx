@@ -464,10 +464,12 @@ const OverviewPage = () => {
                             "flex items-center flex-row gap-4",
                           )}
                         >
-                          <div className="flex-1">
+                          <div className="justify-left">
                             <Avatar
                               name={
-                                asset?.name ? asset.name : r.artifactName || ""
+                                r.artifactName
+                                  ? beautifyPurl(r.artifactName)
+                                  : "P"
                               }
                               avatar={asset?.avatar}
                             />
@@ -477,7 +479,7 @@ const OverviewPage = () => {
                               <Tooltip>
                                 <TooltipTrigger className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-100 flex-1 block">
                                   <span className="text-foreground text-left">
-                                    {r.artifactName || ""}
+                                    {beautifyPurl(r.artifactName || "")}
                                   </span>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -488,23 +490,23 @@ const OverviewPage = () => {
                                 <CVERainbowBadge
                                   low={
                                     mode === "risk"
-                                      ? (r?.low ?? 0)
-                                      : (r?.lowCvss ?? 0)
+                                      ? (r?.cvePurlLow ?? 0)
+                                      : (r?.cvePurlLowCvss ?? 0)
                                   }
                                   medium={
                                     mode === "risk"
-                                      ? (r?.medium ?? 0)
-                                      : (r?.mediumCvss ?? 0)
+                                      ? (r?.cvePurlMedium ?? 0)
+                                      : (r?.cvePurlMediumCvss ?? 0)
                                   }
                                   high={
                                     mode === "risk"
-                                      ? (r?.high ?? 0)
-                                      : (r?.highCvss ?? 0)
+                                      ? (r?.cvePurlHigh ?? 0)
+                                      : (r?.cvePurlHighCvss ?? 0)
                                   }
                                   critical={
                                     mode === "risk"
-                                      ? (r?.critical ?? 0)
-                                      : (r?.criticalCvss ?? 0)
+                                      ? (r?.cvePurlCritical ?? 0)
+                                      : (r?.cvePurlCriticalCvss ?? 0)
                                   }
                                 />
                               </div>

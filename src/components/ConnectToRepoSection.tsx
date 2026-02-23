@@ -188,24 +188,21 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
           />
         </div>
       ) : !hasIntegration ? (
-        <Callout intent="neutral">
-          <div className="flex items-center gap-4">
-            <div>
-              To connect this repository to a GitHub, GitLab, or Jira
-              integration, you need to configure an integration in your
-              organization settings first.
-            </div>
-
+        <ListItem
+          Button={
             <Button
               variant="outline"
+              type="button"
               onClick={() => {
                 router.push(`/${activeOrg.slug}/settings`);
               }}
             >
               Go to Organization Settings
             </Button>
-          </div>
-        </Callout>
+          }
+          Title="No integrations found"
+          Description="To connect a repository, you need to set up a GitHub, GitLab or Jira integration first. Please contact your organization owner or administrator."
+        />
       ) : (
         <>
           <ListItem

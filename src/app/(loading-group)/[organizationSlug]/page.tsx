@@ -21,6 +21,7 @@ import {
   FunctionComponent,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -64,8 +65,12 @@ import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
 import useRouterQuery from "../../../hooks/useRouterQuery";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
+import { Badge } from "@/components/ui/badge";
+import { buildFilterSearchParams } from "@/utils/url";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OrganizationHomePage: FunctionComponent = () => {
+  const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
@@ -81,6 +86,18 @@ const OrganizationHomePage: FunctionComponent = () => {
     mode: "onBlur",
   });
 
+  const queryWithState = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    const state = searchParams?.get("state");
+    if (state === "inactive") {
+      p.append("filterQuery[state][is not]", "active");
+    } else {
+      p.append("filterQuery[state][is]", "active");
+    }
+
+    return p;
+  }, [searchParams]);
+
   const stillOnPage = useRef(true);
   const pushQuery = useRouterQuery();
   const {
@@ -90,9 +107,7 @@ const OrganizationHomePage: FunctionComponent = () => {
     mutate,
   } = useSWR<Paged<ProjectDTO>>(
     activeOrg
-      ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?page=${
-          searchParams?.get("page") || 1
-        }&pageSize=${20}${(searchParams?.get("search") || "") !== "" ? `&search=${searchParams?.get("search")}` : ""}`
+      ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`
       : null,
     async (url: string) =>
       fetcher<Paged<ProjectDTO>>(url).then((res) => {
@@ -113,6 +128,13 @@ const OrganizationHomePage: FunctionComponent = () => {
     }, 500),
     [],
   );
+
+  const handleSetTabValue = (value: string) => {
+    if (value === "all" || value === "inactive") {
+      setViewedProject(value);
+      pushQuery({ state: value === "inactive" ? "inactive" : undefined });
+    }
+  };
 
   const handleTriggerSync = useCallback(async () => {
     setSyncRunning(true);
@@ -255,6 +277,16 @@ const OrganizationHomePage: FunctionComponent = () => {
           forceVertical
           title="Groups"
         >
+          <Tabs
+            defaultValue="all"
+            value={viewedProject}
+            onValueChange={handleSetTabValue}
+          >
+            <TabsList>
+              <TabsTrigger value="all">Groups</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Input
             onChange={debouncedHandleSearch}
             defaultValue={searchParams?.get("search") || ""}
@@ -277,6 +309,9 @@ const OrganizationHomePage: FunctionComponent = () => {
                     <div className="flex flex-row items-center gap-2">
                       <Avatar {...project} />
                       <span>{project.name}</span>
+                      {project.state === "deleted" && (
+                        <Badge variant={"destructive"}>Pending deletion</Badge>
+                      )}
                     </div>
                   }
                   Description={

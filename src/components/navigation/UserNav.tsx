@@ -16,12 +16,12 @@
 
 import { classNames } from "@/utils/common";
 
-import { LogoutLink } from "@/hooks/logoutLink";
+import { getLogoutUrl } from "@/server/actions/logout";
 import {
-  ArrowRightStartOnRectangleIcon,
   CogIcon,
   MoonIcon,
   SunIcon,
+  ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -35,13 +35,19 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useConfig } from "../../context/ConfigContext";
+import { getUserFullName } from "../../types/auth";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
 
   const user = useCurrentUser();
-  const handleLogout = LogoutLink();
+
   const config = useConfig();
+
+  const handleLogout = async () => {
+    const logoutUrl = await getLogoutUrl();
+    window.location.href = logoutUrl;
+  };
 
   return (
     <div className="flex user-nav flex-row justify-between gap-1">
@@ -81,8 +87,11 @@ export default function UserNav() {
               <Avatar>
                 {/*<AvatarImage src="https://github.com/shadcn.png" />*/}
                 <AvatarFallback>
-                  {(user.traits.name.first ?? "").charAt(0).toUpperCase() +
-                    (user.traits.name.last ?? "").charAt(0).toUpperCase()}
+                  {getUserFullName(user)
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </Link>
@@ -97,14 +106,15 @@ export default function UserNav() {
                 User Settings
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuItem
-              id="user-nav-logout-button"
-              className="text-foreground hover:no-underline"
-              onClick={handleLogout}
-            >
-              <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground"></ArrowRightStartOnRectangleIcon>
-              Logout
-            </DropdownMenuItem>
+            <button onClick={handleLogout} className="w-full">
+              <DropdownMenuItem
+                id="user-nav-logout-button"
+                className="text-foreground hover:no-underline"
+              >
+                <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground" />
+                Logout
+              </DropdownMenuItem>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (

@@ -22,7 +22,7 @@ import {
   UpstreamState,
   VulnEventDTO,
 } from "@/types/api/api";
-import { Identity } from "@ory/client";
+import { Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import { config } from "../config";
 

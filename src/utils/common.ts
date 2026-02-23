@@ -15,7 +15,7 @@
 
 import { State } from "@/types/common";
 import { defaultScanner } from "./view";
-import { UserRole } from "@/types/api/api";
+import { DependencyVuln, UserRole } from "@/types/api/api";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
@@ -415,4 +415,12 @@ export const ensureValidBranchOrTagSlug = (name: string) => {
   return name
     .replaceAll(regexpNonAuthorizedChars, "-")
     .replaceAll(regexpMultipleDashes, "-");
+};
+
+export const stateLabels: Record<DependencyVuln["state"], string> = {
+  open: "Open",
+  fixed: "Fixed",
+  accepted: "Accepted",
+  falsePositive: "False Positive",
+  markedForTransfer: "Marked for Transfer",
 };
