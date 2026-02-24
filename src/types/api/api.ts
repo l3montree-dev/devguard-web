@@ -958,8 +958,19 @@ export type VulnDistributionInStructure = VulnDistribution & {
 
 export type VulnDistribution = VulnRiskDistribution & VulnCVSSDistribution
 
+export type ComponentUsageInOrg = {
+    purl: string 
+    totalAmount: number
+}
+
+export type CVEOccurrenceInOrg = {
+    cveID: string 
+    totalAmount: number
+}
+
 export type OrgOverview = {
     structure : OrgStructure;
+    topComponents: ComponentUsageInOrg[]
     vulnDistribution: VulnDistribution
     topProjects: VulnDistributionInStructure[]
     topAssets: VulnDistributionInStructure[]

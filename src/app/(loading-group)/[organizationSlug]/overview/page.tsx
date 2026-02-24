@@ -1,6 +1,6 @@
 "use client"
 
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import Page from "../../../../components/Page";
 import { useViewMode } from "src/hooks/useViewMode";
 import {
@@ -18,6 +18,7 @@ import  Section  from "src/components/common/Section";
 import SeverityCard from "src/components/SeverityCard";
 import StructureCard from "src/components/organization/StructureCard"
 import useSWR from "swr";
+import MostUsedComponents from "@/components/organization/MostUsedComponents";
 
 
 const OrganizationOverview: FunctionComponent  = () => {
@@ -32,7 +33,7 @@ const OrganizationOverview: FunctionComponent  = () => {
 
     return (
         <Page Menu={orgMenu} title="Overview" description="Displays an overview about the stats of the org" Title={null} >
-            <div className="flex mt-4 gap-12 justify-center mb-16 items-start">
+            <div className="flex mt-16 gap-12 justify-center mb-20 items-start">
                 <StructureCard topEntries={orgStatistics?.topProjects ?? []} isLoading={isStatisticsLoading} mode={mode} type="Projects" currentAmount={orgStatistics?.structure.numProjects ?? 0}/>
                 <StructureCard topEntries={orgStatistics?.topAssets ?? []} isLoading={isStatisticsLoading} mode={mode} type="Assets" currentAmount={orgStatistics?.structure.numAssets ?? 0}/>
                 <StructureCard topEntries={orgStatistics?.topArtifacts ?? []} isLoading={isStatisticsLoading} mode={mode} type="Artifacts" currentAmount={orgStatistics?.structure.numArtifacts ?? 0}/>
@@ -42,7 +43,7 @@ const OrganizationOverview: FunctionComponent  = () => {
                     onValueChange={(value) => setMode(value as "risk" | "cvss")}
                     className="w-full"
                 >
-                    <div className="mb-4 flex justify-center mb-8">
+                    <div className="flex justify-center mb-4">
                         <TabsList>
                             <TabsTrigger value="risk">Risk values</TabsTrigger>
                             <TabsTrigger value="cvss">CVSS values</TabsTrigger>
@@ -84,8 +85,7 @@ const OrganizationOverview: FunctionComponent  = () => {
                     title="Dependency Overview"
                     className="mt-20"
                 >
-                    <div>
-                    </div>
+                    <MostUsedComponents topComponents={orgStatistics?.topComponents ?? []}/>
                 </Section>
         </Page>
     )
