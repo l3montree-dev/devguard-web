@@ -30,7 +30,7 @@ const MostUsedComponents: FunctionComponent<Props> = ({
                                         <thead className="border-b bg text-foreground">
                                             <tr>
                                                 <th className="w-40 cursor-pointer break-normal p-4 text-left">
-                                                  <div className="flex flex-row items-center gap-100">
+                                                  <div className="flex flex-row items-center gap-98">
                                                     <span>Package</span>
                                                     <span>Amount</span>
                                                   </div>

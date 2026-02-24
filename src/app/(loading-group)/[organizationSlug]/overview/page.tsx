@@ -84,9 +84,9 @@ const OrganizationOverview: FunctionComponent  = () => {
                     forceVertical
                     description="Have a look at the stats of dependencies in your org"
                     title="Dependency Overview"
-                    className="mt-20"
+                    className="mt-16"
                 >   
-                <div className="flex flex-row gap-12">
+                <div className="mt-2 flex flex-row gap-12">
                     <MostUsedComponents topComponents={orgStatistics?.topComponents ?? []}/>
                     <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []}/>
                 </div>
