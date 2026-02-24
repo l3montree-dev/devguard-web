@@ -66,9 +66,9 @@ const StructureCard : FunctionComponent<Props> = ({
             <div className="text-5xl">{currentAmount}</div>
             <div className="text-3xl text-muted-foreground">{type}</div>
             {!expanded ? (
-                <ChevronLeftIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <ChevronLeftIcon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
             ):(
-                <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <ChevronDownIcon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
             )}
          </div>
          {expanded && (

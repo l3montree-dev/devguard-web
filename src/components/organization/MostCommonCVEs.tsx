@@ -1,23 +1,23 @@
 import { FunctionComponent, useState } from "react"
-import {ComponentUsageInOrg} from "src/types/api/api"
+import { CVEOccurrenceInOrg} from "src/types/api/api"
 import { Card } from "src/components/ui/card"
 import { beautifyPurl } from "src/utils/common";
 import { ChevronDownIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 interface Props {
-    topComponents: ComponentUsageInOrg[]
+    topCVEs: CVEOccurrenceInOrg[]
 }
 
-const MostUsedComponents: FunctionComponent<Props> = ({
-    topComponents,
+const MostCommonCVEs: FunctionComponent<Props> = ({
+    topCVEs,
 }) => {
     const [isExpanded, setExpanded] = useState<boolean>(false)
 
     return (
         <div className={`${isExpanded ? "w-full " : "w-1/4"} lg:w-1/2`} onClick={()=> {setExpanded(!isExpanded)}}>
             <Card className={`rounded-2xl py-4 text-center mb-4 hover:bg-muted`}>
-                    <div className="flex flex-row items-center justify-center ">
-                      <span className="font-semibold text-xl text-muted-foreground px-4">Most Used Components</span>
+                    <div className="flex items-baseline justify-center align-center">
+                      <span className="font-semibold text-xl text-muted-foreground px-4">Most Used CVEs</span>
                     {!isExpanded ? <ChevronLeftIcon className="w-4 h-4 text-muted-foreground flex-shrink-0"/> : <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                         
                     </div>
@@ -31,16 +31,16 @@ const MostUsedComponents: FunctionComponent<Props> = ({
                                             <tr>
                                                 <th className="w-40 cursor-pointer break-normal p-4 text-left">
                                                   <div className="flex flex-row items-center gap-100">
-                                                    <span>Package</span>
+                                                    <span>CVE</span>
                                                     <span>Amount</span>
                                                   </div>
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody className="text-md text-foreground">
-                                          {topComponents.map((entry,index) => (
-                                            <ComponentRow
-                                            purl={entry.purl}
+                                          {topCVEs.map((entry,index) => (
+                                            <CVERow
+                                            cveID={entry.cveID}
                                             amount={entry.totalAmount}
                                             />
                                           ))}
@@ -54,13 +54,13 @@ const MostUsedComponents: FunctionComponent<Props> = ({
         )
 }
 
-interface componentRowProps {
-    purl: string
+interface cveRowProps {
+    cveID: string
     amount: number
 }
 
-const ComponentRow :FunctionComponent<componentRowProps> = ({
-    purl,
+const CVERow :FunctionComponent<cveRowProps> = ({
+    cveID,
     amount,
 }) => {
     return (
@@ -69,7 +69,7 @@ const ComponentRow :FunctionComponent<componentRowProps> = ({
     >
       <td className="p-4 w-1/4">
         <span className="font-medium text-left truncate">
-          {beautifyPurl(purl)}
+          {cveID}
         </span>
       </td>
       <td className="p-4 pl-47 text-left w-1/4">
@@ -79,4 +79,4 @@ const ComponentRow :FunctionComponent<componentRowProps> = ({
   );
 }
 
-export default MostUsedComponents
+export default MostCommonCVEs

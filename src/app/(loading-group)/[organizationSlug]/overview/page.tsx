@@ -19,6 +19,7 @@ import SeverityCard from "src/components/SeverityCard";
 import StructureCard from "src/components/organization/StructureCard"
 import useSWR from "swr";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
+import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 
 
 const OrganizationOverview: FunctionComponent  = () => {
@@ -43,7 +44,7 @@ const OrganizationOverview: FunctionComponent  = () => {
                     onValueChange={(value) => setMode(value as "risk" | "cvss")}
                     className="w-full"
                 >
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-6">
                         <TabsList>
                             <TabsTrigger value="risk">Risk values</TabsTrigger>
                             <TabsTrigger value="cvss">CVSS values</TabsTrigger>
@@ -84,8 +85,12 @@ const OrganizationOverview: FunctionComponent  = () => {
                     description="Have a look at the stats of dependencies in your org"
                     title="Dependency Overview"
                     className="mt-20"
-                >
+                >   
+                <div className="flex flex-row gap-12">
                     <MostUsedComponents topComponents={orgStatistics?.topComponents ?? []}/>
+                    <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []}/>
+                </div>
+                    
                 </Section>
         </Page>
     )

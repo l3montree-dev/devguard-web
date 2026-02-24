@@ -971,6 +971,7 @@ export type CVEOccurrenceInOrg = {
 export type OrgOverview = {
     structure : OrgStructure;
     topComponents: ComponentUsageInOrg[]
+    topCVEs : CVEOccurrenceInOrg[]
     vulnDistribution: VulnDistribution
     topProjects: VulnDistributionInStructure[]
     topAssets: VulnDistributionInStructure[]
