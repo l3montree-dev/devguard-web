@@ -4,7 +4,7 @@ import Page from "@/components/Page";
 import { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { AsyncButton } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -47,6 +47,11 @@ import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../compone
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -326,6 +331,38 @@ const Index: FunctionComponent = () => {
 
                           <div className="flex flex-row justify-end gap-1">
                             <div className="flex flex-wrap justify-end flex-row items-center gap-2">
+                              {vuln.ticketId === null &&
+                                getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                  asset,
+                                  project,
+                                ) === undefined && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span>
+                                        <Button
+                                          variant={"ghost"}
+                                          disabled
+                                          className=""
+                                        >
+                                          <span className="ml-1 text-muted-foreground">
+                                            Create Ticket
+                                          </span>
+                                        </Button>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      No repository is linked. To create a
+                                      ticket, please integrate your issue
+                                      tracker in the {` `}
+                                      <Link
+                                        href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                        className="underline"
+                                      >
+                                        settings
+                                      </Link>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                               {!vuln.ticketId &&
                                 getIntegrationNameFromRepositoryIdOrExternalProviderId(
                                   asset,
