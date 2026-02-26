@@ -435,6 +435,11 @@ const Index: FunctionComponent = () => {
           <div className="overflow-hidden rounded-lg border shadow-sm">
             <div className="overflow-auto">
               <table className="w-full table-fixed overflow-x-auto text-sm">
+                <colgroup>
+                  <col className="w-auto" />
+                  <col className="w-[40px]" />
+                  <col className="w-[40px]" />
+                </colgroup>
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
@@ -455,9 +460,11 @@ const Index: FunctionComponent = () => {
                                 header.getContext(),
                               )}
                             </div>
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
+                            {header.column.columnDef.enableSorting && (
+                              <SortingCaret
+                                sortDirection={header.column.getIsSorted()}
+                              />
+                            )}
                           </div>
                         </th>
                       ))}
