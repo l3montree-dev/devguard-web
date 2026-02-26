@@ -145,7 +145,11 @@ export const DependencyGraphNode: FunctionComponent<
                 className="text-left font-medium leading-tight flex-1 cursor-[inherit]"
               >
                 {beautifyPurl(props.data.label)}
-                {version && <Badge variant={"outline"}>{version}</Badge>}
+                {version && (
+                  <Badge className="ml-2" variant={"outline"}>
+                    {version}
+                  </Badge>
+                )}
               </label>
             </div>
           </div>
