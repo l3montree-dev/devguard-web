@@ -435,3 +435,11 @@ export const truncateMiddle = (text: string, maxLength: number = 20): string => 
 
   return text.slice(0, start) + "..." + text.slice(-end);
 };
+
+// round any number to its 2nd digit using math round
+export const roundToSecondDigit = (num?: number) : number => {
+  if (!num){
+    return 0
+  }
+  return Math.round(100* num)/100
+}

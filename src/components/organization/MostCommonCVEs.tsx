@@ -17,7 +17,7 @@ const MostCommonCVEs: FunctionComponent<Props> = ({
         <div className={`${isExpanded ? "w-full " : "w-1/4"} lg:w-1/2`} onClick={()=> {setExpanded(!isExpanded)}}>
             <Card className={`rounded-2xl py-4 text-center mb-4 hover:bg-muted`}>
                     <div className="flex items-baseline justify-center align-center">
-                      <span className="font-semibold text-xl text-muted-foreground px-4">Most Used CVEs</span>
+                      <span className="font-semibold text-xl text-muted-foreground px-4">Most Common CVEs</span>
                     {!isExpanded ? <ChevronLeftIcon className="w-4 h-4 text-muted-foreground flex-shrink-0"/> : <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                         
                     </div>

@@ -20,6 +20,8 @@ import StructureCard from "src/components/organization/StructureCard"
 import useSWR from "swr";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
+import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
+
 
 
 const OrganizationOverview: FunctionComponent  = () => {
@@ -29,8 +31,14 @@ const OrganizationOverview: FunctionComponent  = () => {
 
     const orgMenu = useOrganizationMenu();
     const [mode, setMode] = useViewMode("devguard-org-view-mode");
-        
+
+            
     const {data : orgStatistics, isLoading : isStatisticsLoading} = useSWR<OrgOverview>(url + "/stats/vuln-statistics/",fetcher)
+
+    const averageRemediations = Math.round(100 *(
+    (orgStatistics?.vulnEventAverage?.averageAcceptedEvents ?? 0) +
+    (orgStatistics?.vulnEventAverage?.averageFalsePositiveEvents ?? 0) +
+    (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0)) )/100
 
     return (
         <Page Menu={orgMenu} title="Overview" description="Displays an overview about the stats of the org" Title={null} >
@@ -82,7 +90,7 @@ const OrganizationOverview: FunctionComponent  = () => {
                 <Section
                     primaryHeadline
                     forceVertical
-                    description="Have a look at the stats of dependencies in your org"
+                    description=""
                     title="Dependency Overview"
                     className="mt-16"
                 >   
@@ -90,8 +98,16 @@ const OrganizationOverview: FunctionComponent  = () => {
                     <MostUsedComponents topComponents={orgStatistics?.topComponents ?? []}/>
                     <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []}/>
                 </div>
-                    
                 </Section>
+                <Section
+                    primaryHeadline
+                    forceVertical
+                    description=""
+                    title="Vulnerability Trends"
+                    className="mt-12"
+                >
+                    <VulnerabilityTrends averagesByTypes={orgStatistics?.vulnEventAverage}/>
+                </Section>       
         </Page>
     )
 }

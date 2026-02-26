@@ -32,7 +32,7 @@ const StructureCard : FunctionComponent<Props> = ({
 
   var maxLen = 20
   if (type === "Artifacts"){
-    maxLen = 40
+    maxLen = 60
   }
 
   const COLLAPSED_HEIGHT = 120; // px

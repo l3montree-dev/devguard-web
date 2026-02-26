@@ -968,7 +968,16 @@ export type CVEOccurrenceInOrg = {
     totalAmount: number
 }
 
+export type AverageVulnEventsPerWeek = {
+    averageDetectedEvents :      number
+    averageReopenedEvents :      number 
+    averageFalsePositiveEvents : number 
+    averageAcceptedEvents :     number 
+    averageFixedEvents :       number 
+}
+
 export type OrgOverview = {
+    vulnEventAverage: AverageVulnEventsPerWeek
     structure : OrgStructure;
     topComponents: ComponentUsageInOrg[]
     topCVEs : CVEOccurrenceInOrg[]
