@@ -188,7 +188,7 @@ ${needs.map((n) => `      - ${n}`).join("\n")}`;
     sbom_file: "results.sbom"
     `,
   full: (config) => `
-    devguard_web_ui: "https://app.devguard.org"
+    devguard_web_ui: "${config.frontendUrl}"
     `,
 };
 
