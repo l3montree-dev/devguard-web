@@ -159,6 +159,13 @@ const VulnWithCveTableRow = ({
   );
 };
 
+const extractQualifiers = (purl: string) => {
+  const parts = purl.split("?");
+  if (parts.length < 2) return "";
+  const qualifiersPart = parts[1];
+  const qualifiers = qualifiersPart.split("&").join(", ");
+  return qualifiers;
+};
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
@@ -211,6 +218,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             </span>
             <span className="text-xs text-muted-foreground">
               {extractVersion(row.original.packageName)}
+            </span>
+
+            <span className="text-xs text-muted-foreground">
+              {extractQualifiers(row.original.packageName)}
             </span>
           </div>
         </td>
