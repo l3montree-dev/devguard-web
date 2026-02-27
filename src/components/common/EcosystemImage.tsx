@@ -43,6 +43,8 @@ const EcosystemImage = ({
       "deb",
       "bitnami",
       "NuGet",
+      "php",
+      "composer",
     ].includes(getEcosystem(packageName))
   ) {
     return (

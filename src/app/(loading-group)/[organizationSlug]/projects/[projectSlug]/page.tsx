@@ -55,29 +55,23 @@ import { debounce } from "lodash";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { buildFilterSearchParams } from "@/utils/url";
 import CustomPagination from "@/components/common/CustomPagination";
+import ListRenderer from "@/components/common/ListRenderer";
 
 function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
   return "type" in d && (d as ProjectDTO).type === "project";
 }
-function checkType(data: SubGroupsAndAssets): {
-  assets: AssetDTO[];
-  subgroups: ProjectDTO[];
+
+function checkType(data: SubGroupsAndAsset): {
+  asset: AssetDTO | null;
+  subgroup: ProjectDTO | null;
 } {
-  const assets: AssetDTO[] = [];
-  const subgroups: ProjectDTO[] = [];
-
-  data.forEach((item) => {
-    if (isProject(item)) {
-      subgroups.push(item);
-    } else {
-      assets.push(item);
-    }
-  });
-
-  return { assets, subgroups };
+  return isProject(data)
+    ? { asset: null, subgroup: data }
+    : { asset: data, subgroup: null };
 }
 
-type SubGroupsAndAssets = Array<AssetDTO | ProjectDTO>;
+type SubGroupsAndAsset = AssetDTO | ProjectDTO;
+type SubGroupsAndAssets = Array<SubGroupsAndAsset>;
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -101,15 +95,16 @@ export default function RepositoriesPage() {
     return p;
   }, [searchParams]);
 
-  const { data: subgroupsWithAssets } = useSWR<Paged<SubGroupsAndAssets>>(
-    () => {
-      if (!isOrganization(organization.organization)) return null;
-      const base = `/organizations/${decodeURIComponent(organization.organization.slug)}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
-      const query = queryWithState.toString();
-      return query ? `${base}&${query}` : base;
-    },
-    fetcher,
-  );
+  const {
+    isLoading,
+    data: subgroupsWithAssets,
+    error,
+  } = useSWR<Paged<SubGroupsAndAsset>>(() => {
+    if (!isOrganization(organization.organization)) return null;
+    const base = `/organizations/${decodeURIComponent(organization.organization.slug)}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
+    const query = queryWithState.toString();
+    return query ? `${base}&${query}` : base;
+  }, fetcher);
 
   const pushQuery = useRouterQuery();
 
@@ -125,12 +120,6 @@ export default function RepositoriesPage() {
       riskAutomaticTicketThreshold: [],
     },
   });
-
-  const { assets, subgroups } = useMemo(() => {
-    if (!subgroupsWithAssets || !subgroupsWithAssets.data)
-      return { assets: [], subgroups: [] };
-    return checkType(subgroupsWithAssets.data.flat());
-  }, [subgroupsWithAssets]);
 
   const projectForm = useForm<ProjectDTO>({
     defaultValues: {
@@ -222,134 +211,117 @@ export default function RepositoriesPage() {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        {assets.length === 0 &&
-        subgroups.length === 0 &&
-        viewedProject !== "inactive" ? (
-          <EmptyParty
-            description="No repositories or subgroups found"
-            title="Your Repositories will show up here!"
-            Button={
-              session &&
-              !project.externalEntityProviderId && (
-                <div className="flex flex-row justify-center gap-2">
-                  <Button
-                    variant={"secondary"}
-                    onClick={() => setShowProjectModal(true)}
-                  >
-                    Create subgroup
-                  </Button>
-
-                  <Button onClick={() => setShowModal(true)}>
-                    Create new Repository
-                  </Button>
-                </div>
-              )
-            }
-          />
-        ) : (
-          <Section
-            Button={
-              session &&
-              !project.externalEntityProviderId && (
-                <div className="flex flex-row gap-2">
-                  <Button
-                    disabled={
-                      project.type !== "default" ||
-                      (currentUserRole !== UserRole.Owner &&
-                        currentUserRole !== UserRole.Admin)
-                    }
-                    variant={"secondary"}
-                    onClick={() => setShowProjectModal(true)}
-                  >
-                    Create New Subgroup
-                  </Button>
-                  <Button
-                    disabled={
-                      project.type !== "default" ||
-                      (currentUserRole !== UserRole.Admin &&
-                        currentUserRole !== UserRole.Owner)
-                    }
-                    onClick={() => setShowModal(true)}
-                  >
-                    Create New Repository
-                  </Button>
-                </div>
-              )
-            }
-            primaryHeadline
-            description={
-              "Repositories managed by the " + project.name + " group"
-            }
-            forceVertical
-            title={project.name}
-          >
-            <Tabs
-              defaultValue="active"
-              value={viewedProject}
-              onValueChange={handleSetTabValue}
-            >
-              <TabsList>
-                <TabsTrigger value="active">
-                  {project.externalEntityProviderId
-                    ? "Repositories"
-                    : "Subgroups & Repositories"}
-                </TabsTrigger>
-                <TabsTrigger value="inactive">Inactive</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <Input
-              onChange={debouncedHandleSearch}
-              defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects and repositories..."
-            />
-            {subgroups?.map((subgroup) => (
-              <Link
-                key={subgroup.id}
-                href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
-                className="flex flex-col gap-2 hover:no-underline"
-              >
-                <ListItem
-                  reactOnHover
-                  Title={
-                    <div className="flex items-center flex-row gap-2">
-                      <Avatar {...subgroup} />
-                      <span>
-                        {subgroup.name.replace(project.name + " /", "")}
-                      </span>
-                      <Badge variant={"outline"}>Subgroup</Badge>
-                      {subgroup.state === "deleted" && (
-                        <Badge variant={"destructive"}>Pending deletion</Badge>
-                      )}
-                      {subgroup.type === "kubernetesNamespace" && (
-                        <Badge variant={"outline"}>
-                          <Image
-                            alt="Kubernetes logo"
-                            src="/assets/kubernetes.svg"
-                            className="-ml-1.5 mr-2"
-                            width={16}
-                            height={16}
-                          />
-                          Kubernetes Namespace
-                        </Badge>
-                      )}
-                    </div>
+        <Section
+          Button={
+            session &&
+            !project.externalEntityProviderId && (
+              <div className="flex flex-row gap-2">
+                <Button
+                  disabled={
+                    project.type !== "default" ||
+                    (currentUserRole !== UserRole.Owner &&
+                      currentUserRole !== UserRole.Admin)
                   }
-                  Description={<Markdown>{subgroup.description}</Markdown>}
-                />
-              </Link>
-            ))}
-            {assets.map((asset) => (
-              <AssetOverviewListItem asset={asset} key={asset.id} />
-            ))}
+                  variant={"secondary"}
+                  onClick={() => setShowProjectModal(true)}
+                >
+                  Create New Subgroup
+                </Button>
+                <Button
+                  disabled={
+                    project.type !== "default" ||
+                    (currentUserRole !== UserRole.Admin &&
+                      currentUserRole !== UserRole.Owner)
+                  }
+                  onClick={() => setShowModal(true)}
+                >
+                  Create New Repository
+                </Button>
+              </div>
+            )
+          }
+          primaryHeadline
+          description={"Repositories managed by the " + project.name + " group"}
+          forceVertical
+          title={project.name}
+        >
+          <Tabs
+            defaultValue="active"
+            value={viewedProject}
+            onValueChange={handleSetTabValue}
+          >
+            <TabsList>
+              <TabsTrigger value="active">
+                {project.externalEntityProviderId
+                  ? "Repositories"
+                  : "Subgroups & Repositories"}
+              </TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-            <div className="mt-4">
-              {subgroupsWithAssets && (
-                <CustomPagination {...subgroupsWithAssets} />
-              )}
-            </div>
-          </Section>
-        )}
+          <Input
+            onChange={debouncedHandleSearch}
+            defaultValue={searchParams?.get("search") || ""}
+            placeholder="Search for projects and repositories..."
+          />
+          <ListRenderer
+            isLoading={isLoading}
+            error={error}
+            data={subgroupsWithAssets?.data}
+            Empty={<EmptyParty title={"No groups found"} description="" />}
+            renderItem={(item) => {
+              const { asset, subgroup } = checkType(item);
+              if (subgroup)
+                return (
+                  <Link
+                    key={subgroup.id}
+                    href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
+                    className="flex flex-col gap-2 hover:no-underline"
+                  >
+                    <ListItem
+                      reactOnHover
+                      Title={
+                        <div className="flex items-center flex-row gap-2">
+                          <Avatar {...subgroup} />
+                          <span>
+                            {subgroup.name.replace(project.name + " /", "")}
+                          </span>
+                          <Badge variant={"outline"}>Subgroup</Badge>
+                          {subgroup.state === "deleted" && (
+                            <Badge variant={"destructive"}>
+                              Pending deletion
+                            </Badge>
+                          )}
+                          {subgroup.type === "kubernetesNamespace" && (
+                            <Badge variant={"outline"}>
+                              <Image
+                                alt="Kubernetes logo"
+                                src="/assets/kubernetes.svg"
+                                className="-ml-1.5 mr-2"
+                                width={16}
+                                height={16}
+                              />
+                              Kubernetes Namespace
+                            </Badge>
+                          )}
+                        </div>
+                      }
+                      Description={<Markdown>{subgroup.description}</Markdown>}
+                    />
+                  </Link>
+                );
+              if (asset)
+                return <AssetOverviewListItem key={asset.id} asset={asset} />;
+            }}
+          />
+
+          <div className="mt-4">
+            {subgroupsWithAssets && (
+              <CustomPagination {...subgroupsWithAssets} />
+            )}
+          </div>
+        </Section>
       </Page>
 
       <Dialog open={showProjectModal}>
