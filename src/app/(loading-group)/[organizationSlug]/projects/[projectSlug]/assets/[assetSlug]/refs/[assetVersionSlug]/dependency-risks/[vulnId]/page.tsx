@@ -786,7 +786,7 @@ const Index: FunctionComponent = () => {
                               enableContextMenu={
                                 vuln.vulnerabilityPath.length !== 0 &&
                                 vuln.state === "open" &&
-                                session
+                                session !== null
                               }
                               graph={graphData}
                               vulns={[vuln]}
