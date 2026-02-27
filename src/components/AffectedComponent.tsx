@@ -187,12 +187,12 @@ const AffectedComponentDetails: FunctionComponent<{
                 <CollapsibleContent className="border-t pt-4 mt-4">
                   <div className="mt-1 flex flex-col text-xs">
                     <span className="text-muted-foreground">Search PURL:</span>
-                    <div>{data.matchContext?.SearchPurl ?? "unknown"}</div>
+                    <div>{data.matchContext?.searchPurl ?? "unknown"}</div>
                   </div>
                   <div className="mt-3 flex flex-col text-xs">
                     <span className="text-muted-foreground">Version Type:</span>
                     <div>
-                      {data.matchContext?.HowToInterpretVersionString ??
+                      {data.matchContext?.howToInterpretVersionString ??
                         "unknown"}
                     </div>
                   </div>
