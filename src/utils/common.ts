@@ -425,9 +425,11 @@ export const stateLabels: Record<DependencyVuln["state"], string> = {
   markedForTransfer: "Marked for Transfer",
 };
 
-
 // Utility function to truncate text in the middle with ellipsis
-export const truncateMiddle = (text: string, maxLength: number = 20): string => {
+export const truncateMiddle = (
+  text: string,
+  maxLength: number = 20,
+): string => {
   if (text.length <= maxLength) return text;
 
   const start = Math.ceil((maxLength - 3) / 2);
@@ -437,9 +439,9 @@ export const truncateMiddle = (text: string, maxLength: number = 20): string => 
 };
 
 // round any number to its 2nd digit using math round
-export const roundToSecondDigit = (num?: number) : number => {
-  if (!num){
-    return 0
+export const roundToSecondDigit = (num?: number): number => {
+  if (!num) {
+    return 0;
   }
-  return Math.round(100* num)/100
-}
+  return Math.round(100 * num) / 100;
+};

@@ -918,71 +918,69 @@ export type ExternalReference = {
   assetId: string;
   assetVersionName: string;
   url: string;
-  type: "cyclonedxvex" | "csaf"; 
+  type: "cyclonedxvex" | "csaf";
 };
 
 export type OrgStructure = {
-    numProjects : number
-    numAssets: number
-    numArtifacts : number
-    lowRisk: number
-    mediumRisk: number
-    highRisk: number
-    criticalRisk: number
-}
+  numProjects: number;
+  numAssets: number;
+  numArtifacts: number;
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+  criticalRisk: number;
+};
 
 export type VulnCVSSDistribution = {
-    lowCVSS: number
-    mediumCVSS: number
-    highCVSS: number
-    criticalCVSS: number
-}
+  lowCVSS: number;
+  mediumCVSS: number;
+  highCVSS: number;
+  criticalCVSS: number;
+};
 
 export type VulnRiskDistribution = {
-    lowRisk: number
-    mediumRisk: number
-    highRisk: number
-    criticalRisk: number
-}
-
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+  criticalRisk: number;
+};
 
 export type VulnDistributionInStructure = VulnDistribution & {
-    name: string
-    slug: string
+  name: string;
+  slug: string;
 
-    projectSlug?: string
-    assetSlug?: string
-    assetVersionName?: string
+  projectSlug?: string;
+  assetSlug?: string;
+  assetVersionName?: string;
+};
 
-}
-
-export type VulnDistribution = VulnRiskDistribution & VulnCVSSDistribution
+export type VulnDistribution = VulnRiskDistribution & VulnCVSSDistribution;
 
 export type ComponentUsageInOrg = {
-    purl: string 
-    totalAmount: number
-}
+  purl: string;
+  totalAmount: number;
+};
 
 export type CVEOccurrenceInOrg = {
-    cveID: string 
-    totalAmount: number
-}
+  cveID: string;
+  totalAmount: number;
+};
 
 export type AverageVulnEventsPerWeek = {
-    averageDetectedEvents :      number
-    averageReopenedEvents :      number 
-    averageFalsePositiveEvents : number 
-    averageAcceptedEvents :     number 
-    averageFixedEvents :       number 
-}
+  averageDetectedEvents: number;
+  averageReopenedEvents: number;
+  averageFalsePositiveEvents: number;
+  averageAcceptedEvents: number;
+  averageFixedEvents: number;
+};
 
 export type OrgOverview = {
-    vulnEventAverage: AverageVulnEventsPerWeek
-    structure : OrgStructure;
-    topComponents: ComponentUsageInOrg[]
-    topCVEs : CVEOccurrenceInOrg[]
-    vulnDistribution: VulnDistribution
-    topProjects: VulnDistributionInStructure[]
-    topAssets: VulnDistributionInStructure[]
-    topArtifacts: VulnDistributionInStructure[]
-}
+  vulnEventAverage: AverageVulnEventsPerWeek;
+  structure: OrgStructure;
+  topComponents: ComponentUsageInOrg[];
+  topCVEs: CVEOccurrenceInOrg[];
+  vulnDistribution: VulnDistribution;
+  topProjects: VulnDistributionInStructure[];
+  topAssets: VulnDistributionInStructure[];
+  topArtifacts: VulnDistributionInStructure[];
+};

@@ -37,24 +37,24 @@ export const useOrganizationMenu = () => {
   const decodedOrgSlug = decodeURIComponent(orgSlug);
 
   const org = useActiveOrg();
-  const menu =[
+  const menu = [
     {
       title: "Overview",
       href: "/" + decodedOrgSlug + "/overview",
       Icon: ChartBarIcon,
-      isActive: decodedPathName === "/" + decodedOrgSlug + "/overview"
+      isActive: decodedPathName === "/" + decodedOrgSlug + "/overview",
     },
   ];
-  
+
   menu.push({
-      title: "Groups",
-      href: "/" + decodedOrgSlug,
-      Icon: ListBulletIcon,
-      isActive: decodedPathName === "/" + decodedOrgSlug,
-    })
+    title: "Groups",
+    href: "/" + decodedOrgSlug,
+    Icon: ListBulletIcon,
+    isActive: decodedPathName === "/" + decodedOrgSlug,
+  });
 
   if (loggedIn && !org.externalEntityProviderId) {
-     menu.push({
+    menu.push({
       title: "Compliance",
       href: "/" + decodedOrgSlug + "/compliance",
       Icon: ScaleIcon,

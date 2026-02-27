@@ -85,13 +85,7 @@ const Index: FunctionComponent = () => {
 
   const { data: events, isLoading: eventsLoading } = useSWR<
     Paged<VulnEventDTO>
-  >(
-    url +
-    "/events/?pageSize=4",
-    fetcher,
-  );
-
-  
+  >(url + "/events/?pageSize=4", fetcher);
 
   const urlQueryAppendixForArtifact = selectedArtifact
     ? "?artifactName=" + encodeURIComponent(selectedArtifact)
@@ -148,12 +142,7 @@ const Index: FunctionComponent = () => {
 
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
-  >(
-      url +
-      "/components/licenses/" +
-      urlQueryAppendixForArtifact,
-    fetcher,
-  );
+  >(url + "/components/licenses/" + urlQueryAppendixForArtifact, fetcher);
 
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");
