@@ -30,9 +30,9 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
   };
 
   return (
-    <div className="flex w-full rounded-lg border p-2">
+    <span className="flex w-full rounded-lg border p-2">
       <span className="font-mono text-sm pr-6 w-9/10">{codeString}</span>
-      <div className="w-1/10">
+      <span className="w-1/10">
         <CopyIcon
           className="w-5 h-5 rounded-lg p-0.5 text-xs hover:text-foreground text-muted-foreground transition-all"
           onClick={(e) => {
@@ -40,8 +40,8 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
             handleCopy();
           }}
         />
-      </div>
-    </div>
+      </span>
+    </span>
   );
 };
 

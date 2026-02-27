@@ -13,23 +13,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM node:24.13.0@sha256:1de022d8459f896fff2e7b865823699dc7a8d5567507e8b87b14a7442e07f206 as build-env
+FROM node:24.14.0@sha256:3a09aa6354567619221ef6c45a5051b671f953f0a1924d1f819ffb236e520e6b AS build-env
 LABEL maintainer="L3montree & DevGuard contributors"
 
 # Disable telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 ARG VERSION
 ARG DEVGUARD_API_URL
 ARG SENTRY_AUTH_TOKEN
 
 WORKDIR /usr/app/
 
-ENV PORT 3000
+ENV PORT=3000
 EXPOSE 3000
 
-ENV NEXT_PUBLIC_ENVIRONMENT production
-ENV NEXT_PUBLIC_VERSION $VERSION
-ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
+ENV NEXT_PUBLIC_ENVIRONMENT=production
+ENV NODE_ENV=production
+
+ENV NEXT_PUBLIC_VERSION=$VERSION
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 
 COPY package-lock.json .
 COPY package.json .
@@ -48,15 +50,15 @@ RUN mkdir -p /usr/app/.next/cache/images && chown -R 53111:53111 /usr/app/.next/
 
 # Second stage
 # Use distroless image for production
-FROM registry.opencode.de/open-code/oci/nodejs:24-minimal@sha256:fa2e475214d03e1bf2027aa01fa094cf0648da360318e94268aa64c591a9910b
+FROM registry.opencode.de/open-code/oci/nodejs:24-minimal@sha256:8a5b144301ac2f11e2a10c39218e6cd200a7d90a238c3ace7c43a32dff975c19
 
 USER 53111
 
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV PORT 3000
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Copy from build
 COPY --from=build-env --chown=53111:53111 /usr/app/next.config.js ./
