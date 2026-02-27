@@ -1,17 +1,6 @@
 "use client";
 
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useSession } from "@/context/SessionContext";
-import Page from "@/components/Page";
-import { Paged, VulnByPackage } from "@/types/api/api";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
-import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -19,8 +8,10 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
+import FalsePositiveDialog from "@/components/FalsePositiveDialog";
+import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -28,17 +19,27 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "sonner";
+import { documentationLinks } from "@/const/documentationLinks";
+import { useSession } from "@/context/SessionContext";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
+import {
+  ColumnDef,
+  createColumnHelper,
+  flexRender,
+} from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
@@ -52,7 +53,6 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
-import { documentationLinks } from "@/const/documentationLinks";
 
 const columnHelper = createColumnHelper<VulnByPackage>();
 
@@ -193,34 +193,67 @@ const Index: FunctionComponent = () => {
       justification: string;
       mechanicalJustification?: string;
     }) => {
-      const resp = await browserApiClient(
-        uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
+      const optimisticState =
+        params.status === "falsePositive"
+          ? "falsePositive"
+          : params.status === "accepted"
+            ? "accepted"
+            : params.status === "reopened"
+              ? "open"
+              : undefined;
+
+      const optimisticData =
+        optimisticState && vulns
+          ? {
+              ...vulns,
+              data: vulns.data.map((pkg) => ({
+                ...pkg,
+                vulns: pkg.vulns.map((v) =>
+                  params.vulnIds.includes(v.id)
+                    ? { ...v, state: optimisticState as VulnWithCVE["state"] }
+                    : v,
+                ),
+              })),
+            }
+          : undefined;
+
+      await mutateVulns(
+        async () => {
+          const resp = await browserApiClient(
+            uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                vulnIds: params.vulnIds,
+                status: params.status,
+                justification: params.justification,
+                mechanicalJustification: params.mechanicalJustification ?? "",
+              }),
+            },
+          );
+
+          if (!resp.ok) {
+            throw new Error("Bulk action failed");
+          }
+
+          // clear selection for the affected IDs
+          setSelectedVulnIds((prev) => {
+            const next = new Set(prev);
+            params.vulnIds.forEach((id) => next.delete(id));
+            return next;
+          });
+
+          // SWR will revalidate (revalidate: true), so returning undefined is fine
+          return undefined;
+        },
         {
-          method: "POST",
-          body: JSON.stringify({
-            vulnIds: params.vulnIds,
-            status: params.status,
-            justification: params.justification,
-            mechanicalJustification: params.mechanicalJustification ?? "",
-          }),
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: true,
         },
       );
-
-      if (!resp.ok) {
-        throw new Error("Bulk action failed");
-      }
-
-      // clear selection for the affected IDs
-      setSelectedVulnIds((prev) => {
-        const next = new Set(prev);
-        params.vulnIds.forEach((id) => next.delete(id));
-        return next;
-      });
-
-      // revalidate the data
-      await mutateVulns();
     },
-    [uri, assetVersionSlug, mutateVulns],
+    [uri, assetVersionSlug, mutateVulns, vulns],
   );
 
   const handleSearch = useDebouncedQuerySearch();

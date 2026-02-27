@@ -25,6 +25,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useCreateVexRule } from "@/hooks/useCreateVexRule";
@@ -390,6 +391,7 @@ const Index: FunctionComponent = () => {
   const assetVersion = useActiveAssetVersion();
 
   const deleteEvent = useDeleteEvent();
+  const currentUser = useCurrentUser();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -555,72 +557,118 @@ const Index: FunctionComponent = () => {
       return true;
     }
 
-    await mutate(async (prev) => {
-      let json: any;
-      if (data.status === "mitigate") {
-        const resp = await browserApiClient(
-          "/organizations/" +
-            activeOrg.slug +
-            "/projects/" +
-            project.slug +
-            "/assets/" +
-            asset.slug +
-            "/refs/" +
-            assetVersion?.slug +
-            "/dependency-vulns/" +
-            vuln.id +
-            "/mitigate",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              comment: data.justification,
-            }),
-          },
-        );
-        json = await resp.json();
-      } else {
-        const resp = await browserApiClient(
-          "/organizations/" +
-            activeOrg.slug +
-            "/projects/" +
-            project.slug +
-            "/assets/" +
-            asset.slug +
-            "/refs/" +
-            assetVersion?.slug +
-            "/dependency-vulns/" +
-            vuln.id,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          },
-        );
-        json = await resp.json();
-      }
+    const optimisticState =
+      data.status === "falsePositive"
+        ? "falsePositive"
+        : data.status === "accepted"
+          ? "accepted"
+          : data.status === "reopened"
+            ? "open"
+            : data.status === "comment"
+              ? vuln.state
+              : undefined;
 
-      if (!json.events) {
-        return toast("Failed to update vulnerability", {
-          description: "Please try again later.",
-        });
-      }
-      setJustification("");
-      return {
-        ...prev,
-        ...json,
-        events: prev?.events.concat([
-          {
-            ...json.events.slice(-1)[0],
-            originalAssetVersionName: assetVersion?.name ?? "",
-          },
-        ]),
-      };
-    });
+    const optimisticEvent =
+      optimisticState !== undefined
+        ? ({
+            type: data.status,
+            id: "optimistic",
+            createdAt: new Date().toISOString(),
+            justification: data.justification ?? "",
+            mechanicalJustification: data.mechanicalJustification ?? "",
+            userId: currentUser?.id ?? "",
+            vulnId: vuln.id,
+            vulnType: "dependencyVuln",
+            vulnerabilityName: vuln.cveID,
+            createdByVexRule: false,
+          } as VulnEventDTO)
+        : undefined;
+
+    const mutatePromise = mutate(
+      async (prev) => {
+        let json: any;
+        if (data.status === "mitigate") {
+          const resp = await browserApiClient(
+            "/organizations/" +
+              activeOrg.slug +
+              "/projects/" +
+              project.slug +
+              "/assets/" +
+              asset.slug +
+              "/refs/" +
+              assetVersion?.slug +
+              "/dependency-vulns/" +
+              vuln.id +
+              "/mitigate",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                comment: data.justification,
+              }),
+            },
+          );
+          json = await resp.json();
+        } else {
+          const resp = await browserApiClient(
+            "/organizations/" +
+              activeOrg.slug +
+              "/projects/" +
+              project.slug +
+              "/assets/" +
+              asset.slug +
+              "/refs/" +
+              assetVersion?.slug +
+              "/dependency-vulns/" +
+              vuln.id,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        }
+
+        if (!json.events) {
+          toast("Failed to update vulnerability", {
+            description: "Please try again later.",
+          });
+          throw new Error("Failed to update vulnerability");
+        }
+        setJustification("");
+        return {
+          ...prev,
+          ...json,
+          events: prev?.events.concat([json.events.slice(-1)[0]]),
+        };
+      },
+      {
+        optimisticData: optimisticState
+          ? {
+              ...vuln,
+              state: optimisticState,
+              events: vuln.events.concat(
+                optimisticEvent ? [optimisticEvent] : [],
+              ),
+            }
+          : undefined,
+        rollbackOnError: true,
+        revalidate: false,
+      },
+    );
+
+    if (optimisticState !== undefined) {
+      // Optimistic update already applied to SWR cache — close the dialog immediately.
+      // The mutation continues in the background; on error SWR rolls back and shows a toast.
+      return true;
+    }
+
+    await mutatePromise;
     return true;
   };
 
