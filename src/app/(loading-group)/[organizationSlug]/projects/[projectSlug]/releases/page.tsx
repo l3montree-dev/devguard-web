@@ -137,13 +137,15 @@ const Releases = () => {
                   key={release.id}
                   Title={release.name}
                   Button={
-                    <Alert
-                      onConfirm={() => deleteRelease(release)}
-                      title="Delete Release"
-                      description="Are you sure you want to delete this release? This action cannot be undone."
-                    >
-                      <Button variant="destructive">Delete</Button>
-                    </Alert>
+                    session && (
+                      <Alert
+                        onConfirm={() => deleteRelease(release)}
+                        title="Delete Release"
+                        description="Are you sure you want to delete this release? This action cannot be undone."
+                      >
+                        <Button variant="destructive">Delete</Button>
+                      </Alert>
+                    )
                   }
                   Description={
                     <div>

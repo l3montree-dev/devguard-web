@@ -79,6 +79,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import RootNodeSelector from "@/components/RootNodeSelector";
+import { useSession } from "@/context/SessionContext";
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -106,6 +107,7 @@ const LicenseCall = (props: {
   dependencyPurl: string;
   justification: string;
 }) => {
+  const { session } = useSession();
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -189,27 +191,29 @@ const LicenseCall = (props: {
             </span>
           </div>
 
-          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-row items-center justify-between">
-              <span className="text-sm mb-2 block text-muted-foreground">
-                Manually correct the license
-              </span>
-            </div>
+          {session && (
+            <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-row items-center justify-between">
+                <span className="text-sm mb-2 block text-muted-foreground">
+                  Manually correct the license
+                </span>
+              </div>
 
-            <div className="mt-2">
-              <Combobox
-                items={licenses}
-                placeholder={getLicenseName(
-                  props.component.license,
-                  props.license.licenseId,
-                )}
-                emptyMessage={""}
-                onSelect={(selectedLicense) =>
-                  handleManuallyOverwriteLicenseChange(selectedLicense)
-                }
-              />
+              <div className="mt-2">
+                <Combobox
+                  items={licenses}
+                  placeholder={getLicenseName(
+                    props.component.license,
+                    props.license.licenseId,
+                  )}
+                  emptyMessage={""}
+                  onSelect={(selectedLicense) =>
+                    handleManuallyOverwriteLicenseChange(selectedLicense)
+                  }
+                />
+              </div>
             </div>
-          </div>
+          )}
         </PopoverContent>
       </div>
     </Popover>

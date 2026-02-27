@@ -17,9 +17,12 @@ import { useConfig } from "../../../../../../../context/ConfigContext";
 import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
+import { useSession } from "@/context/SessionContext";
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
+
+  const { session } = useSession();
 
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
@@ -75,95 +78,107 @@ const Index: FunctionComponent = () => {
       description="Overview of the asset"
       Title={<AssetTitle />}
     >
-      <Section
-        primaryHeadline
-        forceVertical
-        description="Start scanning your code for vulnerabilities, bad-practices, license issues, policy violations and more."
-        title="Welcome to DevGuard 🚀"
-      >
-        {((asset?.externalEntityProviderId &&
-          externalProviderIdToIntegrationName(
-            asset.externalEntityProviderId,
-          ) === "gitlab") ||
-          (asset?.repositoryProvider === "gitlab" && asset?.repositoryId)) && (
-          <>
-            <div className="mb-8">
-              <div className="">
-                <Autosetup {...autosetup} />
+      {session ? (
+        <Section
+          primaryHeadline
+          forceVertical
+          description="Start scanning your code for vulnerabilities, bad-practices, license issues, policy violations and more."
+          title="Welcome to DevGuard 🚀"
+        >
+          {((asset?.externalEntityProviderId &&
+            externalProviderIdToIntegrationName(
+              asset.externalEntityProviderId,
+            ) === "gitlab") ||
+            (asset?.repositoryProvider === "gitlab" &&
+              asset?.repositoryId)) && (
+            <>
+              <div className="mb-8">
+                <div className="">
+                  <Autosetup {...autosetup} />
+                </div>
               </div>
-            </div>
-            <hr className="mb-8" />
-          </>
-        )}
-        <div className="flex flex-col gap-4 z-10">
-          <ListItem
-            Title="Check your Code for Risks 🛡️ (Vulnerabilities, Bad Practices, Leaked Secrets, and more...)"
-            Description={
-              "A typical applications code is made of 70-90% by dependencies (NPM, Go, maven, Debian, etc.). Let's check, if we can find any vulnerable dependencies. Another thing is your code — let's scan for any bad practices here, check that there are no secrets leaked, infrastructure is configured good and more."
-            }
-            Button={
-              <div className="flex flex-row gap-2">
-                <Button
-                  onClick={() => setRiskScanningOpen(true)}
-                  variant={
-                    asset?.externalEntityProviderId &&
-                    externalProviderIdToIntegrationName(
-                      asset.externalEntityProviderId,
-                    ) === "gitlab"
-                      ? "secondary"
-                      : "default"
-                  }
-                >
-                  Setup Risk Scanning
-                </Button>
-              </div>
-            }
-          />
-        </div>
-        <div>
-          <ListItem
-            Title={
-              <span className="">
-                Connect your Issue Tracker to DevGuard{" "}
-                <Image
-                  src="/assets/provider-icons/gitlab.svg"
-                  width={50}
-                  height={50}
-                  alt="GitLab Logo"
-                  className="inline-block ml-2 h-5 w-auto"
-                />
-                <Image
-                  src="/assets/provider-icons/opencode.svg"
-                  width={50}
-                  height={50}
-                  alt="GitLab Logo"
-                  className="inline-block ml-2 h-4 w-auto"
-                />
-                <Image
-                  src="/assets/provider-icons/github.svg"
-                  width={50}
-                  height={50}
-                  alt="GitLab Logo"
-                  className="inline-block ml-2 h-4 w-auto dark:invert"
-                />
-              </span>
-            }
-            Description={
-              "You can connect your Issue Tracker to DevGuard to automatically create issues for identified risks. You can handle findings directly from your issue tracker via slash commands. This way, you can easily track and mitigate vulnerabilities, bad-practices, license issues and more."
-            }
-            Button={
-              <div className="flex flex-row gap-2">
-                <Button
-                  onClick={() => setWebhookIsOpen(true)}
-                  variant={"secondary"}
-                >
-                  Setup Ticket-Integration
-                </Button>
-              </div>
-            }
-          />
-        </div>
-      </Section>
+              <hr className="mb-8" />
+            </>
+          )}
+          <div className="flex flex-col gap-4 z-10">
+            <ListItem
+              Title="Check your Code for Risks 🛡️ (Vulnerabilities, Bad Practices, Leaked Secrets, and more...)"
+              Description={
+                "A typical applications code is made of 70-90% by dependencies (NPM, Go, maven, Debian, etc.). Let's check, if we can find any vulnerable dependencies. Another thing is your code — let's scan for any bad practices here, check that there are no secrets leaked, infrastructure is configured good and more."
+              }
+              Button={
+                <div className="flex flex-row gap-2">
+                  <Button
+                    onClick={() => setRiskScanningOpen(true)}
+                    variant={
+                      asset?.externalEntityProviderId &&
+                      externalProviderIdToIntegrationName(
+                        asset.externalEntityProviderId,
+                      ) === "gitlab"
+                        ? "secondary"
+                        : "default"
+                    }
+                  >
+                    Setup Risk Scanning
+                  </Button>
+                </div>
+              }
+            />
+          </div>
+          <div>
+            <ListItem
+              Title={
+                <span className="">
+                  Connect your Issue Tracker to DevGuard{" "}
+                  <Image
+                    src="/assets/provider-icons/gitlab.svg"
+                    width={50}
+                    height={50}
+                    alt="GitLab Logo"
+                    className="inline-block ml-2 h-5 w-auto"
+                  />
+                  <Image
+                    src="/assets/provider-icons/opencode.svg"
+                    width={50}
+                    height={50}
+                    alt="GitLab Logo"
+                    className="inline-block ml-2 h-4 w-auto"
+                  />
+                  <Image
+                    src="/assets/provider-icons/github.svg"
+                    width={50}
+                    height={50}
+                    alt="GitLab Logo"
+                    className="inline-block ml-2 h-4 w-auto dark:invert"
+                  />
+                </span>
+              }
+              Description={
+                "You can connect your Issue Tracker to DevGuard to automatically create issues for identified risks. You can handle findings directly from your issue tracker via slash commands. This way, you can easily track and mitigate vulnerabilities, bad-practices, license issues and more."
+              }
+              Button={
+                <div className="flex flex-row gap-2">
+                  <Button
+                    onClick={() => setWebhookIsOpen(true)}
+                    variant={"secondary"}
+                  >
+                    Setup Ticket-Integration
+                  </Button>
+                </div>
+              }
+            />
+          </div>
+        </Section>
+      ) : (
+        <Section
+          primaryHeadline
+          forceVertical
+          description="There is not any data to show yet."
+          title="This Repository is empty"
+        >
+          <div></div>
+        </Section>
+      )}
       <RiskScannerDialog
         open={riskScanningIsOpen}
         onOpenChange={setRiskScanningOpen}
