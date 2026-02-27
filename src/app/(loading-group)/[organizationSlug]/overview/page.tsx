@@ -10,17 +10,17 @@ import {
   TabsTrigger,
 } from "src/components/ui/tabs";
 
-import { OrgOverview } from "src/types/api/api";
+import { OrgOverview, ReleaseRiskHistory } from "src/types/api/api";
 import { fetcher } from "src/data-fetcher/fetcher";
 import { useActiveOrg } from "src/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import Section from "src/components/common/Section";
 import SeverityCard from "src/components/SeverityCard";
-import StructureCard from "src/components/organization/StructureCard";
 import useSWR from "swr";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
+import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -40,6 +40,24 @@ const OrganizationOverview: FunctionComponent = () => {
           (orgStatistics?.vulnEventAverage?.averageFalsePositiveEvents ?? 0) +
           (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0)),
     ) / 100;
+
+  const convertedRiskHistory: ReleaseRiskHistory[] =
+    orgStatistics?.orgRiskHistory.map(
+      (entry) =>
+        ({
+          day: entry.day,
+          cvePurlLow: entry.lowRisk,
+          cvePurlMedium: entry.mediumRisk,
+          cvePurlHigh: entry.highRisk,
+          cvePurlCritical: entry.criticalRisk,
+          cvePurlLowCvss: entry.lowCVSS,
+          cvePurlMediumCvss: entry.mediumCVSS,
+          cvePurlHighCvss: entry.highCVSS,
+          cvePurlCriticalCvss: entry.criticalCVSS,
+        }) as ReleaseRiskHistory,
+    ) ?? [];
+
+  console.log("convertedRiskHistory", convertedRiskHistory);
 
   return (
     <Page
@@ -116,7 +134,7 @@ const OrganizationOverview: FunctionComponent = () => {
         forceVertical
         description=""
         title="Dependency Overview"
-        className="mt-16"
+        className="mt-12"
       >
         <div className="mt-2 flex flex-row gap-12">
           <MostUsedComponents
@@ -132,6 +150,11 @@ const OrganizationOverview: FunctionComponent = () => {
         title="Vulnerability Trends"
         className="mt-12"
       >
+        <RiskHistoryDistributionDiagram
+          isLoading={isStatisticsLoading}
+          data={convertedRiskHistory}
+          mode={mode}
+        />
         <VulnerabilityTrends
           averagesByTypes={orgStatistics?.vulnEventAverage}
         />

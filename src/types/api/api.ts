@@ -975,6 +975,20 @@ export type AverageVulnEventsPerWeek = {
   averageFixedEvents: number;
 };
 
+type OrgRiskHistory = {
+  day: string;
+
+  lowRisk: number;
+  highRisk: number;
+  mediumRisk: number;
+  criticalRisk: number;
+
+  lowCVSS: number;
+  mediumCVSS: number;
+  highCVSS: number;
+  criticalCVSS: number;
+};
+
 export type OrgOverview = {
   vulnEventAverage: AverageVulnEventsPerWeek;
   structure: OrgStructure;
@@ -984,4 +998,5 @@ export type OrgOverview = {
   topProjects: VulnDistributionInStructure[];
   topAssets: VulnDistributionInStructure[];
   topArtifacts: VulnDistributionInStructure[];
+  orgRiskHistory: OrgRiskHistory[];
 };
