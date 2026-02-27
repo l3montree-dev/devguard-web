@@ -855,11 +855,11 @@ interface PackageURL {
 }
 
 interface PurlMatchContext {
-  SearchPurl: string;
-  NormalizedVersion: string;
-  HowToInterpretVersionString: VersionInterpretationType;
-  Qualifiers: Record<string, string>;
-  Namespace: string;
+  searchPurl: string;
+  normalizedVersion: string;
+  howToInterpretVersionString: VersionInterpretationType;
+  qualifiers: Record<string, string>;
+  namespace: string;
 }
 
 interface AffectedComponent {
