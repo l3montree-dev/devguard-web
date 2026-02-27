@@ -59,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Move } from "lucide-react";
 
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
@@ -181,13 +182,21 @@ const DependencyGraph: FunctionComponent<{
       childrenLimitMap,
       previousNodesRef.current,
       handleExpansionToggle,
+      enableContextMenu,
     );
     previousNodesRef.current = nodes;
 
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.data.label === graph.name)!;
     return [nodes, edges, rootNode];
-  }, [graph, vulns, expandedNodes, childrenLimitMap, handleExpansionToggle]);
+  }, [
+    graph,
+    vulns,
+    expandedNodes,
+    childrenLimitMap,
+    handleExpansionToggle,
+    enableContextMenu,
+  ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -757,6 +766,17 @@ const DependencyGraph: FunctionComponent<{
           )}
         </Button>
       </div>
+      <div className="absolute z-10 left-2 top-2">
+        <span className="text-sm text-muted-foreground/60 flex items-center gap-1">
+          <Move className="h-3 w-3" />
+          You can interact with this graph
+        </span>
+      </div>
+      {/* Todo: Find a better way to disable edge cursor pointer when context menu
+      is disabled. This is a bit hacky but works for now. Issue 1708 */}
+      {!enableContextMenu && (
+        <style>{`.react-flow__edge.selectable { cursor: grab !important; }`}</style>
+      )}
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
