@@ -50,6 +50,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSession } from "@/context/SessionContext";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -192,6 +193,7 @@ const VexRulesPage: FunctionComponent = () => {
   const handleSearch = useDebouncedQuerySearch();
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const { session } = useSession();
 
   const handleVexUpload = async (params: {
     file: File;
@@ -255,9 +257,11 @@ const VexRulesPage: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Manage VEX Rules"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <Button onClick={() => setUploadVexModal(true)}>
-          Upload a VEX-File or add a VEX-URL
-        </Button>
+        {session && (
+          <Button onClick={() => setUploadVexModal(true)}>
+            Upload a VEX-File or add a VEX-URL
+          </Button>
+        )}
       </div>
       <Section
         description="Manage VEX (Vulnerability Exploitability eXchange) rules for this repository ref (branches/ tags). VEX rules define how vulnerabilities should be handled based on their context."
