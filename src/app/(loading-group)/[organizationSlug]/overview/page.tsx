@@ -48,35 +48,12 @@ const OrganizationOverview: FunctionComponent = () => {
       description="Displays an overview about the stats of the org"
       Title={null}
     >
-      <div className="flex mt-16 gap-12 justify-center mb-20 items-start">
-        <StructureCard
-          topEntries={orgStatistics?.topProjects ?? []}
-          isLoading={isStatisticsLoading}
-          mode={mode}
-          type="Projects"
-          currentAmount={orgStatistics?.structure.numProjects ?? 0}
-        />
-        <StructureCard
-          topEntries={orgStatistics?.topAssets ?? []}
-          isLoading={isStatisticsLoading}
-          mode={mode}
-          type="Assets"
-          currentAmount={orgStatistics?.structure.numAssets ?? 0}
-        />
-        <StructureCard
-          topEntries={orgStatistics?.topArtifacts ?? []}
-          isLoading={isStatisticsLoading}
-          mode={mode}
-          type="Artifacts"
-          currentAmount={orgStatistics?.structure.numArtifacts ?? 0}
-        />
-      </div>
       <Tabs
         value={mode}
         onValueChange={(value) => setMode(value as "risk" | "cvss")}
-        className="w-full"
+        className="mt-12"
       >
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-12">
           <TabsList>
             <TabsTrigger value="risk">Risk values</TabsTrigger>
             <TabsTrigger value="cvss">CVSS values</TabsTrigger>
