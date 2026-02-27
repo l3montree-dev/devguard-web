@@ -65,7 +65,9 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
     header: "Message",
     cell: (info) => {
       return (
-        <span className="text-base text-muted-foreground">{info.getValue()}</span>
+        <span className="text-base text-muted-foreground">
+          {info.getValue()}
+        </span>
       );
     },
   }),
