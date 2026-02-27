@@ -190,27 +190,9 @@ export const extractVersion = (purl: string) => {
     return "";
   }
   const parts = purl.split("@");
-  let version = parts[parts.length - 1];
-  if (version.startsWith("v")) {
-    version = version.substring(1);
-  }
-  //remove any query parameters
-  const qIndex = version.indexOf("?");
-  if (qIndex > 0) {
-    version = version.substring(0, qIndex);
-  }
-
-  // remove everything after "~" and "+"
-  const tildeIndex = version.indexOf("~");
-  if (tildeIndex > 0) {
-    version = version.substring(0, tildeIndex);
-  }
-  const plusIndex = version.indexOf("+");
-  if (plusIndex > 0) {
-    version = version.substring(0, plusIndex);
-  }
-
-  return version;
+  // remove qualifiers from the version part if they exist
+  const versionPart = parts[parts.length - 1].split("?")[0];
+  return versionPart;
 };
 
 export const isValidPackagePurl = (purl: string): boolean => {
