@@ -252,6 +252,9 @@ const Index = () => {
     if (optimisticState !== undefined) {
       // Optimistic update already applied to SWR cache — close the dialog immediately.
       // The mutation continues in the background; on error SWR rolls back and shows a toast.
+      mutatePromise
+        .then(() => toast("Saved", { description: "Changes confirmed by server." }))
+        .catch(() => {});
       setJustification("");
       return true;
     }
