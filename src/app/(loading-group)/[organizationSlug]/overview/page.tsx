@@ -48,62 +48,69 @@ const OrganizationOverview: FunctionComponent = () => {
       description="Displays an overview about the stats of the org"
       Title={null}
     >
-      <Tabs
-        value={mode}
-        onValueChange={(value) => setMode(value as "risk" | "cvss")}
+      <Section
+        primaryHeadline
+        forceVertical
+        description=""
+        title="Total Vulnerabilities"
         className="mt-12"
       >
-        <div className="flex justify-center mb-12">
-          <TabsList>
-            <TabsTrigger value="risk">Risk values</TabsTrigger>
-            <TabsTrigger value="cvss">CVSS values</TabsTrigger>
-          </TabsList>
-        </div>
-        <TabsContent value={mode} className="space-y-4">
-          <div className="grid grid-cols-4 gap-4">
-            <SeverityCard
-              variant="critical"
-              isLoading={isStatisticsLoading}
-              currentAmount={
-                (mode === "risk"
-                  ? orgStatistics?.vulnDistribution.criticalRisk
-                  : orgStatistics?.vulnDistribution.criticalCVSS) ?? 0
-              }
-              mode={mode}
-            />
-            <SeverityCard
-              variant="high"
-              isLoading={isStatisticsLoading}
-              currentAmount={
-                (mode === "risk"
-                  ? orgStatistics?.vulnDistribution.highRisk
-                  : orgStatistics?.vulnDistribution.highCVSS) ?? 0
-              }
-              mode={mode}
-            />
-            <SeverityCard
-              variant="medium"
-              isLoading={isStatisticsLoading}
-              currentAmount={
-                (mode === "risk"
-                  ? orgStatistics?.vulnDistribution.mediumRisk
-                  : orgStatistics?.vulnDistribution.mediumCVSS) ?? 0
-              }
-              mode={mode}
-            />
-            <SeverityCard
-              variant="low"
-              isLoading={isStatisticsLoading}
-              currentAmount={
-                (mode === "risk"
-                  ? orgStatistics?.vulnDistribution.lowRisk
-                  : orgStatistics?.vulnDistribution.lowCVSS) ?? 0
-              }
-              mode={mode}
-            />
+        <Tabs
+          value={mode}
+          onValueChange={(value) => setMode(value as "risk" | "cvss")}
+        >
+          <div className="flex mb-4">
+            <TabsList>
+              <TabsTrigger value="risk">Risk values</TabsTrigger>
+              <TabsTrigger value="cvss">CVSS values</TabsTrigger>
+            </TabsList>
           </div>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value={mode} className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              <SeverityCard
+                variant="critical"
+                isLoading={isStatisticsLoading}
+                currentAmount={
+                  (mode === "risk"
+                    ? orgStatistics?.vulnDistribution.criticalRisk
+                    : orgStatistics?.vulnDistribution.criticalCVSS) ?? 0
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="high"
+                isLoading={isStatisticsLoading}
+                currentAmount={
+                  (mode === "risk"
+                    ? orgStatistics?.vulnDistribution.highRisk
+                    : orgStatistics?.vulnDistribution.highCVSS) ?? 0
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="medium"
+                isLoading={isStatisticsLoading}
+                currentAmount={
+                  (mode === "risk"
+                    ? orgStatistics?.vulnDistribution.mediumRisk
+                    : orgStatistics?.vulnDistribution.mediumCVSS) ?? 0
+                }
+                mode={mode}
+              />
+              <SeverityCard
+                variant="low"
+                isLoading={isStatisticsLoading}
+                currentAmount={
+                  (mode === "risk"
+                    ? orgStatistics?.vulnDistribution.lowRisk
+                    : orgStatistics?.vulnDistribution.lowCVSS) ?? 0
+                }
+                mode={mode}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </Section>
       <Section
         primaryHeadline
         forceVertical

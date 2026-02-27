@@ -962,6 +962,7 @@ export type ComponentUsageInOrg = {
 };
 
 export type CVEOccurrenceInOrg = {
+  cvss: number;
   cveID: string;
   totalAmount: number;
 };
