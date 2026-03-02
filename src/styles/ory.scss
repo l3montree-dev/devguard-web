@@ -1,3 +1,5 @@
+
+
 .ory-card {
     button {
         @apply cursor-pointer;
@@ -34,8 +36,8 @@
     }
 
     a {
-        @apply text-sm text-primary font-medium;
-        text-decoration: none;
+        @apply text-sm  !text-blue-600 dark:!text-primary font-medium;
+        text-decoration: none;       
     }
 
     span {
