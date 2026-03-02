@@ -21,6 +21,7 @@ import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
+import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -39,13 +40,11 @@ const OrganizationOverview: FunctionComponent = () => {
   const { data: orgStatistics, isLoading: isStatisticsLoading } =
     useSWR<OrgOverview>(`${url}/stats/vuln-statistics/?${params}`, fetcher);
 
-  const averageRemediations =
-    Math.round(
-      100 *
-        ((orgStatistics?.vulnEventAverage?.averageAcceptedEvents ?? 0) +
-          (orgStatistics?.vulnEventAverage?.averageFalsePositiveEvents ?? 0) +
-          (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0)),
-    ) / 100;
+  const totalRemediations = Math.round(
+    (orgStatistics?.vulnEventAverage?.averageAcceptedEvents ?? 0) +
+      (orgStatistics?.vulnEventAverage?.averageFalsePositiveEvents ?? 0) +
+      (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0),
+  );
 
   const convertedRiskHistory: ReleaseRiskHistory[] =
     orgStatistics?.orgRiskHistory.map(
@@ -62,8 +61,6 @@ const OrganizationOverview: FunctionComponent = () => {
           cvePurlCriticalCvss: entry.criticalCVSS,
         }) as ReleaseRiskHistory,
     ) ?? [];
-
-  console.log("convertedRiskHistory", convertedRiskHistory);
 
   return (
     <>
@@ -151,6 +148,12 @@ const OrganizationOverview: FunctionComponent = () => {
           />
           <VulnerabilityTrends
             averagesByTypes={orgStatistics?.vulnEventAverage}
+          />
+          <DetectionsRemediationsChart
+            weeklyDetections={Math.round(
+              orgStatistics?.vulnEventAverage.averageDetectedEvents ?? 0,
+            )}
+            weeklyRemediations={totalRemediations}
           />
         </Section>
 
