@@ -187,7 +187,7 @@ const AffectedComponentDetails: FunctionComponent<{
                 <CollapsibleContent className="border-t pt-4 mt-4">
                   <div className="mt-1 flex flex-col text-xs">
                     <span className="text-muted-foreground">Search PURL:</span>
-                    <div>{data.matchContext?.searchPurl ?? "unknown"}</div>
+                    <div>{purl ?? "unknown"}</div>
                   </div>
                   <div className="mt-3 flex flex-col text-xs">
                     <span className="text-muted-foreground">Version Type:</span>
