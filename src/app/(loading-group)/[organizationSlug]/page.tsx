@@ -55,7 +55,6 @@ import { useSession } from "@/context/SessionContext";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
 import useSWR from "swr";
 import Avatar from "../../../components/Avatar";
 import ListRenderer from "../../../components/common/ListRenderer";
@@ -317,7 +316,15 @@ const OrganizationHomePage: FunctionComponent = () => {
                   Description={
                     <div className="flex flex-col">
                       <span>
-                        <Markdown>{project.description}</Markdown>
+                        <Markdown
+                          components={{
+                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                              <span>{props.children}</span>
+                            ),
+                          }}
+                        >
+                          {project.description}
+                        </Markdown>
                       </span>
                       {project.type !== "default" && (
                         <div className="flex mt-4 flex-row items-center gap-2">

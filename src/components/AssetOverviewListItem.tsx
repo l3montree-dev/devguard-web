@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FunctionComponent, useMemo } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { AssetDTO, PolicyEvaluation } from "../types/api/api";
@@ -25,7 +25,15 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
         Description={
           <div className="flex flex-col">
             <span>
-              <Markdown>{asset.description}</Markdown>
+              <Markdown
+                components={{
+                  a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                    <span>{props.children}</span>
+                  ),
+                }}
+              >
+                {asset.description}
+              </Markdown>
             </span>
           </div>
         }

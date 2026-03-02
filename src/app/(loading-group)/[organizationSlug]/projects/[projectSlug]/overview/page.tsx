@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { groupBy, shuffle } from "lodash";
+import { groupBy } from "lodash";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import useSWR from "swr";
@@ -56,9 +56,6 @@ import {
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 
@@ -178,7 +175,6 @@ const OverviewPage = () => {
           "/stats/average-fixing-time?severity=critical"
         : null,
     fetcher,
-    { suspense: true },
   );
 
   const completeRiskHistory: RiskHistory[][] = useMemo(() => {
@@ -193,8 +189,6 @@ const OverviewPage = () => {
   const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
-  const asset = useActiveAsset();
-  const assetVersion = useActiveAssetVersion();
   const router = useRouter();
   const contentTree = useOrganization().contentTree;
 
@@ -454,7 +448,7 @@ const OverviewPage = () => {
 
                       return (
                         <div
-                          key={r.id}
+                          key={`${r.assetId}-${r.artifactName}`}
                           className={classNames(
                             i === 0
                               ? "border-b pb-4"

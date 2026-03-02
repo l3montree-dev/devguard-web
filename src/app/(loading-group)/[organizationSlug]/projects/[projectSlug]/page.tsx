@@ -307,7 +307,17 @@ export default function RepositoriesPage() {
                           )}
                         </div>
                       }
-                      Description={<Markdown>{subgroup.description}</Markdown>}
+                      Description={
+                        <Markdown
+                          components={{
+                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                              <span>{props.children}</span>
+                            ),
+                          }}
+                        >
+                          {subgroup.description}
+                        </Markdown>
+                      }
                     />
                   </Link>
                 );
