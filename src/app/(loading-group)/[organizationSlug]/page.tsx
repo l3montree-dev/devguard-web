@@ -54,8 +54,6 @@ import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { useSession } from "@/context/SessionContext";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
-
 import useSWR from "swr";
 import Avatar from "../../../components/Avatar";
 import ListRenderer from "../../../components/common/ListRenderer";
@@ -298,10 +296,12 @@ const OrganizationHomePage: FunctionComponent = () => {
             data={projects?.data}
             Empty={<EmptyParty title={"No groups found"} description="" />}
             renderItem={(project) => (
-              <Link
+              <div
                 key={project.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}`}
-                className="flex flex-col gap-2 hover:no-underline"
+                onClick={() =>
+                  router.push(`/${activeOrg.slug}/projects/${project.slug}`)
+                }
+                className="flex flex-col gap-2 cursor-pointer"
               >
                 <ListItem
                   reactOnHover
@@ -327,7 +327,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                     </div>
                   }
                 />
-              </Link>
+              </div>
             )}
           />
         </Section>
