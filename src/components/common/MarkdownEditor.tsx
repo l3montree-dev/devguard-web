@@ -68,7 +68,6 @@ const MarkdownEditor: FunctionComponent<Props> = ({
         quotePlugin(),
         headingsPlugin(),
         linkPlugin(),
-        linkDialogPlugin(),
         imagePlugin(),
         tablePlugin(),
         thematicBreakPlugin(),
