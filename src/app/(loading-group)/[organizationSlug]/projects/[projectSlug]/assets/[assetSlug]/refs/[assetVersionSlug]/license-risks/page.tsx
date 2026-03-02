@@ -253,14 +253,10 @@ const Index: FunctionComponent = () => {
         <Card className="px-4">
           {/* License Distribution Radar Chart */}
           <Collapsible className="my-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">License Distribution</h3>
-              </div>
-              <CollapsibleTrigger className="p-2 hover:bg-muted cursor-pointer rounded-md transition-colors">
-                <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
-              </CollapsibleTrigger>
-            </div>
+            <CollapsibleTrigger className="flex w-full items-center justify-between p-2 cursor-pointer rounded-md transition-colors">
+              <h3 className="font-semibold">License Distribution</h3>
+              <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
+            </CollapsibleTrigger>
             <CollapsibleContent className="mt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="bg-background">
