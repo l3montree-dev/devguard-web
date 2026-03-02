@@ -30,8 +30,14 @@ const OrganizationOverview: FunctionComponent = () => {
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
 
+  const params = new URLSearchParams({
+    orgComponentsLimit: "5",
+    topCVEsLimit: "5",
+    topComponentsLimit: "5",
+  });
+
   const { data: orgStatistics, isLoading: isStatisticsLoading } =
-    useSWR<OrgOverview>(url + "/stats/vuln-statistics/", fetcher);
+    useSWR<OrgOverview>(`${url}/stats/vuln-statistics/?${params}`, fetcher);
 
   const averageRemediations =
     Math.round(
@@ -60,106 +66,110 @@ const OrganizationOverview: FunctionComponent = () => {
   console.log("convertedRiskHistory", convertedRiskHistory);
 
   return (
-    <Page
-      Menu={orgMenu}
-      title="Overview"
-      description="Displays an overview about the stats of the org"
-      Title={null}
-    >
-      <Section
-        primaryHeadline
-        forceVertical
-        description=""
-        title="Total Vulnerabilities"
-        className="mt-12"
+    <>
+      <Page
+        Menu={orgMenu}
+        title="Overview"
+        description="Displays an overview about the stats of the org"
+        Title={null}
       >
-        <Tabs
-          value={mode}
-          onValueChange={(value) => setMode(value as "risk" | "cvss")}
-        >
-          <div className="flex mb-4">
-            <TabsList>
-              <TabsTrigger value="risk">Risk values</TabsTrigger>
-              <TabsTrigger value="cvss">CVSS values</TabsTrigger>
+        <div className="fixed left-89/100 top-89/100">
+          <Tabs
+            value={mode}
+            onValueChange={(value) => setMode(value as "risk" | "cvss")}
+          >
+            <TabsList className="py-8 px-4 border-primary border-2">
+              <TabsTrigger className="text-base py-4 px-4" value="risk">
+                Risk
+              </TabsTrigger>
+              <TabsTrigger className="text-base py-4 px-4" value="cvss">
+                CVSS
+              </TabsTrigger>
             </TabsList>
-          </div>
-          <TabsContent value={mode} className="space-y-4">
-            <div className="grid grid-cols-4 gap-4">
-              <SeverityCard
-                variant="critical"
-                isLoading={isStatisticsLoading}
-                currentAmount={
-                  (mode === "risk"
-                    ? orgStatistics?.vulnDistribution.criticalRisk
-                    : orgStatistics?.vulnDistribution.criticalCVSS) ?? 0
-                }
-                mode={mode}
-              />
-              <SeverityCard
-                variant="high"
-                isLoading={isStatisticsLoading}
-                currentAmount={
-                  (mode === "risk"
-                    ? orgStatistics?.vulnDistribution.highRisk
-                    : orgStatistics?.vulnDistribution.highCVSS) ?? 0
-                }
-                mode={mode}
-              />
-              <SeverityCard
-                variant="medium"
-                isLoading={isStatisticsLoading}
-                currentAmount={
-                  (mode === "risk"
-                    ? orgStatistics?.vulnDistribution.mediumRisk
-                    : orgStatistics?.vulnDistribution.mediumCVSS) ?? 0
-                }
-                mode={mode}
-              />
-              <SeverityCard
-                variant="low"
-                isLoading={isStatisticsLoading}
-                currentAmount={
-                  (mode === "risk"
-                    ? orgStatistics?.vulnDistribution.lowRisk
-                    : orgStatistics?.vulnDistribution.lowCVSS) ?? 0
-                }
-                mode={mode}
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </Section>
-      <Section
-        primaryHeadline
-        forceVertical
-        description=""
-        title="Dependency Overview"
-        className="mt-12"
-      >
-        <div className="mt-2 flex flex-row gap-12">
-          <MostUsedComponents
-            topComponents={orgStatistics?.topComponents ?? []}
-          />
-          <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
+          </Tabs>
         </div>
-      </Section>
-      <Section
-        primaryHeadline
-        forceVertical
-        description=""
-        title="Vulnerability Trends"
-        className="mt-12"
-      >
-        <RiskHistoryDistributionDiagram
-          isLoading={isStatisticsLoading}
-          data={convertedRiskHistory}
-          mode={mode}
-        />
-        <VulnerabilityTrends
-          averagesByTypes={orgStatistics?.vulnEventAverage}
-        />
-      </Section>
-    </Page>
+        <Section
+          primaryHeadline
+          forceVertical
+          description=""
+          title="Vulnerability Overview in Organization"
+          className="mt-12"
+        >
+          <Tabs
+            value={mode}
+            onValueChange={(value) => setMode(value as "risk" | "cvss")}
+          >
+            <TabsContent value={mode} className="space-y-4">
+              <div className="grid grid-cols-4 gap-4">
+                <SeverityCard
+                  variant="critical"
+                  isLoading={isStatisticsLoading}
+                  currentAmount={
+                    (mode === "risk"
+                      ? orgStatistics?.vulnDistribution.criticalRisk
+                      : orgStatistics?.vulnDistribution.criticalCVSS) ?? 0
+                  }
+                  mode={mode}
+                />
+                <SeverityCard
+                  variant="high"
+                  isLoading={isStatisticsLoading}
+                  currentAmount={
+                    (mode === "risk"
+                      ? orgStatistics?.vulnDistribution.highRisk
+                      : orgStatistics?.vulnDistribution.highCVSS) ?? 0
+                  }
+                  mode={mode}
+                />
+                <SeverityCard
+                  variant="medium"
+                  isLoading={isStatisticsLoading}
+                  currentAmount={
+                    (mode === "risk"
+                      ? orgStatistics?.vulnDistribution.mediumRisk
+                      : orgStatistics?.vulnDistribution.mediumCVSS) ?? 0
+                  }
+                  mode={mode}
+                />
+                <SeverityCard
+                  variant="low"
+                  isLoading={isStatisticsLoading}
+                  currentAmount={
+                    (mode === "risk"
+                      ? orgStatistics?.vulnDistribution.lowRisk
+                      : orgStatistics?.vulnDistribution.lowCVSS) ?? 0
+                  }
+                  mode={mode}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+          <RiskHistoryDistributionDiagram
+            isLoading={isStatisticsLoading}
+            data={convertedRiskHistory}
+            mode={mode}
+          />
+          <VulnerabilityTrends
+            averagesByTypes={orgStatistics?.vulnEventAverage}
+          />
+        </Section>
+
+        <Section
+          primaryHeadline
+          forceVertical
+          description=""
+          title="Organization Composition"
+          className="mt-10"
+        >
+          <div className="mt-2 flex flex-row gap-12">
+            <MostUsedComponents
+              topComponents={orgStatistics?.topComponents ?? []}
+            />
+            <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
+          </div>
+        </Section>
+      </Page>
+    </>
   );
 };
 
