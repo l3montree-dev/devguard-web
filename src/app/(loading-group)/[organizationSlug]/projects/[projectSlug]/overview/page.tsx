@@ -448,7 +448,7 @@ const OverviewPage = () => {
 
                       return (
                         <div
-                          key={`${r.assetId}-${r.artifactName}-${i}`}
+                          key={`${r.assetId}-${r.artifactName}`}
                           className={classNames(
                             i === 0
                               ? "border-b pb-4"

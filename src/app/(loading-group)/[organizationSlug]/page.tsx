@@ -54,6 +54,7 @@ import { useCurrentUserRole } from "@/hooks/useUserRole";
 import { useSession } from "@/context/SessionContext";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import useSWR from "swr";
 import Avatar from "../../../components/Avatar";
 import ListRenderer from "../../../components/common/ListRenderer";
@@ -296,12 +297,10 @@ const OrganizationHomePage: FunctionComponent = () => {
             data={projects?.data}
             Empty={<EmptyParty title={"No groups found"} description="" />}
             renderItem={(project) => (
-              <div
+              <Link
                 key={project.id}
-                onClick={() =>
-                  router.push(`/${activeOrg.slug}/projects/${project.slug}`)
-                }
-                className="flex flex-col gap-2 cursor-pointer"
+                href={`/${activeOrg.slug}/projects/${project.slug}`}
+                className="flex flex-col gap-2 hover:no-underline"
               >
                 <ListItem
                   reactOnHover
@@ -317,7 +316,15 @@ const OrganizationHomePage: FunctionComponent = () => {
                   Description={
                     <div className="flex flex-col">
                       <span>
-                        <Markdown>{project.description}</Markdown>
+                        <Markdown
+                          components={{
+                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                              <span>{props.children}</span>
+                            ),
+                          }}
+                        >
+                          {project.description}
+                        </Markdown>
                       </span>
                       {project.type !== "default" && (
                         <div className="flex mt-4 flex-row items-center gap-2">
@@ -327,7 +334,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                     </div>
                   }
                 />
-              </div>
+              </Link>
             )}
           />
         </Section>

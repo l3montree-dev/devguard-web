@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Form, FormProvider, useForm } from "react-hook-form";
@@ -273,14 +274,10 @@ export default function RepositoriesPage() {
               const { asset, subgroup } = checkType(item);
               if (subgroup)
                 return (
-                  <div
+                  <Link
                     key={subgroup.id}
-                    onClick={() =>
-                      router.push(
-                        `/${activeOrg.slug}/projects/${subgroup.slug}`,
-                      )
-                    }
-                    className="flex flex-col gap-2 cursor-pointer"
+                    href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
+                    className="flex flex-col gap-2 hover:no-underline"
                   >
                     <ListItem
                       reactOnHover
@@ -310,9 +307,19 @@ export default function RepositoriesPage() {
                           )}
                         </div>
                       }
-                      Description={<Markdown>{subgroup.description}</Markdown>}
+                      Description={
+                        <Markdown
+                          components={{
+                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                              <span>{props.children}</span>
+                            ),
+                          }}
+                        >
+                          {subgroup.description}
+                        </Markdown>
+                      }
                     />
-                  </div>
+                  </Link>
                 );
               if (asset)
                 return <AssetOverviewListItem key={asset.id} asset={asset} />;
