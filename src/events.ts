@@ -7,19 +7,19 @@ type Events = {
   assetVersionDeleted: AssetVersionDeletedEvent;
 };
 
-type Listener = {
+type Listener<T extends keyof Events> = {
   id: string;
-  callback: (payload: Events[keyof Events]) => void;
+  callback: (payload: Events[T]) => void;
 };
 class EventBus {
   private listeners: {
-    [key in keyof Events]: Listener[];
+    [K in keyof Events]: Listener<K>[];
   } = {
     assetVersionDeleted: [],
   };
-  public dispatch(event: {
-    type: keyof Events;
-    payload: Events[keyof Events];
+  public dispatch<E extends keyof Events>(event: {
+    type: E;
+    payload: Events[E];
   }) {
     const listeners = this.listeners[event.type] || [];
 
@@ -36,6 +36,9 @@ class EventBus {
     if (!this.listeners[eventType]) {
       this.listeners[eventType] = [];
     }
+    (this.listeners[eventType] as Listener<T>[]) = this.listeners[
+      eventType
+    ].filter((l) => l.id !== id);
     this.listeners[eventType].push({ id, callback });
   }
 

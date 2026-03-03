@@ -78,7 +78,6 @@ const RefsPage = () => {
         "lastViewedAssetVersionSlug" + params.assetSlug,
       );
       if (stored === open.slug) {
-        console.log("Removing last viewed ref from localStorage");
         localStorage.removeItem(
           "lastViewedAssetVersionSlug" + params.assetSlug,
         );
