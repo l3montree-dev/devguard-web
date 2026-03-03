@@ -59,15 +59,17 @@ const InputWithButton = (props: InputWithButtonProps) => {
           variant === "onCard" ? "bg-background" : "bg-card",
         )}
       >
-        <div className="flex flex-row  justify-between w-full">
+        <div className="flex flex-row  justify-between w-full gap-2">
           <input
             {...inputProps}
             value={props.value ?? ""}
-            className={classNames("w-full bg-transparent focus:outline-none")}
+            className={classNames(
+              "min-w-0 flex-1 truncate bg-transparent focus:outline-none",
+            )}
             readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex shrink-0 flex-row items-center gap-2">
             {copyable && (
               <button
                 name={"clipboard-" + nameKey}
