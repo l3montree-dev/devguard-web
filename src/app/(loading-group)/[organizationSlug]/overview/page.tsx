@@ -35,6 +35,7 @@ const OrganizationOverview: FunctionComponent = () => {
     orgComponentsLimit: "5",
     topCVEsLimit: "5",
     topComponentsLimit: "5",
+    topEcosystemsLimit: "5",
   });
 
   const { data: orgStatistics, isLoading: isStatisticsLoading } =
