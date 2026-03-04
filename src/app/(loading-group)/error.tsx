@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useConfig } from "@/context/ConfigContext";
 
 export default function InternalServerErrorPage({ error }: { error: Error }) {
+  const config = useConfig();
   console.error("ERROR", error);
   return (
     <>
@@ -32,7 +34,7 @@ export default function InternalServerErrorPage({ error }: { error: Error }) {
               <Button variant="default">Take me home...</Button>
             </Link>
             <Link
-              href="https://github.com/l3montree-dev/devguard/issues/new/choose"
+              href={config.issueTrackerUrl}
               target="_blank"
               rel="noreferrer noopener"
             >
