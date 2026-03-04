@@ -44,6 +44,6 @@ export const config = {
   errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
   registrationEnabled: process.env.REGISTRATION_ENABLED !== "false",
   issueTrackerUrl:
-    process.env.ISSUE_TRACKER_URL ??
+    process.env.ISSUE_TRACKER_URL ||
     "https://github.com/l3montree-dev/devguard/issues/new/choose",
 };
