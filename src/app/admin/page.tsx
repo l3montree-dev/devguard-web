@@ -5,10 +5,8 @@
 
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient } from "@/services/adminApi";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,13 +22,28 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { ShieldCheckIcon } from "@heroicons/react/24/outline";
+import InstanceDashboard, {
+  type InstanceDashboardHandle,
+} from "@/components/admin/InstanceDashboard";
+import InstanceTechnicalInfo, {
+  type InstanceTechnicalInfoHandle,
+} from "@/components/admin/InstanceTechnicalInfo";
+import AdminTools from "@/components/admin/AdminTools";
+import Section from "@/components/common/Section";
+import { ArrowPathIcon } from "@heroicons/react/20/solid";
 
 export default function InstanceAdminPage() {
   const { isAuthenticated, authenticate, logout, getPrivateKey } =
     useInstanceAdmin();
   const [keyInput, setKeyInput] = useState("");
   const [verifying, setVerifying] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const techInfoRef = useRef<InstanceTechnicalInfoHandle>(null);
+  const dashboardRef = useRef<InstanceDashboardHandle>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAuthenticate = useCallback(async () => {
     const trimmedKey = keyInput.trim();
@@ -70,6 +83,8 @@ export default function InstanceAdminPage() {
     logout();
     toast.success("Admin session ended. Private key removed from session.");
   }, [logout]);
+
+  if (!mounted) return null;
 
   if (!isAuthenticated) {
     return (
@@ -141,30 +156,49 @@ export default function InstanceAdminPage() {
           End Admin Session
         </Button>
       </div>
+      <Section
+        title="Admin Tools"
+        description="Instance management actions and utilities."
+        forceVertical
+      >
+        <AdminTools />
+      </Section>
 
-      <Alert className="mb-6">
-        <ShieldCheckIcon className="h-4 w-4" />
-        <AlertTitle>Authenticated</AlertTitle>
-        <AlertDescription>
-          You are authenticated as an instance admin. All requests from this
-          page are cryptographically signed with your private key.
-        </AlertDescription>
-      </Alert>
+      <Section
+        title="Instance Technical Info"
+        description="Build version, runtime details, and database status."
+        forceVertical
+        Button={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => techInfoRef.current?.refresh()}
+          >
+            <ArrowPathIcon className="mr-1.5 h-3.5 w-3.5" />
+            Refresh
+          </Button>
+        }
+      >
+        <InstanceTechnicalInfo ref={techInfoRef} />
+      </Section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Instance Overview</CardTitle>
-          <CardDescription>
-            Instance administration features will appear here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Admin endpoints are being developed. This page will provide tools
-            for managing organizations, users, and instance-wide settings.
-          </p>
-        </CardContent>
-      </Card>
+      <Section
+        title="Instance Usage Statistics"
+        description="Overview of users, organisations, projects, and security posture across the instance."
+        forceVertical
+        Button={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => dashboardRef.current?.refresh()}
+          >
+            <ArrowPathIcon className="mr-1.5 h-3.5 w-3.5" />
+            Refresh
+          </Button>
+        }
+      >
+        <InstanceDashboard ref={dashboardRef} />
+      </Section>
     </div>
   );
 }
