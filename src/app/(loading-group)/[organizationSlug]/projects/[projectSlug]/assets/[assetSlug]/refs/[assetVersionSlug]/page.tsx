@@ -44,7 +44,7 @@ import { useArtifacts } from "../../../../../../../../../context/AssetVersionCon
 import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import {
-  AverageFixingTime,
+  AllAverageFixingTimes,
   ComponentRisk,
   LicenseResponse,
   Paged,
@@ -123,8 +123,8 @@ const Index: FunctionComponent = () => {
   );
 
   const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url + "/stats/average-fixing-time/" + urlAppendixForArtifact,
+    useSWR<AllAverageFixingTimes>(
+      url + "/stats/average-fixing-time/" + urlQueryAppendixForArtifact,
       fetcher,
     );
 
@@ -385,8 +385,14 @@ const Index: FunctionComponent = () => {
                   variant="critical"
                   title="Avg. remediation time"
                   description="Time for critical severity vulnerabilities"
-                  averageFixingTimeByCVSS={averageFixingTime?.cvssAvgCritical}
-                  averageFixingTimeByRisk={averageFixingTime?.riskAvgCritical}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds:
+                        averageFixingTime.riskAvgCritical,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgCritical,
+                    }
+                  }
                   isLoading={averageFixingTimeLoading}
                 />
 
@@ -395,8 +401,13 @@ const Index: FunctionComponent = () => {
                   variant="high"
                   title="Avg. remediation time"
                   description="Time for high severity vulnerabilities"
-                  averageFixingTimeByCVSS={averageFixingTime?.cvssAvgHigh}
-                  averageFixingTimeByRisk={averageFixingTime?.riskAvgHigh}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgHigh,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgHigh,
+                    }
+                  }
                   isLoading={averageFixingTimeLoading}
                 />
 
@@ -405,8 +416,13 @@ const Index: FunctionComponent = () => {
                   variant="medium"
                   title="Avg. remediation time"
                   description="Time for medium severity vulnerabilities"
-                  averageFixingTimeByCVSS={averageFixingTime?.cvssAvgMedium}
-                  averageFixingTimeByRisk={averageFixingTime?.riskAvgMedium}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgMedium,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgMedium,
+                    }
+                  }
                   isLoading={averageFixingTimeLoading}
                 />
 
@@ -415,8 +431,13 @@ const Index: FunctionComponent = () => {
                   variant="low"
                   title="Avg. remediation time"
                   description="Time for low severity vulnerabilities"
-                  averageFixingTimeByCVSS={averageFixingTime?.cvssAvgLow}
-                  averageFixingTimeByRisk={averageFixingTime?.riskAvgLow}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgLow,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgLow,
+                    }
+                  }
                   isLoading={averageFixingTimeLoading}
                 />
               </div>

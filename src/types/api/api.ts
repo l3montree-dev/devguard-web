@@ -684,7 +684,7 @@ export interface FirstPartyVuln extends BaseVulnDTO {
   ruleProperties: any;
 }
 
-export interface AverageFixingTime {
+export interface AllAverageFixingTimes {
   riskAvgLow: number;
   riskAvgMedium: number;
   riskAvgHigh: number;

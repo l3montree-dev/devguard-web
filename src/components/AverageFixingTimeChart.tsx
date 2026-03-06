@@ -42,8 +42,7 @@ function getHumanReadableDuration(seconds: number) {
 }
 
 interface Props {
-  averageFixingTimeByCVSS: number | undefined;
-  averageFixingTimeByRisk: number | undefined;
+  avgFixingTime: AverageFixingTime | undefined;
   variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
@@ -52,8 +51,7 @@ interface Props {
 }
 
 const AverageFixingTimeChart: FunctionComponent<Props> = ({
-  averageFixingTimeByCVSS,
-  averageFixingTimeByRisk,
+  avgFixingTime,
   title,
   description,
   variant,
@@ -77,16 +75,17 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
     );
   }
 
-  if (!averageFixingTimeByCVSS) {
-    averageFixingTimeByCVSS = 0;
-  }
-
-  if (!averageFixingTimeByRisk) {
-    averageFixingTimeByRisk = 0;
+  if (!avgFixingTime) {
+    avgFixingTime = {
+      averageFixingTimeSeconds: 0,
+      averageFixingTimeSecondsByCvss: 0,
+    };
   }
 
   const seconds =
-    mode === "cvss" ? averageFixingTimeByCVSS : averageFixingTimeByRisk;
+    mode === "cvss"
+      ? avgFixingTime.averageFixingTimeSecondsByCvss
+      : avgFixingTime.averageFixingTimeSeconds;
   const hasData = seconds > 0;
 
   const { duration, type } = getHumanReadableDuration(seconds);
