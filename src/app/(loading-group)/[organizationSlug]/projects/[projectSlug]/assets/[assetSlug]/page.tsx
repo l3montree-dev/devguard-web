@@ -28,6 +28,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
+import Link from "next/link";
 
 const Index: FunctionComponent = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();
@@ -217,14 +218,14 @@ const Index: FunctionComponent = () => {
                       <p className="text-sm font-semibold">
                         Personal Access Token
                       </p>
-                      <a
+                      <Link
                         href="/user-settings#pat"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-muted-foreground hover:text-foreground underline"
                       >
                         Manage existing tokens
-                      </a>
+                      </Link>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
                       Used for API authentication. Set this as{" "}
