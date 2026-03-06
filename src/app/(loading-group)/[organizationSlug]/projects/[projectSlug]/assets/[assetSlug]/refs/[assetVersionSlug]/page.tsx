@@ -44,7 +44,7 @@ import { useArtifacts } from "../../../../../../../../../context/AssetVersionCon
 import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 import {
-  AverageFixingTime,
+  AllAverageFixingTimes,
   ComponentRisk,
   LicenseResponse,
   Paged,
@@ -122,34 +122,11 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
-  const { data: avgLowFixingTime, isLoading: avgLowFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url + "/stats/average-fixing-time/?severity=low" + urlAppendixForArtifact,
+  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
+    useSWR<AllAverageFixingTimes>(
+      url + "/stats/average-fixing-time/" + urlQueryAppendixForArtifact,
       fetcher,
     );
-  const { data: avgMediumFixingTime, isLoading: avgMediumFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url +
-        "/stats/average-fixing-time/?severity=medium" +
-        urlAppendixForArtifact,
-      fetcher,
-    );
-  const { data: avgHighFixingTime, isLoading: avgHighFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url +
-        "/stats/average-fixing-time/?severity=high" +
-        urlAppendixForArtifact,
-      fetcher,
-    );
-  const {
-    data: avgCriticalFixingTime,
-    isLoading: avgCriticalFixingTimeLoading,
-  } = useSWR<AverageFixingTime>(
-    url +
-      "/stats/average-fixing-time/?severity=critical" +
-      urlAppendixForArtifact,
-    fetcher,
-  );
 
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
@@ -408,8 +385,15 @@ const Index: FunctionComponent = () => {
                   variant="critical"
                   title="Avg. remediation time"
                   description="Time for critical severity vulnerabilities"
-                  isLoading={avgCriticalFixingTimeLoading}
-                  avgFixingTime={avgCriticalFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds:
+                        averageFixingTime.riskAvgCritical,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgCritical,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -417,8 +401,14 @@ const Index: FunctionComponent = () => {
                   variant="high"
                   title="Avg. remediation time"
                   description="Time for high severity vulnerabilities"
-                  avgFixingTime={avgHighFixingTime}
-                  isLoading={avgHighFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgHigh,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgHigh,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -426,8 +416,14 @@ const Index: FunctionComponent = () => {
                   variant="medium"
                   title="Avg. remediation time"
                   description="Time for medium severity vulnerabilities"
-                  avgFixingTime={avgMediumFixingTime}
-                  isLoading={avgMediumFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgMedium,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgMedium,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -435,8 +431,14 @@ const Index: FunctionComponent = () => {
                   variant="low"
                   title="Avg. remediation time"
                   description="Time for low severity vulnerabilities"
-                  avgFixingTime={avgLowFixingTime}
-                  isLoading={avgLowFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgLow,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgLow,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
               </div>
               <Card className="col-span-4 flex flex-col">
