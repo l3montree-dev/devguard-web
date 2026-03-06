@@ -44,6 +44,7 @@ export default function InstanceSettingsCard() {
             <div className="flex items-center gap-3">
               {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
               <Switch
+                disabled={true} // TODO: This setting is not actually implemented yet
                 checked={orgCreationDisabled}
                 onCheckedChange={(checked) => {
                   setOrgCreationDisabled(checked);

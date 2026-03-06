@@ -38,3 +38,105 @@ export const adminBrowserApiClient = async (
     credentials: "omit",
   });
 };
+
+/**
+ * SSE event payload from daemon trigger endpoints.
+ */
+export interface DaemonSSEEvent {
+  event: "log" | "done" | "error";
+  data: string;
+}
+
+/**
+ * Error subclass carrying the HTTP status code from a failed admin API call.
+ */
+export class AdminAPIError extends Error {
+  public readonly status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "AdminAPIError";
+    this.status = status;
+  }
+}
+
+/**
+ * Trigger an admin daemon endpoint that returns an SSE stream.
+ * Calls `onEvent` for each SSE event received, then resolves when the stream ends.
+ * Rejects on HTTP errors (e.g. 429 cooldown) or network failures.
+ */
+export async function adminSSETrigger(
+  input: string,
+  hexPrivateKey: string,
+  onEvent: (evt: DaemonSSEEvent) => void,
+  body?: string,
+): Promise<void> {
+  const resp = await adminBrowserApiClient(input, hexPrivateKey, {
+    method: "POST",
+    body,
+    headers: body ? { "Content-Type": "application/json" } : undefined,
+  });
+
+  if (!resp.ok) {
+    let message: string | undefined;
+    try {
+      const text = await resp.text();
+      // The custom Echo error handler sends he.Message directly as JSON,
+      // which may be a bare string (e.g. "some message") or an object
+      // (e.g. {"message":"..."}). Handle both.
+      try {
+        const json = JSON.parse(text);
+        if (typeof json === "string") {
+          message = json;
+        } else if (typeof json === "object" && json !== null) {
+          message = json.message ?? JSON.stringify(json);
+        }
+      } catch {
+        // Not valid JSON – use the raw body if it looks meaningful
+        if (text && text.length < 500) {
+          message = text;
+        }
+      }
+    } catch {
+      // body unreadable
+    }
+    throw new AdminAPIError(
+      message ?? resp.statusText ?? `HTTP ${resp.status}`,
+      resp.status,
+    );
+  }
+
+  if (!resp.body) {
+    throw new Error("No response body");
+  }
+
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    // Parse SSE lines from buffer
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? ""; // keep incomplete line in buffer
+
+    let currentEvent = "";
+    for (const line of lines) {
+      if (line.startsWith("event: ")) {
+        currentEvent = line.slice(7);
+      } else if (line.startsWith("data: ")) {
+        const data = line.slice(6);
+        if (currentEvent) {
+          onEvent({
+            event: currentEvent as DaemonSSEEvent["event"],
+            data,
+          });
+          currentEvent = "";
+        }
+      }
+    }
+  }
+}
