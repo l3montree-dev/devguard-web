@@ -14,7 +14,7 @@ const MostCommonCVEs: FunctionComponent<Props> = ({ topCVEs }) => {
 
   return (
     <div
-      className={`${isExpanded ? "w-full " : "w-1/4"} lg:w-1/2`}
+      className="w-full"
       onClick={() => {
         setExpanded(!isExpanded);
       }}
