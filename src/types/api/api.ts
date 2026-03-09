@@ -1023,4 +1023,5 @@ export type OrgOverview = {
   orgRiskHistory: OrgRiskHistory[];
   averageRemediationTimes: AverageRemediationTimes;
   averageAgeOfDependencies: number;
+  averageOpenCodeRisksPerProject: number;
 };

@@ -27,6 +27,7 @@ import DetectionsRemediationsChart from "@/components/organization/DetectionsRem
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { Card } from "@/components/ui/card";
 import DependencyAge from "@/components/organization/DependencyAge";
+import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -155,12 +156,20 @@ const OrganizationOverview: FunctionComponent = () => {
           <VulnerabilityTrends
             averagesByTypes={orgStatistics?.vulnEventAverage}
           />
-          <DetectionsRemediationsChart
-            weeklyDetections={Math.round(
-              orgStatistics?.vulnEventAverage.averageDetectedEvents ?? 0,
-            )}
-            weeklyRemediations={totalRemediations}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+              <DetectionsRemediationsChart
+                weeklyDetections={Math.round(
+                  orgStatistics?.vulnEventAverage.averageDetectedEvents ?? 0,
+                )}
+                weeklyRemediations={totalRemediations}
+              />
+              <AverageOpenCodeRisks
+                amount={orgStatistics?.averageOpenCodeRisksPerProject}
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-4 grid grid-cols-4 gap-4">
               <AverageFixingTimeChart
@@ -233,9 +242,9 @@ const OrganizationOverview: FunctionComponent = () => {
           forceVertical
           description=""
           title="Organization Composition"
-          className="mt-10"
+          className="mt-20"
         >
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 mt-4">
             <StructureCard
               type="Projects"
               mode={mode}
@@ -258,14 +267,21 @@ const OrganizationOverview: FunctionComponent = () => {
               isLoading={isStatisticsLoading}
             />
           </div>
-          <MostUsedEcosystems ecosystems={orgStatistics?.topEcosystems ?? []} />
-          <div className="mt-2 flex flex-row gap-12">
+          <div className="grid grid-cols-2 gap-4">
+            <MostUsedEcosystems
+              ecosystems={orgStatistics?.topEcosystems ?? []}
+            />
+            <DependencyAge
+              averageAge={orgStatistics?.averageAgeOfDependencies}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-2">
             <MostUsedComponents
               topComponents={orgStatistics?.topComponents ?? []}
             />
             <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
           </div>
-          <DependencyAge averageAge={orgStatistics?.averageAgeOfDependencies} />
         </Section>
       </Page>
     </>
