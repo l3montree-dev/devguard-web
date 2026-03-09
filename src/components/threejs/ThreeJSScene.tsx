@@ -95,33 +95,10 @@ const Cube = () => {
 };
 
 const ThreeJSScene = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      window.scrollBy(0, e.deltaY);
-    };
-
-    container.addEventListener("wheel", handleWheel, {
-      capture: true,
-      passive: false,
-    });
-    return () =>
-      container.removeEventListener("wheel", handleWheel, { capture: true });
-  }, []);
-
   return (
-    <div ref={containerRef} className="w-full h-full">
-      <Canvas shadows camera={{ position: [-3, 0.5, 3] }}>
-        <Cube />
-        <CameraControls makeDefault dollySpeed={0} />
-      </Canvas>
-    </div>
+    <Canvas shadows camera={{ position: [-3, 0.5, 3] }}>
+      <Cube />
+    </Canvas>
   );
 };
 
