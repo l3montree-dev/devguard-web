@@ -30,7 +30,7 @@ const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
             key={index}
             className={
               part.added
-                ? "text-green-400 font-mono"
+                ? "text-green-500 font-mono"
                 : part.removed
                   ? "bg-red-200 text-red-900"
                   : ""
@@ -120,20 +120,26 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <span className="flex flex-row gap-2 items-center gap-0.5">
                   <Zap className="h-4" />
-                  <span className="flex-1 text-left">{vuln.cveID}</span>
+                  <span className="flex-1 text-left font-semibold">
+                    {vuln.cveID}
+                  </span>
                 </span>
                 <div className="mt-1 flex flex-row gap-2"></div>
-                <div className="mt-2 flex flex-col gap-2">
-                  <div className="flex flew-row gap-2">
-                    <span>Before: </span>
+                <div className="mt-2 flex flex-col gap-2  ">
+                  <div className="flex flex-row gap-2 justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Before:{" "}
+                    </span>
                     <Badge
                       className="font-mono"
                       variant={"outline"}
                     >{`${name + "@" + version}`}</Badge>
                   </div>
-                  <div>
-                    <span>After: </span>
-                    <Badge variant={"outline"} className="font-mono">
+                  <div className="flex flex-row justify-between">
+                    <span className="text-xs text-muted-foreground ">
+                      After:{" "}
+                    </span>
+                    <Badge variant={"outline"} className="font-mono ">
                       {
                         <DiffHighlighter
                           oldVersion={vuln.vulnerabilityPath[0] || ""}

@@ -6,7 +6,7 @@ import {
   PURLInspectResponse,
   VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";
@@ -20,75 +20,42 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
 }> = ({ vuln }) => {
-  const [data, setData] = useState<PURLInspectResponse | null>(null);
   const [activeCVE, setActiveCVE] = useState<VulnInPackage | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
   const { theme } = useTheme();
 
   const purl = vuln.componentPurl;
 
   const url = useMemo(
     () =>
-      `/api/devguard-tunnel/api/v1/vulndb/purl-inspect/${encodeURIComponent(purl ?? "")}`,
+      purl
+        ? `/api/devguard-tunnel/api/v1/vulndb/purl-inspect/${encodeURIComponent(purl)}`
+        : null,
     [purl],
   );
 
-  useEffect(() => {
-    if (!purl) {
-      setIsLoading(false);
-      setError(true);
-      return;
-    }
+  const { data, isLoading, error } = useSWR<PURLInspectResponse>(url, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
-    const abortController = new AbortController();
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(false);
-
-      try {
-        const response = await fetch(url, {
-          cache: "no-store",
-          signal: abortController.signal,
-        });
-
-        if (!response.ok) {
-          setError(true);
-          return;
-        }
-
-        const result = (await response.json()) as PURLInspectResponse;
-        setData(result);
-
-        const matchedCVE = result.vulns.find(
-          (vulnInPkg) => vuln.cveID === vulnInPkg.CVEID,
-        );
-        if (matchedCVE) {
-          setActiveCVE(matchedCVE);
-        }
-      } catch (err) {
-        // Don't set error if request was aborted
-        if (err instanceof Error && err.name !== "AbortError") {
-          setError(true);
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setIsLoading(false);
-        }
+  useSWR(data ? `matched-cve-${vuln.cveID}` : null, () => {
+    if (data) {
+      const matchedCVE = data.vulns.find(
+        (vulnInPkg) => vuln.cveID === vulnInPkg.CVEID,
+      );
+      if (matchedCVE) {
+        setActiveCVE(matchedCVE);
       }
-    };
-
-    fetchData();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [url, purl, vuln.cveID]);
+    }
+    return null;
+  });
 
   if (isLoading) {
     return (
