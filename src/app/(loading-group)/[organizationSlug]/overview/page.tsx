@@ -28,6 +28,7 @@ import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { Card } from "@/components/ui/card";
 import DependencyAge from "@/components/organization/DependencyAge";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
+import RemediationTypeDistribution from "@/components/organization/RemediationDistributionChart";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -205,7 +206,9 @@ const OrganizationOverview: FunctionComponent = () => {
               mode={mode}
             />
           </div>
-
+          <RemediationTypeDistribution
+            distribution={orgStatistics?.remediationTypeDistribution}
+          />
           <VulnerabilityTrends
             averagesByTypes={orgStatistics?.vulnEventAverage}
           />

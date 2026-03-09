@@ -1019,6 +1019,12 @@ export type ProjectVulnCountAverageBySeverity = {
   cvssCriticalAverage: number;
 };
 
+export type RemediationTypeUsage = {
+  acceptedPercentage: number;
+  falsePositivePercentage: number;
+  fixedPercentage: number;
+};
+
 export type OrgOverview = {
   vulnEventAverage: AverageVulnEventsPerWeek;
   structure: OrgStructure;
@@ -1036,4 +1042,5 @@ export type OrgOverview = {
   averageAgeOfDependencies: number;
   averageOpenCodeRisksPerProject: number;
   projectOpenVulnAverage: ProjectVulnCountAverageBySeverity;
+  remediationTypeDistribution: RemediationTypeUsage;
 };
