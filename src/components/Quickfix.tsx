@@ -30,7 +30,7 @@ const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
             key={index}
             className={
               part.added
-                ? "bg-green-200 text-green-900 font-mono"
+                ? "text-green-400 font-mono"
                 : part.removed
                   ? "bg-red-200 text-red-900"
                   : ""
