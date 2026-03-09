@@ -30,7 +30,7 @@ const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
             key={index}
             className={
               part.added
-                ? "bg-green-200 text-green-500 font-semibold"
+                ? "bg-green-200 text-green-900 font-mono"
                 : part.removed
                   ? "bg-red-200 text-red-900"
                   : ""
@@ -96,6 +96,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
     directDependencyFixedVersion,
   );
 
+  const { type, namespace, name, version } = PackageURL.fromString(
+    vuln.vulnerabilityPath[0],
+  );
+
   return (
     <>
       <div className="p-5">
@@ -118,16 +122,28 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   <Zap className="h-4" />
                   <span className="flex-1 text-left">{vuln.cveID}</span>
                 </span>
-                <div className="flex flex-row gap-2">
-                  <DiffHighlighter
-                    oldVersion={vuln.vulnerabilityPath[0] || ""}
-                    newVersion={vuln.directDependencyFixedVersion || ""}
-                  ></DiffHighlighter>
+                <div className="mt-1 flex flex-row gap-2"></div>
+                <div className="mt-2 flex flex-col gap-2">
+                  <div className="flex flew-row gap-2">
+                    <span>Before: </span>
+                    <Badge
+                      className="font-mono"
+                      variant={"outline"}
+                    >{`${name + "@" + version}`}</Badge>
+                  </div>
+                  <div>
+                    <span>After: </span>
+                    <Badge variant={"outline"} className="font-mono">
+                      {
+                        <DiffHighlighter
+                          oldVersion={vuln.vulnerabilityPath[0] || ""}
+                          newVersion={vuln.directDependencyFixedVersion || ""}
+                        ></DiffHighlighter>
+                      }
+                    </Badge>
+                  </div>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {`Fix ${vuln.cveID} by updating to:`}
-                  {/* <CopyCode codeString={ecosystemUpdate} /> */}
-                </span>
+                {/* <CopyCode codeString={ecosystemUpdate} /> */}
               </>
             )}
           </div>
