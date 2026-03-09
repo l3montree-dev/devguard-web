@@ -1262,9 +1262,8 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-
-                <AffectedComponentDetails vuln={vuln} />
                 <Quickfix vuln={vuln} />
+                <AffectedComponentDetails vuln={vuln} />
 
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
