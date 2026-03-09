@@ -20,10 +20,12 @@ import useSWR from "swr";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import MostUsedEcosystems from "@/components/organization/MostUsedEcosystems";
+import StructureCard from "@/components/organization/StructureCard";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
+import { Card } from "@/components/ui/card";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -232,13 +234,36 @@ const OrganizationOverview: FunctionComponent = () => {
           title="Organization Composition"
           className="mt-10"
         >
+          <div className="grid grid-cols-3 gap-4">
+            <StructureCard
+              type="Projects"
+              mode={mode}
+              currentAmount={orgStatistics?.structure.numProjects ?? 0}
+              topEntries={orgStatistics?.topProjects ?? []}
+              isLoading={isStatisticsLoading}
+            />
+            <StructureCard
+              type="Assets"
+              mode={mode}
+              currentAmount={orgStatistics?.structure.numAssets ?? 0}
+              topEntries={orgStatistics?.topAssets ?? []}
+              isLoading={isStatisticsLoading}
+            />
+            <StructureCard
+              type="Artifacts"
+              mode={mode}
+              currentAmount={orgStatistics?.structure.numArtifacts ?? 0}
+              topEntries={orgStatistics?.topArtifacts ?? []}
+              isLoading={isStatisticsLoading}
+            />
+          </div>
+          <MostUsedEcosystems ecosystems={orgStatistics?.topEcosystems ?? []} />
           <div className="mt-2 flex flex-row gap-12">
             <MostUsedComponents
               topComponents={orgStatistics?.topComponents ?? []}
             />
             <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
           </div>
-          <MostUsedEcosystems ecosystems={orgStatistics?.topEcosystems ?? []} />
         </Section>
       </Page>
     </>
