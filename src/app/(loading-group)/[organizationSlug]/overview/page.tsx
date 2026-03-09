@@ -22,6 +22,7 @@ import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
+import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -156,6 +157,71 @@ const OrganizationOverview: FunctionComponent = () => {
             )}
             weeklyRemediations={totalRemediations}
           />
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-4 grid grid-cols-4 gap-4">
+              <AverageFixingTimeChart
+                mode={mode}
+                variant="critical"
+                title="Avg. remediation time"
+                description="Time for critical severity vulnerabilities"
+                avgFixingTime={{
+                  averageFixingTimeSeconds:
+                    orgStatistics?.averageRemediationTimes
+                      ?.criticalRiskAverage ?? 0,
+                  averageFixingTimeSecondsByCvss:
+                    orgStatistics?.averageRemediationTimes
+                      ?.criticalCVSSAverage ?? 0,
+                }}
+                isLoading={isStatisticsLoading}
+              />
+
+              <AverageFixingTimeChart
+                mode={mode}
+                variant="high"
+                title="Avg. remediation time"
+                description="Time for high severity vulnerabilities"
+                avgFixingTime={{
+                  averageFixingTimeSeconds:
+                    orgStatistics?.averageRemediationTimes?.highRiskAverage ??
+                    0,
+                  averageFixingTimeSecondsByCvss:
+                    orgStatistics?.averageRemediationTimes?.highCVSSAverage ??
+                    0,
+                }}
+                isLoading={isStatisticsLoading}
+              />
+
+              <AverageFixingTimeChart
+                mode={mode}
+                variant="medium"
+                title="Avg. remediation time"
+                description="Time for medium severity vulnerabilities"
+                avgFixingTime={{
+                  averageFixingTimeSeconds:
+                    orgStatistics?.averageRemediationTimes?.mediumRiskAverage ??
+                    0,
+                  averageFixingTimeSecondsByCvss:
+                    orgStatistics?.averageRemediationTimes?.mediumCVSSAverage ??
+                    0,
+                }}
+                isLoading={isStatisticsLoading}
+              />
+
+              <AverageFixingTimeChart
+                mode={mode}
+                variant="low"
+                title="Avg. remediation time"
+                description="Time for low severity vulnerabilities"
+                avgFixingTime={{
+                  averageFixingTimeSeconds:
+                    orgStatistics?.averageRemediationTimes?.lowRiskAverage ?? 0,
+                  averageFixingTimeSecondsByCvss:
+                    orgStatistics?.averageRemediationTimes?.lowCVSSAverage ?? 0,
+                }}
+                isLoading={isStatisticsLoading}
+              />
+            </div>
+          </div>
         </Section>
 
         <Section

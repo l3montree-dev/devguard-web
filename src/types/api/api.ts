@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import { number } from "zod";
 import { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
@@ -989,6 +990,18 @@ type OrgRiskHistory = {
   criticalCVSS: number;
 };
 
+export type AverageRemediationTimes = {
+  lowRiskAverage: number;
+  mediumRiskAverage: number;
+  highRiskAverage: number;
+  criticalRiskAverage: number;
+
+  lowCVSSAverage: number;
+  mediumCVSSAverage: number;
+  highCVSSAverage: number;
+  criticalCVSSAverage: number;
+};
+
 export type OrgOverview = {
   vulnEventAverage: AverageVulnEventsPerWeek;
   structure: OrgStructure;
@@ -999,4 +1012,5 @@ export type OrgOverview = {
   topAssets: VulnDistributionInStructure[];
   topArtifacts: VulnDistributionInStructure[];
   orgRiskHistory: OrgRiskHistory[];
+  averageRemediationTimes: AverageRemediationTimes;
 };
