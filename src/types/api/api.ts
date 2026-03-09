@@ -990,6 +990,12 @@ type OrgRiskHistory = {
   criticalCVSS: number;
 };
 
+export type EcosystemUsageInOrg = {
+  ecosystem: string;
+  relativeAmount: number;
+  totalCount: number;
+};
+
 export type AverageRemediationTimes = {
   lowRiskAverage: number;
   mediumRiskAverage: number;
@@ -1005,9 +1011,12 @@ export type AverageRemediationTimes = {
 export type OrgOverview = {
   vulnEventAverage: AverageVulnEventsPerWeek;
   structure: OrgStructure;
+  vulnDistribution: VulnDistribution;
+
   topComponents: ComponentUsageInOrg[];
   topCVEs: CVEOccurrenceInOrg[];
-  vulnDistribution: VulnDistribution;
+  topEcosystems: EcosystemUsageInOrg[];
+
   topProjects: VulnDistributionInStructure[];
   topAssets: VulnDistributionInStructure[];
   topArtifacts: VulnDistributionInStructure[];

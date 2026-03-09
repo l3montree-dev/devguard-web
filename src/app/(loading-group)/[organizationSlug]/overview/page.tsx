@@ -19,6 +19,7 @@ import SeverityCard from "src/components/SeverityCard";
 import useSWR from "swr";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
+import MostUsedEcosystems from "@/components/organization/MostUsedEcosystems";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
@@ -63,7 +64,7 @@ const OrganizationOverview: FunctionComponent = () => {
           cvePurlCriticalCvss: entry.criticalCVSS,
         }) as ReleaseRiskHistory,
     ) ?? [];
-
+  console.log("Org Statistics", orgStatistics);
   return (
     <>
       <Page
@@ -237,6 +238,7 @@ const OrganizationOverview: FunctionComponent = () => {
             />
             <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
           </div>
+          <MostUsedEcosystems ecosystems={orgStatistics?.topEcosystems ?? []} />
         </Section>
       </Page>
     </>

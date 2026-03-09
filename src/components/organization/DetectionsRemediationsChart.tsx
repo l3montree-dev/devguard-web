@@ -1,7 +1,5 @@
 "use client";
-import { FunctionComponent, useState } from "react";
-
-import { TrendingUp } from "lucide-react";
+import { FunctionComponent } from "react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import {
   Card,
