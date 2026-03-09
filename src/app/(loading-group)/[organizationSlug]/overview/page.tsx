@@ -26,6 +26,7 @@ import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistribu
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { Card } from "@/components/ui/card";
+import DependencyAge from "@/components/organization/DependencyAge";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -264,6 +265,7 @@ const OrganizationOverview: FunctionComponent = () => {
             />
             <MostCommonCVEs topCVEs={orgStatistics?.topCVEs ?? []} />
           </div>
+          <DependencyAge averageAge={orgStatistics?.averageAgeOfDependencies} />
         </Section>
       </Page>
     </>

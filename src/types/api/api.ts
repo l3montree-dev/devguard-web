@@ -1022,4 +1022,5 @@ export type OrgOverview = {
   topArtifacts: VulnDistributionInStructure[];
   orgRiskHistory: OrgRiskHistory[];
   averageRemediationTimes: AverageRemediationTimes;
+  averageAgeOfDependencies: number;
 };

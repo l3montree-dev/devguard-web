@@ -15,41 +15,12 @@ import {
   CardDescription,
   CardContent,
 } from "./ui/card";
-import { classNames } from "../utils/common";
+import { classNames, getHumanReadableDuration } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
 import { AverageFixingTime } from "../types/api/api";
 import Loading from "./common/Loading";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-
-function getHumanReadableDuration(seconds: number) {
-  const timeUnits = [
-    { unit: "year", seconds: 365 * 24 * 60 * 60 },
-    { unit: "month", seconds: 30 * 24 * 60 * 60 },
-    { unit: "week", seconds: 7 * 24 * 60 * 60 },
-    { unit: "day", seconds: 24 * 60 * 60 },
-    { unit: "hour", seconds: 60 * 60 },
-    { unit: "minute", seconds: 60 },
-    { unit: "second", seconds: 1 },
-  ];
-
-  for (let i = 0; i < timeUnits.length; i++) {
-    const currentUnit = timeUnits[i];
-    if (seconds >= currentUnit.seconds) {
-      const duration = seconds / currentUnit.seconds;
-      return {
-        duration: duration.toFixed(2),
-        type: currentUnit.unit + (duration > 1 ? "s" : ""),
-      };
-    }
-  }
-
-  // If the input is less than 1 second
-  return {
-    duration: 0,
-    type: "seconds",
-  };
-}
 
 interface Props {
   avgFixingTime: AverageFixingTime | undefined;
