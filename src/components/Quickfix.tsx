@@ -107,17 +107,17 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
           <h3 className=" text-sm font-semibold">Quick Fix</h3>
         </div>
         <div className="relative rounded-lg border bg-card p-4 border">
-          <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
-          </span>
           <div className="text-sm">
             {!directDependencyFixedVersion ? (
               <span className="text-xs text-muted-foreground">
-                No Quickfix available
+                {`No Update for ${name + "@" + version} that patches ${vuln.cveID}`}
               </span>
             ) : (
               <>
+                <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+                </span>
                 <span className="flex flex-row gap-2 items-center gap-0.5">
                   <Zap className="h-4" />
                   <span className="flex-1 text-left font-semibold">
@@ -136,10 +136,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                     >{`${name + "@" + version}`}</Badge>
                   </div>
                   <div className="flex flex-row justify-between">
-                    <span className="text-xs text-muted-foreground ">
+                    <span className="text-xs text-muted-foreground">
                       After:{" "}
                     </span>
-                    <Badge variant={"outline"} className="font-mono ">
+                    <Badge variant={"outline"} className="font-mono scale-100">
                       {
                         <DiffHighlighter
                           oldVersion={vuln.vulnerabilityPath[0] || ""}
@@ -148,8 +148,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                       }
                     </Badge>
                   </div>
+                  <div className="mt-1">
+                    <CopyCode codeString={ecosystemUpdate} />
+                  </div>
                 </div>
-                {/* <CopyCode codeString={ecosystemUpdate} /> */}
               </>
             )}
           </div>
