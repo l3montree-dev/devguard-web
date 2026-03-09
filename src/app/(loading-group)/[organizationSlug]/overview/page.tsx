@@ -153,6 +153,59 @@ const OrganizationOverview: FunctionComponent = () => {
             data={convertedRiskHistory}
             mode={mode}
           />
+        </Section>
+        <Section
+          primaryHeadline
+          forceVertical
+          description=""
+          title="Vulnerability Averages in Organization"
+          className="mt-12"
+        >
+          <div className="grid grid-cols-4 gap-4">
+            <SeverityCard
+              variant="critical"
+              isLoading={isStatisticsLoading}
+              currentAmount={Math.round(
+                (mode === "risk"
+                  ? orgStatistics?.projectOpenVulnAverage.riskCriticalAverage
+                  : orgStatistics?.projectOpenVulnAverage
+                      .cvssCriticalAverage) ?? 0,
+              )}
+              mode={mode}
+            />
+            <SeverityCard
+              variant="high"
+              isLoading={isStatisticsLoading}
+              currentAmount={Math.round(
+                (mode === "risk"
+                  ? orgStatistics?.projectOpenVulnAverage.riskHighAverage
+                  : orgStatistics?.projectOpenVulnAverage.cvssHighAverage) ?? 0,
+              )}
+              mode={mode}
+            />
+            <SeverityCard
+              variant="medium"
+              isLoading={isStatisticsLoading}
+              currentAmount={Math.round(
+                (mode === "risk"
+                  ? orgStatistics?.projectOpenVulnAverage.riskMediumAverage
+                  : orgStatistics?.projectOpenVulnAverage.cvssMediumAverage) ??
+                  0,
+              )}
+              mode={mode}
+            />
+            <SeverityCard
+              variant="low"
+              isLoading={isStatisticsLoading}
+              currentAmount={Math.round(
+                (mode === "risk"
+                  ? orgStatistics?.projectOpenVulnAverage.riskLowAverage
+                  : orgStatistics?.projectOpenVulnAverage.cvssLowAverage) ?? 0,
+              )}
+              mode={mode}
+            />
+          </div>
+
           <VulnerabilityTrends
             averagesByTypes={orgStatistics?.vulnEventAverage}
           />

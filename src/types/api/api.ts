@@ -1008,6 +1008,17 @@ export type AverageRemediationTimes = {
   criticalCVSSAverage: number;
 };
 
+export type ProjectVulnCountAverageBySeverity = {
+  riskLowAverage: number;
+  riskMediumAverage: number;
+  riskHighAverage: number;
+  riskCriticalAverage: number;
+  cvssLowAverage: number;
+  cvssMediumAverage: number;
+  cvssHighAverage: number;
+  cvssCriticalAverage: number;
+};
+
 export type OrgOverview = {
   vulnEventAverage: AverageVulnEventsPerWeek;
   structure: OrgStructure;
@@ -1024,4 +1035,5 @@ export type OrgOverview = {
   averageRemediationTimes: AverageRemediationTimes;
   averageAgeOfDependencies: number;
   averageOpenCodeRisksPerProject: number;
+  projectOpenVulnAverage: ProjectVulnCountAverageBySeverity;
 };
