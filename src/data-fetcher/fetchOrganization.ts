@@ -32,8 +32,9 @@ export async function fetchOrganization(organizationSlug: string) {
     // if the organization slug starts with an @ it is actually an identity provider
     // there has to be a token in the backend - maybe the user just needs to reauthorize.
     if (!org.ok) {
-      console.log("LOGIN REDIRECT", org);
-      // it must be an 500
+      if (org.status === 402) {
+        throw new HttpError("Payment Required", { statusCode: 402 });
+      }
       throw new HttpError();
     }
     // parse the organization
