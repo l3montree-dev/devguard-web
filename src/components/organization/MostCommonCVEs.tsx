@@ -1,7 +1,6 @@
 import { FunctionComponent, useState } from "react";
 import { CVEOccurrenceInOrg } from "src/types/api/api";
 import { Card, CardHeader, CardTitle } from "src/components/ui/card";
-import { beautifyPurl } from "src/utils/common";
 import { ChevronDownIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { CVSSBadge } from "../common/Severity";
 
