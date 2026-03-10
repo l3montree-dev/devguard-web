@@ -15,7 +15,7 @@ interface DiffHighlighterProps {
 
 // PackageURL.fromString("pkg:deb/debian/file@5.46-5?arch=arm64").toString();
 
-const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
+export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
   oldVersion,
   newVersion,
 }) => {
@@ -135,18 +135,24 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                       variant={"outline"}
                     >{`${name + "@" + version}`}</Badge>
                   </div>
-                  <div className="flex flex-row justify-between">
+                  <div className="flex flex-row justify-between items-center">
                     <span className="text-xs text-muted-foreground">
                       After:{" "}
                     </span>
-                    <Badge variant={"outline"} className="font-mono scale-100">
-                      {
-                        <DiffHighlighter
-                          oldVersion={vuln.vulnerabilityPath[0] || ""}
-                          newVersion={vuln.directDependencyFixedVersion || ""}
-                        ></DiffHighlighter>
-                      }
-                    </Badge>
+                    <div className="relative">
+                      <div className="absolute inset-0"></div>
+                      <Badge
+                        variant={"outline"}
+                        className="font-mono scale-100 relative  border-2"
+                      >
+                        {
+                          <DiffHighlighter
+                            oldVersion={vuln.vulnerabilityPath[0] || ""}
+                            newVersion={vuln.directDependencyFixedVersion || ""}
+                          ></DiffHighlighter>
+                        }
+                      </Badge>
+                    </div>
                   </div>
                   <div className="mt-1">
                     <CopyCode codeString={ecosystemUpdate} />

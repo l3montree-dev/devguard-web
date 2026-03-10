@@ -57,6 +57,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
+import { DiffHighlighter } from "./Quickfix";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -74,6 +75,8 @@ export interface DependencyGraphNodeProps {
     flow?: number;
     enableContextMenu?: boolean;
     onExpansionToggle?: (nodeId: string) => void;
+    hasPatch?: boolean;
+    directDependencyFixedVersion?: string | null;
   };
   id: string;
 }
@@ -103,13 +106,18 @@ export const DependencyGraphNode: FunctionComponent<
         props.data.enableContextMenu
           ? "cursor-pointer active:cursor-grabbing"
           : "cursor-grab active:cursor-grabbing",
-        props.data.vuln
-          ? props.data.vuln.every((v) => v.state === "falsePositive")
-            ? "border-gray-500/50 shadow-md"
-            : "border-red-500 shadow-lg"
-          : "border-border",
+        props.data.hasPatch
+          ? "border-green-500"
+          : props.data.vuln
+            ? props.data.vuln.every((v) => v.state === "falsePositive")
+              ? "border-gray-500/50 shadow-md"
+              : "border-red-500 shadow-lg"
+            : "border-border",
       )}
     >
+      {props.data.hasPatch && (
+        <div className="absolute inset-0 rounded-lg pointer-events-none animate-pulse" />
+      )}
       <Handle
         className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
         type="target"
@@ -146,12 +154,21 @@ export const DependencyGraphNode: FunctionComponent<
             <div>
               <label
                 htmlFor="text"
-                className="text-left font-medium leading-tight flex-1 cursor-[inherit]"
+                className="text-left font-medium leading-tight flex-1 cursor-[inherit] flex items-center gap-2 flex-wrap"
               >
                 {beautifyPurl(props.data.label)}
                 {version && (
                   <Badge className="ml-2" variant={"outline"}>
                     {version}
+                  </Badge>
+                )}
+                {props.data.directDependencyFixedVersion && (
+                  <Badge
+                    className="ml-2"
+                    variant={"outline"}
+                    title={`Direct update available to version ${props.data.directDependencyFixedVersion}`}
+                  >
+                    Update Available
                   </Badge>
                 )}
               </label>
