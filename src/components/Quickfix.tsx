@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
 import { DetailedDependencyVulnDTO } from "@/types/api/api";
 import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
-import { Zap, MoveDownIcon } from "lucide-react";
+import { Zap, MoveDownIcon, ArrowUp } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { diffChars } from "diff";
@@ -105,9 +105,9 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   );
   return (
     <>
-      <div className="p-5">
+      <div className="">
         <div className="flex flex-row mb-2 gap-0.5 items-center">
-          <h3 className=" text-sm font-semibold">Quick Fix</h3>
+          {/* <h3 className=" text-sm font-semibold">Quick Fix</h3> */}
         </div>
         <div className="relative rounded-lg border bg-card p-4 border">
           <div className="text-sm">
@@ -117,12 +117,20 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               </span>
             ) : (
               <>
-                <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
+                <Badge
+                  variant="outline"
+                  className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/8 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
+                >
+                  {/* <ArrowUp className="h-3 w-3 animate-subtle-bounce" /> */}
+                  Upgradeable
+                </Badge>
+                {/* <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
-                </span>
+                </span> */}
                 <span className="flex flex-row gap-2 items-center gap-0.5">
-                  <Zap className="h-4" />
+                  {/* <Zap className="h-4" /> */}
+                  {/* <ArrowUp className="h-6 animate-subtle-bounce" /> */}
                   <span className="flex-1 text-left font-semibold">
                     {vuln.cveID}
                   </span>

@@ -769,6 +769,7 @@ const Index: FunctionComponent = () => {
                       </>
                     )}
                     <div className="mt-4">
+                      {vuln && <Quickfix vuln={vuln} />}
                       {(vuln?.vulnerabilityPath.length || 0) === 0 ? (
                         <Callout intent="warning" showIcon>
                           There are more than 12 different paths which lead to
@@ -1262,7 +1263,6 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-                <Quickfix vuln={vuln} />
                 <AffectedComponentDetails vuln={vuln} />
 
                 <div className="p-5">
