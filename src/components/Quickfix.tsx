@@ -114,9 +114,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   return (
     <>
       <div className="">
-        <div className="flex flex-row mb-2 gap-0.5 items-center">
-          {/* <h3 className=" text-sm font-semibold">Quick Fix</h3> */}
-        </div>
+        <div className="flex flex-row mb-2 gap-0.5 items-center"></div>
         <div className="relative rounded-lg border bg-card p-4 border">
           <div className="text-sm">
             {!directDependencyFixedVersion ? (
@@ -125,15 +123,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               </span>
             ) : (
               <>
-                {/* <span className="absolute top-0 right-0 flex size-3 -translate-y-1/2 translate-x-1/2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
-                </span> */}
                 <Badge
                   variant="outline"
                   className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/8 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
                 >
-                  {/* <ArrowUp className="h-3 w-3 animate-subtle-bounce" /> */}
                   Resolve Vulnerability
                 </Badge>
                 <div className="flex flex-row gap-1 items-center">
