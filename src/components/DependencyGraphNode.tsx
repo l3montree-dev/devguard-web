@@ -131,7 +131,7 @@ export const DependencyGraphNode: FunctionComponent<
                 variant="outline"
                 className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
               >
-                <ArrowUp className="h-3 w-3 animate-subtle-bounce" />
+                <ArrowUp className="h-3 w-3" />
                 Upgradeable
               </Badge>
             ) : props.data.vuln.every((v) => v.state === "falsePositive") ? (
