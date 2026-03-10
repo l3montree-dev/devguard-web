@@ -24,6 +24,7 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
   if (newVersion) {
     const { version: newVer } = PackageURL.fromString(newVersion);
     const differences = diffChars(name + "@" + version, name + "@" + newVer);
+
     return (
       <div className="font-mono text-xs">
         {differences.map((part, index) => (
@@ -74,9 +75,11 @@ function renderQuickFixText(
       return `apk add ${directDependencyFixedVersion}`;
     }
     case "deb": {
-      const [packageName, packageVersion] =
-        directDependencyFixedVersion.split("@");
-      return `apt-get install -y ${packageName}=${packageVersion}`;
+      const { name, version } = PackageURL.fromString(
+        directDependencyFixedVersion,
+      );
+
+      return `apt-get install -y ${name}=${version}`;
     }
     default:
       return "";
