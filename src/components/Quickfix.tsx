@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
 import { DetailedDependencyVulnDTO } from "@/types/api/api";
 import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
-import { Zap, MoveDownIcon, ArrowUp } from "lucide-react";
+import { Zap, MoveDownIcon, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { diffChars } from "diff";
@@ -122,7 +122,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/8 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
                 >
                   {/* <ArrowUp className="h-3 w-3 animate-subtle-bounce" /> */}
-                  Upgradeable
+                  Resolve Vulnerability
                 </Badge>
                 {/* <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
@@ -137,19 +137,16 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                 </span>
                 <div className="mt-1 flex flex-row gap-2"></div>
                 <div className="mt-2 flex flex-col gap-2  ">
-                  <div className="flex flex-row gap-2 justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Before:{" "}
-                    </span>
+                  <div className="flex flex-row gap-2 justify-center">
                     <Badge
                       className="font-mono"
                       variant={"outline"}
                     >{`${name + "@" + version}`}</Badge>
                   </div>
-                  <div className="flex flex-row justify-between items-center">
-                    <span className="text-xs text-muted-foreground">
-                      After:{" "}
-                    </span>
+                  <div className="flex flex-row justify-center">
+                    <ArrowDown className="h-6 animate-subtle-bounce " />
+                  </div>
+                  <div className="flex flex-row justify-center items-center">
                     <div className="relative">
                       <div className="absolute inset-0"></div>
                       <Badge
@@ -165,7 +162,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                       </Badge>
                     </div>
                   </div>
-                  <div className="mt-1">
+                  <div className="mt-2 flex flex-row gap-2 items-center ">
                     <CopyCode codeString={ecosystemUpdate} />
                   </div>
                 </div>
