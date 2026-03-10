@@ -22,7 +22,8 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
   const { type, namespace, name, version } = PackageURL.fromString(oldVersion);
 
   if (newVersion) {
-    const differences = diffChars(name + "@" + version, newVersion ?? "");
+    const { version: newVer } = PackageURL.fromString(newVersion);
+    const differences = diffChars(name + "@" + version, name + "@" + newVer);
     return (
       <div className="font-mono text-xs">
         {differences.map((part, index) => (
@@ -99,7 +100,6 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const { type, namespace, name, version } = PackageURL.fromString(
     vuln.vulnerabilityPath[0],
   );
-
   return (
     <>
       <div className="p-5">
