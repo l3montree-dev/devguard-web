@@ -769,7 +769,6 @@ const Index: FunctionComponent = () => {
                       </>
                     )}
                     <div className="mt-4">
-                      {vuln && <Quickfix vuln={vuln} />}
                       {(vuln?.vulnerabilityPath.length || 0) === 0 ? (
                         <Callout intent="warning" showIcon>
                           There are more than 12 different paths which lead to
@@ -810,7 +809,6 @@ const Index: FunctionComponent = () => {
                         </Callout>
                       )}
                     </div>
-
                     {/* VEX Rules applied to this vulnerability */}
                     {vexRulesData && vexRulesData.length > 0 && (
                       <div className="mt-6">
@@ -862,7 +860,11 @@ const Index: FunctionComponent = () => {
                     events={vuln.events}
                     deleteEvent={handleDeleteEvent}
                     page="dependency-risks"
+                    directDependencyFixedVersion={
+                      vuln.directDependencyFixedVersion
+                    }
                   />
+                  {vuln && <Quickfix vuln={vuln} />}
                   {(session || vuln.ticketUrl) && (
                     <div>
                       <Card>

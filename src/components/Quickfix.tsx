@@ -125,6 +125,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               </span>
             ) : (
               <>
+                <span className="absolute top-0 right-0 flex size-3 -translate-y-1/2 translate-x-1/2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+                </span>
                 <Badge
                   variant="outline"
                   className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/8 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
@@ -132,26 +136,16 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   {/* <ArrowUp className="h-3 w-3 animate-subtle-bounce" /> */}
                   Resolve Vulnerability
                 </Badge>
-                {/* <span className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
-                </span> */}
-                <span className="flex flex-row gap-2 items-center gap-0.5">
-                  <BugOff className="h-5"></BugOff>
-                  {/* <Zap className="h-4" /> */}
-                  {/* <ArrowUp className="h-6 animate-subtle-bounce" /> */}
-                  <span className="flex-1 text-left font-semibold">
-                    {vuln.cveID}
-                  </span>
-                </span>
-                <div className="mt-1 flex flex-row gap-2"></div>
-                <div className="mt-2 flex flex-col gap-2 ">
-                  <div className="flex flex-row gap-2 justify-center-safe">
+                <div className="flex flex-row gap-1 items-center">
+                  <span>Fix the vulnerability </span>
+                  <span className="font-semibold">{vuln.cveID}</span>
+                  <span> by upgrading from: </span>
+                  <span className="flex flex-row gap-2">
                     <Badge
                       className="font-mono"
                       variant={"outline"}
                     >{`${name + "@" + version}`}</Badge>
-                    <ArrowRight />
+                    <ArrowRight className="w-4" />
                     <Badge
                       variant={"outline"}
                       className="font-mono scale-100 relative border-2"
@@ -163,27 +157,26 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                         ></DiffHighlighter>
                       }
                     </Badge>
-                  </div>
-                  <div className="flex flex-row justify-between items-center">
-                    <div className="relative">
-                      <div className="absolute inset-0"></div>
-                    </div>
-                  </div>
-                  <div className="mt-2 flex flex-row gap-2 justify-center items-center ">
-                    <CopyCode codeString={ecosystemUpdate} />
-                  </div>
+                  </span>
+                </div>
+                <div className="mt-2 flex">
+                  <CopyCode codeString={ecosystemUpdate} />
                 </div>
               </>
             )}
           </div>
         </div>
-        <Link
-          target="_blank"
-          className="text-xs"
-          href={"https://devguard.org/"}
-        >
-          See how Quick Fix works
-        </Link>
+        <div className="mb-2">
+          <Link
+            target="_blank"
+            className="text-xs"
+            href={
+              "https://devguard.org/explanations/supply-chain-security/transitive-vulnerability-path-analysis"
+            }
+          >
+            See how Quick Fix works
+          </Link>
+        </div>
       </div>
     </>
   );
