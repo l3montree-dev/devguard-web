@@ -25,7 +25,6 @@ import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
-import { Card } from "@/components/ui/card";
 import DependencyAge from "@/components/organization/DependencyAge";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
 import RemediationTypeDistribution from "@/components/organization/RemediationDistributionChart";
@@ -69,7 +68,6 @@ const OrganizationOverview: FunctionComponent = () => {
           cvePurlCriticalCvss: entry.criticalCVSS,
         }) as ReleaseRiskHistory,
     ) ?? [];
-  console.log("Org Statistics", orgStatistics);
   return (
     <>
       <Page

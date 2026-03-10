@@ -439,12 +439,12 @@ export const truncateMiddle = (
 };
 
 // round any number to its 2nd digit using math round
-export const roundToSecondDigit = (num?: number): number => {
+export function roundToSecondDigit(num?: number): number {
   if (!num) {
     return 0;
   }
   return Math.round(100 * num) / 100;
-};
+}
 
 export function getHumanReadableDuration(seconds: number) {
   const timeUnits = [
