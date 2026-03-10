@@ -12,7 +12,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { number } from "zod";
 import { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
