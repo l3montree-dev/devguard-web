@@ -2,11 +2,19 @@ import { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
 import { DetailedDependencyVulnDTO } from "@/types/api/api";
 import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
-import { Zap, MoveDownIcon, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Zap,
+  MoveDownIcon,
+  ArrowUp,
+  ArrowDown,
+  ArrowRight,
+  BugOff,
+} from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { diffChars } from "diff";
 import { PackageURL } from "packageurl-js";
+import { Button } from "./ui/button";
 
 interface DiffHighlighterProps {
   oldVersion: string;
@@ -129,6 +137,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
                 </span> */}
                 <span className="flex flex-row gap-2 items-center gap-0.5">
+                  <BugOff className="h-5"></BugOff>
                   {/* <Zap className="h-4" /> */}
                   {/* <ArrowUp className="h-6 animate-subtle-bounce" /> */}
                   <span className="flex-1 text-left font-semibold">
@@ -136,33 +145,31 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   </span>
                 </span>
                 <div className="mt-1 flex flex-row gap-2"></div>
-                <div className="mt-2 flex flex-col gap-2  ">
-                  <div className="flex flex-row gap-2 justify-center">
+                <div className="mt-2 flex flex-col gap-2 ">
+                  <div className="flex flex-row gap-2 justify-center-safe">
                     <Badge
                       className="font-mono"
                       variant={"outline"}
                     >{`${name + "@" + version}`}</Badge>
+                    <ArrowRight />
+                    <Badge
+                      variant={"outline"}
+                      className="font-mono scale-100 relative border-2"
+                    >
+                      {
+                        <DiffHighlighter
+                          oldVersion={vuln.vulnerabilityPath[0] || ""}
+                          newVersion={vuln.directDependencyFixedVersion || ""}
+                        ></DiffHighlighter>
+                      }
+                    </Badge>
                   </div>
-                  <div className="flex flex-row justify-center">
-                    <ArrowDown className="h-6 animate-subtle-bounce " />
-                  </div>
-                  <div className="flex flex-row justify-center items-center">
+                  <div className="flex flex-row justify-between items-center">
                     <div className="relative">
                       <div className="absolute inset-0"></div>
-                      <Badge
-                        variant={"outline"}
-                        className="font-mono scale-100 relative  border-2"
-                      >
-                        {
-                          <DiffHighlighter
-                            oldVersion={vuln.vulnerabilityPath[0] || ""}
-                            newVersion={vuln.directDependencyFixedVersion || ""}
-                          ></DiffHighlighter>
-                        }
-                      </Badge>
                     </div>
                   </div>
-                  <div className="mt-2 flex flex-row gap-2 items-center ">
+                  <div className="mt-2 flex flex-row gap-2 justify-center items-center ">
                     <CopyCode codeString={ecosystemUpdate} />
                   </div>
                 </div>
