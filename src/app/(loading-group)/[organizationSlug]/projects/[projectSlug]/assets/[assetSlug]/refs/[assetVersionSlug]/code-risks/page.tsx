@@ -141,24 +141,32 @@ const Index: FunctionComponent = () => {
       {
         label: "Filename",
         value: "uri",
-        operators: ["like", "is", "is not"],
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
       },
       {
         label: "Message",
         value: "message",
-        operators: ["like"],
+        operators: [{ value: "like" }],
       },
       {
         label: "Scanner",
         value: "scanner_ids",
-        operators: ["like", "is", "is not"],
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
       },
       ...(isClosed
         ? [
             {
               label: "State",
               value: "state",
-              operators: ["is"],
+              operators: [{ value: "is" }],
               filterValues: [
                 { value: "accepted", label: "Accepted" },
                 { value: "falsePositive", label: "False Positive" },

@@ -560,32 +560,53 @@ const Index: FunctionComponent = () => {
               {
                 label: "Dependency Package",
                 value: "dependency_id",
-                operators: ["like", "is", "is not"],
+                operators: [
+                  { value: "ilike", label: "contains" },
+                  { value: "is" },
+                  { value: "is not" },
+                ],
               },
               {
                 label: "License",
                 value: "dependency.license",
-                operators: ["like", "is", "is not"],
+                operators: [
+                  { value: "ilike", label: "contains" },
+                  { value: "is" },
+                  { value: "is not" },
+                ],
               },
               {
                 label: "Repository",
                 value: "dependency_project.project_key",
-                operators: ["like"],
+                operators: [{ value: "ilike", label: "contains" }],
               },
+
               {
                 label: "Repository Stars",
                 value: "dependency_project.stars_count",
-                operators: ["is greater than", "is less than", "is"],
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
               },
               {
                 label: "Repository Forks",
                 value: "dependency_project.forks_count",
-                operators: ["is greater than", "is less than", "is"],
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
               },
               {
                 label: "OpenSSF Scorecard",
                 value: "dependency_project.score_card_score",
-                operators: ["is greater than", "is less than", "is"],
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
                 filterValues: [
                   { label: "Awesome (7.0 - 10.0)", value: "awesome" },
                   { label: "Good (5.0 - 7.0)", value: "good" },

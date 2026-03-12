@@ -27,7 +27,7 @@ import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 interface FilterOption {
   label: string;
   value: string;
-  operators: string[];
+  operators: Array<{ value: string; label?: string }>;
   filterValues?: Array<{ value: string; label?: string }>;
 }
 
@@ -102,6 +102,12 @@ const Filter: FunctionComponent<Props> = ({
   const getFieldLabel = (fieldValue: string) =>
     options.find((o) => o.value === fieldValue)?.label ?? fieldValue;
 
+  const getOperatorLabel = (fieldValue: string, operatorValue: string) =>
+    options
+      .find((o) => o.value === fieldValue)
+      ?.operators.find((op) => op.value === operatorValue)?.label ??
+    operatorValue;
+
   // ── Search-input handlers ──────────────────────────────────────────────────
 
   const handleInputFocus = () => {
@@ -135,7 +141,7 @@ const Filter: FunctionComponent<Props> = ({
     setSelectedField(value);
     setInputQuery("");
     if (option?.operators.length === 1) {
-      setSelectedOperator(option.operators[0]);
+      setSelectedOperator(option.operators[0].value);
       setStep("value");
     } else {
       setStep("operator");
@@ -208,7 +214,7 @@ const Filter: FunctionComponent<Props> = ({
           handleSearchForText();
         }
       } else if (step === "operator") {
-        handleSelectOperator(operators[focusedIndex]);
+        handleSelectOperator(operators[focusedIndex].value);
       } else if (step === "value" && showFilterValues) {
         handleApplyValue(
           selectedOption?.filterValues?.[focusedIndex]?.value ?? "",
@@ -228,7 +234,7 @@ const Filter: FunctionComponent<Props> = ({
     const option = options.find((o) => o.value === v);
     setFilterField(v);
     setFilterOperator(
-      option?.operators.length === 1 ? option.operators[0] : "",
+      option?.operators.length === 1 ? option.operators[0].value : "",
     );
     setFilterValueInput("");
   };
@@ -310,11 +316,11 @@ const Filter: FunctionComponent<Props> = ({
                 </p>
                 {operators.map((op, i) => (
                   <button
-                    key={op}
-                    onClick={() => handleSelectOperator(op)}
+                    key={op.value}
+                    onClick={() => handleSelectOperator(op.value)}
                     className={`w-full px-3 py-2 text-left text-sm hover:bg-accent ${focusedIndex === i ? "bg-accent" : ""}`}
                   >
-                    {op}
+                    {op.label ?? op.value}
                   </button>
                 ))}
               </div>
@@ -327,7 +333,8 @@ const Filter: FunctionComponent<Props> = ({
                   className="flex items-center gap-1 px-3 py-2 text-xs text-muted-foreground hover:text-foreground"
                 >
                   <ChevronLeftIcon className="h-3 w-3" />
-                  {getFieldLabel(selectedField)} {selectedOperator}
+                  {getFieldLabel(selectedField)}{" "}
+                  {getOperatorLabel(selectedField, selectedOperator)}
                 </button>
                 <p className="px-3 py-1 text-xs font-medium text-muted-foreground">
                   Value
@@ -404,8 +411,8 @@ const Filter: FunctionComponent<Props> = ({
               </SelectTrigger>
               <SelectContent>
                 {filterOperators.map((op) => (
-                  <SelectItem key={op} value={op}>
-                    {op}
+                  <SelectItem key={op.value} value={op.value}>
+                    {op.label ?? op.value}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -492,7 +499,8 @@ const Filter: FunctionComponent<Props> = ({
               className="flex items-center gap-1 pr-1"
             >
               <span>
-                {getFieldLabel(f.field)} {f.operator} &ldquo;{f.value}&rdquo;
+                {getFieldLabel(f.field)} {getOperatorLabel(f.field, f.operator)}{" "}
+                &ldquo;{f.value}&rdquo;
               </span>
               <button
                 onClick={() => onRemoveFilter(f)}

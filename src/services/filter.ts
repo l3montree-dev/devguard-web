@@ -54,7 +54,7 @@ export const query2SortingState = (query: ParsedUrlQuery): ColumnSort[] => {
 export const filterForm2Query = (form: FilterForm) => {
   const key = "filterQuery[" + form.field + "][" + form.operator + "]";
 
-  if (form.operator === "like") {
+  if (form.operator === "like" || form.operator === "ilike") {
     return {
       [key]: "%" + form.value + "%",
     };

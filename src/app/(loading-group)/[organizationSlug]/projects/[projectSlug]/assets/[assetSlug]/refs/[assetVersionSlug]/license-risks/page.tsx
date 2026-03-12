@@ -237,20 +237,28 @@ const Index: FunctionComponent = () => {
       {
         label: "Artifact",
         value: "artifact_license_risks.artifact_artifact_name",
-        operators: ["is", "is not", "like"],
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
         filterValues: artifacts.map((a) => ({ value: a.artifactName })),
       },
       {
         label: "Package Name",
         value: "component_purl",
-        operators: ["like", "is", "is not"],
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
       },
       ...(isClosed
         ? [
             {
               label: "State",
               value: "state",
-              operators: ["is"],
+              operators: [{ value: "is" }],
               filterValues: [
                 { value: "accepted", label: "Accepted" },
                 { value: "falsePositive", label: "False Positive" },

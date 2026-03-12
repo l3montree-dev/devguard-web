@@ -281,13 +281,17 @@ const Index: FunctionComponent = () => {
   const filterOptions: {
     label: string;
     value: string;
-    operators: string[];
+    operators: Array<{ value: string; label?: string }>;
     filterValues?: Array<{ value: string; label?: string }>;
   }[] = [
     {
       label: "Artifact",
       value: "artifact_dependency_vulns.artifact_artifact_name",
-      operators: ["is", "is not", "like"],
+      operators: [
+        { value: "is" },
+        { value: "is not" },
+        { value: "ilike", label: "contains" },
+      ],
       filterValues: artifacts.map((a) => ({ value: a.artifactName })),
     },
     ...(isClosed
@@ -295,7 +299,7 @@ const Index: FunctionComponent = () => {
           {
             label: "State",
             value: "state",
-            operators: ["is"],
+            operators: [{ value: "is" }],
             filterValues: [
               { value: "accepted", label: "Accepted" },
               { value: "falsePositive", label: "False Positive" },
@@ -307,17 +311,29 @@ const Index: FunctionComponent = () => {
     {
       label: "Package Name",
       value: "component_purl",
-      operators: ["like", "is", "is not"],
+      operators: [
+        { value: "ilike", label: "contains" },
+        { value: "is" },
+        { value: "is not" },
+      ],
     },
     {
       label: "CVE",
       value: "cve_id",
-      operators: ["like", "is", "is not"],
+      operators: [
+        { value: "ilike", label: "contains" },
+        { value: "is" },
+        { value: "is not" },
+      ],
     },
     {
       label: "CVSS",
       value: "CVE.cvss",
-      operators: ["is less than", "is greater than", "is"],
+      operators: [
+        { value: "is less than" },
+        { value: "is greater than" },
+        { value: "is" },
+      ],
       filterValues: [
         { value: "low", label: "Low (0-4)" },
         { value: "medium", label: "Medium (4-7)" },
@@ -328,7 +344,11 @@ const Index: FunctionComponent = () => {
     {
       label: "Risk",
       value: "raw_risk_assessment",
-      operators: ["is less than", "is greater than", "is"],
+      operators: [
+        { value: "is less than" },
+        { value: "is greater than" },
+        { value: "is" },
+      ],
       filterValues: [
         { value: "low", label: "Low (0-4)" },
         { value: "medium", label: "Medium (4-7)" },
