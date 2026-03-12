@@ -603,12 +603,12 @@ const Index: FunctionComponent = () => {
               placeholder: "Search or filter results...",
             }}
           />
+        </div>
 
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-            {isLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-          </div>
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+          {isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
