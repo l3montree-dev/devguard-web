@@ -39,7 +39,7 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
-import Filter from "../../../../../../../../../../components/Filter";
+import Filter from "@/components/Filter";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -158,7 +158,7 @@ const Index: FunctionComponent = () => {
             {
               label: "State",
               value: "state",
-              operators: ["is", "is not"],
+              operators: ["is"],
               filterValues: [
                 { value: "accepted", label: "Accepted" },
                 { value: "falsePositive", label: "False Positive" },

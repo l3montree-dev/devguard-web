@@ -82,11 +82,11 @@ import RootNodeSelector from "@/components/RootNodeSelector";
 import { useSession } from "@/context/SessionContext";
 import Filter from "@/components/Filter";
 
-const scorecardRanges: Record<string, [number, number]> = {
-  bad: [0, 3],
+const scorecardRanges: Record<string, [number | null, number | null]> = {
+  bad: [null, 3],
   mid: [2.9, 5],
   good: [4.9, 7],
-  awesome: [6.9, 10],
+  awesome: [6.9, null],
 };
 
 const licenseMap = licenses.reduce(
@@ -435,11 +435,18 @@ const Index: FunctionComponent = () => {
       ) {
         const [min, max] = scorecardRanges[data.value];
         const newParams = new URLSearchParams(searchParams?.toString() ?? "");
-        newParams.set(
-          `filterQuery[${data.field}][is greater than]`,
-          String(min),
-        );
-        newParams.set(`filterQuery[${data.field}][is less than]`, String(max));
+        if (min !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is greater than]`,
+            String(min),
+          );
+        }
+        if (max !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is less than]`,
+            String(max),
+          );
+        }
         router.push(pathname + "?" + newParams.toString());
         return;
       }

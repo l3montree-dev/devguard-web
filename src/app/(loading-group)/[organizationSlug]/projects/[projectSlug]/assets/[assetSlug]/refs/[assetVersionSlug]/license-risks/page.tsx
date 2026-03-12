@@ -250,7 +250,7 @@ const Index: FunctionComponent = () => {
             {
               label: "State",
               value: "state",
-              operators: ["is", "is not"],
+              operators: ["is"],
               filterValues: [
                 { value: "accepted", label: "Accepted" },
                 { value: "falsePositive", label: "False Positive" },
@@ -446,6 +446,7 @@ const Index: FunctionComponent = () => {
             onClearAllFilters={clearAllFilters}
             search={{
               onChange: handleSearch,
+              defaultValue: searchParams?.get("search") ?? "",
               placeholder: "Search or filter results...",
             }}
           />

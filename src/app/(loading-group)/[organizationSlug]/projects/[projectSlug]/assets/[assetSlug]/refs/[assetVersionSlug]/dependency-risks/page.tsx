@@ -37,10 +37,16 @@ import {
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import Filter from "../../../../../../../../../../components/Filter";
+import Filter from "@/components/Filter";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -54,11 +60,11 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 
-const severityRanges: Record<string, [number, number]> = {
-  low: [0, 3.9],
-  medium: [4, 6.9],
-  high: [7, 8.9],
-  critical: [8.9, 10],
+const severityRanges: Record<string, [number | null, number | null]> = {
+  low: [null, 4],
+  medium: [3.9, 7],
+  high: [6.9, 9],
+  critical: [8.9, null],
 };
 
 const rangeFilterFields = ["CVE.cvss", "raw_risk_assessment"];
@@ -289,7 +295,7 @@ const Index: FunctionComponent = () => {
           {
             label: "State",
             value: "state",
-            operators: ["is", "is not"],
+            operators: ["is"],
             filterValues: [
               { value: "accepted", label: "Accepted" },
               { value: "falsePositive", label: "False Positive" },
@@ -346,11 +352,18 @@ const Index: FunctionComponent = () => {
       ) {
         const [min, max] = severityRanges[data.value];
         const newParams = new URLSearchParams(params?.toString() ?? "");
-        newParams.set(
-          `filterQuery[${data.field}][is greater than]`,
-          String(min),
-        );
-        newParams.set(`filterQuery[${data.field}][is less than]`, String(max));
+        if (min !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is greater than]`,
+            String(min),
+          );
+        }
+        if (max !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is less than]`,
+            String(max),
+          );
+        }
         router.push(pathname + "?" + newParams.toString());
         return;
       }

@@ -1,9 +1,9 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { FilterForm } from "@/services/filter";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,13 @@ const Filter: FunctionComponent<Props> = ({
   const [selectedOperator, setSelectedOperator] = useState<string>("");
   const [filterValue, setFilterValue] = useState<string>("");
   const [inputQuery, setInputQuery] = useState<string>("");
-  const [activeSearchQuery, setActiveSearchQuery] = useState<string>("");
+  const [activeSearchQuery, setActiveSearchQuery] = useState<string>(
+    search?.defaultValue ?? "",
+  );
+
+  useEffect(() => {
+    setActiveSearchQuery(search?.defaultValue ?? "");
+  }, [search?.defaultValue]);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   // Filter-button popover state
@@ -125,9 +131,15 @@ const Filter: FunctionComponent<Props> = ({
   };
 
   const handleSelectLabel = (value: string) => {
+    const option = options.find((o) => o.value === value);
     setSelectedField(value);
     setInputQuery("");
-    setStep("operator");
+    if (option?.operators.length === 1) {
+      setSelectedOperator(option.operators[0]);
+      setStep("value");
+    } else {
+      setStep("operator");
+    }
   };
 
   const handleSelectOperator = (op: string) => {
@@ -213,8 +225,11 @@ const Filter: FunctionComponent<Props> = ({
   const filterValues = filterOption?.filterValues;
 
   const handleFilterFieldChange = (v: string) => {
+    const option = options.find((o) => o.value === v);
     setFilterField(v);
-    setFilterOperator("");
+    setFilterOperator(
+      option?.operators.length === 1 ? option.operators[0] : "",
+    );
     setFilterValueInput("");
   };
 
