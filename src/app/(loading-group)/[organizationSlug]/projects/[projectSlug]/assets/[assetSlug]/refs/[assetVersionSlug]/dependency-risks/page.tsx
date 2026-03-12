@@ -12,7 +12,6 @@ import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { AsyncButton, Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -37,10 +36,11 @@ import {
 } from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import Filter from "../../../../../../../../../../components/Filter";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -53,6 +53,15 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
+
+const severityRanges: Record<string, [number, number]> = {
+  low: [0, 3.9],
+  medium: [4, 6.9],
+  high: [7, 8.9],
+  critical: [8.9, 10],
+};
+
+const rangeFilterFields = ["CVE.cvss", "raw_risk_assessment"];
 
 const columnHelper = createColumnHelper<VulnByPackage>();
 
@@ -126,6 +135,7 @@ const Index: FunctionComponent = () => {
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
+  const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useDecodedPathname();
   const params = useSearchParams();
@@ -184,7 +194,9 @@ const Index: FunctionComponent = () => {
     isLoading,
     error,
     mutate: mutateVulns,
-  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher);
+  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
+    keepPreviousData: true,
+  });
 
   const handleBulkAction = useCallback(
     async (params: {
@@ -258,10 +270,94 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const { table } = useTable({
+  const isClosed = params?.get("state") === "closed";
+
+  const filterOptions: {
+    label: string;
+    value: string;
+    operators: string[];
+    filterValues?: Array<{ value: string; label?: string }>;
+  }[] = [
+    {
+      label: "Artifact",
+      value: "artifact_dependency_vulns.artifact_artifact_name",
+      operators: ["is", "is not", "like"],
+      filterValues: artifacts.map((a) => ({ value: a.artifactName })),
+    },
+    ...(isClosed
+      ? [
+          {
+            label: "State",
+            value: "state",
+            operators: ["is", "is not"],
+            filterValues: [
+              { value: "accepted", label: "Accepted" },
+              { value: "falsePositive", label: "False Positive" },
+              { value: "fixed", label: "Fixed" },
+            ],
+          },
+        ]
+      : []),
+    {
+      label: "Package Name",
+      value: "component_purl",
+      operators: ["like", "is", "is not"],
+    },
+    {
+      label: "CVE",
+      value: "cve_id",
+      operators: ["like", "is", "is not"],
+    },
+    {
+      label: "CVSS",
+      value: "CVE.cvss",
+      operators: ["is less than", "is greater than", "is"],
+      filterValues: [
+        { value: "low", label: "Low (0-4)" },
+        { value: "medium", label: "Medium (4-7)" },
+        { value: "high", label: "High (7-9)" },
+        { value: "critical", label: "Critical (9-10)" },
+      ],
+    },
+    {
+      label: "Risk",
+      value: "raw_risk_assessment",
+      operators: ["is less than", "is greater than", "is"],
+      filterValues: [
+        { value: "low", label: "Low (0-4)" },
+        { value: "medium", label: "Medium (4-7)" },
+        { value: "high", label: "High (7-9)" },
+        { value: "critical", label: "Critical (9-10)" },
+      ],
+    },
+  ];
+
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
+
+  const handleDependencyFilter = useCallback(
+    (data: Parameters<typeof handleFilter>[0]) => {
+      if (
+        rangeFilterFields.includes(data.field) &&
+        (data.operator === "is" || data.operator === "is not") &&
+        severityRanges[data.value]
+      ) {
+        const [min, max] = severityRanges[data.value];
+        const newParams = new URLSearchParams(params?.toString() ?? "");
+        newParams.set(
+          `filterQuery[${data.field}][is greater than]`,
+          String(min),
+        );
+        newParams.set(`filterQuery[${data.field}][is less than]`, String(max));
+        router.push(pathname + "?" + newParams.toString());
+        return;
+      }
+      handleFilter(data);
+    },
+    [handleFilter, params, pathname, router],
+  );
 
   // Compute selected open/closed IDs for batch actions
   const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
@@ -325,11 +421,7 @@ const Index: FunctionComponent = () => {
         description="This table shows all the identified dependency risks for this repository."
         className="mb-4 mt-4"
       >
-        <div className="relative flex flex-row gap-2">
-          <QueryArtifactSelector
-            unassignPossible
-            artifacts={artifacts.map((a) => a.artifactName)}
-          />
+        <div className="flex flex-1 flex-col gap-2">
           <Tabs
             defaultValue={
               params?.has("state") ? (params.get("state") as string) : "open"
@@ -358,15 +450,23 @@ const Index: FunctionComponent = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={params?.get("search") as string}
-            placeholder="Search for cve, package name, message or scanner..."
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-            {isLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
+          <div className="flex flex-row gap-2">
+            <Filter
+              options={filterOptions}
+              onFilter={handleDependencyFilter}
+              onRemoveFilter={removeFilter}
+              onClearAllFilters={clearAllFilters}
+              search={{
+                onChange: handleSearch,
+                defaultValue: params?.get("search") ?? "",
+                placeholder: "Search or filter results...",
+              }}
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
           </div>
         </div>
       </Section>
@@ -518,7 +618,8 @@ const Index: FunctionComponent = () => {
                   ))}
                 </thead>
                 <tbody className="text-sm text-foreground">
-                  {isLoading &&
+                  {!table.getRowModel().rows &&
+                    isLoading &&
                     Array.from(Array(5).keys()).map((el) => (
                       <tr key={el} className="border-b">
                         <td className="p-4" colSpan={4}>
