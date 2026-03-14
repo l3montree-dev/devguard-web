@@ -19,7 +19,8 @@ export default function useFilter() {
     searchParams?.forEach((value, key) => {
       if (!newSearchParams.has(key)) newSearchParams.set(key, value);
     });
-    router.push(pathname + "?" + searchParams?.toString());
+
+    router.push(pathname + "?" + newSearchParams.toString());
   };
 
   const [sortingState, setSortingState] = useState<SortingState>([]);
@@ -29,6 +30,14 @@ export default function useFilter() {
     // get the current params first
     const copied = new URLSearchParams(searchParams || {});
     copied.delete("filterQuery[" + f.field + "][" + f.operator + "]");
+    router.push(pathname + "?" + copied.toString());
+  };
+
+  const clearAllFilters = () => {
+    const copied = new URLSearchParams(searchParams || {});
+    Array.from(copied.keys())
+      .filter((key) => key.startsWith("filterQuery["))
+      .forEach((key) => copied.delete(key));
     router.push(pathname + "?" + copied.toString());
   };
 
@@ -61,6 +70,7 @@ export default function useFilter() {
   return {
     handleFilter,
     removeFilter,
+    clearAllFilters,
     handleSort: handleSetSortingState,
     sortingState,
   };
