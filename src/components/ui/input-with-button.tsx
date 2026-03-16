@@ -51,7 +51,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
     });
   };
 
-  const truncateValue = (value: string, maxLength: number = 50): string => {
+  const truncateValue = (value: string, maxLength: number = 60): string => {
     if (value.length <= maxLength) return value;
     return value.substring(0, maxLength - 3) + "...";
   };
