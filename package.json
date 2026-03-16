@@ -49,6 +49,8 @@
         "@tanstack/react-table": "^8.21.3",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
+        "@uiw/codemirror-theme-dracula": "^4.25.8",
+        "@uiw/codemirror-theme-vscode": "^4.25.8",
         "@xyflow/react": "^12.6.4",
         "autoprefixer": "10.4.27",
         "axios": "^1.13.6",
