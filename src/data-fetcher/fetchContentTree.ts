@@ -14,6 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { HttpError } from "./http-error";
 
 export async function fetchContentTree(organizationSlug: string) {
   // get the devGuardApiClient
@@ -27,6 +28,13 @@ export async function fetchContentTree(organizationSlug: string) {
         decodeURIComponent(organizationSlug) +
         "/content-tree",
     );
+
+    if (!contentTree.ok) {
+      if (contentTree.status === 402) {
+        throw new HttpError("Payment Required", { statusCode: 402 });
+      }
+      throw new HttpError();
+    }
 
     const contentTreeData = await contentTree.json();
 
