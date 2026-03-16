@@ -50,6 +50,11 @@ const InputWithButton = (props: InputWithButtonProps) => {
         copyToastDescription ?? "The code has been copied to your clipboard.",
     });
   };
+
+  const truncateValue = (value: string, maxLength: number = 50): string => {
+    if (value.length <= maxLength) return value;
+    return value.substring(0, maxLength - 3) + "...";
+  };
   return (
     <div className="flex flex-col items-stretch gap-2 pt-4">
       <Label className="font-medium">{label}</Label>
@@ -62,12 +67,12 @@ const InputWithButton = (props: InputWithButtonProps) => {
         <div className="flex flex-row  justify-between w-full">
           <input
             {...inputProps}
-            value={props.value ?? ""}
+            value={truncateValue(props.value ?? "")}
             className={classNames("w-full bg-transparent focus:outline-none")}
             readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center gap-4">
             {copyable && (
               <button
                 name={"clipboard-" + nameKey}
