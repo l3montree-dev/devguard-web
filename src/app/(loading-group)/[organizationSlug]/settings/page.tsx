@@ -262,6 +262,19 @@ const Home = () => {
     }
   };
 
+  const handleDeleteOrganization = async () => {
+    const res = await browserApiClient("/organizations/" + activeOrg.slug, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      toast.success("Organization deleted successfully");
+      router.push("/");
+    } else {
+      toast.error("Failed to delete organization");
+    }
+  };
+
   const config = useConfig();
 
   return (
@@ -577,22 +590,12 @@ const Home = () => {
       >
         <Card className="p-6">
           <div className="flex justify-end">
-            <Link
-              href={
-                "mailto:" +
-                config.accountDeletionMail +
-                "?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
-                "=" +
-                activeOrg.id +
-                "%0AName%3D" +
-                activeOrg.name +
-                "%20%0A%0AThank%20you."
-              }
+            <AsyncButton
+              variant="destructive"
+              onClick={handleDeleteOrganization}
             >
-              <Button variant="destructive">
-                Request Organization Deletion
-              </Button>
-            </Link>
+              Request Organization Deletion
+            </AsyncButton>
           </div>
         </Card>
       </Section>
