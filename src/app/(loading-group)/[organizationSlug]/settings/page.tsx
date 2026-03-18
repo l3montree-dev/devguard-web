@@ -58,6 +58,7 @@ import {
   useOrganization,
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
+import Alert from "../../../../components/common/Alert";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -590,12 +591,13 @@ const Home = () => {
       >
         <Card className="p-6">
           <div className="flex justify-end">
-            <AsyncButton
-              variant="destructive"
-              onClick={handleDeleteOrganization}
+            <Alert
+              title="Are you sure to delete this organization?"
+              description="This action cannot be undone. All data associated with this organization will be deleted."
+              onConfirm={handleDeleteOrganization}
             >
-              Request Organization Deletion
-            </AsyncButton>
+              <Button variant="destructive">Delete Organization</Button>
+            </Alert>
           </div>
         </Card>
       </Section>
