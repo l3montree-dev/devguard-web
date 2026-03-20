@@ -1,13 +1,5 @@
 import { FunctionComponent } from "react";
-import {
-  Label,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-  ReferenceLine,
-} from "recharts";
 
-import { ChartContainer } from "./ui/chart";
 import {
   Card,
   CardHeader,
@@ -18,8 +10,6 @@ import {
 import { classNames, getHumanReadableDuration } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
 import { AverageFixingTime } from "../types/api/api";
-import Loading from "./common/Loading";
-import { Loader2 } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 
 interface Props {
@@ -71,97 +61,24 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
 
   const { duration, type } = getHumanReadableDuration(seconds);
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader>
         <CardTitle className="">{title}</CardTitle>
         <CardDescription>{description}.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="-mb-20 relative">
-          <ChartContainer
-            config={{
-              should: { label: "Should", color: "var(--color-should)" },
-              has: { label: "Has", color: "var(--color-has)" },
-            }}
-            className="mx-auto aspect-square max-h-[250px]"
-          >
-            <RadialBarChart
-              data={[
-                {
-                  should: 60 * 60 * 24 * 30, //4 * 30 * 24 * 60 * 60,
-                  has: seconds,
-                },
-              ]}
-              startAngle={180}
-              endAngle={0}
-              innerRadius={80}
-              outerRadius={130}
-            >
-              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                <Label
-                  content={({ viewBox }) => {
-                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                      if (!hasData) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) - 8}
-                              className="fill-foreground text-6xl"
-                            >
-                              ∞
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 16}
-                              className="fill-muted-foreground text-sm"
-                            >
-                              No data yet
-                            </tspan>
-                          </text>
-                        );
-                      }
-
-                      return (
-                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 16}
-                            className="fill-foreground text-2xl font-bold"
-                          >
-                            {duration}
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 4}
-                            className="fill-muted-foreground"
-                          >
-                            {type}
-                          </tspan>
-                        </text>
-                      );
-                    }
-                  }}
-                />
-              </PolarRadiusAxis>
-              <RadialBar
-                fill="hsl(var(--secondary))"
-                dataKey="should"
-                className="stroke-transparent"
-              />
-              <RadialBar
-                dataKey="has"
-                cornerRadius={5}
-                fill="hsl(var(--primary))"
-                className="stroke-2"
-              />
-              {/* Custom reference line */}
-            </RadialBarChart>
-          </ChartContainer>
+      <CardContent className="flex flex-col flex-1">
+        <div className="flex flex-col items-center justify-center flex-1 gap-1">
+          {hasData ? (
+            <>
+              <span className="text-6xl font-bold">{duration}</span>
+              <span className="text-muted-foreground text-sm">{type}</span>
+            </>
+          ) : (
+            <>
+              <span className="text-6xl">∞</span>
+              <span className="text-muted-foreground text-sm">No data yet</span>
+            </>
+          )}
         </div>
         <div className="flex">
           <span

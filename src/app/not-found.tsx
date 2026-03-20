@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { config } from "@/config";
 
 export default function NotFoundPage() {
   return (
@@ -25,7 +26,7 @@ export default function NotFoundPage() {
               <Button variant="default">Take me home...</Button>
             </Link>
             <Link
-              href="https://github.com/l3montree-dev/devguard/issues/new/choose"
+              href={config.issueTrackerUrl}
               target="_blank"
               rel="noreferrer noopener"
             >

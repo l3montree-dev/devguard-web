@@ -21,6 +21,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import Link from "next/link";
+import { useSession } from "@/context/SessionContext";
 
 export function useSelectArtifact(
   unassignPossible: boolean,
@@ -48,6 +49,7 @@ export function SimpleArtifactSelector({
   unassignPossible?: boolean;
   isReleaseSelector?: boolean;
 }) {
+  const { session } = useSession();
   const [filter, setFilter] = useState("");
 
   const filteredArtifacts = useMemo(() => {
@@ -134,15 +136,18 @@ export function SimpleArtifactSelector({
             <span className="text-muted-foreground">Clear selection</span>
           </DropdownMenuCheckboxItem>
         )}
-        {filteredArtifacts.length === 0 && filter.length > 0 && (
-          <DropdownMenuItem
-            onClick={handleArtifactCreation}
-            className="bg-card cursor-pointer mt-2 border flex flex-row justify-between font-medium"
-          >
-            Create artifact {filter}
-            <PlusCircleIcon className="w-5 h-5 text-muted-foreground" />
-          </DropdownMenuItem>
-        )}
+        {filteredArtifacts.length === 0 &&
+          filter.length > 0 &&
+          !isReleaseSelector &&
+          session && (
+            <DropdownMenuItem
+              onClick={handleArtifactCreation}
+              className="bg-card cursor-pointer mt-2 border flex flex-row justify-between font-medium"
+            >
+              Create artifact {filter}
+              <PlusCircleIcon className="w-5 h-5 text-muted-foreground" />
+            </DropdownMenuItem>
+          )}
         {filteredArtifacts.map((artifact) => (
           <DropdownMenuCheckboxItem
             key={artifact}

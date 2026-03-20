@@ -28,11 +28,6 @@ const ThreeJSFeatureScreen = () => {
               <span className="font-medium dark:text-white">
                 Get AppSec done with ease
               </span>
-              <p className="text-sm text-muted-foreground">
-                No need for hours of configuration or research. DevGuard
-                provides you with a full OWASP DevSecOps pipeline, advanced
-                supply chain security, and more.
-              </p>
             </div>
           </div>
           <div className="flex gap-4 flex-row">
@@ -43,11 +38,6 @@ const ThreeJSFeatureScreen = () => {
               <span className="font-medium dark:text-white">
                 Automated Tracking, Documentation & Reporting
               </span>
-              <p className="text-sm text-muted-foreground">
-                As a developer you love to code - probably not hasseling with
-                compliance. DevGuard provides a pre-release checklist,
-                prioritized todos, and a full audit trail.
-              </p>
             </div>
           </div>
         </div>
@@ -62,11 +52,6 @@ const ThreeJSFeatureScreen = () => {
               <span className="font-medium dark:text-white">
                 Use with your favorite tools
               </span>
-              <p className="text-sm text-muted-foreground">
-                Keep using your favorite tools. DevGuard integrates with all
-                major continous integration pipelines & software development
-                tools.
-              </p>
             </div>
           </div>
           <div className="flex gap-4 flex-row">
@@ -77,10 +62,6 @@ const ThreeJSFeatureScreen = () => {
               <span className="font-medium dark:text-white">
                 Open Source & Made in Europe
               </span>
-              <p className="text-sm text-muted-foreground">
-                The core team behind DevGuard is based in Bonn, Germany. We are
-                committed to open source. Especially when it comes to security.
-              </p>
             </div>
           </div>
         </div>

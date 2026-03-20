@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useConfig } from "../../context/ConfigContext";
+import { getUserFullName } from "../../types/auth";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
@@ -86,8 +87,11 @@ export default function UserNav() {
               <Avatar>
                 {/*<AvatarImage src="https://github.com/shadcn.png" />*/}
                 <AvatarFallback>
-                  {(user.traits.name.first ?? "").charAt(0).toUpperCase() +
-                    (user.traits.name.last ?? "").charAt(0).toUpperCase()}
+                  {getUserFullName(user)
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             </Link>

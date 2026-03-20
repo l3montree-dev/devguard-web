@@ -28,17 +28,18 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
       description: "The code has been copied to your clipboard.",
     });
   };
+
   return (
-    <span className="inline-flex">
-      <span className="relative w-full overflow-hidden rounded-lg border px-1.5 py-0.5">
-        <button
-          onClick={handleCopy}
-          type="button"
-          className="absolute right-1 top-1 z-10 rounded-lg p-0.5  text-xs hover:text-foreground text-muted-foreground transition-all"
-        >
-          <CopyIcon className="w-3.5 h-3.5" />
-        </button>
-        <span className="relative font-mono text-sm pr-6">{codeString}</span>
+    <span className="flex w-full rounded-lg border p-2">
+      <span className="font-mono text-sm pr-6 w-9/10">{codeString}</span>
+      <span className="w-1/10">
+        <CopyIcon
+          className="w-5 h-5 rounded-lg p-0.5 text-xs hover:text-foreground text-muted-foreground transition-all"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCopy();
+          }}
+        />
       </span>
     </span>
   );

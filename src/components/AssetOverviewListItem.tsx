@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { FunctionComponent, useMemo } from "react";
+import React, { FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { AssetDTO, PolicyEvaluation } from "../types/api/api";
 import Avatar from "./Avatar";
 import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";
+import { Badge } from "./ui/badge";
 
 interface Props {
   asset: AssetDTO;
@@ -24,7 +25,15 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
         Description={
           <div className="flex flex-col">
             <span>
-              <Markdown>{asset.description}</Markdown>
+              <Markdown
+                components={{
+                  a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                    <span>{props.children}</span>
+                  ),
+                }}
+              >
+                {asset.description}
+              </Markdown>
             </span>
           </div>
         }
@@ -32,6 +41,12 @@ const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
           <div className="flex flex-row items-center gap-2">
             <Avatar avatar={asset.avatar} name={asset.name} />
             {asset.name}
+            {asset.state === "archived" && (
+              <Badge variant={"outline"}>Archived</Badge>
+            )}
+            {asset.state === "deleted" && (
+              <Badge variant={"destructive"}>Pending deletion</Badge>
+            )}
           </div>
         }
       />

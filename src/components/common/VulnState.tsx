@@ -7,10 +7,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
-import { ExpandedVulnDTOState } from "../../types/api/api";
-import { Scale } from "lucide-react";
+import { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
+import { Scale, Bug } from "lucide-react";
+import { evTypeBackground } from "@/utils/view";
 
-const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
+const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
   state,
 }) => {
   const defaultClasses =
@@ -21,8 +22,8 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
         <Badge
           variant={"default"}
           className={classNames(
-            defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            evTypeBackground["fixed"],
+            "text-secondary-foreground",
           )}
         >
           <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
@@ -36,7 +37,8 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            evTypeBackground["accepted"],
+            "text-secondary-foreground",
           )}
         >
           <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
@@ -50,25 +52,12 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
           variant={"default"}
           className={classNames(
             defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            evTypeBackground["falsePositive"],
+            "text-secondary-foreground",
           )}
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
-        </Badge>
-      );
-
-    case "not-found":
-      return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            defaultClasses,
-            "bg-secondary text-secondary-foreground",
-          )}
-        >
-          <Scale className="-ml-1 inline-block h-4 w-4" />
-          Not Found
         </Badge>
       );
 
@@ -78,11 +67,10 @@ const VulnState: FunctionComponent<{ state: ExpandedVulnDTOState }> = ({
         <Badge
           variant={"default"}
           className={classNames(
-            defaultClasses,
-            "bg-secondary text-secondary-foreground",
+            "text-secondary-foreground px-3 py-1 bg-secondary",
           )}
         >
-          <BugAntIcon className="-ml-1 inline-block h-4 w-4" />
+          <Bug className="-ml-1 inline-block h-4 w-4 mr-1" />
           Open
         </Badge>
       );

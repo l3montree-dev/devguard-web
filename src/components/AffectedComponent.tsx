@@ -187,12 +187,32 @@ const AffectedComponentDetails: FunctionComponent<{
                 <CollapsibleContent className="border-t pt-4 mt-4">
                   <div className="mt-1 flex flex-col text-xs">
                     <span className="text-muted-foreground">Search PURL:</span>
-                    <div>{data.matchContext?.SearchPurl ?? "unknown"}</div>
+                    <div>{data.matchContext?.searchPurl ?? "unknown"}</div>
                   </div>
+                  {data.matchContext?.qualifiers &&
+                    Object.keys(data.matchContext.qualifiers).length > 0 && (
+                      <div className="mt-3 flex flex-col text-xs">
+                        <span className="text-muted-foreground">
+                          Qualifiers:
+                        </span>
+                        <ul className="mt-1 list-none space-y-0.5">
+                          {Object.entries(data.matchContext.qualifiers).map(
+                            ([, value]: [string, any]) => (
+                              <li key={value.Key ?? value}>
+                                <span className="text-muted-foreground">
+                                  {value.Key ?? value}:
+                                </span>{" "}
+                                {value.Value ?? ""}
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   <div className="mt-3 flex flex-col text-xs">
                     <span className="text-muted-foreground">Version Type:</span>
                     <div>
-                      {data.matchContext?.HowToInterpretVersionString ??
+                      {data.matchContext?.howToInterpretVersionString ??
                         "unknown"}
                     </div>
                   </div>

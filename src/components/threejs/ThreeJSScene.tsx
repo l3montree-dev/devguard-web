@@ -98,7 +98,6 @@ const ThreeJSScene = () => {
   return (
     <Canvas shadows camera={{ position: [-3, 0.5, 3] }}>
       <Cube />
-      <CameraControls makeDefault />
     </Canvas>
   );
 };

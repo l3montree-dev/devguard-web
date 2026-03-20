@@ -1,5 +1,10 @@
 // components/license-risk/LicenseRiskRow.tsx
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import {
+  beautifyPurl,
+  classNames,
+  extractVersion,
+  truncateMiddle,
+} from "@/utils/common";
 import { usePathname, useRouter } from "next/navigation";
 import { LicenseRiskDTO } from "../../types/api/api";
 import EcosystemImage from "../common/EcosystemImage";
@@ -26,13 +31,15 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         "hover:bg-gray-50 dark:hover:bg-card",
       )}
     >
-      <td className="p-4 flex flex-row items-center gap-2">
-        <EcosystemImage packageName={risk.componentPurl} size={16} />
+      <td className="p-4 flex flex-row items-center gap-2 min-w-0">
+        <div className="w-4 flex-shrink-0">
+          <EcosystemImage packageName={risk.componentPurl} size={16} />
+        </div>
         <span className="font-medium truncate">
           {beautifyPurl(risk.componentPurl)}
         </span>
-        <span className="text-xs text-muted-foreground">
-          {extractVersion(risk.componentPurl)}
+        <span className="text-xs text-muted-foreground flex-shrink-0 whitespace-nowrap">
+          {truncateMiddle(extractVersion(risk.componentPurl), 24)}
         </span>
       </td>
 

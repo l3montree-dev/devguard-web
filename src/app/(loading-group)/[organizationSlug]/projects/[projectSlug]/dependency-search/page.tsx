@@ -23,7 +23,6 @@ import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../../../hooks/useOrganizationMenu";
 
-import ArtifactBadge from "@/components/ArtifactBadge";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import { Badge } from "@/components/ui/badge";
@@ -97,14 +96,6 @@ const OrgDependencySearch: FunctionComponent = () => {
         <span className="flex flex-row items-start gap-2">
           {row.getValue()}
         </span>
-      ),
-    }),
-    columnHelper.accessor("artifactName", {
-      header: "Artifacts",
-      id: "artifactName",
-      enableSorting: false,
-      cell: (row) => (
-        <ArtifactBadge key={row.getValue()} artifactName={row.getValue()} />
       ),
     }),
   ];

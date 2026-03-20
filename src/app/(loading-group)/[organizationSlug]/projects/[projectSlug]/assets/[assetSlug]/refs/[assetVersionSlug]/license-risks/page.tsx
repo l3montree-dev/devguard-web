@@ -55,6 +55,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import Filter from "@/components/Filter";
 
 const columnHelper = createColumnHelper<LicenseRiskDTO>();
 
@@ -148,6 +149,7 @@ const Index: FunctionComponent = () => {
       "license-risks?" +
       query.toString(),
     fetcher,
+    { keepPreviousData: true },
   );
 
   const { data: licenses, isLoading: licensesLoading } = useSWR<
@@ -226,7 +228,51 @@ const Index: FunctionComponent = () => {
     [licenses, riskyLicenses],
   );
 
-  const { table } = useTable({
+  const artifacts = useArtifacts();
+
+  const isClosed = searchParams?.get("state") === "closed";
+
+  const filterOptions = useMemo(() => {
+    const options = [
+      {
+        label: "Artifact",
+        value: "artifact_license_risks.artifact_artifact_name",
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
+        filterValues: artifacts.map((a) => ({ value: a.artifactName })),
+      },
+      {
+        label: "Package Name",
+        value: "component_purl",
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
+      },
+      ...(isClosed
+        ? [
+            {
+              label: "State",
+              value: "state",
+              operators: [{ value: "is" }],
+              filterValues: [
+                { value: "accepted", label: "Accepted" },
+                { value: "falsePositive", label: "False Positive" },
+                { value: "fixed", label: "Fixed" },
+              ],
+            },
+          ]
+        : []),
+    ];
+
+    return options;
+  }, [artifacts, isClosed]);
+
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
@@ -235,7 +281,6 @@ const Index: FunctionComponent = () => {
 
   const { branches, tags } = useAssetBranchesAndTags();
   const push = useRouterQuery();
-  const artifacts = useArtifacts();
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -253,14 +298,10 @@ const Index: FunctionComponent = () => {
         <Card className="px-4">
           {/* License Distribution Radar Chart */}
           <Collapsible className="my-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">License Distribution</h3>
-              </div>
-              <CollapsibleTrigger className="p-2 hover:bg-muted cursor-pointer rounded-md transition-colors">
-                <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
-              </CollapsibleTrigger>
-            </div>
+            <CollapsibleTrigger className="flex w-full items-center justify-between p-2 cursor-pointer rounded-md transition-colors">
+              <h3 className="font-semibold">License Distribution</h3>
+              <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
+            </CollapsibleTrigger>
             <CollapsibleContent className="mt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="bg-background">
@@ -374,11 +415,7 @@ const Index: FunctionComponent = () => {
             </CollapsibleContent>
           </Collapsible>
         </Card>
-        <div className="relative flex flex-row gap-2">
-          <QueryArtifactSelector
-            unassignPossible
-            artifacts={artifacts.map((a) => a.artifactName)}
-          />
+        <div className="relative flex flex-col gap-2">
           <Tabs
             defaultValue={
               searchParams?.has("state")
@@ -410,11 +447,18 @@ const Index: FunctionComponent = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={searchParams?.get("search") as string}
-            placeholder="Search for cve, package name, message or scanner..."
+          <Filter
+            options={filterOptions}
+            onFilter={handleFilter}
+            onRemoveFilter={removeFilter}
+            onClearAllFilters={clearAllFilters}
+            search={{
+              onChange: handleSearch,
+              defaultValue: searchParams?.get("search") ?? "",
+              placeholder: "Search or filter results...",
+            }}
           />
+
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
             {isLoading && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -435,6 +479,11 @@ const Index: FunctionComponent = () => {
           <div className="overflow-hidden rounded-lg border shadow-sm">
             <div className="overflow-auto">
               <table className="w-full table-fixed overflow-x-auto text-sm">
+                <colgroup>
+                  <col className="w-auto" />
+                  <col className="w-[40px]" />
+                  <col className="w-[40px]" />
+                </colgroup>
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
@@ -455,9 +504,11 @@ const Index: FunctionComponent = () => {
                                 header.getContext(),
                               )}
                             </div>
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
+                            {header.column.columnDef.enableSorting && (
+                              <SortingCaret
+                                sortDirection={header.column.getIsSorted()}
+                              />
+                            )}
                           </div>
                         </th>
                       ))}

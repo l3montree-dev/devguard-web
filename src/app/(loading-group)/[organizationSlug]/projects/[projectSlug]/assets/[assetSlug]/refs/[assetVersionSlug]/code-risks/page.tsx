@@ -22,7 +22,6 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
@@ -40,6 +39,7 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
+import Filter from "@/components/Filter";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -65,7 +65,9 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
     header: "Message",
     cell: (info) => {
       return (
-        <span className="text-sm text-muted-foreground">{info.getValue()}</span>
+        <span className="text-base text-muted-foreground">
+          {info.getValue()}
+        </span>
       );
     },
   }),
@@ -129,9 +131,55 @@ const Index: FunctionComponent = () => {
       "first-party-vulns/?" +
       query.toString(),
     fetcher,
+    {
+      keepPreviousData: true,
+    },
   );
+  const isClosed = searchParams?.get("state") === "closed";
+  const filterOptions = useMemo(() => {
+    const options = [
+      {
+        label: "Filename",
+        value: "uri",
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
+      },
+      {
+        label: "Message",
+        value: "message",
+        operators: [{ value: "like" }],
+      },
+      {
+        label: "Scanner",
+        value: "scanner_ids",
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
+      },
+      ...(isClosed
+        ? [
+            {
+              label: "State",
+              value: "state",
+              operators: [{ value: "is" }],
+              filterValues: [
+                { value: "accepted", label: "Accepted" },
+                { value: "falsePositive", label: "False Positive" },
+                { value: "fixed", label: "Fixed" },
+              ],
+            },
+          ]
+        : []),
+    ];
+    return options;
+  }, [isClosed]);
 
-  const { table } = useTable({
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
@@ -164,7 +212,7 @@ const Index: FunctionComponent = () => {
         description="This table shows all the identified code risks for this repository."
         className="mb-4 mt-4"
       >
-        <div className="relative flex flex-row gap-2">
+        <div className="relative flex flex-col gap-2">
           <Tabs
             defaultValue={
               params?.has("state") ? (params.get("state") as string) : "open"
@@ -193,10 +241,16 @@ const Index: FunctionComponent = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={params?.get("search") ?? ""}
-            placeholder="Search for filename, message or scanner..."
+          <Filter
+            options={filterOptions}
+            onFilter={handleFilter}
+            onRemoveFilter={removeFilter}
+            onClearAllFilters={clearAllFilters}
+            search={{
+              onChange: handleSearch,
+              defaultValue: params?.get("search") ?? "",
+              placeholder: "Search or filter results...",
+            }}
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
             {isLoading && (
@@ -249,7 +303,8 @@ const Index: FunctionComponent = () => {
                     ))}
                   </thead>
                   <tbody className="text-sm text-foreground">
-                    {isLoading &&
+                    {!table.getRowModel().rows &&
+                      isLoading &&
                       Array.from(Array(10).keys()).map((el, i, arr) => (
                         <tr
                           className={classNames(

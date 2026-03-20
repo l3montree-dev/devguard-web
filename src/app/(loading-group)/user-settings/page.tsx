@@ -13,12 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { Settings } from "@ory/elements-react/theme";
-import { getSettingsFlow, OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "@/ory.config";
+import { getSettingsFlow, OryPageParams } from "@ory/nextjs/app";
 import Page from "../../../components/Page";
-import Section from "../../../components/common/Section";
-import { oryComponentOverrides } from "../../../components/ory/overrides";
+import UserSettings from "../../../components/UserSettings";
 import PatManagementSection from "./PatManagementSection";
 
 const SettingsPage = async (props: OryPageParams) => {
@@ -31,12 +29,7 @@ const SettingsPage = async (props: OryPageParams) => {
   return (
     <Page title="Profile Management and Security Settings">
       <div className="dark:text-white">
-        <Settings
-          config={oryConfig}
-          flow={flow as any}
-          components={oryComponentOverrides}
-        />
-
+        <UserSettings flow={flow as any} config={oryConfig} />
         <PatManagementSection />
       </div>
     </Page>

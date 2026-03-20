@@ -589,7 +589,7 @@ const PublicUrlsSection: FunctionComponent<{
       ))}
       {basePath && (
         <img
-          src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+          src={`${basePath}/badges/cvss/`}
           alt="CVSS Badge"
           className="mt-4 rounded-md shadow-sm hover:shadow-md transition-shadow"
         />

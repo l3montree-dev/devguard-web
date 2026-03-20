@@ -155,7 +155,7 @@ export interface ProjectDTO {
   parentId: string | null;
   parent: ProjectDTO | null;
 
-  type: "default" | "kubernetesNamespace" | "kubernetesCluster";
+  type: "default" | "kubernetesNamespace" | "kubernetesCluster" | "project";
 
   repositoryId?: string;
   repositoryName?: string;
@@ -171,6 +171,8 @@ export interface ProjectDTO {
 
   externalEntityId?: string;
   externalEntityProviderId?: string;
+
+  state: "active" | "deleted";
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
@@ -518,6 +520,8 @@ export interface AssetDTO {
 
   pipelineError?: string;
   pipelineLastRun: string;
+
+  state: "active" | "archived" | "deleted";
 }
 
 export interface DependencyTreeNode {
@@ -652,8 +656,16 @@ export interface FirstPartyVuln extends BaseVulnDTO {
   ruleProperties: any;
 }
 
-export interface AverageFixingTime {
-  averageFixingTimeSeconds: number;
+export interface AllAverageFixingTimes {
+  riskAvgLow: number;
+  riskAvgMedium: number;
+  riskAvgHigh: number;
+  riskAvgCritical: number;
+
+  cvssAvgLow: number;
+  cvssAvgMedium: number;
+  cvssAvgHigh: number;
+  cvssAvgCritical: number;
 }
 
 export interface ComponentPaged {
@@ -850,11 +862,11 @@ interface PackageURL {
 }
 
 interface PurlMatchContext {
-  SearchPurl: string;
-  NormalizedVersion: string;
-  HowToInterpretVersionString: VersionInterpretationType;
-  Qualifiers: Record<string, string>;
-  Namespace: string;
+  searchPurl: string;
+  normalizedVersion: string;
+  howToInterpretVersionString: VersionInterpretationType;
+  qualifiers: Record<string, string>;
+  namespace: string;
 }
 
 interface AffectedComponent {

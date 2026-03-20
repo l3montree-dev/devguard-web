@@ -58,6 +58,7 @@ import {
   useOrganization,
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
+import Alert from "../../../../components/common/Alert";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -259,6 +260,19 @@ const Home = () => {
       });
     } else {
       toast.error("Failed to delete webhook");
+    }
+  };
+
+  const handleDeleteOrganization = async () => {
+    const res = await browserApiClient("/organizations/" + activeOrg.slug, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      toast.success("Organization deleted successfully");
+      router.push("/");
+    } else {
+      toast.error("Failed to delete organization");
     }
   };
 
@@ -577,22 +591,13 @@ const Home = () => {
       >
         <Card className="p-6">
           <div className="flex justify-end">
-            <Link
-              href={
-                "mailto:" +
-                config.accountDeletionMail +
-                "?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
-                "=" +
-                activeOrg.id +
-                "%0AName%3D" +
-                activeOrg.name +
-                "%20%0A%0AThank%20you."
-              }
+            <Alert
+              title="Are you sure to delete this organization?"
+              description="This action cannot be undone. All data associated with this organization will be deleted."
+              onConfirm={handleDeleteOrganization}
             >
-              <Button variant="destructive">
-                Request Organization Deletion
-              </Button>
-            </Link>
+              <Button variant="destructive">Delete Organization</Button>
+            </Alert>
           </div>
         </Card>
       </Section>

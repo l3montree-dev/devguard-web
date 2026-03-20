@@ -1,17 +1,6 @@
 "use client";
 
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useSession } from "@/context/SessionContext";
-import Page from "@/components/Page";
-import { Paged, VulnByPackage } from "@/types/api/api";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
-import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -19,27 +8,45 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
+import FalsePositiveDialog from "@/components/FalsePositiveDialog";
+import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
-import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "sonner";
+import { documentationLinks } from "@/const/documentationLinks";
+import { useSession } from "@/context/SessionContext";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
+import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
+import {
+  ColumnDef,
+  createColumnHelper,
+  flexRender,
+} from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
+import Filter from "@/components/Filter";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -52,7 +59,15 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
-import { documentationLinks } from "@/const/documentationLinks";
+
+const severityRanges: Record<string, [number | null, number | null]> = {
+  low: [null, 4],
+  medium: [3.9, 7],
+  high: [6.9, 9],
+  critical: [8.9, null],
+};
+
+const rangeFilterFields = ["CVE.cvss", "raw_risk_assessment"];
 
 const columnHelper = createColumnHelper<VulnByPackage>();
 
@@ -126,6 +141,7 @@ const Index: FunctionComponent = () => {
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
+  const router = useRouter();
   const { branches, tags } = useAssetBranchesAndTags();
   const pathname = useDecodedPathname();
   const params = useSearchParams();
@@ -184,7 +200,9 @@ const Index: FunctionComponent = () => {
     isLoading,
     error,
     mutate: mutateVulns,
-  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher);
+  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
+    keepPreviousData: true,
+  });
 
   const handleBulkAction = useCallback(
     async (params: {
@@ -193,42 +211,186 @@ const Index: FunctionComponent = () => {
       justification: string;
       mechanicalJustification?: string;
     }) => {
-      const resp = await browserApiClient(
-        uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
+      const optimisticState =
+        params.status === "falsePositive"
+          ? "falsePositive"
+          : params.status === "accepted"
+            ? "accepted"
+            : params.status === "reopened"
+              ? "open"
+              : undefined;
+
+      const optimisticData =
+        optimisticState && vulns
+          ? {
+              ...vulns,
+              data: vulns.data.map((pkg) => ({
+                ...pkg,
+                vulns: pkg.vulns.map((v) =>
+                  params.vulnIds.includes(v.id)
+                    ? { ...v, state: optimisticState as VulnWithCVE["state"] }
+                    : v,
+                ),
+              })),
+            }
+          : undefined;
+
+      await mutateVulns(
+        async () => {
+          const resp = await browserApiClient(
+            uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                vulnIds: params.vulnIds,
+                status: params.status,
+                justification: params.justification,
+                mechanicalJustification: params.mechanicalJustification ?? "",
+              }),
+            },
+          );
+
+          if (!resp.ok) {
+            throw new Error("Bulk action failed");
+          }
+
+          // clear selection for the affected IDs
+          setSelectedVulnIds((prev) => {
+            const next = new Set(prev);
+            params.vulnIds.forEach((id) => next.delete(id));
+            return next;
+          });
+
+          // SWR will revalidate (revalidate: true), so returning undefined is fine
+          return undefined;
+        },
         {
-          method: "POST",
-          body: JSON.stringify({
-            vulnIds: params.vulnIds,
-            status: params.status,
-            justification: params.justification,
-            mechanicalJustification: params.mechanicalJustification ?? "",
-          }),
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: true,
         },
       );
-
-      if (!resp.ok) {
-        throw new Error("Bulk action failed");
-      }
-
-      // clear selection for the affected IDs
-      setSelectedVulnIds((prev) => {
-        const next = new Set(prev);
-        params.vulnIds.forEach((id) => next.delete(id));
-        return next;
-      });
-
-      // revalidate the data
-      await mutateVulns();
     },
-    [uri, assetVersionSlug, mutateVulns],
+    [uri, assetVersionSlug, mutateVulns, vulns],
   );
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const { table } = useTable({
+  const isClosed = params?.get("state") === "closed";
+
+  const filterOptions: {
+    label: string;
+    value: string;
+    operators: Array<{ value: string; label?: string }>;
+    filterValues?: Array<{ value: string; label?: string }>;
+  }[] = [
+    {
+      label: "Artifact",
+      value: "artifact_dependency_vulns.artifact_artifact_name",
+      operators: [
+        { value: "is" },
+        { value: "is not" },
+        { value: "ilike", label: "contains" },
+      ],
+      filterValues: artifacts.map((a) => ({ value: a.artifactName })),
+    },
+    ...(isClosed
+      ? [
+          {
+            label: "State",
+            value: "state",
+            operators: [{ value: "is" }],
+            filterValues: [
+              { value: "accepted", label: "Accepted" },
+              { value: "falsePositive", label: "False Positive" },
+              { value: "fixed", label: "Fixed" },
+            ],
+          },
+        ]
+      : []),
+    {
+      label: "Package Name",
+      value: "component_purl",
+      operators: [
+        { value: "ilike", label: "contains" },
+        { value: "is" },
+        { value: "is not" },
+      ],
+    },
+    {
+      label: "CVE",
+      value: "cve_id",
+      operators: [
+        { value: "ilike", label: "contains" },
+        { value: "is" },
+        { value: "is not" },
+      ],
+    },
+    {
+      label: "CVSS",
+      value: "CVE.cvss",
+      operators: [
+        { value: "is less than" },
+        { value: "is greater than" },
+        { value: "is" },
+      ],
+      filterValues: [
+        { value: "low", label: "Low (0-4)" },
+        { value: "medium", label: "Medium (4-7)" },
+        { value: "high", label: "High (7-9)" },
+        { value: "critical", label: "Critical (9-10)" },
+      ],
+    },
+    {
+      label: "Risk",
+      value: "raw_risk_assessment",
+      operators: [
+        { value: "is less than" },
+        { value: "is greater than" },
+        { value: "is" },
+      ],
+      filterValues: [
+        { value: "low", label: "Low (0-4)" },
+        { value: "medium", label: "Medium (4-7)" },
+        { value: "high", label: "High (7-9)" },
+        { value: "critical", label: "Critical (9-10)" },
+      ],
+    },
+  ];
+
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
+
+  const handleDependencyFilter = useCallback(
+    (data: Parameters<typeof handleFilter>[0]) => {
+      if (
+        rangeFilterFields.includes(data.field) &&
+        (data.operator === "is" || data.operator === "is not") &&
+        severityRanges[data.value]
+      ) {
+        const [min, max] = severityRanges[data.value];
+        const newParams = new URLSearchParams(params?.toString() ?? "");
+        if (min !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is greater than]`,
+            String(min),
+          );
+        }
+        if (max !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is less than]`,
+            String(max),
+          );
+        }
+        router.push(pathname + "?" + newParams.toString());
+        return;
+      }
+      handleFilter(data);
+    },
+    [handleFilter, params, pathname, router],
+  );
 
   // Compute selected open/closed IDs for batch actions
   const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
@@ -292,11 +454,7 @@ const Index: FunctionComponent = () => {
         description="This table shows all the identified dependency risks for this repository."
         className="mb-4 mt-4"
       >
-        <div className="relative flex flex-row gap-2">
-          <QueryArtifactSelector
-            unassignPossible
-            artifacts={artifacts.map((a) => a.artifactName)}
-          />
+        <div className="flex flex-1 flex-col gap-2">
           <Tabs
             defaultValue={
               params?.has("state") ? (params.get("state") as string) : "open"
@@ -325,15 +483,23 @@ const Index: FunctionComponent = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={params?.get("search") as string}
-            placeholder="Search for cve, package name, message or scanner..."
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
-            {isLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
+          <div className="flex flex-row gap-2">
+            <Filter
+              options={filterOptions}
+              onFilter={handleDependencyFilter}
+              onRemoveFilter={removeFilter}
+              onClearAllFilters={clearAllFilters}
+              search={{
+                onChange: handleSearch,
+                defaultValue: params?.get("search") ?? "",
+                placeholder: "Search or filter results...",
+              }}
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
           </div>
         </div>
       </Section>
@@ -485,7 +651,8 @@ const Index: FunctionComponent = () => {
                   ))}
                 </thead>
                 <tbody className="text-sm text-foreground">
-                  {isLoading &&
+                  {!table.getRowModel().rows &&
+                    isLoading &&
                     Array.from(Array(5).keys()).map((el) => (
                       <tr key={el} className="border-b">
                         <td className="p-4" colSpan={4}>

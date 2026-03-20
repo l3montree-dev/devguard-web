@@ -22,9 +22,18 @@ import { Registration } from "@ory/elements-react/theme";
 import { getRegistrationFlow, OryPageParams } from "@ory/nextjs/app";
 import { oryComponentOverrides } from "../../components/ory/overrides";
 import oryConfig from "../../ory.config";
+import TermsOfUseLink from "../../components/TermsOfUseLink";
+import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
+import { rewriteFlow } from "../../types/auth";
+import { config } from "../../config";
+import { redirect } from "next/navigation";
 
 // Renders the registration page
 const RegistrationPage = async (props: OryPageParams) => {
+  if (!config.registrationEnabled) {
+    redirect("/login");
+  }
+
   const flow = await getRegistrationFlow(oryConfig, props.searchParams);
   if (!flow) {
     return null;
@@ -69,10 +78,16 @@ const RegistrationPage = async (props: OryPageParams) => {
               </p>
             </div>
             <Registration
-              flow={flow}
+              flow={rewriteFlow(flow)}
               config={oryConfig}
               components={oryComponentOverrides}
             />
+            <div className="mt-12 flex flex-col items-center">
+              <p className="text-sm/6 text-muted-foreground text-center max-w-sm">
+                By using DevGuard you agree to our <TermsOfUseLink /> and{" "}
+                <PrivacyPolicyLink />.
+              </p>
+            </div>
           </div>
         </div>
         <ThreeJSFeatureScreen />

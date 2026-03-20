@@ -219,6 +219,7 @@ export const getLayoutedElements = (
   childrenLimitMap: Map<string, number>,
   previousNodes: Array<any> = [],
   onExpansionToggle?: (nodeId: string) => void,
+  enableContextMenu?: boolean,
 ): [
   Array<{
     id: string;
@@ -332,6 +333,7 @@ export const getLayoutedElements = (
         hasMore: childCount > shownCount,
         isLoadMoreNode,
         parentId,
+        enableContextMenu,
         remainingCount: parentId
           ? (childCountMap.get(parentId) || 0) -
             (childrenLimitMap.get(parentId) || INITIAL_CHILDREN_TO_SHOW)
