@@ -20,11 +20,11 @@ import {
 const chartConfig = {
   detections: {
     label: "Detections",
-    color: "red",
+    color: "hsl(0 84% 60%)",
   },
   remediations: {
     label: "Remediations",
-    color: "green",
+    color: "hsl(142 71% 45%)",
   },
 } satisfies ChartConfig;
 
@@ -37,9 +37,11 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
   weeklyDetections,
   weeklyRemediations,
 }) => {
+  const spacer = Math.max(weeklyDetections, weeklyRemediations) * 0.03 || 1;
   const chartData = [
     {
       detections: weeklyDetections,
+      gap: spacer,
       remediations: Math.max(
         weeklyRemediations,
         Math.round(weeklyDetections / 15),
@@ -52,21 +54,23 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Detections vs Remediations</CardTitle>
+        <CardTitle className="text-base">Detections vs Remediations</CardTitle>
         <CardDescription>
           Average weekly detections vs remediations
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 items-center pb-0">
+      <CardContent className="flex items-center pb-6">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[250px]"
+          className="mx-auto w-full max-w-[280px] [aspect-ratio:2/1]"
         >
           <RadialBarChart
             data={chartData}
             endAngle={180}
             innerRadius={80}
             outerRadius={140}
+            cx="50%"
+            cy="85%"
           >
             <ChartTooltip
               cursor={false}
@@ -100,15 +104,15 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
                       <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) - 16}
+                          y={(viewBox.cy || 0) - 24}
                           className="fill-foreground text-2xl font-bold"
                         >
                           {weeklyDetections.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 4}
-                          className="fill-muted-foreground"
+                          y={(viewBox.cy || 0) - 6}
+                          className="fill-muted-foreground text-xs"
                         >
                           Detections
                         </tspan>
@@ -123,14 +127,24 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
               stackId="a"
               cornerRadius={5}
               fill="var(--color-detections)"
-              className="stroke-transparent stroke-2"
+              fillOpacity={0.2}
+              stroke="var(--color-detections)"
+              strokeWidth={2}
+            />
+            <RadialBar
+              dataKey="gap"
+              stackId="a"
+              fill="transparent"
+              stroke="transparent"
             />
             <RadialBar
               dataKey="remediations"
-              fill="var(--color-remediations)"
               stackId="a"
               cornerRadius={5}
-              className="stroke-transparent stroke-2"
+              fill="var(--color-remediations)"
+              fillOpacity={0.2}
+              stroke="var(--color-remediations)"
+              strokeWidth={2}
             />
             <ChartLegend className="mt-8" content={<ChartLegendContent />} />
           </RadialBarChart>

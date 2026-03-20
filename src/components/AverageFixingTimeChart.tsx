@@ -33,7 +33,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-base">{title}</CardTitle>
           <CardDescription>
             {description}. Target Line shows 30 days.
           </CardDescription>
@@ -63,20 +63,20 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="">{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
         <div className="flex flex-col items-center justify-center flex-1 gap-1">
           {hasData ? (
             <>
-              <span className="text-6xl font-bold">{duration}</span>
-              <span className="text-muted-foreground text-sm">{type}</span>
+              <span className="text-3xl font-semibold">{duration}</span>
+              <span className="text-sm text-muted-foreground">{type}</span>
             </>
           ) : (
             <>
-              <span className="text-6xl">∞</span>
-              <span className="text-muted-foreground text-sm">No data yet</span>
+              <span className="text-3xl text-muted-foreground">∞</span>
+              <span className="text-sm text-muted-foreground">No data yet</span>
             </>
           )}
         </div>

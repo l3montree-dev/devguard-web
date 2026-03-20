@@ -25,9 +25,9 @@ interface Props {
 
 const chartConfig: ChartConfig = {
   amount: { label: "Amount" },
-  fixed: { label: "Fixed", color: "hsl(var(--chart-1))" },
-  accepted: { label: "Accepted", color: "hsl(var(--chart-2))" },
-  falsePositive: { label: "False Positive", color: "hsl(var(--chart-3))" },
+  fixed: { label: "Fixed", color: "hsl(142 71% 45%)" },
+  accepted: { label: "Accepted", color: "hsl(217 91% 60%)" },
+  falsePositive: { label: "False Positive", color: "hsl(45 93% 47%)" },
 };
 
 const RemediationTypeDistribution: FunctionComponent<Props> = ({
@@ -45,23 +45,26 @@ const RemediationTypeDistribution: FunctionComponent<Props> = ({
       type: "fixed",
       amount: distribution.fixedPercentage,
       fill: "var(--color-fixed)",
+      stroke: "var(--color-fixed)",
     },
     {
       type: "accepted",
       amount: distribution.acceptedPercentage,
       fill: "var(--color-accepted)",
+      stroke: "var(--color-accepted)",
     },
     {
       type: "falsePositive",
       amount: distribution.falsePositivePercentage,
       fill: "var(--color-falsePositive)",
+      stroke: "var(--color-falsePositive)",
     },
   ];
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Remediation Type Distribution</CardTitle>
+        <CardTitle className="text-base">Remediation Type Distribution</CardTitle>
         <CardDescription>
           How vulnerabilities are remediated across the organization
         </CardDescription>
@@ -100,6 +103,8 @@ const RemediationTypeDistribution: FunctionComponent<Props> = ({
               dataKey="amount"
               startAngle={90}
               endAngle={-270}
+              fillOpacity={0.2}
+              strokeWidth={2}
             />
             <ChartLegend
               content={<ChartLegendContent nameKey="type" />}

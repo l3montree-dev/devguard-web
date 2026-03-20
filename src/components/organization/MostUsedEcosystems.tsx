@@ -23,7 +23,13 @@ interface Props {
   ecosystems: EcosystemUsageInOrg[];
 }
 
-const chartColors = ["red", "blue", "green", "yellow", "purple"];
+const chartColors = [
+  "hsl(0 84% 60%)",
+  "hsl(217 91% 60%)",
+  "hsl(142 71% 45%)",
+  "hsl(45 93% 47%)",
+  "hsl(271 91% 65%)",
+];
 
 const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
   const chartConfig = useMemo(() => {
@@ -44,12 +50,13 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
     amount: eco.relativeAmount,
     totalCount: eco.totalCount,
     fill: `var(--color-${eco.ecosystem})`,
+    stroke: `var(--color-${eco.ecosystem})`,
   }));
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Top Ecosystems</CardTitle>
+        <CardTitle className="text-base">Top Ecosystems</CardTitle>
         <CardDescription>
           Most used ecosystems across Organization
         </CardDescription>
@@ -86,6 +93,8 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
               dataKey="amount"
               startAngle={90}
               endAngle={-270}
+              fillOpacity={0.2}
+              strokeWidth={2}
             />
             <ChartLegend
               content={<ChartLegendContent nameKey="ecosystem" />}

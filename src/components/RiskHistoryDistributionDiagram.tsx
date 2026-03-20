@@ -37,7 +37,7 @@ export function RiskHistoryDistributionDiagram({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="text-base">
           {mode === "risk" ? "Risk" : "CVSS"} Distribution Trend
         </CardTitle>
       </CardHeader>

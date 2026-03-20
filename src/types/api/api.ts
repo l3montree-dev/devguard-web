@@ -944,17 +944,17 @@ export type OrgStructure = {
 };
 
 export type VulnCVSSDistribution = {
-  lowCVSS: number;
-  mediumCVSS: number;
-  highCVSS: number;
-  criticalCVSS: number;
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
 };
 
 export type VulnRiskDistribution = {
-  lowRisk: number;
-  mediumRisk: number;
-  highRisk: number;
-  criticalRisk: number;
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
 };
 
 export type VulnDistributionInStructure = VulnDistribution & {
