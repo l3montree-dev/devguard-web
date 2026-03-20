@@ -1,5 +1,6 @@
 "use client";
 import AssetTitle from "@/components/common/AssetTitle";
+import CopyCode from "@/components/common/CopyCode";
 import Section from "@/components/common/Section";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
@@ -18,8 +19,19 @@ import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { useSession } from "@/context/SessionContext";
+import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import { InputWithButton } from "@/components/ui/input-with-button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDownIcon } from "lucide-react";
+import Link from "next/link";
 
 const Index: FunctionComponent = () => {
+  const { pat, onCreatePat } = usePersonalAccessToken();
   const assetMenu = useAssetMenu();
 
   const { session } = useSession();
@@ -168,6 +180,82 @@ const Index: FunctionComponent = () => {
               }
             />
           </div>
+          <Collapsible className="mb-6 mt-4 pb-6">
+            <CollapsibleTrigger className="flex w-full items-center justify-between group">
+              <div className="text-left">
+                <h2 className="text-base font-semibold leading-7 text-foreground">
+                  Essential Project Config
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  These values are required to connect your CI/CD pipeline or
+                  tooling to this asset.
+                </p>
+              </div>
+              <ChevronDownIcon className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Card className="mt-4">
+                <CardContent className="flex flex-col gap-6 pt-6">
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Asset Name</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Use this as the{" "}
+                      <code className="font-mono text-xs">
+                        {asset.repositoryProvider === "github"
+                          ? "asset-name"
+                          : "devguard_asset_name"}
+                      </code>{" "}
+                      config parameter when sending scan reports or SBOMs to
+                      DevGuard.
+                    </p>
+                    <CopyCode
+                      language="shell"
+                      codeString={`${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}`}
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-semibold">
+                        Personal Access Token
+                      </p>
+                      <Link
+                        href="/user-settings#pat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground hover:text-foreground underline"
+                      >
+                        Manage existing tokens
+                      </Link>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Used for API authentication. Set this as{" "}
+                      <code className="font-mono text-xs">DEVGUARD_TOKEN</code>{" "}
+                      in your CI/CD variables.
+                    </p>
+                    <InputWithButton
+                      label="Personal Access token"
+                      nameKey="devguard-secret-token"
+                      copyable={true}
+                      copyToastDescription="The DevGuard token has been copied to your clipboard."
+                      mutable={true}
+                      variant="onCard"
+                      value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+                      update={{
+                        update: () =>
+                          onCreatePat({
+                            scopes: "scan",
+                            description: "DevGuard token with 'scan' scope",
+                          }),
+                        updateConfirmTitle: "Create new personal access token",
+                        updateConfirmDescription:
+                          "Are you sure you want to create a new personal access token? Make sure to copy it, as you won't be able to see it again.",
+                      }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
         </Section>
       ) : (
         <Section

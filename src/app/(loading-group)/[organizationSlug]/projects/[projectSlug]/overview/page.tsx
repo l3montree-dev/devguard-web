@@ -42,6 +42,7 @@ import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
 import {
+  AllAverageFixingTimes,
   AverageFixingTime,
   Paged,
   ReleaseDTO,
@@ -116,66 +117,19 @@ const OverviewPage = () => {
     fetcher,
   );
 
-  const { data: avgLowFixingTime, isLoading: avgLowFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      () =>
-        releaseId
-          ? "/organizations/" +
-            organizationSlug +
-            "/projects/" +
-            projectSlug +
-            "/releases/" +
-            releaseId +
-            "/stats/average-fixing-time?severity=low"
-          : null,
-      fetcher,
-    );
-
-  const { data: avgMediumFixingTime, isLoading: avgMediumFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      () =>
-        releaseId
-          ? "/organizations/" +
-            organizationSlug +
-            "/projects/" +
-            projectSlug +
-            "/releases/" +
-            releaseId +
-            "/stats/average-fixing-time?severity=medium"
-          : null,
-      fetcher,
-    );
-
-  const { data: avgHighFixingTime, isLoading: avgHighFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      () =>
-        releaseId
-          ? "/organizations/" +
-            organizationSlug +
-            "/projects/" +
-            projectSlug +
-            "/releases/" +
-            releaseId +
-            "/stats/average-fixing-time?severity=high"
-          : null,
-      fetcher,
-    );
-  const {
-    data: avgCriticalFixingTime,
-    isLoading: avgCriticalFixingTimeLoading,
-  } = useSWR<AverageFixingTime>(
-    () =>
+  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
+    useSWR<AllAverageFixingTimes>(
       releaseId
         ? "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/releases/" +
-          releaseId +
-          "/stats/average-fixing-time?severity=critical"
+            organizationSlug +
+            "/projects/" +
+            projectSlug +
+            "/releases/" +
+            releaseId +
+            "/stats/average-fixing-time"
         : null,
-    fetcher,
-  );
+      fetcher,
+    );
 
   const completeRiskHistory: RiskHistory[][] = useMemo(() => {
     const groups = groupBy(riskHistory ?? [], "day");
@@ -390,35 +344,60 @@ const OverviewPage = () => {
               <div className="grid grid-cols-2 col-span-2 gap-4">
                 <AverageFixingTimeChart
                   mode={mode}
-                  isLoading={avgCriticalFixingTimeLoading}
                   variant="critical"
                   title="Avg. remediation time"
                   description="Average fixing time for critical severity flaws"
-                  avgFixingTime={avgCriticalFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds:
+                        averageFixingTime.riskAvgCritical,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgCritical,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
                 <AverageFixingTimeChart
                   mode={mode}
-                  isLoading={avgHighFixingTimeLoading}
                   title="Avg. remediation time"
                   variant="high"
                   description="Average fixing time for high severity flaws"
-                  avgFixingTime={avgHighFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgHigh,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgHigh,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
                 <AverageFixingTimeChart
                   mode={mode}
-                  isLoading={avgMediumFixingTimeLoading}
                   title="Avg. remediation time"
                   variant="medium"
                   description="Average fixing time for medium severity flaws"
-                  avgFixingTime={avgMediumFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgMedium,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgMedium,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
                 <AverageFixingTimeChart
                   mode={mode}
-                  isLoading={avgLowFixingTimeLoading}
+                  isLoading={averageFixingTimeLoading}
                   title="Avg. remediation time"
                   variant="low"
                   description="Average fixing time for low severity flaws"
-                  avgFixingTime={avgLowFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgLow,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgLow,
+                    }
+                  }
                 />
               </div>
 

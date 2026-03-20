@@ -16,7 +16,13 @@ export default function useTable<T>(
   },
   additionalOptions?: Partial<TableOptions<T>>,
 ) {
-  const { sortingState, handleSort } = useFilter();
+  const {
+    handleFilter,
+    removeFilter,
+    clearAllFilters,
+    sortingState,
+    handleSort,
+  } = useFilter();
 
   const table = useReactTable({
     columns: columnsDef,
@@ -32,5 +38,8 @@ export default function useTable<T>(
 
   return {
     table,
+    handleFilter,
+    removeFilter,
+    clearAllFilters,
   };
 }
