@@ -37,6 +37,7 @@ import { browserApiClient } from "../../../../../../../../services/devGuardApi";
 import { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
+import { eventBus } from "@/events";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -72,6 +73,17 @@ const RefsPage = () => {
           refs: prev.refs.filter((ref) => ref.slug !== open.slug),
         };
       });
+      // If the deleted ref is the last viewed ref, remove it from localStorage
+      const stored = localStorage.getItem(
+        "lastViewedAssetVersionSlug" + params.assetSlug,
+      );
+      if (stored === open.slug) {
+        localStorage.removeItem(
+          "lastViewedAssetVersionSlug" + params.assetSlug,
+        );
+        eventBus.dispatch({ type: "assetVersionDeleted", payload: {} });
+      }
+
       setOpen(null);
     } else {
       toast.error("Failed to delete ref");

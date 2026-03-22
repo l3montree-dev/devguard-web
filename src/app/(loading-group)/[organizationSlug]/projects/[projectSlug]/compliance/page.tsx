@@ -41,7 +41,7 @@ const ComplianceIndex = () => {
       projectSlug +
       "/policies/",
     async (url: string) => {
-      const [allPolicies, enabledPolicies] = await Promise.all([
+      const [enabledPolicies, allPolicies] = await Promise.all([
         browserApiClient(url).then((r) => r.json()),
         browserApiClient(
           "/organizations/" + organizationSlug + "/policies/",
