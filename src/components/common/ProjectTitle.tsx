@@ -5,7 +5,7 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { Badge } from "../ui/badge";
 import { ProjectDTO } from "../../types/api/api";
 import Image from "next/image";
-import { truncateMiddle } from "src/utils/common";
+import { truncateMiddle } from "@/utils/common";
 
 export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
   if (type === "kubernetesNamespace") {

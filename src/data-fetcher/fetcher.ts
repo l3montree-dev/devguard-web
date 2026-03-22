@@ -4,6 +4,8 @@ export class FetcherError extends Error {
   status: number;
   constructor(message: string, status: number) {
     super(message);
+    Object.setPrototypeOf(this, FetcherError.prototype);
+    this.name = "FetcherError";
     this.status = status;
   }
 }

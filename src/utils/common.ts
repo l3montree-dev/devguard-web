@@ -428,7 +428,10 @@ export function roundToSecondDigit(num?: number): number {
   return Math.round(100 * num) / 100;
 }
 
-export function getHumanReadableDuration(seconds: number) {
+export function getHumanReadableDuration(seconds: number): {
+  duration: string;
+  type: string;
+} {
   const timeUnits = [
     { unit: "year", seconds: 365 * 24 * 60 * 60 },
     { unit: "month", seconds: 30 * 24 * 60 * 60 },
@@ -452,7 +455,7 @@ export function getHumanReadableDuration(seconds: number) {
 
   // If the input is less than 1 second
   return {
-    duration: 0,
+    duration: (0).toFixed(2),
     type: "seconds",
   };
 }
