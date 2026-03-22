@@ -13,7 +13,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AverageStatsSection from "@/components/organization/AverageStatsSection";
-import OrganisationCompositionSection from "@/components/organization/OrganisationCompositionSection";
+import OrganizationCompositionSection from "@/components/organization/OrganizationCompositionSection";
 import TotalVulnerabilitiesSection from "@/components/organization/TotalVulnerabilitiesSection";
 
 const STATS_PARAMS = new URLSearchParams({
@@ -133,7 +133,7 @@ const OrganizationOverview: FunctionComponent = () => {
         </Card>
       ) : (
         <>
-          <OrganisationCompositionSection
+          <OrganizationCompositionSection
             mode={mode}
             isStatisticsLoading={isStatisticsLoading}
             orgStatistics={orgStatistics}

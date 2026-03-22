@@ -8,7 +8,7 @@ import MostVulnerableList from "@/components/organization/MostVulnerableList";
 import DependencyAge from "@/components/organization/DependencyAge";
 import { OrgOverview, VulnDistributionInStructure } from "@/types/api/api";
 
-export interface OrganisationCompositionSectionProps {
+export interface OrganizationCompositionSectionProps {
   mode: "risk" | "cvss";
   isStatisticsLoading: boolean;
   orgStatistics: OrgOverview | undefined;
@@ -21,11 +21,11 @@ interface StructureColumn {
   entries: VulnDistributionInStructure[];
 }
 
-export default function OrganisationCompositionSection({
+export default function OrganizationCompositionSection({
   mode,
   isStatisticsLoading,
   orgStatistics,
-}: OrganisationCompositionSectionProps) {
+}: OrganizationCompositionSectionProps) {
   const columns: StructureColumn[] = [
     {
       type: "Projects",
