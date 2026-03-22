@@ -933,3 +933,104 @@ export type ExternalReference = {
   url: string;
   type: "cyclonedxvex" | "csaf";
 };
+
+export interface SeverityBreakdown {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
+export interface OrgVulnStats extends SeverityBreakdown {
+  org: string;
+}
+
+export interface VulnerableAssetStats {
+  asset: string;
+  org: string;
+  open: number;
+  critical: number;
+}
+
+export interface TopCVEStats {
+  cve: string;
+  affected: number;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+}
+
+export interface TopDependencyStats {
+  pkg: string;
+  count: number;
+  ecosystem: string;
+}
+
+export interface OrgCodeRiskStats {
+  org: string;
+  risks: number;
+}
+
+export interface MaliciousPackageStats {
+  pkg: string;
+  ecosystem: string;
+  affected: number;
+  type: string;
+}
+
+export interface InstanceAdminStatsDTO {
+  totalUsers: number;
+  totalOrganisations: number;
+  nonEmptyProjects: number;
+  totalProjectRefs: number;
+  ticketSyncProjects: number;
+  enabledIntegrations: number;
+  avgVulnsPerOrg: OrgVulnStats[];
+  topVulnerableAssets: VulnerableAssetStats[];
+  topCVEs: TopCVEStats[];
+  topDependencies: TopDependencyStats[];
+  avgCodeRisksPerOrg: OrgCodeRiskStats[];
+  maliciousPackages: MaliciousPackageStats[];
+}
+
+export interface InstanceBuildInfo {
+  version: string;
+  commit: string;
+  branch: string;
+  buildDate: string;
+}
+
+export interface InstanceProcessInfo {
+  pid: number;
+  hostname: string;
+  uptimeSeconds: number;
+}
+
+export interface InstanceRuntimeMemInfo {
+  alloc: number;
+  totalAlloc: number;
+  sys: number;
+  heapAlloc: number;
+}
+
+export interface InstanceRuntimeInfo {
+  goVersion: string;
+  numGoroutines: number;
+  mem: InstanceRuntimeMemInfo;
+}
+
+export interface InstanceDatabaseInfo {
+  maxOpenConnections: number;
+  openConnections: number;
+  inUse: number;
+  idle: number;
+  status: string;
+  migrationVersion: number;
+  migrationDirty: boolean;
+  vulndbVersion: string;
+}
+
+export interface InstanceInfoDTO {
+  build: InstanceBuildInfo;
+  process: InstanceProcessInfo;
+  runtime: InstanceRuntimeInfo;
+  database: InstanceDatabaseInfo;
+}
