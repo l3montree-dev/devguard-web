@@ -16,6 +16,16 @@ export interface AverageStatsSectionProps {
   orgStatistics: OrgOverview | undefined;
 }
 
+type Severity = "critical" | "high" | "medium" | "low";
+
+interface SeverityAvg {
+  variant: Severity;
+  risk: number | undefined;
+  cvss: number | undefined;
+  remediationRisk: number | undefined;
+  remediationCvss: number | undefined;
+}
+
 export default function AverageStatsSection({
   mode,
   isStatisticsLoading,
@@ -27,6 +37,41 @@ export default function AverageStatsSection({
       (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0),
   );
 
+  const severities: SeverityAvg[] = [
+    {
+      variant: "critical",
+      risk: orgStatistics?.projectOpenVulnAverage.riskCriticalAverage,
+      cvss: orgStatistics?.projectOpenVulnAverage.cvssCriticalAverage,
+      remediationRisk:
+        orgStatistics?.averageRemediationTimes?.criticalRiskAverage,
+      remediationCvss:
+        orgStatistics?.averageRemediationTimes?.criticalCVSSAverage,
+    },
+    {
+      variant: "high",
+      risk: orgStatistics?.projectOpenVulnAverage.riskHighAverage,
+      cvss: orgStatistics?.projectOpenVulnAverage.cvssHighAverage,
+      remediationRisk: orgStatistics?.averageRemediationTimes?.highRiskAverage,
+      remediationCvss: orgStatistics?.averageRemediationTimes?.highCVSSAverage,
+    },
+    {
+      variant: "medium",
+      risk: orgStatistics?.projectOpenVulnAverage.riskMediumAverage,
+      cvss: orgStatistics?.projectOpenVulnAverage.cvssMediumAverage,
+      remediationRisk:
+        orgStatistics?.averageRemediationTimes?.mediumRiskAverage,
+      remediationCvss:
+        orgStatistics?.averageRemediationTimes?.mediumCVSSAverage,
+    },
+    {
+      variant: "low",
+      risk: orgStatistics?.projectOpenVulnAverage.riskLowAverage,
+      cvss: orgStatistics?.projectOpenVulnAverage.cvssLowAverage,
+      remediationRisk: orgStatistics?.averageRemediationTimes?.lowRiskAverage,
+      remediationCvss: orgStatistics?.averageRemediationTimes?.lowCVSSAverage,
+    },
+  ];
+
   return (
     <Section
       forceVertical
@@ -35,46 +80,15 @@ export default function AverageStatsSection({
       className="mt-16"
     >
       <div className="grid grid-cols-4 gap-4">
-        <SeverityCard
-          variant="critical"
-          isLoading={isStatisticsLoading}
-          currentAmount={Math.round(
-            (mode === "risk"
-              ? orgStatistics?.projectOpenVulnAverage.riskCriticalAverage
-              : orgStatistics?.projectOpenVulnAverage.cvssCriticalAverage) ?? 0,
-          )}
-          mode={mode}
-        />
-        <SeverityCard
-          variant="high"
-          isLoading={isStatisticsLoading}
-          currentAmount={Math.round(
-            (mode === "risk"
-              ? orgStatistics?.projectOpenVulnAverage.riskHighAverage
-              : orgStatistics?.projectOpenVulnAverage.cvssHighAverage) ?? 0,
-          )}
-          mode={mode}
-        />
-        <SeverityCard
-          variant="medium"
-          isLoading={isStatisticsLoading}
-          currentAmount={Math.round(
-            (mode === "risk"
-              ? orgStatistics?.projectOpenVulnAverage.riskMediumAverage
-              : orgStatistics?.projectOpenVulnAverage.cvssMediumAverage) ?? 0,
-          )}
-          mode={mode}
-        />
-        <SeverityCard
-          variant="low"
-          isLoading={isStatisticsLoading}
-          currentAmount={Math.round(
-            (mode === "risk"
-              ? orgStatistics?.projectOpenVulnAverage.riskLowAverage
-              : orgStatistics?.projectOpenVulnAverage.cvssLowAverage) ?? 0,
-          )}
-          mode={mode}
-        />
+        {severities.map(({ variant, risk, cvss }) => (
+          <SeverityCard
+            key={variant}
+            variant={variant}
+            isLoading={isStatisticsLoading}
+            currentAmount={Math.round((mode === "risk" ? risk : cvss) ?? 0)}
+            mode={mode}
+          />
+        ))}
       </div>
       <RemediationTypeDistribution
         distribution={orgStatistics?.remediationTypeDistribution}
@@ -92,58 +106,20 @@ export default function AverageStatsSection({
         />
       </div>
       <div className="grid grid-cols-4 gap-4">
-        <AverageFixingTimeChart
-          mode={mode}
-          variant="critical"
-          title="Avg. remediation time"
-          description="Time for critical severity vulnerabilities"
-          avgFixingTime={{
-            averageFixingTimeSeconds:
-              orgStatistics?.averageRemediationTimes?.criticalRiskAverage ?? 0,
-            averageFixingTimeSecondsByCvss:
-              orgStatistics?.averageRemediationTimes?.criticalCVSSAverage ?? 0,
-          }}
-          isLoading={isStatisticsLoading}
-        />
-        <AverageFixingTimeChart
-          mode={mode}
-          variant="high"
-          title="Avg. remediation time"
-          description="Time for high severity vulnerabilities"
-          avgFixingTime={{
-            averageFixingTimeSeconds:
-              orgStatistics?.averageRemediationTimes?.highRiskAverage ?? 0,
-            averageFixingTimeSecondsByCvss:
-              orgStatistics?.averageRemediationTimes?.highCVSSAverage ?? 0,
-          }}
-          isLoading={isStatisticsLoading}
-        />
-        <AverageFixingTimeChart
-          mode={mode}
-          variant="medium"
-          title="Avg. remediation time"
-          description="Time for medium severity vulnerabilities"
-          avgFixingTime={{
-            averageFixingTimeSeconds:
-              orgStatistics?.averageRemediationTimes?.mediumRiskAverage ?? 0,
-            averageFixingTimeSecondsByCvss:
-              orgStatistics?.averageRemediationTimes?.mediumCVSSAverage ?? 0,
-          }}
-          isLoading={isStatisticsLoading}
-        />
-        <AverageFixingTimeChart
-          mode={mode}
-          variant="low"
-          title="Avg. remediation time"
-          description="Time for low severity vulnerabilities"
-          avgFixingTime={{
-            averageFixingTimeSeconds:
-              orgStatistics?.averageRemediationTimes?.lowRiskAverage ?? 0,
-            averageFixingTimeSecondsByCvss:
-              orgStatistics?.averageRemediationTimes?.lowCVSSAverage ?? 0,
-          }}
-          isLoading={isStatisticsLoading}
-        />
+        {severities.map(({ variant, remediationRisk, remediationCvss }) => (
+          <AverageFixingTimeChart
+            key={variant}
+            mode={mode}
+            variant={variant}
+            title="Avg. remediation time"
+            description={`Time for ${variant} severity vulnerabilities`}
+            avgFixingTime={{
+              averageFixingTimeSeconds: remediationRisk ?? 0,
+              averageFixingTimeSecondsByCvss: remediationCvss ?? 0,
+            }}
+            isLoading={isStatisticsLoading}
+          />
+        ))}
       </div>
     </Section>
   );

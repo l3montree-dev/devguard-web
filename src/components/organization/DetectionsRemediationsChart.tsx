@@ -37,17 +37,10 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
   weeklyDetections,
   weeklyRemediations,
 }) => {
-  const spacer = Math.max(weeklyDetections, weeklyRemediations) * 0.03 || 1;
   const chartData = [
     {
       detections: weeklyDetections,
-      gap: spacer,
-      remediations: Math.max(
-        weeklyRemediations,
-        Math.round(weeklyDetections / 15),
-      ),
-      actualDetections: weeklyDetections,
-      actualRemediations: weeklyRemediations,
+      remediations: weeklyRemediations,
     },
   ];
 
@@ -77,19 +70,16 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
               content={
                 <ChartTooltipContent
                   hideLabel
-                  formatter={(value, name, item) => {
-                    name = name as string;
-                    const actual =
-                      name === "detections"
-                        ? item.payload.actualDetections
-                        : item.payload.actualRemediations;
-                    const displayName = name[0].toUpperCase() + name.slice(1);
+                  formatter={(value, name) => {
+                    const displayName =
+                      chartConfig[name as keyof typeof chartConfig]?.label ??
+                      String(name);
                     return (
                       <div className="flex gap-4">
                         <span className="text-muted-foreground">
                           {displayName}
                         </span>
-                        <span>{actual}</span>
+                        <span>{value}</span>
                       </div>
                     );
                   }}
@@ -130,12 +120,6 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
               fillOpacity={0.2}
               stroke="var(--color-detections)"
               strokeWidth={2}
-            />
-            <RadialBar
-              dataKey="gap"
-              stackId="a"
-              fill="transparent"
-              stroke="transparent"
             />
             <RadialBar
               dataKey="remediations"

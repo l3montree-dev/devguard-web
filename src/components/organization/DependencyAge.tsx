@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
+} from "@/components/ui/card";
 import { getHumanReadableDuration } from "@/utils/common";
 
 interface Props {
@@ -15,29 +15,36 @@ interface Props {
 const MAX_YEARS = 10;
 const SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
 
-function durationToColor(seconds: number): string {
+type ColorLevel = "green" | "yellow" | "orange" | "red";
+
+function ageToColorLevel(seconds: number): ColorLevel {
   const days = seconds / (60 * 60 * 24);
-  if (days <= 364.25) return "text-green-500";
-  if (days <= 2 * 364.25) return "text-yellow-500";
-  if (days <= 5 * 364.25) return "text-orange-500";
-  return "text-red-500";
+  if (days <= 364.25) return "green";
+  if (days <= 2 * 364.25) return "yellow";
+  if (days <= 5 * 364.25) return "orange";
+  return "red";
 }
 
-function durationToMarkerColor(seconds: number): string {
-  const days = seconds / (60 * 60 * 24);
-  if (days <= 364.25) return "bg-green-500";
-  if (days <= 2 * 364.25) return "bg-yellow-500";
-  if (days <= 5 * 364.25) return "bg-orange-500";
-  return "bg-red-500";
-}
+const textColorClass: Record<ColorLevel, string> = {
+  green: "text-green-500",
+  yellow: "text-yellow-500",
+  orange: "text-orange-500",
+  red: "text-red-500",
+};
+
+const markerColorClass: Record<ColorLevel, string> = {
+  green: "bg-green-500",
+  yellow: "bg-yellow-500",
+  orange: "bg-orange-500",
+  red: "bg-red-500",
+};
 
 const DependencyAge: FunctionComponent<Props> = ({ averageAge }) => {
-  if (!averageAge) {
-    averageAge = 0;
-  }
-  const { duration, type } = getHumanReadableDuration(averageAge);
+  const age = averageAge ?? 0;
+  const { duration, type } = getHumanReadableDuration(age);
+  const colorLevel = ageToColorLevel(age);
 
-  const years = averageAge / SECONDS_PER_YEAR;
+  const years = age / SECONDS_PER_YEAR;
   const pct = Math.min((years / MAX_YEARS) * 100, 100);
 
   return (
@@ -51,7 +58,7 @@ const DependencyAge: FunctionComponent<Props> = ({ averageAge }) => {
       <CardContent className="flex flex-1 flex-col items-center justify-center gap-6 pt-6">
         <div className="flex flex-col items-center gap-1">
           <span
-            className={`text-4xl font-semibold ${durationToColor(averageAge)}`}
+            className={`text-4xl font-semibold ${textColorClass[colorLevel]}`}
           >
             {duration}
           </span>
@@ -66,7 +73,7 @@ const DependencyAge: FunctionComponent<Props> = ({ averageAge }) => {
               <div className="h-full w-[50%] bg-red-500/20" />
             </div>
             <div
-              className={`absolute top-0 h-full rounded-full ${durationToMarkerColor(averageAge)}`}
+              className={`absolute top-0 h-full rounded-full ${markerColorClass[colorLevel]}`}
               style={{ width: `${Math.max(pct, 2)}%` }}
             />
           </div>

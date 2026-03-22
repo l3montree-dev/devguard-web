@@ -21,6 +21,29 @@ export default function TotalVulnerabilitiesSection({
   orgStatistics,
   convertedRiskHistory,
 }: TotalVulnerabilitiesSectionProps) {
+  const severities = [
+    {
+      variant: "critical" as const,
+      risk: orgStatistics?.vulnDistribution.critical,
+      cvss: orgStatistics?.vulnDistribution.criticalCvss,
+    },
+    {
+      variant: "high" as const,
+      risk: orgStatistics?.vulnDistribution.high,
+      cvss: orgStatistics?.vulnDistribution.highCvss,
+    },
+    {
+      variant: "medium" as const,
+      risk: orgStatistics?.vulnDistribution.medium,
+      cvss: orgStatistics?.vulnDistribution.mediumCvss,
+    },
+    {
+      variant: "low" as const,
+      risk: orgStatistics?.vulnDistribution.low,
+      cvss: orgStatistics?.vulnDistribution.lowCvss,
+    },
+  ];
+
   return (
     <Section
       forceVertical
@@ -29,46 +52,15 @@ export default function TotalVulnerabilitiesSection({
       className="mt-16"
     >
       <div className="grid grid-cols-4 gap-4">
-        <SeverityCard
-          variant="critical"
-          isLoading={isStatisticsLoading}
-          currentAmount={
-            (mode === "risk"
-              ? orgStatistics?.vulnDistribution.critical
-              : orgStatistics?.vulnDistribution.criticalCvss) ?? 0
-          }
-          mode={mode}
-        />
-        <SeverityCard
-          variant="high"
-          isLoading={isStatisticsLoading}
-          currentAmount={
-            (mode === "risk"
-              ? orgStatistics?.vulnDistribution.high
-              : orgStatistics?.vulnDistribution.highCvss) ?? 0
-          }
-          mode={mode}
-        />
-        <SeverityCard
-          variant="medium"
-          isLoading={isStatisticsLoading}
-          currentAmount={
-            (mode === "risk"
-              ? orgStatistics?.vulnDistribution.medium
-              : orgStatistics?.vulnDistribution.mediumCvss) ?? 0
-          }
-          mode={mode}
-        />
-        <SeverityCard
-          variant="low"
-          isLoading={isStatisticsLoading}
-          currentAmount={
-            (mode === "risk"
-              ? orgStatistics?.vulnDistribution.low
-              : orgStatistics?.vulnDistribution.lowCvss) ?? 0
-          }
-          mode={mode}
-        />
+        {severities.map(({ variant, risk, cvss }) => (
+          <SeverityCard
+            key={variant}
+            variant={variant}
+            isLoading={isStatisticsLoading}
+            currentAmount={(mode === "risk" ? risk : cvss) ?? 0}
+            mode={mode}
+          />
+        ))}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <MostUsedComponents

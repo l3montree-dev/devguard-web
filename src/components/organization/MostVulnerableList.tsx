@@ -5,12 +5,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "src/components/ui/card";
-import { Skeleton } from "src/components/ui/skeleton";
-import { VulnDistributionInStructure } from "src/types/api/api";
-import CVERainbowBadge from "src/components/CVERainbowBadge";
-import { truncateMiddle } from "src/utils/common";
-import { useActiveOrg } from "src/hooks/useActiveOrg";
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { VulnDistributionInStructure } from "@/types/api/api";
+import CVERainbowBadge from "@/components/CVERainbowBadge";
+import { truncateMiddle } from "@/utils/common";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 import Link from "next/link";
 
 function getHref(
@@ -81,14 +86,21 @@ const MostVulnerableList: FunctionComponent<Props> = ({
                     key={entry.name || i}
                     className="border-b last:border-0 even:bg-muted/40"
                   >
-                    <td colSpan={2} className="p-0">
+                    <td className="p-0">
                       <Link
                         href={getHref(activeOrg.slug, type, entry)}
-                        className="flex items-center justify-between px-3 py-2 hover:bg-accent/50 transition-colors"
+                        className="!opacity-100 flex items-center justify-between px-3 py-2 hover:bg-accent/50 transition-colors"
                       >
-                        <span className="!text-white truncate font-mono text-sm font-medium">
-                          {truncateMiddle(entry.name, 24)}
-                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="!text-foreground truncate font-mono text-sm font-medium">
+                              {truncateMiddle(entry.name, 24)}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <span className="font-mono">{entry.name}</span>
+                          </TooltipContent>
+                        </Tooltip>
                         <CVERainbowBadge
                           low={mode === "risk" ? entry.low : entry.lowCvss}
                           medium={

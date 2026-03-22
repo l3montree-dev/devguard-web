@@ -6,7 +6,7 @@ import MostUsedEcosystems from "@/components/organization/MostUsedEcosystems";
 import StructureCard from "@/components/organization/StructureCard";
 import MostVulnerableList from "@/components/organization/MostVulnerableList";
 import DependencyAge from "@/components/organization/DependencyAge";
-import { OrgOverview } from "@/types/api/api";
+import { OrgOverview, VulnDistributionInStructure } from "@/types/api/api";
 
 export interface OrganisationCompositionSectionProps {
   mode: "risk" | "cvss";
@@ -14,11 +14,39 @@ export interface OrganisationCompositionSectionProps {
   orgStatistics: OrgOverview | undefined;
 }
 
+interface StructureColumn {
+  type: "Projects" | "Assets" | "Artifacts";
+  listTitle: string;
+  count: number | undefined;
+  entries: VulnDistributionInStructure[];
+}
+
 export default function OrganisationCompositionSection({
   mode,
   isStatisticsLoading,
   orgStatistics,
 }: OrganisationCompositionSectionProps) {
+  const columns: StructureColumn[] = [
+    {
+      type: "Projects",
+      listTitle: "Most Vulnerable Groups",
+      count: orgStatistics?.structure.numProjects,
+      entries: orgStatistics?.topProjects ?? [],
+    },
+    {
+      type: "Assets",
+      listTitle: "Most Vulnerable Repositories",
+      count: orgStatistics?.structure.numAssets,
+      entries: orgStatistics?.topAssets ?? [],
+    },
+    {
+      type: "Artifacts",
+      listTitle: "Most Vulnerable Artifacts",
+      count: orgStatistics?.structure.numArtifacts,
+      entries: orgStatistics?.topArtifacts ?? [],
+    },
+  ];
+
   return (
     <Section
       forceVertical
@@ -27,48 +55,22 @@ export default function OrganisationCompositionSection({
       className="mt-12"
     >
       <div className="grid grid-cols-3 gap-4">
-        <div className="flex flex-col gap-4">
-          <StructureCard
-            type="Projects"
-            currentAmount={orgStatistics?.structure.numProjects ?? 0}
-            isLoading={isStatisticsLoading}
-          />
-          <MostVulnerableList
-            title="Most Vulnerable Groups"
-            type="Projects"
-            entries={orgStatistics?.topProjects ?? []}
-            mode={mode}
-            isLoading={isStatisticsLoading}
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <StructureCard
-            type="Assets"
-            currentAmount={orgStatistics?.structure.numAssets ?? 0}
-            isLoading={isStatisticsLoading}
-          />
-          <MostVulnerableList
-            title="Most Vulnerable Repositories"
-            type="Assets"
-            entries={orgStatistics?.topAssets ?? []}
-            mode={mode}
-            isLoading={isStatisticsLoading}
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <StructureCard
-            type="Artifacts"
-            currentAmount={orgStatistics?.structure.numArtifacts ?? 0}
-            isLoading={isStatisticsLoading}
-          />
-          <MostVulnerableList
-            title="Most Vulnerable Artifacts"
-            type="Artifacts"
-            entries={orgStatistics?.topArtifacts ?? []}
-            mode={mode}
-            isLoading={isStatisticsLoading}
-          />
-        </div>
+        {columns.map(({ type, listTitle, count, entries }) => (
+          <div key={type} className="flex flex-col gap-4">
+            <StructureCard
+              type={type}
+              currentAmount={count ?? 0}
+              isLoading={isStatisticsLoading}
+            />
+            <MostVulnerableList
+              title={listTitle}
+              type={type}
+              entries={entries}
+              mode={mode}
+              isLoading={isStatisticsLoading}
+            />
+          </div>
+        ))}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <MostUsedEcosystems ecosystems={orgStatistics?.topEcosystems ?? []} />

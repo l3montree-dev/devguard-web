@@ -5,16 +5,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
+} from "@/components/ui/card";
 
 interface Props {
   amount: number | undefined;
 }
 
 const AverageOpenCodeRisks: FunctionComponent<Props> = ({ amount }) => {
-  if (!amount) {
-    amount = 0;
-  }
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
@@ -24,7 +21,7 @@ const AverageOpenCodeRisks: FunctionComponent<Props> = ({ amount }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 items-center justify-center">
-        <p className="text-4xl font-semibold">{amount}</p>
+        <p className="text-4xl font-semibold">{amount ?? 0}</p>
       </CardContent>
     </Card>
   );
