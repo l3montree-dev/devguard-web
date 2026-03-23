@@ -1,21 +1,56 @@
 "use client";
 
-import { json } from "@codemirror/lang-json";
+import { json, jsonParseLinter } from "@codemirror/lang-json";
+import { yaml } from "@codemirror/lang-yaml";
+import { Diagnostic, linter, lintGutter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView, basicSetup } from "codemirror";
+import jsYaml from "js-yaml";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 
+function yamlParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    try {
+      jsYaml.load(view.state.doc.toString());
+      return [];
+    } catch (e) {
+      if (e instanceof jsYaml.YAMLException) {
+        const pos = (e as jsYaml.YAMLException).mark?.position ?? 0;
+        return [
+          {
+            from: pos,
+            to: pos,
+            severity: "error",
+            message: (e as jsYaml.YAMLException).reason,
+          },
+        ];
+      }
+      return [];
+    }
+  };
+}
+
 interface Props {
   value: string;
+  language?: string;
   onChange: (value: string) => void;
+  onValidation?: (isValid: boolean) => void;
   readOnly?: boolean;
 }
 
-const JsonCodeEditor = ({ value, onChange, readOnly = false }: Props) => {
+const CodeEditor = ({
+  value,
+  language = "json",
+  onChange,
+  onValidation,
+  readOnly = false,
+}: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const onValidationRef = useRef(onValidation);
+  onValidationRef.current = onValidation;
 
   const { theme } = useTheme();
 
@@ -24,13 +59,23 @@ const JsonCodeEditor = ({ value, onChange, readOnly = false }: Props) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const langExtension = language === "yaml" ? yaml() : json();
+    const langLinter =
+      language === "yaml" ? yamlParseLinter() : jsonParseLinter();
+
     const view = new EditorView({
       state: EditorState.create({
         doc: value,
         extensions: [
           basicSetup,
           currentTheme,
-          json(),
+          langExtension,
+          linter((view) => {
+            const diagnostics = langLinter(view);
+            onValidationRef.current?.(diagnostics.length === 0);
+            return diagnostics;
+          }),
+          lintGutter(),
           EditorState.readOnly.of(readOnly),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
@@ -53,7 +98,7 @@ const JsonCodeEditor = ({ value, onChange, readOnly = false }: Props) => {
       viewRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentTheme]);
 
   // Sync external value changes without recreating the editor
   useEffect(() => {
@@ -75,4 +120,4 @@ const JsonCodeEditor = ({ value, onChange, readOnly = false }: Props) => {
   );
 };
 
-export default JsonCodeEditor;
+export default CodeEditor;

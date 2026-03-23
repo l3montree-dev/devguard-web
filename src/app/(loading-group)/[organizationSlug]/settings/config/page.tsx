@@ -3,101 +3,116 @@
 
 "use client";
 
-import JsonCodeEditor from "@/components/common/JsonCodeEditor";
+import CodeEditor from "@/components/common/CodeEditor";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { browserApiClient } from "@/services/devGuardApi";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
 
-const allry = [
-  { value: "trivy-config", label: "Trivy" },
-  { value: "gitleaks-config", label: "Gitleaks" },
-  { value: "semgrep-config", label: "Semgrep" },
+const configFileTmp = [
+  { value: "trivy-config", label: "Trivy", language: "yaml" },
+  { value: "gitleaks-config", label: "Gitleaks", language: "json" },
+  { value: "semgrep-config", label: "Semgrep", language: "yaml" },
 ];
-
-export type ConfigFile = Record<string, unknown>;
 
 const Config = () => {
   const org = useActiveOrg();
   const orgMenu = useOrganizationMenu();
 
-  const [selectedConfigId, setSelectedConfigId] = useState(allry[0].value);
+  const [selectedConfigId, setSelectedConfigId] = useState(
+    configFileTmp[0].value,
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [editorValue, setEditorValue] = useState("");
-  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  //const [configFile, setConfigFile] = useState<string | null>(null);
+
+  const selectedLanguage =
+    configFileTmp.find((c) => c.value === selectedConfigId)?.language ?? "json";
 
   const configFileUrl = org
     ? "/organizations/" + org.slug + "/config-files/" + selectedConfigId
     : null;
 
-  const { data: configFile, mutate } = useSWR<ConfigFile>(
-    configFileUrl,
-    fetcher,
-  );
+  const {
+    data: configFile,
+    mutate,
+    error,
+  } = useSWR<string | null>(configFileUrl, async (url: string) => {
+    const response = await browserApiClient(url);
+    if (!response.ok && response.status !== 404) {
+      throw new Error("Failed to fetch config file");
+    }
+    const config = await response.text();
+    return config;
+  });
 
-  const handleConfigChange = (configId: string) => {
+  const handleSelectedConfigChange = (configId: string) => {
     setSelectedConfigId(configId);
     setIsEditing(false);
-    setJsonError(null);
+    setCodeError(null);
   };
 
-  const handleConfigFileChange = async (newConfig: ConfigFile) => {
+  const handleConfigFileChange = async (newConfig: string) => {
     const resp = await fetcher(configFileUrl!, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newConfig),
+      headers: {
+        "Content-Type": "text/html",
+      },
+      body: newConfig,
     });
 
     if (!resp) {
       return;
     }
 
-    mutate(resp, false);
+    mutate();
   };
 
   const handleEditClick = () => {
-    setEditorValue(JSON.stringify(configFile, null, 2));
-    setJsonError(null);
+    setEditorValue(configFile ?? "");
+    setCodeError(null);
     setIsEditing(true);
   };
 
   const handleEditorChange = (value: string) => {
     setEditorValue(value);
-    try {
-      JSON.parse(value);
-      setJsonError(null);
-    } catch {
-      setJsonError("Invalid JSON");
-    }
+  };
+
+  const handleEditorValidation = (isValid: boolean) => {
+    setCodeError(isValid ? null : `Invalid ${selectedLanguage?.toUpperCase()}`);
   };
 
   const handleSave = async () => {
     try {
-      const parsed = JSON.parse(editorValue) as ConfigFile;
-      await handleConfigFileChange(parsed);
+      await handleConfigFileChange(editorValue);
       setIsEditing(false);
     } catch {
-      setJsonError("Invalid JSON — cannot save");
+      setCodeError(`Failed to save the new Configuration`);
     }
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    setJsonError(null);
+    setCodeError(null);
   };
 
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
       <div className="flex h-full w-full flex-col gap-4 p-4">
         <div>
-          <Tabs value={selectedConfigId} onValueChange={handleConfigChange}>
+          <Tabs
+            value={selectedConfigId}
+            onValueChange={handleSelectedConfigChange}
+          >
             <TabsList>
-              {allry.map((config) => (
+              {configFileTmp.map((config) => (
                 <TabsTrigger key={config.value} value={config.value}>
                   {config.label}
                 </TabsTrigger>
@@ -106,7 +121,7 @@ const Config = () => {
             <TabsContent value={selectedConfigId}>
               <p className="text-sm text-muted-foreground">
                 Here you can view and edit the configuration file for{" "}
-                {selectedConfigId}.
+                {configFileTmp.find((c) => c.value === selectedConfigId)?.label}
               </p>
             </TabsContent>
           </Tabs>
@@ -115,16 +130,18 @@ const Config = () => {
         {isEditing ? (
           <div className="flex flex-col gap-2">
             <div>
-              <JsonCodeEditor
+              <CodeEditor
                 value={editorValue}
                 onChange={handleEditorChange}
+                onValidation={handleEditorValidation}
+                language={selectedLanguage}
               />
             </div>
-            {jsonError && (
-              <p className="text-sm text-destructive">{jsonError}</p>
+            {codeError && (
+              <p className="text-sm text-destructive">{codeError}</p>
             )}
             <div className="flex gap-2 sticky bottom-0 bg-background/80 pt-2 justify-end">
-              <Button onClick={handleSave} disabled={!!jsonError}>
+              <Button onClick={handleSave} disabled={!!codeError}>
                 Save
               </Button>
               <Button variant="outline" onClick={handleCancel}>
@@ -141,10 +158,11 @@ const Config = () => {
               </Button>
             </div>
             <div>
-              <JsonCodeEditor
-                value={JSON.stringify(configFile, null, 2)}
+              <CodeEditor
+                value={configFile || ""}
                 onChange={() => {}}
                 readOnly
+                language={selectedLanguage}
               />
             </div>
           </div>
