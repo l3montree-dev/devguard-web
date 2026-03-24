@@ -1,5 +1,5 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 "use client";
 
@@ -61,7 +61,10 @@ const ConfigFileEditor = ({
   };
 
   const handleConfigFileChange = async (newConfig: string) => {
-    const resp = await browserApiClient(configFileUrl!, {
+    if (!configFileUrl) {
+      return;
+    }
+    const resp = await browserApiClient(configFileUrl, {
       method: "PUT",
       headers: { "Content-Type": "text/plain" },
       body: newConfig,

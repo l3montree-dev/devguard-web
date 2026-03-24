@@ -291,17 +291,23 @@ const Index: FunctionComponent = () => {
         >
           <Card className="p-6">
             <div className="flex justify-end">
-              <Link
-                href={
-                  "/" +
-                  activeOrg.slug +
-                  "/projects/" +
-                  project?.slug +
-                  "/settings/config"
-                }
-              >
-                <Button variant={"outline"}>Go to Configuration Files</Button>
-              </Link>
+              {project?.slug ? (
+                <Link
+                  href={
+                    "/" +
+                    activeOrg.slug +
+                    "/projects/" +
+                    project.slug +
+                    "/settings/config"
+                  }
+                >
+                  <Button variant={"outline"}>Go to Configuration Files</Button>
+                </Link>
+              ) : (
+                <Button variant={"outline"} disabled>
+                  Go to Configuration Files
+                </Button>
+              )}
             </div>
           </Card>
         </Section>

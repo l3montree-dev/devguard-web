@@ -36,7 +36,7 @@ import {
 } from "../../../../../../../../components/ui/collapsible";
 import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
-import { Card } from "../../../../../../../../components/ui/card";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {

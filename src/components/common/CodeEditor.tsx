@@ -98,6 +98,10 @@ const CodeEditor = ({
           currentTheme,
           languageExtensions[language],
           linter((view) => {
+            if (view.state.doc.toString() == "") {
+              onValidationRef.current?.(true);
+              return [];
+            }
             const diagnostics = langLinter(view);
             onValidationRef.current?.(diagnostics.length === 0);
             return diagnostics;
