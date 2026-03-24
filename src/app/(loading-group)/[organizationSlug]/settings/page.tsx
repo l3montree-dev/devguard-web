@@ -527,6 +527,20 @@ const Home = () => {
         </FormProvider>
       </div>
       <hr />
+      <Section
+        id="config-files"
+        title="Configuration Files"
+        description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link href={"/" + activeOrg.slug + "/settings/config"}>
+              <Button variant={"outline"}>Go to Configuration Files</Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
+      <hr />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>
           <Section
