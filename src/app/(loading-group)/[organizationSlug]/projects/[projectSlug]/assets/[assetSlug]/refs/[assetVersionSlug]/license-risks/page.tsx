@@ -55,6 +55,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import Filter from "@/components/Filter";
 
 const columnHelper = createColumnHelper<LicenseRiskDTO>();
 
@@ -148,6 +149,7 @@ const Index: FunctionComponent = () => {
       "license-risks?" +
       query.toString(),
     fetcher,
+    { keepPreviousData: true },
   );
 
   const { data: licenses, isLoading: licensesLoading } = useSWR<
@@ -226,7 +228,51 @@ const Index: FunctionComponent = () => {
     [licenses, riskyLicenses],
   );
 
-  const { table } = useTable({
+  const artifacts = useArtifacts();
+
+  const isClosed = searchParams?.get("state") === "closed";
+
+  const filterOptions = useMemo(() => {
+    const options = [
+      {
+        label: "Artifact",
+        value: "artifact_license_risks.artifact_artifact_name",
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
+        filterValues: artifacts.map((a) => ({ value: a.artifactName })),
+      },
+      {
+        label: "Package Name",
+        value: "component_purl",
+        operators: [
+          { value: "ilike", label: "contains" },
+          { value: "is" },
+          { value: "is not" },
+        ],
+      },
+      ...(isClosed
+        ? [
+            {
+              label: "State",
+              value: "state",
+              operators: [{ value: "is" }],
+              filterValues: [
+                { value: "accepted", label: "Accepted" },
+                { value: "falsePositive", label: "False Positive" },
+                { value: "fixed", label: "Fixed" },
+              ],
+            },
+          ]
+        : []),
+    ];
+
+    return options;
+  }, [artifacts, isClosed]);
+
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
@@ -235,7 +281,6 @@ const Index: FunctionComponent = () => {
 
   const { branches, tags } = useAssetBranchesAndTags();
   const push = useRouterQuery();
-  const artifacts = useArtifacts();
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -370,11 +415,7 @@ const Index: FunctionComponent = () => {
             </CollapsibleContent>
           </Collapsible>
         </Card>
-        <div className="relative flex flex-row gap-2">
-          <QueryArtifactSelector
-            unassignPossible
-            artifacts={artifacts.map((a) => a.artifactName)}
-          />
+        <div className="relative flex flex-col gap-2">
           <Tabs
             defaultValue={
               searchParams?.has("state")
@@ -406,11 +447,18 @@ const Index: FunctionComponent = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={(e) => handleSearch(e.target.value)}
-            defaultValue={searchParams?.get("search") as string}
-            placeholder="Search for cve, package name, message or scanner..."
+          <Filter
+            options={filterOptions}
+            onFilter={handleFilter}
+            onRemoveFilter={removeFilter}
+            onClearAllFilters={clearAllFilters}
+            search={{
+              onChange: handleSearch,
+              defaultValue: searchParams?.get("search") ?? "",
+              placeholder: "Search or filter results...",
+            }}
           />
+
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
             {isLoading && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
