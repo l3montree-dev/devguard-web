@@ -36,6 +36,8 @@ import {
 } from "../../../../../../../../components/ui/collapsible";
 import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
+import { Card } from "../../../../../../../../components/ui/card";
+import Link from "next/link";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -365,6 +367,30 @@ const Index: FunctionComponent = () => {
               }}
             />
           </div>
+        </Section>
+        <hr />
+        <Section
+          id="config-files"
+          title="Configuration Files"
+          description="View and edit configuration files for this repository, including scanner tool settings. These configurations override project-level settings for this specific repository."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <Link
+                href={
+                  "/" +
+                  activeOrg.slug +
+                  "/projects/" +
+                  project!.slug +
+                  "/assets/" +
+                  asset.slug +
+                  "/settings/config"
+                }
+              >
+                <Button variant={"outline"}>Go to Configuration Files</Button>
+              </Link>
+            </div>
+          </Card>
         </Section>
         <hr />
       </div>
