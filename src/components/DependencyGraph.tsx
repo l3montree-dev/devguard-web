@@ -135,8 +135,8 @@ const DependencyGraph: FunctionComponent<{
 
   // Compute direct dependencies with available patches
   const directDepsWithPatchesRef = useRef<Set<string>>(new Set());
-  useMemo(() => {
-    directDepsWithPatchesRef.current.clear();
+  directDepsWithPatchesRef.current = useMemo(() => {
+    const deps = new Set<string>();
     vulns.forEach((vuln) => {
       // Check if this is a DetailedDependencyVulnDTO with directDependencyFixedVersion
       const detailedVuln = vuln as any;
@@ -146,9 +146,10 @@ const DependencyGraph: FunctionComponent<{
         detailedVuln.vulnerabilityPath.length > 0
       ) {
         // The direct dependency is the first element in the path
-        directDepsWithPatchesRef.current.add(detailedVuln.vulnerabilityPath[0]);
+        deps.add(detailedVuln.vulnerabilityPath[0]);
       }
     });
+    return deps;
   }, [vulns]);
 
   if (childCountMapRef.current.size === 0) {

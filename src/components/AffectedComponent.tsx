@@ -6,7 +6,7 @@ import {
   PURLInspectResponse,
   VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";
@@ -45,7 +45,7 @@ const AffectedComponentDetails: FunctionComponent<{
     revalidateOnReconnect: false,
   });
 
-  useSWR(data ? `matched-cve-${vuln.cveID}` : null, () => {
+  useEffect(() => {
     if (data) {
       const matchedCVE = data.vulns.find(
         (vulnInPkg) => vuln.cveID === vulnInPkg.CVEID,
@@ -54,8 +54,7 @@ const AffectedComponentDetails: FunctionComponent<{
         setActiveCVE(matchedCVE);
       }
     }
-    return null;
-  });
+  }, [data, vuln.cveID]);
 
   if (isLoading) {
     return (
