@@ -23,41 +23,6 @@ const STATS_PARAMS = new URLSearchParams({
   topEcosystemsLimit: "5",
 }).toString();
 
-function toReleaseRiskHistory(
-  entry: OrgOverview["orgRiskHistory"][number],
-): ReleaseRiskHistory {
-  return {
-    id: "",
-    sumOpenRisk: 0,
-    averageOpenRisk: 0,
-    maxOpenRisk: 0,
-    minOpenRisk: 0,
-    sumClosedRisk: 0,
-    averageClosedRisk: 0,
-    maxClosedRisk: 0,
-    minClosedRisk: 0,
-    openVulns: 0,
-    fixedVulns: 0,
-    low: 0,
-    medium: 0,
-    high: 0,
-    critical: 0,
-    lowCvss: 0,
-    mediumCvss: 0,
-    highCvss: 0,
-    criticalCvss: 0,
-    day: entry.day,
-    cvePurlLow: entry.lowRisk,
-    cvePurlMedium: entry.mediumRisk,
-    cvePurlHigh: entry.highRisk,
-    cvePurlCritical: entry.criticalRisk,
-    cvePurlLowCvss: entry.lowCVSS,
-    cvePurlMediumCvss: entry.mediumCVSS,
-    cvePurlHighCvss: entry.highCVSS,
-    cvePurlCriticalCvss: entry.criticalCVSS,
-  };
-}
-
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const orgSlug = activeOrg.slug;
@@ -77,9 +42,6 @@ const OrganizationOverview: FunctionComponent = () => {
   const is404 = error instanceof FetcherError && error.status === 404;
   const isError = !isStatisticsLoading && error && !is404;
   const hasNoData = !isStatisticsLoading && (is404 || !orgStatistics);
-
-  const convertedRiskHistory: ReleaseRiskHistory[] =
-    orgStatistics?.orgRiskHistory.map(toReleaseRiskHistory) ?? [];
 
   return (
     <Page
@@ -142,7 +104,7 @@ const OrganizationOverview: FunctionComponent = () => {
             mode={mode}
             isStatisticsLoading={isStatisticsLoading}
             orgStatistics={orgStatistics}
-            convertedRiskHistory={convertedRiskHistory}
+            riskHistory={orgStatistics?.orgRiskHistory || []}
           />
           <AverageStatsSection
             mode={mode}

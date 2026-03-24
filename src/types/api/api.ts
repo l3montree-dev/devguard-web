@@ -760,33 +760,6 @@ export interface RiskHistory {
   maxClosedRisk: number;
   minClosedRisk: number;
 
-  low: number;
-  medium: number;
-  high: number;
-  critical: number;
-
-  lowCvss: number;
-  mediumCvss: number;
-  highCvss: number;
-  criticalCvss: number;
-
-  openVulns: number;
-  fixedVulns: number;
-}
-
-export interface RiskHistory {
-  id: string;
-  day: string;
-  sumOpenRisk: number;
-  averageOpenRisk: number;
-  maxOpenRisk: number;
-  minOpenRisk: number;
-
-  sumClosedRisk: number;
-  averageClosedRisk: number;
-  maxClosedRisk: number;
-  minClosedRisk: number;
-
   openVulns: number;
   fixedVulns: number;
 
@@ -987,20 +960,6 @@ export type AverageVulnEventsPerWeek = {
   averageFixedEvents: number;
 };
 
-type OrgRiskHistory = {
-  day: string;
-
-  lowRisk: number;
-  highRisk: number;
-  mediumRisk: number;
-  criticalRisk: number;
-
-  lowCVSS: number;
-  mediumCVSS: number;
-  highCVSS: number;
-  criticalCVSS: number;
-};
-
 export type EcosystemUsageInOrg = {
   ecosystem: string;
   relativeAmount: number;
@@ -1048,7 +1007,7 @@ export type OrgOverview = {
   topProjects: VulnDistributionInStructure[];
   topAssets: VulnDistributionInStructure[];
   topArtifacts: VulnDistributionInStructure[];
-  orgRiskHistory: OrgRiskHistory[];
+  orgRiskHistory: ReleaseRiskHistory[];
   averageRemediationTimes: AverageRemediationTimes;
   averageAgeOfDependencies: number;
   averageOpenCodeRisksPerProject: number;

@@ -4,7 +4,7 @@
 import Section from "@/components/common/Section";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import SeverityCard from "@/components/SeverityCard";
-import { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
+import { OrgOverview, ReleaseRiskHistory, RiskHistory } from "@/types/api/api";
 import MostUsedComponents from "./MostUsedComponents";
 import MostCommonCVEs from "./MostCommonCVEs";
 
@@ -12,14 +12,14 @@ export interface TotalVulnerabilitiesSectionProps {
   mode: "risk" | "cvss";
   isStatisticsLoading: boolean;
   orgStatistics: OrgOverview | undefined;
-  convertedRiskHistory: ReleaseRiskHistory[];
+  riskHistory: ReleaseRiskHistory[];
 }
 
 export default function TotalVulnerabilitiesSection({
   mode,
   isStatisticsLoading,
   orgStatistics,
-  convertedRiskHistory,
+  riskHistory,
 }: TotalVulnerabilitiesSectionProps) {
   const severities = [
     {
@@ -70,7 +70,7 @@ export default function TotalVulnerabilitiesSection({
       </div>
       <div>
         <RiskHistoryDistributionDiagram
-          data={convertedRiskHistory}
+          data={riskHistory}
           isLoading={isStatisticsLoading}
           mode={mode}
         />
