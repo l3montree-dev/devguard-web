@@ -7,8 +7,27 @@ import { EditorState } from "@codemirror/state";
 import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView, basicSetup } from "codemirror";
 import jsYaml from "js-yaml";
+import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
+import { StreamLanguage } from "@codemirror/language";
+import { toml } from "@codemirror/legacy-modes/mode/toml";
+
+function tomlParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    try {
+      tomlParser.parse(view.state.doc.toString());
+      return [];
+    } catch (e) {
+      if (e instanceof Error) {
+        const match = e.message.match(/pos (\d+)/i);
+        const pos = match ? parseInt(match[1], 10) - 1 : 0;
+        return [{ from: pos, to: pos, severity: "error", message: e.message }];
+      }
+      return [];
+    }
+  };
+}
 
 function yamlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
@@ -17,28 +36,35 @@ function yamlParseLinter() {
       return [];
     } catch (e) {
       if (e instanceof jsYaml.YAMLException) {
-        const pos = (e as jsYaml.YAMLException).mark?.position ?? 0;
-        return [
-          {
-            from: pos,
-            to: pos,
-            severity: "error",
-            message: (e as jsYaml.YAMLException).reason,
-          },
-        ];
+        const pos = e.mark?.position ?? 0;
+        return [{ from: pos, to: pos, severity: "error", message: e.reason }];
       }
       return [];
     }
   };
 }
 
+export type Language = keyof typeof languageExtensions;
+
 interface Props {
   value: string;
-  language?: string;
+  language?: Language;
   onChange: (value: string) => void;
   onValidation?: (isValid: boolean) => void;
   readOnly?: boolean;
 }
+
+const languageExtensions = {
+  yaml: yaml(),
+  json: json(),
+  toml: StreamLanguage.define(toml),
+};
+
+const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
+  yaml: yamlParseLinter(),
+  json: jsonParseLinter(),
+  toml: tomlParseLinter(),
+};
 
 const CodeEditor = ({
   value,
@@ -49,27 +75,28 @@ const CodeEditor = ({
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const onValidationRef = useRef(onValidation);
   onValidationRef.current = onValidation;
+  const valueRef = useRef(value);
+  valueRef.current = value;
 
   const { theme } = useTheme();
-
   const currentTheme = theme === "dark" ? vscodeDark : vscodeLight;
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const langExtension = language === "yaml" ? yaml() : json();
-    const langLinter =
-      language === "yaml" ? yamlParseLinter() : jsonParseLinter();
+    const langLinter = languageLinters[language];
 
     const view = new EditorView({
       state: EditorState.create({
-        doc: value,
+        doc: valueRef.current,
         extensions: [
           basicSetup,
           currentTheme,
-          langExtension,
+          languageExtensions[language],
           linter((view) => {
             const diagnostics = langLinter(view);
             onValidationRef.current?.(diagnostics.length === 0);
@@ -79,7 +106,7 @@ const CodeEditor = ({
           EditorState.readOnly.of(readOnly),
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
-              onChange(update.state.doc.toString());
+              onChangeRef.current(update.state.doc.toString());
             }
           }),
           EditorView.theme({
@@ -97,8 +124,7 @@ const CodeEditor = ({
       view.destroy();
       viewRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTheme]);
+  }, [currentTheme, language, readOnly]);
 
   // Sync external value changes without recreating the editor
   useEffect(() => {

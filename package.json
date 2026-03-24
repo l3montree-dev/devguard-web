@@ -15,6 +15,7 @@
         "@headlessui/react": "^2.2.9",
         "@heroicons/react": "^2.2.0",
         "@hookform/resolvers": "^5.2.2",
+        "@iarna/toml": "^2.2.5",
         "@mdxeditor/editor": "^3.52.4",
         "@ory/elements-react": "^1.1.0",
         "@ory/nextjs": "^1.0.0-rc.1",

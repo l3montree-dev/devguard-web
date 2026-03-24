@@ -3,11 +3,10 @@
 
 "use client";
 
-import CodeEditor from "@/components/common/CodeEditor";
+import CodeEditor, { type Language } from "@/components/common/CodeEditor";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -16,9 +15,9 @@ import { useState } from "react";
 import useSWR from "swr";
 
 const configFileTmp = [
-  { value: "trivy-config", label: "Trivy", language: "yaml" },
+  { value: "trivy", label: "Trivy", language: "yaml" },
   { value: "gitleaks-config", label: "Gitleaks", language: "json" },
-  { value: "semgrep-config", label: "Semgrep", language: "yaml" },
+  { value: "semgrep-config", label: "Semgrep", language: "toml" },
 ];
 
 const Config = () => {
@@ -33,25 +32,30 @@ const Config = () => {
   const [codeError, setCodeError] = useState<string | null>(null);
   //const [configFile, setConfigFile] = useState<string | null>(null);
 
-  const selectedLanguage =
-    configFileTmp.find((c) => c.value === selectedConfigId)?.language ?? "json";
+  const selectedLanguage = (configFileTmp.find(
+    (c) => c.value === selectedConfigId,
+  )?.language ?? "json") as Language;
 
   const configFileUrl = org
-    ? "/organizations/" + org.slug + "/config-files/" + selectedConfigId
+    ? "/organizations/" +
+      org.slug +
+      "/config-files/" +
+      selectedConfigId +
+      "." +
+      selectedLanguage
     : null;
 
-  const {
-    data: configFile,
-    mutate,
-    error,
-  } = useSWR<string | null>(configFileUrl, async (url: string) => {
-    const response = await browserApiClient(url);
-    if (!response.ok && response.status !== 404) {
-      throw new Error("Failed to fetch config file");
-    }
-    const config = await response.text();
-    return config;
-  });
+  const { data: configFile, mutate } = useSWR<string | null>(
+    configFileUrl,
+    async (url: string) => {
+      const response = await browserApiClient(url);
+      if (!response.ok && response.status !== 404) {
+        throw new Error("Failed to fetch config file");
+      }
+      const config = await response.text();
+      return config;
+    },
+  );
 
   const handleSelectedConfigChange = (configId: string) => {
     setSelectedConfigId(configId);
@@ -60,18 +64,20 @@ const Config = () => {
   };
 
   const handleConfigFileChange = async (newConfig: string) => {
-    const resp = await fetcher(configFileUrl!, {
+    const resp = await browserApiClient(configFileUrl!, {
       method: "PUT",
       headers: {
-        "Content-Type": "text/html",
+        "Content-Type": "text/plain",
       },
       body: newConfig,
     });
 
-    if (!resp) {
+    if (!resp.ok) {
+      setCodeError(`Failed to save the new Configuration`);
       return;
     }
-
+    setIsEditing(false);
+    setCodeError(null);
     mutate();
   };
 
@@ -87,15 +93,6 @@ const Config = () => {
 
   const handleEditorValidation = (isValid: boolean) => {
     setCodeError(isValid ? null : `Invalid ${selectedLanguage?.toUpperCase()}`);
-  };
-
-  const handleSave = async () => {
-    try {
-      await handleConfigFileChange(editorValue);
-      setIsEditing(false);
-    } catch {
-      setCodeError(`Failed to save the new Configuration`);
-    }
   };
 
   const handleCancel = () => {
@@ -141,7 +138,10 @@ const Config = () => {
               <p className="text-sm text-destructive">{codeError}</p>
             )}
             <div className="flex gap-2 sticky bottom-0 bg-background/80 pt-2 justify-end">
-              <Button onClick={handleSave} disabled={!!codeError}>
+              <Button
+                onClick={() => handleConfigFileChange(editorValue)}
+                disabled={!!codeError}
+              >
                 Save
               </Button>
               <Button variant="outline" onClick={handleCancel}>
