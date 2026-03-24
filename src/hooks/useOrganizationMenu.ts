@@ -15,7 +15,7 @@
 
 import { UserRole } from "@/types/api/api";
 import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { ScaleIcon } from "lucide-react";
+import { ScaleIcon, ChartBarIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
 import { useCurrentUser } from "./useCurrentUser";
@@ -39,12 +39,19 @@ export const useOrganizationMenu = () => {
   const org = useActiveOrg();
   const menu = [
     {
-      title: "Groups",
-      href: "/" + decodedOrgSlug,
-      Icon: ListBulletIcon,
-      isActive: decodedPathName === "/" + decodedOrgSlug,
+      title: "Overview",
+      href: "/" + decodedOrgSlug + "/overview",
+      Icon: ChartBarIcon,
+      isActive: decodedPathName === "/" + decodedOrgSlug + "/overview",
     },
   ];
+
+  menu.push({
+    title: "Groups",
+    href: "/" + decodedOrgSlug,
+    Icon: ListBulletIcon,
+    isActive: decodedPathName === "/" + decodedOrgSlug,
+  });
 
   if (loggedIn && !org.externalEntityProviderId) {
     menu.push({
@@ -67,8 +74,6 @@ export const useOrganizationMenu = () => {
         ),
       });
     }
-
-    return menu;
   }
   return menu;
 };
