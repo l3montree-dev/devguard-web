@@ -97,9 +97,6 @@ function renderQuickFixText(
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {
-  //   console.log("Quickfix component received vuln:", vuln);
-  console.log(vuln.vulnerabilityPath[0]);
-
   const componentPurl = vuln.componentPurl;
   const directDependencyFixedVersion =
     vuln.directDependencyFixedVersion ?? undefined;

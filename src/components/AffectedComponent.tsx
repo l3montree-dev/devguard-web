@@ -6,7 +6,7 @@ import {
   PURLInspectResponse,
   VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useMemo, useState } from "react";
+import { FunctionComponent, useMemo } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";
@@ -27,7 +27,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
 }> = ({ vuln }) => {
-  const [activeCVE, setActiveCVE] = useState<VulnInPackage | null>(null);
   const { theme } = useTheme();
 
   const purl = vuln.componentPurl;
@@ -45,17 +44,13 @@ const AffectedComponentDetails: FunctionComponent<{
     revalidateOnReconnect: false,
   });
 
-  useSWR(data ? `matched-cve-${vuln.cveID}` : null, () => {
-    if (data) {
-      const matchedCVE = data.vulns.find(
-        (vulnInPkg) => vuln.cveID === vulnInPkg.CVEID,
-      );
-      if (matchedCVE) {
-        setActiveCVE(matchedCVE);
-      }
-    }
-    return null;
-  });
+  // Compute the matched CVE from the fetched data
+  const activeCVE = useMemo(() => {
+    if (!data) return null;
+    return (
+      data.vulns.find((vulnInPkg) => vuln.cveID === vulnInPkg.CVEID) ?? null
+    );
+  }, [data, vuln.cveID]);
 
   if (isLoading) {
     return (
