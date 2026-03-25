@@ -56,6 +56,8 @@ const ConfigFileEditor = ({
   useEffect(() => {
     if (configFile) {
       setEditorValue(configFile);
+    } else {
+      setEditorValue("");
     }
   }, [configFile]);
 
@@ -121,7 +123,7 @@ const ConfigFileEditor = ({
         <div className="sticky bottom-0 flex justify-end gap-2 bg-background/80 pt-2">
           <Button
             onClick={() => handleConfigFileChange(editorValue)}
-            disabled={!!codeError}
+            disabled={!!codeError || editorValue === configFile}
           >
             Save
           </Button>
