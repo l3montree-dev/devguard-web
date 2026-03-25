@@ -15,6 +15,7 @@ const defaultConfigFiles = [
   { value: "trivy", label: "Trivy", language: "yaml" },
   { value: "gitleaks-config", label: "Gitleaks", language: "json" },
   { value: "semgrep-config", label: "Semgrep", language: "toml" },
+  { value: "checkov-config", label: "Checkov", language: "yaml" },
 ];
 
 export type ConfigFile = (typeof defaultConfigFiles)[number];
