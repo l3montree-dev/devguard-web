@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Pencil } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 const defaultConfigFiles = [
@@ -31,7 +31,6 @@ const ConfigFileEditor = ({
   const [selectedConfigId, setSelectedConfigId] = useState(
     configFiles[0].value,
   );
-  const [isEditing, setIsEditing] = useState(false);
   const [editorValue, setEditorValue] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
 
@@ -54,9 +53,14 @@ const ConfigFileEditor = ({
     },
   );
 
+  useEffect(() => {
+    if (configFile) {
+      setEditorValue(configFile);
+    }
+  }, [configFile]);
+
   const handleSelectedConfigChange = (configId: string) => {
     setSelectedConfigId(configId);
-    setIsEditing(false);
     setCodeError(null);
   };
 
@@ -74,24 +78,13 @@ const ConfigFileEditor = ({
       setCodeError("Failed to save the new Configuration");
       return;
     }
-    setIsEditing(false);
+    setEditorValue(newConfig);
     setCodeError(null);
     mutate();
   };
 
-  const handleEditClick = () => {
-    setEditorValue(configFile ?? "");
-    setCodeError(null);
-    setIsEditing(true);
-  };
-
   const handleEditorValidation = (isValid: boolean) => {
     setCodeError(isValid ? null : `Invalid ${selectedLanguage?.toUpperCase()}`);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setCodeError(null);
   };
 
   return (
@@ -117,43 +110,23 @@ const ConfigFileEditor = ({
         </Tabs>
       </div>
 
-      {isEditing ? (
-        <div className="flex flex-col gap-2">
-          <CodeEditor
-            value={editorValue}
-            onChange={setEditorValue}
-            onValidation={handleEditorValidation}
-            language={selectedLanguage}
-          />
-          {codeError && <p className="text-sm text-destructive">{codeError}</p>}
-          <div className="sticky bottom-0 flex justify-end gap-2 bg-background/80 pt-2">
-            <Button
-              onClick={() => handleConfigFileChange(editorValue)}
-              disabled={!!codeError}
-            >
-              Save
-            </Button>
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </div>
+      <div className="flex flex-col gap-2">
+        <CodeEditor
+          value={editorValue}
+          onChange={setEditorValue}
+          onValidation={handleEditorValidation}
+          language={selectedLanguage}
+        />
+        {codeError && <p className="text-sm text-destructive">{codeError}</p>}
+        <div className="sticky bottom-0 flex justify-end gap-2 bg-background/80 pt-2">
+          <Button
+            onClick={() => handleConfigFileChange(editorValue)}
+            disabled={!!codeError}
+          >
+            Save
+          </Button>
         </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <div className="sticky top-0 z-10 flex justify-end bg-background/80 pt-2">
-            <Button variant="outline" size="sm" onClick={handleEditClick}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
-          </div>
-          <CodeEditor
-            value={configFile || ""}
-            onChange={() => {}}
-            readOnly
-            language={selectedLanguage}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
 };
