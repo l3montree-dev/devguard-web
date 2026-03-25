@@ -82,8 +82,8 @@ const CodeEditor = ({
   const valueRef = useRef(value);
   valueRef.current = value;
 
-  const { theme } = useTheme();
-  const currentTheme = theme === "dark" ? vscodeDark : vscodeLight;
+  const { resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme === "dark" ? vscodeDark : vscodeLight;
 
   useEffect(() => {
     if (!containerRef.current) return;
