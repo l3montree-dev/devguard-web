@@ -13,7 +13,9 @@ import {
 
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import Link from "next/link";
 
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
@@ -281,6 +283,34 @@ const Index: FunctionComponent = () => {
             <hr />
           </>
         )}
+        <hr />
+        <Section
+          id="config-files"
+          title="Configuration Files"
+          description="View and edit configuration files for this project, including scanner tool settings. These configurations override organization-level settings and are inherited by all repositories in this project."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              {project?.slug ? (
+                <Link
+                  href={
+                    "/" +
+                    activeOrg.slug +
+                    "/projects/" +
+                    project.slug +
+                    "/settings/config"
+                  }
+                >
+                  <Button variant={"outline"}>Go to Configuration Files</Button>
+                </Link>
+              ) : (
+                <Button variant={"outline"} disabled>
+                  Go to Configuration Files
+                </Button>
+              )}
+            </div>
+          </Card>
+        </Section>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(handleUpdate)}>
             <ProjectForm
