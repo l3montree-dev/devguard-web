@@ -37,14 +37,9 @@ export function RiskHistoryDistributionDiagram({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="text-base">
           {mode === "risk" ? "Risk" : "CVSS"} Distribution Trend
         </CardTitle>
-        <CardDescription>
-          The stacked distribution of critical, high, medium, and low{" "}
-          {mode === "risk" ? "risk" : "CVSS"} values in the past months
-          (combined across all projects).
-        </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (

@@ -60,4 +60,20 @@ const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
   );
 };
 
+export const CVSSBadge = ({ cvss, gray }: { cvss: number; gray?: boolean }) => {
+  const rounded = Math.floor(cvss * 10) / 10;
+  const cls = getSeverityClassNames(riskToSeverity(rounded), Boolean(gray));
+
+  return (
+    <span
+      className={classNames(
+        "px-2 text-xs font-medium whitespace-nowrap rounded-full py-1",
+        cls,
+      )}
+    >
+      {rounded.toFixed(1)}
+    </span>
+  );
+};
+
 export default Severity;

@@ -577,34 +577,6 @@ export interface RiskDistribution {
   high: number;
   critical: number;
 }
-
-export interface RiskHistory {
-  id: string;
-  day: string;
-  sumOpenRisk: number;
-  averageOpenRisk: number;
-  maxOpenRisk: number;
-  minOpenRisk: number;
-
-  sumClosedRisk: number;
-  averageClosedRisk: number;
-  maxClosedRisk: number;
-  minClosedRisk: number;
-
-  low: number;
-  medium: number;
-  high: number;
-  critical: number;
-
-  lowCvss: number;
-  mediumCvss: number;
-  highCvss: number;
-  criticalCvss: number;
-
-  openVulns: number;
-  fixedVulns: number;
-}
-
 export interface VulnCountByScanner {
   [scannerId: string]: number;
 }
@@ -932,4 +904,113 @@ export type ExternalReference = {
   assetVersionName: string;
   url: string;
   type: "cyclonedxvex" | "csaf";
+};
+
+export type OrgStructure = {
+  numProjects: number;
+  numAssets: number;
+  numArtifacts: number;
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+  criticalRisk: number;
+};
+
+export type VulnCVSSDistribution = {
+  lowCvss: number;
+  mediumCvss: number;
+  highCvss: number;
+  criticalCvss: number;
+};
+
+export type VulnRiskDistribution = {
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+};
+
+export type VulnDistributionInStructure = VulnDistribution & {
+  name: string;
+  slug: string;
+
+  projectSlug?: string;
+  assetSlug?: string;
+  assetVersionName?: string;
+};
+
+export type VulnDistribution = VulnRiskDistribution & VulnCVSSDistribution;
+
+export type ComponentUsageInOrg = {
+  purl: string;
+  totalAmount: number;
+};
+
+export type CVEOccurrenceInOrg = {
+  cvss: number;
+  cveID: string;
+  totalAmount: number;
+};
+
+export type AverageVulnEventsPerWeek = {
+  averageDetectedEvents: number;
+  averageReopenedEvents: number;
+  averageFalsePositiveEvents: number;
+  averageAcceptedEvents: number;
+  averageFixedEvents: number;
+};
+
+export type EcosystemUsageInOrg = {
+  ecosystem: string;
+  relativeAmount: number;
+  totalCount: number;
+};
+
+export type AverageRemediationTimes = {
+  lowRiskAverage: number;
+  mediumRiskAverage: number;
+  highRiskAverage: number;
+  criticalRiskAverage: number;
+
+  lowCVSSAverage: number;
+  mediumCVSSAverage: number;
+  highCVSSAverage: number;
+  criticalCVSSAverage: number;
+};
+
+export type ProjectVulnCountAverageBySeverity = {
+  riskLowAverage: number;
+  riskMediumAverage: number;
+  riskHighAverage: number;
+  riskCriticalAverage: number;
+  cvssLowAverage: number;
+  cvssMediumAverage: number;
+  cvssHighAverage: number;
+  cvssCriticalAverage: number;
+};
+
+export type RemediationTypeUsage = {
+  acceptedPercentage: number;
+  falsePositivePercentage: number;
+  fixedPercentage: number;
+};
+
+export type OrgOverview = {
+  vulnEventAverage: AverageVulnEventsPerWeek;
+  structure: OrgStructure;
+  vulnDistribution: VulnDistribution;
+
+  topComponents: ComponentUsageInOrg[];
+  topCVEs: CVEOccurrenceInOrg[];
+  topEcosystems: EcosystemUsageInOrg[];
+
+  topProjects: VulnDistributionInStructure[];
+  topAssets: VulnDistributionInStructure[];
+  topArtifacts: VulnDistributionInStructure[];
+  orgRiskHistory: ReleaseRiskHistory[];
+  averageRemediationTimes: AverageRemediationTimes;
+  averageAgeOfDependencies: number;
+  averageOpenCodeRisksPerProject: number;
+  projectOpenVulnAverage: ProjectVulnCountAverageBySeverity;
+  remediationTypeDistribution: RemediationTypeUsage;
 };
