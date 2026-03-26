@@ -66,15 +66,27 @@ function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
   );
 }
 
-function OrySsoButton(props: OryNodeSsoButtonProps) {
-  const provider = String(props.attributes.value).split("-")[0];
+function OrySsoButton({
+  node,
+  attributes,
+  onClick,
+  ...rest
+}: OryNodeSsoButtonProps) {
+  const provider = String(attributes.value).split("-")[0];
   const displayName = providerDisplayNames[provider];
   return (
-    <Button variant="secondary" className="w-full" {...props}>
+    <Button
+      variant="secondary"
+      className="w-full"
+      name={attributes.name}
+      type={attributes.type === "button" ? "button" : "submit"}
+      value={attributes.value?.toString()}
+      disabled={attributes.disabled}
+      onClick={onClick}
+      {...rest}
+    >
       <SsoProviderIcon provider={provider} />
-      {displayName
-        ? `Sign in with ${displayName}`
-        : props.node.meta.label?.text}
+      {displayName ? `Sign in with ${displayName}` : node.meta.label?.text}
     </Button>
   );
 }
@@ -88,7 +100,8 @@ function SsoProviderIcon({ provider }: { provider: string }) {
     return (
       <Image
         src="/assets/provider-icons/opencode.svg"
-        alt="OpenCode Icon"
+        alt=""
+        aria-hidden
         width={20}
         height={20}
         className="mr-2"
@@ -99,7 +112,8 @@ function SsoProviderIcon({ provider }: { provider: string }) {
     return (
       <Image
         src="/assets/provider-icons/gitlab.svg"
-        alt="GitLab Icon"
+        alt=""
+        aria-hidden
         width={20}
         height={20}
         className="mr-2"
@@ -110,7 +124,8 @@ function SsoProviderIcon({ provider }: { provider: string }) {
     return (
       <Image
         src="/assets/provider-icons/github.svg"
-        alt="GitHub Icon"
+        alt=""
+        aria-hidden
         width={20}
         height={20}
         className="mr-2"
@@ -130,14 +145,23 @@ function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
       {linkButtons.map((button) => {
-        const attrs = button.attributes as { value?: string };
+        const attrs = button.attributes as {
+          name?: string;
+          type?: string;
+          value?: string;
+          disabled?: boolean;
+        };
         const provider = String(attrs.value ?? "").split("-")[0];
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button
-            key={String(attrs.value)}
+            key={`link:${attrs.name ?? ""}:${attrs.value ?? ""}`}
             variant="secondary"
             className="w-44"
+            name={attrs.name}
+            type={attrs.type === "button" ? "button" : "submit"}
+            value={attrs.value}
+            disabled={attrs.disabled}
             onClick={button.onClick}
           >
             <SsoProviderIcon provider={provider} />
@@ -149,14 +173,23 @@ function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
         <Separator className="my-2" />
       )}
       {unlinkButtons.map((button) => {
-        const attrs = button.attributes as { value?: string };
+        const attrs = button.attributes as {
+          name?: string;
+          type?: string;
+          value?: string;
+          disabled?: boolean;
+        };
         const provider = String(attrs.value ?? "").split("-")[0];
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button
-            key={String(attrs.value)}
+            key={`unlink:${attrs.name ?? ""}:${attrs.value ?? ""}`}
             variant="secondary"
             className="w-44"
+            name={attrs.name}
+            type={attrs.type === "button" ? "button" : "submit"}
+            value={attrs.value}
+            disabled={attrs.disabled}
             onClick={button.onClick}
           >
             <SsoProviderIcon provider={provider} />
