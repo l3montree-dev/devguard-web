@@ -13,6 +13,7 @@ import {
   type OryNodeInputProps,
   type OryNodeLabelProps,
   type OryNodeSsoButtonProps,
+  type OrySettingsSsoProps,
 } from "@ory/elements-react";
 import { DefaultCardFooter } from "@ory/elements-react/theme";
 import Image from "next/image";
@@ -110,6 +111,91 @@ function OrySsoButton(props: OryNodeSsoButtonProps) {
 
 function OrySsoRoot({ children }: OryFormSsoRootProps) {
   return <div className="flex flex-col gap-2">{children}</div>;
+}
+
+function SsoProviderIcon({ provider }: { provider: string }) {
+  if (provider === "opencode") {
+    return (
+      <Image
+        src="/assets/provider-icons/opencode.svg"
+        alt="OpenCode Icon"
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  if (provider === "gitlab") {
+    return (
+      <Image
+        src="/assets/provider-icons/gitlab.svg"
+        alt="GitLab Icon"
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  if (provider === "github") {
+    return (
+      <Image
+        src="/assets/provider-icons/github.svg"
+        alt="GitHub Icon"
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  return null;
+}
+
+const providerDisplayNames: Record<string, string> = {
+  github: "GitHub",
+  gitlab: "GitLab",
+  opencode: "openCode",
+};
+
+function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
+  return (
+    <div className="flex flex-row flex-wrap gap-2">
+      {linkButtons.map((button) => {
+        const attrs = button.attributes as { value?: string };
+        const provider = String(attrs.value ?? "").split("-")[0];
+        const displayName = providerDisplayNames[provider] ?? provider;
+        return (
+          <Button
+            key={String(attrs.value)}
+            variant="secondary"
+            className="w-44"
+            onClick={button.onClick}
+          >
+            <SsoProviderIcon provider={provider} />
+            Link {displayName}
+          </Button>
+        );
+      })}
+      {unlinkButtons.length > 0 && linkButtons.length > 0 && (
+        <Separator className="my-2" />
+      )}
+      {unlinkButtons.map((button) => {
+        const attrs = button.attributes as { value?: string };
+        const provider = String(attrs.value ?? "").split("-")[0];
+        const displayName = providerDisplayNames[provider] ?? provider;
+        return (
+          <Button
+            key={String(attrs.value)}
+            variant="secondary"
+            className="w-44"
+            onClick={button.onClick}
+          >
+            <SsoProviderIcon provider={provider} />
+            Unlink {displayName}
+          </Button>
+        );
+      })}
+    </div>
+  );
 }
 
 function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
@@ -306,6 +392,7 @@ export const oryComponentOverrides: OryFlowComponentOverrides = {
   },
   Form: {
     SsoRoot: OrySsoRoot,
+    SsoSettings: OrySsoSettings,
   },
   Card: {
     Root: OryCardRoot,
