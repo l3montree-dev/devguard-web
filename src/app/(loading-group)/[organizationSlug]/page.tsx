@@ -67,6 +67,7 @@ import { useUpdateOrganization } from "@/context/OrganizationContext";
 import { Badge } from "@/components/ui/badge";
 import { buildFilterSearchParams } from "@/utils/url";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Sort from "@/components/Sort";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
@@ -110,9 +111,6 @@ const OrganizationHomePage: FunctionComponent = () => {
       : null,
     async (url: string) =>
       fetcher<Paged<ProjectDTO>>(url).then((res) => {
-        res.data = res.data.sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
-        );
         return res;
       }),
   );
@@ -286,11 +284,22 @@ const OrganizationHomePage: FunctionComponent = () => {
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Input
-            onChange={debouncedHandleSearch}
-            defaultValue={searchParams?.get("search") || ""}
-            placeholder="Search for projects"
-          />
+
+          <div className="flex gap-2">
+            <Sort
+              sortOptions={[
+                { label: "Name", value: "name" },
+                { label: "Created at", value: "created_at" },
+                { label: "Updated at", value: "updated_at" },
+              ]}
+            />
+
+            <Input
+              onChange={debouncedHandleSearch}
+              defaultValue={searchParams?.get("search") || ""}
+              placeholder="Search for projects"
+            />
+          </div>
           <ListRenderer
             isLoading={isLoading}
             error={error}
