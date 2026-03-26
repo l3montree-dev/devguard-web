@@ -7,6 +7,7 @@ import {
   type OryFlowComponentOverrides,
   type OryFormSectionContentProps,
   type OryFormSectionFooterProps,
+  type OryFormSsoRootProps,
   type OryNodeButtonProps,
   type OryNodeImageProps,
   type OryNodeInputProps,
@@ -105,6 +106,10 @@ function OrySsoButton(props: OryNodeSsoButtonProps) {
       )}
     </Button>
   );
+}
+
+function OrySsoRoot({ children }: OryFormSsoRootProps) {
+  return <div className="flex flex-col gap-2">{children}</div>;
 }
 
 function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
@@ -298,6 +303,9 @@ export const oryComponentOverrides: OryFlowComponentOverrides = {
     Checkbox: OryCheckbox,
     // Image: OryImage,
     // Label: OryLabel,
+  },
+  Form: {
+    SsoRoot: OrySsoRoot,
   },
   Card: {
     Root: OryCardRoot,
