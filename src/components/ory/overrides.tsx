@@ -67,44 +67,14 @@ function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
 }
 
 function OrySsoButton(props: OryNodeSsoButtonProps) {
+  const provider = String(props.attributes.value).split("-")[0];
+  const displayName = providerDisplayNames[provider];
   return (
     <Button variant="secondary" className="w-full" {...props}>
-      {props.attributes.value === "opencode" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/opencode.svg"
-            alt="OpenCode Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with openCode
-        </>
-      ) : props.attributes.value === "gitlab" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/gitlab.svg"
-            alt="GitLab Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with GitLab
-        </>
-      ) : props.attributes.value === "github" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/github.svg"
-            alt="GitHub Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with GitHub
-        </>
-      ) : (
-        props.node.meta.label?.text
-      )}
+      <SsoProviderIcon provider={provider} />
+      {displayName
+        ? `Sign in with ${displayName}`
+        : props.node.meta.label?.text}
     </Button>
   );
 }
