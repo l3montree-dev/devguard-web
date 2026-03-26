@@ -4,13 +4,13 @@
 import { FunctionComponent, useState } from "react";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import BarsArrowUpIcon from "@heroicons/react/20/solid/BarsArrowUpIcon";
-import { BarsArrowDownIcon } from "@heroicons/react/20/solid";
+import { BarsArrowUpIcon, BarsArrowDownIcon } from "@heroicons/react/20/solid";
 import { cn } from "@/lib/utils";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { useSearchParams } from "next/navigation";
@@ -34,7 +34,7 @@ export const buildSortQuery = (
 };
 
 interface Props {
-  sortOptions: SortOption[];
+  sortOptions: [SortOption, ...SortOption[]];
 }
 
 const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
@@ -67,22 +67,23 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
             {selectedLabel}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="">
-          {sortOptions.map((option) => (
-            <DropdownMenuCheckboxItem
-              key={option.value}
-              checked={sortBy === option.value}
-              onCheckedChange={() => {
-                setSortBy(option.value);
-                pushQuery({
-                  ...buildSortQuery(sortOptions, option.value, sortDirection),
-                  page: "1",
-                });
-              }}
-            >
-              {option.label}
-            </DropdownMenuCheckboxItem>
-          ))}
+        <DropdownMenuContent align="start">
+          <DropdownMenuRadioGroup
+            value={sortBy}
+            onValueChange={(value) => {
+              setSortBy(value);
+              pushQuery({
+                ...buildSortQuery(sortOptions, value, sortDirection),
+                page: "1",
+              });
+            }}
+          >
+            {sortOptions.map((option) => (
+              <DropdownMenuRadioItem key={option.value} value={option.value}>
+                {option.label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
