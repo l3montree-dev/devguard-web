@@ -7,11 +7,13 @@ import {
   type OryFlowComponentOverrides,
   type OryFormSectionContentProps,
   type OryFormSectionFooterProps,
+  type OryFormSsoRootProps,
   type OryNodeButtonProps,
   type OryNodeImageProps,
   type OryNodeInputProps,
   type OryNodeLabelProps,
   type OryNodeSsoButtonProps,
+  type OrySettingsSsoProps,
 } from "@ory/elements-react";
 import { DefaultCardFooter } from "@ory/elements-react/theme";
 import Image from "next/image";
@@ -64,46 +66,138 @@ function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
   );
 }
 
-function OrySsoButton(props: OryNodeSsoButtonProps) {
+function OrySsoButton({
+  node,
+  attributes,
+  onClick,
+  ...rest
+}: OryNodeSsoButtonProps) {
+  const provider = String(attributes.value).split("-")[0];
+  const displayName = providerDisplayNames[provider];
   return (
-    <Button variant="secondary" className="w-full" {...props}>
-      {props.attributes.value === "opencode" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/opencode.svg"
-            alt="OpenCode Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with openCode
-        </>
-      ) : props.attributes.value === "gitlab" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/gitlab.svg"
-            alt="GitLab Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with GitLab
-        </>
-      ) : props.attributes.value === "github" ? (
-        <>
-          <Image
-            src="/assets/provider-icons/github.svg"
-            alt="GitHub Icon"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          Sign in with GitHub
-        </>
-      ) : (
-        props.node.meta.label?.text
-      )}
+    <Button
+      variant="secondary"
+      className="w-full"
+      name={attributes.name}
+      type={attributes.type === "button" ? "button" : "submit"}
+      value={attributes.value?.toString()}
+      disabled={attributes.disabled}
+      onClick={onClick}
+      {...rest}
+    >
+      <SsoProviderIcon provider={provider} />
+      {displayName ? `Sign in with ${displayName}` : node.meta.label?.text}
     </Button>
+  );
+}
+
+function OrySsoRoot({ children }: OryFormSsoRootProps) {
+  return <div className="flex flex-col gap-2">{children}</div>;
+}
+
+function SsoProviderIcon({ provider }: { provider: string }) {
+  if (provider === "opencode") {
+    return (
+      <Image
+        src="/assets/provider-icons/opencode.svg"
+        alt=""
+        aria-hidden
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  if (provider === "gitlab") {
+    return (
+      <Image
+        src="/assets/provider-icons/gitlab.svg"
+        alt=""
+        aria-hidden
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  if (provider === "github") {
+    return (
+      <Image
+        src="/assets/provider-icons/github.svg"
+        alt=""
+        aria-hidden
+        width={20}
+        height={20}
+        className="mr-2"
+      />
+    );
+  }
+  return null;
+}
+
+const providerDisplayNames: Record<string, string> = {
+  github: "GitHub",
+  gitlab: "GitLab",
+  opencode: "openCode",
+};
+
+function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
+  return (
+    <div className="flex flex-row flex-wrap gap-2">
+      {linkButtons.map((button) => {
+        const attrs = button.attributes as {
+          name?: string;
+          type?: string;
+          value?: string;
+          disabled?: boolean;
+        };
+        const provider = String(attrs.value ?? "").split("-")[0];
+        const displayName = providerDisplayNames[provider] ?? provider;
+        return (
+          <Button
+            key={`link:${attrs.name ?? ""}:${attrs.value ?? ""}`}
+            variant="secondary"
+            className="w-44"
+            name={attrs.name}
+            type={attrs.type === "button" ? "button" : "submit"}
+            value={attrs.value}
+            disabled={attrs.disabled}
+            onClick={button.onClick}
+          >
+            <SsoProviderIcon provider={provider} />
+            Link {displayName}
+          </Button>
+        );
+      })}
+      {unlinkButtons.length > 0 && linkButtons.length > 0 && (
+        <Separator className="my-2" />
+      )}
+      {unlinkButtons.map((button) => {
+        const attrs = button.attributes as {
+          name?: string;
+          type?: string;
+          value?: string;
+          disabled?: boolean;
+        };
+        const provider = String(attrs.value ?? "").split("-")[0];
+        const displayName = providerDisplayNames[provider] ?? provider;
+        return (
+          <Button
+            key={`unlink:${attrs.name ?? ""}:${attrs.value ?? ""}`}
+            variant="secondary"
+            className="w-44"
+            name={attrs.name}
+            type={attrs.type === "button" ? "button" : "submit"}
+            value={attrs.value}
+            disabled={attrs.disabled}
+            onClick={button.onClick}
+          >
+            <SsoProviderIcon provider={provider} />
+            Unlink {displayName}
+          </Button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -298,6 +392,10 @@ export const oryComponentOverrides: OryFlowComponentOverrides = {
     Checkbox: OryCheckbox,
     // Image: OryImage,
     // Label: OryLabel,
+  },
+  Form: {
+    SsoRoot: OrySsoRoot,
+    SsoSettings: OrySsoSettings,
   },
   Card: {
     Root: OryCardRoot,
