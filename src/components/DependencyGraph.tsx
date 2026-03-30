@@ -211,7 +211,7 @@ const DependencyGraph: FunctionComponent<{
     previousNodesRef.current = nodes;
 
     // get the root node - we use it for the initial position of the viewport
-    const rootNode = nodes.find((n) => n.data.label === graph.name)!;
+    const rootNode = nodes.find((n) => n.id === graph.id);
     return [nodes, edges, rootNode];
   }, [
     graph,
@@ -369,9 +369,8 @@ const DependencyGraph: FunctionComponent<{
 
     setEdges(styledEdges);
 
-    if (isFirstRender.current) {
+    if (isFirstRender.current && rootNode) {
       isFirstRender.current = false;
-      // just use the root node
       setViewPort({
         x: -rootNode.position.x + 10,
         y: -rootNode.position.y + height / 2,

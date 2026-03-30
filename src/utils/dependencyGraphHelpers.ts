@@ -43,11 +43,11 @@ export const populateChildCounts = (
   childCountMap: Map<string, number>,
   visited: Set<string> = new Set(),
 ) => {
-  if (!node.name || isInfoSource(node.name)) return;
+  if (!node.id || isInfoSource(node.name)) return;
 
   // Prevent infinite recursion due to circular dependencies
-  if (visited.has(node.name)) return;
-  visited.add(node.name);
+  if (visited.has(node.id)) return;
+  visited.add(node.id);
 
   // count the number of children
   // if it has an info source child, count its children instead
@@ -58,7 +58,7 @@ export const populateChildCounts = (
       return acc + 1;
     }
   }, 0);
-  childCountMap.set(node.name, count);
+  childCountMap.set(node.id, count);
 
   // Recursively populate for all descendants (sorted for determinism)
   [...node.children]
@@ -87,55 +87,57 @@ export const addRecursive = (
   childrenLimitMap: Map<string, number>,
   riskMap: Map<string, number>,
   visited: Set<string> = new Set(),
+  nameMap: Map<string, string> = new Map(),
 ) => {
-  if (node.name !== "" && !isInfoSource(node.name)) {
+  if (node.id !== "" && !isInfoSource(node.name)) {
     // Prevent infinite recursion due to circular dependencies
-    if (visited.has(node.name)) return;
-    visited.add(node.name);
+    if (visited.has(node.id)) return;
+    visited.add(node.id);
+    nameMap.set(node.id, node.name);
 
-    dagreGraph.setNode(node.name, {
+    dagreGraph.setNode(node.id, {
       width: nodeWidth,
       height: nodeHeight,
     });
     // Store risk for this node
-    riskMap.set(node.name, node.risk ?? 0);
+    riskMap.set(node.id, node.risk ?? 0);
 
     // Only process children if this node is expanded
-    const isExpanded = expandedNodes.has(node.name);
+    const isExpanded = expandedNodes.has(node.id);
 
     // Get the limit for how many children to show
     const childLimit =
-      childrenLimitMap.get(node.name) || INITIAL_CHILDREN_TO_SHOW;
-    const totalChildren = childCountMap.get(node.name) || 0;
+      childrenLimitMap.get(node.id) || INITIAL_CHILDREN_TO_SHOW;
+    const totalChildren = childCountMap.get(node.id) || 0;
     let childrenProcessed = 0;
 
     // Sort children alphabetically for deterministic order
     [...node.children]
       .sort((a, b) => a.name.localeCompare(b.name))
       .forEach((dep) => {
-        if (dep.name === "") {
+        if (dep.id === "") {
           return;
         }
         // If child is an info source, track it but don't add to graph
         if (isInfoSource(dep.name)) {
-          if (!infoSourceMap.has(node.name)) {
-            infoSourceMap.set(node.name, new Set());
+          if (!infoSourceMap.has(node.id)) {
+            infoSourceMap.set(node.id, new Set());
           }
-          infoSourceMap.get(node.name)!.add(dep.name);
+          infoSourceMap.get(node.id)!.add(dep.name);
           // Continue processing grandchildren as if they were direct children (if expanded)
           if (isExpanded && childrenProcessed < childLimit) {
             [...dep.children]
               .sort((a, b) => a.name.localeCompare(b.name))
               .forEach((grandchild) => {
-                if (grandchild.name !== "" && !isInfoSource(grandchild.name)) {
+                if (grandchild.id !== "" && !isInfoSource(grandchild.name)) {
                   if (childrenProcessed >= childLimit) return;
                   childrenProcessed++;
 
-                  dagreGraph.setNode(grandchild.name, {
+                  dagreGraph.setNode(grandchild.id, {
                     width: nodeWidth,
                     height: nodeHeight,
                   });
-                  dagreGraph.setEdge(node.name, grandchild.name);
+                  dagreGraph.setEdge(node.id, grandchild.id);
                   addRecursive(
                     dagreGraph,
                     grandchild,
@@ -147,6 +149,7 @@ export const addRecursive = (
                     childrenLimitMap,
                     riskMap,
                     visited,
+                    nameMap,
                   );
                 }
               });
@@ -159,11 +162,11 @@ export const addRecursive = (
           childrenProcessed++;
 
           // Only add child nodes if parent is expanded
-          dagreGraph.setNode(dep.name, {
+          dagreGraph.setNode(dep.id, {
             width: nodeWidth,
             height: nodeHeight,
           });
-          dagreGraph.setEdge(node.name, dep.name);
+          dagreGraph.setEdge(node.id, dep.id);
           addRecursive(
             dagreGraph,
             dep,
@@ -175,16 +178,17 @@ export const addRecursive = (
             childrenLimitMap,
             riskMap,
             visited,
+            nameMap,
           );
         }
       });
 
     // Add "Show more" node if there are more children to display
     if (isExpanded && childrenProcessed < totalChildren) {
-      const loadMoreId = `${node.name}__load_more`;
+      const loadMoreId = `${node.id}__load_more`;
 
       dagreGraph.setNode(loadMoreId, { width: nodeWidth, height: nodeHeight });
-      dagreGraph.setEdge(node.name, loadMoreId);
+      dagreGraph.setEdge(node.id, loadMoreId);
       childCountMap.set(loadMoreId, 0); // Load more node has no children
       riskMap.set(loadMoreId, 0);
     }
@@ -261,6 +265,7 @@ export const getLayoutedElements = (
   const infoSourceMap = new Map<string, Set<string>>();
   const childCountMap = new Map<string, number>();
   const riskMap = new Map<string, number>();
+  const nameMap = new Map<string, string>();
 
   // Pre-populate child counts for all nodes
   populateChildCounts(tree, childCountMap);
@@ -275,6 +280,8 @@ export const getLayoutedElements = (
     childCountMap,
     childrenLimitMap,
     riskMap,
+    new Set(),
+    nameMap,
   );
 
   dagre.layout(dagreGraph, { width: 10, height: 10 });
@@ -321,9 +328,9 @@ export const getLayoutedElements = (
       type: isLoadMoreNode ? "loadMoreNode" : "customNode",
       position,
       data: {
-        label: el,
+        label: nameMap.get(el) ?? el,
         risk: riskMap.get(el) ?? 0,
-        vuln: vulnMap[el],
+        vuln: vulnMap[nameMap.get(el) ?? el],
         nodeWidth,
         nodeHeight,
         infoSources: infoSourceMap.get(el),
@@ -650,8 +657,9 @@ export const recursiveAddRisk = (
   // Global visited set for risk propagation - ensures each node is updated only once
   const propagationVisited = new Set<ViewDependencyTreeNode>();
 
-  // Track recursion stack for cycle detection. We keep both an array (stack)
-  // for identifying cycle members and a set for O(1) membership checks.
+  // Track recursion stack for cycle detection using node id (not name) so that
+  // distinct nodes with the same name (e.g. multiple "*" wildcards) are not
+  // falsely treated as cycles.
   const recursionStack: ViewDependencyTreeNode[] = [];
   const recursionSet = new Set<string>();
 
@@ -664,8 +672,8 @@ export const recursiveAddRisk = (
   // Then recursively process the tree
   const processNode = (n: ViewDependencyTreeNode) => {
     // If the node is already on the current recursion stack -> we've found a cycle
-    if (recursionSet.has(n.name)) {
-      const idx = recursionStack.findIndex((x) => x.name === n.name);
+    if (recursionSet.has(n.id)) {
+      const idx = recursionStack.findIndex((x) => x.id === n.id);
       if (idx !== -1) {
         // Mark all nodes that are part of the cycle
         markCycleFromIndex(idx);
@@ -679,7 +687,7 @@ export const recursiveAddRisk = (
     processedNodes.add(n);
 
     // Push onto recursion stack
-    recursionSet.add(n.name);
+    recursionSet.add(n.id);
     recursionStack.push(n);
 
     const nodeFlaws = vulns.filter((p) => p.componentPurl === n.name);
@@ -702,7 +710,7 @@ export const recursiveAddRisk = (
 
     // Pop from recursion stack
     recursionStack.pop();
-    recursionSet.delete(n.name);
+    recursionSet.delete(n.id);
   };
 
   processNode(node);
@@ -712,8 +720,10 @@ export const recursiveAddRisk = (
 export const convertPathsToTree = (
   paths: Array<Array<string>>,
   vulns: Array<DependencyVuln>,
+  addRoot = true,
 ): ViewDependencyTreeNode => {
   const root: ViewDependencyTreeNode = {
+    id: "ROOT",
     name: "ROOT",
     children: [],
     risk: 0,
@@ -731,6 +741,16 @@ export const convertPathsToTree = (
       if (part === "ROOT") {
         continue;
       }
+
+      // Wildcards are positional — never reuse them via nodeMap to avoid cycles
+      if (part === "*") {
+        const wildcardNode = pathEntryToViewNode(part);
+        currentNode.children.push(wildcardNode);
+        wildcardNode.parents.push(currentNode);
+        currentNode = wildcardNode;
+        continue;
+      }
+
       // check if we already have this child
       const node = nodeMap.get(part);
       if (node) {
@@ -758,6 +778,13 @@ export const convertPathsToTree = (
     }
   }
   recursiveAddRisk(root, vulns);
+
+  if (!addRoot && root.children.length > 0) {
+    const newRoot = root.children[0];
+    newRoot.parents = newRoot.parents.filter((p) => p !== root);
+    return newRoot;
+  }
+
   return root;
 };
 
@@ -765,6 +792,7 @@ export interface ViewDependencyTreeNode extends Omit<
   DependencyTreeNode,
   "children"
 > {
+  id: string;
   risk: number;
   parents: Array<ViewDependencyTreeNode>;
   children: ViewDependencyTreeNode[];
@@ -779,6 +807,7 @@ export function minimalTreeToViewDependencyTreeNode(
 ): ViewDependencyTreeNode {
   if (!tree) {
     return {
+      id: "ROOT",
       name: "ROOT",
       risk: 0,
       parents: [],
@@ -842,8 +871,10 @@ export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
     }
   }
 
+  const name = entry === "" ? "ROOT" : entry;
   return {
-    name: entry === "" ? "ROOT" : entry,
+    id: name === "*" ? crypto.randomUUID() : name,
+    name,
     children: [],
     risk: 0,
     parents: [],
@@ -869,20 +900,17 @@ export const recursiveRemoveWithoutRisk = (
   node: ViewDependencyTreeNode,
   recursionSet: Set<string> = new Set(),
 ) => {
-  // Detect cycles by tracking nodes in the current recursion stack using their names.
-  if (recursionSet.has(node.name)) {
-    // Mark node as being part of a cycle so callers can handle it specially if needed
+  // Detect cycles by id so that distinct nodes with the same name (e.g. "*") are not falsely treated as cycles.
+  if (recursionSet.has(node.id)) {
     node.hasCycle = true;
-    // Stop further descent to avoid infinite recursion. Preserve the node (don't prune).
     return node;
   }
 
-  // Add current node to recursion set
-  recursionSet.add(node.name);
+  recursionSet.add(node.id);
 
   // If this node has no risk, prune it (and its subtree)
   if (node.risk === 0) {
-    recursionSet.delete(node.name);
+    recursionSet.delete(node.id);
     return null;
   }
 
@@ -891,7 +919,6 @@ export const recursiveRemoveWithoutRisk = (
     .map((c) => recursiveRemoveWithoutRisk(c, recursionSet))
     .filter((n): n is ViewDependencyTreeNode => n !== null);
 
-  // Remove current node from recursion set before returning
-  recursionSet.delete(node.name);
+  recursionSet.delete(node.id);
   return node;
 };

@@ -57,6 +57,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   const graph = useMemo(() => {
     if (!vexRule?.pathPattern)
       return {
+        id: "(*)",
         name: "(*)",
         children: [],
         risk: 0,
@@ -64,8 +65,8 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
         nodeType: "component" as const,
       };
 
-    const g = convertPathsToTree([vexRule.pathPattern], []);
-    g.name = "(*)";
+    const g = convertPathsToTree([vexRule.pathPattern], [], false);
+
     return g;
   }, [vexRule?.pathPattern]);
 
