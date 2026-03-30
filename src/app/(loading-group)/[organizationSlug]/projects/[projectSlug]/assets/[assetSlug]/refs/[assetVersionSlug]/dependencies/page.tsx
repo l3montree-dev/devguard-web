@@ -1,20 +1,32 @@
 "use client";
 
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { browserApiClient } from "@/services/devGuardApi";
-import "@xyflow/react/dist/style.css";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
+import Filter from "@/components/Filter";
+import Page from "@/components/Page";
+import RootNodeSelector from "@/components/RootNodeSelector";
 import AssetTitle from "@/components/common/AssetTitle";
+import { Combobox } from "@/components/common/Combobox";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
+import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useSession } from "@/context/SessionContext";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
+import { browserApiClient } from "@/services/devGuardApi";
 import {
   Component,
   ComponentPaged,
@@ -41,11 +53,24 @@ import {
   createColumnHelper,
   flexRender,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch, Loader2 } from "lucide-react";
+import "@xyflow/react/dist/style.css";
+import {
+  ChevronDownIcon,
+  GitBranch,
+  GitBranchIcon,
+  Loader2,
+  Loader2Icon,
+} from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
+import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
 import DateString, {
   parseDateOnly,
 } from "../../../../../../../../../../components/common/DateString";
+import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
 import SortingCaret from "../../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import {
@@ -53,34 +78,17 @@ import {
   Button,
   buttonVariants,
 } from "../../../../../../../../../../components/ui/button";
-import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
-import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
-import Page from "@/components/Page";
-import { Combobox } from "@/components/common/Combobox";
-import { useRouter } from "next/navigation";
-import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
-import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
-import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
-import { Input } from "@/components/ui/input";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { GitBranchIcon, Loader2Icon } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import useSWR from "swr";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../../../../../../../components/ui/tooltip";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
+import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
-import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import RootNodeSelector from "@/components/RootNodeSelector";
-import { useSession } from "@/context/SessionContext";
-import Filter from "@/components/Filter";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],
@@ -241,13 +249,20 @@ const columnsDef: ColumnDef<
     id: "dependency_purl",
     cell: (row) => (
       <span className="flex flex-row items-center gap-2">
-        <EcosystemImage packageName={row.getValue()} size={16} />
-        <span className="font-medium truncate">
-          {beautifyPurl(row.getValue())}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {extractVersion(row.getValue())}
-        </span>
+        <Tooltip>
+          <TooltipTrigger className="flex flex-row items-center gap-2">
+            <EcosystemImage packageName={row.getValue()} size={16} />
+            <span className="font-medium truncate">
+              {beautifyPurl(row.getValue())}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {extractVersion(row.getValue())}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{row.getValue()}</p>
+          </TooltipContent>
+        </Tooltip>
       </span>
     ),
   }),
