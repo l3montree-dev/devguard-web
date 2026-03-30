@@ -1,7 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { FunctionComponent, useState } from "react";
+import useRouterQuery from "@/hooks/useRouterQuery";
+import { cn } from "@/lib/utils";
+import { BarsArrowDownIcon, BarsArrowUpIcon } from "@heroicons/react/20/solid";
+import { useSearchParams } from "next/navigation";
+import { FunctionComponent } from "react";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +14,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { BarsArrowUpIcon, BarsArrowDownIcon } from "@heroicons/react/20/solid";
-import { cn } from "@/lib/utils";
-import useRouterQuery from "@/hooks/useRouterQuery";
-import { useSearchParams } from "next/navigation";
 
 export interface SortOption {
   label: string;
@@ -43,23 +43,20 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
   const initialSortOption = sortOptions.find(
     (o) => searchParams?.get(`sort[${o.value}]`) !== null,
   );
-  const [sortBy, setSortBy] = useState<string>(
-    initialSortOption?.value ?? sortOptions[0].value,
-  );
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">(
-    initialSortOption
-      ? ((searchParams?.get(`sort[${initialSortOption.value}]`) as
-          | "asc"
-          | "desc") ?? "asc")
-      : "asc",
-  );
+  const sortBy = initialSortOption?.value ?? sortOptions[0].value;
+
+  const sortDirection = initialSortOption
+    ? ((searchParams?.get(`sort[${initialSortOption.value}]`) as
+        | "asc"
+        | "desc") ?? "asc")
+    : "asc";
 
   const selectedLabel =
     sortOptions.find((o) => o.value === sortBy)?.label ?? sortBy;
 
   return (
     <div
-      className={cn("flex h-10 rounded-md border flex flex-row items-center")}
+      className={cn("flex h-11 rounded-md border flex flex-row items-center")}
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -71,7 +68,6 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
           <DropdownMenuRadioGroup
             value={sortBy}
             onValueChange={(value) => {
-              setSortBy(value);
               pushQuery({
                 ...buildSortQuery(sortOptions, value, sortDirection),
                 page: "1",
@@ -93,7 +89,6 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
         size={"sm"}
         onClick={() => {
           const newDirection = sortDirection === "asc" ? "desc" : "asc";
-          setSortDirection(newDirection);
           pushQuery({
             ...buildSortQuery(sortOptions, sortBy, newDirection),
             page: "1",
