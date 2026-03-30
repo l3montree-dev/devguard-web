@@ -246,7 +246,7 @@ const columnsDef: ColumnDef<
 >[] = [
   columnHelper.accessor("dependencyPurl", {
     header: "Package",
-    id: "dependency_purl",
+    id: "dependency_id",
     cell: (row) => (
       <span className="flex flex-row items-center gap-2">
         <Tooltip>
@@ -661,7 +661,7 @@ const Index: FunctionComponent = () => {
                       key={header.id}
                     >
                       <div
-                        className="flex flex-row gap-2"
+                        className="flex flex-row items-center gap-2"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {flexRender(
