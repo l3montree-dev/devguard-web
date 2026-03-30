@@ -32,6 +32,10 @@ type PageProps = {
     Icon: any;
   }>;
   fullscreen?: boolean;
+  breadcrumbs?: Array<{
+    title: string;
+    href: string;
+  }>;
 };
 
 // Add that the navigation is a prop
@@ -45,6 +49,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       <div>
         <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
           <Main
+            breadcrumbs={props.breadcrumbs}
             fullscreen={props.fullscreen}
             Menu={props.Menu}
             Button={props.Button}
