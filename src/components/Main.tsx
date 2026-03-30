@@ -21,6 +21,14 @@ import { documentationLinks } from "@/const/documentationLinks";
 
 import { useConfig } from "../context/ConfigContext";
 import EntityProviderBanner from "./common/EntityProviderBanner";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "./ui/breadcrumb";
 
 interface Props {
   title: string;
@@ -34,9 +42,17 @@ interface Props {
     isActive?: boolean;
   }>;
   fullscreen?: boolean;
+  breadcrumbs?: Array<{
+    title: string;
+    href: string;
+  }>;
 }
 
-const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
+const Main: FunctionComponent<Props> = ({
+  children,
+  fullscreen,
+  breadcrumbs,
+}) => {
   const dimensions = useDimensions();
   const themeConfig = useConfig();
 
@@ -49,6 +65,31 @@ const Main: FunctionComponent<Props> = ({ children, fullscreen }) => {
           !fullscreen && "mx-auto max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
         )}
       >
+        {breadcrumbs && (
+          <Breadcrumb className="mb-4">
+            <BreadcrumbList>
+              {breadcrumbs.map((breadcrumb, index) => (
+                <React.Fragment key={index}>
+                  <BreadcrumbItem>
+                    {index + 1 == breadcrumbs.length ? (
+                      <BreadcrumbPage className="font-medium">
+                        {breadcrumb.title}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink
+                        className="text-muted-foreground! font-medium"
+                        href={breadcrumb.href}
+                      >
+                        {breadcrumb.title}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
+        )}
         {children}
       </div>
       <div className="bg-footer">

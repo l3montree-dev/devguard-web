@@ -21,7 +21,21 @@ const Config = () => {
       : null;
 
   return (
-    <Page title={""} Menu={projectMenu} Title={<ProjectTitle />}>
+    <Page
+      breadcrumbs={[
+        {
+          title: "Settings",
+          href: "./",
+        },
+        {
+          title: "Config",
+          href: "",
+        },
+      ]}
+      title={""}
+      Menu={projectMenu}
+      Title={<ProjectTitle />}
+    >
       <ConfigFileEditor baseUrl={baseUrl} />
     </Page>
   );

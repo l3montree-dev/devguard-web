@@ -28,7 +28,21 @@ const Config = () => {
       : null;
 
   return (
-    <Page title={asset?.name || ""} Menu={assetMenu} Title={<AssetTitle />}>
+    <Page
+      breadcrumbs={[
+        {
+          title: "Settings",
+          href: "./",
+        },
+        {
+          title: "Config",
+          href: "",
+        },
+      ]}
+      title={asset?.name || ""}
+      Menu={assetMenu}
+      Title={<AssetTitle />}
+    >
       <ConfigFileEditor baseUrl={baseUrl} />
     </Page>
   );

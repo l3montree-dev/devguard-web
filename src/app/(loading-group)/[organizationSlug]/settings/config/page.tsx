@@ -15,7 +15,21 @@ const Config = () => {
   const baseUrl = org ? "/organizations/" + org.slug : null;
 
   return (
-    <Page Title={null} title={""} Menu={orgMenu}>
+    <Page
+      breadcrumbs={[
+        {
+          title: "Settings",
+          href: "./",
+        },
+        {
+          title: "Config",
+          href: "",
+        },
+      ]}
+      Title={null}
+      title={""}
+      Menu={orgMenu}
+    >
       <ConfigFileEditor baseUrl={baseUrl} />
     </Page>
   );
