@@ -156,17 +156,17 @@ export const eventTypeMessages = (
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600",
-  fixed: "bg-green-600",
-  detected: "bg-red-600",
-  falsePositive: "bg-purple-600",
-  mitigate: "bg-green-600",
-  markedForTransfer: "bg-blue-600",
-  rawRiskAssessmentUpdated: "bg-secondary",
-  reopened: "bg-red-600",
+  accepted: "bg-purple-600 text-white!",
+  fixed: "bg-green-600 text-white!",
+  detected: "bg-red-600 text-white!",
+  falsePositive: "bg-purple-600 text-white!",
+  mitigate: "bg-green-600 text-white!",
+  markedForTransfer: "bg-blue-600 text-white!",
+  rawRiskAssessmentUpdated: "bg-secondary text-white!",
+  reopened: "bg-red-600 text-white!",
   comment: "bg-secondary",
-  ticketClosed: "bg-red-600",
-  ticketDeleted: "bg-red-600",
+  ticketClosed: "bg-red-600 text-white!",
+  ticketDeleted: "bg-red-600 text-white!",
   licenseDecision: "bg-yellow-500 !text-black",
 };
 

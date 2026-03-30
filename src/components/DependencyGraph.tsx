@@ -61,6 +61,33 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Move } from "lucide-react";
 
+// Returns the suffix of the path starting at nodeId going toward the leaf.
+// Uses highlightPath if the node appears in it; otherwise falls back to
+// traversing down via parentToChildEdges (first child at each step).
+function getPathSuffix(
+  nodeId: string,
+  highlightPath: string[] | undefined,
+  parentToChildEdges: Map<string, Array<{ edgeId: string; child: string }>>,
+): string[] {
+  if (highlightPath && highlightPath.length > 0) {
+    const idx = highlightPath.indexOf(nodeId);
+    if (idx !== -1) return highlightPath.slice(idx);
+  }
+  const path: string[] = [nodeId];
+  const visited = new Set<string>([nodeId]);
+  let current = nodeId;
+  while (true) {
+    const children = parentToChildEdges.get(current);
+    if (!children || children.length === 0) break;
+    const child = children[0].child;
+    if (visited.has(child)) break;
+    visited.add(child);
+    path.push(child);
+    current = child;
+  }
+  return path;
+}
+
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
 
@@ -68,12 +95,9 @@ interface ContextMenuState {
   type: MenuType;
   x: number;
   y: number;
-  // For edge menu
-  parentName?: string;
-  childName?: string;
-  // For node menu
-  nodeName?: string;
-  isLastNode?: boolean;
+  childIndex?: number;
+  // Full path suffix from the clicked position to the leaf
+  path: string[];
 }
 
 // VEX justification options
@@ -81,14 +105,14 @@ export type VexSelection =
   | {
       type: "edge";
       justification: string;
-      parentName: string;
-      childName: string;
+      // this is the index of the child in the path
+      childIndex: number;
+      path: string[]; // full path from parent to child, used for rule creation
     }
   | {
       type: "node";
       justification: string;
-      nodeName: string;
-      isLastNode: boolean;
+      path: string[]; // suffix from the clicked node to the leaf
     };
 
 const nodeTypes = {
@@ -453,14 +477,17 @@ const DependencyGraph: FunctionComponent<{
       return;
     }
     if (!enableContextMenu) return;
-    // Show context menu for regular nodes
-    const hasChildren = edgeMaps.parentToChildEdges.has(node.id);
+
+    const path = getPathSuffix(
+      node.id,
+      highlightPath,
+      edgeMaps.parentToChildEdges,
+    );
     setContextMenu({
       type: "node",
       x: event.clientX,
       y: event.clientY,
-      nodeName: node.id,
-      isLastNode: !hasChildren,
+      path,
     });
   };
 
@@ -589,15 +616,20 @@ const DependencyGraph: FunctionComponent<{
       const parentName = edge.target;
       const childName = edge.source;
 
+      const path = getPathSuffix(
+        parentName,
+        highlightPath,
+        edgeMaps.parentToChildEdges,
+      );
       setContextMenu({
         type: "edge",
         x: event.clientX,
         y: event.clientY,
-        parentName,
-        childName,
+        childIndex: path.indexOf(childName),
+        path,
       });
     },
-    [enableContextMenu],
+    [enableContextMenu, edgeMaps, highlightPath],
   );
 
   // Node context menu click handler
@@ -609,16 +641,19 @@ const DependencyGraph: FunctionComponent<{
       // Don't show menu for load more nodes
       if (node.data.isLoadMoreNode || !enableContextMenu) return;
 
-      const hasChildren = edgeMaps.parentToChildEdges.has(node.id);
+      const path = getPathSuffix(
+        node.id,
+        highlightPath,
+        edgeMaps.parentToChildEdges,
+      );
       setContextMenu({
         type: "node",
         x: event.clientX,
         y: event.clientY,
-        nodeName: node.id,
-        isLastNode: !hasChildren,
+        path,
       });
     },
-    [enableContextMenu, edgeMaps],
+    [enableContextMenu, edgeMaps, highlightPath],
   );
 
   // Close context menu
@@ -636,19 +671,19 @@ const DependencyGraph: FunctionComponent<{
         return;
       }
 
+      const path = contextMenu.path ?? [];
       const selection: VexSelection =
         contextMenu.type === "edge"
           ? {
               type: "edge",
               justification,
-              parentName: contextMenu.parentName!,
-              childName: contextMenu.childName!,
+              path,
+              childIndex: path.length - 1,
             }
           : {
               type: "node",
               justification,
-              nodeName: contextMenu.nodeName!,
-              isLastNode: contextMenu.isLastNode ?? false,
+              path,
             };
 
       try {
@@ -838,57 +873,57 @@ const DependencyGraph: FunctionComponent<{
               side="bottom"
               sideOffset={5}
             >
-              {contextMenu.type === "edge" &&
-                contextMenu.parentName &&
-                contextMenu.childName && (
-                  <>
-                    <DropdownMenuItem
-                      className="flex-col items-start gap-1 py-3"
-                      onClick={() =>
-                        handleVexOptionClick(
-                          "does_not_call_vulnerable_function",
-                        )
-                      }
-                    >
-                      <span className="font-medium leading-none">
-                        Does Not Call Vulnerable Function
-                      </span>
-                      <span className="text-xs text-muted-foreground leading-snug">
-                        {getDisplayName(contextMenu.parentName)} does not call
-                        vulnerable code in{" "}
-                        {getDisplayName(contextMenu.childName)}
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex-col items-start gap-1 py-3"
-                      onClick={() => handleVexOptionClick("inline_mitigations")}
-                    >
-                      <span className="font-medium leading-none">
-                        Inline Mitigations
-                      </span>
-                      <span className="text-xs text-muted-foreground leading-snug">
-                        {getDisplayName(contextMenu.parentName)} implements
-                        safeguards against vulnerable code
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex-col items-start gap-1 py-3"
-                      onClick={() =>
-                        handleVexOptionClick("uncontrollable_by_attacker")
-                      }
-                    >
-                      <span className="font-medium leading-none">
-                        Uncontrollable by Attacker
-                      </span>
-                      <span className="text-xs text-muted-foreground leading-snug">
-                        {getDisplayName(contextMenu.parentName)} makes sure,
-                        that vulnerable code cannot be exploited in this context
-                      </span>
-                    </DropdownMenuItem>
-                  </>
-                )}
+              {contextMenu.type === "edge" && contextMenu.path.length >= 2 && (
+                <>
+                  <DropdownMenuItem
+                    className="flex-col items-start gap-1 py-3"
+                    onClick={() =>
+                      handleVexOptionClick("does_not_call_vulnerable_function")
+                    }
+                  >
+                    <span className="font-medium leading-none">
+                      Does Not Call Vulnerable Function
+                    </span>
+                    <span className="text-xs text-muted-foreground leading-snug">
+                      {getDisplayName(contextMenu.path[0])} does not call
+                      vulnerable code in{" "}
+                      {getDisplayName(
+                        contextMenu.path[
+                          contextMenu.childIndex ?? contextMenu.path.length - 1
+                        ],
+                      )}
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex-col items-start gap-1 py-3"
+                    onClick={() => handleVexOptionClick("inline_mitigations")}
+                  >
+                    <span className="font-medium leading-none">
+                      Inline Mitigations
+                    </span>
+                    <span className="text-xs text-muted-foreground leading-snug">
+                      {getDisplayName(contextMenu.path[0])} implements
+                      safeguards against vulnerable code
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex-col items-start gap-1 py-3"
+                    onClick={() =>
+                      handleVexOptionClick("uncontrollable_by_attacker")
+                    }
+                  >
+                    <span className="font-medium leading-none">
+                      Uncontrollable by Attacker
+                    </span>
+                    <span className="text-xs text-muted-foreground leading-snug">
+                      {getDisplayName(contextMenu.path[0])} makes sure, that
+                      vulnerable code cannot be exploited in this context
+                    </span>
+                  </DropdownMenuItem>
+                </>
+              )}
 
-              {contextMenu.type === "node" && contextMenu.nodeName && (
+              {contextMenu.type === "node" && contextMenu.path.length > 0 && (
                 <>
                   <DropdownMenuItem
                     className="flex-col items-start gap-1 py-3"
@@ -902,17 +937,23 @@ const DependencyGraph: FunctionComponent<{
                     </span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    className="flex-col items-start gap-1 py-3"
-                    onClick={() => handleVexOptionClick("no_vulnerable_code")}
-                  >
-                    <span className="font-medium leading-none">
-                      No Vulnerable Code
-                    </span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      This version does not include vulnerable code
-                    </span>
-                  </DropdownMenuItem>
+                  {highlightPath &&
+                    contextMenu.path[0] ===
+                      highlightPath[highlightPath.length - 1] && (
+                      <DropdownMenuItem
+                        className="flex-col items-start gap-1 py-3"
+                        onClick={() =>
+                          handleVexOptionClick("no_vulnerable_code")
+                        }
+                      >
+                        <span className="font-medium leading-none">
+                          No Vulnerable Code
+                        </span>
+                        <span className="text-xs text-muted-foreground leading-snug">
+                          This version does not include vulnerable code
+                        </span>
+                      </DropdownMenuItem>
+                    )}
                 </>
               )}
             </DropdownMenuContent>

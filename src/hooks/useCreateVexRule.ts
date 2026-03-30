@@ -14,6 +14,34 @@ interface UseCreateParams {
   mutate: () => Promise<any> | null;
 }
 
+const mechMap: Record<string, string> = {
+  not_present: "component_not_present",
+  no_vulnerable_code: "vulnerable_code_not_present",
+  does_not_call_vulnerable_function: "vulnerable_code_not_in_execute_path",
+  inline_mitigations: "inline_mitigations_already_exist",
+  uncontrollable_by_attacker:
+    "vulnerable_code_cannot_be_controlled_by_adversary",
+};
+
+const labelMap: Record<string, string> = {
+  not_present: "Not Present",
+  no_vulnerable_code: "No Vulnerable Code",
+  does_not_call_vulnerable_function: "Does Not Call Vulnerable Function",
+  inline_mitigations: "Inline Mitigations",
+  uncontrollable_by_attacker: "Uncontrollable by Attacker",
+};
+
+// Builds the path pattern array for a VEX rule from a user selection.
+// Node selections use ["*", node, "*"] to match regardless of position.
+// Edge selections use ["*", ...suffix] to match the specific dependency chain.
+export function buildVexPathPattern(selection: VexSelection): string[] | null {
+  if (!selection.path || selection.path.length === 0) return null;
+  if (selection.type === "node") {
+    return ["*", selection.path[0], "*"];
+  }
+  return ["*", ...selection.path];
+}
+
 // Returns an async handler that accepts the VEX selection and creates a false positive rule
 export function useCreateVexRule({
   activeOrgSlug,
@@ -25,41 +53,13 @@ export function useCreateVexRule({
 }: UseCreateParams) {
   return useCallback(
     async (selection: VexSelection) => {
-      // map VEX keys to mechanical justification
-      const mechMap: Record<string, string> = {
-        not_present: "component_not_present",
-        no_vulnerable_code: "vulnerable_code_not_present",
-        does_not_call_vulnerable_function:
-          "vulnerable_code_not_in_execute_path",
-        inline_mitigations: "inline_mitigations_already_exist",
-        uncontrollable_by_attacker:
-          "vulnerable_code_cannot_be_controlled_by_adversary",
-      };
-
-      const labelMap: Record<string, string> = {
-        not_present: "Not Present",
-        no_vulnerable_code: "No Vulnerable Code",
-        does_not_call_vulnerable_function: "Does Not Call Vulnerable Function",
-        inline_mitigations: "Inline Mitigations",
-        uncontrollable_by_attacker: "Uncontrollable by Attacker",
-      };
-
-      let pathPattern: string[] | undefined;
-      if (selection.type === "node" && selection.nodeName) {
-        if (selection.isLastNode) {
-          // if it's the last node, match the full path to avoid over-applying rules
-          pathPattern = [selection.nodeName];
-        } else {
-          pathPattern = [selection.nodeName, "*"];
-        }
-      } else if (selection.type === "edge" && selection.parentName) {
-        pathPattern = [selection.parentName, "*"];
-      } else {
+      const pathPattern = buildVexPathPattern(selection);
+      if (!pathPattern) {
         toast("Invalid selection for creating VEX rule");
         return false;
       }
 
-      if (!pathPattern || !cveId) {
+      if (!cveId) {
         toast("Could not determine path for rule");
         return false;
       }
@@ -89,7 +89,6 @@ export function useCreateVexRule({
           return false;
         }
 
-        // optionally refresh state
         try {
           await mutate?.();
         } catch (e) {
@@ -107,6 +106,6 @@ export function useCreateVexRule({
         return false;
       }
     },
-    [activeOrgSlug, projectSlug, assetSlug, cveId, mutate],
+    [activeOrgSlug, projectSlug, assetSlug, cveId, mutate, assetVersionSlug],
   );
 }

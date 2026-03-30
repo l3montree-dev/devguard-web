@@ -53,7 +53,6 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
           className={classNames(
             defaultClasses,
             evTypeBackground["falsePositive"],
-            "text-secondary-foreground",
           )}
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />
