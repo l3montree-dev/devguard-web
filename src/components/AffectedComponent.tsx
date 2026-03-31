@@ -6,7 +6,7 @@ import {
   PURLInspectResponse,
   VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useMemo } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";
@@ -21,22 +21,17 @@ import {
 } from "./ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { fetcher } from "@/data-fetcher/fetcher";
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
 }> = ({ vuln }) => {
-  const [activeCVE, setActiveCVE] = useState<VulnInPackage | null>(null);
   const { theme } = useTheme();
 
   const purl = vuln.componentPurl;
 
   const url = useMemo(
-    () =>
-      purl
-        ? `/api/devguard-tunnel/api/v1/vulndb/purl-inspect/${encodeURIComponent(purl)}`
-        : null,
+    () => (purl ? `/vulndb/purl-inspect/${encodeURIComponent(purl)}` : null),
     [purl],
   );
 
@@ -45,15 +40,12 @@ const AffectedComponentDetails: FunctionComponent<{
     revalidateOnReconnect: false,
   });
 
-  useEffect(() => {
-    if (data) {
-      const matchedCVE = data.vulns.find(
-        (vulnInPkg) => vuln.cveID === vulnInPkg.CVEID,
-      );
-      if (matchedCVE) {
-        setActiveCVE(matchedCVE);
-      }
-    }
+  // Compute the matched CVE from the fetched data
+  const activeCVE = useMemo(() => {
+    if (!data) return null;
+    return (
+      data.vulns.find((vulnInPkg) => vuln.cveID === vulnInPkg.CVEID) ?? null
+    );
   }, [data, vuln.cveID]);
 
   if (isLoading) {
@@ -145,8 +137,8 @@ const AffectedComponentDetails: FunctionComponent<{
                     Fixed in:{" "}
                   </span>
                   <Badge variant={"outline"}>
-                    {activeCVE?.FixedVersion ??
-                      vuln.componentFixedVersion ??
+                    {extractVersion(vuln.directDependencyFixedVersion || "") ||
+                      extractVersion(vuln.componentFixedVersion || "") ||
                       "no patch available"}
                   </Badge>
                 </div>

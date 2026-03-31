@@ -2,7 +2,7 @@
 
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
-import CopyCode from "@/components/common/CopyCode";
+
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import FormatDate from "@/components/risk-assessment/FormatDate";
@@ -36,14 +36,9 @@ import {
   RequirementsLevel,
   VexRule,
   VulnEventDTO,
-  DependencyVuln,
-  VulnInPackage,
-  PURLInspectResponse,
 } from "@/types/api/api";
-import { beautifyPurl, getEcosystem } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
-  BugAntIcon,
   InformationCircleIcon,
   ShareIcon,
   SpeakerXMarkIcon,

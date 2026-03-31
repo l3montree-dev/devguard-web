@@ -252,7 +252,7 @@ export const getLayoutedElements = (
 
   // Build a map of nodes that are first in a vulnerability path with a fix available
   const firstInPathWithFixMap = new Map<string, string>();
-  vulns.forEach((vuln: any) => {
+  vulns.forEach((vuln: DependencyVuln) => {
     if (
       vuln.directDependencyFixedVersion &&
       vuln.vulnerabilityPath &&

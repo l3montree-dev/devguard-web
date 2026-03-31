@@ -1,35 +1,29 @@
 import { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
 import { DetailedDependencyVulnDTO } from "@/types/api/api";
-import { beautifyPurl, extractVersion, getEcosystem } from "@/utils/common";
-import {
-  Zap,
-  MoveDownIcon,
-  ArrowUp,
-  ArrowDown,
-  ArrowRight,
-  BugOff,
-} from "lucide-react";
+import { getEcosystem } from "@/utils/common";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { diffChars } from "diff";
 import { PackageURL } from "packageurl-js";
-import { Button } from "./ui/button";
-
+import { isValidPackagePurl } from "@/utils/common";
 interface DiffHighlighterProps {
   oldVersion: string;
   newVersion?: string;
 }
 
-// PackageURL.fromString("pkg:deb/debian/file@5.46-5?arch=arm64").toString();
-
 export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
   oldVersion,
   newVersion,
 }) => {
-  const { type, namespace, name, version } = PackageURL.fromString(oldVersion);
+  if (!isValidPackagePurl(oldVersion)) {
+    return <span className="font-mono text-xs">{oldVersion}</span>;
+  }
 
-  if (newVersion) {
+  const { name, version } = PackageURL.fromString(oldVersion);
+
+  if (newVersion && isValidPackagePurl(newVersion)) {
     const { version: newVer } = PackageURL.fromString(newVersion);
     const differences = diffChars(name + "@" + version, name + "@" + newVer);
 
@@ -83,11 +77,13 @@ function renderQuickFixText(
       return `apk add ${directDependencyFixedVersion}`;
     }
     case "deb": {
-      const { name, version } = PackageURL.fromString(
-        directDependencyFixedVersion,
-      );
-
-      return `apt-get install -y ${name}=${version}`;
+      if (isValidPackagePurl(directDependencyFixedVersion)) {
+        const { name, version } = PackageURL.fromString(
+          directDependencyFixedVersion,
+        );
+        return `apt-get install -y ${name}=${version}`;
+      }
+      return `apt-get install -y ${directDependencyFixedVersion}`;
     }
     default:
       return "";
@@ -105,9 +101,22 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
     directDependencyFixedVersion,
   );
 
-  const { type, namespace, name, version } = PackageURL.fromString(
-    vuln.vulnerabilityPath[0],
-  );
+  const vulnerabilityPath = vuln.vulnerabilityPath[0];
+
+  // Validate the vulnerability path is a valid PURL before parsing
+  if (!isValidPackagePurl(vulnerabilityPath)) {
+    return (
+      <div className="rounded-lg border bg-card p-4">
+        <span className="text-xs text-muted-foreground">
+          Invalid package URL: {vulnerabilityPath}
+        </span>
+      </div>
+    );
+  }
+
+  const { type, namespace, name, version } =
+    PackageURL.fromString(vulnerabilityPath);
+
   return (
     <>
       <div className="">
@@ -122,7 +131,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <Badge
                   variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/8 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
+                  className="absolute top-0 left-0 -translate-y-1/2 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
                 >
                   Resolve Vulnerability
                 </Badge>

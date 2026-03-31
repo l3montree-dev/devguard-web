@@ -57,7 +57,6 @@ import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
-import { DiffHighlighter } from "./Quickfix";
 
 export interface DependencyGraphNodeProps {
   data: {
@@ -115,9 +114,6 @@ export const DependencyGraphNode: FunctionComponent<
             : "border-border",
       )}
     >
-      {props.data.hasPatch && (
-        <div className="absolute inset-0 rounded-lg pointer-events-none animate-pulse" />
-      )}
       <Handle
         className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
         type="target"

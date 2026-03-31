@@ -195,9 +195,6 @@ export const extractVersion = (purl: string) => {
   return versionPart;
 };
 
-export const extractNameandPurl = (purl: string) => {
-  const parts = purl.split("@");
-};
 export const isValidPackagePurl = (purl: string): boolean => {
   if (!purl) return false;
   // PURL format: pkg:<type>/<namespace?>/<name>@<version?>?<qualifiers?>#<subpath?>
