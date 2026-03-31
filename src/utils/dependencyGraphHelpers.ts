@@ -250,19 +250,6 @@ export const getLayoutedElements = (
     {} as { [key: string]: DependencyVuln[] },
   );
 
-  // Build a map of nodes that are first in a vulnerability path with a fix available
-  const firstInPathWithFixMap = new Map<string, string>();
-  vulns.forEach((vuln: DependencyVuln) => {
-    if (
-      vuln.directDependencyFixedVersion &&
-      vuln.vulnerabilityPath &&
-      vuln.vulnerabilityPath.length > 0
-    ) {
-      const firstInPath = vuln.vulnerabilityPath[0];
-      firstInPathWithFixMap.set(firstInPath, vuln.directDependencyFixedVersion);
-    }
-  });
-
   dagreGraph.setGraph({
     rankdir: direction,
     nodesep: 0,
@@ -354,7 +341,6 @@ export const getLayoutedElements = (
           : 0,
         onExpansionToggle,
         hasPatch: directDepsWithPatches?.has(el) ?? false,
-        directDependencyFixedVersion: firstInPathWithFixMap.get(el) ?? null,
       },
     };
   });

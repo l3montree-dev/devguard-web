@@ -75,7 +75,6 @@ export interface DependencyGraphNodeProps {
     enableContextMenu?: boolean;
     onExpansionToggle?: (nodeId: string) => void;
     hasPatch?: boolean;
-    directDependencyFixedVersion?: string | null;
   };
   id: string;
 }
