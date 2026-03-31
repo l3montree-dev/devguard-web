@@ -53,7 +53,7 @@ export const LoadMoreNode: FunctionComponent<{
 };
 
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { DependencyVuln } from "../types/api/api";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
@@ -74,6 +74,7 @@ export interface DependencyGraphNodeProps {
     flow?: number;
     enableContextMenu?: boolean;
     onExpansionToggle?: (nodeId: string) => void;
+    hasPatch?: boolean;
   };
   id: string;
 }
@@ -103,11 +104,13 @@ export const DependencyGraphNode: FunctionComponent<
         props.data.enableContextMenu
           ? "cursor-pointer active:cursor-grabbing"
           : "cursor-grab active:cursor-grabbing",
-        props.data.vuln
-          ? props.data.vuln.every((v) => v.state === "falsePositive")
-            ? "border-gray-500/50 shadow-md"
-            : "border-red-500 shadow-lg"
-          : "border-border",
+        props.data.hasPatch
+          ? "border-green-500"
+          : props.data.vuln
+            ? props.data.vuln.every((v) => v.state === "falsePositive")
+              ? "border-gray-500/50 shadow-md"
+              : "border-red-500 shadow-lg"
+            : "border-border",
       )}
     >
       <Handle
@@ -116,9 +119,17 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        {props.data.vuln && (
+        {(props.data.vuln || props.data.hasPatch) && (
           <div className="absolute -top-2 -right-2 z-10">
-            {props.data.vuln.every((v) => v.state === "falsePositive") ? (
+            {props.data.hasPatch ? (
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
+              >
+                <ArrowUp className="h-3 w-3" />
+                Upgradeable
+              </Badge>
+            ) : props.data.vuln.every((v) => v.state === "falsePositive") ? (
               <Badge
                 variant="outline"
                 className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-gray-500/80 text-white border-gray-500/80"
@@ -143,10 +154,11 @@ export const DependencyGraphNode: FunctionComponent<
                 <EcosystemImage packageName={props.data.label} size={16} />
               </div>
             )}
+
             <div>
               <label
                 htmlFor="text"
-                className="text-left font-medium leading-tight flex-1 cursor-[inherit]"
+                className="text-left font-medium leading-tight flex-1 cursor-[inherit] flex items-center gap-2 flex-wrap"
               >
                 {beautifyPurl(props.data.label)}
                 {version && (

@@ -157,6 +157,22 @@ const DependencyGraph: FunctionComponent<{
   const childCountMapRef = useRef<Map<string, number>>(new Map());
   const childrenLimitMapRef = useRef<Map<string, number>>(new Map());
 
+  // Compute direct dependencies with available patches
+  const directDepsWithPatches = useMemo(() => {
+    const set = new Set<string>();
+    vulns.forEach((vuln) => {
+      if (
+        vuln.directDependencyFixedVersion &&
+        vuln.vulnerabilityPath &&
+        vuln.vulnerabilityPath.length > 0
+      ) {
+        // The direct dependency is the first element in the path
+        set.add(vuln.vulnerabilityPath[0]);
+      }
+    });
+    return set;
+  }, [vulns]);
+
   if (childCountMapRef.current.size === 0) {
     populateChildCounts(graph, childCountMapRef.current);
   }
@@ -207,6 +223,7 @@ const DependencyGraph: FunctionComponent<{
       previousNodesRef.current,
       handleExpansionToggle,
       enableContextMenu,
+      directDepsWithPatches,
     );
     previousNodesRef.current = nodes;
 

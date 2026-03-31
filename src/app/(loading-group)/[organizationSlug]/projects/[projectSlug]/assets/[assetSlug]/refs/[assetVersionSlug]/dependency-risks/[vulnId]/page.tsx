@@ -2,7 +2,7 @@
 
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
-import CopyCode from "@/components/common/CopyCode";
+
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import FormatDate from "@/components/risk-assessment/FormatDate";
@@ -37,10 +37,8 @@ import {
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
-import { beautifyPurl, getEcosystem } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
-  BugAntIcon,
   InformationCircleIcon,
   ShareIcon,
   SpeakerXMarkIcon,
@@ -60,6 +58,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
+import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
@@ -289,96 +288,6 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .filter(Boolean)
     .join("\n");
 };
-
-type MemoResult = {
-  globalUpdate: string;
-  ecosystemUpdate: string;
-};
-
-function Quickfix(props: { vuln: string; version?: string; package?: string }) {
-  const { globalUpdate, ecosystemUpdate } = useMemo<MemoResult>(() => {
-    switch (getEcosystem(props.vuln)) {
-      case "npm": {
-        return {
-          globalUpdate: `npm audit fix`,
-          ecosystemUpdate: `npm install ${props.package}@${props.version}`,
-        };
-      }
-      case "golang": {
-        return {
-          globalUpdate: `go get -u ./...`,
-          ecosystemUpdate: `go get ${props.package}@${props.version}`,
-        };
-      }
-      case "pypi": {
-        return {
-          globalUpdate: `pip install pip-audit 
-          pip-audit`,
-          ecosystemUpdate: `pip install ${props.package}@${props.version}`,
-        };
-      }
-      case "cargo": {
-        return {
-          globalUpdate: `cargo update`,
-          ecosystemUpdate: `# in Cargo.toml: ${props.package}="${props.version}"`,
-        };
-      }
-      case "nuget": {
-        return {
-          globalUpdate: `dotnet list package --vulnerable
-          dotnet outdated`,
-          ecosystemUpdate: `dotnet add package ${props.package} --version${props.version}`,
-        };
-      }
-      case "apk": {
-        return {
-          globalUpdate: `apk update && apk upgrade`,
-          ecosystemUpdate: `apk add ${props.package}=${props.version}`,
-        };
-      }
-      // Ref: https://github.com/l3montree-dev/devguard/issues/1050
-      /*case "deb": {
-        return {
-          globalUpdate: `apt update && apt upgrade`,
-          ecosystemUpdate: `apt-get install -y ${props.package}=${props.version}`,
-        };
-      }*/
-      default:
-        return {
-          globalUpdate: ``,
-          ecosystemUpdate: ``,
-        };
-    }
-  }, []);
-
-  return globalUpdate === "" && ecosystemUpdate === "" ? null : (
-    <div className="relative">
-      <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
-      <div className="relative ">
-        <div className="rounded-lg ">
-          <div className=" rounded-lg border bg-card p-4 border">
-            <div className="text-sm">
-              <div className="mb-2">
-                <span className="text-xs text-muted-foreground">
-                  Update all Dependencies
-                </span>
-
-                <CopyCode codeString={globalUpdate}></CopyCode>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground">
-                  {`Update only ${props.package} `}
-                </span>
-
-                <CopyCode codeString={ecosystemUpdate}></CopyCode>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
@@ -895,7 +804,6 @@ const Index: FunctionComponent = () => {
                         </Callout>
                       )}
                     </div>
-
                     {/* VEX Rules applied to this vulnerability */}
                     {vexRulesData && vexRulesData.length > 0 && (
                       <div className="mt-6">
@@ -947,7 +855,11 @@ const Index: FunctionComponent = () => {
                     events={vuln.events}
                     deleteEvent={handleDeleteEvent}
                     page="dependency-risks"
+                    directDependencyFixedVersion={
+                      vuln.directDependencyFixedVersion
+                    }
                   />
+                  {vuln && <Quickfix vuln={vuln} />}
                   {(session || vuln.ticketUrl) && (
                     <div>
                       <Card>
@@ -1348,32 +1260,8 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-
                 <AffectedComponentDetails vuln={vuln} />
 
-                {vuln.componentPurl !== null && (
-                  <div className="p-5">
-                    <div className="flex flex-col gap-4">
-                      {vuln.componentFixedVersion !== null && (
-                        <>
-                          <Quickfix
-                            vuln={vuln.componentPurl}
-                            version={
-                              Boolean(vuln.componentFixedVersion)
-                                ? (vuln.componentFixedVersion as string)
-                                : ""
-                            }
-                            package={
-                              Boolean(vuln.componentPurl)
-                                ? (beautifyPurl(vuln.componentPurl) as string)
-                                : ""
-                            }
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
                     Management decisions across the organization

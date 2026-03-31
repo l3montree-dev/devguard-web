@@ -224,6 +224,7 @@ export const getLayoutedElements = (
   previousNodes: Array<any> = [],
   onExpansionToggle?: (nodeId: string) => void,
   enableContextMenu?: boolean,
+  directDepsWithPatches?: Set<string>,
 ): [
   Array<{
     id: string;
@@ -346,6 +347,7 @@ export const getLayoutedElements = (
             (childrenLimitMap.get(parentId) || INITIAL_CHILDREN_TO_SHOW)
           : 0,
         onExpansionToggle,
+        hasPatch: directDepsWithPatches?.has(el) ?? false,
       },
     };
   });
