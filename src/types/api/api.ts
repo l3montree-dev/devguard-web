@@ -250,7 +250,7 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
-  vulnType: "dependencyVuln" | "firstPartyVuln";
+  vulnType: "dependencyVuln" | "firstPartyVuln" | "licenseRisk";
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
