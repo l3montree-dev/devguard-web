@@ -15,6 +15,7 @@ import CVERainbowBadge from "../../../../../../components/CVERainbowBadge";
 import Page from "../../../../../../components/Page";
 import { RiskHistoryDistributionDiagram } from "../../../../../../components/RiskHistoryDistributionDiagram";
 import SeverityCard from "../../../../../../components/SeverityCard";
+import QuickfixNotification from "../../../../../../components/QuickfixNotification";
 import { AsyncButton, Button } from "../../../../../../components/ui/button";
 import {
   Card,
@@ -52,12 +53,14 @@ import {
   normalizeContentTree,
   reduceRiskHistories,
   sortRisk,
+  withMockFixableRiskHistory,
 } from "../../../../../../utils/view";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useSession } from "@/context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
+import Callout from "@/components/common/Callout";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -178,7 +181,10 @@ const OverviewPage = () => {
   );
 
   const completeRiskHistory: RiskHistory[][] = useMemo(() => {
-    const groups = groupBy(riskHistory ?? [], "day");
+    const groups = groupBy(
+      withMockFixableRiskHistory(riskHistory ?? []),
+      "day",
+    );
     const days = Object.keys(groups).sort();
     return days.map((day) => {
       return groups[day];
@@ -251,6 +257,59 @@ const OverviewPage = () => {
       0,
     );
   }, [completeRiskHistory, mode]);
+
+  const criticalFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableCritical ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const highFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableHigh ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const mediumFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableMedium ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const lowFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableLow ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const totalAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) =>
+        sum +
+        (r?.totalAmount ??
+          (r?.cvePurlLow ?? 0) +
+            (r?.cvePurlMedium ?? 0) +
+            (r?.cvePurlHigh ?? 0) +
+            (r?.cvePurlCritical ?? 0)),
+      0,
+    );
+  }, [completeRiskHistory]);
+  const quickfixAmount =
+    criticalFixableAmount +
+    highFixableAmount +
+    mediumFixableAmount +
+    lowFixableAmount;
+
+  console.log(quickfixAmount);
 
   const vulnerableArtifacts = useMemo(() => {
     if (completeRiskHistory.length === 0) return [];
@@ -357,6 +416,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="critical"
                 currentAmount={criticalAmount}
+                fixableAmount={criticalFixableAmount}
                 queryIntervalStart={8.9}
                 queryIntervalEnd={10}
                 mode={mode}
@@ -365,6 +425,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="high"
                 currentAmount={highAmount}
+                fixableAmount={highFixableAmount}
                 queryIntervalStart={6.9}
                 queryIntervalEnd={9}
                 mode={mode}
@@ -373,6 +434,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="medium"
                 currentAmount={mediumAmount}
+                fixableAmount={mediumFixableAmount}
                 queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 mode={mode}
@@ -381,10 +443,20 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="low"
                 currentAmount={lowAmount}
+                fixableAmount={lowFixableAmount}
                 queryIntervalStart={0}
                 queryIntervalEnd={4}
                 mode={mode}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-2">
+                <QuickfixNotification
+                  totalAmount={totalAmount}
+                  fixableAmount={quickfixAmount}
+                  isLoading={riskHistoryLoading}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 gap-4">
               <div className="grid grid-cols-2 col-span-2 gap-4">

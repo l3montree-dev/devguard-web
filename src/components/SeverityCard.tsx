@@ -15,9 +15,11 @@ import {
 } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { useSearchParams } from "next/navigation";
+import { WrenchIcon } from "lucide-react";
 
 interface Props {
   currentAmount: number;
+  fixableAmount: number;
   queryIntervalStart: number;
   queryIntervalEnd: number;
   variant: "high" | "medium" | "low" | "critical";
@@ -27,6 +29,7 @@ interface Props {
 
 const SeverityCard: FunctionComponent<Props> = ({
   currentAmount,
+  fixableAmount,
   variant,
   queryIntervalStart,
   queryIntervalEnd,
@@ -77,7 +80,13 @@ const SeverityCard: FunctionComponent<Props> = ({
     );
   }
   return (
-    <Card>
+    <Card className="relative">
+      {fixableAmount > 0 && (
+        <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium text-yellow-500 shadow-sm">
+          <WrenchIcon className="h-3.5 w-3.5" />
+          <span>{fixableAmount}</span>
+        </div>
+      )}
       <CardHeader className="pb-2">
         <CardTitle className="flex flex-row items-start justify-between">
           <span>
