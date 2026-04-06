@@ -16,7 +16,8 @@ import { Switch } from "@/components/ui/switch";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { getLogoutUrl } from "@/server/actions/logout";
 import Link from "next/link";
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -25,7 +26,10 @@ import Section from "../../../components/common/Section";
 import { useConfig } from "../../../context/ConfigContext";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
-import { PatWithPrivKey, PersonalAccessTokenDTO } from "../../../types/api/api";
+import type {
+  PatWithPrivKey,
+  PersonalAccessTokenDTO,
+} from "../../../types/api/api";
 
 const PatManagementSection: FunctionComponent = () => {
   const [newToken, setNewToken] = useState<PatWithPrivKey | null>(null);

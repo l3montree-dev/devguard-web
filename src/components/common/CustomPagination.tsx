@@ -1,5 +1,6 @@
-import { Paged } from "@/types/api/api";
-import { FunctionComponent, useMemo } from "react";
+import type { Paged } from "@/types/api/api";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 
 import useRouterQuery from "../../hooks/useRouterQuery";
 import { Button } from "../ui/button";

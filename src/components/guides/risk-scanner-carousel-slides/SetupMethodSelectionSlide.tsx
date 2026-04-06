@@ -1,6 +1,6 @@
 import { SparklesIcon } from "@heroicons/react/20/solid";
 import { FlaskConical } from "lucide-react";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,7 @@ import {
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { classNames } from "@/utils/common";
-import { AssetDTO } from "@/types/api/api";
+import type { AssetDTO } from "@/types/api/api";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
 interface SetupMethodSelectionSlideProps {

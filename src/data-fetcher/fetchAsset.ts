@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { AssetDTO } from "@/types/api/api";
+import type { AssetDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
 import { HttpError } from "./http-error";

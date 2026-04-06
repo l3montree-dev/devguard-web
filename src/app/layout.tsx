@@ -11,7 +11,7 @@ import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
-import { OrganizationDTO } from "../types/api/api";
+import type { OrganizationDTO } from "../types/api/api";
 import InternalServerErrorPage from "./error";
 
 export const lexend = Lexend({

@@ -1,7 +1,7 @@
 "use client";
 
 import Page from "@/components/Page";
-import { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
+import type { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import Image from "next/image";
 import Link from "next/link";
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 import useSWR from "swr";
 
 import AssetTitle from "@/components/common/AssetTitle";

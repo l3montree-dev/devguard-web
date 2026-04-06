@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import Section from "./common/Section";
 import { FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";

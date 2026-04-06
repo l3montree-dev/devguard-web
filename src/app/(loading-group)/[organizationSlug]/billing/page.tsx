@@ -9,7 +9,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import ProductManagement from "@/components/billling/ProductManagement";
 import Products from "@/components/billling/ProductsList";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { ProductsData } from "@/types/api/billing";
+import type { ProductsData } from "@/types/api/billing";
 import Link from "next/link";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { Skeleton } from "@/components/ui/skeleton";

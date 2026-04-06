@@ -1,4 +1,4 @@
-import { AssetVersionDTO } from "@/types/api/api";
+import type { AssetVersionDTO } from "@/types/api/api";
 import { PlusCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";

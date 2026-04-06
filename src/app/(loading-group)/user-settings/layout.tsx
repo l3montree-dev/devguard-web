@@ -3,7 +3,7 @@ import React from "react";
 
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
-import { OrganizationDetailsDTO } from "../../../types/api/api";
+import type { OrganizationDetailsDTO } from "../../../types/api/api";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.

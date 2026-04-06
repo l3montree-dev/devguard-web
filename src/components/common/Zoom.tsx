@@ -1,14 +1,8 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-  type FC,
-} from "react";
+import { useEffect, useRef, useState, type FC } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { Root } from "@radix-ui/react-portal";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 

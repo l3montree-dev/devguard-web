@@ -31,12 +31,13 @@ import { useConfig } from "@/context/ConfigContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 import { AlertTriangle, ChevronDown } from "lucide-react";
-import React, { FunctionComponent, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import React, { type FunctionComponent, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
-import { AssetFormValues, createUpdateHandler } from "../AssetForm";
+import { createUpdateHandler } from "../AssetForm";
+import type { AssetFormValues } from "../AssetForm";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
 import { cn } from "@/lib/utils";

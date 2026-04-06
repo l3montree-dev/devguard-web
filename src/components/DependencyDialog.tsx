@@ -1,12 +1,5 @@
-import {
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-
+import { useCallback, useEffect, useState } from "react";
+import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import DependencyGraph from "@/components/DependencyGraph";
 import {
   Dialog,
@@ -17,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { browserApiClient } from "@/services/devGuardApi";
-import { Project, ScoreCard } from "@/types/api/api";
+import type { Project, ScoreCard } from "@/types/api/api";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -30,10 +23,8 @@ import OpenSsfDetails from "./OpenSsfDetails";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
-import {
-  convertPathsToTree,
-  ViewDependencyTreeNode,
-} from "../utils/dependencyGraphHelpers";
+import { convertPathsToTree } from "../utils/dependencyGraphHelpers";
+import type { ViewDependencyTreeNode } from "../utils/dependencyGraphHelpers";
 import { useTheme } from "next-themes";
 
 interface Props {

@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { Modify } from "../common";
+import type { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
   compliant: boolean | null;

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
-import { VexSelection } from "@/components/DependencyGraph";
+import type { VexSelection } from "@/components/DependencyGraph";
 
 interface UseCreateParams {
   activeOrgSlug: string;

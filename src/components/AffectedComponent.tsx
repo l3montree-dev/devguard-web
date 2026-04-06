@@ -1,12 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import {
+import type {
   DetailedDependencyVulnDTO,
   PURLInspectResponse,
   VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { type FunctionComponent } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Badge } from "./ui/badge";

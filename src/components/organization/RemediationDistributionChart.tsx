@@ -16,8 +16,8 @@ import {
   ChartTooltip,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { FunctionComponent } from "react";
-import { RemediationTypeUsage } from "@/types/api/api";
+import type { FunctionComponent } from "react";
+import type { RemediationTypeUsage } from "@/types/api/api";
 
 interface Props {
   distribution: RemediationTypeUsage | undefined;

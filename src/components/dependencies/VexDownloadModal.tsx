@@ -6,9 +6,10 @@ import {
   PersonStandingIcon,
 } from "lucide-react";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { toast } from "sonner";
-import { ArtifactDTO } from "../../types/api/api";
+import type { ArtifactDTO } from "../../types/api/api";
 import { SimpleArtifactSelector, useSelectArtifact } from "../ArtifactSelector";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import { Badge } from "../ui/badge";

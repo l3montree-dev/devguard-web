@@ -3,9 +3,10 @@
 
 "use client";
 
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 import { useSearchParams } from "next/navigation";
-import { FilterForm } from "@/services/filter";
+import type { FilterForm } from "@/services/filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

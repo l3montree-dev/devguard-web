@@ -19,7 +19,8 @@ import Link from "next/link";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
 
 import { Registration } from "@ory/elements-react/theme";
-import { getRegistrationFlow, OryPageParams } from "@ory/nextjs/app";
+import { getRegistrationFlow } from "@ory/nextjs/app";
+import type { OryPageParams } from "@ory/nextjs/app";
 import { oryComponentOverrides } from "../../components/ory/overrides";
 import oryConfig from "../../ory.config";
 import TermsOfUseLink from "../../components/TermsOfUseLink";

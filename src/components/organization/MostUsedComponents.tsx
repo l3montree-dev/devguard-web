@@ -1,5 +1,5 @@
-import { FunctionComponent } from "react";
-import { ComponentUsageInOrg } from "@/types/api/api";
+import type { FunctionComponent } from "react";
+import type { ComponentUsageInOrg } from "@/types/api/api";
 import {
   Card,
   CardContent,

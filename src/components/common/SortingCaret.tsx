@@ -5,7 +5,7 @@ import {
   ArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import { Arrow } from "@radix-ui/react-tooltip";
-import React, { FunctionComponent } from "react";
+import React, { type FunctionComponent } from "react";
 
 interface Props {
   sortDirection: "asc" | "desc" | false;

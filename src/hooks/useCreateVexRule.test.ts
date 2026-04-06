@@ -1,5 +1,5 @@
 import { buildVexPathPattern } from "./useCreateVexRule";
-import { VexSelection } from "@/components/DependencyGraph";
+import type { VexSelection } from "@/components/DependencyGraph";
 
 describe("buildVexPathPattern", () => {
   it("returns null for empty path", () => {

@@ -2,8 +2,8 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { Paged, VexRule } from "@/types/api/api";
-import React, { FunctionComponent, useMemo, useState } from "react";
+import type { Paged, VexRule } from "@/types/api/api";
+import React, { type FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import EmptyParty from "@/components/common/EmptyParty";
@@ -22,11 +22,8 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import useTable from "@/hooks/useTable";
 import { classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";

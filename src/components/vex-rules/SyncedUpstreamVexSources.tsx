@@ -1,4 +1,5 @@
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Collapsible,
@@ -20,7 +21,7 @@ import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
-import { ExternalReference } from "@/types/api/api";
+import type { ExternalReference } from "@/types/api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SyncedUpstreamVexSources: FunctionComponent = () => {

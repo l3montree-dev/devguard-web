@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { VulnDistributionInStructure } from "@/types/api/api";
+import type { VulnDistributionInStructure } from "@/types/api/api";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
 import { truncateMiddle } from "@/utils/common";
 import { useActiveOrg } from "@/hooks/useActiveOrg";

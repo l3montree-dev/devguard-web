@@ -12,7 +12,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import {
   Card,
   CardContent,
@@ -43,7 +44,7 @@ import VulnEventItem from "../../../../../../../../../components/VulnEventItem";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
-import {
+import type {
   AllAverageFixingTimes,
   ComponentRisk,
   LicenseResponse,
@@ -54,7 +55,6 @@ import {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
-
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();

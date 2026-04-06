@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Config } from "@/types/common";
+import type { Config } from "@/types/common";
 import { CrownIcon } from "lucide-react";
 import { ImageZoom } from "../../common/Zoom";
 import DevguardTokenCard from "../../DevguardTokenCard";

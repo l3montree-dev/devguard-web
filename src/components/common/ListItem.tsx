@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactNode, type JSX } from "react";
+import React, { type FunctionComponent, type ReactNode, type JSX } from "react";
 import {
   Card,
   CardContent,

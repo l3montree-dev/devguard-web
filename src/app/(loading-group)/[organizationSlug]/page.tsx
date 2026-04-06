@@ -17,21 +17,16 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../services/devGuardApi";
-import { Paged, ProjectDTO, UserRole } from "../../../types/api/api";
-import { CreateProjectReq } from "../../../types/api/req";
+import { UserRole } from "../../../types/api/api";
+import type { Paged, ProjectDTO } from "../../../types/api/api";
+import type { CreateProjectReq } from "../../../types/api/req";
 
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";

@@ -2,10 +2,10 @@
 
 import Page from "@/components/Page";
 
-import { PolicyEvaluation } from "@/types/api/api";
+import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import Markdown from "react-markdown";
 
 import AssetTitle from "@/components/common/AssetTitle";

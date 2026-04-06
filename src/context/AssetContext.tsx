@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useContext } from "react";
-import { AssetDTO } from "../types/api/api";
-import { NoopUpdater, WithUpdater } from "./ClientContextWrapper";
+import type { AssetDTO } from "../types/api/api";
+import { NoopUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "./ClientContextWrapper";
 
 const AssetContext = createContext<WithUpdater<AssetDTO | null>>({
   v: null,

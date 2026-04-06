@@ -1,16 +1,13 @@
 "use client";
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
 
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
-import {
-  ProjectDTO,
-  UserRole,
-  WebhookDTO,
-} from "../../../../../../types/api/api";
-
+import { UserRole } from "../../../../../../types/api/api";
+import type { ProjectDTO, WebhookDTO } from "../../../../../../types/api/api";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

@@ -29,11 +29,11 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useCreateVexRule } from "@/hooks/useCreateVexRule";
-import {
+import { RequirementsLevel } from "@/types/api/api";
+import type {
   AssetDTO,
   DependencyVulnHints,
   DetailedDependencyVulnDTO,
-  RequirementsLevel,
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
@@ -46,7 +46,6 @@ import {
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { Bug, CheckCircleIcon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -54,7 +53,8 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FunctionComponent, ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -76,10 +76,8 @@ import { Skeleton } from "../../../../../../../../../../../components/ui/skeleto
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import {
-  convertPathsToTree,
-  ViewDependencyTreeNode,
-} from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
 import { useSession } from "@/context/SessionContext";
 

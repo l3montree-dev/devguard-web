@@ -18,7 +18,8 @@ import Link from "next/link";
 
 import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
 import { Recovery } from "@ory/elements-react/theme";
-import { getRecoveryFlow, OryPageParams } from "@ory/nextjs/app";
+import { getRecoveryFlow } from "@ory/nextjs/app";
+import type { OryPageParams } from "@ory/nextjs/app";
 import Image from "next/image";
 import { Button } from "../../components/ui/button";
 import {

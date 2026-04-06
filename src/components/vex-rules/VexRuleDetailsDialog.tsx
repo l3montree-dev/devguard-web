@@ -1,5 +1,6 @@
-import { VexRule } from "@/types/api/api";
-import { FunctionComponent, useMemo, useState } from "react";
+import type { VexRule } from "@/types/api/api";
+import { useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,

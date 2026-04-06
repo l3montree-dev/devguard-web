@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { AssetDTO } from "../types/api/api";
+import type { AssetDTO } from "../types/api/api";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { browserApiClient } from "../services/devGuardApi";
 import { convertRepos } from "./useRepositorySearch";
 import { toast } from "sonner";
-import { ExternalTicketProvider } from "../types/common";
+import type { ExternalTicketProvider } from "../types/common";
 
 export default function useRepositoryConnection() {
   const activeOrg = useActiveOrg();

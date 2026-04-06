@@ -1,4 +1,4 @@
-import React, { FunctionComponent, PropsWithChildren } from "react";
+import React, { type FunctionComponent, type PropsWithChildren } from "react";
 import {
   AlertDialog,
   AlertDialogAction,

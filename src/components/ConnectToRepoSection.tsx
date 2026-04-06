@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { type FunctionComponent, useState } from "react";
 import Section from "./common/Section";
 import ListItem from "./common/ListItem";
 import { Button, buttonVariants } from "./ui/button";

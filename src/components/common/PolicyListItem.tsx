@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Policy } from "../../types/api/api";
+import type { Policy } from "../../types/api/api";
 import {
   DropdownMenu,
   DropdownMenuContent,

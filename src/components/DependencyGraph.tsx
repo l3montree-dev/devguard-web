@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { DependencyVuln, VexRule } from "@/types/api/api";
+import type { DependencyVuln, VexRule } from "@/types/api/api";
 
 import { beautifyPurl, classNames } from "@/utils/common";
 
@@ -22,14 +22,8 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { FunctionComponent } from "react";
 
 // or if you just want basic styles
 import {
@@ -48,8 +42,8 @@ import {
   propagateHighlighting,
   traverseDownward,
   traverseUpward,
-  ViewDependencyTreeNode,
 } from "../utils/dependencyGraphHelpers";
+import type { ViewDependencyTreeNode } from "../utils/dependencyGraphHelpers";
 import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
 import { Button } from "./ui/button";
 import {

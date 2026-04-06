@@ -1,4 +1,4 @@
-import { ExternalTicketProvider } from "@/types/common";
+import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
 
 export default function ProviderTitleIcon({

@@ -1,6 +1,7 @@
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import Link from "next/link";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {

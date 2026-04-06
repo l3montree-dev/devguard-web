@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { OrganizationDetailsDTO } from "../types/api/api";
-import { WithUpdater } from "./ClientContextWrapper";
-import { ContentTreeElement } from "../utils/view";
+import type { OrganizationDetailsDTO } from "../types/api/api";
+import type { WithUpdater } from "./ClientContextWrapper";
+import type { ContentTreeElement } from "../utils/view";
 
 const OrganizationContext = createContext<
   WithUpdater<{

@@ -2,7 +2,8 @@ import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { CarouselApi, CarouselItem } from "@/components/ui/carousel";
+import { CarouselItem } from "@/components/ui/carousel";
+import type { CarouselApi } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
@@ -11,10 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ExternalTicketProvider,
-  ExternalTicketProviderNames,
-} from "@/types/common";
+import { ExternalTicketProviderNames } from "@/types/common";
+import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "../ProviderSetup";
 import { useEffect } from "react";

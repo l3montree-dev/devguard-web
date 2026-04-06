@@ -1,6 +1,6 @@
 "use client";
 import Page from "@/components/Page";
-import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
+import AssetForm, { type AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { InputWithButton } from "@/components/ui/input-with-button";
@@ -12,7 +12,8 @@ import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -23,7 +24,8 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { AssetDTO, UserRole } from "../../../../../../../../types/api/api";
+import { UserRole } from "../../../../../../../../types/api/api";
+import type { AssetDTO } from "../../../../../../../../types/api/api";
 import {
   generateNewSecret,
   getParentRepositoryIdAndName,

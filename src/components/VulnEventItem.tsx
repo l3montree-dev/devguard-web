@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from "react";
-import { VulnEventDTO } from "../types/api/api";
+import React, { type FunctionComponent } from "react";
+import type { VulnEventDTO } from "../types/api/api";
 import {
   defaultScanner,
   eventMessages,

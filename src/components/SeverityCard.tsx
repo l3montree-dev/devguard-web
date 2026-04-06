@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useActiveOrg } from "../hooks/useActiveOrg";

@@ -1,4 +1,5 @@
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,7 @@ import {
 } from "./ui/dialog";
 
 import { browserApiClient } from "@/services/devGuardApi";
-import { InviteRequest } from "@/types/api/api";
+import type { InviteRequest } from "@/types/api/api";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Callout from "./common/Callout";

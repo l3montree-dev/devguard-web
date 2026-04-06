@@ -20,7 +20,7 @@
     "skipLibCheck": true,
     "strict": true,
     "noImplicitOverride": true,
-    "noUncheckedSideEffectImports": true,
+    "noUncheckedSideEffectImports": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,

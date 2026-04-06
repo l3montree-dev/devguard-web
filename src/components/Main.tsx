@@ -16,7 +16,7 @@ import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
-import React, { FunctionComponent } from "react";
+import React, { type FunctionComponent } from "react";
 import { documentationLinks } from "@/const/documentationLinks";
 
 import { useConfig } from "../context/ConfigContext";

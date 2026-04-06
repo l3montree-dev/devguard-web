@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import React, { FunctionComponent, PropsWithChildren } from "react";
+import React, { type FunctionComponent, type PropsWithChildren } from "react";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -16,8 +16,9 @@ import {
   ChartTooltip,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { FunctionComponent, useMemo } from "react";
-import { EcosystemUsageInOrg } from "@/types/api/api";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
+import type { EcosystemUsageInOrg } from "@/types/api/api";
 
 interface Props {
   ecosystems: EcosystemUsageInOrg[];

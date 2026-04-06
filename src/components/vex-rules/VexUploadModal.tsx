@@ -1,6 +1,7 @@
 "use client";
 
-import { FunctionComponent, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +38,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
-import { ExternalReference } from "@/types/api/api";
+import type { ExternalReference } from "@/types/api/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,12 +48,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "../FileUpload";
 import AutoHeight from "embla-carousel-auto-height";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from "../ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
+import type { CarouselApi } from "../ui/carousel";
 import Fade from "embla-carousel-fade";
 
 interface VexUploadModalProps {

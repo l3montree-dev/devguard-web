@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
 import CopyCode from "../../common/CopyCode";
 import PatSection from "../../PatSection";

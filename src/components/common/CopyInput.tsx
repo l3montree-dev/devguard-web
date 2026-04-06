@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Copy } from "lucide-react";

@@ -34,7 +34,7 @@ import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import { useSession } from "../../../../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
-import { AssetVersionDTO } from "../../../../../../../../types/api/api";
+import type { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";

@@ -21,9 +21,11 @@ import {
 } from "@/components/ui/form";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { FunctionComponent, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { AssetFormValues, createUpdateHandler } from "../AssetForm";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { createUpdateHandler } from "../AssetForm";
+import type { AssetFormValues } from "../AssetForm";
 import { Settings2 } from "lucide-react";
 
 interface Props {
