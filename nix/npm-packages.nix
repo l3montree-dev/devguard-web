@@ -13,9 +13,6 @@
 
   tarballs = pkgs.lib.mapAttrs fetchTarball packages;
 
-  stripPrefix = path:
-    pkgs.lib.removePrefix "node_modules/" path;
-
   node_modules = pkgs.runCommand "node-modules" {
     nativeBuildInputs = [ pkgs.nodejs_24 ];
   } ''
