@@ -1,0 +1,46 @@
+# DevSecOps Workflow Definition
+# This workflow is triggered on every push to the repository
+name: DevGuard-Web-Workflow
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  code-scanning:
+    uses: l3montree-dev/devguard-action/.github/workflows/code-scanning.yml@nix
+    permissions:
+      contents: read
+      security-events: write
+    with:
+      asset-name: l3montree-cybersecurity/projects/devguard/assets/devguard-web
+      api-url: https://api.main.devguard.org
+      fail-on-risk: high
+      fail-on-cvss: high
+      web-ui: https://main.devguard.org
+      continue-on-open-code-risk: true
+    secrets:
+      devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
+
+  web-pipeline:
+    uses: l3montree-dev/devguard-action/.github/workflows/full-nix.yml@nix
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    with:
+      nix-target-amd64: devguard-web-amd64
+      nix-target-arm64: devguard-web-arm64
+      nix-version: '2.34.4'
+      image-name: ghcr.io/${{ github.repository }}
+      asset-name: l3montree-cybersecurity/projects/devguard/assets/devguard-web
+      api-url: https://api.main.devguard.org
+      web-ui: https://main.devguard.org
+      fail-on-cvss: high
+      fail-on-risk: high
+      nix-cache-substituter: https://nix.garage.l3montree.cloud
+      nix-cache-public-key: nix.garage.l3montree.cloud:MGlzfPQKA91/zxw91CN+GP7NpjAAwmKvWXlDYgeeI8k=
+      nix-cache-s3-bucket: nix
+      nix-cache-region: garage
+    secrets:
+      devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
