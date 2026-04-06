@@ -209,6 +209,7 @@ export interface DependencyVuln extends BaseVulnDTO {
   rawRiskAssessment: number;
   riskRecalculatedAt: string;
   componentFixedVersion: string | null;
+  directDependencyFixedVersion: string | null;
   componentPurl: string;
   vulnerabilityPath: string[];
 }

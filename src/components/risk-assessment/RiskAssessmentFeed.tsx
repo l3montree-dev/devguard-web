@@ -92,6 +92,12 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   }
 }
 
+function hasQuickfix(
+  directDependencyFixedVersion: string | null | undefined,
+): boolean {
+  return !!directDependencyFixedVersion;
+}
+
 const RiskFeedItem = ({
   event,
   events,
@@ -104,6 +110,7 @@ const RiskFeedItem = ({
   vulnerabilityName,
   deleteEvent,
   page,
+  directDependencyFixedVersion,
 }: {
   event: VulnEventDTO;
   events: VulnEventDTO[];
@@ -116,6 +123,7 @@ const RiskFeedItem = ({
   vulnerabilityName: string;
   deleteEvent?: (eventId: string) => void;
   page: number;
+  directDependencyFixedVersion?: string | null;
 }) => {
   const user = findUser(event.userId, org, currentUser);
 
@@ -132,7 +140,9 @@ const RiskFeedItem = ({
     >
       <div
         className={classNames(
-          event.createdByVexRule ? "border-dashed border" : "",
+          event.createdByVexRule || hasQuickfix(directDependencyFixedVersion)
+            ? "border-dashed border"
+            : "",
           "absolute left-[13px] h-full border-l border-r -bottom-[35px]",
         )}
       />
@@ -254,11 +264,13 @@ export default function RiskAssessmentFeed({
   vulnerabilityName,
   page,
   deleteEvent,
+  directDependencyFixedVersion,
 }: {
   events: VulnEventDTO[];
   vulnerabilityName: string;
   page: string;
   deleteEvent: (eventId: string) => Promise<void>;
+  directDependencyFixedVersion?: string | null;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -334,6 +346,9 @@ export default function RiskAssessmentFeed({
                       key={event.id}
                       event={event}
                       events={events}
+                      directDependencyFixedVersion={
+                        directDependencyFixedVersion
+                      }
                     />
                   );
                 })}
@@ -359,6 +374,7 @@ export default function RiskAssessmentFeed({
                   key={event.id}
                   event={event}
                   events={events}
+                  directDependencyFixedVersion={directDependencyFixedVersion}
                 />
               );
             })}
