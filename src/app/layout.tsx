@@ -2,7 +2,7 @@ import "@/styles/tailwind.scss";
 import "focus-visible";
 
 import { ThemeProvider } from "next-themes";
-import { Inter, Lexend, Merriweather } from "next/font/google";
+import localFont from "next/font/local";
 import React from "react";
 import { Toaster } from "sonner";
 import { config } from "../config";
@@ -14,23 +14,16 @@ import { fetchSession } from "../data-fetcher/fetchSession";
 import type { OrganizationDTO } from "../types/api/api";
 import InternalServerErrorPage from "./error";
 
-export const lexend = Lexend({
-  subsets: ["latin"],
+export const lexend = localFont({
+  src: "../../public/fonts/Lexend/Lexend-VariableFont_wght.ttf",
   display: "swap",
   variable: "--font-lexend",
 });
 
-export const inter = Inter({
-  subsets: ["latin"],
+export const inter = localFont({
+  src: "../../public/fonts/Inter-VariableFont_opsz,wght.ttf",
   display: "swap",
   variable: "--font-inter",
-});
-
-export const merriweather = Merriweather({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-merriweather",
-  weight: "700",
 });
 
 export default async function RootLayout({
@@ -61,12 +54,7 @@ export default async function RootLayout({
         <body
           suppressHydrationWarning
           className={
-            "flex min-h-full flex-col " +
-            inter.variable +
-            " " +
-            lexend.variable +
-            " " +
-            merriweather.variable
+            "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
           }
         >
           {config.themeCssUrl && (
@@ -112,12 +100,7 @@ export default async function RootLayout({
         <body
           suppressHydrationWarning
           className={
-            "flex min-h-full flex-col " +
-            inter.variable +
-            " " +
-            lexend.variable +
-            " " +
-            merriweather.variable
+            "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
           }
         >
           <ThemeProvider
