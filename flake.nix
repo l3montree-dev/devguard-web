@@ -13,6 +13,10 @@
         pkgs = nixpkgs.legacyPackages.${system};
         sbomnixPkgs = sbomnix.packages.${system};
         npmPackages = (import ./nix/npm-packages.nix { inherit pkgs; });
+        pkgsLinuxAmd64 = nixpkgs.legacyPackages.x86_64-linux;
+        pkgsLinuxArm64 = nixpkgs.legacyPackages.aarch64-linux;
+        nodejs = import ./nix/nodejs.nix { inherit pkgs pkgsLinuxAmd64 pkgsLinuxArm64; };
+        nodejsLinuxLibs = nodejs.linuxLibs;
 
         devguardWeb = pkgs.stdenv.mkDerivation {
           name = "devguard-web";
@@ -30,7 +34,7 @@
               ./sentry.server.config.ts
             ];
           };
-          nativeBuildInputs = [ pkgs.nodejs_24 pkgs.cacert ];
+          nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
             cp -r ${npmPackages.node_modules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
@@ -43,14 +47,13 @@
           '';
         };
 
-        # Use native pkgs when host matches target for cache hits; fall back to pkgsCross.
-        amd64Pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        arm64Pkgs = nixpkgs.legacyPackages.aarch64-linux;
+        nodejsLinuxAmd64 = nodejs.x86_64-linux;
+        nodejsLinuxArm64 = nodejs.aarch64-linux;
 
-        mkDevguardWebOCI = nodePkgs: pkgs.dockerTools.buildLayeredImage {
+        mkDevguardWebOCI = linuxPkgs: node: pkgs.dockerTools.buildLayeredImage {
           name = "devguard-web-oci";
           tag = "latest";
-          contents = [ nodePkgs.nodejs_24 nodePkgs.cacert ];
+          contents = [ node pkgs.cacert ] ++ (nodejsLinuxLibs linuxPkgs);
           fakeRootCommands = ''
             # Copy standalone output to /app (outside Nix store) so Next.js
             # can write its cache at runtime. The Nix store is read-only.
@@ -60,7 +63,7 @@
             chown -R 53111:53111 app
           '';
           config = {
-            Cmd = [ "${nodePkgs.nodejs_24}/bin/node" "/app/server.js" ];
+            Cmd = [ "${node}/bin/node" "/app/server.js" ];
             User = "53111:53111";
             Expose = [ "3000" ];
           };
@@ -69,8 +72,8 @@
       {
         packages.default = devguardWeb;
         packages.node_modules = npmPackages.node_modules;
-        packages."devguard-web-amd64" = mkDevguardWebOCI amd64Pkgs;
-        packages."devguard-web-arm64" = mkDevguardWebOCI arm64Pkgs;
+        packages."devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
+        packages."devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64 nodejsLinuxArm64;
       }
     );
 }
