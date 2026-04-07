@@ -70,10 +70,13 @@
         };
       in
       {
-        packages.default = devguardWeb;
-        packages.node_modules = npmPackages.node_modules;
-        packages."devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
-        packages."devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64 nodejsLinuxArm64;
+        packages = {
+          default = devguardWeb;
+          node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).node_modules;
+          node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).node_modules;
+          "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
+          "devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64 nodejsLinuxArm64;
+        };
       }
     );
 }
