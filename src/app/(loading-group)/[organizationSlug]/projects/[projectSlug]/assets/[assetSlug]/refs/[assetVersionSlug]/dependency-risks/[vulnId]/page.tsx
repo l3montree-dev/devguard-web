@@ -336,10 +336,10 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
-  // Fetch VEX rules for the current CVE to show FP edges in the graph
+  // Fetch VEX rules for the current vulnerability to show FP edges in the graph
   const { data: vexRulesData, mutate: mutateVexRules } = useSWR<VexRule[]>(
     vuln
-      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?vulnId=${encodeURIComponent(vuln.id)}`
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
       : null,
     fetcher,
   );
