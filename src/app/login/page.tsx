@@ -18,7 +18,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Login } from "@ory/elements-react/theme";
-import { getLoginFlow, OryPageParams } from "@ory/nextjs/app";
+import { getLoginFlow } from "@ory/nextjs/app";
+import type { OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "../../ory.config";
 import { config } from "../../config";
 import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";

@@ -20,6 +20,7 @@ const nextConfig = {
       istextorbinary: "./src/lib/istextorbinary-wrapper.js",
     },
   },
+  output: "standalone",
   webpack: (config) => {
     // this will override the experiments
     config.experiments = { ...config.experiments, topLevelAwait: true };

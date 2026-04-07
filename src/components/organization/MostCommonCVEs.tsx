@@ -1,5 +1,5 @@
-import { FunctionComponent } from "react";
-import { CVEOccurrenceInOrg } from "@/types/api/api";
+import type { FunctionComponent } from "react";
+import type { CVEOccurrenceInOrg } from "@/types/api/api";
 import {
   Card,
   CardContent,

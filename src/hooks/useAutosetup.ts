@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 
 import { browserApiClient } from "@/services/devGuardApi";
-import { PatWithPrivKey } from "@/types/api/api";
+import type { PatWithPrivKey } from "@/types/api/api";
 import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";

@@ -1,6 +1,7 @@
-import { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
+import type { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { FunctionComponent, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import type { FunctionComponent } from "react";
 import styles from "../../styles/mdxeditor.module.scss";
 
 import {

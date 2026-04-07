@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 import Head from "next/head";
-import React, { PropsWithChildren, useState } from "react";
+import React, { type PropsWithChildren, useState } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import { Toaster } from "./ui/sonner";

@@ -1,14 +1,15 @@
 // Copyright 2025 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { integrationSnippets } from "../../../integrationSnippets";
-import {
+import type {
   AssetDTO,
   OrganizationDetailsDTO,
   ProjectDTO,
 } from "../../../types/api/api";
-import { Config, GitInstances } from "../../../types/common";
+import { GitInstances } from "../../../types/common";
+import { type Config } from "../../../types/common";
 import CopyCode, { CopyCodeFragment } from "../../common/CopyCode";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";

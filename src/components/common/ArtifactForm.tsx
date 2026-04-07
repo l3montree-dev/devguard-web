@@ -1,10 +1,11 @@
 // Copyright 2025 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { Button } from "../ui/button";
 import {
   FormControl,

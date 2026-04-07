@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 import {
   Card,
@@ -9,7 +9,7 @@ import {
 } from "./ui/card";
 import { classNames, getHumanReadableDuration } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
-import { AverageFixingTime } from "../types/api/api";
+import type { AverageFixingTime } from "../types/api/api";
 import { Skeleton } from "./ui/skeleton";
 
 interface Props {

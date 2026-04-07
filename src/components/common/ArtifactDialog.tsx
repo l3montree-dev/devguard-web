@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArtifactCreateUpdateRequest } from "@/types/api/api";
-import { UseFormReturn } from "react-hook-form";
+import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import type { UseFormReturn } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import ArtifactForm from "./ArtifactForm";

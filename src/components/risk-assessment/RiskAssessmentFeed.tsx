@@ -19,7 +19,8 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
-import { UserRole, VulnEventDTO } from "@/types/api/api";
+import { UserRole } from "@/types/api/api";
+import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,

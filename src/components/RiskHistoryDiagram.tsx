@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { RiskHistory } from "@/types/api/api";
+import type { RiskHistory } from "@/types/api/api";
 import { generateColor } from "@/utils/view";
 import { useMemo } from "react";
 import {

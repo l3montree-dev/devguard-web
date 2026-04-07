@@ -2,7 +2,8 @@
 
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { yaml } from "@codemirror/lang-yaml";
-import { Diagnostic, linter, lintGutter } from "@codemirror/lint";
+import { linter, lintGutter } from "@codemirror/lint";
+import type { Diagnostic } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
 import { EditorView, basicSetup } from "codemirror";

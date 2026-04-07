@@ -5,7 +5,7 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { cn } from "@/lib/utils";
 import { BarsArrowDownIcon, BarsArrowUpIcon } from "@heroicons/react/20/solid";
 import { useSearchParams } from "next/navigation";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,

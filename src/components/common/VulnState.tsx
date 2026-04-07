@@ -5,9 +5,9 @@ import {
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
-import { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
+import type { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
 import { Scale, Bug } from "lucide-react";
 import { evTypeBackground } from "@/utils/view";
 

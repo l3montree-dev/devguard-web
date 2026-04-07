@@ -15,7 +15,7 @@
 
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 export const LoadMoreNode: FunctionComponent<{
   data: {
@@ -54,7 +54,7 @@ export const LoadMoreNode: FunctionComponent<{
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
-import { DependencyVuln } from "../types/api/api";
+import type { DependencyVuln } from "../types/api/api";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
 

@@ -15,7 +15,7 @@
 import { allowedActionsCheck, classNames } from "@/utils/common";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { buttonVariants } from "./ui/button";

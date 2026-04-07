@@ -1,4 +1,4 @@
-import { ProductsData } from "@/types/api/billing";
+import type { ProductsData } from "@/types/api/billing";
 
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { classNames } from "@/utils/common";

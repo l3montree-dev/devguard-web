@@ -3,7 +3,8 @@
 
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import Image from "next/image";
 
 import {

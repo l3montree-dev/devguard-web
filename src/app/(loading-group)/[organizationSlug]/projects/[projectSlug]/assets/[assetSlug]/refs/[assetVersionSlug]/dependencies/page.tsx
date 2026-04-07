@@ -27,7 +27,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
-import {
+import type {
   Component,
   ComponentPaged,
   License,
@@ -48,11 +48,8 @@ import {
   ScaleIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import "@xyflow/react/dist/style.css";
 import {
   ChevronDownIcon,
@@ -63,7 +60,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";

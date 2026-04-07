@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import { Policy } from "../types/api/api";
+import type { Policy } from "../types/api/api";
 import Callout from "./common/Callout";
 import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
 import FileUpload from "./FileUpload";

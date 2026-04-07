@@ -7,16 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
-import { Paged, ProjectDependency } from "@/types/api/api";
+import type { Paged, ProjectDependency } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import useSWR from "swr";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import { fetcher } from "../../../../../../data-fetcher/fetcher";

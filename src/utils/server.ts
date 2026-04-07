@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 
 import {
-  AssetDTO,
-  AssetVersionDTO,
-  ProjectDTO,
-  RiskHistory,
+  type AssetDTO,
+  type AssetVersionDTO,
+  type ProjectDTO,
+  type RiskHistory,
 } from "@/types/api/api";
-
 type RiskHistoryEl = {
   riskHistory: RiskHistory[];
 } & (

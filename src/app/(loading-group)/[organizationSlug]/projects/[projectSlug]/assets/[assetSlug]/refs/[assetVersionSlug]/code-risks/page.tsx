@@ -5,14 +5,12 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 
 import Page from "@/components/Page";
-import { FirstPartyVuln, Paged } from "@/types/api/api";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import type { FirstPartyVuln, Paged } from "@/types/api/api";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 
 import { classNames } from "@/utils/common";
 

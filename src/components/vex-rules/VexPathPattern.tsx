@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { beautifyPurl, extractVersion } from "@/utils/common";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 interface VexPathPatternProps {
   pathPattern: string[];

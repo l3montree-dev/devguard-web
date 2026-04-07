@@ -1,5 +1,5 @@
-import { JiraIntegrationDTO } from "@/types/api/api";
-import React, { FunctionComponent, ReactNode } from "react";
+import type { JiraIntegrationDTO } from "@/types/api/api";
+import React, { type FunctionComponent, type ReactNode } from "react";
 import {
   Dialog,
   DialogContent,

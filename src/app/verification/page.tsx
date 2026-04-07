@@ -16,7 +16,8 @@ import Head from "next/head";
 
 import ThreeJSFeatureScreen from "@/components/threejs/ThreeJSFeatureScreen";
 import { Verification } from "@ory/elements-react/theme";
-import { getVerificationFlow, OryPageParams } from "@ory/nextjs/app";
+import { getVerificationFlow } from "@ory/nextjs/app";
+import type { OryPageParams } from "@ory/nextjs/app";
 import Image from "next/image";
 import oryConfig from "../../ory.config";
 import { oryComponentOverrides } from "../../components/ory/overrides";

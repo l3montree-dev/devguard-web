@@ -15,7 +15,8 @@
 
 import { CopyIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 

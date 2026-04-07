@@ -1,8 +1,9 @@
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import useDecodedPathname from "../hooks/useDecodedPathname";
-import { PolicyEvaluation } from "../types/api/api";
+import type { PolicyEvaluation } from "../types/api/api";
 import { classNames } from "../utils/common";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";

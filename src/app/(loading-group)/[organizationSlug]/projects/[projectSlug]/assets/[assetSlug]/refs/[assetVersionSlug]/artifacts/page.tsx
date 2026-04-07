@@ -11,7 +11,7 @@ import { documentationLinks } from "@/const/documentationLinks";
 import { useSession } from "@/context/SessionContext";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
-import {
+import type {
   ArtifactCreateUpdateRequest,
   ArtifactDTO,
   ExternalReferenceErrorDTO,

@@ -15,9 +15,9 @@
 
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
-  DependencyTreeNode,
-  DependencyVuln,
-  MinimalDependencyTree,
+  type DependencyTreeNode,
+  type DependencyVuln,
+  type MinimalDependencyTree,
 } from "../types/api/api";
 // Pagination settings
 export const MAX_CHILDREN_PER_PAGE = 50;

@@ -1,6 +1,6 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
-import { DetailedDependencyVulnDTO } from "@/types/api/api";
+import type { DetailedDependencyVulnDTO } from "@/types/api/api";
 import { getEcosystem } from "@/utils/common";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";

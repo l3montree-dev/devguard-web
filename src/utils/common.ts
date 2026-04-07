@@ -13,9 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { State } from "@/types/common";
+import type { State } from "@/types/common";
 import { defaultScanner } from "./view";
-import { DependencyVuln, UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/api/api";
+import type { DependencyVuln } from "@/types/api/api";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");

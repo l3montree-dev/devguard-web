@@ -1,7 +1,9 @@
-import { VexRule } from "@/types/api/api";
+import type { VexRule } from "@/types/api/api";
 import { classNames } from "@/utils/common";
-import { Row, flexRender } from "@tanstack/react-table";
-import { FunctionComponent, useState } from "react";
+import { flexRender } from "@tanstack/react-table";
+import type { Row } from "@tanstack/react-table";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";

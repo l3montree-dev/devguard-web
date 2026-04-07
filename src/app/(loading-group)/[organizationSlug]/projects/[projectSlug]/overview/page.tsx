@@ -41,7 +41,7 @@ import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
-import {
+import type {
   AllAverageFixingTimes,
   AverageFixingTime,
   Paged,

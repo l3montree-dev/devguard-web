@@ -1,10 +1,10 @@
 "use client";
 
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import Page from "@/components/Page";
 import { useViewMode } from "@/hooks/useViewMode";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
+import type { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
 import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";

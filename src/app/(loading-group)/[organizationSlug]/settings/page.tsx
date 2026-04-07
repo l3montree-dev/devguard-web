@@ -41,11 +41,11 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { browserApiClient } from "@/services/devGuardApi";
-import {
+import { UserRole } from "@/types/api/api";
+import type {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
-  UserRole,
   WebhookDTO,
 } from "@/types/api/api";
 import Image from "next/image";

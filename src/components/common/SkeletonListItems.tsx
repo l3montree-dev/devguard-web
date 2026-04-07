@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import SkeletonListItem from "./SkeletonListItem";
 
 interface Props {}

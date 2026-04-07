@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { ReleaseRiskHistory } from "@/types/api/api";
+import type { ReleaseRiskHistory } from "@/types/api/api";
 import {
   Area,
   AreaChart,

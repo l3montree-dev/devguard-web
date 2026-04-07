@@ -12,20 +12,19 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import {
+import { UpstreamState } from "@/types/api/api";
+import type {
   AssetDTO,
   ComponentRisk,
   OrganizationDetailsDTO,
   ProjectDTO,
   ReleaseRiskHistory,
   RiskHistory,
-  UpstreamState,
   VulnEventDTO,
 } from "@/types/api/api";
-import { Identity } from "@ory/client-fetch";
+import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import { config } from "../config";
-
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
     case "mitigate":

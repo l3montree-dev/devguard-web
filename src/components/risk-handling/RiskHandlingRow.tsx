@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   beautifyPurl,
   classNames,
@@ -21,9 +21,9 @@ import {
   stateLabels,
 } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { Row } from "@tanstack/react-table";
+import type { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
-import React, { FunctionComponent, useMemo, useState } from "react";
+import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import Severity from "../common/Severity";
 import { Badge } from "../ui/badge";

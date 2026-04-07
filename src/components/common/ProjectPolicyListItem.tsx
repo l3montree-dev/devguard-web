@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Policy, UserRole } from "../../types/api/api";
+import { UserRole } from "../../types/api/api";
+import type { Policy } from "../../types/api/api";
 import ListItem from "./ListItem";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";

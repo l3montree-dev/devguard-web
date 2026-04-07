@@ -9,7 +9,7 @@ import Markdown from "react-markdown";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
-  AssetFormValues,
+  type AssetFormValues,
 } from "../../../../../components/asset/AssetForm";
 import AssetOverviewListItem from "../../../../../components/AssetOverviewListItem";
 import Avatar from "../../../../../components/Avatar";
@@ -40,15 +40,13 @@ import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
 import { useSession } from "../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../services/devGuardApi";
-import {
+import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
+import type {
   AssetDTO,
   EnvDTO,
   Paged,
   ProjectDTO,
-  RequirementsLevel,
-  UserRole,
 } from "../../../../../types/api/api";
-
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { debounce } from "lodash";

@@ -27,23 +27,15 @@ import {
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
-import { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import Filter from "@/components/Filter";

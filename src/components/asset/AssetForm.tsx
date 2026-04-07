@@ -1,10 +1,12 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { FunctionComponent, useState } from "react";
-import { AssetDTO, UserRole } from "@/types/api/api";
-import { Modify } from "@/types/common";
-import { UseFormReturn } from "react-hook-form";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
+import { UserRole } from "@/types/api/api";
+import type { AssetDTO } from "@/types/api/api";
+import type { Modify } from "@/types/common";
+import type { UseFormReturn } from "react-hook-form";
 import Section from "../common/Section";
 import React from "react";
 import ConnectToRepoSection from "../ConnectToRepoSection";

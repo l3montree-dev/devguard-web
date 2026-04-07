@@ -17,7 +17,8 @@ import {
 } from "@ory/elements-react";
 import { DefaultCardFooter } from "@ory/elements-react/theme";
 import Image from "next/image";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { PropsWithChildren } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import Section from "../common/Section";

@@ -1,27 +1,26 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import {
+import type {
   DetailedDependencyVulnDTO,
   PURLInspectResponse,
-  VulnInPackage,
 } from "@/types/api/api";
-import { FunctionComponent, useMemo } from "react";
-import EcosystemImage from "./common/EcosystemImage";
 import { beautifyPurl, extractVersion } from "@/utils/common";
+import { useMemo, type FunctionComponent } from "react";
+import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
 
-import Image from "next/image";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { CaretDownIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 import Link from "next/link";
+import useSWR from "swr";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import { CaretDownIcon } from "@radix-ui/react-icons";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;

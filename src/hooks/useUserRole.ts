@@ -1,8 +1,9 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { OrganizationDetailsDTO, ProjectDTO, UserRole } from "@/types/api/api";
-import { User } from "@/types/auth";
+import { UserRole } from "@/types/api/api";
+import type { OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
+import type { User } from "@/types/auth";
 import { useMemo } from "react";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
