@@ -24,10 +24,11 @@
     '') tarballs)}
   '';
 
-  patchedNodeModules = pkgs.runCommand "node-modules" {
+  patchedNodeModules = pkgs.runCommand "node-modules-patched" {
     nativeBuildInputs = [ pkgs.nodejs_24 ];
   } ''
     echo "applying patches..."
+    mkdir -p $out
     cp -r ${node_modules}/* $out/
     cd $out
     cp ${../package.json} package.json
