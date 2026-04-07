@@ -131,8 +131,7 @@ export const eventTypeMessages = (
         "detected " +
         flawName +
         " with a risk of " +
-        event.arbitraryJSONData.risk +
-        " "
+        event.arbitraryJSONData.risk
       );
     case "falsePositive":
       return "marked " + flawName + " as false positive ";
