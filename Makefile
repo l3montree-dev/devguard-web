@@ -7,6 +7,5 @@ nix-cache-push::
 	@echo "Building node_modules..."
 	nix build --no-link .#node_modules
 	@echo "Pushing closure to S3 cache..."
-	nix copy \
-		$$(nix path-info -r .#node_modules) \
-		--to 's3://$(NIX_CACHE_BUCKET)?endpoint=$(NIX_CACHE_ENDPOINT)&region=$(NIX_CACHE_REGION)&scheme=https&profile=garage&secret-key=$(NIX_CACHE_SECRET_KEY)'
+	nix copy .#node_modules \
+		--to 's3://$(NIX_CACHE_BUCKET)?endpoint=$(NIX_CACHE_ENDPOINT)&region=$(NIX_CACHE_REGION)&scheme=https&profile=garage&secret-key=$(NIX_CACHE_SECRET_KEY)&multipart-upload=true'
