@@ -11,21 +11,21 @@
     '';
   };
 
-  # Runs on the host stdenv (Darwin or Linux native), uses patchelf to rewrite
-  # the interpreter and RPATH to point at the target Linux store paths.
+  # Uses the target platform's runCommand so patchelf runs on the correct Linux
+  # builder (not Darwin), preserving ELF symbol versioning correctly.
   mkLinuxDerivation = { name, src, targetPkgs, interpreter }:
-    pkgs.stdenv.mkDerivation {
-      inherit name src;
-      nativeBuildInputs = [ pkgs.patchelf ];
-      installPhase = ''
-        mkdir -p $out
-        cp -r * $out/
-        patchelf \
-          --set-interpreter ${interpreter} \
-          --set-rpath ${pkgs.lib.makeLibraryPath (linuxLibs targetPkgs)} \
-          $out/bin/node
-      '';
-    };
+    targetPkgs.runCommand name {
+      inherit src;
+      nativeBuildInputs = [ targetPkgs.patchelf ];
+    } ''
+      mkdir -p $out
+      cd $out
+      tar -xzf $src --strip-components=1
+      patchelf \
+        --set-interpreter ${interpreter} \
+        --set-rpath ${pkgs.lib.makeLibraryPath (linuxLibs targetPkgs)} \
+        bin/node
+    '';
 
   aarch64-darwin = pkgs.stdenv.mkDerivation {
       name = "nodejs-25.9.0-darwin-arm64";
