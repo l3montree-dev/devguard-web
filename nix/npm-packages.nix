@@ -13,9 +13,7 @@
 
   tarballs = pkgs.lib.mapAttrs fetchTarball packages;
 
-  node_modules = pkgs.runCommand "node-modules" {
-    nativeBuildInputs = [ pkgs.nodejs_24 ];
-  } ''
+  node_modules = pkgs.runCommand "node-modules" { } ''
     set -euo pipefail
     mkdir -p $out/node_modules
     ${pkgs.lib.concatStringsSep "\n" (pkgs.lib.mapAttrsToList (path: tarball: ''
@@ -24,8 +22,13 @@
       tar -xzf ${tarball} -C "$out/${path}" --strip-components=1 --no-same-permissions --mode='u=rwX,go=rX' --delay-directory-restore
       chmod -R u+rwX "$out/${path}"
     '') tarballs)}
+  '';
 
+  patchedNodeModules = pkgs.runCommand "node-modules" {
+    nativeBuildInputs = [ pkgs.nodejs_24 ];
+  } ''
     echo "applying patches..."
+    cp -r ${node_modules}/* $out/
     cd $out
     cp ${../package.json} package.json
     cp -r ${../patches} patches
