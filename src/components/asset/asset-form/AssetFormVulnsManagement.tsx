@@ -578,6 +578,7 @@ const PublicUrlsSection: FunctionComponent<{
           className={copyable ? "text-foreground" : "text-muted-foreground"}
         >
           <InputWithButton
+            className="truncate"
             label={url.label}
             copyable={copyable && !!url.value}
             copyToastDescription={url.copyToastDescription}
