@@ -1,7 +1,7 @@
 import type { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
 import type { DetailedDependencyVulnDTO } from "@/types/api/api";
-import { getEcosystem } from "@/utils/common";
+import { beautifyPurl, getEcosystem } from "@/utils/common";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
@@ -114,9 +114,6 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
     );
   }
 
-  const { type, namespace, name, version } =
-    PackageURL.fromString(vulnerabilityPath);
-
   return (
     <>
       <div className="">
@@ -125,7 +122,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
           <div className="text-sm">
             {!directDependencyFixedVersion ? (
               <span className="text-xs text-muted-foreground">
-                {`No Update for ${name + "@" + version} that patches ${vuln.cveID}`}
+                {`No Update for ${beautifyPurl(vulnerabilityPath)} that patches ${vuln.cveID}`}
               </span>
             ) : (
               <>
