@@ -1,5 +1,11 @@
 {
   description = "DevGuard Web";
+
+  nixConfig = {
+    extra-substituters = [ "https://nix.garage.l3montree.cloud" ];
+    extra-trusted-public-keys = [ "nix.garage.l3montree.cloud:MGlzfPQKA91/zxw91CN+GP7NpjAAwmKvWXlDYgeeI8k=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";

@@ -27,6 +27,7 @@
   patchedNodeModules = pkgs.runCommand "node-modules-patched" {
     nativeBuildInputs = [ pkgs.nodejs_24 ];
   } ''
+    set -euo pipefail
     echo "applying patches..."
     mkdir -p $out
     cp -r ${node_modules}/* $out/
@@ -34,6 +35,7 @@
     cp ${../package.json} package.json
     cp -r ${../patches} patches
     chmod -R u+rwX patches
-    node node_modules/patch-package/index.js
+    chmod -R u+rwX node_modules
+    node node_modules/patch-package/index.js --error-on-fail
   '';
 }
