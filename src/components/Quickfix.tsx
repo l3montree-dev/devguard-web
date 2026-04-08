@@ -139,10 +139,9 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                   </span>
                   <span> by upgrading from: </span>
                   <span className="flex flex-row gap-2">
-                    <Badge
-                      className="font-mono"
-                      variant={"outline"}
-                    >{`${name + "@" + version}`}</Badge>
+                    <Badge className="font-mono" variant={"outline"}>
+                      {beautifyPurl(vulnerabilityPath)}
+                    </Badge>
                     <ArrowRight className="w-4" />
                     <Badge
                       variant={"outline"}
