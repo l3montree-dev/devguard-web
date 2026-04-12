@@ -62,13 +62,19 @@ const CommentDialog: FunctionComponent<CommentDialogProps> = ({
               placeholder="Add your comment here..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
+              maxLength={4000}
             />
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <AsyncButton onClick={handleSubmit}>Add Comment</AsyncButton>
+            <AsyncButton
+              onClick={handleSubmit}
+              disabled={justification.length > 4000}
+            >
+              Add Comment
+            </AsyncButton>
           </DialogFooter>
         </form>
       </DialogContent>
