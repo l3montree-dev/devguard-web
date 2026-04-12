@@ -84,13 +84,19 @@ const AcceptRiskDialog: FunctionComponent<AcceptRiskDialogProps> = ({
               placeholder="Add your comment here..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
+              maxLength={4000}
             />
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <AsyncButton onClick={handleSubmit}>Accept Risk</AsyncButton>
+            <AsyncButton
+              onClick={handleSubmit}
+              disabled={justification.length > 4000}
+            >
+              Accept Risk
+            </AsyncButton>
           </DialogFooter>
         </form>
       </DialogContent>
