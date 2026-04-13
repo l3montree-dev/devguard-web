@@ -65,6 +65,9 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
 
       return (
         <Link
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
           href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/dependency-risks?search=${encodeURIComponent(cveId)}&state=closed`}
           className=""
         >
