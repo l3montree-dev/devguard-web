@@ -39,7 +39,7 @@
     }
 
     a {
-        @apply text-sm  !text-blue-600 dark:!text-primary font-medium;
+        @apply text-sm! text-blue-600! dark:text-primary! font-medium!;
         text-decoration: none;       
     }
 

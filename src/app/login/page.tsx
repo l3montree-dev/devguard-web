@@ -22,8 +22,9 @@ import { getLoginFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "../../ory.config";
 import { config } from "../../config";
-import ThreeJSFeatureScreen from "../../components/threejs/ThreeJSFeatureScreen";
-import { oryComponentOverrides } from "../../components/ory/overrides";
+import ContainerYardScene from "../../components/threejs/ContainerYardScene";
+import { loginComponentOverrides } from "../../components/ory/overrides";
+import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
 
@@ -40,54 +41,62 @@ const LoginPage = async (props: OryPageParams) => {
         <title>DevGuard - Sign in</title>
         <meta name="description" content="DevGuard Sign in" />
       </Head>
-      <div className="flex min-h-screen flex-1 flex-row">
-        <div className="flex w-2/5 bg-background flex-col items-center justify-center ">
-          <div className="w-full px-8 xl:px-24">
-            <div className="mb-10">
-              <Image
-                className="hidden h-14 w-auto dark:block"
-                src={"/logo_inverse_horizontal.svg"}
-                alt="DevGuard by l3montree Logo"
-                width={300}
-                height={300}
-              />
-              <Image
-                className="h-16 w-auto dark:hidden"
-                src={"/logo_horizontal.svg"}
-                alt="DevGuard by l3montree Logo"
-                width={300}
-                height={300}
-              />
-              <h2 className="mt-10 text-left text-2xl font-bold leading-9 tracking-tight">
-                Sign in to your Account
-              </h2>
-              {config.registrationEnabled && (
-                <p className="mt-2 text-sm/6 text-muted-foreground">
-                  Don&quot;t have an Account?{" "}
-                  <Link
-                    data-testid="cta-link"
-                    href="/registration"
-                    className="font-semibold hover:underline"
-                  >
-                    Sign up for free
-                  </Link>
-                </p>
-              )}
-            </div>
-            <Login
-              config={oryConfig}
-              flow={flow}
-              components={oryComponentOverrides}
-            />
-            <div className="mt-12 flex flex-col items-center">
-              <p className="text-sm/6 text-muted-foreground text-center max-w-sm">
-                By using DevGuard you agree to our <TermsOfUseLink /> and{" "}
-                <PrivacyPolicyLink />.
-              </p>
-            </div>
+      <div className="relative min-h-screen bg-background">
+        {/* Top edge grid pattern */}
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-50 h-8 border-t border-b border-t-(--grid-line-color) border-b-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px]" />
+        {/* Bottom edge grid pattern */}
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-8 border-t border-b border-t-(--grid-line-color) border-b-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px]" />
+        {/* Left edge grid pattern */}
+        <div className="pointer-events-none fixed inset-y-0 left-0 z-50 hidden w-8 border-r border-r-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
+        {/* Right edge grid pattern */}
+        <div className="pointer-events-none fixed inset-y-0 right-0 z-50 hidden w-8 border-l border-l-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
+
+        <div className="flex min-h-screen items-center justify-center p-6">
+          <div className="w-full max-w-6xl">
+            <Card className="overflow-hidden p-0">
+              <CardContent className="grid p-0 md:grid-cols-5">
+                {/* Left: login form */}
+                <div className="flex flex-col justify-center p-8 col-span-2">
+                  <div className="mb-6 flex justify-center">
+                    <Image
+                      className="hidden h-16 w-auto dark:block"
+                      src={"/logo_inverse_horizontal.svg"}
+                      alt="DevGuard by l3montree Logo"
+                      width={200}
+                      height={200}
+                    />
+                    <Image
+                      className="h-10 w-auto dark:hidden"
+                      src={"/logo_horizontal.svg"}
+                      alt="DevGuard by l3montree Logo"
+                      width={200}
+                      height={200}
+                    />
+                  </div>
+
+                  <Login
+                    config={oryConfig}
+                    flow={flow}
+                    components={loginComponentOverrides}
+                  />
+
+                  <p className="mt-6 text-center text-xs text-muted-foreground">
+                    By using DevGuard you agree to our <TermsOfUseLink /> and{" "}
+                    <PrivacyPolicyLink />.
+                  </p>
+                </div>
+
+                {/* Right: container yard scene */}
+                <div
+                  className="col-span-3 relative hidden border-l md:block"
+                  style={{ background: "hsl(var(--harbor-background))" }}
+                >
+                  <ContainerYardScene />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-        <ThreeJSFeatureScreen />
       </div>
     </>
   );
