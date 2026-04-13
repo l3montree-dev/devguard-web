@@ -290,7 +290,7 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
-  const { theme } = useTheme();
+  const { resolvedTheme, theme } = useTheme();
   const { session } = useSession();
 
   const activeOrg = useActiveOrg();
@@ -737,7 +737,9 @@ const Index: FunctionComponent = () => {
                         </div>
                         <div
                           style={{ height: 400 }}
-                          className={`w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                          className={
+                            "w-full rounded-lg border bg-gray-50 dark:bg-black"
+                          }
                         >
                           {graphData && vuln && (
                             <DependencyGraph
