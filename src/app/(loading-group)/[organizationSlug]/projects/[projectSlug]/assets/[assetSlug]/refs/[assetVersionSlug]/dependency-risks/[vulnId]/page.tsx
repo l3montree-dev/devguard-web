@@ -47,7 +47,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { Bug, CheckCircleIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -290,7 +289,6 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
-  const { resolvedTheme, theme } = useTheme();
   const { session } = useSession();
 
   const activeOrg = useActiveOrg();
