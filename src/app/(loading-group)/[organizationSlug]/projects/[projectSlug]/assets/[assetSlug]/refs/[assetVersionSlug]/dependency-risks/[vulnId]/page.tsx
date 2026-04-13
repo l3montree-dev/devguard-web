@@ -344,7 +344,6 @@ const Index: FunctionComponent = () => {
       : null,
     fetcher,
   );
-  console.log(vexRulesData)
 
   // Handler to create false-positive rules from the dependency graph context menu
   const createFalsePositive = useCreateVexRule({
