@@ -34,7 +34,6 @@ import type {
   AssetDTO,
   DependencyVulnHints,
   DetailedDependencyVulnDTO,
-  Paged,
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
