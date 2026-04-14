@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 
 const defaultConfigFiles = [
@@ -71,6 +72,7 @@ const ConfigFileEditor = ({
     if (!configFileUrl) {
       return;
     }
+
     const resp = await browserApiClient(configFileUrl, {
       method: "PUT",
       headers: { "Content-Type": "text/plain" },
@@ -81,6 +83,7 @@ const ConfigFileEditor = ({
       setCodeError("Failed to save the new Configuration");
       return;
     }
+    toast.success("Config saved successfully");
     setEditorValue(newConfig);
     setCodeError(null);
     mutate();
@@ -118,6 +121,10 @@ const ConfigFileEditor = ({
           value={editorValue}
           onChange={setEditorValue}
           onValidation={handleEditorValidation}
+          onSave={() => {
+            if (!!codeError || editorValue === configFile) return;
+            handleConfigFileChange(editorValue);
+          }}
           language={selectedLanguage}
         />
         {codeError && <p className="text-sm text-destructive">{codeError}</p>}
