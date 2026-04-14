@@ -122,7 +122,7 @@ const ConfigFileEditor = ({
           onChange={setEditorValue}
           onValidation={handleEditorValidation}
           onSave={() => {
-            if (!!codeError || editorValue === configFile) return;
+            if (!!codeError || editorValue === configFile || configFile === undefined) return;
             handleConfigFileChange(editorValue);
           }}
           language={selectedLanguage}
