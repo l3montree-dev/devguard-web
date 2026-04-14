@@ -92,21 +92,20 @@ const CodeEditor = ({
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme === "dark" ? vscodeDark : vscodeLight;
 
-  const tabExtension = keymap.of([indentWithTab]);
-
-  const saveKeymap = keymap.of([
-    {
-      key: "Mod-s",
-      preventDefault: true,
-      run: () => {
-        onSaveRef.current();
-        return true;
-      },
-    },
-  ]);
-
   useEffect(() => {
     if (!containerRef.current) return;
+    const tabExtension = keymap.of([indentWithTab]);
+
+    const saveKeymap = keymap.of([
+      {
+        key: "Mod-s",
+        preventDefault: true,
+        run: () => {
+          onSaveRef.current();
+          return true;
+        },
+      },
+    ]);
 
     const langLinter = languageLinters[language];
 
