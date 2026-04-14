@@ -9,7 +9,7 @@ export default function useDebouncedQuerySearch() {
       debounce((value: string) => {
         updateQueryParams({
           search: value || undefined,
-          page:1
+          page: 1,
         });
       }, 500),
     [updateQueryParams],
