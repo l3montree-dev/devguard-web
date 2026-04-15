@@ -59,7 +59,7 @@ const getEcosystemContent = (key: string, url: string) => {
           <InputWithButton
             label="Index URL"
             message="Set as index-url in pip.conf under [global], or export as PIP_INDEX_URL."
-            value={`index-url =${url}/simple`}
+            value={`index-url =${url}`}
             nameKey="pypi-index-url"
             copyable
           />
