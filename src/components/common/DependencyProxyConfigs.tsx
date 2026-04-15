@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
@@ -117,6 +117,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
+  const initializedForUrl = useRef<string | null | undefined>(undefined);
 
   const [selectedProxyTab, setSelectedProxyTab] = useState("");
   const [checkPackage, setCheckPackage] = useState("");
@@ -128,10 +129,13 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
-    const config = data ?? defaultConfig;
-    setRulesText(config.rules);
-    setMinReleaseTime(config.minReleaseTime);
-  }, [data]);
+    if (data !== undefined && initializedForUrl.current !== configUrl) {
+      const config = data ?? defaultConfig;
+      setRulesText(config.rules);
+      setMinReleaseTime(config.minReleaseTime);
+      initializedForUrl.current = configUrl;
+    }
+  }, [data, configUrl]);
 
   useEffect(() => {
     if (proxyUrls && !selectedProxyTab) {
@@ -158,22 +162,30 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
     setIsChecking(true);
     setCheckResult(null);
 
-    // Route through the Next.js tunnel to avoid CORS issues and get the real HTTP status
-    const proxyPath = new URL(proxyUrl).pathname.replace(/\/$/, "");
-    const checkUrl =
-      "/api/devguard-tunnel" + proxyPath + "/" + checkPackage.trim();
-
-    const resp = await fetch(checkUrl, { method: "GET" });
-
-    let reason: string | undefined = undefined;
-    if (resp.status === 403) {
-      const body = await resp.json();
-      reason = body.reason ?? body.message;
+    try {
+      // Route through the Next.js tunnel to avoid CORS issues and get the real HTTP status
+      const proxyPath = new URL(proxyUrl).pathname.replace(/\/$/, "");
+      const checkUrl =
+        "/api/devguard-tunnel" + proxyPath + "/" + checkPackage.trim();
+      const resp = await fetch(checkUrl, { method: "GET" });
+      let reason: string | undefined = undefined;
+      if (resp.status === 403) {
+        try {
+          const body = await resp.json();
+          reason = body.reason ?? body.message;
+        } catch {
+          reason = "Access denied";
+        }
+      }
+      setCheckResult({ allowed: resp.ok, status: resp.status, reason });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to check package";
+      setCheckResult({ allowed: false, status: 0, reason: message });
+      toast.error("Failed to check package");
+    } finally {
+      setIsChecking(false);
     }
-
-    setCheckResult({ allowed: resp.ok, status: resp.status, reason });
-
-    setIsChecking(false);
   };
 
   const handleSave = async () => {
@@ -432,7 +444,10 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
           </CardContent>
         </Card>
         <div className="sticky bottom-0 flex justify-end pt-2">
-          <Button onClick={handleSave} disabled={isSaving || !!codeError}>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || data === undefined || !!codeError}
+          >
             {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>

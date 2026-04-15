@@ -41,10 +41,10 @@ function isValidPkgLine(line: string): [boolean, string | null] {
   if (stripped.trim() === "")
     return [
       false,
-      "Empty line, use a purl (e.g. pkg:npm/next@13.4.4) or a wildcard (*)",
+      "Empty line, use a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (*)",
     ];
 
-  // Valid PURL
+  // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
   if (valid(stripped)) {
     const normalizedPurl = normalize(stripped);
     if (normalizedPurl !== stripped) {
@@ -55,40 +55,34 @@ function isValidPkgLine(line: string): [boolean, string | null] {
     }
     return [true, null];
   } else if (stripped.includes("*")) {
-    const match = stripped.match(/\*+/);
-    if (match && match[0].length > 2) {
-      return [false, "Invalid wildcard pattern, only * or ** are allowed"];
-    }
-    const afterWildcard = stripped.slice(
-      stripped.indexOf(match![0]) + match![0].length,
-    );
-    if (afterWildcard !== "" && !afterWildcard.startsWith("/")) {
-      return [
-        false,
-        "Invalid wildcard pattern, wildcard must be followed by / or nothing",
-      ];
-    }
-
-    if (afterWildcard.startsWith("/")) {
-      const purlPart = afterWildcard.slice(1);
-      if (purlPart === "") {
+    const segments = stripped.split("/");
+    for (const segment of segments) {
+      if (segment === "") {
         return [
           false,
-          "Invalid wildcard pattern, missing a package name. e.g. */next or **/next",
+          "Invalid wildcard pattern, path segments cannot be empty (e.g. avoid trailing or double /)",
+        ];
+      }
+      if (segment.includes("*") && segment !== "*" && segment !== "**") {
+        return [
+          false,
+          `Invalid wildcard pattern: "${segment}", wildcards must occupy a full path segment (* or **)`,
         ];
       }
     }
-
+    return [true, null];
+  } else if (/^[a-zA-Z][a-zA-Z0-9_.-]*\/\S+$/.test(stripped)) {
+    // Short-form <ecosystem>/<name>[@<version>] (e.g. npm/lodash or npm/lodash@4.17.21)
     return [true, null];
   } else if (stripped.startsWith("pkg")) {
     return [
       false,
-      "Invalid package rule, expected format: pkg:<type>/<name>[@<version>], e.g. pkg:npm/next or pkg:npm/next@13.4.4",
+      "Invalid package rule, expected format: <ecosystem>/<name>[@<version>], e.g. npm/lodash or npm/lodash@4.17.21",
     ];
   }
   return [
     false,
-    "Invalid package rule, expected a purl (e.g. pkg:npm/next[@13.4.4]) or a wildcard pattern (e.g. */next or **/next)",
+    "Invalid package rule, expected a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (e.g. */lodash or **/lodash)",
   ];
 }
 

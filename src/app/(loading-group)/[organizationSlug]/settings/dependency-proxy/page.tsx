@@ -3,7 +3,6 @@
 
 "use client";
 
-import ConfigFileEditor from "@/components/common/ConfigFileEditor";
 import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
 import Page from "@/components/Page";
 import { useActiveOrg } from "@/hooks/useActiveOrg";

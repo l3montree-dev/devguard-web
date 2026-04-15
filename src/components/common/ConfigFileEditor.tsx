@@ -4,6 +4,7 @@
 "use client";
 
 import CodeEditor, { type Language } from "@/components/common/CodeEditor";
+import type { Diagnostic } from "@codemirror/lint";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -86,13 +87,14 @@ const ConfigFileEditor = ({
     mutate();
   };
 
-  const handleEditorValidation = (isValid: boolean, diagnostics: any[]) => {
+  const handleEditorValidation = (
+    isValid: boolean,
+    diagnostics: Diagnostic[],
+  ) => {
     if (isValid) {
       setCodeError(null);
     } else {
-      if (diagnostics.length > 0) {
-        setCodeError(diagnostics[0].message || "Invalid configuration");
-      }
+      setCodeError(diagnostics[0]?.message ?? "Invalid configuration");
     }
   };
 
