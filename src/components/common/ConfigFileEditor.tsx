@@ -86,8 +86,14 @@ const ConfigFileEditor = ({
     mutate();
   };
 
-  const handleEditorValidation = (isValid: boolean) => {
-    setCodeError(isValid ? null : `Invalid ${selectedLanguage?.toUpperCase()}`);
+  const handleEditorValidation = (isValid: boolean, diagnostics: any[]) => {
+    if (isValid) {
+      setCodeError(null);
+    } else {
+      if (diagnostics.length > 0) {
+        setCodeError(diagnostics[0].message || "Invalid configuration");
+      }
+    }
   };
 
   return (

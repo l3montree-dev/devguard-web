@@ -13,6 +13,9 @@ import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
+import valid from "purl/valid";
+import normalize from "purl/normalize";
+import { after } from "lodash";
 
 function tomlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
@@ -51,7 +54,7 @@ interface Props {
   value: string;
   language?: Language;
   onChange: (value: string) => void;
-  onValidation?: (isValid: boolean) => void;
+  onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
   readOnly?: boolean;
 }
 
@@ -100,11 +103,11 @@ const CodeEditor = ({
           languageExtensions[language],
           linter((view) => {
             if (view.state.doc.toString() == "") {
-              onValidationRef.current?.(true);
+              onValidationRef.current?.(true, []);
               return [];
             }
             const diagnostics = langLinter(view);
-            onValidationRef.current?.(diagnostics.length === 0);
+            onValidationRef.current?.(diagnostics.length === 0, diagnostics);
             return diagnostics;
           }),
           lintGutter(),
