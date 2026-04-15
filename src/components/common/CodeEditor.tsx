@@ -15,7 +15,6 @@ import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
 import valid from "purl/valid";
 import normalize from "purl/normalize";
-import { after } from "lodash";
 
 function tomlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
