@@ -5,7 +5,7 @@
 
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
-import DependencyProxySettings from "@/components/common/DependencyProxySettings";
+import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -43,7 +43,7 @@ const Config = () => {
       Menu={assetMenu}
       Title={<AssetTitle />}
     >
-      <DependencyProxySettings baseUrl={baseUrl} />
+      <DependencyProxyConfigs baseUrl={baseUrl} />
     </Page>
   );
 };

@@ -4,7 +4,7 @@
 "use client";
 
 import Page from "@/components/Page";
-import DependencyProxySettings from "@/components/common/DependencyProxySettings";
+import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
 import ProjectTitle from "@/components/common/ProjectTitle";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -36,7 +36,7 @@ const Config = () => {
       Menu={projectMenu}
       Title={<ProjectTitle />}
     >
-      <DependencyProxySettings baseUrl={baseUrl} />
+      <DependencyProxyConfigs baseUrl={baseUrl} />
     </Page>
   );
 };

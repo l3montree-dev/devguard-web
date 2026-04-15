@@ -29,13 +29,64 @@ const defaultConfig: DependencyProxyConfig = {
   minReleaseTime: 60,
 };
 
+const getEcosystemContent = (key: string, url: string) => {
+  switch (key) {
+    case "npm":
+      return (
+        <InputWithButton
+          label="npm Registry URL"
+          message="Create a .npmrc file in your project root with this content to enable proxying for npm packages."
+          value={`registry=${url}`}
+          nameKey="npm-proxy-url"
+          copyable
+        />
+      );
+
+    case "go":
+      return (
+        <InputWithButton
+          label="Go Module Proxy"
+          message="Set this environment variable or add it to your shell profile (.bashrc, .zshrc) to route Go module downloads through the dependency proxy."
+          value={`export GOPROXY="${url}"`}
+          nameKey="go-proxy-url"
+          copyable
+        />
+      );
+
+    case "pypi": {
+      return (
+        <div className="flex flex-col">
+          <InputWithButton
+            label="Index URL"
+            message="Set as index-url in pip.conf under [global], or export as PIP_INDEX_URL."
+            value={`index-url =${url}/simple`}
+            nameKey="pypi-index-url"
+            copyable
+          />
+        </div>
+      );
+    }
+
+    default:
+      return (
+        <InputWithButton
+          label={`${key.toUpperCase()} Proxy URL`}
+          message="Copy this URL to configure your package manager to use the dependency proxy."
+          value={url}
+          nameKey={`${key}-proxy-url`}
+          copyable
+        />
+      );
+  }
+};
+
 interface Props {
   baseUrl: string | null;
 }
 
-const DependencyProxySettings = ({ baseUrl }: Props) => {
+const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const configUrl = baseUrl
-    ? baseUrl + "/config-files/dependency-proxy-settings"
+    ? baseUrl + "/config-files/dependency-proxy-configs"
     : null;
 
   const { data, mutate } = useSWR<DependencyProxyConfig | null>(
@@ -174,13 +225,7 @@ const DependencyProxySettings = ({ baseUrl }: Props) => {
               {proxyUrls &&
                 Object.entries(proxyUrls).map(([key, url]) => (
                   <TabsContent key={key} value={key}>
-                    <InputWithButton
-                      label={`${key.toUpperCase()} Proxy URL`}
-                      message="The URL of the proxy server for this package manager. You can copy the URL to use it in your package manager configuration."
-                      value={url}
-                      nameKey={`${key}-proxy-url`}
-                      copyable
-                    />
+                    {getEcosystemContent(key, url)}
                   </TabsContent>
                 ))}
             </Tabs>
@@ -387,10 +432,7 @@ const DependencyProxySettings = ({ baseUrl }: Props) => {
           </CardContent>
         </Card>
         <div className="sticky bottom-0 flex justify-end pt-2">
-          <Button
-            onClick={handleSave}
-            disabled={isSaving || !data || !!codeError}
-          >
+          <Button onClick={handleSave} disabled={isSaving || !!codeError}>
             {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>
@@ -399,4 +441,4 @@ const DependencyProxySettings = ({ baseUrl }: Props) => {
   );
 };
 
-export default DependencyProxySettings;
+export default DependencyProxyConfigs;

@@ -4,7 +4,7 @@
 "use client";
 
 import ConfigFileEditor from "@/components/common/ConfigFileEditor";
-import DependencyProxySettings from "@/components/common/DependencyProxySettings";
+import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
 import Page from "@/components/Page";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
@@ -31,7 +31,7 @@ const Config = () => {
       title={""}
       Menu={orgMenu}
     >
-      <DependencyProxySettings baseUrl={baseUrl} />
+      <DependencyProxyConfigs baseUrl={baseUrl} />
     </Page>
   );
 };
