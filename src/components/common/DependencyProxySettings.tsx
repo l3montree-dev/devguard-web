@@ -367,9 +367,9 @@ const DependencyProxySettings = ({ baseUrl }: Props) => {
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <p className="text-sm text-muted-foreground">
-              Minimum time in minutes that a package must be idle before the
-              proxy serves it. This helps to ensure that only stable packages
-              are proxied.
+              Minimum time in hours that a package must be idle before the proxy
+              serves it. This helps to ensure that only stable packages are
+              proxied.
             </p>
             <div className="flex items-center gap-2">
               <Input
@@ -381,7 +381,7 @@ const DependencyProxySettings = ({ baseUrl }: Props) => {
                 onChange={(e) => setMinReleaseTime(Number(e.target.value))}
               />
               <span className="whitespace-nowrap text-sm text-muted-foreground">
-                min
+                hours
               </span>
             </div>
           </CardContent>
