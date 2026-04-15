@@ -33,6 +33,90 @@ function tomlParseLinter() {
   };
 }
 
+function isValidPkgLine(line: string): [boolean, string | null] {
+  const trimmed = line.trim();
+  // Comments are valid
+  if (trimmed.startsWith("#")) return [true, null];
+  // Strip optional negation prefix
+  const stripped = trimmed.startsWith("!") ? trimmed.slice(1) : trimmed;
+  if (stripped.trim() === "")
+    return [
+      false,
+      "Empty line, use a purl (e.g. pkg:npm/next@13.4.4) or a wildcard (*)",
+    ];
+
+  // Valid PURL
+  if (valid(stripped)) {
+    const normalizedPurl = normalize(stripped);
+    if (normalizedPurl !== stripped) {
+      return [
+        false,
+        `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+      ];
+    }
+    return [true, null];
+  } else if (stripped.includes("*")) {
+    const match = stripped.match(/\*+/);
+    if (match && match[0].length > 2) {
+      return [false, "Invalid wildcard pattern, only * or ** are allowed"];
+    }
+    const afterWildcard = stripped.slice(
+      stripped.indexOf(match![0]) + match![0].length,
+    );
+    if (afterWildcard !== "" && !afterWildcard.startsWith("/")) {
+      return [
+        false,
+        "Invalid wildcard pattern, wildcard must be followed by / or nothing",
+      ];
+    }
+
+    if (afterWildcard.startsWith("/")) {
+      const purlPart = afterWildcard.slice(1);
+      if (purlPart === "") {
+        return [
+          false,
+          "Invalid wildcard pattern, missing a package name. e.g. */next or **/next",
+        ];
+      }
+    }
+
+    return [true, null];
+  } else if (stripped.startsWith("pkg")) {
+    return [
+      false,
+      "Invalid package rule, expected format: pkg:<type>/<name>[@<version>], e.g. pkg:npm/next or pkg:npm/next@13.4.4",
+    ];
+  }
+  return [
+    false,
+    "Invalid package rule, expected a purl (e.g. pkg:npm/next[@13.4.4]) or a wildcard pattern (e.g. */next or **/next)",
+  ];
+}
+
+function packageParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    const text = view.state.doc.toString();
+    const lines = text.split("\n");
+    const diagnostics: Diagnostic[] = [];
+    lines.forEach((line, index) => {
+      if (line.trim() === "") return;
+      const [isValid, errorMessage] = isValidPkgLine(line);
+      if (!isValid) {
+        const pos = view.state.doc.line(index + 1).from;
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message:
+            errorMessage ||
+            `Invalid package URL or pattern at line ${index + 1}`,
+        });
+      }
+    });
+    return diagnostics;
+  };
+}
+
 function yamlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
     try {
@@ -62,12 +146,14 @@ const languageExtensions = {
   yaml: yaml(),
   json: json(),
   toml: StreamLanguage.define(toml),
+  pkg: [],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
+  pkg: packageParseLinter(),
 };
 
 const CodeEditor = ({
