@@ -22,11 +22,14 @@ import { getLoginFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "../../ory.config";
 import { config } from "../../config";
+import { documentationLinks } from "../../const/documentationLinks";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import { loginComponentOverrides } from "../../components/ory/overrides";
 import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
+import Footer from "@/components/misc/Footer";
+import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 
 const LoginPage = async (props: OryPageParams) => {
   const flow = await getLoginFlow(oryConfig, props.searchParams);
@@ -41,17 +44,9 @@ const LoginPage = async (props: OryPageParams) => {
         <title>DevGuard - Sign in</title>
         <meta name="description" content="DevGuard Sign in" />
       </Head>
-      <div className="relative min-h-screen bg-background">
-        {/* Top edge grid pattern */}
-        <div className="pointer-events-none fixed inset-x-0 top-0 z-50 h-8 border-t border-b border-t-(--grid-line-color) border-b-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px]" />
-        {/* Bottom edge grid pattern */}
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-8 border-t border-b border-t-(--grid-line-color) border-b-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px]" />
-        {/* Left edge grid pattern */}
-        <div className="pointer-events-none fixed inset-y-0 left-0 z-50 hidden w-8 border-r border-r-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
-        {/* Right edge grid pattern */}
-        <div className="pointer-events-none fixed inset-y-0 right-0 z-50 hidden w-8 border-l border-l-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
-
-        <div className="flex min-h-screen items-center justify-center p-6">
+      <div className="relative flex min-h-screen flex-col bg-background">
+        <FourSideGridPattern />
+        <div className="flex min-h-screen items-center justify-center flex-col pt-6">
           <div className="w-full max-w-6xl">
             <Card className="overflow-hidden p-0">
               <CardContent className="grid p-0 md:grid-cols-5">
@@ -95,6 +90,9 @@ const LoginPage = async (props: OryPageParams) => {
                 </div>
               </CardContent>
             </Card>
+          </div>
+          <div className="mt-14">
+            <Footer />
           </div>
         </div>
       </div>

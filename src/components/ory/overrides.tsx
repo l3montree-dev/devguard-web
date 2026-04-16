@@ -1,6 +1,6 @@
 "use client";
 
-import { FingerPrintIcon } from "@heroicons/react/24/outline";
+import { FingerPrintIcon, KeyIcon } from "@heroicons/react/24/outline";
 import {
   type OryCardContentProps,
   type OryCardSettingsSectionProps,
@@ -12,10 +12,10 @@ import {
   type OryNodeImageProps,
   type OryNodeInputProps,
   type OryNodeLabelProps,
+  type OryCardAuthMethodListItemProps,
+  type OryMessageContentProps,
   type OryNodeSsoButtonProps,
   type OrySettingsSsoProps,
-  useOryConfiguration,
-  useOryFlow,
 } from "@ory/elements-react";
 import {
   DefaultCardFooter,
@@ -28,7 +28,7 @@ import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
@@ -83,7 +83,7 @@ function OrySsoButton({
   return (
     <Button
       variant="outline"
-      className="w-full"
+      className="px-6"
       name={attributes.name}
       type={attributes.type === "button" ? "button" : "submit"}
       value={attributes.value?.toString()}
@@ -92,13 +92,13 @@ function OrySsoButton({
       {...rest}
     >
       <SsoProviderIcon provider={provider} />
-      {displayName ? `Sign in with ${displayName}` : node.meta.label?.text}
+      {displayName ? `${displayName}` : node.meta.label?.text}
     </Button>
   );
 }
 
 function OrySsoRoot({ children }: OryFormSsoRootProps) {
-  return <div className="flex flex-col gap-3 mt-3">{children}</div>;
+  return <div className="flex justify-between gap-3 mt-3">{children}</div>;
 }
 
 function SsoProviderIcon({ provider }: { provider: string }) {
@@ -304,7 +304,7 @@ function OryLabel({ node, attributes, children, ...rest }: OryNodeLabelProps) {
 }
 
 function OryCardRoot({ children }: PropsWithChildren) {
-  return <Card className="p-6 ory-card">{children}</Card>;
+  return <Card className="ory-card border-0 shadow-none">{children}</Card>;
 }
 
 // Transparent root for layouts that provide their own card wrapper (e.g. login page)
@@ -403,6 +403,53 @@ function OryToast({ message, id }: { message: any; id: string | number }) {
   return null;
 }
 
+const MESSAGE_OVERRIDES: Record<number, string> = {
+  4000029: "You must accept the terms of use to use DevGuard",
+};
+
+function OryMessageContent({ message }: OryMessageContentProps) {
+  const text = MESSAGE_OVERRIDES[message.id] ?? message.text;
+  const colorClass =
+    message.type === "error"
+      ? "text-destructive"
+      : message.type === "success"
+        ? "text-green-600"
+        : "text-muted-foreground";
+
+  return <span className={`leading-normal text-sm ${colorClass}`}>{text}</span>;
+}
+
+function OryAuthMethodListItem({
+  onClick,
+  group,
+}: OryCardAuthMethodListItemProps) {
+  const isPasskey = group === "passkey";
+
+  return (
+    <Button
+      variant={isPasskey ? "default" : "secondary"}
+      className="h-auto w-full justify-start gap-3 p-3 text-left"
+      onClick={onClick}
+    >
+      {isPasskey ? (
+        <FingerPrintIcon className="w-5 h-5 shrink-0" />
+      ) : (
+        <KeyIcon className="w-5 h-5 shrink-0" />
+      )}
+      <span className="flex flex-col">
+        <span className="font-medium">
+          {isPasskey ? "Passkey (recommended)" : "Password"}
+        </span>
+        <span className="text-xs opacity-70 font-normal">
+          {isPasskey
+            ? "Use your device's fingerprint or face recognition"
+            : "Enter the password associated with your account"}
+        </span>
+      </span>
+    </Button>
+  );
+}
+
 export const loginComponentOverrides: OryFlowComponentOverrides = {
   Node: {
     Button: OryButton,
@@ -421,11 +468,13 @@ export const loginComponentOverrides: OryFlowComponentOverrides = {
     Header: OryCardHeader,
     Footer: OryCardFooter,
     Divider: OryCardDivider,
+    AuthMethodListItem: OryAuthMethodListItem,
     SettingsSection: OrySettingsSection,
     SettingsSectionContent: OrySettingsSectionContent,
     SettingsSectionFooter: OrySettingsSectionFooter,
   },
   Message: {
+    Content: OryMessageContent,
     Toast: OryToast,
   },
 };
@@ -450,11 +499,13 @@ export const oryComponentOverrides: OryFlowComponentOverrides = {
     Footer: OryCardFooter,
     // Content: OryCardContent,
     Divider: OryCardDivider,
+    AuthMethodListItem: OryAuthMethodListItem,
     SettingsSection: OrySettingsSection,
     SettingsSectionContent: OrySettingsSectionContent,
     SettingsSectionFooter: OrySettingsSectionFooter,
   },
   Message: {
+    Content: OryMessageContent,
     Toast: OryToast,
   },
 };
