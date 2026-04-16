@@ -94,7 +94,6 @@
     --radius: 0.5rem;
 
     --grid-line-color: hsl(210 18% 84% / 0.6);
-    --harbor-background: var(--background);
 
     --chart-1: 42 96% 56%;
     --chart-2: 223 68% 52%;
@@ -122,7 +121,7 @@
     --footer-background: 214 20% 98%;
     --footer-foreground: 226 57% 0%;
 
-    --harbor-background: hsl(225 59% 21%);
+    --harbor-background: 225 59% 21%;
   }
 
   .dark {
@@ -180,7 +179,7 @@
     --footer-background: 213 27% 7%;
     --footer-foreground: 0 0% 98%;
 
-    --harbor-background: hsl(213 27% 7%);
+    --harbor-background: 213 27% 7%;
   }
 }
 

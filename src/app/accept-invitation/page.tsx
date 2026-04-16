@@ -1,7 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
+
 import { browserApiClient } from "@/services/devGuardApi";
 import Head from "next/head";
-
 import Footer from "@/components/misc/Footer";
 import ContainerYardScene from "@/components/threejs/ContainerYardScene";
 import Image from "next/image";
@@ -9,12 +11,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { getLogoutUrl } from "@/server/actions/logout";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
