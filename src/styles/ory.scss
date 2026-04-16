@@ -4,9 +4,6 @@
     button {
         @apply cursor-pointer;
     }
-    button:not([role="checkbox"]) {
-        @apply border hover:bg-secondary/40 rounded-md;
-    }
     header {
         h1 {
             display: none;
@@ -39,7 +36,7 @@
     }
 
     a {
-        @apply text-sm  !text-blue-600 dark:!text-primary font-medium;
+        @apply text-sm! text-blue-600! dark:text-primary! font-medium!;
         text-decoration: none;       
     }
 

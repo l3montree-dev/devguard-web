@@ -81,7 +81,11 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <AsyncButton variant={"secondary"} onClick={handleSubmit} disabled={justification.length > 4000}>
+            <AsyncButton
+              variant={"secondary"}
+              onClick={handleSubmit}
+              disabled={justification.length > 4000}
+            >
               <div className="flex flex-row items-center">
                 {integrationType === "gitlab" && (
                   <>
