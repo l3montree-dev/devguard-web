@@ -4,9 +4,9 @@ import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { yaml } from "@codemirror/lang-yaml";
 import { linter, lintGutter } from "@codemirror/lint";
 import type { Diagnostic } from "@codemirror/lint";
+import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
-import { EditorView, basicSetup } from "codemirror";
 import jsYaml from "js-yaml";
 import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
@@ -15,6 +15,8 @@ import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
+import valid from "purl/valid";
+import normalize from "purl/normalize";
 
 function tomlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
@@ -29,6 +31,140 @@ function tomlParseLinter() {
       }
       return [];
     }
+  };
+}
+
+function purlParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    const text = view.state.doc.toString();
+    const lines = text.split("\n");
+    const diagnostics: Diagnostic[] = [];
+    lines.forEach((line, index) => {
+      if (line.trim() === "") return;
+      if (line.trim().startsWith("#")) return;
+      const tokens = line.trim().split(/\s+/);
+      const pos = view.state.doc.line(index + 1).from;
+      if (tokens.length > 1) {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Each line must contain exactly one package URL (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+        return;
+      }
+      const purl = tokens[0];
+      const validPurl = valid(purl);
+      if (!validPurl) {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Invalid package URL, expected format: pkg:<ecosystem>/<name>@<version> (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+        return;
+      } else {
+        const normalizedPurl = normalize(purl);
+        if (normalizedPurl !== purl) {
+          diagnostics.push({
+            from: pos,
+            to: pos + line.length,
+            severity: "error",
+            message: `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+          });
+        }
+      }
+      // Check that a version is present (PURL version comes after @)
+      const versionMatch = purl.match(/@([^?#]+)/);
+      if (!versionMatch || versionMatch[1].trim() === "") {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Package URL must include a version (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+      }
+    });
+    return diagnostics;
+  };
+}
+
+function isValidDependencyProxyRule(line: string): [boolean, string | null] {
+  const trimmed = line.trim();
+  // Comments are valid
+  if (trimmed.startsWith("#")) return [true, null];
+  // Strip optional negation prefix
+  const stripped = trimmed.startsWith("!") ? trimmed.slice(1) : trimmed;
+  if (stripped.trim() === "")
+    return [
+      false,
+      "Empty line, use a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (*)",
+    ];
+
+  if (stripped.startsWith("pkg:")) {
+    // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
+    if (valid(stripped)) {
+      const normalizedPurl = normalize(stripped);
+      if (normalizedPurl !== stripped) {
+        return [
+          false,
+          `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+        ];
+      }
+      const hasVersionOrWildcard =
+        stripped.includes("@") || stripped.includes("*");
+      if (!hasVersionOrWildcard) {
+        return [
+          false,
+          "Package rule must specify a version or wildcard (e.g. pkg:npm/lodash@4.17.21 or pkg:npm/lodash@*)",
+        ];
+      }
+      return [true, null];
+    }
+    return [
+      false,
+      "Invalid package URL, expected format: pkg:<ecosystem>/<name>@<version>, e.g. pkg:npm/lodash@4.17.21 or pkg:npm/react*",
+    ];
+  } else if (stripped.startsWith("*")) {
+    const segments = stripped.split("/");
+    for (const segment of segments) {
+      if (segment === "") {
+        return [
+          false,
+          "Invalid wildcard pattern, path segments cannot be empty (e.g. avoid trailing or double /)",
+        ];
+      }
+    }
+    return [true, null];
+  }
+
+  return [
+    false,
+    "Invalid package rule, expected a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**)",
+  ];
+}
+
+function dependencyProxyRuleParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    const text = view.state.doc.toString();
+    const lines = text.split("\n");
+    const diagnostics: Diagnostic[] = [];
+    lines.forEach((line, index) => {
+      if (line.trim() === "") return;
+      const [isValid, errorMessage] = isValidDependencyProxyRule(line);
+      if (!isValid) {
+        const pos = view.state.doc.line(index + 1).from;
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message:
+            errorMessage ||
+            `Invalid package URL or pattern at line ${index + 1}`,
+        });
+      }
+    });
+    return diagnostics;
   };
 }
 
@@ -53,8 +189,8 @@ interface Props {
   value: string;
   language?: Language;
   onChange: (value: string) => void;
-  onValidation?: (isValid: boolean) => void;
-  onSave: () => void;
+  onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
+  onSave?: () => void;
   readOnly?: boolean;
 }
 
@@ -62,12 +198,16 @@ const languageExtensions = {
   yaml: yaml(),
   json: json(),
   toml: StreamLanguage.define(toml),
+  dependencyProxyRule: [],
+  purl: [],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
+  dependencyProxyRule: dependencyProxyRuleParseLinter(),
+  purl: purlParseLinter(),
 };
 
 const CodeEditor = ({
@@ -101,7 +241,7 @@ const CodeEditor = ({
         key: "Mod-s",
         preventDefault: true,
         run: () => {
-          onSaveRef.current();
+          onSaveRef.current?.();
           return true;
         },
       },
@@ -118,11 +258,11 @@ const CodeEditor = ({
           languageExtensions[language],
           linter((view) => {
             if (view.state.doc.toString() == "") {
-              onValidationRef.current?.(true);
+              onValidationRef.current?.(true, []);
               return [];
             }
             const diagnostics = langLinter(view);
-            onValidationRef.current?.(diagnostics.length === 0);
+            onValidationRef.current?.(diagnostics.length === 0, diagnostics);
             return diagnostics;
           }),
           lintGutter(),
