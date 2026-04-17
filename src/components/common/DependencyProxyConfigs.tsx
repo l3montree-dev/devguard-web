@@ -13,11 +13,68 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
+
+function matchPattern(pattern: string, packagePurl: string): boolean {
+  const parts = pattern.split("*");
+  if (parts.length === 1) {
+    return packagePurl === pattern;
+  }
+  if (parts[0] !== "" && !packagePurl.startsWith(parts[0])) {
+    return false;
+  }
+  if (
+    parts[parts.length - 1] !== "" &&
+    !packagePurl.endsWith(parts[parts.length - 1])
+  ) {
+    return false;
+  }
+  let rest = packagePurl;
+  for (const part of parts) {
+    if (part === "") continue;
+    const idx = rest.indexOf(part);
+    if (idx === -1) return false;
+    rest = rest.slice(idx + part.length);
+  }
+  return true;
+}
+
+interface CheckResult {
+  packagePurl: string;
+  blocked: boolean;
+  matchedRule: string;
+}
+
+function checkRulesAgainstPackages(
+  rulesText: string,
+  checkerRulesText: string,
+): CheckResult[] {
+  const rules = rulesText
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "" && !l.startsWith("#"));
+
+  const packages = checkerRulesText
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "" && !l.startsWith("#"));
+
+  return packages.map((packagePurl) => {
+    let blocked = false;
+    let matchedRule = "";
+
+    for (const rule of rules) {
+      const negate = rule.startsWith("!");
+      const pattern = negate ? rule.slice(1) : rule;
+      const matched = matchPattern(pattern, packagePurl);
+      if (matched) {
+        blocked = !negate;
+        matchedRule = rule;
+      }
+    }
+
+    return { packagePurl, blocked, matchedRule };
+  });
+}
 
 interface DependencyProxyConfig {
   rules: string;
@@ -117,16 +174,30 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
+  const [rulesCheckerOpen, setRulesCheckerOpen] = useState(false);
   const initializedForUrl = useRef<string | null | undefined>(undefined);
 
   const [selectedProxyTab, setSelectedProxyTab] = useState("");
-  const [checkPackage, setCheckPackage] = useState("");
-  const [checkResult, setCheckResult] = useState<{
-    allowed: boolean;
-    status: number | null;
-    reason?: string;
-  } | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
+
+  const [checkerRulesText, setCheckerRulesText] = useState(
+    "# Example package URLs to test against the rules: \n" +
+      "# You can add new ones or modify these to test your rules.\n" +
+      "\n" +
+      "pkg:pypi/requests@2.25.1" +
+      "\n" +
+      "pkg:npm/lodash@4.17.21" +
+      "\n" +
+      "pkg:go/github.com/lodash/lodash@v1.0.0",
+  );
+  const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
+
+  useEffect(() => {
+    if (checkerRulesText.trim()) {
+      setCheckResults(checkRulesAgainstPackages(rulesText, checkerRulesText));
+    } else {
+      setCheckResults([]);
+    }
+  }, [rulesText, checkerRulesText]);
 
   useEffect(() => {
     if (data !== undefined && initializedForUrl.current !== configUrl) {
@@ -152,39 +223,6 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
           diagnostics[0].message || "Invalid package rules configuration",
         );
       }
-    }
-  };
-
-  const handleCheck = async () => {
-    if (!proxyUrls || !selectedProxyTab || !checkPackage.trim()) return;
-    const proxyUrl = proxyUrls[selectedProxyTab];
-    if (!proxyUrl) return;
-    setIsChecking(true);
-    setCheckResult(null);
-
-    try {
-      // Route through the Next.js tunnel to avoid CORS issues and get the real HTTP status
-      const proxyPath = new URL(proxyUrl).pathname.replace(/\/$/, "");
-      const checkUrl =
-        "/api/devguard-tunnel" + proxyPath + "/" + checkPackage.trim();
-      const resp = await fetch(checkUrl, { method: "GET" });
-      let reason: string | undefined = undefined;
-      if (resp.status === 403) {
-        try {
-          const body = await resp.json();
-          reason = body.reason ?? body.message;
-        } catch {
-          reason = "Access denied";
-        }
-      }
-      setCheckResult({ allowed: resp.ok, status: resp.status, reason });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to check package";
-      setCheckResult({ allowed: false, status: 0, reason: message });
-      toast.error("Failed to check package");
-    } finally {
-      setIsChecking(false);
     }
   };
 
@@ -223,7 +261,6 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
               value={selectedProxyTab}
               onValueChange={(v) => {
                 setSelectedProxyTab(v);
-                setCheckResult(null);
               }}
             >
               <TabsList>
@@ -241,70 +278,6 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   </TabsContent>
                 ))}
             </Tabs>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium">Test Package Rules</p>
-                <div className="flex items-center gap-2">
-                  <Input
-                    variant="onCard"
-                    placeholder="e.g. lodash"
-                    value={checkPackage}
-                    onChange={(e) => {
-                      setCheckPackage(e.target.value);
-                      setCheckResult(null);
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && handleCheck()}
-                    className="w-56"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCheck}
-                    disabled={isChecking || !checkPackage.trim()}
-                  >
-                    {isChecking ? "Checking..." : "Check"}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Sends a request to the{" "}
-                  {selectedProxyTab ? selectedProxyTab.toUpperCase() : ""} proxy
-                  registry to verify whether the package is allowed or blocked
-                  by the current rules.
-                </p>
-              </div>
-              {checkResult && (
-                <div className="flex items-center gap-1.5 text-sm">
-                  {checkResult.status === 200 ? (
-                    <>
-                      <CheckCircleIcon className="h-4 w-4 shrink-0 text-green-500" />
-                      <span className="text-green-500">
-                        This package is allowed by the current rules.
-                      </span>
-                    </>
-                  ) : checkResult.status === 403 ? (
-                    <>
-                      <XCircleIcon className="h-4 w-4 shrink-0 text-red-500" />
-                      <span className="text-red-500">
-                        {checkResult.reason ? (
-                          <>Blocked: {checkResult.reason}</>
-                        ) : (
-                          "This package would be blocked by the current rules."
-                        )}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <ExclamationCircleIcon className="h-4 w-4 shrink-0 text-red-500" />
-                      <span className="text-red-500">
-                        Request failed (HTTP {checkResult.status}). Make sure
-                        you have selected the correct proxy URL tab and that the
-                        package exists in the chosen registry.
-                      </span>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
           </CardContent>
         </Card>
         <Card>
@@ -318,28 +291,37 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   Define rules for blocking packages using gitignore-style
                   patterns. Each line is one rule, applied top to bottom.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setRulesHelpOpen((v) => !v)}
-                  className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
-                >
-                  {rulesHelpOpen ? "Hide examples" : "Show examples"}
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setRulesHelpOpen((v) => !v)}
+                    className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
+                  >
+                    {rulesHelpOpen ? "Hide examples" : "Show examples"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRulesCheckerOpen((v) => !v)}
+                    className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
+                  >
+                    {rulesCheckerOpen ? "Hide tester" : "Test your rules"}
+                  </button>
+                </div>
               </div>
               {rulesHelpOpen && (
                 <div className="mt-2 flex flex-col gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
                   {[
                     {
-                      pattern: "npm/lodash",
-                      desc: "Blocks all versions of a package in a specific ecosystem.",
-                      example:
-                        "npm/lodash → blocks lodash@1.x, lodash@4.x, … in npm",
-                    },
-                    {
-                      pattern: "npm/lodash@4.17.21",
+                      pattern: "npm/lodash@1.17.21",
                       desc: "Blocks exactly one specific version.",
                       example:
                         "npm/lodash@4.17.21 → only that version is blocked",
+                    },
+                    {
+                      pattern: "npm/lodash*",
+                      desc: "Blocks all versions matching a prefix.",
+                      example:
+                        "npm/lodash* → blocks npm/lodash@4.17.21, npm/lodash@5.0.0, …",
                     },
                     {
                       pattern: "npm/lodash@4.*",
@@ -348,27 +330,16 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                         "npm/lodash@4.* → blocks npm/lodash@4.0.0, npm/lodash@4.17.21, …",
                     },
                     {
-                      pattern: "*/lodash",
-                      desc: "Wildcard * matches any single path segment — blocks a package across all ecosystems.",
-                      example: "*/lodash → matches npm/lodash and go/lodash",
+                      pattern: "*lodash*",
+                      desc: "Blocks any package with lodash in its name, regardless of ecosystem or version.",
+                      example:
+                        "*lodash* → matches npm/lodash@4.17.21, go/lodash@v1.0.0, …",
                     },
                     {
-                      pattern: "npm/*/lodash",
+                      pattern: "npm*lodash@1.17.21",
                       desc: "Wildcards can be combined to match specific patterns.",
                       example:
-                        "npm/*/lodash → matches npm/frontend/lodash but not npm/lodash or go/lodash",
-                    },
-                    {
-                      pattern: "npm/**/lodash",
-                      desc: "Double wildcard ** matches any number of path segments.",
-                      example:
-                        "npm/**/lodash → matches npm/lodash, npm/frontend/lodash, npm/a/b/lodash, …",
-                    },
-                    {
-                      pattern: "**/next",
-                      desc: "Double wildcard ** matches any number of path segments.",
-                      example:
-                        "**/next → matches npm/next, npm/example/next, npm/a/b/next, …",
+                        "npm/*/lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
                     },
                     {
                       pattern: "*",
@@ -376,10 +347,10 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                       example: "* → all packages are blocked",
                     },
                     {
-                      pattern: "!*/lodash",
+                      pattern: "!*lodash",
                       desc: "Negation with ! allows a package even if a previous rule blocked it.",
                       example:
-                        "* then !*/lodash → everything blocked except lodash",
+                        "* then !*lodash → everything blocked except lodash",
                     },
                     {
                       pattern: "!*",
@@ -407,17 +378,66 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                 </div>
               )}
             </div>
-            <CodeEditor
-              value={rulesText}
-              language="pkg"
-              onChange={setRulesText}
-              onValidation={handleEditorValidation}
-            />
+            <div className="flex flex-col gap-4 md:flex-row pb-6">
+              <div className="min-w-0 flex-1">
+                <div>
+                  <p className="mb-1 text-sm text-muted-foreground">
+                    Enter your dependency proxy rules below:
+                  </p>
+                </div>
+                <CodeEditor
+                  value={rulesText}
+                  language="dependencyProxyRule"
+                  onChange={setRulesText}
+                  onValidation={handleEditorValidation}
+                />
+              </div>
+              {rulesCheckerOpen && (
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <p className="mb-1 text-sm text-muted-foreground">
+                    Test your rules by entering package URLs (one per line) in
+                    the box below.
+                  </p>
+                  <CodeEditor
+                    value={checkerRulesText}
+                    language="purl"
+                    onChange={setCheckerRulesText}
+                  />
+
+                  {checkResults.length > 0 && (
+                    <div className="rounded-md border bg-muted/40 p-2 font-mono text-xs">
+                      {checkResults.map(
+                        ({ packagePurl, blocked, matchedRule }) => (
+                          <div
+                            key={packagePurl}
+                            className={
+                              blocked
+                                ? "text-destructive"
+                                : "text-green-600 dark:text-green-400"
+                            }
+                          >
+                            {packagePurl}
+                            {matchedRule && (
+                              <span className="opacity-60">
+                                {" # "}
+                                {blocked ? "blocked" : "allowed"} by &quot;
+                                {matchedRule}&quot;
+                              </span>
+                            )}
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {codeError && (
               <p className="text-sm text-destructive">{codeError}</p>
             )}
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Cooldown Period</CardTitle>
@@ -446,7 +466,13 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
         <div className="sticky bottom-0 flex justify-end pt-2">
           <Button
             onClick={handleSave}
-            disabled={isSaving || data === undefined || !!codeError}
+            disabled={
+              isSaving ||
+              data === undefined ||
+              !!codeError ||
+              (rulesText === (data ?? defaultConfig).rules &&
+                minReleaseTime === (data ?? defaultConfig).minReleaseTime)
+            }
           >
             {isSaving ? "Saving..." : "Save"}
           </Button>

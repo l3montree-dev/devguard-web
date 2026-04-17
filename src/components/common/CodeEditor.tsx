@@ -4,9 +4,9 @@ import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { yaml } from "@codemirror/lang-yaml";
 import { linter, lintGutter } from "@codemirror/lint";
 import type { Diagnostic } from "@codemirror/lint";
+import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
-import { EditorView, basicSetup } from "codemirror";
 import jsYaml from "js-yaml";
 import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
@@ -32,7 +32,52 @@ function tomlParseLinter() {
   };
 }
 
-function isValidPkgLine(line: string): [boolean, string | null] {
+function purlParseLinter() {
+  return (view: EditorView): Diagnostic[] => {
+    const text = view.state.doc.toString();
+    const lines = text.split("\n");
+    const diagnostics: Diagnostic[] = [];
+    lines.forEach((line, index) => {
+      if (line.trim() === "") return;
+      if (line.trim().startsWith("#")) return;
+      const tokens = line.trim().split(/\s+/);
+      const pos = view.state.doc.line(index + 1).from;
+      if (tokens.length > 1) {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Each line must contain exactly one package URL (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+        return;
+      }
+      const purl = tokens[0];
+      const validPurl = valid(purl);
+      if (!validPurl) {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Invalid package URL, expected format: pkg:<ecosystem>/<name>@<version> (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+        return;
+      }
+      // Check that a version is present (PURL version comes after @)
+      const versionMatch = purl.match(/@([^?#]+)/);
+      if (!versionMatch || versionMatch[1].trim() === "") {
+        diagnostics.push({
+          from: pos,
+          to: pos + line.length,
+          severity: "error",
+          message: `Package URL must include a version (e.g. pkg:npm/lodash@4.17.21)`,
+        });
+      }
+    });
+    return diagnostics;
+  };
+}
+
+function isValidDependencyProxyRule(line: string): [boolean, string | null] {
   const trimmed = line.trim();
   // Comments are valid
   if (trimmed.startsWith("#")) return [true, null];
@@ -44,6 +89,8 @@ function isValidPkgLine(line: string): [boolean, string | null] {
       "Empty line, use a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (*)",
     ];
 
+  const hasVersionOrWildcard = stripped.includes("*") || stripped.includes("@");
+
   // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
   if (valid(stripped)) {
     const normalizedPurl = normalize(stripped);
@@ -51,6 +98,12 @@ function isValidPkgLine(line: string): [boolean, string | null] {
       return [
         false,
         `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+      ];
+    }
+    if (!hasVersionOrWildcard) {
+      return [
+        false,
+        "Package rule must specify a version or wildcard (e.g. pkg:npm/lodash@4.17.21 or pkg:npm/lodash@*)",
       ];
     }
     return [true, null];
@@ -63,37 +116,43 @@ function isValidPkgLine(line: string): [boolean, string | null] {
           "Invalid wildcard pattern, path segments cannot be empty (e.g. avoid trailing or double /)",
         ];
       }
-      if (segment.includes("*") && segment !== "*" && segment !== "**") {
-        return [
-          false,
-          `Invalid wildcard pattern: "${segment}", wildcards must occupy a full path segment (* or **)`,
-        ];
-      }
+    }
+    if (!stripped.endsWith("*") && !stripped.includes("@")) {
+      return [
+        false,
+        "Wildcard pattern must end with * or specify a version (e.g. *react* or *react@1.0.0)",
+      ];
     }
     return [true, null];
   } else if (/^[a-zA-Z][a-zA-Z0-9_.-]*\/\S+$/.test(stripped)) {
-    // Short-form <ecosystem>/<name>[@<version>] (e.g. npm/lodash or npm/lodash@4.17.21)
+    // Short-form <ecosystem>/<name>@<version> (e.g. npm/lodash@4.17.21 or npm/lodash@*)
+    if (!hasVersionOrWildcard) {
+      return [
+        false,
+        "Package rule must specify a version or wildcard (e.g. npm/lodash@4.17.21 or npm/lodash@*)",
+      ];
+    }
     return [true, null];
   } else if (stripped.startsWith("pkg")) {
     return [
       false,
-      "Invalid package rule, expected format: <ecosystem>/<name>[@<version>], e.g. npm/lodash or npm/lodash@4.17.21",
+      "Invalid package rule, expected format: <ecosystem>/<name>@<version>, e.g. npm/lodash@4.17.21",
     ];
   }
   return [
     false,
-    "Invalid package rule, expected a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (e.g. */lodash or **/lodash)",
+    "Invalid package rule, expected a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**)",
   ];
 }
 
-function packageParseLinter() {
+function dependencyProxyRuleParseLinter() {
   return (view: EditorView): Diagnostic[] => {
     const text = view.state.doc.toString();
     const lines = text.split("\n");
     const diagnostics: Diagnostic[] = [];
     lines.forEach((line, index) => {
       if (line.trim() === "") return;
-      const [isValid, errorMessage] = isValidPkgLine(line);
+      const [isValid, errorMessage] = isValidDependencyProxyRule(line);
       if (!isValid) {
         const pos = view.state.doc.line(index + 1).from;
         diagnostics.push({
@@ -139,14 +198,16 @@ const languageExtensions = {
   yaml: yaml(),
   json: json(),
   toml: StreamLanguage.define(toml),
-  pkg: [],
+  dependencyProxyRule: [],
+  purl: [],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  pkg: packageParseLinter(),
+  dependencyProxyRule: dependencyProxyRuleParseLinter(),
+  purl: purlParseLinter(),
 };
 
 const CodeEditor = ({
