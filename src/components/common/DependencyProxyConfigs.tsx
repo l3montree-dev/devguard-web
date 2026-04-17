@@ -14,6 +14,7 @@ import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { is } from "zod/v4/locales";
+import type { Diagnostic } from "@codemirror/lint";
 
 function matchPattern(pattern: string, packagePurl: string): boolean {
   const parts = pattern.split("*");
@@ -117,7 +118,7 @@ const getEcosystemContent = (key: string, url: string) => {
           <InputWithButton
             label="Index URL"
             message="Set as index-url in pip.conf under [global], or export as PIP_INDEX_URL."
-            value={`index-url =${url}`}
+            value={`index-url = ${url}`}
             nameKey="pypi-index-url"
             copyable
           />
@@ -215,7 +216,10 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
     }
   }, [proxyUrls, selectedProxyTab]);
 
-  const handleEditorValidation = (isValid: boolean, diagnostics: any[]) => {
+  const handleEditorValidation = (
+    isValid: boolean,
+    diagnostics: Diagnostic[],
+  ) => {
     if (isValid) {
       setCodeError(null);
     } else {
@@ -283,7 +287,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-base"> Blocked Package Rules </CardTitle>
+            <CardTitle className="text-base"> Blocked Package Rules</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
@@ -340,7 +344,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                       pattern: "npm*lodash@1.17.21",
                       desc: "Wildcards can be combined to match specific patterns.",
                       example:
-                        "npm/*/lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
+                        "npm*lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
                     },
                     {
                       pattern: "*",
@@ -348,10 +352,10 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                       example: "* → all packages are blocked",
                     },
                     {
-                      pattern: "!*lodash",
+                      pattern: "!*lodash*",
                       desc: "Negation with ! allows a package even if a previous rule blocked it.",
                       example:
-                        "* then !*lodash → everything blocked except lodash",
+                        "* then !*lodash* → everything blocked except lodash",
                     },
                     {
                       pattern: "!*",

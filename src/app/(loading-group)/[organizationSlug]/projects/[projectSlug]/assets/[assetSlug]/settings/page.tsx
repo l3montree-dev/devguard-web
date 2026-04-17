@@ -413,7 +413,7 @@ const Index: FunctionComponent = () => {
                 }
               >
                 <Button variant={"outline"}>
-                  Go to Dependency Proxy Settings{" "}
+                  Go to Dependency Proxy Settings
                 </Button>
               </Link>
             </div>

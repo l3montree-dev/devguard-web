@@ -63,6 +63,16 @@ function purlParseLinter() {
           message: `Invalid package URL, expected format: pkg:<ecosystem>/<name>@<version> (e.g. pkg:npm/lodash@4.17.21)`,
         });
         return;
+      } else {
+        const normalizedPurl = normalize(purl);
+        if (normalizedPurl !== purl) {
+          diagnostics.push({
+            from: pos,
+            to: pos + line.length,
+            severity: "error",
+            message: `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+          });
+        }
       }
       // Check that a version is present (PURL version comes after @)
       const versionMatch = purl.match(/@([^?#]+)/);
@@ -88,28 +98,34 @@ function isValidDependencyProxyRule(line: string): [boolean, string | null] {
   if (stripped.trim() === "")
     return [
       false,
-      "Empty line, use a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (*)",
+      "Empty line, use a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (*)",
     ];
 
-  const hasVersionOrWildcard = stripped.includes("*") || stripped.includes("@");
-
-  // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
-  if (valid(stripped)) {
-    const normalizedPurl = normalize(stripped);
-    if (normalizedPurl !== stripped) {
-      return [
-        false,
-        `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
-      ];
+  if (stripped.startsWith("pkg:")) {
+    // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
+    if (valid(stripped)) {
+      const normalizedPurl = normalize(stripped);
+      if (normalizedPurl !== stripped) {
+        return [
+          false,
+          `Package URL is not normalized, did you mean "${normalizedPurl}"?`,
+        ];
+      }
+      const hasVersionOrWildcard =
+        stripped.includes("@") || stripped.includes("*");
+      if (!hasVersionOrWildcard) {
+        return [
+          false,
+          "Package rule must specify a version or wildcard (e.g. pkg:npm/lodash@4.17.21 or pkg:npm/lodash@*)",
+        ];
+      }
+      return [true, null];
     }
-    if (!hasVersionOrWildcard) {
-      return [
-        false,
-        "Package rule must specify a version or wildcard (e.g. pkg:npm/lodash@4.17.21 or pkg:npm/lodash@*)",
-      ];
-    }
-    return [true, null];
-  } else if (stripped.includes("*")) {
+    return [
+      false,
+      "Invalid package URL, expected format: pkg:<ecosystem>/<name>@<version>, e.g. pkg:npm/lodash@4.17.21 or pkg:npm/react*",
+    ];
+  } else if (stripped.startsWith("*")) {
     const segments = stripped.split("/");
     for (const segment of segments) {
       if (segment === "") {
@@ -119,31 +135,12 @@ function isValidDependencyProxyRule(line: string): [boolean, string | null] {
         ];
       }
     }
-    if (!stripped.endsWith("*") && !stripped.includes("@")) {
-      return [
-        false,
-        "Wildcard pattern must end with * or specify a version (e.g. *react* or *react@1.0.0)",
-      ];
-    }
     return [true, null];
-  } else if (/^[a-zA-Z][a-zA-Z0-9_.-]*\/\S+$/.test(stripped)) {
-    // Short-form <ecosystem>/<name>@<version> (e.g. npm/lodash@4.17.21 or npm/lodash@*)
-    if (!hasVersionOrWildcard) {
-      return [
-        false,
-        "Package rule must specify a version or wildcard (e.g. npm/lodash@4.17.21 or npm/lodash@*)",
-      ];
-    }
-    return [true, null];
-  } else if (stripped.startsWith("pkg")) {
-    return [
-      false,
-      "Invalid package rule, expected format: <ecosystem>/<name>@<version>, e.g. npm/lodash@4.17.21",
-    ];
   }
+
   return [
     false,
-    "Invalid package rule, expected a package pattern (e.g. npm/lodash or npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**)",
+    "Invalid package rule, expected a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**)",
   ];
 }
 
