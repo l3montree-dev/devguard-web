@@ -33,3 +33,26 @@ export function urlToBaseURL(url: string): string {
 
   return formatedUrl[1];
 }
+
+export const parseHttpsUrl = (
+  raw: string | undefined,
+  varName: string,
+): string => {
+  const trimmed = raw?.trim();
+  if (!trimmed) return "";
+  try {
+    const u = new URL(trimmed);
+    if (u.protocol !== "https:") {
+      throw new Error(`must use https (got ${u.protocol})`);
+    }
+    if (u.username || u.password) {
+      throw new Error("must not include credentials (user:pass@)");
+    }
+    return u.toString();
+  } catch (e) {
+    console.warn(
+      `[config] Ignoring ${varName}: ${(e as Error).message}. Expected absolute https URL.`,
+    );
+    return "";
+  }
+};
