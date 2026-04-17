@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { is } from "zod/v4/locales";
 
 function matchPattern(pattern: string, packagePurl: string): boolean {
   const parts = pattern.split("*");
@@ -390,6 +391,16 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   language="dependencyProxyRule"
                   onChange={setRulesText}
                   onValidation={handleEditorValidation}
+                  onSave={
+                    codeError ||
+                    isSaving ||
+                    (rulesText === (data ?? defaultConfig).rules &&
+                      minReleaseTime ===
+                        (data ?? defaultConfig).minReleaseTime) ||
+                    data === undefined
+                      ? undefined
+                      : handleSave
+                  }
                 />
               </div>
               {rulesCheckerOpen && (

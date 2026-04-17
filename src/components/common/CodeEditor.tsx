@@ -193,7 +193,7 @@ interface Props {
   language?: Language;
   onChange: (value: string) => void;
   onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
-  onSave: () => void;
+  onSave?: () => void;
   readOnly?: boolean;
 }
 
@@ -244,7 +244,7 @@ const CodeEditor = ({
         key: "Mod-s",
         preventDefault: true,
         run: () => {
-          onSaveRef.current();
+          onSaveRef.current?.();
           return true;
         },
       },
