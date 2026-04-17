@@ -42,9 +42,12 @@
           };
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
+            export NODE_OPTIONS="--max-old-space-size=4096"
+            export GIT_COMMIT_SHA="${self.rev or "dev"}"
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
-            node ./node_modules/next/dist/bin/next build
+            node ./node_modules/next/dist/bin/next build --turbopack
+            node -e "const f='.next/prerender-manifest.json',m=JSON.parse(require('fs').readFileSync(f));delete m.preview;require('fs').writeFileSync(f,JSON.stringify(m))"
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''
@@ -78,8 +81,8 @@
       {
         packages = {
           default = devguardWeb;
-          node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).node_modules;
-          node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).node_modules;
+          node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).patchedNodeModules;
+          node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).patchedNodeModules;
           "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
           "devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64 nodejsLinuxArm64;
         };

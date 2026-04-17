@@ -15,6 +15,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? "dev",
   turbopack: {
     resolveAlias: {
       istextorbinary: "./src/lib/istextorbinary-wrapper.js",
@@ -51,7 +52,8 @@ module.exports = withSentryConfig(module.exports, {
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
   // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
+  // disabled: causes excessive memory usage during webpack compilation in CI
+  widenClientFileUpload: false,
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.

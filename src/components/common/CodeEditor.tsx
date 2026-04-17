@@ -13,6 +13,8 @@ import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
+import { keymap } from "@codemirror/view";
+import { indentWithTab } from "@codemirror/commands";
 import valid from "purl/valid";
 import normalize from "purl/normalize";
 
@@ -191,6 +193,7 @@ interface Props {
   language?: Language;
   onChange: (value: string) => void;
   onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
+  onSave: () => void;
   readOnly?: boolean;
 }
 
@@ -215,6 +218,7 @@ const CodeEditor = ({
   language = "json",
   onChange,
   onValidation,
+  onSave,
   readOnly = false,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -223,6 +227,8 @@ const CodeEditor = ({
   onChangeRef.current = onChange;
   const onValidationRef = useRef(onValidation);
   onValidationRef.current = onValidation;
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
   const valueRef = useRef(value);
   valueRef.current = value;
 
@@ -231,6 +237,18 @@ const CodeEditor = ({
 
   useEffect(() => {
     if (!containerRef.current) return;
+    const tabExtension = keymap.of([indentWithTab]);
+
+    const saveKeymap = keymap.of([
+      {
+        key: "Mod-s",
+        preventDefault: true,
+        run: () => {
+          onSaveRef.current();
+          return true;
+        },
+      },
+    ]);
 
     const langLinter = languageLinters[language];
 
@@ -261,6 +279,8 @@ const CodeEditor = ({
             "&": { height: "100%", fontSize: "13px" },
             ".cm-scroller": { overflow: "auto", fontFamily: "monospace" },
           }),
+          tabExtension,
+          saveKeymap,
         ],
       }),
       parent: containerRef.current,

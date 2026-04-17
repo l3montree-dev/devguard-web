@@ -17,11 +17,10 @@ stages:
   nix_cache_public_key: nix.garage.l3montree.cloud:MGlzfPQKA91/zxw91CN+GP7NpjAAwmKvWXlDYgeeI8k=
   nix_cache_s3_bucket: nix
   nix_cache_region: garage
-  version: nix
 
 
 include:
-  - remote: https://gitlab.com/l3montree/devguard/-/raw/nix/templates/build-nix-multiarch.yml
+  - remote: https://gitlab.com/l3montree/devguard/-/raw/main/templates/build-nix-multiarch.yml
     inputs:
       <<: *common
       nix_target_amd64: "devguard-web-amd64"

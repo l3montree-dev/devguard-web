@@ -16,13 +16,10 @@ import Link from "next/link";
 import { Loader2, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import EcosystemImage from "@/components/common/EcosystemImage";
 import { Badge } from "@/components/ui/badge";
 import Section from "@/components/common/Section";
 import DependencyGraph from "../DependencyGraph";
 import { convertPathsToTree } from "../../utils/dependencyGraphHelpers";
-import { useTheme } from "next-themes";
 import ListItem from "../common/ListItem";
 
 interface VexRuleDetailsDialogProps {
@@ -52,8 +49,6 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReapplying, setIsReapplying] = useState(false);
-
-  const { theme } = useTheme();
 
   const graph = useMemo(() => {
     if (!vexRule?.pathPattern)
@@ -138,10 +133,9 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             forceVertical
           >
             <div
-              className={classNames(
-                "h-72 w-full rounded-lg border",
-                theme === "light" ? "bg-gray-50" : "bg-black",
-              )}
+              className={
+                "h-72 w-full rounded-lg border bg-gray-50 dark:bg-black"
+              }
             >
               <DependencyGraph
                 variant="compact"

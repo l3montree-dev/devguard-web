@@ -34,7 +34,6 @@ import type {
   AssetDTO,
   DependencyVulnHints,
   DetailedDependencyVulnDTO,
-  Paged,
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
@@ -47,7 +46,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { Bug, CheckCircleIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -290,7 +288,6 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
-  const { theme } = useTheme();
   const { session } = useSession();
 
   const activeOrg = useActiveOrg();
@@ -338,7 +335,7 @@ const Index: FunctionComponent = () => {
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
   // Fetch VEX rules for the current vulnerability to show FP edges in the graph
-  const { data: vexRulesData, mutate: mutateVexRules } = useSWR<Paged<VexRule>>(
+  const { data: vexRulesData, mutate: mutateVexRules } = useSWR<VexRule[]>(
     vuln
       ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
       : null,
@@ -737,7 +734,9 @@ const Index: FunctionComponent = () => {
                         </div>
                         <div
                           style={{ height: 400 }}
-                          className={`w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                          className={
+                            "w-full rounded-lg border bg-gray-50 dark:bg-black"
+                          }
                         >
                           {graphData && vuln && (
                             <DependencyGraph
@@ -756,7 +755,7 @@ const Index: FunctionComponent = () => {
                                 ...vuln.vulnerabilityPath,
                               ]}
                               onVexSelect={createFalsePositive}
-                              vexRules={vexRulesData?.data}
+                              vexRules={vexRulesData}
                             />
                           )}
                         </div>
@@ -804,13 +803,13 @@ const Index: FunctionComponent = () => {
                       )}
                     </div>
                     {/* VEX Rules applied to this vulnerability */}
-                    {vexRulesData && vexRulesData.data.length > 0 && (
+                    {vexRulesData && vexRulesData.length > 0 && (
                       <div className="mt-6">
                         <span className="font-semibold block mb-2">
-                          VEX Rules ({vexRulesData.data.length})
+                          VEX Rules ({vexRulesData.length})
                         </span>
                         <div className="flex flex-col gap-2">
-                          {vexRulesData.data.map((rule) => (
+                          {vexRulesData.map((rule) => (
                             <button
                               key={rule.id}
                               onClick={() => {
