@@ -43,9 +43,11 @@
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
             export NODE_OPTIONS="--max-old-space-size=4096"
+            export GIT_COMMIT_SHA="${self.rev or "dev"}"
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
             node ./node_modules/next/dist/bin/next build --turbopack
+            node -e "const f='.next/prerender-manifest.json',m=JSON.parse(require('fs').readFileSync(f));delete m.preview;require('fs').writeFileSync(f,JSON.stringify(m))"
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''
