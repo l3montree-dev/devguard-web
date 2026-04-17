@@ -57,10 +57,30 @@ export default async function RootLayout({
             "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
           }
         >
-          {config.themeCssUrl && (
-            <link rel="stylesheet" href={config.themeCssUrl} />
+          {config.theme.cssUrl && (
+            <link rel="stylesheet" href={config.theme.cssUrl} />
           )}
-          {config.themeJsUrl && <script src={config.themeJsUrl} defer></script>}
+          {config.theme.jsUrl && (
+            <script
+              src={config.theme.jsUrl}
+              defer
+              {...(config.theme.jsIntegrity && {
+                integrity: config.theme.jsIntegrity,
+                crossOrigin: "anonymous",
+              })}
+            ></script>
+          )}
+          {config.analytics.scriptUrl && config.analytics.websiteId && (
+            <script
+              defer
+              src={config.analytics.scriptUrl}
+              data-website-id={config.analytics.websiteId}
+              {...(config.analytics.integrity && {
+                integrity: config.analytics.integrity,
+                crossOrigin: "anonymous",
+              })}
+            />
+          )}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

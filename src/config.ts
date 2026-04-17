@@ -13,6 +13,23 @@
 // You should have received a copy of the GNU Affero General Public License
 
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+const parseHttpsUrl = (raw: string | undefined, varName: string): string => {
+  if (!raw) return "";
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== "https:") {
+      throw new Error(`must use https (got ${u.protocol})`);
+    }
+    return u.toString();
+  } catch (e) {
+    console.warn(
+      `[config] Ignoring ${varName}: ${(e as Error).message}. Expected absolute https URL.`,
+    );
+    return "";
+  }
+};
+
 export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
   devguardApiUrlPublicInternet:
@@ -23,8 +40,19 @@ export const config = {
     process.env.PRIVACY_POLICY_LINK || "https://devguard.org/privacy-policy",
   termsOfUseLink:
     process.env.TERMS_OF_USE_LINK || "https://devguard.org/terms-of-use",
-  themeJsUrl: process.env.THEME_JS_URL || "",
-  themeCssUrl: process.env.THEME_CSS_URL || "",
+  theme: {
+    jsUrl: parseHttpsUrl(process.env.THEME_JS_URL, "THEME_JS_URL"),
+    jsIntegrity: process.env.THEME_JS_INTEGRITY || "",
+    cssUrl: parseHttpsUrl(process.env.THEME_CSS_URL, "THEME_CSS_URL"),
+  },
+  analytics: {
+    scriptUrl: parseHttpsUrl(
+      process.env.ANALYTICS_SCRIPT_URL,
+      "ANALYTICS_SCRIPT_URL",
+    ),
+    websiteId: process.env.ANALYTICS_WEBSITE_ID || "",
+    integrity: process.env.ANALYTICS_SCRIPT_INTEGRITY || "",
+  },
   imprintLink: process.env.IMPRINT_LINK || "https://devguard.org/imprint",
   frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
   accountDeletionMail:
