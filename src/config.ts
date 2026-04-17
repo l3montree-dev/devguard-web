@@ -1,34 +1,7 @@
-// Copyright (C) 2023 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-const parseHttpsUrl = (raw: string | undefined, varName: string): string => {
-  if (!raw) return "";
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== "https:") {
-      throw new Error(`must use https (got ${u.protocol})`);
-    }
-    return u.toString();
-  } catch (e) {
-    console.warn(
-      `[config] Ignoring ${varName}: ${(e as Error).message}. Expected absolute https URL.`,
-    );
-    return "";
-  }
-};
+import { parseHttpsUrl } from "./utils/url";
 
 export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
