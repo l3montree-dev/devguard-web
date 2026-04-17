@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { is } from "zod/v4/locales";
 import type { Diagnostic } from "@codemirror/lint";
 
 function matchPattern(pattern: string, packagePurl: string): boolean {
