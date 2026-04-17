@@ -42,9 +42,10 @@
           };
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
+            export NODE_OPTIONS="--max-old-space-size=4096"
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
-            node ./node_modules/next/dist/bin/next build
+            node ./node_modules/next/dist/bin/next build --turbopack
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''

@@ -46,7 +46,9 @@ const VexPathPattern: FunctionComponent<VexPathPatternProps> = ({
   // Strip a leading "*" that precedes "ROOT" — the wildcard is redundant for display
   // since ROOT already conveys "your application". Renders ["*","ROOT","pkg"] as "Your Application → pkg".
   const displayPattern =
-    pathPattern.length >= 2 && pathPattern[0] === "*" && pathPattern[1] === "ROOT"
+    pathPattern.length >= 2 &&
+    pathPattern[0] === "*" &&
+    pathPattern[1] === "ROOT"
       ? pathPattern.slice(1)
       : pathPattern;
 
@@ -74,7 +76,10 @@ const VexPathPattern: FunctionComponent<VexPathPatternProps> = ({
         <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
           {displayPattern.map((segment, index) => (
             <span key={index} className="flex flex-row items-center gap-1">
-              <PathSegment segment={segment} showIcon={segment !== "*" && segment !== "ROOT"} />
+              <PathSegment
+                segment={segment}
+                showIcon={segment !== "*" && segment !== "ROOT"}
+              />
               {index < displayPattern.length - 1 && <span>→</span>}
             </span>
           ))}
