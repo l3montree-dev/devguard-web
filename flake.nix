@@ -47,7 +47,6 @@
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
             node ./node_modules/next/dist/bin/next build --turbopack
-            node -e "['prerender-manifest.json','standalone/.next/prerender-manifest.json'].forEach(p=>{const f='.next/'+p,m=JSON.parse(require('fs').readFileSync(f));delete m.preview;require('fs').writeFileSync(f,JSON.stringify(m))})"
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''
