@@ -7,7 +7,10 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="px-6 text-center text-sm text-muted-foreground sm:px-10">
+    <footer
+      id="misc-footer"
+      className="px-6 text-center text-sm text-muted-foreground sm:px-10"
+    >
       <div className="mb-2 flex flex-wrap justify-center gap-5">
         <Link
           className="!text-muted-foreground hover:!text-foreground"

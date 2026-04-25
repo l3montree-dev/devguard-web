@@ -22,7 +22,13 @@ import {
   DefaultCardHeader,
 } from "@ory/elements-react/theme";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useState,
+} from "react";
 import type { PropsWithChildren } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
@@ -76,14 +82,15 @@ function OrySsoButton({
   node,
   attributes,
   onClick,
+  className,
   ...rest
-}: OryNodeSsoButtonProps) {
+}: OryNodeSsoButtonProps & { className?: string }) {
   const provider = String(attributes.value).split("-")[0];
   const displayName = providerDisplayNames[provider];
   return (
     <Button
       variant="outline"
-      className="px-6"
+      className={`px-6 ${className ?? ""}`.trim()}
       name={attributes.name}
       type={attributes.type === "button" ? "button" : "submit"}
       value={attributes.value?.toString()}
@@ -98,7 +105,35 @@ function OrySsoButton({
 }
 
 function OrySsoRoot({ children }: OryFormSsoRootProps) {
-  return <div className="flex justify-between gap-3 mt-3">{children}</div>;
+  const ssoButtons = Children.toArray(children);
+  const providerCount = ssoButtons.length;
+
+  const rootClassName =
+    providerCount >= 3
+      ? "flex justify-between gap-3 mt-3 items-center"
+      : "flex gap-3 mt-3 items-center";
+
+  const withLayout = ssoButtons.map((child) => {
+    if (!isValidElement<{ className?: string }>(child)) return child;
+
+    const baseClass = child.props.className ?? "";
+
+    if (providerCount === 1) {
+      return cloneElement(child, {
+        className: `${baseClass} w-full`.trim(),
+      });
+    }
+
+    if (providerCount === 2) {
+      return cloneElement(child, {
+        className: `${baseClass} flex-1`.trim(),
+      });
+    }
+
+    return child;
+  });
+
+  return <div className={rootClassName}>{withLayout}</div>;
 }
 
 function SsoProviderIcon({ provider }: { provider: string }) {
