@@ -76,6 +76,7 @@ const RegistrationPage = async (props: OryPageParams) => {
                 <div
                   className="col-span-3 relative hidden border-l md:block"
                   style={{ background: "hsl(var(--harbor-background))" }}
+                  id="container-yard-scene"
                 >
                   <ContainerYardScene />
                 </div>
