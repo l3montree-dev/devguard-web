@@ -160,7 +160,7 @@ export const eventTypeMessages = (
       break;
     }
   }
-  if (event.userId.endsWith("@mcp-server")) {
+  if (event.userAgent === "devguard-mcp-server") {
     message += " (applied by AI agent)";
   }
   return message;
