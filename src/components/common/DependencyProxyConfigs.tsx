@@ -14,6 +14,9 @@ import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Diagnostic } from "@codemirror/lint";
+import Section from "./Section";
+import { CopyCodeFragment } from "./CopyCode";
+import Callout from "./Callout";
 
 function matchPattern(pattern: string, packagePurl: string): boolean {
   const parts = pattern.split("*");
@@ -121,6 +124,35 @@ const getEcosystemContent = (key: string, url: string) => {
             nameKey="pypi-index-url"
             copyable
           />
+        </div>
+      );
+    }
+    case "oci": {
+      return (
+        <div>
+          <InputWithButton
+            label="OCI Image Proxy URL"
+            message="Use this URL as the registry endpoint in your container image pull configuration to route image pulls through the dependency proxy."
+            value={url}
+            nameKey="oci-proxy-url"
+            copyable
+          />
+          <p className="my-4 text-sm">
+            <span className="font-medium mb-1 block">Example</span>
+            <CopyCodeFragment
+              codeString={`docker pull ${url}/docker.io/library/nginx:latest`}
+            />
+          </p>
+          <Callout intent="warning">
+            You need to provide the full original registry and image path after
+            the proxy URL. For example, if you want to pull nginx:latest from
+            Docker Hub, you need to use the URL{" "}
+            <code className="font-mono text-sm">
+              {url}/docker.io/library/nginx:latest
+            </code>{" "}
+            instead of just{" "}
+            <code className="font-mono text-sm">{url}/nginx:latest</code>.
+          </Callout>
         </div>
       );
     }
@@ -256,11 +288,11 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Proxy URLs</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
+        <Section
+          title="Dependency Proxy URLs"
+          description="Configure your package manager to use the dependency proxy by using the URLs below. Click on each URL for specific configuration instructions for different ecosystems."
+        >
+          <div className="border rounded-md p-4">
             <Tabs
               value={selectedProxyTab}
               onValueChange={(v) => {
@@ -282,186 +314,176 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   </TabsContent>
                 ))}
             </Tabs>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base"> Blocked Package Rules</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Define rules for blocking packages using gitignore-style
-                  patterns. Each line is one rule, applied top to bottom.
-                </p>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setRulesHelpOpen((v) => !v)}
-                    className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
-                  >
-                    {rulesHelpOpen ? "Hide examples" : "Show examples"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRulesCheckerOpen((v) => !v)}
-                    className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
-                  >
-                    {rulesCheckerOpen ? "Hide tester" : "Test your rules"}
-                  </button>
-                </div>
+          </div>
+        </Section>
+        <Section
+          description="Define rules for blocking packages using gitignore-style patterns. Each line is one rule, applied top to bottom."
+          title="Blocked Packages Rules"
+        >
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground"></p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setRulesHelpOpen((v) => !v)}
+                  className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
+                >
+                  {rulesHelpOpen ? "Hide examples" : "Show examples"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRulesCheckerOpen((v) => !v)}
+                  className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
+                >
+                  {rulesCheckerOpen ? "Hide tester" : "Test your rules"}
+                </button>
               </div>
-              {rulesHelpOpen && (
-                <div className="mt-2 flex flex-col gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-                  {[
-                    {
-                      pattern: "npm/lodash@1.17.21",
-                      desc: "Blocks exactly one specific version.",
-                      example:
-                        "npm/lodash@4.17.21 → only that version is blocked",
-                    },
-                    {
-                      pattern: "npm/lodash*",
-                      desc: "Blocks all versions matching a prefix.",
-                      example:
-                        "npm/lodash* → blocks npm/lodash@4.17.21, npm/lodash@5.0.0, …",
-                    },
-                    {
-                      pattern: "npm/lodash@4.*",
-                      desc: "Blocks all versions matching a version prefix.",
-                      example:
-                        "npm/lodash@4.* → blocks npm/lodash@4.0.0, npm/lodash@4.17.21, …",
-                    },
-                    {
-                      pattern: "*lodash*",
-                      desc: "Blocks any package with lodash in its name, regardless of ecosystem or version.",
-                      example:
-                        "*lodash* → matches npm/lodash@4.17.21, go/lodash@v1.0.0, …",
-                    },
-                    {
-                      pattern: "npm*lodash@1.17.21",
-                      desc: "Wildcards can be combined to match specific patterns.",
-                      example:
-                        "npm*lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
-                    },
-                    {
-                      pattern: "*",
-                      desc: "Blocks every package in every ecosystem.",
-                      example: "* → all packages are blocked",
-                    },
-                    {
-                      pattern: "!*lodash*",
-                      desc: "Negation with ! allows a package even if a previous rule blocked it.",
-                      example:
-                        "* then !*lodash* → everything blocked except lodash",
-                    },
-                    {
-                      pattern: "!*",
-                      desc: "Allows every package — overrides all previous block rules.",
-                      example: "* then !* → nothing is blocked in the end",
-                    },
-                    {
-                      pattern: "# comment",
-                      desc: "Lines starting with # are ignored.",
-                      example: "# block dangerous packages",
-                    },
-                  ].map(({ pattern, desc, example }) => (
-                    <div key={pattern} className="flex flex-col gap-0.5">
-                      <div className="flex items-baseline gap-2">
-                        <code className="rounded bg-muted px-1 py-0.5 font-mono text-foreground">
-                          {pattern}
-                        </code>
-                        <span>{desc}</span>
-                      </div>
-                      <span className="pl-1 text-muted-foreground/70">
-                        e.g. <code className="font-mono">{example}</code>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-            <div className="flex flex-col gap-4 md:flex-row pb-6">
-              <div className="min-w-0 flex-1">
-                <div>
-                  <p className="mb-1 text-sm text-muted-foreground">
-                    Enter your dependency proxy rules below:
-                  </p>
-                </div>
-                <CodeEditor
-                  value={rulesText}
-                  language="dependencyProxyRule"
-                  onChange={setRulesText}
-                  onValidation={handleEditorValidation}
-                  onSave={
-                    codeError ||
-                    isSaving ||
-                    (rulesText === (data ?? defaultConfig).rules &&
-                      minReleaseTime ===
-                        (data ?? defaultConfig).minReleaseTime) ||
-                    data === undefined
-                      ? undefined
-                      : handleSave
-                  }
-                />
+            {rulesHelpOpen && (
+              <div className="mt-2 flex flex-col gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
+                {[
+                  {
+                    pattern: "npm/lodash@1.17.21",
+                    desc: "Blocks exactly one specific version.",
+                    example:
+                      "npm/lodash@4.17.21 → only that version is blocked",
+                  },
+                  {
+                    pattern: "npm/lodash*",
+                    desc: "Blocks all versions matching a prefix.",
+                    example:
+                      "npm/lodash* → blocks npm/lodash@4.17.21, npm/lodash@5.0.0, …",
+                  },
+                  {
+                    pattern: "npm/lodash@4.*",
+                    desc: "Blocks all versions matching a version prefix.",
+                    example:
+                      "npm/lodash@4.* → blocks npm/lodash@4.0.0, npm/lodash@4.17.21, …",
+                  },
+                  {
+                    pattern: "*lodash*",
+                    desc: "Blocks any package with lodash in its name, regardless of ecosystem or version.",
+                    example:
+                      "*lodash* → matches npm/lodash@4.17.21, go/lodash@v1.0.0, …",
+                  },
+                  {
+                    pattern: "npm*lodash@1.17.21",
+                    desc: "Wildcards can be combined to match specific patterns.",
+                    example:
+                      "npm*lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
+                  },
+                  {
+                    pattern: "*",
+                    desc: "Blocks every package in every ecosystem.",
+                    example: "* → all packages are blocked",
+                  },
+                  {
+                    pattern: "!*lodash*",
+                    desc: "Negation with ! allows a package even if a previous rule blocked it.",
+                    example:
+                      "* then !*lodash* → everything blocked except lodash",
+                  },
+                  {
+                    pattern: "!*",
+                    desc: "Allows every package — overrides all previous block rules.",
+                    example: "* then !* → nothing is blocked in the end",
+                  },
+                  {
+                    pattern: "# comment",
+                    desc: "Lines starting with # are ignored.",
+                    example: "# block dangerous packages",
+                  },
+                ].map(({ pattern, desc, example }) => (
+                  <div key={pattern} className="flex flex-col gap-0.5">
+                    <div className="flex items-baseline gap-2">
+                      <code className="rounded bg-muted px-1 py-0.5 font-mono text-foreground">
+                        {pattern}
+                      </code>
+                      <span>{desc}</span>
+                    </div>
+                    <span className="pl-1 text-muted-foreground/70">
+                      e.g. <code className="font-mono">{example}</code>
+                    </span>
+                  </div>
+                ))}
               </div>
-              {rulesCheckerOpen && (
-                <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <p className="mb-1 text-sm text-muted-foreground">
-                    Test your rules by entering package URLs (one per line) in
-                    the box below.
-                  </p>
-                  <CodeEditor
-                    value={checkerRulesText}
-                    language="purl"
-                    onChange={setCheckerRulesText}
-                  />
-
-                  {checkResults.length > 0 && (
-                    <div className="rounded-md border bg-muted/40 p-2 font-mono text-xs">
-                      {checkResults.map(
-                        ({ packagePurl, blocked, matchedRule }) => (
-                          <div
-                            key={packagePurl}
-                            className={
-                              blocked
-                                ? "text-destructive"
-                                : "text-green-600 dark:text-green-400"
-                            }
-                          >
-                            {packagePurl}
-                            {matchedRule && (
-                              <span className="opacity-60">
-                                {" # "}
-                                {blocked ? "blocked" : "allowed"} by &quot;
-                                {matchedRule}&quot;
-                              </span>
-                            )}
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            {codeError && (
-              <p className="text-sm text-destructive">{codeError}</p>
             )}
-          </CardContent>
-        </Card>
+            {rulesCheckerOpen && (
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <p className="mb-1 text-sm text-muted-foreground">
+                  Test your rules by entering package URLs (one per line) in the
+                  box below.
+                </p>
+                <CodeEditor
+                  value={checkerRulesText}
+                  language="purl"
+                  onChange={setCheckerRulesText}
+                />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Cooldown Period</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">
-              Minimum time in hours that a package must be idle before the proxy
-              serves it. This helps to ensure that only stable packages are
-              proxied.
-            </p>
+                {checkResults.length > 0 && (
+                  <div className="rounded-md border bg-muted/40 p-2 font-mono text-xs">
+                    {checkResults.map(
+                      ({ packagePurl, blocked, matchedRule }) => (
+                        <div
+                          key={packagePurl}
+                          className={
+                            blocked
+                              ? "text-destructive"
+                              : "text-green-600 dark:text-green-400"
+                          }
+                        >
+                          {packagePurl}
+                          {matchedRule && (
+                            <span className="opacity-60">
+                              {" # "}
+                              {blocked ? "blocked" : "allowed"} by &quot;
+                              {matchedRule}&quot;
+                            </span>
+                          )}
+                        </div>
+                      ),
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-4 md:flex-row pb-6">
+            <div className="min-w-0 flex-1">
+              <div>
+                <p className="mb-1 text-sm font-medium">
+                  Enter your dependency proxy rules below:
+                </p>
+              </div>
+              <CodeEditor
+                value={rulesText}
+                language="dependencyProxyRule"
+                onChange={setRulesText}
+                onValidation={handleEditorValidation}
+                onSave={
+                  codeError ||
+                  isSaving ||
+                  (rulesText === (data ?? defaultConfig).rules &&
+                    minReleaseTime ===
+                      (data ?? defaultConfig).minReleaseTime) ||
+                  data === undefined
+                    ? undefined
+                    : handleSave
+                }
+              />
+            </div>
+          </div>
+          {codeError && <p className="text-sm text-destructive">{codeError}</p>}
+        </Section>
+        <Section
+          title="Cooldown Period"
+          description="Set a cooldown period in hours that enforces a minimum time between when a new package version is released and when it can be downloaded through the proxy. "
+        >
+          <div>
+            <span className="text-sm mb-2 block font-medium">
+              Minimum release age
+            </span>
             <div className="flex items-center gap-2">
               <Input
                 type="number"
@@ -475,8 +497,14 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                 hours
               </span>
             </div>
-          </CardContent>
-        </Card>
+            <p className="mt-2 text-sm text-muted-foreground">
+              In major supply chain incidents—such as the 2026 axios
+              compromise—malicious versions were identified and marked as
+              deprecated within a few hours. Deprecation is a common
+              registry-level mitigation used to discourage further installs.
+            </p>
+          </div>
+        </Section>
         <div className="sticky bottom-0 flex justify-end pt-2">
           <Button
             onClick={handleSave}

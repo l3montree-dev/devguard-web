@@ -6,7 +6,7 @@ import { linter, lintGutter } from "@codemirror/lint";
 import type { Diagnostic } from "@codemirror/lint";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
-import { vscodeDark, vscodeLight } from "@uiw/codemirror-theme-vscode";
+import { vscodeDarkInit, vscodeLight } from "@uiw/codemirror-theme-vscode";
 import jsYaml from "js-yaml";
 import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
@@ -18,6 +18,12 @@ import { indentWithTab } from "@codemirror/commands";
 import valid from "purl/valid";
 import normalize from "purl/normalize";
 
+const vscodeDark = vscodeDarkInit({
+  settings: {
+    background: "#0E1117",
+    gutterBackground: "#0E1117",
+  },
+});
 function tomlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
     try {
@@ -33,6 +39,10 @@ function tomlParseLinter() {
     }
   };
 }
+
+const ociReferenceRegex = new RegExp(
+  "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])(?:(?:\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+)?(?::[0-9]+)?/)?[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?(?:(?:/[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?)+)?)(?::([\w][\w.-]{0,127}))?(?:@([A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}))?$",
+);
 
 function purlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
@@ -101,6 +111,11 @@ function isValidDependencyProxyRule(line: string): [boolean, string | null] {
       "Empty line, use a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (*)",
     ];
 
+  // check if wildcard is inside - everything is valid then
+  if (stripped.includes("*")) {
+    return [true, null];
+  }
+
   if (stripped.startsWith("pkg:")) {
     // Valid fully-qualified PURL (pkg:npm/lodash@4.17.21)
     if (valid(stripped)) {
@@ -136,11 +151,13 @@ function isValidDependencyProxyRule(line: string): [boolean, string | null] {
       }
     }
     return [true, null];
+  } else if (ociReferenceRegex.test(stripped)) {
+    return [true, null];
   }
 
   return [
     false,
-    "Invalid package rule, expected a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**)",
+    "Invalid package rule, expected a package pattern (e.g. pkg:npm/lodash@4.17.21) or a wildcard (e.g. *lodash* or **lodash**) or an OCI reference (e.g. registry.example.com/repo/image:tag or registry.example.com/repo/image@sha256:abcdef...)",
   ];
 }
 
@@ -306,7 +323,7 @@ const CodeEditor = ({
   return (
     <div
       ref={containerRef}
-      className="h-full w-full overflow-hidden rounded border"
+      className="h-full w-full overflow-hidden rounded-lg border"
     />
   );
 };
