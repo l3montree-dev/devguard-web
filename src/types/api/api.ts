@@ -260,6 +260,7 @@ interface BaseVulnEventDTO {
   packageName: string | null;
   uri: string | null;
   createdByVexRule: boolean;
+  userAgent: string;
 }
 
 export interface ExternalReferenceErrorDTO {

@@ -262,10 +262,6 @@ export const findUser = (
   org: OrganizationDetailsDTO,
   currentUser?: Identity,
 ) => {
-  if (id.endsWith("@mcp-server")) {
-    id = id.replace("@mcp-server", "");
-  }
-
   if (id === "system") {
     return {
       displayName: "System",
