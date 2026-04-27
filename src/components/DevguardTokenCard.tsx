@@ -4,12 +4,16 @@ import CopyCode from "./common/CopyCode";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import { InputWithButton } from "./ui/input-with-button";
 
-const DevguardTokenCard = () => {
+const DevguardTokenCard = ({
+  title = "Create a new variable / secret",
+}: {
+  title?: string;
+}) => {
   const { pat, onCreatePat } = usePersonalAccessToken();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create a new variable / secret</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="mb-2">

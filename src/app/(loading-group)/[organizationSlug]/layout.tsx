@@ -4,6 +4,7 @@ import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
 import { notFound, redirect } from "next/navigation";
+import { config } from "../../../config";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
@@ -38,7 +39,9 @@ export default async function OrganizationLayout({
       </ClientContextWrapper>
     );
   } catch (error) {
-    // redirect to /
+    if (error instanceof HttpError && error.statusCode === 402) {
+      redirect(config.billingUrl);
+    }
     redirect("/");
   }
 }

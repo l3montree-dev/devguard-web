@@ -1,9 +1,9 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { FunctionComponent } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { AssetFormValues } from "../AssetForm";
+import type { FunctionComponent } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import type { AssetFormValues } from "../AssetForm";
 import {
   FormField,
   FormItem,

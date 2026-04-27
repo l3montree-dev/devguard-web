@@ -1,11 +1,12 @@
 "use client";
 import { createContext, useContext } from "react";
-import {
+import type {
   ArtifactDTO,
   AssetVersionDTO,
   InformationSources,
 } from "../types/api/api";
-import { NoopUpdater, WithUpdater } from "./ClientContextWrapper";
+import { NoopUpdater } from "./ClientContextWrapper";
+import { type WithUpdater } from "./ClientContextWrapper";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
 import { useActiveAsset } from "@/hooks/useActiveAsset";

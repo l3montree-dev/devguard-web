@@ -1,7 +1,7 @@
 "use client";
 
 import Page from "@/components/Page";
-import { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
+import type { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import Image from "next/image";
 import Link from "next/link";
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 import useSWR from "swr";
 
 import AssetTitle from "@/components/common/AssetTitle";
@@ -119,70 +120,122 @@ const Index: FunctionComponent = () => {
       });
     }
 
-    let json: DetailedLicenseRiskDTO;
+    const optimisticState =
+      data.status === "accepted"
+        ? "accepted"
+        : data.status === "reopened"
+          ? "open"
+          : data.status === "comment"
+            ? vuln.state
+            : undefined;
 
-    if (data.status === "mitigate") {
-      const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/mitigate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        },
-      );
-      json = await resp.json();
-    } else if (data.status === "licenseDecision") {
-      const resp = await browserApiClient(
-        `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/final-license-decision`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
-      json = await resp.json();
-    } else {
-      const resp = await browserApiClient(
-        "/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset.slug +
-          "/refs/" +
-          assetVersion?.slug +
-          "/license-risks/" +
-          vuln.id,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
-      json = await resp.json();
-    }
+    const optimisticEvent =
+      optimisticState !== undefined
+        ? ({
+            type: data.status,
+            id: "optimistic",
+            createdAt: new Date().toISOString(),
+            justification: data.justification ?? "",
+            mechanicalJustification: "",
+            userId: session?.identity.id ?? "",
+            vulnId: vuln.id,
+            vulnType: "dependencyVuln",
+            vulnerabilityName: null,
+            arbitraryJSONData: { scannerIds: "" },
+            packageName: vuln.componentPurl,
+            uri: null,
+            createdByVexRule: false,
+          } as VulnEventDTO)
+        : undefined;
 
-    if (!json?.events) {
-      return toast("Failed to update license risk", {
-        description: "Please try again later.",
-      });
-    }
+    const mutatePromise = mutate(
+      async (current) => {
+        let json: DetailedLicenseRiskDTO;
 
-    // Update the local data and revalidate
-    mutate(
-      {
-        ...vuln,
-        ...json,
-        events: vuln.events.concat([
-          {
-            ...json.events.slice(-1)[0],
-          },
-        ]),
+        if (data.status === "mitigate") {
+          const resp = await browserApiClient(
+            `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/mitigate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        } else if (data.status === "licenseDecision") {
+          const resp = await browserApiClient(
+            `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/final-license-decision`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        } else {
+          const resp = await browserApiClient(
+            "/organizations/" +
+              activeOrg.slug +
+              "/projects/" +
+              project.slug +
+              "/assets/" +
+              asset.slug +
+              "/refs/" +
+              assetVersion?.slug +
+              "/license-risks/" +
+              vuln.id,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        }
+
+        if (!json?.events) {
+          toast("Failed to update license risk", {
+            description: "Please try again later.",
+          });
+          throw new Error("Failed to update license risk");
+        }
+
+        return {
+          ...current!,
+          ...json,
+          events: current!.events.concat([json.events.slice(-1)[0]]),
+        };
       },
-      false,
+      {
+        optimisticData: optimisticState
+          ? {
+              ...vuln,
+              state: optimisticState,
+              events: vuln.events.concat(
+                optimisticEvent ? [optimisticEvent] : [],
+              ),
+            }
+          : undefined,
+        rollbackOnError: true,
+        revalidate: false,
+      },
     );
+
+    if (optimisticState !== undefined) {
+      // Optimistic update already applied to SWR cache — close the dialog immediately.
+      // The mutation continues in the background; on error SWR rolls back and shows a toast.
+      mutatePromise
+        .then(() =>
+          toast("Saved", { description: "Changes confirmed by server." }),
+        )
+        .catch(() => {});
+      setJustification("");
+      return true;
+    }
+
+    await mutatePromise;
     setJustification("");
   };
 

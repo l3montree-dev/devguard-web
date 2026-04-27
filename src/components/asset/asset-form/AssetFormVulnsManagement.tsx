@@ -3,7 +3,7 @@
 
 import ListItem from "@/components/common/ListItem";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AsyncButton } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,32 +18,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithButton } from "@/components/ui/input-with-button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useConfig } from "@/context/ConfigContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
-import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 import { AlertTriangle, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
-import React, { FunctionComponent, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import React, { type FunctionComponent, useMemo, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
-import { AssetFormValues, createUpdateHandler } from "../AssetForm";
+import { createUpdateHandler } from "../AssetForm";
+import type { AssetFormValues } from "../AssetForm";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
 import { cn } from "@/lib/utils";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { validateArtifactNameAgainstPurlSpec } from "../../../utils/common";
+import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
+import { toast } from "sonner";
+import { BranchTagSelector } from "@/components/BranchTagSelector";
+import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -434,132 +430,105 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const ArtifactInputCVSSBadge: FunctionComponent<{
-  assetId: string;
-  devguardApiUrl: string;
+const CVSSBadgePreview: FunctionComponent<{
   orgSlug: string;
   projectSlug?: string;
   assetSlug?: string;
+  publicBadgeUrl?: string;
+  copyable: boolean;
+}> = ({ orgSlug, projectSlug, assetSlug, publicBadgeUrl, copyable }) => {
+  const handleCopy = async () => {
+    if (!publicBadgeUrl) return;
+    try {
+      await navigator.clipboard.writeText(publicBadgeUrl);
+      toast("Copied to clipboard", {
+        description:
+          "The CVSS Badge URL has been copied. Use the badge in your README or other documentation.",
+      });
+    } catch {
+      toast("Failed to copy to clipboard", {
+        description:
+          "We couldn't access your clipboard. Please copy the CVSS Badge URL manually.",
+      });
+    }
+  };
+
+  return (
+    <div className="flex flex-row items-center gap-3 rounded-md border bg-background p-2 justify-between">
+      <img
+        src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+        alt="CVSS Badge"
+        className="rounded-md shadow-sm"
+      />
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!copyable || !publicBadgeUrl}
+          onClick={handleCopy}
+          aria-label="Copy CVSS badge URL"
+          className="disabled:opacity-50"
+        >
+          <ClipboardDocumentIcon className="mr-2 h-4 w-4" />
+          Copy badge URL
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const RefArtifactSelector: FunctionComponent<{
+  refs: AssetVersionDTO[];
+  initialVersionSlug?: string;
+  artifacts?: ArtifactDTO[];
   selectedVersionSlug: string;
   selectedArtifact: string;
-  setSelectedVersionSlug: (v: string) => void;
-  setSelectedArtifact: (v: string) => void;
-  refs: AssetVersionDTO[];
-  artifacts?: ArtifactDTO[];
-  selectedVersion?: AssetVersionDTO;
-  purlValidation: { isValid: boolean; warning?: string };
-  basePath?: string;
+  onSelectVersion: (slug: string) => void;
+  onSelectArtifact: (artifact: string) => void;
 }> = ({
-  orgSlug,
-  projectSlug,
-  assetSlug,
+  refs,
+  initialVersionSlug,
+  artifacts,
   selectedVersionSlug,
   selectedArtifact,
-  setSelectedVersionSlug,
-  setSelectedArtifact,
-  refs,
-  artifacts,
-  selectedVersion,
-  purlValidation,
-  basePath,
+  onSelectVersion,
+  onSelectArtifact,
 }) => {
+  const { branches, tags } = useMemo(
+    () => ({
+      branches: refs.filter((r) => r.type === "branch"),
+      tags: refs.filter((r) => r.type === "tag"),
+    }),
+    [refs],
+  );
+
+  const artifactNames = useMemo(
+    () => artifacts?.map((a) => a.artifactName) ?? [],
+    [artifacts],
+  );
+
   return (
-    <div className="flex flex-row gap-8 mt-4">
+    <div className="flex flex-row flex-wrap items-end gap-3">
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">Branch / Tag</label>
-        <Select
-          value={selectedVersionSlug}
-          onValueChange={setSelectedVersionSlug}
-        >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-grey-200 cursor-pointer">
-            <SelectValue placeholder="Select a version" />
-          </SelectTrigger>
-          <SelectContent>
-            {refs.map((ref) => (
-              <SelectItem key={ref.slug} value={ref.slug}>
-                {ref.name}
-                {ref.defaultBranch ? " (default)" : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <BranchTagSelector
+          branches={branches}
+          tags={tags}
+          initialSlug={initialVersionSlug}
+          disableNavigateToRefInsteadCall={(v) => onSelectVersion(v.slug)}
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">Artifact</label>
-        <Select
-          value={selectedArtifact}
-          onValueChange={setSelectedArtifact}
-          disabled={!selectedVersionSlug || !artifacts?.length}
-        >
-          <SelectTrigger className="bg-muted/50 outline outline-1 outline-grey-200 cursor-pointer">
-            <SelectValue
-              placeholder={
-                !selectedVersionSlug
-                  ? "Select a version first"
-                  : !artifacts?.length
-                    ? "No artifacts available"
-                    : "Select an artifact"
-              }
-            />
-          </SelectTrigger>
-          <SelectContent>
-            {artifacts?.map((artifact) => (
-              <SelectItem
-                key={artifact.artifactName}
-                value={artifact.artifactName}
-              >
-                {artifact.artifactName || "Default"}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SimpleArtifactSelector
+          artifacts={artifactNames}
+          selectedArtifact={selectedArtifact || undefined}
+          onSelect={(a) => onSelectArtifact(a ?? "")}
+          assetVersionSlug={selectedVersionSlug || undefined}
+        />
       </div>
-
-      {selectedArtifact && selectedVersion && !purlValidation.isValid && (
-        <div className="w-full">
-          <Alert variant="default">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>{purlValidation.warning}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {basePath && (
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium">CVSS-Badge</label>
-          <div className="flex flex-row items-center gap-2">
-            <img
-              src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
-              alt="CVSS Badge"
-              className="rounded-md shadow-sm hover:shadow-md transition-shadow"
-            />
-            <button
-              type="button"
-              className="cursor-pointer transition-all hover:opacity-100"
-              aria-label="Copy CVSS badge URL"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(
-                    `${basePath}/badges/cvss/`,
-                  );
-                  toast("Copied to clipboard", {
-                    description:
-                      "The CVSS Badge URL has been copied to your clipboard. Enable public access to use the Badge in your README or other documentation.",
-                  });
-                } catch (error) {
-                  toast("Failed to copy to clipboard", {
-                    description:
-                      "We couldn't access your clipboard. Please copy the CVSS Badge URL manually.",
-                  });
-                }
-              }}
-            >
-              <ClipboardDocumentIcon className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -590,34 +559,21 @@ const PublicUrlsSection: FunctionComponent<{
       value: basePath ? `${basePath}/sbom.json/` : "",
       copyToastDescription: "The SBOM-URL has been copied to your clipboard.",
     },
-    {
-      label: "CVSS Badge URL",
-      nameKey: "cvss-badge-url",
-      value: basePath ? `${basePath}/badges/cvss/` : "",
-      copyToastDescription:
-        "The CVSS Badge URL has been copied to your clipboard.",
-      message:
-        "You can use the URL to display this badge in your README or other documentation.",
-    },
   ];
 
   return (
     <>
       {urls.map((url) => (
-        <div
+        <InputWithButton
           key={url.nameKey}
-          className={copyable ? "text-foreground" : "text-muted-foreground"}
-        >
-          <InputWithButton
-            label={url.label}
-            copyable={copyable && !!url.value}
-            copyToastDescription={url.copyToastDescription}
-            nameKey={url.nameKey}
-            variant="onCard"
-            value={url.value}
-            message={url.message}
-          />
-        </div>
+          className="truncate"
+          label={url.label}
+          copyable={copyable && !!url.value}
+          copyToastDescription={url.copyToastDescription}
+          nameKey={url.nameKey}
+          variant="onCard"
+          value={url.value}
+        />
       ))}
     </>
   );
@@ -669,18 +625,19 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
     }
   }, [artifacts, selectedArtifact]);
 
-  // Get the selected version to check validation
   const selectedVersion = refs.find((ref) => ref.slug === selectedVersionSlug);
 
-  // Validate artifact name + version creates a valid PURL
-  const purlValidation = React.useMemo(() => {
-    return validateArtifactNameAgainstPurlSpec(selectedArtifact);
-  }, [selectedArtifact]);
+  const purlValidation = React.useMemo(
+    () => validateArtifactNameAgainstPurlSpec(selectedArtifact),
+    [selectedArtifact],
+  );
 
   const basePath =
     selectedVersionSlug && selectedArtifact
       ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}`
       : undefined;
+
+  const publicBadgeUrl = basePath ? `${basePath}/badges/cvss/` : undefined;
 
   return (
     <>
@@ -719,55 +676,79 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
           render={({ field }) => (
             <FormItem>
               <ListItem
+                className="!items-start"
                 Description={
-                  <>
-                    By enabling this option, your vulnerability endpoints are
-                    made publicly accessible. Select an asset version and
-                    artifact below to construct the public URLs.
-                    <ArtifactInputCVSSBadge
-                      assetId={assetId!}
+                  <div className="space-y-4">
+                    <p>
+                      By enabling this option, your vulnerability endpoints are
+                      made publicly accessible. Select an asset version and
+                      artifact below to construct the public URLs.
+                    </p>
+                    <RefArtifactSelector
+                      refs={refs}
+                      initialVersionSlug={defaultBranch?.slug}
+                      artifacts={artifacts}
+                      selectedVersionSlug={selectedVersionSlug}
+                      selectedArtifact={selectedArtifact}
+                      onSelectVersion={setSelectedVersionSlug}
+                      onSelectArtifact={setSelectedArtifact}
+                    />
+                    <CVSSBadgePreview
                       orgSlug={orgSlug}
                       projectSlug={projectSlug}
                       assetSlug={assetSlug}
-                      devguardApiUrl={devguardApiUrl}
-                      selectedVersionSlug={selectedVersionSlug}
-                      selectedArtifact={selectedArtifact}
-                      setSelectedVersionSlug={setSelectedVersionSlug}
-                      setSelectedArtifact={setSelectedArtifact}
-                      refs={refs}
-                      artifacts={artifacts}
-                      selectedVersion={selectedVersion}
-                      purlValidation={purlValidation}
-                      basePath={basePath}
+                      publicBadgeUrl={publicBadgeUrl}
+                      copyable={field.value}
                     />
-                    {field.value && (
-                      <Collapsible defaultOpen={false} className="mt-4">
-                        <div className="rounded-lg border bg-background overflow-hidden">
-                          <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
-                            <span>Public URLs</span>
-                            <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <div className="border-t px-4 py-4 space-y-2">
-                              <PublicUrlsSection
-                                devguardApiUrl={devguardApiUrl}
-                                orgSlug={orgSlug}
-                                copyable={field.value}
-                                basePath={basePath}
-                              />
-                            </div>
-                          </CollapsibleContent>
-                        </div>
-                      </Collapsible>
-                    )}
-                  </>
+                    {selectedArtifact &&
+                      selectedVersion &&
+                      !purlValidation.isValid && (
+                        <Alert variant="default">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertDescription>
+                            {purlValidation.warning}
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    <Collapsible defaultOpen={false}>
+                      <div
+                        className={cn(
+                          "rounded-lg border bg-background overflow-hidden",
+                          !field.value && "opacity-60",
+                        )}
+                      >
+                        <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
+                          <span className="flex items-center gap-2">
+                            Public SBOM/ VEX/ CSAF URLs
+                            {!field.value && (
+                              <span className="text-xs font-normal text-muted-foreground">
+                                (enable public access to copy)
+                              </span>
+                            )}
+                          </span>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 [[data-state=open]_&]:rotate-180" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="border-t px-4 py-4 space-y-2">
+                            <PublicUrlsSection
+                              devguardApiUrl={devguardApiUrl}
+                              orgSlug={orgSlug}
+                              copyable={field.value}
+                              basePath={basePath}
+                            />
+                          </div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  </div>
                 }
-                Title={"Enable public access to vulnerability data."}
+                Title="Enable public access to vulnerability data"
                 Button={
                   <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      className="mt-6"
                     />
                   </FormControl>
                 }

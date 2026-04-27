@@ -1,4 +1,5 @@
-import { FunctionComponent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,

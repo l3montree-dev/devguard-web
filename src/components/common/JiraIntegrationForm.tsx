@@ -11,7 +11,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "sonner";
-import { JiraIntegrationDTO } from "@/types/api/api";
+import type { JiraIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import React from "react";

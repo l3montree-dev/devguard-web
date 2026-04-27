@@ -1,5 +1,5 @@
 import { config as appConfig } from "@/config";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "node:stream";
 
 export const config = {

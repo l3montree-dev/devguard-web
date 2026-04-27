@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { FunctionComponent } from "react";
-import { CarouselApi, CarouselItem } from "../../ui/carousel";
+import React, { type FunctionComponent } from "react";
+import { CarouselItem } from "../../ui/carousel";
+import type { CarouselApi } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import {
+import type {
   OrganizationDetailsDTO,
   GitLabIntegrationDTO,
 } from "../../../types/api/api";

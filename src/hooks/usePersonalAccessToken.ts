@@ -1,6 +1,6 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
-import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
+import type { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
 import { uniqBy, isEqual } from "lodash";

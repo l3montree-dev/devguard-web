@@ -2,8 +2,9 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
-import React, { FunctionComponent } from "react";
-import { Carousel, CarouselApi, CarouselContent } from "../ui/carousel";
+import React, { type FunctionComponent } from "react";
+import { Carousel, CarouselContent } from "../ui/carousel";
+import type { CarouselApi } from "../ui/carousel";
 
 import useRepositoryConnection from "../../hooks/useRepositoryConnection";
 import { Dialog, DialogContent } from "../ui/dialog";

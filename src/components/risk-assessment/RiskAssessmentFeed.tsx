@@ -18,7 +18,9 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { UserRole, VulnEventDTO } from "@/types/api/api";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { UserRole } from "@/types/api/api";
+import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,
@@ -44,28 +46,22 @@ import {
   Scale,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
 import Markdown from "react-markdown";
 import rehypeExternalLinks from "rehype-external-links";
 import remarkGfm from "remark-gfm";
+import Alert from "../common/Alert";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import FormatDate from "./FormatDate";
+import { Collapsible, CollapsibleContent } from "../ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import Alert from "../common/Alert";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-import { useState } from "react";
+import FormatDate from "./FormatDate";
 
 function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   switch (eventType) {
@@ -96,6 +92,12 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
   }
 }
 
+function hasQuickfix(
+  directDependencyFixedVersion: string | null | undefined,
+): boolean {
+  return !!directDependencyFixedVersion;
+}
+
 const RiskFeedItem = ({
   event,
   events,
@@ -108,6 +110,7 @@ const RiskFeedItem = ({
   vulnerabilityName,
   deleteEvent,
   page,
+  directDependencyFixedVersion,
 }: {
   event: VulnEventDTO;
   events: VulnEventDTO[];
@@ -120,6 +123,7 @@ const RiskFeedItem = ({
   vulnerabilityName: string;
   deleteEvent?: (eventId: string) => void;
   page: number;
+  directDependencyFixedVersion?: string | null;
 }) => {
   const user = findUser(event.userId, org, currentUser);
 
@@ -136,16 +140,18 @@ const RiskFeedItem = ({
     >
       <div
         className={classNames(
-          event.createdByVexRule ? "border-dashed border" : "",
+          event.createdByVexRule || hasQuickfix(directDependencyFixedVersion)
+            ? "border-dashed border"
+            : "",
           "absolute left-[13px] h-full border-l border-r -bottom-[35px]",
         )}
       />
       <div
         className={classNames(
           event.createdByVexRule
-            ? "bg-secondary"
+            ? "bg-secondary text-secondary-foreground"
             : evTypeBackground[event.type],
-          "h-7 w-7 rounded-full text-white border-2 flex flex-row items-center z-10 justify-center border-background p-1",
+          "h-7 w-7 rounded-full border-2 flex flex-row items-center z-10 justify-center border-background p-1",
         )}
       >
         <EventTypeIcon eventType={event.type} />
@@ -258,11 +264,13 @@ export default function RiskAssessmentFeed({
   vulnerabilityName,
   page,
   deleteEvent,
+  directDependencyFixedVersion,
 }: {
   events: VulnEventDTO[];
   vulnerabilityName: string;
   page: string;
   deleteEvent: (eventId: string) => Promise<void>;
+  directDependencyFixedVersion?: string | null;
 }) {
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -338,6 +346,9 @@ export default function RiskAssessmentFeed({
                       key={event.id}
                       event={event}
                       events={events}
+                      directDependencyFixedVersion={
+                        directDependencyFixedVersion
+                      }
                     />
                   );
                 })}
@@ -363,6 +374,7 @@ export default function RiskAssessmentFeed({
                   key={event.id}
                   event={event}
                   events={events}
+                  directDependencyFixedVersion={directDependencyFixedVersion}
                 />
               );
             })}

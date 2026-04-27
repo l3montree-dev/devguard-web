@@ -23,14 +23,13 @@ import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { useSession } from "../../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
-import {
+import type {
   CandidatesDTO,
   Paged,
   ReleaseDTO,
   ReleaseItem,
 } from "../../../../../../types/api/api";
-import { Modify } from "../../../../../../types/common";
-
+import { type Modify } from "../../../../../../types/common";
 const Releases = () => {
   const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
@@ -137,13 +136,15 @@ const Releases = () => {
                   key={release.id}
                   Title={release.name}
                   Button={
-                    <Alert
-                      onConfirm={() => deleteRelease(release)}
-                      title="Delete Release"
-                      description="Are you sure you want to delete this release? This action cannot be undone."
-                    >
-                      <Button variant="destructive">Delete</Button>
-                    </Alert>
+                    session && (
+                      <Alert
+                        onConfirm={() => deleteRelease(release)}
+                        title="Delete Release"
+                        description="Are you sure you want to delete this release? This action cannot be undone."
+                      >
+                        <Button variant="destructive">Delete</Button>
+                      </Alert>
+                    )
                   }
                   Description={
                     <div>

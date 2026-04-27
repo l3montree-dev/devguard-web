@@ -11,7 +11,7 @@ import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "sonner";
-import { GitLabIntegrationDTO } from "@/types/api/api";
+import type { GitLabIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";

@@ -1,4 +1,4 @@
-import { OrganizationDetailsDTO } from "@/types/api/api";
+import type { OrganizationDetailsDTO } from "@/types/api/api";
 import { useOrganization } from "../context/OrganizationContext";
 
 export function useActiveOrg(): OrganizationDetailsDTO {

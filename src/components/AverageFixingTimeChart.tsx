@@ -1,13 +1,5 @@
-import { FunctionComponent } from "react";
-import {
-  Label,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-  ReferenceLine,
-} from "recharts";
+import type { FunctionComponent } from "react";
 
-import { ChartContainer } from "./ui/chart";
 import {
   Card,
   CardHeader,
@@ -15,41 +7,10 @@ import {
   CardDescription,
   CardContent,
 } from "./ui/card";
-import { classNames } from "../utils/common";
+import { classNames, getHumanReadableDuration } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
-import { AverageFixingTime } from "../types/api/api";
-import Loading from "./common/Loading";
-import { Loader2 } from "lucide-react";
+import type { AverageFixingTime } from "../types/api/api";
 import { Skeleton } from "./ui/skeleton";
-
-function getHumanReadableDuration(seconds: number) {
-  const timeUnits = [
-    { unit: "year", seconds: 365 * 24 * 60 * 60 },
-    { unit: "month", seconds: 30 * 24 * 60 * 60 },
-    { unit: "week", seconds: 7 * 24 * 60 * 60 },
-    { unit: "day", seconds: 24 * 60 * 60 },
-    { unit: "hour", seconds: 60 * 60 },
-    { unit: "minute", seconds: 60 },
-    { unit: "second", seconds: 1 },
-  ];
-
-  for (let i = 0; i < timeUnits.length; i++) {
-    const currentUnit = timeUnits[i];
-    if (seconds >= currentUnit.seconds) {
-      const duration = seconds / currentUnit.seconds;
-      return {
-        duration: duration.toFixed(2),
-        type: currentUnit.unit + (duration > 1 ? "s" : ""),
-      };
-    }
-  }
-
-  // If the input is less than 1 second
-  return {
-    duration: 0,
-    type: "seconds",
-  };
-}
 
 interface Props {
   avgFixingTime: AverageFixingTime | undefined;
@@ -72,7 +33,7 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-base">{title}</CardTitle>
           <CardDescription>
             {description}. Target Line shows 30 days.
           </CardDescription>
@@ -100,97 +61,24 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
 
   const { duration, type } = getHumanReadableDuration(seconds);
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="">{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="-mb-20 relative">
-          <ChartContainer
-            config={{
-              should: { label: "Should", color: "var(--color-should)" },
-              has: { label: "Has", color: "var(--color-has)" },
-            }}
-            className="mx-auto aspect-square max-h-[250px]"
-          >
-            <RadialBarChart
-              data={[
-                {
-                  should: 60 * 60 * 24 * 30, //4 * 30 * 24 * 60 * 60,
-                  has: seconds,
-                },
-              ]}
-              startAngle={180}
-              endAngle={0}
-              innerRadius={80}
-              outerRadius={130}
-            >
-              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                <Label
-                  content={({ viewBox }) => {
-                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                      if (!hasData) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) - 8}
-                              className="fill-foreground text-6xl"
-                            >
-                              ∞
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 16}
-                              className="fill-muted-foreground text-sm"
-                            >
-                              No data yet
-                            </tspan>
-                          </text>
-                        );
-                      }
-
-                      return (
-                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 16}
-                            className="fill-foreground text-2xl font-bold"
-                          >
-                            {duration}
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 4}
-                            className="fill-muted-foreground"
-                          >
-                            {type}
-                          </tspan>
-                        </text>
-                      );
-                    }
-                  }}
-                />
-              </PolarRadiusAxis>
-              <RadialBar
-                fill="hsl(var(--secondary))"
-                dataKey="should"
-                className="stroke-transparent"
-              />
-              <RadialBar
-                dataKey="has"
-                cornerRadius={5}
-                fill="hsl(var(--primary))"
-                className="stroke-2"
-              />
-              {/* Custom reference line */}
-            </RadialBarChart>
-          </ChartContainer>
+      <CardContent className="flex flex-col flex-1">
+        <div className="flex flex-col items-center justify-center flex-1 gap-1">
+          {hasData ? (
+            <>
+              <span className="text-3xl font-semibold">{duration}</span>
+              <span className="text-sm text-muted-foreground">{type}</span>
+            </>
+          ) : (
+            <>
+              <span className="text-3xl text-muted-foreground">∞</span>
+              <span className="text-sm text-muted-foreground">No data yet</span>
+            </>
+          )}
         </div>
         <div className="flex">
           <span

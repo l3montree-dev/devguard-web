@@ -12,7 +12,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import {
   Card,
   CardContent,
@@ -43,8 +44,8 @@ import VulnEventItem from "../../../../../../../../../components/VulnEventItem";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
-import {
-  AverageFixingTime,
+import type {
+  AllAverageFixingTimes,
   ComponentRisk,
   LicenseResponse,
   Paged,
@@ -54,7 +55,6 @@ import {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
-
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
@@ -73,21 +73,6 @@ const Index: FunctionComponent = () => {
     };
   const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
 
-  const { data: events, isLoading: eventsLoading } = useSWR<
-    Paged<VulnEventDTO>
-  >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/events/?pageSize=4",
-    fetcher,
-  );
-
   const url =
     "/organizations/" +
     organizationSlug +
@@ -97,6 +82,10 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/refs/" +
     assetVersionSlug;
+
+  const { data: events, isLoading: eventsLoading } = useSWR<
+    Paged<VulnEventDTO>
+  >(url + "/events/?pageSize=4", fetcher);
 
   const urlQueryAppendixForArtifact = selectedArtifact
     ? "?artifactName=" + encodeURIComponent(selectedArtifact)
@@ -122,50 +111,15 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
-  const { data: avgLowFixingTime, isLoading: avgLowFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url + "/stats/average-fixing-time/?severity=low" + urlAppendixForArtifact,
+  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
+    useSWR<AllAverageFixingTimes>(
+      url + "/stats/average-fixing-time/" + urlQueryAppendixForArtifact,
       fetcher,
     );
-  const { data: avgMediumFixingTime, isLoading: avgMediumFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url +
-        "/stats/average-fixing-time/?severity=medium" +
-        urlAppendixForArtifact,
-      fetcher,
-    );
-  const { data: avgHighFixingTime, isLoading: avgHighFixingTimeLoading } =
-    useSWR<AverageFixingTime>(
-      url +
-        "/stats/average-fixing-time/?severity=high" +
-        urlAppendixForArtifact,
-      fetcher,
-    );
-  const {
-    data: avgCriticalFixingTime,
-    isLoading: avgCriticalFixingTimeLoading,
-  } = useSWR<AverageFixingTime>(
-    url +
-      "/stats/average-fixing-time/?severity=critical" +
-      urlAppendixForArtifact,
-    fetcher,
-  );
 
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
-  >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/components/licenses/" +
-      urlQueryAppendixForArtifact,
-    fetcher,
-  );
+  >(url + "/components/licenses/" + urlQueryAppendixForArtifact, fetcher);
 
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");
@@ -408,8 +362,15 @@ const Index: FunctionComponent = () => {
                   variant="critical"
                   title="Avg. remediation time"
                   description="Time for critical severity vulnerabilities"
-                  isLoading={avgCriticalFixingTimeLoading}
-                  avgFixingTime={avgCriticalFixingTime}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds:
+                        averageFixingTime.riskAvgCritical,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgCritical,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -417,8 +378,14 @@ const Index: FunctionComponent = () => {
                   variant="high"
                   title="Avg. remediation time"
                   description="Time for high severity vulnerabilities"
-                  avgFixingTime={avgHighFixingTime}
-                  isLoading={avgHighFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgHigh,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgHigh,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -426,8 +393,14 @@ const Index: FunctionComponent = () => {
                   variant="medium"
                   title="Avg. remediation time"
                   description="Time for medium severity vulnerabilities"
-                  avgFixingTime={avgMediumFixingTime}
-                  isLoading={avgMediumFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgMedium,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgMedium,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
 
                 <AverageFixingTimeChart
@@ -435,8 +408,14 @@ const Index: FunctionComponent = () => {
                   variant="low"
                   title="Avg. remediation time"
                   description="Time for low severity vulnerabilities"
-                  avgFixingTime={avgLowFixingTime}
-                  isLoading={avgLowFixingTimeLoading}
+                  avgFixingTime={
+                    averageFixingTime && {
+                      averageFixingTimeSeconds: averageFixingTime.riskAvgLow,
+                      averageFixingTimeSecondsByCvss:
+                        averageFixingTime.cvssAvgLow,
+                    }
+                  }
+                  isLoading={averageFixingTimeLoading}
                 />
               </div>
               <Card className="col-span-4 flex flex-col">

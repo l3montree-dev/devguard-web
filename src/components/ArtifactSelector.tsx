@@ -21,6 +21,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import Link from "next/link";
+import { useSession } from "@/context/SessionContext";
 
 export function useSelectArtifact(
   unassignPossible: boolean,
@@ -41,13 +42,16 @@ export function SimpleArtifactSelector({
   selectedArtifact,
   unassignPossible = false,
   isReleaseSelector = false,
+  assetVersionSlug,
 }: {
   artifacts: string[];
   onSelect: (artifact: string | undefined) => void;
   selectedArtifact?: string;
   unassignPossible?: boolean;
   isReleaseSelector?: boolean;
+  assetVersionSlug?: string;
 }) {
+  const { session } = useSession();
   const [filter, setFilter] = useState("");
 
   const filteredArtifacts = useMemo(() => {
@@ -63,17 +67,19 @@ export function SimpleArtifactSelector({
     assetVersionSlug?: string;
   };
 
+  const effectiveAssetVersionSlug = assetVersionSlug ?? params.assetVersionSlug;
+
   const updateAssetVersion = useUpdateAssetVersionState();
 
   const handleArtifactCreation = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!params.assetVersionSlug) {
+    if (!effectiveAssetVersionSlug) {
       toast.error("Asset version is not selected.");
       return;
     }
 
     const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts/`,
+      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${effectiveAssetVersionSlug}/artifacts/`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -136,7 +142,8 @@ export function SimpleArtifactSelector({
         )}
         {filteredArtifacts.length === 0 &&
           filter.length > 0 &&
-          !isReleaseSelector && (
+          !isReleaseSelector &&
+          session && (
             <DropdownMenuItem
               onClick={handleArtifactCreation}
               className="bg-card cursor-pointer mt-2 border flex flex-row justify-between font-medium"
@@ -160,9 +167,9 @@ export function SimpleArtifactSelector({
             {artifact === "" ? "Default" : artifact}
           </DropdownMenuCheckboxItem>
         ))}
-        {!isReleaseSelector && (
+        {!isReleaseSelector && effectiveAssetVersionSlug && (
           <Link
-            href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts`}
+            href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${effectiveAssetVersionSlug}/artifacts`}
           >
             <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
               View all artifacts

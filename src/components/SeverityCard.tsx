@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -18,8 +18,8 @@ import { useSearchParams } from "next/navigation";
 
 interface Props {
   currentAmount: number;
-  queryIntervalStart: number;
-  queryIntervalEnd: number;
+  queryIntervalStart?: number;
+  queryIntervalEnd?: number;
   variant: "high" | "medium" | "low" | "critical";
   mode?: "risk" | "cvss";
   isLoading: boolean;
@@ -44,29 +44,37 @@ const SeverityCard: FunctionComponent<Props> = ({
     variant: Props["variant"],
   ): { [key: string]: string } => {
     const property = mode === "risk" ? "raw_risk_assessment" : "CVE.cvss";
+    const result: { [key: string]: string } = {};
 
     switch (variant) {
       case "low":
-        return {
-          [`filterQuery[${property}][is less than]`]:
-            queryIntervalEnd.toString(),
-        };
+        if (queryIntervalEnd !== undefined) {
+          result[`filterQuery[${property}][is less than]`] =
+            queryIntervalEnd.toString();
+        }
+        break;
 
       case "high":
       case "medium":
-        return {
-          [`filterQuery[${property}][is less than]`]:
-            queryIntervalEnd.toString(),
-          [`filterQuery[${property}][is greater than]`]:
-            queryIntervalStart.toString(),
-        };
+        if (queryIntervalEnd !== undefined) {
+          result[`filterQuery[${property}][is less than]`] =
+            queryIntervalEnd.toString();
+        }
+        if (queryIntervalStart !== undefined) {
+          result[`filterQuery[${property}][is greater than]`] =
+            queryIntervalStart.toString();
+        }
+        break;
 
       case "critical":
-        return {
-          [`filterQuery[${property}][is greater than]`]:
-            queryIntervalStart.toString(),
-        };
+        if (queryIntervalStart !== undefined) {
+          result[`filterQuery[${property}][is greater than]`] =
+            queryIntervalStart.toString();
+        }
+        break;
     }
+
+    return result;
   };
 
   if (isLoading) {
@@ -89,7 +97,12 @@ const SeverityCard: FunctionComponent<Props> = ({
                 `/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${activeAssetVersion?.slug}/dependency-risks?` +
                 new URLSearchParams({
                   ...applySQLFilter(variant),
-                  ...(artifactName && { artifact: artifactName }),
+                  ...(artifactName
+                    ? {
+                        ["filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]"]:
+                          artifactName,
+                      }
+                    : {}),
                 })
               }
               className="text-xs !text-muted-foreground"

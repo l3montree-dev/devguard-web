@@ -13,4 +13,8 @@ export const documentationLinks = {
     "https://devguard.org/explanations/vulnerability-management/risk-assessment-methodology",
   markFalsePositive:
     "https://devguard.org/explanations/vulnerability-management/vulnerability-events#2-mark-as-false-positive",
+  cveDetails: (cveId: string) =>
+    `https://docs.devguard.org/vulnerability-database/${cveId}/`,
+  packageInspector: (purl: string) =>
+    `https://docs.devguard.org/package-inspector/${encodeURIComponent(purl)}`,
 };

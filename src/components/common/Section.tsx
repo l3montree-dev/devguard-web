@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { classNames } from "@/utils/common";
-import React, { FunctionComponent, ReactNode } from "react";
+import React, { type FunctionComponent, type ReactNode } from "react";
 
 interface Props {
   title?: string;

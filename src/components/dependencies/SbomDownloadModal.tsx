@@ -15,11 +15,12 @@ import {
 } from "../ui/dialog";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { ArtifactDTO } from "../../types/api/api";
+import type { ArtifactDTO } from "../../types/api/api";
 import {
   QueryArtifactSelector,
   SimpleArtifactSelector,

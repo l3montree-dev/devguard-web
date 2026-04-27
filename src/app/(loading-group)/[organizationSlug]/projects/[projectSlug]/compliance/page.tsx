@@ -2,7 +2,8 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { Policy, UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/api/api";
+import type { Policy } from "@/types/api/api";
 
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import Link from "next/link";
@@ -41,7 +42,7 @@ const ComplianceIndex = () => {
       projectSlug +
       "/policies/",
     async (url: string) => {
-      const [allPolicies, enabledPolicies] = await Promise.all([
+      const [enabledPolicies, allPolicies] = await Promise.all([
         browserApiClient(url).then((r) => r.json()),
         browserApiClient(
           "/organizations/" + organizationSlug + "/policies/",

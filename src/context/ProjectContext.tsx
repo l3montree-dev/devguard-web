@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext } from "react";
-import { AssetDTO, ProjectDTO } from "../types/api/api";
-import { WithUpdater } from "./ClientContextWrapper";
+import type { AssetDTO, ProjectDTO } from "../types/api/api";
+import type { WithUpdater } from "./ClientContextWrapper";
 
 const ProjectContext = createContext<
   WithUpdater<(ProjectDTO & { assets: AssetDTO[] }) | null>

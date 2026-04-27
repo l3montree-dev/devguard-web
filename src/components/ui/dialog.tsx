@@ -3,7 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 import { cn } from "@/lib/utils";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Dispatch } from "react";
+import type { Dispatch } from "react";
 
 const Dialog = DialogPrimitive.Root;
 

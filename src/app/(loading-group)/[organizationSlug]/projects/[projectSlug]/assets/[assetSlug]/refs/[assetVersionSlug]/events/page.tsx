@@ -2,8 +2,8 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { Paged, VulnEventDTO } from "@/types/api/api";
-import { FunctionComponent } from "react";
+import type { Paged, VulnEventDTO } from "@/types/api/api";
+import type { FunctionComponent } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";

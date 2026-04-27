@@ -2,7 +2,7 @@
 
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
-import CopyCode from "@/components/common/CopyCode";
+
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import FormatDate from "@/components/risk-assessment/FormatDate";
@@ -25,40 +25,39 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useCreateVexRule } from "@/hooks/useCreateVexRule";
-import {
+import { RequirementsLevel } from "@/types/api/api";
+import type {
   AssetDTO,
   DependencyVulnHints,
   DetailedDependencyVulnDTO,
-  RequirementsLevel,
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
-import { beautifyPurl, getEcosystem } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
-  BugAntIcon,
   InformationCircleIcon,
   ShareIcon,
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { Bug, CheckCircleIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FunctionComponent, ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
+import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
@@ -75,11 +74,10 @@ import { Skeleton } from "../../../../../../../../../../../components/ui/skeleto
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import {
-  convertPathsToTree,
-  ViewDependencyTreeNode,
-} from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
+import { useSession } from "@/context/SessionContext";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -288,99 +286,9 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
     .join("\n");
 };
 
-type MemoResult = {
-  globalUpdate: string;
-  ecosystemUpdate: string;
-};
-
-function Quickfix(props: { vuln: string; version?: string; package?: string }) {
-  const { globalUpdate, ecosystemUpdate } = useMemo<MemoResult>(() => {
-    switch (getEcosystem(props.vuln)) {
-      case "npm": {
-        return {
-          globalUpdate: `npm audit fix`,
-          ecosystemUpdate: `npm install ${props.package}@${props.version}`,
-        };
-      }
-      case "golang": {
-        return {
-          globalUpdate: `go get -u ./...`,
-          ecosystemUpdate: `go get ${props.package}@${props.version}`,
-        };
-      }
-      case "pypi": {
-        return {
-          globalUpdate: `pip install pip-audit 
-          pip-audit`,
-          ecosystemUpdate: `pip install ${props.package}@${props.version}`,
-        };
-      }
-      case "cargo": {
-        return {
-          globalUpdate: `cargo update`,
-          ecosystemUpdate: `# in Cargo.toml: ${props.package}="${props.version}"`,
-        };
-      }
-      case "nuget": {
-        return {
-          globalUpdate: `dotnet list package --vulnerable
-          dotnet outdated`,
-          ecosystemUpdate: `dotnet add package ${props.package} --version${props.version}`,
-        };
-      }
-      case "apk": {
-        return {
-          globalUpdate: `apk update && apk upgrade`,
-          ecosystemUpdate: `apk add ${props.package}=${props.version}`,
-        };
-      }
-      // Ref: https://github.com/l3montree-dev/devguard/issues/1050
-      /*case "deb": {
-        return {
-          globalUpdate: `apt update && apt upgrade`,
-          ecosystemUpdate: `apt-get install -y ${props.package}=${props.version}`,
-        };
-      }*/
-      default:
-        return {
-          globalUpdate: ``,
-          ecosystemUpdate: ``,
-        };
-    }
-  }, []);
-
-  return globalUpdate === "" && ecosystemUpdate === "" ? null : (
-    <div className="relative">
-      <h3 className="mb-2 text-sm font-semibold">Quick Fix</h3>
-      <div className="relative ">
-        <div className="rounded-lg ">
-          <div className=" rounded-lg border bg-card p-4 border">
-            <div className="text-sm">
-              <div className="mb-2">
-                <span className="text-xs text-muted-foreground">
-                  Update all Dependencies
-                </span>
-
-                <CopyCode codeString={globalUpdate}></CopyCode>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground">
-                  {`Update only ${props.package} `}
-                </span>
-
-                <CopyCode codeString={ecosystemUpdate}></CopyCode>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
-  const { theme } = useTheme();
+  const { session } = useSession();
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -390,6 +298,7 @@ const Index: FunctionComponent = () => {
   const assetVersion = useActiveAssetVersion();
 
   const deleteEvent = useDeleteEvent();
+  const currentUser = useCurrentUser();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
@@ -425,10 +334,10 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
-  // Fetch VEX rules for the current CVE to show FP edges in the graph
+  // Fetch VEX rules for the current vulnerability to show FP edges in the graph
   const { data: vexRulesData, mutate: mutateVexRules } = useSWR<VexRule[]>(
     vuln
-      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?vulnId=${encodeURIComponent(vuln.id)}`
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
       : null,
     fetcher,
   );
@@ -555,72 +464,123 @@ const Index: FunctionComponent = () => {
       return true;
     }
 
-    await mutate(async (prev) => {
-      let json: any;
-      if (data.status === "mitigate") {
-        const resp = await browserApiClient(
-          "/organizations/" +
-            activeOrg.slug +
-            "/projects/" +
-            project.slug +
-            "/assets/" +
-            asset.slug +
-            "/refs/" +
-            assetVersion?.slug +
-            "/dependency-vulns/" +
-            vuln.id +
-            "/mitigate",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              comment: data.justification,
-            }),
-          },
-        );
-        json = await resp.json();
-      } else {
-        const resp = await browserApiClient(
-          "/organizations/" +
-            activeOrg.slug +
-            "/projects/" +
-            project.slug +
-            "/assets/" +
-            asset.slug +
-            "/refs/" +
-            assetVersion?.slug +
-            "/dependency-vulns/" +
-            vuln.id,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          },
-        );
-        json = await resp.json();
-      }
+    const optimisticState =
+      data.status === "falsePositive"
+        ? "falsePositive"
+        : data.status === "accepted"
+          ? "accepted"
+          : data.status === "reopened"
+            ? "open"
+            : data.status === "comment"
+              ? vuln.state
+              : undefined;
 
-      if (!json.events) {
-        return toast("Failed to update vulnerability", {
-          description: "Please try again later.",
-        });
-      }
-      setJustification("");
-      return {
-        ...prev,
-        ...json,
-        events: prev?.events.concat([
-          {
-            ...json.events.slice(-1)[0],
-            originalAssetVersionName: assetVersion?.name ?? "",
-          },
-        ]),
-      };
-    });
+    const optimisticEvent =
+      optimisticState !== undefined
+        ? ({
+            type: data.status,
+            id: "optimistic",
+            createdAt: new Date().toISOString(),
+            justification: data.justification ?? "",
+            mechanicalJustification: data.mechanicalJustification ?? "",
+            userId: currentUser?.id ?? "",
+            vulnId: vuln.id,
+            vulnType: "dependencyVuln",
+            vulnerabilityName: vuln.cveID,
+            createdByVexRule: false,
+          } as VulnEventDTO)
+        : undefined;
+
+    const mutatePromise = mutate(
+      async (prev) => {
+        let json: any;
+        if (data.status === "mitigate") {
+          const resp = await browserApiClient(
+            "/organizations/" +
+              activeOrg.slug +
+              "/projects/" +
+              project.slug +
+              "/assets/" +
+              asset.slug +
+              "/refs/" +
+              assetVersion?.slug +
+              "/dependency-vulns/" +
+              vuln.id +
+              "/mitigate",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                comment: data.justification,
+              }),
+            },
+          );
+          json = await resp.json();
+        } else {
+          const resp = await browserApiClient(
+            "/organizations/" +
+              activeOrg.slug +
+              "/projects/" +
+              project.slug +
+              "/assets/" +
+              asset.slug +
+              "/refs/" +
+              assetVersion?.slug +
+              "/dependency-vulns/" +
+              vuln.id,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        }
+
+        if (!json.events) {
+          toast("Failed to update vulnerability", {
+            description: "Please try again later.",
+          });
+          throw new Error("Failed to update vulnerability");
+        }
+        setJustification("");
+        return {
+          ...prev,
+          ...json,
+          events: prev?.events.concat([json.events.slice(-1)[0]]),
+        };
+      },
+      {
+        optimisticData: optimisticState
+          ? {
+              ...vuln,
+              state: optimisticState,
+              events: vuln.events.concat(
+                optimisticEvent ? [optimisticEvent] : [],
+              ),
+            }
+          : undefined,
+        rollbackOnError: true,
+        revalidate: false,
+      },
+    );
+
+    if (optimisticState !== undefined) {
+      // Optimistic update already applied to SWR cache — close the dialog immediately.
+      // The mutation continues in the background; on error SWR rolls back and shows a toast.
+      mutatePromise
+        .then(() =>
+          toast("Saved", { description: "Changes confirmed by server." }),
+        )
+        .catch(() => {});
+      return true;
+    }
+
+    await mutatePromise;
     return true;
   };
 
@@ -774,7 +734,9 @@ const Index: FunctionComponent = () => {
                         </div>
                         <div
                           style={{ height: 400 }}
-                          className={`w-full rounded-lg border ${theme === "light" ? "bg-gray-50" : "bg-black"} `}
+                          className={
+                            "w-full rounded-lg border bg-gray-50 dark:bg-black"
+                          }
                         >
                           {graphData && vuln && (
                             <DependencyGraph
@@ -783,7 +745,8 @@ const Index: FunctionComponent = () => {
                               height={400}
                               enableContextMenu={
                                 vuln.vulnerabilityPath.length !== 0 &&
-                                vuln.state === "open"
+                                vuln.state === "open" &&
+                                session !== null
                               }
                               graph={graphData}
                               vulns={[vuln]}
@@ -804,21 +767,31 @@ const Index: FunctionComponent = () => {
                           There are more than 12 different paths which lead to
                           this vulnerability in your dependency tree. Therefore
                           the graph is not displayed by default to avoid
-                          performance issues. You can still mark this
-                          vulnerability as false positive or accept the risk
-                          using the buttons below.
+                          performance issues.
+                          {session
+                            ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
+                            : ""}
                         </Callout>
                       ) : (
                         <Callout showIcon intent="neutral">
                           You can interact with the graph by zooming in/out,
-                          clicking on edges to mark them as false positives and
-                          remove nodes that are not relevant for dependency
-                          propagation. You are trying to answer the question:{" "}
-                          <b>
-                            How does the vulnerability get inherited by my
-                            project?
-                          </b>{" "}
-                          This will create{" "}
+                          {session ? (
+                            <>
+                              clicking on edges to mark them as false positives
+                              and remove nodes that are not relevant for
+                              dependency propagation.
+                            </>
+                          ) : (
+                            ""
+                          )}
+                          <>
+                            You are trying to answer the question:{" "}
+                            <b>
+                              How does the vulnerability get inherited by my
+                              project?
+                            </b>{" "}
+                            This will create{" "}
+                          </>
                           <Link
                             href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
                             className=""
@@ -829,7 +802,6 @@ const Index: FunctionComponent = () => {
                         </Callout>
                       )}
                     </div>
-
                     {/* VEX Rules applied to this vulnerability */}
                     {vexRulesData && vexRulesData.length > 0 && (
                       <div className="mt-6">
@@ -881,150 +853,172 @@ const Index: FunctionComponent = () => {
                     events={vuln.events}
                     deleteEvent={handleDeleteEvent}
                     page="dependency-risks"
+                    directDependencyFixedVersion={
+                      vuln.directDependencyFixedVersion
+                    }
                   />
-                  <div>
-                    <Card>
-                      <CardContent className="mt-4">
-                        {vuln.state === "open" ? (
-                          <form
-                            className="flex flex-col gap-4"
-                            onSubmit={(e) => e.preventDefault()}
-                          >
-                            <div className="flex flex-row justify-end gap-1">
-                              <div className="flex flex-row items-start gap-2 pt-2">
-                                {vuln.ticketId === null &&
-                                integrationName === undefined ? (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span>
+                  {vuln && <Quickfix vuln={vuln} />}
+                  {(session || vuln.ticketUrl) && (
+                    <div>
+                      <Card>
+                        <CardContent className="mt-4">
+                          {session && (
+                            <>
+                              {vuln.state === "open" ? (
+                                <form
+                                  className="flex flex-col gap-4"
+                                  onSubmit={(e) => e.preventDefault()}
+                                >
+                                  <div className="flex flex-row justify-end gap-1">
+                                    <div className="flex flex-row items-start gap-2 pt-2">
+                                      {vuln.ticketId === null &&
+                                      integrationName === undefined ? (
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <span>
+                                              <Button
+                                                variant={"ghost"}
+                                                disabled
+                                                className=""
+                                              >
+                                                <span className="ml-1 text-muted-foreground">
+                                                  Create Ticket
+                                                </span>
+                                              </Button>
+                                            </span>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            No repository is linked. To create a
+                                            ticket, please integrate your issue
+                                            tracker in the {` `}
+                                            <Link
+                                              href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                              className="underline"
+                                            >
+                                              settings
+                                            </Link>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      ) : (
                                         <Button
-                                          variant={"ghost"}
-                                          disabled
-                                          className=""
+                                          variant={"secondary"}
+                                          onClick={() =>
+                                            setMitigateDialogOpen(true)
+                                          }
                                         >
-                                          <span className="ml-1 text-muted-foreground">
-                                            Create Ticket
+                                          {integrationName === "gitlab" && (
+                                            <GitProviderIcon
+                                              externalEntityProviderIdOrRepositoryId={
+                                                asset.externalEntityProviderId ??
+                                                "gitlab"
+                                              }
+                                            />
+                                          )}
+                                          {integrationName === "github" && (
+                                            <Image
+                                              alt="GitHub Logo"
+                                              width={15}
+                                              height={15}
+                                              className="dark:invert"
+                                              src={"/assets/github.svg"}
+                                            />
+                                          )}
+                                          {integrationName === "jira" && (
+                                            <Image
+                                              alt="Jira Logo"
+                                              width={15}
+                                              height={15}
+                                              src={
+                                                "/assets/jira-svgrepo-com.svg"
+                                              }
+                                            />
+                                          )}
+                                          <span className="ml-1">
+                                            Create Ticket{" "}
                                           </span>
                                         </Button>
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      No repository is linked. To create a
-                                      ticket, please integrate your issue
-                                      tracker in the {` `}
-                                      <Link
-                                        href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                        className="underline"
-                                      >
-                                        settings
-                                      </Link>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                ) : (
-                                  <Button
-                                    variant={"secondary"}
-                                    onClick={() => setMitigateDialogOpen(true)}
-                                  >
-                                    {integrationName === "gitlab" && (
-                                      <GitProviderIcon
-                                        externalEntityProviderIdOrRepositoryId={
-                                          asset.externalEntityProviderId ??
-                                          "gitlab"
+                                      )}
+                                      <Button
+                                        onClick={() =>
+                                          setFalsePositiveDialogOpen(true)
                                         }
-                                      />
-                                    )}
-                                    {integrationName === "github" && (
-                                      <Image
-                                        alt="GitHub Logo"
-                                        width={15}
-                                        height={15}
-                                        className="dark:invert"
-                                        src={"/assets/github.svg"}
-                                      />
-                                    )}
-                                    {integrationName === "jira" && (
-                                      <Image
-                                        alt="Jira Logo"
-                                        width={15}
-                                        height={15}
-                                        src={"/assets/jira-svgrepo-com.svg"}
-                                      />
-                                    )}
-                                    <span className="ml-1">Create Ticket </span>
-                                  </Button>
-                                )}
-                                <Button
-                                  onClick={() =>
-                                    setFalsePositiveDialogOpen(true)
-                                  }
-                                  variant={"secondary"}
+                                        variant={"secondary"}
+                                      >
+                                        Mark as False Positive
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          setAcceptRiskDialogOpen(true)
+                                        }
+                                        variant={"secondary"}
+                                      >
+                                        Accept risk
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          setCommentDialogOpen(true)
+                                        }
+                                        variant={"default"}
+                                      >
+                                        Comment
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </form>
+                              ) : (
+                                <form
+                                  className="flex flex-col gap-4"
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                  }}
                                 >
-                                  Mark as False Positive
-                                </Button>
-                                <Button
-                                  onClick={() => setAcceptRiskDialogOpen(true)}
-                                  variant={"secondary"}
-                                >
-                                  Accept risk
-                                </Button>
-                                <Button
-                                  onClick={() => setCommentDialogOpen(true)}
-                                  variant={"default"}
-                                >
-                                  Comment
-                                </Button>
-                              </div>
-                            </div>
-                          </form>
-                        ) : (
-                          <form
-                            className="flex flex-col gap-4"
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                            }}
-                          >
-                            <div>
-                              <label className="mb-2 block text-sm font-semibold">
-                                Comment
-                              </label>
-                              <MarkdownEditor
-                                value={justification ?? ""}
-                                setValue={setJustification}
-                                placeholder="Add your comment here..."
-                              />
-                            </div>
+                                  <div>
+                                    <label className="mb-2 block text-sm font-semibold">
+                                      Comment
+                                    </label>
+                                    <MarkdownEditor
+                                      value={justification ?? ""}
+                                      setValue={setJustification}
+                                      placeholder="Add your comment here..."
+                                    />
+                                  </div>
 
-                            <p className="text-sm text-muted-foreground">
-                              You can reopen this vuln, if you plan to mitigate
-                              the risk now, or accepted this vuln by accident.
-                            </p>
-                            <div className="flex flex-row justify-end">
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "reopened",
-                                    justification,
-                                  })
-                                }
-                                variant={"secondary"}
-                                type="submit"
-                              >
-                                Reopen
-                              </AsyncButton>
-                            </div>
-                          </form>
-                        )}
-                        {vuln.ticketUrl && (
-                          <small className="mt-2 block w-full text-right text-muted-foreground">
-                            Comment will be synced with{" "}
-                            <Link href={vuln.ticketUrl} target="_blank">
-                              {vuln.ticketUrl}
-                            </Link>
-                          </small>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    You can reopen this vuln, if you plan to
+                                    mitigate the risk now, or accepted this vuln
+                                    by accident.
+                                  </p>
+                                  <div className="flex flex-row justify-end">
+                                    <AsyncButton
+                                      onClick={() =>
+                                        handleSubmit({
+                                          status: "reopened",
+                                          justification,
+                                        })
+                                      }
+                                      variant={"secondary"}
+                                      type="submit"
+                                    >
+                                      Reopen
+                                    </AsyncButton>
+                                  </div>
+                                </form>
+                              )}
+                            </>
+                          )}
+
+                          {vuln.ticketUrl && (
+                            <small className="mt-2 block w-full text-right text-muted-foreground">
+                              Comment will be synced with{" "}
+                              <Link href={vuln.ticketUrl} target="_blank">
+                                {vuln.ticketUrl}
+                              </Link>
+                            </small>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -1264,32 +1258,8 @@ const Index: FunctionComponent = () => {
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
-
                 <AffectedComponentDetails vuln={vuln} />
 
-                {vuln.componentPurl !== null && (
-                  <div className="p-5">
-                    <div className="flex flex-col gap-4">
-                      {vuln.componentFixedVersion !== null && (
-                        <>
-                          <Quickfix
-                            vuln={vuln.componentPurl}
-                            version={
-                              Boolean(vuln.componentFixedVersion)
-                                ? (vuln.componentFixedVersion as string)
-                                : ""
-                            }
-                            package={
-                              Boolean(vuln.componentPurl)
-                                ? (beautifyPurl(vuln.componentPurl) as string)
-                                : ""
-                            }
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
                     Management decisions across the organization

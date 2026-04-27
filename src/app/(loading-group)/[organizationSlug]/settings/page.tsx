@@ -41,11 +41,11 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { browserApiClient } from "@/services/devGuardApi";
-import {
+import { UserRole } from "@/types/api/api";
+import type {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
-  UserRole,
   WebhookDTO,
 } from "@/types/api/api";
 import Image from "next/image";
@@ -58,6 +58,7 @@ import {
   useOrganization,
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
+import Alert from "../../../../components/common/Alert";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -259,6 +260,19 @@ const Home = () => {
       });
     } else {
       toast.error("Failed to delete webhook");
+    }
+  };
+
+  const handleDeleteOrganization = async () => {
+    const res = await browserApiClient("/organizations/" + activeOrg.slug, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      toast.success("Organization deleted successfully");
+      router.push("/");
+    } else {
+      toast.error("Failed to delete organization");
     }
   };
 
@@ -527,6 +541,20 @@ const Home = () => {
         </FormProvider>
       </div>
       <hr />
+      <Section
+        id="config-files"
+        title="Configuration Files"
+        description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link href={"/" + activeOrg.slug + "/settings/config"}>
+              <Button variant={"outline"}>Go to Configuration Files</Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
+      <hr />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>
           <Section
@@ -577,22 +605,13 @@ const Home = () => {
       >
         <Card className="p-6">
           <div className="flex justify-end">
-            <Link
-              href={
-                "mailto:" +
-                config.accountDeletionMail +
-                "?subject=Request%20DevGuard%20Organization%20Deletion&body=Hello%2C%20%0A%0AI%20would%20like%20request%20to%20delete%20my%20Organization%20in%20DevGuard.%20%0A%0AID" +
-                "=" +
-                activeOrg.id +
-                "%0AName%3D" +
-                activeOrg.name +
-                "%20%0A%0AThank%20you."
-              }
+            <Alert
+              title="Are you sure to delete this organization?"
+              description="This action cannot be undone. All data associated with this organization will be deleted."
+              onConfirm={handleDeleteOrganization}
             >
-              <Button variant="destructive">
-                Request Organization Deletion
-              </Button>
-            </Link>
+              <Button variant="destructive">Delete Organization</Button>
+            </Alert>
           </div>
         </Card>
       </Section>

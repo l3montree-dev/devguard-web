@@ -1,6 +1,7 @@
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { browserApiClient } from "@/services/devGuardApi";
-import { VexRule } from "@/types/api/api";
+import type { VexRule } from "@/types/api/api";
 
 interface VexRuleActionsCellProps {
   rule: VexRule;

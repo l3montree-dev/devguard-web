@@ -13,7 +13,7 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { OrganizationDTO } from "@/types/api/api";
+import type { OrganizationDTO } from "@/types/api/api";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";

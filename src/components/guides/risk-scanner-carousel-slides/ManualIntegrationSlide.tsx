@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
-import { ArtifactDTO } from "@/types/api/api";
+import type { ArtifactDTO } from "@/types/api/api";
 import { QuestionMarkCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { type FunctionComponent, useEffect, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../hooks/useDecodedParams";
 import { classNames } from "../../../utils/common";

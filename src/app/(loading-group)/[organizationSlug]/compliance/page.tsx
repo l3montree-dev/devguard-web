@@ -2,8 +2,9 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { Policy } from "@/types/api/api";
-import { FunctionComponent, useState } from "react";
+import type { Policy } from "@/types/api/api";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import EmptyParty from "../../../../components/common/EmptyParty";

@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { config } from "../../config";
 
 const Err = () => {
   return (
@@ -24,7 +25,7 @@ const Err = () => {
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-3">
           <Link
-            href="https://github.com/l3montree-dev/devguard/issues/new/choose"
+            href={config.issueTrackerUrl}
             target="_blank"
             rel="noreferrer noopener"
           >

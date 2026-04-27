@@ -1,4 +1,4 @@
-import { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
+import type { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
 import { browserApiClient } from "./devGuardApi";
 import { generateKeyPair } from "./keyService";
 

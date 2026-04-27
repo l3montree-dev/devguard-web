@@ -40,6 +40,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
     variant,
     mutable,
     nameKey,
+    className,
     ...inputProps
   } = props;
 
@@ -59,12 +60,13 @@ const InputWithButton = (props: InputWithButtonProps) => {
           variant === "onCard" ? "bg-background" : "bg-card",
         )}
       >
-        <div className="flex flex-row  justify-between w-full gap-2">
+        <div className="flex flex-row  justify-between w-full gap-1">
           <input
             {...inputProps}
             value={props.value ?? ""}
             className={classNames(
-              "min-w-0 flex-1 truncate bg-transparent focus:outline-none",
+              "w-full bg-transparent focus:outline-none",
+              className,
             )}
             readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}

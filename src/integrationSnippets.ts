@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { Config } from "./types/common";
+import type { Config } from "./types/common";
 
 type jobName =
   | "secret-scanning"

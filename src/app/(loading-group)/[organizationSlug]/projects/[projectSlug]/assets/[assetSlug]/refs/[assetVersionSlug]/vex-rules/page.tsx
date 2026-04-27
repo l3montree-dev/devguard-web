@@ -2,8 +2,8 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { Paged, VexRule } from "@/types/api/api";
-import React, { FunctionComponent, useMemo, useState } from "react";
+import type { Paged, VexRule } from "@/types/api/api";
+import React, { type FunctionComponent, useMemo, useState } from "react";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import EmptyParty from "@/components/common/EmptyParty";
@@ -22,11 +22,8 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import useTable from "@/hooks/useTable";
 import { classNames } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
@@ -50,6 +47,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSession } from "@/context/SessionContext";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -67,6 +65,9 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
 
       return (
         <Link
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
           href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/dependency-risks?search=${encodeURIComponent(cveId)}&state=closed`}
           className=""
         >
@@ -192,6 +193,7 @@ const VexRulesPage: FunctionComponent = () => {
   const handleSearch = useDebouncedQuerySearch();
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const { session } = useSession();
 
   const handleVexUpload = async (params: {
     file: File;
@@ -255,9 +257,11 @@ const VexRulesPage: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Manage VEX Rules"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        <Button onClick={() => setUploadVexModal(true)}>
-          Upload a VEX-File or add a VEX-URL
-        </Button>
+        {session && (
+          <Button onClick={() => setUploadVexModal(true)}>
+            Upload a VEX-File or add a VEX-URL
+          </Button>
+        )}
       </div>
       <Section
         description="Manage VEX (Vulnerability Exploitability eXchange) rules for this repository ref (branches/ tags). VEX rules define how vulnerabilities should be handled based on their context."

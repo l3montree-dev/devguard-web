@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { useConfig } from "@/context/ConfigContext";
 
 export default function ErrPage(props: { error: Error }) {
   const { error } = props;
+  const config = useConfig();
 
   let statusCode = 500;
   let title = "Something went wrong!";
@@ -51,7 +53,7 @@ export default function ErrPage(props: { error: Error }) {
               <Button variant="default">Take me home...</Button>
             </Link>
             <Link
-              href="https://github.com/l3montree-dev/devguard/issues/new/choose"
+              href={config.issueTrackerUrl}
               target="_blank"
               rel="noreferrer noopener"
             >

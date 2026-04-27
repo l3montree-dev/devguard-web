@@ -1,6 +1,6 @@
 import * as OTPAuth from "otpauth";
 import { DevGuardPOM } from "./pom/devguard";
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";

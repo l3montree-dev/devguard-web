@@ -1,5 +1,5 @@
-import { ColumnSort } from "@tanstack/react-table";
-import { ParsedUrlQuery } from "querystring";
+import type { ColumnSort } from "@tanstack/react-table";
+import type { ParsedUrlQuery } from "querystring";
 
 export interface FilterableColumnDef {
   operators: string[];
@@ -53,6 +53,13 @@ export const query2SortingState = (query: ParsedUrlQuery): ColumnSort[] => {
 
 export const filterForm2Query = (form: FilterForm) => {
   const key = "filterQuery[" + form.field + "][" + form.operator + "]";
+
+  if (form.operator === "like" || form.operator === "ilike") {
+    return {
+      [key]: "%" + form.value + "%",
+    };
+  }
+
   return {
     [key]: form.value,
   };

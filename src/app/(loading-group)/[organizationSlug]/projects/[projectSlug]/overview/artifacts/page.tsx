@@ -6,17 +6,15 @@ import Section from "@/components/common/Section";
 import { useOrganization } from "@/context/OrganizationContext";
 import useTable from "@/hooks/useTable";
 import { useViewMode } from "@/hooks/useViewMode";
-import { ReleaseDTO, RiskHistory } from "@/types/api/api";
+import type { ReleaseDTO, RiskHistory } from "@/types/api/api";
 import { beautifyPurl, classNames } from "@/utils/common";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import "@xyflow/react/dist/style.css";
 import { groupBy } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import SortingCaret from "../../../../../../../components/common/SortingCaret";

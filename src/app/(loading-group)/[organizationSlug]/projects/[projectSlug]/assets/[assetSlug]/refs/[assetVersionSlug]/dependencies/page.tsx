@@ -1,21 +1,33 @@
 "use client";
 
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { browserApiClient } from "@/services/devGuardApi";
-import "@xyflow/react/dist/style.css";
-import { FunctionComponent, useMemo, useState } from "react";
+import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
+import Filter from "@/components/Filter";
+import Page from "@/components/Page";
+import RootNodeSelector from "@/components/RootNodeSelector";
 import AssetTitle from "@/components/common/AssetTitle";
+import { Combobox } from "@/components/common/Combobox";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import Section from "@/components/common/Section";
+import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useSession } from "@/context/SessionContext";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
-import {
+import { browserApiClient } from "@/services/devGuardApi";
+import type {
   Component,
   ComponentPaged,
   License,
@@ -36,16 +48,27 @@ import {
   ScaleIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
+import "@xyflow/react/dist/style.css";
 import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
-import { ChevronDownIcon, GitBranch, Loader2 } from "lucide-react";
+  ChevronDownIcon,
+  GitBranch,
+  GitBranchIcon,
+  Loader2,
+  Loader2Icon,
+} from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
+import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
 import DateString, {
   parseDateOnly,
 } from "../../../../../../../../../../components/common/DateString";
+import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
 import SortingCaret from "../../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import {
@@ -53,32 +76,24 @@ import {
   Button,
   buttonVariants,
 } from "../../../../../../../../../../components/ui/button";
-import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
-import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
-import Page from "@/components/Page";
-import { Combobox } from "@/components/common/Combobox";
-import { useRouter } from "next/navigation";
-import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
-import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
-import SbomDownloadModal from "@/components/dependencies/SbomDownloadModal";
-import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
-import { Input } from "@/components/ui/input";
+import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { GitBranchIcon, Loader2Icon } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import useSWR from "swr";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../../../../../../../../components/ui/tooltip";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
+import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
+import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
-import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import RootNodeSelector from "@/components/RootNodeSelector";
+
+const scorecardRanges: Record<string, [number | null, number | null]> = {
+  bad: [null, 3],
+  mid: [2.9, 5],
+  good: [4.9, 7],
+  awesome: [6.9, null],
+};
 
 const licenseMap = licenses.reduce(
   (acc, { value, label }) => {
@@ -106,6 +121,7 @@ const LicenseCall = (props: {
   dependencyPurl: string;
   justification: string;
 }) => {
+  const { session } = useSession();
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -189,27 +205,29 @@ const LicenseCall = (props: {
             </span>
           </div>
 
-          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-row items-center justify-between">
-              <span className="text-sm mb-2 block text-muted-foreground">
-                Manually correct the license
-              </span>
-            </div>
+          {session && (
+            <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-row items-center justify-between">
+                <span className="text-sm mb-2 block text-muted-foreground">
+                  Manually correct the license
+                </span>
+              </div>
 
-            <div className="mt-2">
-              <Combobox
-                items={licenses}
-                placeholder={getLicenseName(
-                  props.component.license,
-                  props.license.licenseId,
-                )}
-                emptyMessage={""}
-                onSelect={(selectedLicense) =>
-                  handleManuallyOverwriteLicenseChange(selectedLicense)
-                }
-              />
+              <div className="mt-2">
+                <Combobox
+                  items={licenses}
+                  placeholder={getLicenseName(
+                    props.component.license,
+                    props.license.licenseId,
+                  )}
+                  emptyMessage={""}
+                  onSelect={(selectedLicense) =>
+                    handleManuallyOverwriteLicenseChange(selectedLicense)
+                  }
+                />
+              </div>
             </div>
-          </div>
+          )}
         </PopoverContent>
       </div>
     </Popover>
@@ -226,16 +244,23 @@ const columnsDef: ColumnDef<
 >[] = [
   columnHelper.accessor("dependencyPurl", {
     header: "Package",
-    id: "dependency_purl",
+    id: "dependency_id",
     cell: (row) => (
       <span className="flex flex-row items-center gap-2">
-        <EcosystemImage packageName={row.getValue()} size={16} />
-        <span className="font-medium truncate">
-          {beautifyPurl(row.getValue())}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {extractVersion(row.getValue())}
-        </span>
+        <Tooltip>
+          <TooltipTrigger className="flex flex-row items-center gap-2">
+            <EcosystemImage packageName={row.getValue()} size={16} />
+            <span className="font-medium truncate">
+              {beautifyPurl(row.getValue())}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {extractVersion(row.getValue())}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{row.getValue()}</p>
+          </TooltipContent>
+        </Tooltip>
       </span>
     ),
   }),
@@ -347,16 +372,11 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
+  let { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
     url + "?" + params.toString(),
     fetcher,
     {
-      fallbackData: {
-        data: [],
-        page: 1,
-        pageSize: 20,
-        total: 0,
-      },
+      keepPreviousData: true,
     },
   );
   const { data: licenses } = useSWR<LicenseResponse[]>(
@@ -367,6 +387,7 @@ const Index: FunctionComponent = () => {
           encodeURIComponent(searchParams.get("artifact") as string)
         : ""),
     fetcher,
+    { keepPreviousData: true },
   );
 
   const artifacts = useArtifacts();
@@ -383,9 +404,18 @@ const Index: FunctionComponent = () => {
     [licenses],
   );
 
-  components!.data = useMemo(
+  if (!components) {
+    components = {
+      data: [],
+      page: 1,
+      pageSize: 25,
+      total: 0,
+    };
+  }
+
+  components.data = useMemo(
     () =>
-      components!.data.map((component) => ({
+      components.data.map((component) => ({
         ...component,
         license: licenseMap[
           (component.dependency.license ?? "").toLowerCase()
@@ -400,7 +430,7 @@ const Index: FunctionComponent = () => {
 
   const router = useRouter();
 
-  const { table } = useTable({
+  const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     data: (components?.data ?? []) as Array<
       ComponentPaged & {
         license: LicenseResponse;
@@ -408,6 +438,35 @@ const Index: FunctionComponent = () => {
     >,
     columnsDef,
   });
+
+  const handleDependencyFilter = useCallback(
+    (data: Parameters<typeof handleFilter>[0]) => {
+      if (
+        data.field === "dependency_project.score_card_score" &&
+        (data.operator === "is" || data.operator === "is not") &&
+        scorecardRanges[data.value]
+      ) {
+        const [min, max] = scorecardRanges[data.value];
+        const newParams = new URLSearchParams(searchParams?.toString() ?? "");
+        if (min !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is greater than]`,
+            String(min),
+          );
+        }
+        if (max !== null) {
+          newParams.set(
+            `filterQuery[${data.field}][is less than]`,
+            String(max),
+          );
+        }
+        router.push(pathname + "?" + newParams.toString());
+        return;
+      }
+      handleFilter(data);
+    },
+    [handleFilter, searchParams, pathname, router],
+  );
 
   function dataPassthrough(data: ComponentPaged) {
     setDatasets({
@@ -501,17 +560,89 @@ const Index: FunctionComponent = () => {
           />
           <RootNodeSelector />
           <div className="relative flex-1">
-            <Input
-              onChange={(e) => handleSearch(e.target.value)}
-              defaultValue={searchParams?.get("search") as string}
-              placeholder="Search for dependencies or versions - just start typing..."
-            />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
               {isLoading && (
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               )}
             </div>
           </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Filter
+            options={[
+              {
+                label: "Dependency Package",
+                value: "dependency_id",
+                operators: [
+                  { value: "ilike", label: "contains" },
+                  { value: "is" },
+                  { value: "is not" },
+                ],
+              },
+              {
+                label: "License",
+                value: "dependency.license",
+                operators: [
+                  { value: "ilike", label: "contains" },
+                  { value: "is" },
+                  { value: "is not" },
+                ],
+              },
+              {
+                label: "Repository",
+                value: "dependency_project.project_key",
+                operators: [{ value: "ilike", label: "contains" }],
+              },
+
+              {
+                label: "Repository Stars",
+                value: "dependency_project.stars_count",
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
+              },
+              {
+                label: "Repository Forks",
+                value: "dependency_project.forks_count",
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
+              },
+              {
+                label: "OpenSSF Scorecard",
+                value: "dependency_project.score_card_score",
+                operators: [
+                  { value: "is greater than" },
+                  { value: "is less than" },
+                  { value: "is" },
+                ],
+                filterValues: [
+                  { label: "Awesome (7.0 - 10.0)", value: "awesome" },
+                  { label: "Good (5.0 - 7.0)", value: "good" },
+                  { label: "Mid (3.0 - 5.0)", value: "mid" },
+                  { label: "Bad (0.0 - 3.0)", value: "bad" },
+                ],
+              },
+            ]}
+            onFilter={handleDependencyFilter}
+            onRemoveFilter={removeFilter}
+            onClearAllFilters={clearAllFilters}
+            search={{
+              onChange: handleSearch,
+              defaultValue: params?.get("search") ?? "",
+              placeholder: "Search or filter results...",
+            }}
+          />
+        </div>
+
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+          {isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
@@ -528,7 +659,7 @@ const Index: FunctionComponent = () => {
                       key={header.id}
                     >
                       <div
-                        className="flex flex-row gap-2"
+                        className="flex flex-row items-center gap-2"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {flexRender(
@@ -547,6 +678,7 @@ const Index: FunctionComponent = () => {
 
             <tbody>
               {isLoading &&
+                !table.getRowModel().rows &&
                 Array.from(Array(10).keys()).map((el, i, arr) => (
                   <tr
                     className={classNames(

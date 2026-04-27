@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import { config } from "../config";
-import { NoopUpdater, WithUpdater } from "./ClientContextWrapper";
+import { NoopUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "./ClientContextWrapper";
 
 const ConfigContext = React.createContext<WithUpdater<typeof config>>({
   v: config,

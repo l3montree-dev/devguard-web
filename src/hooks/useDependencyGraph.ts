@@ -4,7 +4,7 @@ import {
   recursiveAddRisk,
   recursiveRemoveWithoutRisk,
 } from "@/utils/dependencyGraphHelpers";
-import { MinimalDependencyTree, DependencyVuln } from "@/types/api/api";
+import type { MinimalDependencyTree, DependencyVuln } from "@/types/api/api";
 
 /**
  * Hook that converts a MinimalDependencyTree and affected components into a

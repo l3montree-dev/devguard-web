@@ -18,14 +18,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ScoreCard } from "@/types/api/api";
+import type { ScoreCard } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import {
   ChevronDownIcon,
   ChevronRightIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import React, { FunctionComponent } from "react";
+import React, { type FunctionComponent } from "react";
 import OpenSsfScore from "./common/OpenSsfScore";
 import {
   Collapsible,

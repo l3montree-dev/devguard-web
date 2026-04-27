@@ -15,7 +15,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
+import type { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 
 import { browserApiClient } from "@/services/devGuardApi";
 import { Form } from "./ui/form";

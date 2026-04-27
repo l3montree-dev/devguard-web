@@ -6,7 +6,7 @@ import {
   truncateMiddle,
 } from "@/utils/common";
 import { usePathname, useRouter } from "next/navigation";
-import { LicenseRiskDTO } from "../../types/api/api";
+import type { LicenseRiskDTO } from "../../types/api/api";
 import EcosystemImage from "../common/EcosystemImage";
 import { Badge } from "../ui/badge";
 import { getSeverityClassNames } from "../common/Severity";

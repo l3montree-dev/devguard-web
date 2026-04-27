@@ -6,7 +6,7 @@ import {
   TriangleAlert,
   Lightbulb,
 } from "lucide-react";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 
 interface CalloutProps {
   intent: "info" | "success" | "warning" | "danger" | "neutral";

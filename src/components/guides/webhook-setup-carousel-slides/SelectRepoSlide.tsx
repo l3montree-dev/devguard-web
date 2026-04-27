@@ -1,4 +1,4 @@
-import { AssetFormValues } from "@/components/asset/AssetForm";
+import type { AssetFormValues } from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";

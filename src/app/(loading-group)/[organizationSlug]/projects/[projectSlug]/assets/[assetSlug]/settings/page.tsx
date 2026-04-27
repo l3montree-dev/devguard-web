@@ -1,6 +1,6 @@
 "use client";
 import Page from "@/components/Page";
-import AssetForm, { AssetFormValues } from "@/components/asset/AssetForm";
+import AssetForm, { type AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { InputWithButton } from "@/components/ui/input-with-button";
@@ -12,7 +12,8 @@ import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
-import { FunctionComponent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -23,7 +24,8 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { AssetDTO, UserRole } from "../../../../../../../../types/api/api";
+import { UserRole } from "../../../../../../../../types/api/api";
+import type { AssetDTO } from "../../../../../../../../types/api/api";
 import {
   generateNewSecret,
   getParentRepositoryIdAndName,
@@ -36,6 +38,8 @@ import {
 } from "../../../../../../../../components/ui/collapsible";
 import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
+import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -365,6 +369,30 @@ const Index: FunctionComponent = () => {
               }}
             />
           </div>
+        </Section>
+        <hr />
+        <Section
+          id="config-files"
+          title="Configuration Files"
+          description="View and edit configuration files for this repository, including scanner tool settings. These configurations override project-level settings for this specific repository."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <Link
+                href={
+                  "/" +
+                  activeOrg.slug +
+                  "/projects/" +
+                  project!.slug +
+                  "/assets/" +
+                  asset.slug +
+                  "/settings/config"
+                }
+              >
+                <Button variant={"outline"}>Go to Configuration Files</Button>
+              </Link>
+            </div>
+          </Card>
         </Section>
         <hr />
       </div>

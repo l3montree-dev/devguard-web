@@ -1,6 +1,7 @@
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -205,6 +206,7 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
               placeholder="Add your comment here..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
+              maxLength={4000}
             />
           </div>
           <DialogFooter>
@@ -217,6 +219,7 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
                   onClick={handleSubmit}
                   variant={"default"}
                   className="mr-0 rounded-r-none pr-0 capitalize"
+                  disabled={justification.length > 4000}
                 >
                   {removeUnderscores(selectedOption)}
                 </AsyncButton>
