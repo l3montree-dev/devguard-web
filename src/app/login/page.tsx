@@ -46,7 +46,7 @@ const LoginPage = async (props: OryPageParams) => {
                       height={200}
                     />
                     <Image
-                      className="h-10 w-auto dark:hidden"
+                      className="h-16 w-auto dark:hidden"
                       src={"/logo_horizontal.svg"}
                       alt="DevGuard by l3montree Logo"
                       width={200}

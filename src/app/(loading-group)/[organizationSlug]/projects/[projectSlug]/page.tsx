@@ -270,6 +270,7 @@ export default function RepositoriesPage() {
             />
 
             <Input
+              className="h-11"
               onChange={debouncedHandleSearch}
               defaultValue={searchParams?.get("search") || ""}
               placeholder="Search for projects and repositories..."

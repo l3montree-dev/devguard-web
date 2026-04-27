@@ -290,6 +290,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             />
 
             <Input
+              className="h-11"
               onChange={debouncedHandleSearch}
               defaultValue={searchParams?.get("search") || ""}
               placeholder="Search for projects"
