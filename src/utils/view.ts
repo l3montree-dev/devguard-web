@@ -103,54 +103,67 @@ export const eventTypeMessages = (
   flawName: string,
   events?: VulnEventDTO[],
 ) => {
+  let message = "";
   switch (event.type) {
     case "licenseDecision":
-      return (
+      message =
         "made a license decision: " +
-        event.arbitraryJSONData.finalLicenseDecision
-      );
+        event.arbitraryJSONData.finalLicenseDecision;
+      break;
     case "ticketClosed":
-      return "closed the ticket for " + flawName;
+      message = "closed the ticket for " + flawName;
+      break;
     case "ticketDeleted":
-      return "deleted the ticket for " + flawName;
+      message = "deleted the ticket for " + flawName;
+      break;
     case "mitigate":
-      return "created a ticket for " + flawName;
+      message = "created a ticket for " + flawName;
+      break;
     case "reopened":
-      return "reopened " + flawName;
+      message = "reopened " + flawName;
+      break;
     case "accepted":
-      return "accepted the risk of " + flawName;
+      message = "accepted the risk of " + flawName;
+      break;
     case "fixed":
-      return "fixed " + flawName;
+      message = "fixed " + flawName;
+      break;
     case "comment":
-      return "added a comment";
+      message = "added a comment";
+      break;
     case "detected":
       if (event.arbitraryJSONData.risk === 0) {
-        return "detected " + flawName;
+        message = "detected " + flawName;
+      } else {
+        message =
+          "detected " +
+          flawName +
+          " with a risk of " +
+          event.arbitraryJSONData.risk;
       }
-      return (
-        "detected " +
-        flawName +
-        " with a risk of " +
-        event.arbitraryJSONData.risk
-      );
+      break;
     case "falsePositive":
-      return "marked " + flawName + " as false positive ";
-    case "rawRiskAssessmentUpdated":
-      if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJSONData.risk;
-      }
+      message = "marked " + flawName + " as false positive";
+      break;
+    case "rawRiskAssessmentUpdated": {
       const oldRisk = event.arbitraryJSONData.oldRisk;
-      if (!oldRisk && oldRisk !== 0) {
-        return "updated the risk assessment to " + event.arbitraryJSONData.risk;
+      if (events === undefined || (!oldRisk && oldRisk !== 0)) {
+        message =
+          "updated the risk assessment to " + event.arbitraryJSONData.risk;
+      } else {
+        message =
+          "updated the risk assessment from " +
+          oldRisk +
+          " to " +
+          event.arbitraryJSONData.risk;
       }
-      return (
-        "updated the risk assessment from " +
-        oldRisk +
-        " to " +
-        event.arbitraryJSONData.risk
-      );
+      break;
+    }
   }
-  return "";
+  if (event.userId.endsWith("@mcp-server")) {
+    message += " (applied by AI agent)";
+  }
+  return message;
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
@@ -249,6 +262,10 @@ export const findUser = (
   org: OrganizationDetailsDTO,
   currentUser?: Identity,
 ) => {
+  if (id.endsWith("@mcp-server")) {
+    id = id.replace("@mcp-server", "");
+  }
+
   if (id === "system") {
     return {
       displayName: "System",

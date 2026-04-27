@@ -44,6 +44,7 @@ import {
   GitBranchIcon,
   GitPullRequestCreateArrowIcon,
   Scale,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -176,6 +177,12 @@ const RiskFeedItem = ({
                   />
                 </AvatarFallback>
               </Avatar>
+            ) : event.userId.endsWith("@mcp-server") ? (
+              <Avatar>
+                <AvatarFallback className="bg-yellow-500 !text-black">
+                  <Sparkles className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
             ) : (
               <Avatar>
                 {Boolean(user?.avatarUrl) && (
@@ -222,6 +229,17 @@ const RiskFeedItem = ({
                   >
                     {msg}
                   </Markdown>
+                  {event.userId.endsWith("@mcp-server") && (
+                    <div className="mt-3 flex items-start gap-2 rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400">
+                      <span className="mt-0.5 shrink-0">⚠️</span>
+                      <span>
+                        <strong>AI-applied action! review carefully.</strong>{" "}
+                        This action was applied by an AI agent. Verify that it
+                        is accurate and suitable for your specific context. AI
+                        output can contain errors or incomplete information.
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
