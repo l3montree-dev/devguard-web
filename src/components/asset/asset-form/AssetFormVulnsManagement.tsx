@@ -566,7 +566,7 @@ const PublicUrlsSection: FunctionComponent<{
       {urls.map((url) => (
         <InputWithButton
           key={url.nameKey}
-          className="truncate"
+          className="truncate text-foreground"
           label={url.label}
           copyable={copyable && !!url.value}
           copyToastDescription={url.copyToastDescription}
