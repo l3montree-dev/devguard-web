@@ -71,7 +71,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
             readOnly={!mutable || !inputProps.onChange}
             name={"input" + nameKey}
           />
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex shrink-0 flex-row items-center gap-2">
             {copyable && (
               <button
                 name={"clipboard-" + nameKey}
