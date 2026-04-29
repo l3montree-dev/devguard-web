@@ -1,25 +1,23 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import CustomPagination from "@/components/common/CustomPagination";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useRouterQuery from "@/hooks/useRouterQuery";
+import { buildFilterSearchParams } from "@/utils/url";
+import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import { Form, FormProvider, useForm } from "react-hook-form";
-import Markdown from "react-markdown";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
   type AssetFormValues,
 } from "../../../../../components/asset/AssetForm";
-import AssetOverviewListItem from "../../../../../components/AssetOverviewListItem";
-import Avatar from "../../../../../components/Avatar";
-import EmptyParty from "../../../../../components/common/EmptyParty";
-import ListItem from "../../../../../components/common/ListItem";
 import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
 import { ProjectForm } from "../../../../../components/project/ProjectForm";
-import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import {
   Dialog,
@@ -34,44 +32,25 @@ import {
   useOrganization,
 } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
-import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
+import { useSession } from "../../../../../context/SessionContext";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
+import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
-import { useSession } from "../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../services/devGuardApi";
-import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
 import type {
   AssetDTO,
   EnvDTO,
   Paged,
   ProjectDTO,
 } from "../../../../../types/api/api";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { debounce } from "lodash";
-import useRouterQuery from "@/hooks/useRouterQuery";
-import { buildFilterSearchParams } from "@/utils/url";
-import CustomPagination from "@/components/common/CustomPagination";
-import ListRenderer from "@/components/common/ListRenderer";
+import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
 
 import Sort from "@/components/Sort";
-
-function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
-  return "type" in d && (d as ProjectDTO).type === "project";
-}
-
-function checkType(data: SubGroupsAndAsset): {
-  asset: AssetDTO | null;
-  subgroup: ProjectDTO | null;
-} {
-  return isProject(data)
-    ? { asset: null, subgroup: data }
-    : { asset: data, subgroup: null };
-}
-
-type SubGroupsAndAsset = AssetDTO | ProjectDTO;
-type SubGroupsAndAssets = Array<SubGroupsAndAsset>;
+import SubgroupsAndAssetsList, {
+  checkType,
+  type SubGroupsAndAsset,
+} from "@/components/SubgroupsAndAssetsList";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -99,6 +78,7 @@ export default function RepositoriesPage() {
     isLoading,
     data: subgroupsWithAssets,
     error,
+    mutate,
   } = useSWR<Paged<SubGroupsAndAsset>>(() => {
     if (!isOrganization(organization.organization)) return null;
     const base = `/organizations/${decodeURIComponent(organization.organization.slug)}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
@@ -203,6 +183,55 @@ export default function RepositoriesPage() {
     }
   };
 
+  const handleLazyDataFetching = async (
+    projectSlug: string,
+    projectId: string,
+  ) => {
+    const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+
+    const resp = await browserApiClient(base);
+    if (resp.ok) {
+      const data = await resp.json();
+      const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+
+      mutate(
+        (prev) => {
+          if (!prev) return prev;
+          // traverse the whole tree, find the correct project and update it with the new data
+          const recursiveFn = (item: SubGroupsAndAsset): SubGroupsAndAsset => {
+            const { asset, subgroup } = checkType(item);
+            if (asset != null) {
+              return asset;
+            }
+
+            if (subgroup.id === projectId) {
+              return { ...subgroup, subGroupsAndAsset: subGroupsAndAsset.data };
+            }
+
+            return {
+              ...subgroup,
+              subGroupsAndAsset: subgroup?.subGroupsAndAsset?.map(recursiveFn),
+            };
+          };
+
+          return {
+            ...prev,
+            data: prev.data.map(recursiveFn) as Array<
+              ProjectDTO & {
+                resourceType: "project";
+              }
+            >,
+          };
+        },
+        { revalidate: false },
+      );
+    } else {
+      toast.error(
+        "Failed to load subgroups and assets. Please try again later.",
+      );
+    }
+  };
+
   return (
     <>
       <Page
@@ -276,65 +305,12 @@ export default function RepositoriesPage() {
               placeholder="Search for projects and repositories..."
             />
           </div>
-          <ListRenderer
+          <SubgroupsAndAssetsList
             isLoading={isLoading}
             error={error}
-            data={subgroupsWithAssets?.data}
-            Empty={<EmptyParty title={"No groups found"} description="" />}
-            renderItem={(item) => {
-              const { asset, subgroup } = checkType(item);
-              if (subgroup)
-                return (
-                  <Link
-                    key={subgroup.id}
-                    href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
-                    className="flex flex-col gap-2 hover:no-underline"
-                  >
-                    <ListItem
-                      reactOnHover
-                      Title={
-                        <div className="flex items-center flex-row gap-2">
-                          <Avatar {...subgroup} />
-                          <span>
-                            {subgroup.name.replace(project.name + " /", "")}
-                          </span>
-                          <Badge variant={"outline"}>Subgroup</Badge>
-                          {subgroup.state === "deleted" && (
-                            <Badge variant={"destructive"}>
-                              Pending deletion
-                            </Badge>
-                          )}
-                          {subgroup.type === "kubernetesNamespace" && (
-                            <Badge variant={"outline"}>
-                              <Image
-                                alt="Kubernetes logo"
-                                src="/assets/kubernetes.svg"
-                                className="-ml-1.5 mr-2"
-                                width={16}
-                                height={16}
-                              />
-                              Kubernetes Namespace
-                            </Badge>
-                          )}
-                        </div>
-                      }
-                      Description={
-                        <Markdown
-                          components={{
-                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
-                              <span>{props.children}</span>
-                            ),
-                          }}
-                        >
-                          {subgroup.description}
-                        </Markdown>
-                      }
-                    />
-                  </Link>
-                );
-              if (asset)
-                return <AssetOverviewListItem key={asset.id} asset={asset} />;
-            }}
+            subgroupsWithAssets={subgroupsWithAssets?.data}
+            projectSlug={project.slug}
+            onFetchData={handleLazyDataFetching}
           />
 
           <div className="mt-4">

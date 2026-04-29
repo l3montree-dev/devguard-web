@@ -17,18 +17,17 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FunctionComponent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../services/devGuardApi";
-import { UserRole } from "../../../types/api/api";
 import type { Paged, ProjectDTO } from "../../../types/api/api";
+import { UserRole } from "../../../types/api/api";
 import type { CreateProjectReq } from "../../../types/api/req";
 
-import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import {
   Dialog,
@@ -38,31 +37,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { ProjectForm } from "@/components/project/ProjectForm";
+import Sort from "@/components/Sort";
+import SubgroupsAndAssetsList, {
+  checkType,
+  type SubGroupsAndAsset,
+} from "@/components/SubgroupsAndAssetsList";
 import { Input } from "@/components/ui/input";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUpdateOrganization } from "@/context/OrganizationContext";
 import { useSession } from "@/context/SessionContext";
+import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import useSWR from "swr";
-import Avatar from "../../../components/Avatar";
-import ListRenderer from "../../../components/common/ListRenderer";
-import Markdown from "../../../components/common/Markdown";
-import { ProjectBadge } from "../../../components/common/ProjectTitle";
-import { fetcher } from "../../../data-fetcher/fetcher";
 import EmptyParty from "../../../components/common/EmptyParty";
+import ListRenderer from "../../../components/common/ListRenderer";
+import { fetcher } from "../../../data-fetcher/fetcher";
 import useRouterQuery from "../../../hooks/useRouterQuery";
-import { useUpdateOrganization } from "@/context/OrganizationContext";
-import { Badge } from "@/components/ui/badge";
-import { buildFilterSearchParams } from "@/utils/url";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Sort from "@/components/Sort";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
@@ -100,14 +97,19 @@ const OrganizationHomePage: FunctionComponent = () => {
     data: projects,
     error,
     mutate,
-  } = useSWR<Paged<ProjectDTO>>(
-    activeOrg
-      ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`
-      : null,
-    async (url: string) =>
-      fetcher<Paged<ProjectDTO>>(url).then((res) => {
-        return res;
-      }),
+  } = useSWR<Paged<SubGroupsAndAsset>>(
+    `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`,
+    async (url: string) => {
+      const data = await fetcher<Paged<ProjectDTO>>(url);
+      // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
+      return {
+        ...data,
+        data: data.data.map((item) => ({
+          ...item,
+          resourceType: "project",
+        })),
+      } as Paged<SubGroupsAndAsset>;
+    },
   );
 
   const debouncedHandleSearch = useCallback(
@@ -170,6 +172,55 @@ const OrganizationHomePage: FunctionComponent = () => {
       });
     }
     mutate();
+  };
+
+  const handleLazyDataFetching = async (
+    projectSlug: string,
+    projectId: string,
+  ) => {
+    const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+
+    const resp = await browserApiClient(base);
+    if (resp.ok) {
+      const data = await resp.json();
+      const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+
+      mutate(
+        (prev) => {
+          if (!prev) return prev;
+          // traverse the whole tree, find the correct project and update it with the new data
+          const recursiveFn = (item: SubGroupsAndAsset): SubGroupsAndAsset => {
+            const { asset, subgroup } = checkType(item);
+            if (asset != null) {
+              return asset;
+            }
+
+            if (subgroup.id === projectId) {
+              return { ...subgroup, subGroupsAndAsset: subGroupsAndAsset.data };
+            }
+
+            return {
+              ...subgroup,
+              subGroupsAndAsset: subgroup?.subGroupsAndAsset?.map(recursiveFn),
+            };
+          };
+
+          return {
+            ...prev,
+            data: prev.data.map(recursiveFn) as Array<
+              ProjectDTO & {
+                resourceType: "project";
+              }
+            >,
+          };
+        },
+        { revalidate: false },
+      );
+    } else {
+      toast.error(
+        "Failed to load subgroups and assets. Please try again later.",
+      );
+    }
   };
 
   useEffect(() => {
@@ -301,46 +352,25 @@ const OrganizationHomePage: FunctionComponent = () => {
             error={error}
             data={projects?.data}
             Empty={<EmptyParty title={"No groups found"} description="" />}
-            renderItem={(project) => (
-              <Link
-                key={project.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}`}
-                className="flex flex-col gap-2 hover:no-underline"
-              >
-                <ListItem
-                  reactOnHover
-                  Title={
-                    <div className="flex flex-row items-center gap-2">
-                      <Avatar {...project} />
-                      <span>{project.name}</span>
-                      {project.state === "deleted" && (
-                        <Badge variant={"destructive"}>Pending deletion</Badge>
-                      )}
-                    </div>
-                  }
-                  Description={
-                    <div className="flex flex-col">
-                      <span>
-                        <Markdown
-                          components={{
-                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
-                              <span>{props.children}</span>
-                            ),
-                          }}
-                        >
-                          {project.description}
-                        </Markdown>
-                      </span>
-                      {project.type !== "default" && (
-                        <div className="flex mt-4 flex-row items-center gap-2">
-                          <ProjectBadge type={project.type} />
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
-              </Link>
-            )}
+            renderItem={(project) => {
+              return (
+                <div key={project.id} className="flex flex-col">
+                  <div className="pl-4 pt-2 flex flex-col gap-2">
+                    <SubgroupsAndAssetsList
+                      project={
+                        project as ProjectDTO & { resourceType: "project" }
+                      }
+                      onFetchData={handleLazyDataFetching}
+                      subgroupsWithAssets={
+                        (project as ProjectDTO & { resourceType: "project" })
+                          .subGroupsAndAsset
+                      }
+                      projectSlug={project.slug}
+                    />
+                  </div>
+                </div>
+              );
+            }}
           />
         </Section>
         {projects && (
