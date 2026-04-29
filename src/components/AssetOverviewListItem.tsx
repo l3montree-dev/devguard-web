@@ -1,8 +1,8 @@
 import Link from "next/link";
-import React, { type FunctionComponent, useMemo } from "react";
+import React, { type FunctionComponent } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import type { AssetDTO, PolicyEvaluation } from "../types/api/api";
+import type { AssetDTO } from "../types/api/api";
 import Avatar from "./Avatar";
 import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";
@@ -10,15 +10,20 @@ import { Badge } from "./ui/badge";
 
 interface Props {
   asset: AssetDTO;
+  projectSlug?: string;
 }
-const AssetOverviewListItem: FunctionComponent<Props> = ({ asset }) => {
+const AssetOverviewListItem: FunctionComponent<Props> = ({
+  asset,
+  projectSlug: projectSlugProp,
+}) => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
+  const projectSlug = projectSlugProp ?? project?.slug;
 
   return (
     <Link
       key={asset.id}
-      href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/`}
+      href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${asset.slug}/`}
     >
       <ListItem
         reactOnHover
