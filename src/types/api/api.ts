@@ -12,6 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
+import type { SubGroupsAndAsset } from "@/components/SubgroupsAndAssetsList";
 import type { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
@@ -173,6 +174,8 @@ export interface ProjectDTO {
   externalEntityProviderId?: string;
 
   state: "active" | "deleted";
+
+  subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
