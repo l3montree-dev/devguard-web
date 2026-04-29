@@ -4,7 +4,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { AssetDTO, ProjectDTO } from "../types/api/api";
+import type { AssetDTO, ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
 import AssetOverviewListItem from "./AssetOverviewListItem";
 import Avatar from "./Avatar";
 import EmptyParty from "./common/EmptyParty";
@@ -13,11 +13,7 @@ import ListRenderer from "./common/ListRenderer";
 import Markdown from "./common/Markdown";
 import { ProjectBadge } from "./common/ProjectTitle";
 import { Badge } from "./ui/badge";
-import { randFloat } from "three/src/math/MathUtils.js";
-
-export type SubGroupsAndAsset =
-  | (AssetDTO & { resourceType: "asset" })
-  | (ProjectDTO & { resourceType: "project" });
+import Link from "next/link";
 
 export function isProject(
   d: SubGroupsAndAsset,
@@ -55,71 +51,85 @@ export default function SubgroupsAndAssetsList({
   project,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(project === undefined);
+  const [isLoading, setIsLoading] = useState(false);
   const activeOrg = useActiveOrg();
   const router = useRouter();
 
-  const toggleSubgroup = (slug: string, id: string) => {
-    onFetchData(slug, id);
+  const toggleSubgroup = async (
+    slug: string,
+    id: string,
+    e: React.MouseEvent,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isExpanded && subgroupsWithAssets === undefined) {
+      setIsLoading(true);
+      try {
+        await onFetchData(slug, id);
+      } finally {
+        setIsLoading(false);
+      }
+    }
     setIsExpanded((prev) => !prev);
   };
 
   return (
     <>
       {project && (
-        <ListItem
-          reactOnHover
-          Title={
-            <div className="flex flex-row items-center gap-2">
-              <button
-                onClick={() => toggleSubgroup(projectSlug, project.id)}
-                className="p-1 rounded hover:bg-muted flex-shrink-0"
-                aria-label={isExpanded ? "Collapse" : "Expand"}
-              >
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-              <div
-                className="flex flex-row items-center gap-2 cursor-pointer"
-                onClick={() =>
-                  router.push(`/${activeOrg.slug}/projects/${project.slug}`)
-                }
-              >
+        <Link
+          key={project.id}
+          href={`/${activeOrg.slug}/projects/${project.slug}`}
+          className="flex flex-col gap-2 no-underline text-inherit"
+        >
+          <ListItem
+            reactOnHover
+            Title={
+              <div className="flex flex-row items-center gap-2">
+                <button
+                  onClick={(e) => toggleSubgroup(projectSlug, project.id, e)}
+                  className="p-1 rounded hover:bg-muted flex-shrink-0"
+                  aria-label={isExpanded ? "Collapse" : "Expand"}
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+
                 <Avatar {...project} />
                 <span>{project?.name}</span>
                 {project.state === "deleted" && (
                   <Badge variant={"destructive"}>Pending deletion</Badge>
                 )}
               </div>
-            </div>
-          }
-          Description={
-            <div className="flex flex-col">
-              <span>
-                <Markdown
-                  components={{
-                    a: (props: React.ComponentPropsWithoutRef<"a">) => (
-                      <span>{props.children}</span>
-                    ),
-                  }}
-                >
-                  {project.description}
-                </Markdown>
-              </span>
-              {project.type !== "default" && (
-                <div className="flex mt-4 flex-row items-center gap-2">
-                  <ProjectBadge type={project.type} />
-                </div>
-              )}
-            </div>
-          }
-        />
+            }
+            Description={
+              <div className="flex flex-col">
+                <span>
+                  <Markdown
+                    components={{
+                      a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                        <span>{props.children}</span>
+                      ),
+                    }}
+                  >
+                    {project.description}
+                  </Markdown>
+                </span>
+                {project.type !== "default" && (
+                  <div className="flex mt-4 flex-row items-center gap-2">
+                    <ProjectBadge type={project.type} />
+                  </div>
+                )}
+              </div>
+            }
+          />
+        </Link>
       )}
       {isExpanded && (
         <ListRenderer
-          isLoading={subgroupsWithAssets === undefined}
+          isLoading={isLoading}
           error={error}
           data={subgroupsWithAssets}
           Empty={<EmptyParty title={"No groups found"} description="" />}

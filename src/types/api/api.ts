@@ -12,7 +12,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import type { SubGroupsAndAsset } from "@/components/SubgroupsAndAssetsList";
 import type { Modify } from "../common";
 
 export interface PolicyEvaluation extends Policy {
@@ -143,6 +142,10 @@ export interface PersonalAccessTokenDTO {
 export interface PatWithPrivKey extends PersonalAccessTokenDTO {
   privKey: string;
 }
+
+export type SubGroupsAndAsset =
+  | (AssetDTO & { resourceType: "asset" })
+  | (ProjectDTO & { resourceType: "project" });
 
 export interface ProjectDTO {
   avatar?: string;

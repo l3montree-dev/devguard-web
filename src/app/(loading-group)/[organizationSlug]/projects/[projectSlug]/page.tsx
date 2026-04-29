@@ -43,13 +43,13 @@ import type {
   EnvDTO,
   Paged,
   ProjectDTO,
+  SubGroupsAndAsset,
 } from "../../../../../types/api/api";
 import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
 
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
-  type SubGroupsAndAsset,
 } from "@/components/SubgroupsAndAssetsList";
 
 export default function RepositoriesPage() {
@@ -75,7 +75,6 @@ export default function RepositoriesPage() {
   }, [searchParams]);
 
   const {
-    isLoading,
     data: subgroupsWithAssets,
     error,
     mutate,
@@ -216,11 +215,7 @@ export default function RepositoriesPage() {
 
           return {
             ...prev,
-            data: prev.data.map(recursiveFn) as Array<
-              ProjectDTO & {
-                resourceType: "project";
-              }
-            >,
+            data: prev.data.map(recursiveFn) as SubGroupsAndAsset[],
           };
         },
         { revalidate: false },
@@ -306,7 +301,6 @@ export default function RepositoriesPage() {
             />
           </div>
           <SubgroupsAndAssetsList
-            isLoading={isLoading}
             error={error}
             subgroupsWithAssets={subgroupsWithAssets?.data}
             projectSlug={project.slug}
