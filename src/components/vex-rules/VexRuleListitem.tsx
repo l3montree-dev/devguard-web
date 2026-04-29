@@ -2,19 +2,19 @@ import type { VexRule } from "@/types/api/api";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
 
-interface VexRuleListitemProps {
+interface VexRuleListItemProps {
   rule: VexRule;
   onClick: () => void;
 }
 
-const VexRuleListitem: FunctionComponent<VexRuleListitemProps> = ({
+const VexRuleListItem: FunctionComponent<VexRuleListItemProps> = ({
   rule,
   onClick,
 }) => {
 
   return (
     <button
-      key={rule.id}
+      type="button"
       onClick={onClick}
       className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted/50 transition-colors cursor-pointer"
     >
@@ -38,4 +38,4 @@ const VexRuleListitem: FunctionComponent<VexRuleListitemProps> = ({
   );
 };
 
-export default VexRuleListitem;
+export default VexRuleListItem;

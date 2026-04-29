@@ -13,7 +13,7 @@ import VexRuleResult from "./VexRuleResult";
 import VexHasEffectBadge from "./VexHasEffectBadge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -72,10 +72,8 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
     if (!deleteUrlBase) return;
 
     setIsAcceptingRecommendation(true);
-
-    const resp = await browserApiClient(
-      deleteUrlBase,
-      {
+    try {
+      const resp = await browserApiClient(deleteUrlBase, {
         method: "POST",
         body: JSON.stringify({
           cveId: vexRule.cveId,
@@ -83,15 +81,19 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
           mechanicalJustification: vexRule.mechanicalJustification ?? "",
           pathPattern: vexRule.pathPattern,
         }),
-      },
-    );
-    if (!resp.ok) {
-      toast.error("Failed to reapply VEX rule");
-    } else {
-      toast.success("VEX rule recommendation applied succesfully");
-      onAccepted?.();
+      });
+      if (!resp.ok) {
+        toast.error("Failed to apply VEX rule recommendation");
+      } else {
+        toast.success("VEX rule recommendation applied successfully");
+        onOpenChange(false);
+        onAccepted?.();
+      }
+    } catch {
+      toast.error("Failed to apply VEX rule recommendation");
+    } finally {
+      setIsAcceptingRecommendation(false);
     }
-    setIsAcceptingRecommendation(false);
   };
 
   return (

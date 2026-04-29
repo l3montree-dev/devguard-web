@@ -78,7 +78,7 @@ import { convertPathsToTree } from "../../../../../../../../../../../utils/depen
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
 import { useSession } from "@/context/SessionContext";
-import VexRuleListitem from "@/components/vex-rules/VexRuleListitem";
+import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
 
 const MarkdownEditor = dynamic(
@@ -854,7 +854,7 @@ const Index: FunctionComponent = () => {
                               ),
                             ) && (
                               <div className="flex flex-col gap-2 my-2">
-                                <VexRuleListitem
+                                <VexRuleListItem
                                   rule={recommendedVexRule}
                                   onClick={() => {
                                     setSelectedVexRule(recommendedVexRule);
@@ -878,7 +878,7 @@ const Index: FunctionComponent = () => {
                       {vexRulesData && vexRulesData.length > 0 && (
                         <div className="flex flex-col gap-2">
                           {vexRulesData.map((rule) => (
-                            <VexRuleListitem
+                            <VexRuleListItem
                               key={rule.id}
                               rule={rule}
                               onClick={() => {
