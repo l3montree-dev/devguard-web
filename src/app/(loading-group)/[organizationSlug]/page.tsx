@@ -24,7 +24,11 @@ import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../services/devGuardApi";
-import type { Paged, ProjectDTO } from "../../../types/api/api";
+import type {
+  Paged,
+  ProjectDTO,
+  SubGroupsAndAsset,
+} from "../../../types/api/api";
 import { UserRole } from "../../../types/api/api";
 import type { CreateProjectReq } from "../../../types/api/req";
 
@@ -45,7 +49,6 @@ import { ProjectForm } from "@/components/project/ProjectForm";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
-  type SubGroupsAndAsset,
 } from "@/components/SubgroupsAndAssetsList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
