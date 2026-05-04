@@ -67,6 +67,7 @@ import useRouterQuery from "../../../hooks/useRouterQuery";
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
   const [open, setOpen] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const { session } = useSession();
@@ -118,8 +119,10 @@ const OrganizationHomePage: FunctionComponent = () => {
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value === "") {
+        setIsSearchActive(false);
         mutate();
       } else if (e.target.value.length >= 3) {
+        setIsSearchActive(true);
         handleSearchChange(e.target.value);
       }
     }, 500),
@@ -352,17 +355,23 @@ const OrganizationHomePage: FunctionComponent = () => {
           forceVertical
           title="Groups"
         >
-          <Tabs
-            defaultValue="all"
-            value={viewedProject}
-            onValueChange={handleSetTabValue}
-          >
-            <TabsList>
-              <TabsTrigger value="all">Groups</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
+          <div className="flex items-center gap-4">
+            <Tabs
+              defaultValue="all"
+              value={viewedProject}
+              onValueChange={handleSetTabValue}
+            >
+              <TabsList>
+                <TabsTrigger value="all">Groups</TabsTrigger>
+                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            {isSearchActive && (
+              <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+                Filter is disabled while search is active
+              </span>
+            )}
+          </div>
           <div className="flex gap-2">
             <Sort
               sortOptions={[

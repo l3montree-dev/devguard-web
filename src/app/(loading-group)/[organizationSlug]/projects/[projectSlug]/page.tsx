@@ -108,14 +108,17 @@ export default function RepositoriesPage() {
 
   const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const projectMenu = useProjectMenu();
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value === "") {
+        setIsSearchActive(false);
         mutate();
       } else if (e.target.value.length >= 3) {
+        setIsSearchActive(true);
         handleSearchChange(e.target.value);
       }
     }, 500),
@@ -294,21 +297,27 @@ export default function RepositoriesPage() {
           forceVertical
           title={project.name}
         >
-          <Tabs
-            defaultValue="active"
-            value={viewedProject}
-            onValueChange={handleSetTabValue}
-          >
-            <TabsList>
-              <TabsTrigger value="active">
-                {project.externalEntityProviderId
-                  ? "Repositories"
-                  : "Subgroups & Repositories"}
-              </TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
+          <div className="flex items-center gap-4">
+            <Tabs
+              defaultValue="active"
+              value={viewedProject}
+              onValueChange={handleSetTabValue}
+            >
+              <TabsList>
+                <TabsTrigger value="active">
+                  {project.externalEntityProviderId
+                    ? "Repositories"
+                    : "Subgroups & Repositories"}
+                </TabsTrigger>
+                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            {isSearchActive && (
+              <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+                Filter is disabled while search is active
+              </span>
+            )}
+          </div>
           <div className="flex gap-2">
             <Sort
               sortOptions={[
