@@ -554,6 +554,21 @@ const Home = () => {
           </div>
         </Card>
       </Section>
+      <Section
+        id="dependency-proxy"
+        title="Dependency Proxy Settings"
+        description="View and edit the settings for the Dependency Proxy, which caches dependencies to speed up builds and reduce load on external package registries."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link href={"/" + activeOrg.slug + "/settings/dependency-proxy"}>
+              <Button variant={"outline"}>
+                Go to Dependency Proxy Settings{" "}
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
       <hr />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>

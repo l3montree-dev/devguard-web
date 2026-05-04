@@ -78,8 +78,8 @@ import { convertPathsToTree } from "../../../../../../../../../../../utils/depen
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
 import { useSession } from "@/context/SessionContext";
-import VexRuleListItem from "../../../../../../../../../../../components/vex-rules/VexRuleListItem";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
+import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
