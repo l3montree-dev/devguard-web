@@ -67,7 +67,6 @@ import useRouterQuery from "../../../hooks/useRouterQuery";
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
   const [open, setOpen] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
   const { session } = useSession();
@@ -81,6 +80,9 @@ const OrganizationHomePage: FunctionComponent = () => {
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
   });
+
+  const searchQuery = searchParams?.get("search") ?? "";
+  const isSearchActive = searchQuery.length >= 3;
 
   const queryWithState = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
@@ -96,37 +98,40 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const stillOnPage = useRef(true);
   const pushQuery = useRouterQuery();
+
+  const swrUrl = isSearchActive
+    ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?${queryWithState.toString()}`
+    : `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`;
+
+  console.log("SWR URL", swrUrl);
+
   const {
     isLoading,
     data: projects,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(
-    `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`,
-    async (url: string) => {
-      const data = await fetcher<Paged<ProjectDTO>>(url);
-      // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
-      return {
-        ...data,
-        data: data.data.map((item) => ({
-          ...item,
-          resourceType: "project",
-        })),
-      } as Paged<SubGroupsAndAsset>;
-    },
-  );
+  } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
+    const data = await fetcher<Paged<ProjectDTO>>(url);
+    // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
+    return {
+      ...data,
+      data: data.data.map((item) => ({
+        ...item,
+        resourceType: "project",
+      })),
+    } as Paged<SubGroupsAndAsset>;
+  });
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value === "") {
-        setIsSearchActive(false);
-        mutate();
-      } else if (e.target.value.length >= 3) {
-        setIsSearchActive(true);
-        handleSearchChange(e.target.value);
+      const value = e.target.value;
+      if (value === "") {
+        pushQuery({ search: undefined, page: 1 });
+      } else if (value.length >= 3) {
+        pushQuery({ search: value, page: 1 });
       }
     }, 500),
-    [],
+    [pushQuery],
   );
 
   const handleSearchChange = async (search: string) => {
@@ -216,6 +221,7 @@ const OrganizationHomePage: FunctionComponent = () => {
     const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
 
     const resp = await browserApiClient(base);
+    console.log("Lazy fetching data for project", projectSlug, resp);
     if (resp.ok) {
       const data = await resp.json();
       const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;

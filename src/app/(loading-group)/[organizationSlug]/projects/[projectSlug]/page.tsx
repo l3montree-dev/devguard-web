@@ -62,6 +62,9 @@ export default function RepositoriesPage() {
   const [showModal, setShowModal] = useState(false);
   const searchParams = useSearchParams();
 
+  const searchQuery = searchParams?.get("search") ?? "";
+  const isSearchActive = searchQuery.length >= 3;
+
   const queryWithState = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
@@ -74,18 +77,35 @@ export default function RepositoriesPage() {
     return p;
   }, [searchParams]);
 
+  const pushQuery = useRouterQuery();
+
+  const swrUrl = (() => {
+    if (!isOrganization(organization.organization)) return null;
+    const orgSlug = decodeURIComponent(organization.organization.slug);
+    if (isSearchActive) {
+      return `/organizations/${orgSlug}/projects/search?parentId=${project?.id}&${queryWithState.toString()}`;
+    }
+    const base = `/organizations/${orgSlug}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
+    const query = queryWithState.toString();
+    return query ? `${base}&${query}` : base;
+  })();
+
   const {
     data: subgroupsWithAssets,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(() => {
-    if (!isOrganization(organization.organization)) return null;
-    const base = `/organizations/${decodeURIComponent(organization.organization.slug)}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
-    const query = queryWithState.toString();
-    return query ? `${base}&${query}` : base;
-  }, fetcher);
-
-  const pushQuery = useRouterQuery();
+  } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
+    if (isSearchActive) {
+      const raw = (await fetcher(url)) as Paged<
+        ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
+      >;
+      return {
+        ...raw,
+        data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
+      };
+    }
+    return fetcher<Paged<SubGroupsAndAsset>>(url);
+  });
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
@@ -108,47 +128,20 @@ export default function RepositoriesPage() {
 
   const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const projectMenu = useProjectMenu();
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value === "") {
-        setIsSearchActive(false);
-        mutate();
-      } else if (e.target.value.length >= 3) {
-        setIsSearchActive(true);
-        handleSearchChange(e.target.value);
+      const value = e.target.value;
+      if (value === "") {
+        pushQuery({ search: undefined, page: 1 });
+      } else if (value.length >= 3) {
+        pushQuery({ search: value, page: 1 });
       }
     }, 500),
-    [],
+    [pushQuery],
   );
-
-  const handleSearchChange = async (search: string) => {
-    const params = buildFilterSearchParams(searchParams);
-    params.set("search", search);
-    params.set("page", "1");
-
-    const resp = await browserApiClient(
-      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?parentId=${project?.id}&${params.toString()}`,
-    );
-    if (!resp.ok) {
-      toast.error("Failed to search projects. Please try again later.");
-      return;
-    }
-
-    const raw = (await resp.json()) as Paged<
-      ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
-    >;
-
-    const data: Paged<SubGroupsAndAsset> = {
-      ...raw,
-      data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
-    };
-
-    mutate(data, { revalidate: false });
-  };
 
   const handleSetTabValue = (value: string) => {
     if (value === "active" || value === "inactive") {
