@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import React from "react";
 import { Toaster } from "sonner";
 import { config } from "../config";
+import MobileGate from "@/components/MobileGate";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
@@ -96,7 +97,7 @@ export default async function RootLayout({
                   organizations: orgs,
                 }}
               >
-                {children}
+                <MobileGate>{children}</MobileGate>
                 <Toaster />
               </ClientContextWrapper>
             </ClientContextWrapper>
@@ -130,7 +131,9 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <InternalServerErrorPage error={error as Error} />
+            <MobileGate>
+              <InternalServerErrorPage error={error as Error} />
+            </MobileGate>
             <Toaster />
           </ThemeProvider>
         </body>

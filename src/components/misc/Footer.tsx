@@ -9,9 +9,9 @@ export default function Footer() {
   return (
     <footer
       id="misc-footer"
-      className="px-6 text-center text-sm text-muted-foreground sm:px-10"
+      className="px-4 text-center text-xs text-muted-foreground sm:px-10 sm:text-sm"
     >
-      <div className="mb-2 flex flex-wrap justify-center gap-5">
+      <div className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1 sm:gap-5">
         <Link
           className="!text-muted-foreground hover:!text-foreground"
           target="_blank"
@@ -61,9 +61,13 @@ export default function Footer() {
           AGPL-3.0-License
         </Link>
       </div>
-      Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
-      Contributors. All rights reserved. Version{" "}
-      {process.env.NEXT_PUBLIC_VERSION}
+      <p className="text-balance">
+        Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
+        Contributors. All rights reserved.{" "}
+        <span className="block sm:inline">
+          Version {process.env.NEXT_PUBLIC_VERSION}
+        </span>
+      </p>
     </footer>
   );
 }
