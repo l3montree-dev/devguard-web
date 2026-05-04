@@ -118,13 +118,42 @@ const OrganizationHomePage: FunctionComponent = () => {
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.value === "") {
-        pushQuery({ search: undefined, page: "1" });
+        mutate();
       } else if (e.target.value.length >= 3) {
-        pushQuery({ search: e.target.value, page: "1" });
+        handleSearchChange(e.target.value);
       }
     }, 500),
     [],
   );
+
+  const handleSearchChange = async (search: string) => {
+    const params = buildFilterSearchParams(searchParams);
+    params.set("search", search);
+    params.set("page", "1");
+
+    const resp = await browserApiClient(
+      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?${params.toString()}`,
+    );
+    if (!resp.ok) {
+      toast.error("Failed to search projects. Please try again later.");
+      return;
+    }
+
+    const raw = (await resp.json()) as Paged<ProjectDTO>;
+
+    const data: Paged<SubGroupsAndAsset> = {
+      ...raw,
+      data: raw.data.map((item) => {
+        const { asset, subgroup } = checkType(item as SubGroupsAndAsset);
+        if (asset) {
+          return { ...asset, resourceType: "asset" as const };
+        }
+        return { ...subgroup!, resourceType: "project" as const };
+      }),
+    };
+
+    mutate(data, { revalidate: false });
+  };
 
   const handleSetTabValue = (value: string) => {
     if (value === "all" || value === "inactive") {

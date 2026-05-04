@@ -2,8 +2,7 @@
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AssetDTO, ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
 import AssetOverviewListItem from "./AssetOverviewListItem";
 import Avatar from "./Avatar";
@@ -50,10 +49,18 @@ export default function SubgroupsAndAssetsList({
   projectSlug,
   project,
 }: Props) {
-  const [isExpanded, setIsExpanded] = useState(project === undefined);
+  const hasPreloadedChildren =
+    subgroupsWithAssets != null && subgroupsWithAssets.length > 0;
+  const [isExpanded, setIsExpanded] = useState(
+    project === undefined || hasPreloadedChildren,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const activeOrg = useActiveOrg();
-  const router = useRouter();
+
+  useEffect(() => {
+    if (project === undefined) return;
+    setIsExpanded(hasPreloadedChildren);
+  }, [hasPreloadedChildren, project]);
 
   const toggleSubgroup = async (
     slug: string,
@@ -62,7 +69,7 @@ export default function SubgroupsAndAssetsList({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isExpanded && subgroupsWithAssets === undefined) {
+    if (!isExpanded) {
       setIsLoading(true);
       try {
         await onFetchData(slug, id);
