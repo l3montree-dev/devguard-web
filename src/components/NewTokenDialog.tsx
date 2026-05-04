@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import { PatWithPrivKey } from "@/types/api/api";
+import type { PatWithPrivKey } from "@/types/api/api";
 import { Button } from "./ui/button";
 import CopyInput from "./common/CopyInput";
 import { Badge } from "./ui/badge";

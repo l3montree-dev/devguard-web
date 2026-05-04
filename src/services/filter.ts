@@ -1,5 +1,5 @@
-import { ColumnSort } from "@tanstack/react-table";
-import { ParsedUrlQuery } from "querystring";
+import type { ColumnSort } from "@tanstack/react-table";
+import type { ParsedUrlQuery } from "querystring";
 
 export interface FilterableColumnDef {
   operators: string[];

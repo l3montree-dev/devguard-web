@@ -2,10 +2,10 @@ import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 
 import { useAutosetup } from "@/hooks/useAutosetup";
-import { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
 import { useRouter } from "next/navigation";
 import React, {
-  FunctionComponent,
+  type FunctionComponent,
   useCallback,
   useEffect,
   useRef,
@@ -40,7 +40,8 @@ import { SetupMethodSelectionSlide } from "./guides/risk-scanner-carousel-slides
 import UpdateRepositoryProviderSlide from "./guides/risk-scanner-carousel-slides/UpdateRepositoryProviderSlide";
 import YamlGeneratorSlide from "./guides/risk-scanner-carousel-slides/YamlGeneratorSlide";
 import SelectRepoSlide from "./guides/webhook-setup-carousel-slides/SelectRepoSlide";
-import { Carousel, CarouselApi, CarouselContent } from "./ui/carousel";
+import { Carousel, CarouselContent } from "./ui/carousel";
+import type { CarouselApi } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { DevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/DevGuardCliSlide";
 import { ensureValidBranchOrTagSlug } from "@/utils/common";

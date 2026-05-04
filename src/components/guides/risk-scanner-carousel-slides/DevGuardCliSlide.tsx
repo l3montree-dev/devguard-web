@@ -5,7 +5,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { useConfig } from "../../../context/ConfigContext";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";

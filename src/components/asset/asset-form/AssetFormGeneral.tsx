@@ -14,9 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
-import { FunctionComponent } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { AssetFormValues, createUpdateHandler } from "../AssetForm";
+import type { FunctionComponent } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { createUpdateHandler } from "../AssetForm";
+import type { AssetFormValues } from "../AssetForm";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;

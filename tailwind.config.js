@@ -106,11 +106,17 @@ module.exports = {
           "50%": { backgroundPosition: "100% 50%" },
           "100%": { backgroundPosition: "0% 50%" },
         },
+        "subtle-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-1px)" },
+        },
       },
       animation: {
+        "upgrade-pulse": "upgrade-pulse 0.5s bounce ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         gradient: "gradient 8s linear infinite",
+        "subtle-bounce": "subtle-bounce 1.5s ease-in-out infinite",
       },
     },
   },

@@ -1,9 +1,5 @@
-import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-  TableOptions,
-} from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import type { ColumnDef, TableOptions } from "@tanstack/react-table";
 import useFilter from "./useFilter";
 
 export default function useTable<T>(

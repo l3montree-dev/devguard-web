@@ -1,7 +1,7 @@
 // Copyright 2025 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import React, { FunctionComponent } from "react";
+import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
 import { Button } from "../../ui/button";
 import { Card, CardDescription, CardTitle } from "../../ui/card";
@@ -16,7 +16,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { Config } from "@/types/common";
+import type { Config } from "@/types/common";
 
 interface ScannerOptionsSelectionSlideProps {
   config: Config;

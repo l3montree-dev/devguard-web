@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ComponentRisk } from "@/types/api/api";
+import type { ComponentRisk } from "@/types/api/api";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { useMemo } from "react";
 import { sortRisk } from "../utils/view";

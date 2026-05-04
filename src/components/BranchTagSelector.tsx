@@ -1,4 +1,4 @@
-import { AssetVersionDTO } from "@/types/api/api";
+import type { AssetVersionDTO } from "@/types/api/api";
 import { PlusCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
@@ -23,10 +23,12 @@ import { useSession } from "@/context/SessionContext";
 export function BranchTagSelector({
   branches,
   tags,
+  initialSlug,
   disableNavigateToRefInsteadCall,
 }: {
   branches: AssetVersionDTO[];
   tags: AssetVersionDTO[];
+  initialSlug?: string;
   disableNavigateToRefInsteadCall?: (assetVersionDTO: AssetVersionDTO) => void;
 }) {
   const router = useRouter();
@@ -41,7 +43,7 @@ export function BranchTagSelector({
 
   const initAssetVersion = branches
     .concat(tags)
-    .find((i) => i.slug === params.assetVersionSlug);
+    .find((i) => i.slug === (initialSlug ?? params.assetVersionSlug));
 
   const [view, setView] = useState(
     initAssetVersion?.type === "tag" ? "tags" : "branches",

@@ -3,13 +3,11 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import { LicenseResponse, LicenseRiskDTO, Paged } from "@/types/api/api";
-import {
-  ColumnDef,
-  createColumnHelper,
-  flexRender,
-} from "@tanstack/react-table";
-import { FunctionComponent, useMemo } from "react";
+import type { LicenseResponse, LicenseRiskDTO, Paged } from "@/types/api/api";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
@@ -302,7 +300,7 @@ const Index: FunctionComponent = () => {
               <h3 className="font-semibold">License Distribution</h3>
               <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="mt-4">
+            <CollapsibleContent className="my-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="bg-background">
                   <CardHeader className="items-start pb-4">

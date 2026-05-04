@@ -2,8 +2,12 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
-import { WebhookDTO } from "@/types/api/api";
-import React, { FunctionComponent, ReactNode, useEffect } from "react";
+import type { WebhookDTO } from "@/types/api/api";
+import React, {
+  type FunctionComponent,
+  type ReactNode,
+  useEffect,
+} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AsyncButton, Button } from "../ui/button";

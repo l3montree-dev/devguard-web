@@ -1,8 +1,8 @@
 import Link from "next/link";
-import React, { FunctionComponent, useMemo } from "react";
+import React, { type FunctionComponent, useMemo } from "react";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import { AssetDTO, PolicyEvaluation } from "../types/api/api";
+import type { AssetDTO, PolicyEvaluation } from "../types/api/api";
 import Avatar from "./Avatar";
 import ListItem from "./common/ListItem";
 import Markdown from "./common/Markdown";

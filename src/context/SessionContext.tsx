@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import { User } from "../types/auth";
-import { OrganizationDTO } from "../types/api/api";
-import { NoopUpdater, WithUpdater } from "./ClientContextWrapper";
+import type { User } from "../types/auth";
+import type { OrganizationDTO } from "../types/api/api";
+import { NoopUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "./ClientContextWrapper";
 
 const SessionContext = React.createContext<
   WithUpdater<{

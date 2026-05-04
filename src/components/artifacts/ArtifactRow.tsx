@@ -1,4 +1,4 @@
-import { ArtifactDTO, InformationSources } from "@/types/api/api";
+import type { ArtifactDTO, InformationSources } from "@/types/api/api";
 import {
   classNames,
   validateArtifactNameAgainstPurlSpec,
@@ -10,7 +10,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { Tooltip } from "@radix-ui/react-tooltip";
 import { AlertTriangle } from "lucide-react";
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";

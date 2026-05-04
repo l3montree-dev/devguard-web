@@ -1,13 +1,13 @@
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useMemo, useState } from "react";
 import { useActiveProject } from "../hooks/useActiveProject";
-import {
+import type {
   ArtifactDTO,
   CandidatesDTO,
   ReleaseDTO,
   ReleaseItem,
 } from "../types/api/api";
-import { Modify } from "../types/common";
+import { type Modify } from "../types/common";
 import { Combobox } from "./common/Combobox";
 import Section from "./common/Section";
 import { AsyncButton, Button } from "./ui/button";

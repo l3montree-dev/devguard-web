@@ -16,7 +16,7 @@ import {
   CommandLineIcon,
   DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { classNames } from "../../../utils/common";
 import { Badge } from "../../ui/badge";
 import { Button } from "../../ui/button";

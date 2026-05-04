@@ -17,7 +17,7 @@
             @apply text-sm text-muted-foreground block mb-4;
         }
         button.group {
-            @apply py-2 px-2 mb-0 rounded-md bg-background;
+            @apply w-full py-2 px-2 mb-0 rounded-md bg-background;
         }
         a.group {
             @apply py-2 px-2 mb-4 rounded-md bg-background;
@@ -36,7 +36,7 @@
     }
 
     a {
-        @apply text-sm  !text-blue-600 dark:!text-primary font-medium;
+        @apply text-sm! text-blue-600! dark:text-primary! font-medium!;
         text-decoration: none;       
     }
 
@@ -54,7 +54,7 @@
     }
 
     .text-interface-foreground-validation-danger {
-        @apply text-sm bg-red-500/10 px-4 py-2 rounded-md border-red-500 border text-red-50 mt-2 block mb-2;
+        @apply text-sm bg-red-500/10 px-4 py-2 rounded-md border-red-500 border mt-2 block mb-2 text-red-400;
     }
 
     .text-button-link-brand-brand {

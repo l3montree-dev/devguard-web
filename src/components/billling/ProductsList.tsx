@@ -1,4 +1,4 @@
-import { ProductsData } from "@/types/api/billing";
+import type { ProductsData } from "@/types/api/billing";
 import Product from "./Product";
 
 function Products({

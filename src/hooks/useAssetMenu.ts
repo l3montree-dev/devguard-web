@@ -12,7 +12,8 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { AssetDTO, AssetVersionDTO, UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/api/api";
+import type { AssetDTO, AssetVersionDTO } from "@/types/api/api";
 import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,
@@ -22,7 +23,7 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { CodeIcon, BookCheckIcon, ScanText, TextSelect } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
+import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import { useCurrentUser } from "./useCurrentUser";

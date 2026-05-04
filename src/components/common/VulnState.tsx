@@ -5,9 +5,9 @@ import {
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import { Badge } from "../ui/badge";
-import { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
+import type { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
 import { Scale, Bug } from "lucide-react";
 import { evTypeBackground } from "@/utils/view";
 
@@ -53,7 +53,6 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
           className={classNames(
             defaultClasses,
             evTypeBackground["falsePositive"],
-            "text-secondary-foreground",
           )}
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />

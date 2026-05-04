@@ -14,7 +14,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import oryConfig from "@/ory.config";
-import { getSettingsFlow, OryPageParams } from "@ory/nextjs/app";
+import { getSettingsFlow } from "@ory/nextjs/app";
+import type { OryPageParams } from "@ory/nextjs/app";
 import Page from "../../../components/Page";
 import UserSettings from "../../../components/UserSettings";
 import PatManagementSection from "./PatManagementSection";

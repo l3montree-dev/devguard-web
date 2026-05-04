@@ -42,12 +42,14 @@ export function SimpleArtifactSelector({
   selectedArtifact,
   unassignPossible = false,
   isReleaseSelector = false,
+  assetVersionSlug,
 }: {
   artifacts: string[];
   onSelect: (artifact: string | undefined) => void;
   selectedArtifact?: string;
   unassignPossible?: boolean;
   isReleaseSelector?: boolean;
+  assetVersionSlug?: string;
 }) {
   const { session } = useSession();
   const [filter, setFilter] = useState("");
@@ -65,17 +67,19 @@ export function SimpleArtifactSelector({
     assetVersionSlug?: string;
   };
 
+  const effectiveAssetVersionSlug = assetVersionSlug ?? params.assetVersionSlug;
+
   const updateAssetVersion = useUpdateAssetVersionState();
 
   const handleArtifactCreation = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!params.assetVersionSlug) {
+    if (!effectiveAssetVersionSlug) {
       toast.error("Asset version is not selected.");
       return;
     }
 
     const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts/`,
+      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${effectiveAssetVersionSlug}/artifacts/`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -163,9 +167,9 @@ export function SimpleArtifactSelector({
             {artifact === "" ? "Default" : artifact}
           </DropdownMenuCheckboxItem>
         ))}
-        {!isReleaseSelector && (
+        {!isReleaseSelector && effectiveAssetVersionSlug && (
           <Link
-            href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/artifacts`}
+            href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${effectiveAssetVersionSlug}/artifacts`}
           >
             <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
               View all artifacts

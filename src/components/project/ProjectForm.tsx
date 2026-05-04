@@ -1,6 +1,6 @@
-import { ProjectDTO } from "@/types/api/api";
-import { FunctionComponent } from "react";
-import { UseFormReturn } from "react-hook-form";
+import type { ProjectDTO } from "@/types/api/api";
+import type { FunctionComponent } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormDescription,

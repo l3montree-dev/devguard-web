@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 import Head from "next/head";
-import React, { PropsWithChildren, useState } from "react";
+import React, { type PropsWithChildren, useState } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import { Toaster } from "./ui/sonner";
@@ -32,6 +32,10 @@ type PageProps = {
     Icon: any;
   }>;
   fullscreen?: boolean;
+  breadcrumbs?: Array<{
+    title: string;
+    href: string;
+  }>;
 };
 
 // Add that the navigation is a prop
@@ -45,6 +49,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       <div>
         <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
           <Main
+            breadcrumbs={props.breadcrumbs}
             fullscreen={props.fullscreen}
             Menu={props.Menu}
             Button={props.Button}

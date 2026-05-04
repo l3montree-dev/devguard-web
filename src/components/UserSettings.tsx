@@ -1,6 +1,6 @@
-import { OryClientConfiguration } from "@ory/elements-react";
+import type { OryClientConfiguration } from "@ory/elements-react";
 import { Settings } from "@ory/elements-react/theme";
-import { SettingsFlow } from "@ory/client-fetch";
+import type { SettingsFlow } from "@ory/client-fetch";
 import React, { useMemo } from "react";
 import { oryComponentOverrides } from "./ory/overrides";
 import { rewriteFlow } from "../types/auth";

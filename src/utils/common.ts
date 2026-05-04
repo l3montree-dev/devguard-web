@@ -13,9 +13,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { State } from "@/types/common";
+import type { State } from "@/types/common";
 import { defaultScanner } from "./view";
-import { DependencyVuln, UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/api/api";
+import type { DependencyVuln } from "@/types/api/api";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
@@ -407,6 +408,7 @@ export const stateLabels: Record<DependencyVuln["state"], string> = {
   markedForTransfer: "Marked for Transfer",
 };
 
+// Utility function to truncate text in the middle with ellipsis
 export const truncateMiddle = (
   text: string,
   maxLength: number = 20,
@@ -418,3 +420,43 @@ export const truncateMiddle = (
 
   return text.slice(0, start) + "..." + text.slice(-end);
 };
+
+// round any number to its 2nd digit using math round
+export function roundToSecondDigit(num?: number): number {
+  if (!num) {
+    return 0;
+  }
+  return Math.round(100 * num) / 100;
+}
+
+export function getHumanReadableDuration(seconds: number): {
+  duration: string;
+  type: string;
+} {
+  const timeUnits = [
+    { unit: "year", seconds: 365 * 24 * 60 * 60 },
+    { unit: "month", seconds: 30 * 24 * 60 * 60 },
+    { unit: "week", seconds: 7 * 24 * 60 * 60 },
+    { unit: "day", seconds: 24 * 60 * 60 },
+    { unit: "hour", seconds: 60 * 60 },
+    { unit: "minute", seconds: 60 },
+    { unit: "second", seconds: 1 },
+  ];
+
+  for (let i = 0; i < timeUnits.length; i++) {
+    const currentUnit = timeUnits[i];
+    if (seconds >= currentUnit.seconds) {
+      const duration = seconds / currentUnit.seconds;
+      return {
+        duration: duration.toFixed(2),
+        type: currentUnit.unit + (duration > 1 ? "s" : ""),
+      };
+    }
+  }
+
+  // If the input is less than 1 second
+  return {
+    duration: (0).toFixed(2),
+    type: "seconds",
+  };
+}

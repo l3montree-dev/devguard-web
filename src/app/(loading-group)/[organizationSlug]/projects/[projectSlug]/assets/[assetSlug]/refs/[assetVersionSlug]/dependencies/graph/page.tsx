@@ -25,18 +25,17 @@ import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useDependencyGraph } from "@/hooks/useDependencyGraph";
 import useDimensions from "@/hooks/useDimensions";
-import { DependencyVuln, MinimalDependencyTree } from "@/types/api/api";
-import { classNames, toSearchParams } from "@/utils/common";
+import type { DependencyVuln, MinimalDependencyTree } from "@/types/api/api";
+import { toSearchParams } from "@/utils/common";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
-import { useTheme } from "next-themes";
 import RootNodeSelector from "@/components/RootNodeSelector";
 
 const DependencyGraphPage: FunctionComponent = () => {
@@ -50,8 +49,6 @@ const DependencyGraphPage: FunctionComponent = () => {
       assetSlug: string;
       assetVersionSlug: string;
     };
-
-  const { theme } = useTheme();
 
   const all = searchParams?.get("all") === "1";
   const menu = useAssetMenu();
@@ -134,12 +131,10 @@ const DependencyGraphPage: FunctionComponent = () => {
             )}
           </div>
         </div>
-
         <div
-          className={classNames(
-            "h-screen w-full rounded-lg border bg-background",
-            theme === "light" ? "bg-gray-50" : "bg-black",
-          )}
+          className={
+            "h-screen w-full rounded-lg border bg-gray-50 dark:bg-black"
+          }
         >
           {graph ? (
             <DependencyGraph

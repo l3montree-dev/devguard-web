@@ -41,11 +41,11 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { browserApiClient } from "@/services/devGuardApi";
-import {
+import { UserRole } from "@/types/api/api";
+import type {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
-  UserRole,
   WebhookDTO,
 } from "@/types/api/api";
 import Image from "next/image";
@@ -540,6 +540,35 @@ const Home = () => {
           </form>
         </FormProvider>
       </div>
+      <hr />
+      <Section
+        id="config-files"
+        title="Configuration Files"
+        description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link href={"/" + activeOrg.slug + "/settings/config"}>
+              <Button variant={"outline"}>Go to Configuration Files</Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
+      <Section
+        id="dependency-proxy"
+        title="Dependency Proxy Settings"
+        description="View and edit the settings for the Dependency Proxy, which caches dependencies to speed up builds and reduce load on external package registries."
+      >
+        <Card className="p-6">
+          <div className="flex justify-end">
+            <Link href={"/" + activeOrg.slug + "/settings/dependency-proxy"}>
+              <Button variant={"outline"}>
+                Go to Dependency Proxy Settings{" "}
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </Section>
       <hr />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>

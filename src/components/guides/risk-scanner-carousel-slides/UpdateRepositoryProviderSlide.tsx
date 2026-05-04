@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import useDecodedParams from "../../../hooks/useDecodedParams";
 import { browserApiClient } from "../../../services/devGuardApi";
-import { AssetDTO } from "../../../types/api/api";
+import type { AssetDTO } from "../../../types/api/api";
 import { classNames } from "../../../utils/common";
 import { AsyncButton } from "../../ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";

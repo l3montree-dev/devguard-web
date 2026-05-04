@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, ComponentType, useState } from "react";
+import { useState } from "react";
+import type { ReactNode, ComponentType } from "react";
 
 export type WithUpdater<T> = { v: T } & {
   update: (newValue: T | ((prev: T) => T)) => void;

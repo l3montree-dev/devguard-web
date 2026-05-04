@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { classNames } from "../../utils/common";
 
 export const getClassNames = (severity: string) => {

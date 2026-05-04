@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PatWithPrivKey } from "../types/api/api";
+import type { PatWithPrivKey } from "../types/api/api";
 import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
 import { Button } from "./ui/button";

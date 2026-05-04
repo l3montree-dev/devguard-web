@@ -3,7 +3,7 @@
 import Page from "@/components/Page";
 
 import { browserApiClient } from "@/services/devGuardApi";
-import { DetailedFirstPartyVulnDTO, VulnEventDTO } from "@/types/api/api";
+import type { DetailedFirstPartyVulnDTO, VulnEventDTO } from "@/types/api/api";
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -14,7 +14,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import Link from "next/link";
-import { FunctionComponent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
 import Markdown from "react-markdown";
 
 import { Badge } from "@/components/ui/badge";

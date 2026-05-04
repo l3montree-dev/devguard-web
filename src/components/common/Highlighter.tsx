@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import React, { FunctionComponent, useMemo } from "react";
+import React, { type FunctionComponent, useMemo } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import yaml from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
 import shell from "react-syntax-highlighter/dist/esm/languages/hljs/bash";

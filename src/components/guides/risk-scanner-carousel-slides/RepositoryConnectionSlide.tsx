@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { FunctionComponent } from "react";
+import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { OrganizationDetailsDTO } from "../../../types/api/api";
-import { ExternalTicketProvider } from "../../../types/common";
+import type { OrganizationDetailsDTO } from "../../../types/api/api";
+import type { ExternalTicketProvider } from "../../../types/common";
 import ProviderSetup from "../ProviderSetup";
 
 interface RepositoryConnectionSlideProps {

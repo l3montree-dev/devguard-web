@@ -12,7 +12,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { FunctionComponent, useMemo } from "react";
+import { useMemo } from "react";
+import type { FunctionComponent } from "react";
 import {
   Card,
   CardContent,
@@ -43,7 +44,7 @@ import VulnEventItem from "../../../../../../../../../components/VulnEventItem";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
 import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
-import {
+import type {
   AllAverageFixingTimes,
   ComponentRisk,
   LicenseResponse,
@@ -54,7 +55,6 @@ import {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
-
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
@@ -73,21 +73,6 @@ const Index: FunctionComponent = () => {
     };
   const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
 
-  const { data: events, isLoading: eventsLoading } = useSWR<
-    Paged<VulnEventDTO>
-  >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/events/?pageSize=4",
-    fetcher,
-  );
-
   const url =
     "/organizations/" +
     organizationSlug +
@@ -97,6 +82,10 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/refs/" +
     assetVersionSlug;
+
+  const { data: events, isLoading: eventsLoading } = useSWR<
+    Paged<VulnEventDTO>
+  >(url + "/events/?pageSize=4", fetcher);
 
   const urlQueryAppendixForArtifact = selectedArtifact
     ? "?artifactName=" + encodeURIComponent(selectedArtifact)
@@ -130,19 +119,7 @@ const Index: FunctionComponent = () => {
 
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
-  >(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/refs/" +
-      assetVersionSlug +
-      "/components/licenses/" +
-      urlQueryAppendixForArtifact,
-    fetcher,
-  );
+  >(url + "/components/licenses/" + urlQueryAppendixForArtifact, fetcher);
 
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");

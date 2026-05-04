@@ -9,7 +9,7 @@ import Markdown from "react-markdown";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
-  AssetFormValues,
+  type AssetFormValues,
 } from "../../../../../components/asset/AssetForm";
 import AssetOverviewListItem from "../../../../../components/AssetOverviewListItem";
 import Avatar from "../../../../../components/Avatar";
@@ -40,15 +40,13 @@ import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
 import { useSession } from "../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../services/devGuardApi";
-import {
+import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
+import type {
   AssetDTO,
   EnvDTO,
   Paged,
   ProjectDTO,
-  RequirementsLevel,
-  UserRole,
 } from "../../../../../types/api/api";
-
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { debounce } from "lodash";
@@ -56,6 +54,8 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { buildFilterSearchParams } from "@/utils/url";
 import CustomPagination from "@/components/common/CustomPagination";
 import ListRenderer from "@/components/common/ListRenderer";
+
+import Sort from "@/components/Sort";
 
 function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
   return "type" in d && (d as ProjectDTO).type === "project";
@@ -260,11 +260,22 @@ export default function RepositoriesPage() {
             </TabsList>
           </Tabs>
 
-          <Input
-            onChange={debouncedHandleSearch}
-            defaultValue={searchParams?.get("search") || ""}
-            placeholder="Search for projects and repositories..."
-          />
+          <div className="flex gap-2">
+            <Sort
+              sortOptions={[
+                { label: "Name", value: "name" },
+                { label: "Created at", value: "created_at" },
+                { label: "Updated at", value: "updated_at" },
+              ]}
+            />
+
+            <Input
+              className="h-11"
+              onChange={debouncedHandleSearch}
+              defaultValue={searchParams?.get("search") || ""}
+              placeholder="Search for projects and repositories..."
+            />
+          </div>
           <ListRenderer
             isLoading={isLoading}
             error={error}

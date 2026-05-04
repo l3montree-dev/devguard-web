@@ -3,7 +3,8 @@
 
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { useState } from "react";
+import type { FunctionComponent } from "react";
 import Image from "next/image";
 
 import {
@@ -73,13 +74,18 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
               placeholder="Add your justification for mitigating this vulnerability..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
+              maxLength={4000}
             />
           </div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <AsyncButton variant={"secondary"} onClick={handleSubmit}>
+            <AsyncButton
+              variant={"secondary"}
+              onClick={handleSubmit}
+              disabled={justification.length > 4000}
+            >
               <div className="flex flex-row items-center">
                 {integrationType === "gitlab" && (
                   <>
