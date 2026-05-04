@@ -331,7 +331,7 @@ export default function RepositoriesPage() {
               className="h-11"
               onChange={debouncedHandleSearch}
               defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects and repositories..."
+              placeholder="Search for projects and repositories (min. 3 characters)..."
             />
           </div>
           <SubgroupsAndAssetsList

@@ -385,7 +385,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               className="h-11"
               onChange={debouncedHandleSearch}
               defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects"
+              placeholder="Search for projects (min. 3 characters)..."
             />
           </div>
           <ListRenderer
