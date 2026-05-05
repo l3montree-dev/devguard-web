@@ -51,6 +51,7 @@ import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
+import { is } from "zod/v4/locales";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -295,6 +296,7 @@ export default function RepositoriesPage() {
               defaultValue="active"
               value={viewedProject}
               onValueChange={handleSetTabValue}
+              className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
             >
               <TabsList>
                 <TabsTrigger value="active">
@@ -307,7 +309,7 @@ export default function RepositoriesPage() {
             </Tabs>
             {isSearchActive && (
               <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
-                Filter is disabled while search is active
+                Filter and sorting options are disabled while searching
               </span>
             )}
           </div>

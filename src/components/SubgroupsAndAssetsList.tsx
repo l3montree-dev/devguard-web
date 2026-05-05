@@ -2,7 +2,12 @@
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type ComponentPropsWithoutRef,
+  type MouseEvent,
+} from "react";
 import type { AssetDTO, ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
 import AssetOverviewListItem from "./AssetOverviewListItem";
 import Avatar from "./Avatar";
@@ -62,11 +67,7 @@ export default function SubgroupsAndAssetsList({
     setIsExpanded(hasPreloadedChildren);
   }, [hasPreloadedChildren, project]);
 
-  const toggleSubgroup = async (
-    slug: string,
-    id: string,
-    e: React.MouseEvent,
-  ) => {
+  const toggleSubgroup = async (slug: string, id: string, e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isExpanded) {
@@ -116,7 +117,7 @@ export default function SubgroupsAndAssetsList({
                 <span>
                   <Markdown
                     components={{
-                      a: (props: React.ComponentPropsWithoutRef<"a">) => (
+                      a: (props: ComponentPropsWithoutRef<"a">) => (
                         <span>{props.children}</span>
                       ),
                     }}

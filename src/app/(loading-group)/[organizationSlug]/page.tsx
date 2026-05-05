@@ -103,8 +103,6 @@ const OrganizationHomePage: FunctionComponent = () => {
     ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?${queryWithState.toString()}`
     : `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`;
 
-  console.log("SWR URL", swrUrl);
-
   const {
     isLoading,
     data: projects,
@@ -133,35 +131,6 @@ const OrganizationHomePage: FunctionComponent = () => {
     }, 500),
     [pushQuery],
   );
-
-  const handleSearchChange = async (search: string) => {
-    const params = buildFilterSearchParams(searchParams);
-    params.set("search", search);
-    params.set("page", "1");
-
-    const resp = await browserApiClient(
-      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?${params.toString()}`,
-    );
-    if (!resp.ok) {
-      toast.error("Failed to search projects. Please try again later.");
-      return;
-    }
-
-    const raw = (await resp.json()) as Paged<ProjectDTO>;
-
-    const data: Paged<SubGroupsAndAsset> = {
-      ...raw,
-      data: raw.data.map((item) => {
-        const { asset, subgroup } = checkType(item as SubGroupsAndAsset);
-        if (asset) {
-          return { ...asset, resourceType: "asset" as const };
-        }
-        return { ...subgroup!, resourceType: "project" as const };
-      }),
-    };
-
-    mutate(data, { revalidate: false });
-  };
 
   const handleSetTabValue = (value: string) => {
     if (value === "all" || value === "inactive") {
@@ -366,6 +335,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               defaultValue="all"
               value={viewedProject}
               onValueChange={handleSetTabValue}
+              className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
             >
               <TabsList>
                 <TabsTrigger value="all">Groups</TabsTrigger>
@@ -374,7 +344,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             </Tabs>
             {isSearchActive && (
               <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
-                Filter is disabled while search is active
+                Filter and sorting options are disabled while searching
               </span>
             )}
           </div>
