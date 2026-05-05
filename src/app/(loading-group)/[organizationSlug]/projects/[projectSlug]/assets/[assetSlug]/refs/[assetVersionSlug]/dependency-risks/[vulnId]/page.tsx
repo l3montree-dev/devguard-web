@@ -45,7 +45,7 @@ import {
   StopIcon,
 } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { BookOpenCheck, Bug, CheckCircleIcon } from "lucide-react";
+import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -826,10 +826,22 @@ const Index: FunctionComponent = () => {
                       <span className="font-semibold block mb-2">
                         VEX Rules
                       </span>
-                      <span className="font-semibold block mb-2">
+                      <span className="font-semibold block mb-2 flex items-center gap-1">
                         Recommendation
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <CircleHelp className="w-4 h-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="relative font-normal">
+                              This recommendation is derived from patterns and
+                              best practices observed across teams in your
+                              DevGuard community.
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
                       </span>
-                      {recommendedVexRule?.id && (
+                      {recommendedVexRule?.cveId && (
                         <>
                           {vexRulesData &&
                             vexRulesData.some((obj) =>
@@ -840,8 +852,7 @@ const Index: FunctionComponent = () => {
                             ) && (
                               <div className="my-2 flex gap-2 items-center text-muted-foreground border rounded-lg p-5">
                                 <div className=" cve-description overflow-x-auto ">
-                                  Our recommendation already aligns with one of
-                                  your applied VEX Rules.
+                                  One of your applied VEX Rules already aligns with the community driven recommendation.
                                 </div>
                                 <BookOpenCheck />
                               </div>
@@ -867,7 +878,7 @@ const Index: FunctionComponent = () => {
                             )}
                         </>
                       )}
-                      {!recommendedVexRule?.id && (
+                      {!recommendedVexRule?.cveId && (
                         <div className="my-2 cve-description overflow-x-auto text-muted-foreground">
                           There is currently no VEX Rule recommended.
                         </div>
