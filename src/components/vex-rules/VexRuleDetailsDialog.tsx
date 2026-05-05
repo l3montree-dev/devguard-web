@@ -126,7 +126,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
                 The dependency path where this rule applies. The wildcard * will
                 match any component (Zero or more).{" "}
                 <Link href="https://devguard.org/explanations/vulnerability-management/mitigation-strategies#vex-rules-automating-mitigation-at-scale">
-                  Checkout the documentation for path patterns
+                  Check out the documentation for path patterns
                 </Link>
               </p>
             }

@@ -6,12 +6,11 @@ interface VexRuleListItemProps {
   rule: VexRule;
   onClick: () => void;
 }
- 
+
 const VexRuleListItem: FunctionComponent<VexRuleListItemProps> = ({
   rule,
   onClick,
 }) => {
-
   return (
     <button
       type="button"

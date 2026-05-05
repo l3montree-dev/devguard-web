@@ -623,7 +623,9 @@ const Index: FunctionComponent = () => {
   }
 
   function pathEqual<T>(a: T[], b: T[]) {
-    if (a.length === 0 || b.length === 0 || a.length !== b.length) return false;
+    if (a.length === 0 || b.length === 0 || a.length !== b.length) {
+      return false;
+    }
 
     return a.every((val, i) => val === b[i]);
   }
@@ -852,7 +854,8 @@ const Index: FunctionComponent = () => {
                             ) && (
                               <div className="my-2 flex gap-2 items-center text-muted-foreground border rounded-lg p-5">
                                 <div className=" cve-description overflow-x-auto ">
-                                  One of your applied VEX Rules already aligns with the community driven recommendation.
+                                  One of your applied VEX Rules already aligns
+                                  with the community-driven recommendation.
                                 </div>
                                 <BookOpenCheck />
                               </div>
