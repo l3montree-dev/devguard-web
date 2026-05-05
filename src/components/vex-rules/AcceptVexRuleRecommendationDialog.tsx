@@ -44,7 +44,7 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
   projectSlug,
   assetSlug,
   assetVersionSlug,
-  urlBase: deleteUrlBase,
+  urlBase: vexRulesUrlBase,
   onAccepted,
 }) => {
   const [isAcceptingRecommendation, setIsAcceptingRecommendation] =
@@ -69,11 +69,11 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
   if (!vexRule) return null;
 
   const handleAcceptRecommendation = async () => {
-    if (!deleteUrlBase) return;
+    if (!vexRulesUrlBase) return;
 
     setIsAcceptingRecommendation(true);
     try {
-      const resp = await browserApiClient(deleteUrlBase, {
+      const resp = await browserApiClient(vexRulesUrlBase, {
         method: "POST",
         body: JSON.stringify({
           cveId: vexRule.cveId,
@@ -218,7 +218,7 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          {deleteUrlBase && (
+          {vexRulesUrlBase && (
             <>
               <Button
                 onClick={handleAcceptRecommendation}
