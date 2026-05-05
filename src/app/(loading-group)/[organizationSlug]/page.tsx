@@ -190,7 +190,6 @@ const OrganizationHomePage: FunctionComponent = () => {
     const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
 
     const resp = await browserApiClient(base);
-    console.log("Lazy fetching data for project", projectSlug, resp);
     if (resp.ok) {
       const data = await resp.json();
       const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;

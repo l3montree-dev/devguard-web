@@ -51,7 +51,6 @@ import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
-import { is } from "zod/v4/locales";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(

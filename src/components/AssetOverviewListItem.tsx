@@ -10,15 +10,13 @@ import { Badge } from "./ui/badge";
 
 interface Props {
   asset: AssetDTO;
-  projectSlug?: string;
+  projectSlug: string;
 }
 const AssetOverviewListItem: FunctionComponent<Props> = ({
   asset,
-  projectSlug: projectSlugProp,
+  projectSlug,
 }) => {
   const activeOrg = useActiveOrg();
-  const project = useActiveProject();
-  const projectSlug = projectSlugProp ?? project?.slug;
 
   return (
     <Link
