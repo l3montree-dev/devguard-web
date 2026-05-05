@@ -9,6 +9,8 @@ import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { HttpError } from "../../../data-fetcher/http-error";
+import { fetchSession } from "../../../data-fetcher/fetchSession";
+import { getCurrentUserRole } from "@/hooks/useUserRole";
 
 export default async function OrganizationLayout({
   // Layouts must accept a children prop.
@@ -19,8 +21,9 @@ export default async function OrganizationLayout({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string }>;
 }) {
+  let organizationSlug = "";
   try {
-    const { organizationSlug } = await params;
+    organizationSlug = await params.then((p) => p.organizationSlug);
     const [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
@@ -40,7 +43,10 @@ export default async function OrganizationLayout({
     );
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 402) {
-      redirect(config.billingUrl);
+      redirect(
+        config.billingUrl +
+          `?expired=1 ${organizationSlug ? `&orgName=${organizationSlug}` : ""}`,
+      );
     }
     redirect("/");
   }
