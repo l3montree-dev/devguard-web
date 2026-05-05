@@ -231,9 +231,14 @@ const RiskFeedItem = ({
                   </Markdown>
                   {event.userAgent === "devguard-mcp-server" && (
                     <div className="mt-3 flex items-start gap-2 rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400">
-                      <span className="mt-0.5 shrink-0">⚠️</span>
+                      <span aria-hidden="true" className="mt-0.5 shrink-0">
+                        ⚠️
+                      </span>
                       <span>
-                        <strong>AI-applied action! Review carefully.</strong>{" "}
+                        <span className="sr-only">Warning: </span>
+                        <strong>
+                          AI-applied action! Review carefully.
+                        </strong>{" "}
                         This action was applied by an AI agent. Verify that it
                         is accurate and suitable for your specific context. AI
                         output can contain errors or incomplete information.

@@ -108,7 +108,9 @@ export const eventTypeMessages = (
     case "licenseDecision":
       message =
         "made a license decision: " +
-        event.arbitraryJSONData.finalLicenseDecision;
+          event.arbitraryJSONData.finalLicenseDecision ||
+        event.arbitraryJSONData.license ||
+        "unknown license";
       break;
     case "ticketClosed":
       message = "closed the ticket for " + flawName;
