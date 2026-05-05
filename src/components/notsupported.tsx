@@ -14,76 +14,58 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Image from "next/image";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { classNames } from "@/utils/common";
-import GradientText from "@/components/misc/GradientText";
+import { Button } from "@/components/ui/button";
+import Footer from "@/components/misc/Footer";
 
 export default function NotSupported() {
   return (
-    <div className="text-center">
-      <div className="flex flex-col min-h-screen justify-center items-center">
-        <Image
-          src="/assets/nosupport-gopher.png"
-          alt="sad"
-          width={50}
-          height={50}
-          className="m-8"
-        />
-        <div className="mx-4">
-          <Card className="">
-            <CardHeader>
-              <CardTitle>No Mobile Support for Devguard</CardTitle>
-              <CardDescription>
-                We are not sure if DevGuard on Mobile makes sense - if you are
-                interested in DevGuard Mobile Support give us a heads up on our
-                GitHub.
-              </CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <div className="flex w-full flex-row justify-between space-x-4">
-                <a
-                  className={classNames(
-                    "!text-primary-foreground flex-1",
-                    buttonVariants({ variant: "default" }),
-                  )}
-                  href="https://devguard.org"
-                >
-                  <Image
-                    src="/logo_icon.svg"
-                    alt="DevGuard Logo"
-                    width={24}
-                    height={24}
-                    className=" mr-2"
-                  />
-                  Devguard
-                </a>
-                <a
-                  className={classNames(
-                    "flex-1",
-                    buttonVariants({ variant: "secondary" }),
-                  )}
-                  href="https://github.com/l3montree-dev/devguard"
-                >
-                  <Image
-                    src="/assets/github.svg"
-                    alt="GitHub Logo"
-                    className="mr-2 dark:invert"
-                    width={24}
-                    height={24}
-                  />
-                  GitHub
-                </a>
-              </div>
-            </CardFooter>
-          </Card>
+    <div className="flex min-h-screen flex-col bg-background">
+      <main className="grid flex-1 place-items-center px-6 py-24 sm:py-32 lg:px-8">
+        <div className="text-center">
+          <Image
+            src="/assets/nosupport-gopher.png"
+            alt="DevGuard does not support mobile yet"
+            width={500}
+            height={500}
+            className="mx-auto h-48 w-auto rounded-lg"
+          />
+          <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+            No mobile support
+          </h1>
+          <p className="mt-6 text-pretty text-lg font-medium text-muted-foreground sm:text-xl/8">
+            DevGuard isn&rsquo;t optimized for small screens yet. Please open it
+            on a desktop browser &mdash; and if mobile support matters to you,
+            cast your vote on the GitHub discussion.
+          </p>
+          <div className="mt-10 flex items-center justify-center gap-x-6">
+            <a
+              href="https://devguard.org"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <Button variant="default">To devguard.org</Button>
+            </a>
+            <a
+              href="https://github.com/l3montree-dev/devguard/discussions/1923"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <Button variant="secondary">
+                <Image
+                  src="/assets/github.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="mr-2 dark:invert"
+                />
+                Vote on GitHub
+              </Button>
+            </a>
+          </div>
         </div>
+      </main>
+      <div className="pb-6">
+        <Footer />
       </div>
     </div>
   );
