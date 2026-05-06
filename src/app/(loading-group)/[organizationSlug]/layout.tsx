@@ -19,8 +19,10 @@ export default async function OrganizationLayout({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string }>;
 }) {
+  let organizationSlug = "";
   try {
-    const { organizationSlug } = await params;
+    const { organizationSlug: slug } = await params;
+    organizationSlug = slug;
     const [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
@@ -40,8 +42,13 @@ export default async function OrganizationLayout({
     );
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 402) {
-      redirect(config.billingUrl);
+      const billingUrl = new URL(config.billingUrl);
+      billingUrl.searchParams.set("expired", "1");
+      if (organizationSlug) {
+        billingUrl.searchParams.set("orgName", organizationSlug);
+      }
+      redirect(billingUrl.toString());
     }
-    redirect("/");
   }
+  redirect("/");
 }
