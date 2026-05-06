@@ -1,20 +1,11 @@
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { browserApiClient } from "../services/devGuardApi";
 import type { InstanceSettings } from "@/types/api/api";
 
+const fetcher = (url: string) =>
+  browserApiClient(url).then((res) => (res.ok ? res.json() : null));
+
 export const useInstanceSettings = () => {
-  const [instanceSettings, setInstanceSettings] =
-    useState<InstanceSettings | null>(null);
-
-  useEffect(() => {
-    browserApiClient("/instance-settings/")
-      .then((res) => {
-        if (res.ok) return res.json();
-      })
-      .then((data: InstanceSettings) => {
-        if (data) setInstanceSettings(data);
-      });
-  }, []);
-
-  return instanceSettings;
+  const { data } = useSWR<InstanceSettings>("/instance-settings/", fetcher);
+  return data ?? null;
 };
