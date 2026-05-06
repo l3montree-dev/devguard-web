@@ -35,6 +35,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useSession, useUpdateSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
+import { useInstanceSettings } from "../hooks/useInstanceSettings";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -52,6 +53,7 @@ export const OrganizationDropDown = () => {
 
   const user = useCurrentUser();
   const router = useRouter();
+  const instanceSettings = useInstanceSettings();
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
   if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
@@ -134,7 +136,7 @@ export const OrganizationDropDown = () => {
           <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-header-foreground transition-all hover:bg-white/10">
             <ChevronUpDownIcon className="block h-7 w-7 p-1" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="min-w-48">
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-xs text-muted-foreground">
                 Organizations
@@ -169,13 +171,17 @@ export const OrganizationDropDown = () => {
                 </>
               )}
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-              <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
-                <PlusIcon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              Create Organization
-            </DropdownMenuItem>
+            {!instanceSettings?.singleOrganizationMode && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+                  <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
+                    <PlusIcon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  Create Organization
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
