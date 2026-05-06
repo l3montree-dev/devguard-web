@@ -57,6 +57,53 @@ export default function InstanceSettingsCard() {
               />
             </div>
           </div>
+          <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
+            <div>
+              <p className="text-sm font-medium">Disable Public OCI Proxy</p>
+              <p className="text-xs text-muted-foreground">
+                When enabled, the public OCI proxy is disabled, preventing users
+                from pulling container images through it.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
+              <Switch
+                disabled={true} // TODO: This setting is not actually implemented yet
+                checked={orgCreationDisabled}
+                onCheckedChange={(checked) => {
+                  setOrgCreationDisabled(checked);
+                  toast.success(
+                    checked
+                      ? "Organisation creation disabled for regular users."
+                      : "Organisation creation re-enabled.",
+                  );
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
+            <div>
+              <p className="text-sm font-medium">Disable User Registration</p>
+              <p className="text-xs text-muted-foreground">
+                When enabled, new user registrations are disabled.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
+              <Switch
+                disabled={true} // TODO: This setting is not actually implemented yet
+                checked={orgCreationDisabled}
+                onCheckedChange={(checked) => {
+                  setOrgCreationDisabled(checked);
+                  toast.success(
+                    checked
+                      ? "Organisation creation disabled for regular users."
+                      : "Organisation creation re-enabled.",
+                  );
+                }}
+              />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

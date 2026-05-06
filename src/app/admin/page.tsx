@@ -3,7 +3,10 @@
 
 "use client";
 
-import { useInstanceAdmin } from "@/context/InstanceAdminContext";
+import {
+  SessionCountdown,
+  useInstanceAdmin,
+} from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient } from "@/services/adminApi";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -152,9 +155,12 @@ export default function InstanceAdminPage() {
             Manage this DevGuard instance.
           </p>
         </div>
-        <Button variant="destructive" onClick={handleLogout}>
-          End Admin Session
-        </Button>
+        <div className="flex flex-col items-end gap-1">
+          <Button variant="destructive" onClick={handleLogout}>
+            End Admin Session
+          </Button>
+          <SessionCountdown />
+        </div>
       </div>
       <Section
         title="Admin Tools"
