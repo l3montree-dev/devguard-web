@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /accept-invitation
+Disallow: /recovery
+Disallow: /registration
+Disallow: /verification
+Disallow: /gh
