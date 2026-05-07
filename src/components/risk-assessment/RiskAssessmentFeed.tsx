@@ -114,7 +114,7 @@ const RiskFeedGroupHeader = ({
   const type = groupedEvents[0].type;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible asChild open={isOpen} onOpenChange={setIsOpen}>
       <li className="relative flex flex-row items-start gap-4 transition-all">
         <div
           className={classNames(
@@ -317,7 +317,7 @@ const RiskFeedItem = ({
   );
 };
 
-function groupEventsByDateAndType(
+function groupContiguousEventsByType(
   events: VulnEventDTO[],
 ): (VulnEventDTO | VulnEventDTO[])[] {
   const result: (VulnEventDTO | VulnEventDTO[])[] = [];
@@ -359,7 +359,7 @@ export default function RiskAssessmentFeed({
   deleteEvent: (eventId: string) => Promise<void>;
   directDependencyFixedVersion?: string | null;
 }) {
-  const groupedEvents = groupEventsByDateAndType(events);
+  const groupedEvents = groupContiguousEventsByType(events);
 
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -371,11 +371,14 @@ export default function RiskAssessmentFeed({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const deleteHistory = () => {
-    events.slice(0, events.length - 3).forEach(async (event) => {
-      // we are using await on purpose here to not overload the server with delete requests
+  const deleteHistory = async () => {
+    const hiddenGroups = groupedEvents.slice(0, groupedEvents.length - 3);
+    const hiddenEvents = hiddenGroups.flatMap((groupOrEvent) =>
+      Array.isArray(groupOrEvent) ? groupOrEvent : [groupOrEvent],
+    );
+    for (const event of hiddenEvents) {
       await deleteEvent(event.id);
-    });
+    }
   };
 
   return (
@@ -422,14 +425,14 @@ export default function RiskAssessmentFeed({
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
                 {groupedEvents
                   .slice(0, groupedEvents.length - 3)
-                  .map((groupedEvents, index) => {
-                    if (Array.isArray(groupedEvents)) {
+                  .map((groupOrEvent, index) => {
+                    if (Array.isArray(groupOrEvent)) {
                       return (
                         <RiskFeedGroupHeader
-                          key={index}
-                          groupedEvents={groupedEvents}
+                          key={groupOrEvent[0].id}
+                          groupedEvents={groupOrEvent}
                         >
-                          {groupedEvents.map((event) => (
+                          {groupOrEvent.map((event) => (
                             <RiskFeedItem
                               activeAssetVersion={activeAssetVersion}
                               vulnerabilityName={vulnerabilityName}
@@ -452,7 +455,7 @@ export default function RiskAssessmentFeed({
                         </RiskFeedGroupHeader>
                       );
                     }
-                    const event = groupedEvents as VulnEventDTO;
+                    const event = groupOrEvent as VulnEventDTO;
 
                     return (
                       <RiskFeedItem
@@ -481,14 +484,14 @@ export default function RiskAssessmentFeed({
         <div className="flex flex-col gap-10">
           {groupedEvents
             .slice(Math.max(groupedEvents.length - 3, 0), groupedEvents.length)
-            .map((groupedEvents, index) => {
-              if (Array.isArray(groupedEvents)) {
+            .map((groupOrEvent, index) => {
+              if (Array.isArray(groupOrEvent)) {
                 return (
                   <RiskFeedGroupHeader
-                    key={index}
-                    groupedEvents={groupedEvents}
+                    key={groupOrEvent[0].id}
+                    groupedEvents={groupOrEvent}
                   >
-                    {groupedEvents.map((event) => (
+                    {groupOrEvent.map((event) => (
                       <RiskFeedItem
                         activeAssetVersion={activeAssetVersion}
                         vulnerabilityName={vulnerabilityName}
@@ -511,7 +514,7 @@ export default function RiskAssessmentFeed({
                   </RiskFeedGroupHeader>
                 );
               }
-              const event = groupedEvents as VulnEventDTO;
+              const event = groupOrEvent as VulnEventDTO;
               return (
                 <RiskFeedItem
                   activeAssetVersion={activeAssetVersion}
