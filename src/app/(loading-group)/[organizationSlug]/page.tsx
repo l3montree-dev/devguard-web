@@ -173,6 +173,10 @@ const OrganizationHomePage: FunctionComponent = () => {
   };
 
   useEffect(() => {
+    localStorage.setItem("lastActiveOrg", activeOrg.slug);
+  }, [activeOrg.slug]);
+
+  useEffect(() => {
     // trigger a sync on page load - if the org has an external entity provider
     if (activeOrg.externalEntityProviderId) {
       // check in localStorage if the sync was already triggered
