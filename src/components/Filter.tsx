@@ -25,6 +25,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
+const MIN_SEARCH_LENGTH = 3;
+
 interface FilterOption {
   label: string;
   value: string;
@@ -126,7 +128,7 @@ const Filter: FunctionComponent<Props> = ({
   };
 
   const handleSearchForText = () => {
-    if (inputQuery.length < 3) return;
+    if (inputQuery.length < MIN_SEARCH_LENGTH) return;
     search?.onChange(inputQuery);
     setActiveSearchQuery(inputQuery);
     setInputQuery("");
@@ -196,7 +198,9 @@ const Filter: FunctionComponent<Props> = ({
     if (step === "label") {
       itemCount =
         filteredOptions.length +
-        (inputQuery && search && inputQuery.length >= 3 ? 1 : 0);
+        (inputQuery && search && inputQuery.length >= MIN_SEARCH_LENGTH
+          ? 1
+          : 0);
     } else if (step === "operator") {
       itemCount = operators.length;
     } else if (step === "value" && showFilterValues) {
@@ -296,7 +300,7 @@ const Filter: FunctionComponent<Props> = ({
                 )}
                 {inputQuery &&
                   search &&
-                  (inputQuery.length < 3 ? (
+                  (inputQuery.length < MIN_SEARCH_LENGTH ? (
                     <p className="px-3 py-2 text-xs text-muted-foreground">
                       Please enter at least 3 characters to search.
                     </p>
