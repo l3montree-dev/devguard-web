@@ -1,27 +1,32 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSession } from "../context/SessionContext";
 import { useEffect } from "react";
 
 const Index = () => {
   const { organizations } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    const lastActiveOrg = localStorage.getItem("lastActiveOrg");
-    if (lastActiveOrg) {
-      // Check if the last active org is still in the user's org list
-      const orgExists = organizations.some((org) => org.slug === lastActiveOrg);
-      if (orgExists) {
-        redirect(`/${lastActiveOrg}`);
-      }
-    }
     if (organizations.length > 0) {
-      redirect(`/${organizations[0].slug}`);
+      const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+      if (lastActiveOrg) {
+        const orgExists = organizations.some(
+          (org) => org.slug === lastActiveOrg,
+        );
+        if (orgExists) {
+          router.replace(`/${lastActiveOrg}`);
+        } else {
+          router.replace(`/${organizations[0].slug}`);
+        }
+      } else {
+        router.replace(`/${organizations[0].slug}`);
+      }
     } else {
-      redirect("/setup");
+      router.replace("/setup");
     }
-  }, [organizations]);
+  }, [organizations, router]);
 
   return null;
 };
