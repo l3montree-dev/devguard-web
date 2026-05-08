@@ -25,6 +25,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
+const MIN_SEARCH_LENGTH = 3;
+
 interface FilterOption {
   label: string;
   value: string;
@@ -126,6 +128,7 @@ const Filter: FunctionComponent<Props> = ({
   };
 
   const handleSearchForText = () => {
+    if (inputQuery.length < MIN_SEARCH_LENGTH) return;
     search?.onChange(inputQuery);
     setActiveSearchQuery(inputQuery);
     setInputQuery("");
@@ -193,7 +196,11 @@ const Filter: FunctionComponent<Props> = ({
 
     let itemCount = 0;
     if (step === "label") {
-      itemCount = filteredOptions.length + (inputQuery && search ? 1 : 0);
+      itemCount =
+        filteredOptions.length +
+        (inputQuery && search && inputQuery.length >= MIN_SEARCH_LENGTH
+          ? 1
+          : 0);
     } else if (step === "operator") {
       itemCount = operators.length;
     } else if (step === "value" && showFilterValues) {
@@ -291,15 +298,21 @@ const Filter: FunctionComponent<Props> = ({
                     ))}
                   </>
                 )}
-                {inputQuery && search && (
-                  <button
-                    onClick={handleSearchForText}
-                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent ${focusedIndex === filteredOptions.length ? "bg-accent" : ""}`}
-                  >
-                    <SearchIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                    Search for &ldquo;{inputQuery}&rdquo;
-                  </button>
-                )}
+                {inputQuery &&
+                  search &&
+                  (inputQuery.length < MIN_SEARCH_LENGTH ? (
+                    <p className="px-3 py-2 text-xs text-muted-foreground">
+                      Please enter at least 3 characters to search.
+                    </p>
+                  ) : (
+                    <button
+                      onClick={handleSearchForText}
+                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent ${focusedIndex === filteredOptions.length ? "bg-accent" : ""}`}
+                    >
+                      <SearchIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      Search for &ldquo;{inputQuery}&rdquo;
+                    </button>
+                  ))}
               </div>
             )}
 
