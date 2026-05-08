@@ -2,17 +2,28 @@
 
 import { redirect } from "next/navigation";
 import { useSession } from "../context/SessionContext";
+import { useEffect } from "react";
 
 const Index = () => {
-  // decide where to go based on if the user has any orgs
   const { organizations } = useSession();
-  if (organizations.length > 0) {
-    // redirect to the first org
-    redirect(`/${organizations[0].slug}`);
-  } else {
-    // redirect to the onboarding page
-    redirect("/setup");
-  }
+
+  useEffect(() => {
+    const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+    if (lastActiveOrg) {
+      // Check if the last active org is still in the user's org list
+      const orgExists = organizations.some((org) => org.slug === lastActiveOrg);
+      if (orgExists) {
+        redirect(`/${lastActiveOrg}`);
+      }
+    }
+    if (organizations.length > 0) {
+      redirect(`/${organizations[0].slug}`);
+    } else {
+      redirect("/setup");
+    }
+  }, [organizations]);
+
+  return null;
 };
 
 export default Index;
