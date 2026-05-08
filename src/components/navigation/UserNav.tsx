@@ -35,11 +35,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useConfig } from "../../context/ConfigContext";
 import { getUserFullName } from "../../types/auth";
-import { Separator } from "../ui/separator";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
@@ -47,7 +47,6 @@ export default function UserNav() {
   const user = useCurrentUser();
 
   const config = useConfig();
-  config.frontendUrl;
 
   const handleLogout = async () => {
     const logoutUrl = await getLogoutUrl();
@@ -57,7 +56,7 @@ export default function UserNav() {
   return (
     <div className="flex user-nav flex-row justify-between gap-1">
       <DropdownMenu>
-        <DropdownMenuTrigger className="theme-chooser">
+        <DropdownMenuTrigger aria-label="Open tools menu">
           <div className="flex w-10 flex-row justify-center">
             <WrenchScrewdriverIcon className="h-[1.2rem] w-[1.2rem] dark:text-muted-foreground text-background transition-all" />
           </div>
@@ -67,6 +66,7 @@ export default function UserNav() {
             className="hover:bg-transparent hover:no-underline !text-foreground"
             href={`https://docs.devguard.org/package-inspector?src=${config.frontendUrl}&app=devguard-web`}
             target="_blank"
+            rel="noopener noreferrer"
           >
             <DropdownMenuItem className="hover:bg-transparent hover:no-underline !text-foreground flex items-center gap-2">
               <DocumentMagnifyingGlassIcon className="h-4 w-4" />
@@ -74,11 +74,12 @@ export default function UserNav() {
             </DropdownMenuItem>
           </Link>
 
-          <Separator />
+          <DropdownMenuSeparator />
           <Link
             className="hover:bg-transparent hover:no-underline !text-foreground"
             href={`https://docs.devguard.org/vulnerability-database/?src=${config.frontendUrl}&app=devguard-web`}
             target="_blank"
+            rel="noopener noreferrer"
           >
             <DropdownMenuItem className="hover:bg-transparent hover:no-underline !text-foreground flex items-center gap-2">
               <CircleStackIcon className="h-4 w-4" />
