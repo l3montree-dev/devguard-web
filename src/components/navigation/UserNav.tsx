@@ -21,6 +21,9 @@ import {
   CogIcon,
   MoonIcon,
   SunIcon,
+  WrenchScrewdriverIcon,
+  CircleStackIcon,
+  DocumentMagnifyingGlassIcon,
   ArrowRightStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
@@ -32,6 +35,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useConfig } from "../../context/ConfigContext";
@@ -51,6 +55,39 @@ export default function UserNav() {
 
   return (
     <div className="flex user-nav flex-row justify-between gap-1">
+      <DropdownMenu>
+        <DropdownMenuTrigger aria-label="Open tools menu">
+          <div className="flex w-10 flex-row justify-center">
+            <WrenchScrewdriverIcon className="h-[1.2rem] w-[1.2rem] dark:text-muted-foreground text-background transition-all" />
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <Link
+            className="hover:bg-transparent hover:no-underline !text-foreground"
+            href={`https://docs.devguard.org/package-inspector?src=${config.frontendUrl}&app=devguard-web`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <DropdownMenuItem className="hover:bg-transparent hover:no-underline !text-foreground flex items-center gap-2">
+              <DocumentMagnifyingGlassIcon className="h-4 w-4" />
+              <span>Package Inspector</span>
+            </DropdownMenuItem>
+          </Link>
+
+          <DropdownMenuSeparator />
+          <Link
+            className="hover:bg-transparent hover:no-underline !text-foreground"
+            href={`https://docs.devguard.org/vulnerability-database/?src=${config.frontendUrl}&app=devguard-web`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <DropdownMenuItem className="hover:bg-transparent hover:no-underline !text-foreground flex items-center gap-2">
+              <CircleStackIcon className="h-4 w-4" />
+              <span>Vulnerability Database</span>
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuContent>
+      </DropdownMenu>
       {!config.enforceTheme && (
         <DropdownMenu>
           <DropdownMenuTrigger className="theme-chooser">
