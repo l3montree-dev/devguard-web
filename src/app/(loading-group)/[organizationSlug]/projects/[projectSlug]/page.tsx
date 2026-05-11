@@ -203,50 +203,56 @@ export default function RepositoriesPage() {
     }
   };
 
-  const handleLazyDataFetching = async (
-    projectSlug: string,
-    projectId: string,
-  ) => {
-    const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+  const handleLazyDataFetching = useCallback(
+    async (projectSlug: string, projectId: string) => {
+      const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
 
-    const resp = await browserApiClient(base);
-    if (resp.ok) {
-      const data = await resp.json();
-      const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+      const resp = await browserApiClient(base);
+      if (resp.ok) {
+        const data = await resp.json();
+        const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
 
-      mutate(
-        (prev) => {
-          if (!prev) return prev;
-          // traverse the whole tree, find the correct project and update it with the new data
-          const recursiveFn = (item: SubGroupsAndAsset): SubGroupsAndAsset => {
-            const { asset, subgroup } = checkType(item);
-            if (asset != null) {
-              return asset;
-            }
+        mutate(
+          (prev) => {
+            if (!prev) return prev;
+            // traverse the whole tree, find the correct project and update it with the new data
+            const recursiveFn = (
+              item: SubGroupsAndAsset,
+            ): SubGroupsAndAsset => {
+              const { asset, subgroup } = checkType(item);
+              if (asset != null) {
+                return asset;
+              }
 
-            if (subgroup.id === projectId) {
-              return { ...subgroup, subGroupsAndAsset: subGroupsAndAsset.data };
-            }
+              if (subgroup.id === projectId) {
+                return {
+                  ...subgroup,
+                  subGroupsAndAsset: subGroupsAndAsset.data,
+                };
+              }
+
+              return {
+                ...subgroup,
+                subGroupsAndAsset:
+                  subgroup?.subGroupsAndAsset?.map(recursiveFn),
+              };
+            };
 
             return {
-              ...subgroup,
-              subGroupsAndAsset: subgroup?.subGroupsAndAsset?.map(recursiveFn),
+              ...prev,
+              data: prev.data.map(recursiveFn) as SubGroupsAndAsset[],
             };
-          };
-
-          return {
-            ...prev,
-            data: prev.data.map(recursiveFn) as SubGroupsAndAsset[],
-          };
-        },
-        { revalidate: false },
-      );
-    } else {
-      toast.error(
-        "Failed to load subgroups and assets. Please try again later.",
-      );
-    }
-  };
+          },
+          { revalidate: false },
+        );
+      } else {
+        toast.error(
+          "Failed to load subgroups and assets. Please try again later.",
+        );
+      }
+    },
+    [activeOrg.slug, mutate],
+  );
 
   return (
     <>

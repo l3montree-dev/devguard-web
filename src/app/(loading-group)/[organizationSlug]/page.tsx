@@ -183,54 +183,60 @@ const OrganizationHomePage: FunctionComponent = () => {
     mutate();
   };
 
-  const handleLazyDataFetching = async (
-    projectSlug: string,
-    projectId: string,
-  ) => {
-    const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+  const handleLazyDataFetching = useCallback(
+    async (projectSlug: string, projectId: string) => {
+      const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
 
-    const resp = await browserApiClient(base);
-    if (resp.ok) {
-      const data = await resp.json();
-      const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+      const resp = await browserApiClient(base);
+      if (resp.ok) {
+        const data = await resp.json();
+        const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
 
-      mutate(
-        (prev) => {
-          if (!prev) return prev;
-          // traverse the whole tree, find the correct project and update it with the new data
-          const recursiveFn = (item: SubGroupsAndAsset): SubGroupsAndAsset => {
-            const { asset, subgroup } = checkType(item);
-            if (asset != null) {
-              return asset;
-            }
+        mutate(
+          (prev) => {
+            if (!prev) return prev;
+            // traverse the whole tree, find the correct project and update it with the new data
+            const recursiveFn = (
+              item: SubGroupsAndAsset,
+            ): SubGroupsAndAsset => {
+              const { asset, subgroup } = checkType(item);
+              if (asset != null) {
+                return asset;
+              }
 
-            if (subgroup.id === projectId) {
-              return { ...subgroup, subGroupsAndAsset: subGroupsAndAsset.data };
-            }
+              if (subgroup.id === projectId) {
+                return {
+                  ...subgroup,
+                  subGroupsAndAsset: subGroupsAndAsset.data,
+                };
+              }
+
+              return {
+                ...subgroup,
+                subGroupsAndAsset:
+                  subgroup?.subGroupsAndAsset?.map(recursiveFn),
+              };
+            };
 
             return {
-              ...subgroup,
-              subGroupsAndAsset: subgroup?.subGroupsAndAsset?.map(recursiveFn),
+              ...prev,
+              data: prev.data.map(recursiveFn) as Array<
+                ProjectDTO & {
+                  resourceType: "project";
+                }
+              >,
             };
-          };
-
-          return {
-            ...prev,
-            data: prev.data.map(recursiveFn) as Array<
-              ProjectDTO & {
-                resourceType: "project";
-              }
-            >,
-          };
-        },
-        { revalidate: false },
-      );
-    } else {
-      toast.error(
-        "Failed to load subgroups and assets. Please try again later.",
-      );
-    }
-  };
+          },
+          { revalidate: false },
+        );
+      } else {
+        toast.error(
+          "Failed to load subgroups and assets. Please try again later.",
+        );
+      }
+    },
+    [activeOrg.slug, mutate],
+  );
 
   useEffect(() => {
     // trigger a sync on page load - if the org has an external entity provider
@@ -363,31 +369,33 @@ const OrganizationHomePage: FunctionComponent = () => {
               placeholder="Search for projects (min. 3 characters)..."
             />
           </div>
-          <ListRenderer
-            isLoading={isLoading}
-            error={error}
-            data={projects?.data}
-            Empty={<EmptyParty title={"No groups found"} description="" />}
-            renderItem={(project) => {
-              return (
-                <div key={project.id} className="flex flex-col">
-                  <div className="pl-4 pt-2 flex flex-col gap-2">
-                    <SubgroupsAndAssetsList
-                      project={
-                        project as ProjectDTO & { resourceType: "project" }
-                      }
-                      onFetchData={handleLazyDataFetching}
-                      subgroupsWithAssets={
-                        (project as ProjectDTO & { resourceType: "project" })
-                          .subGroupsAndAsset
-                      }
-                      projectSlug={project.slug}
-                    />
+          <div id="group-and-project-list">
+            <ListRenderer
+              isLoading={isLoading}
+              error={error}
+              data={projects?.data}
+              Empty={<EmptyParty title={"No groups found"} description="" />}
+              renderItem={(project) => {
+                return (
+                  <div key={project.id} className="flex flex-col">
+                    <div className="flex flex-col gap-2">
+                      <SubgroupsAndAssetsList
+                        project={
+                          project as ProjectDTO & { resourceType: "project" }
+                        }
+                        onFetchData={handleLazyDataFetching}
+                        subgroupsWithAssets={
+                          (project as ProjectDTO & { resourceType: "project" })
+                            .subGroupsAndAsset
+                        }
+                        projectSlug={project.slug}
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            }}
-          />
+                );
+              }}
+            />
+          </div>
         </Section>
         {projects && (
           <div className="mt-4">
