@@ -128,12 +128,15 @@ const RiskFeedGroupHeader = ({
           <CollapsibleTrigger asChild>
             <button className="w-full bg-card px-2 py-2 font-medium flex flex-row items-center justify-between hover:bg-muted/50 transition-colors">
               <span className="flex flex-row items-center gap-2">
-                {eventTypeMessages(groupedEvents[0], "", [])}
+                {(() => {
+                  const msg = eventTypeMessages(groupedEvents[0], "", []);
+                  return msg.charAt(0).toUpperCase() + msg.slice(1);
+                })()}
                 <span className="text-muted-foreground font-normal text-sm">
                   across other branches
                 </span>
                 <Badge variant="secondary" className="text-xs font-normal">
-                  {groupedEvents.length}×
+                  {groupedEvents.length}x
                 </Badge>
               </span>
               <ChevronDownIcon
@@ -200,7 +203,8 @@ const RiskFeedItem = ({
           event.createdByVexRule || hasQuickfix(directDependencyFixedVersion)
             ? "border-dashed border"
             : "",
-          "absolute left-[13px] h-full border-l border-r -bottom-[35px]",
+          inGroup ? "left-[15px]" : "left-[13px]",
+          "absolute h-full border-l border-r -bottom-[35px]",
         )}
       />
       {!inGroup && (
