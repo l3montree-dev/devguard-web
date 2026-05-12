@@ -32,6 +32,7 @@ import RiskScannerDialog from "../../../../../../../../../../components/RiskScan
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
+import { useScannerImage } from "../../../../../../../../../../context/ScannerImageContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
@@ -186,6 +187,7 @@ const Index: FunctionComponent = () => {
 
   const assetMenu = useAssetMenu();
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
 
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -360,6 +362,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         open={isOpen}
         onOpenChange={setIsOpen}
       />

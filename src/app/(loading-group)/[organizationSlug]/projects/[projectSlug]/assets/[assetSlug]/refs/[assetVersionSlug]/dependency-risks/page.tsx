@@ -45,6 +45,7 @@ import DependencyRiskScannerDialog from "../../../../../../../../../../component
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
+import { useScannerImage } from "../../../../../../../../../../context/ScannerImageContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
@@ -127,6 +128,7 @@ const Index: FunctionComponent = () => {
     });
   }, []);
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
   const { session } = useSession();
 
   const assetMenu = useAssetMenu();
@@ -686,6 +688,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         assetVersion={assetVersion}
         artifacts={artifacts || []}
       />

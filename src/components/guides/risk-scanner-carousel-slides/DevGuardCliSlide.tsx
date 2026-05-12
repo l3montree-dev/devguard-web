@@ -33,12 +33,14 @@ interface DevGuardCliSlideProps {
 
   onClose: () => void;
   prevIndex: number;
+  scannerImage: string;
 }
 
 export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   api,
   prevIndex,
   onClose,
+  scannerImage,
 }) => {
   const pat = usePersonalAccessToken();
   const org = useActiveOrg();
@@ -70,7 +72,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
             </p>
             <CopyCode
               language="shell"
-              codeString="docker pull ghcr.io/l3montree-dev/devguard/devguard-scanner:latest"
+              codeString={`docker pull ${scannerImage}`}
             />
           </>
         </Section>

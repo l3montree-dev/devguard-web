@@ -16,6 +16,7 @@ import RiskScannerDialog from "../../../../../../../components/RiskScannerDialog
 import { Button } from "../../../../../../../components/ui/button";
 import { useAsset } from "../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../context/ConfigContext";
+import { useScannerImage } from "../../../../../../../context/ScannerImageContext";
 import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
@@ -40,6 +41,7 @@ const Index: FunctionComponent = () => {
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
   const autosetup = useAutosetup(
     !riskScanningIsOpen,
     config.devguardApiUrlPublicInternet,
@@ -274,6 +276,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
       />
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
