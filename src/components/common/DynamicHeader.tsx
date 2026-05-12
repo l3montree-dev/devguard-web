@@ -12,6 +12,7 @@ import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
 import { OrganizationDropDown } from "../OrganizationDropDown";
 import EntityProviderImage from "./EntityProviderImage";
+import { MessageCircleQuestion } from "lucide-react";
 
 const levelMapping: { [idx: number]: string } = {
   1: "root",
@@ -37,8 +38,14 @@ interface Props {
     isActive?: boolean;
   }> | null;
   z: number;
+  showHelpCenter?: boolean;
 }
-export default function DynamicHeader({ Title, menu, z }: Props) {
+export default function DynamicHeader({
+  Title,
+  menu,
+  z,
+  showHelpCenter = false,
+}: Props) {
   const activeOrg = useActiveOrg();
   const pathname = usePathname();
   const params = useDecodedParams();
@@ -70,24 +77,43 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
           </div>
         </div>
         {menu && (
-          <div className="flex flex-row items-end gap-6 text-sm">
-            {menu.map((item) => (
+          <div
+            data-tour="menu"
+            className="flex flex-row items-end justify-between text-sm"
+          >
+            <div className="flex flex-row items-end gap-6 text-sm">
+              {menu.map((item) => (
+                <Link
+                  className={classNames(
+                    "cursor:pointer relative hover:no-underline",
+                  )}
+                  key={item.title}
+                  href={item.href}
+                >
+                  {(item.isActive || pathname == item.href) && (
+                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
+                  )}
+                  <div className="mt-4 flex flex-row items-center gap-1">
+                    <item.Icon className="h-5 w-5 text-gray-400" />
+                    <span className="text-header-foreground">{item.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            {showHelpCenter && (
               <Link
-                className={classNames(
-                  "cursor:pointer relative hover:no-underline",
-                )}
-                key={item.title}
-                href={item.href}
+                href={`/${slug}/help-center`}
+                className="cursor-pointer relative hover:no-underline"
               >
-                {(item.isActive || pathname == item.href) && (
-                  <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
-                )}
-                <div className="mt-4 flex flex-row items-center gap-1">
-                  <item.Icon className="h-5 w-5 text-gray-400" />
-                  <span className="text-header-foreground">{item.title}</span>
+                <div
+                  data-tour="help-center"
+                  className="mt-4 flex flex-row items-center gap-1"
+                >
+                  <MessageCircleQuestion className="h-5 w-5 text-gray-400" />
+                  <span className="text-header-foreground">Help Center</span>
                 </div>
               </Link>
-            ))}
+            )}
           </div>
         )}
       </div>

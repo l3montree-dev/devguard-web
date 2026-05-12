@@ -7,7 +7,7 @@ import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import type { FunctionComponent } from "react";
 import Autosetup from "../../../../../../../components/Autosetup";
@@ -46,6 +46,7 @@ const Index: FunctionComponent = () => {
     "full",
   );
   const router = useRouter();
+  const searchParams = useSearchParams();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -66,6 +67,10 @@ const Index: FunctionComponent = () => {
       redirectTo = asset.refs[0];
     }
     let destination = `/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${redirectTo.slug}`;
+    const startTour = searchParams?.get("startTour");
+    if (startTour) {
+      destination += `?startTour=${startTour}`;
+    }
     router.replace(destination);
   }, [
     asset,

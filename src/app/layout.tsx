@@ -14,6 +14,7 @@ import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
 import type { OrganizationDTO } from "../types/api/api";
 import InternalServerErrorPage from "./error";
+import { TourContextProvider } from "@/context/TourContext";
 
 export const lexend = localFont({
   src: "../../public/fonts/Lexend/Lexend-VariableFont_wght.ttf",
@@ -97,8 +98,10 @@ export default async function RootLayout({
                   organizations: orgs,
                 }}
               >
-                <MobileGate>{children}</MobileGate>
-                <Toaster />
+                <TourContextProvider>
+                  <MobileGate>{children}</MobileGate>
+                  <Toaster />
+                </TourContextProvider>
               </ClientContextWrapper>
             </ClientContextWrapper>
           </ThemeProvider>

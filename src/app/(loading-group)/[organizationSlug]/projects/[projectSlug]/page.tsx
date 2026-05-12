@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
@@ -56,6 +56,8 @@ import CustomPagination from "@/components/common/CustomPagination";
 import ListRenderer from "@/components/common/ListRenderer";
 
 import Sort from "@/components/Sort";
+import { usePageTour } from "@/hooks/usePageTour";
+import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 
 function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
   return "type" in d && (d as ProjectDTO).type === "project";
@@ -131,6 +133,15 @@ export default function RepositoriesPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
 
   const projectMenu = useProjectMenu();
+
+  const { startTour } = usePageTour(groupHomeTourSteps);
+
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "2") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,6 +228,7 @@ export default function RepositoriesPage() {
             !project.externalEntityProviderId && (
               <div className="flex flex-row gap-2">
                 <Button
+                  data-tour="create-subgroup-button"
                   disabled={
                     project.type !== "default" ||
                     (currentUserRole !== UserRole.Owner &&
@@ -228,6 +240,7 @@ export default function RepositoriesPage() {
                   Create New Subgroup
                 </Button>
                 <Button
+                  data-tour="create-repository-button"
                   disabled={
                     project.type !== "default" ||
                     (currentUserRole !== UserRole.Admin &&

@@ -10,5 +10,5 @@ export default function OrgHeader() {
   const menu = useOrganizationMenu();
   const activeOrg = useActiveOrg();
 
-  return <DynamicHeader z={2} Title={null} menu={menu} />;
+  return <DynamicHeader z={2} Title={null} menu={menu} showHelpCenter />;
 }

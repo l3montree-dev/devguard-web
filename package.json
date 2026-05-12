@@ -46,6 +46,7 @@
         "@react-three/drei": "^10.7.7",
         "@react-three/fiber": "^9.5.0",
         "@react-three/rapier": "^2.2.0",
+        "@reactour/tour": "3.8.0",
         "@sentry/nextjs": "^9.34.0",
         "@tanstack/react-table": "^8.21.3",
         "@types/react": "19.2.14",

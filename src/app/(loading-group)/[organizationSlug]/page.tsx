@@ -63,6 +63,10 @@ import { Badge } from "@/components/ui/badge";
 import { buildFilterSearchParams } from "@/utils/url";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Sort from "@/components/Sort";
+import { usePageTour } from "@/hooks/usePageTour";
+import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
+import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
+import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
@@ -196,160 +200,180 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
 
+  const { startTour } = usePageTour(orgHomeTourSteps);
+  const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
+
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "1") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <Page Title={null} title={""} Menu={orgMenu}>
-      <Dialog open={open}>
-        <DialogContent setOpen={setOpen}>
-          <DialogHeader>
-            <DialogTitle>Create new Group</DialogTitle>
-            <DialogDescription>
-              A project groups multiple software projects (repositories) inside
-              a single entity. Something like: frontend and backend
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <FormProvider {...form}>
-            <form
-              className="space-y-8"
-              onSubmit={form.handleSubmit(handleCreateProject)}
-            >
-              <ProjectForm forceVerticalSections form={form} hideDangerZone />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  isSubmitting={form.formState.isSubmitting}
-                >
-                  Create
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+    <>
+      <WelcomeModal
+        open={showModal}
+        onStartTour={() => handleStartTour(startTour)}
+        onSkip={handleSkip}
+      />
+      <Page Title={null} title={""} Menu={orgMenu}>
+        <Dialog open={open}>
+          <DialogContent setOpen={setOpen}>
+            <DialogHeader>
+              <DialogTitle>Create new Group</DialogTitle>
+              <DialogDescription>
+                A project groups multiple software projects (repositories)
+                inside a single entity. Something like: frontend and backend
+              </DialogDescription>
+            </DialogHeader>
+            <hr />
+            <FormProvider {...form}>
+              <form
+                className="space-y-8"
+                onSubmit={form.handleSubmit(handleCreateProject)}
+              >
+                <ProjectForm forceVerticalSections form={form} hideDangerZone />
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    isSubmitting={form.formState.isSubmitting}
+                  >
+                    Create
+                  </Button>
+                </DialogFooter>
+              </form>
+            </FormProvider>
+          </DialogContent>
+        </Dialog>
 
-      <div>
-        {activeOrg.externalEntityProviderId && (
-          <div className="flex mb-4 flex-row items-center justify-end gap-2">
-            <Button
-              size={"sm"}
-              variant={"outline"}
-              onClick={handleTriggerSync}
-              disabled={syncRunning}
-            >
-              {syncRunning ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Import of projects running</span>
-                </span>
-              ) : (
-                <span>
-                  Import projects from {activeOrg.externalEntityProviderId}
-                </span>
-              )}
-            </Button>
-          </div>
-        )}
-        <Section
-          primaryHeadline
-          Button={
-            session &&
-            !activeOrg.externalEntityProviderId && (
+        <div>
+          {activeOrg.externalEntityProviderId && (
+            <div className="flex mb-4 flex-row items-center justify-end gap-2">
               <Button
-                disabled={
-                  currentUserRole !== UserRole.Owner &&
-                  currentUserRole !== UserRole.Admin
-                }
-                onClick={() => setOpen(true)}
+                size={"sm"}
+                variant={"outline"}
+                onClick={handleTriggerSync}
+                disabled={syncRunning}
               >
-                Create New Group
+                {syncRunning ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Import of projects running</span>
+                  </span>
+                ) : (
+                  <span>
+                    Import projects from {activeOrg.externalEntityProviderId}
+                  </span>
+                )}
               </Button>
-            )
-          }
-          description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
-          forceVertical
-          title="Groups"
-        >
-          <Tabs
-            defaultValue="all"
-            value={viewedProject}
-            onValueChange={handleSetTabValue}
+            </div>
+          )}
+          <Section
+            primaryHeadline
+            Button={
+              session &&
+              !activeOrg.externalEntityProviderId && (
+                <Button
+                  data-tour="create-group-button"
+                  disabled={
+                    currentUserRole !== UserRole.Owner &&
+                    currentUserRole !== UserRole.Admin
+                  }
+                  onClick={() => setOpen(true)}
+                >
+                  Create New Group
+                </Button>
+              )
+            }
+            description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            forceVertical
+            title="Groups"
           >
-            <TabsList>
-              <TabsTrigger value="all">Groups</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          </Tabs>
+            <Tabs
+              defaultValue="all"
+              value={viewedProject}
+              onValueChange={handleSetTabValue}
+            >
+              <TabsList>
+                <TabsTrigger value="all">Groups</TabsTrigger>
+                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-          <div className="flex gap-2">
-            <Sort
-              sortOptions={[
-                { label: "Name", value: "name" },
-                { label: "Created at", value: "created_at" },
-                { label: "Updated at", value: "updated_at" },
-              ]}
-            />
+            <div className="flex gap-2">
+              <Sort
+                sortOptions={[
+                  { label: "Name", value: "name" },
+                  { label: "Created at", value: "created_at" },
+                  { label: "Updated at", value: "updated_at" },
+                ]}
+              />
 
-            <Input
-              className="h-11"
-              onChange={debouncedHandleSearch}
-              defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects"
+              <Input
+                className="h-11"
+                onChange={debouncedHandleSearch}
+                defaultValue={searchParams?.get("search") || ""}
+                placeholder="Search for projects"
+              />
+            </div>
+            <ListRenderer
+              isLoading={isLoading}
+              error={error}
+              data={projects?.data}
+              Empty={<EmptyParty title={"No groups found"} description="" />}
+              renderItem={(project) => (
+                <Link
+                  key={project.id}
+                  href={`/${activeOrg.slug}/projects/${project.slug}`}
+                  className="flex flex-col gap-2 hover:no-underline"
+                >
+                  <ListItem
+                    reactOnHover
+                    Title={
+                      <div className="flex flex-row items-center gap-2">
+                        <Avatar {...project} />
+                        <span>{project.name}</span>
+                        {project.state === "deleted" && (
+                          <Badge variant={"destructive"}>
+                            Pending deletion
+                          </Badge>
+                        )}
+                      </div>
+                    }
+                    Description={
+                      <div className="flex flex-col">
+                        <span>
+                          <Markdown
+                            components={{
+                              a: (
+                                props: React.ComponentPropsWithoutRef<"a">,
+                              ) => <span>{props.children}</span>,
+                            }}
+                          >
+                            {project.description}
+                          </Markdown>
+                        </span>
+                        {project.type !== "default" && (
+                          <div className="flex mt-4 flex-row items-center gap-2">
+                            <ProjectBadge type={project.type} />
+                          </div>
+                        )}
+                      </div>
+                    }
+                  />
+                </Link>
+              )}
             />
-          </div>
-          <ListRenderer
-            isLoading={isLoading}
-            error={error}
-            data={projects?.data}
-            Empty={<EmptyParty title={"No groups found"} description="" />}
-            renderItem={(project) => (
-              <Link
-                key={project.id}
-                href={`/${activeOrg.slug}/projects/${project.slug}`}
-                className="flex flex-col gap-2 hover:no-underline"
-              >
-                <ListItem
-                  reactOnHover
-                  Title={
-                    <div className="flex flex-row items-center gap-2">
-                      <Avatar {...project} />
-                      <span>{project.name}</span>
-                      {project.state === "deleted" && (
-                        <Badge variant={"destructive"}>Pending deletion</Badge>
-                      )}
-                    </div>
-                  }
-                  Description={
-                    <div className="flex flex-col">
-                      <span>
-                        <Markdown
-                          components={{
-                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
-                              <span>{props.children}</span>
-                            ),
-                          }}
-                        >
-                          {project.description}
-                        </Markdown>
-                      </span>
-                      {project.type !== "default" && (
-                        <div className="flex mt-4 flex-row items-center gap-2">
-                          <ProjectBadge type={project.type} />
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
-              </Link>
-            )}
-          />
-        </Section>
-        {projects && (
-          <div className="mt-4">
-            <CustomPagination {...projects} />
-          </div>
-        )}
-      </div>
-    </Page>
+          </Section>
+          {projects && (
+            <div className="mt-4">
+              <CustomPagination {...projects} />
+            </div>
+          )}
+        </div>
+      </Page>
+    </>
   );
 };
 

@@ -10,9 +10,11 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
+import { usePageTour } from "@/hooks/usePageTour";
+import { repoHomeTourSteps } from "@/components/common/tours/repo-home-tour";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -136,6 +138,14 @@ const Index: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const artifactName = searchParams?.get("artifact") ?? "";
 
+  const { startTour } = usePageTour(repoHomeTourSteps);
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "3") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pathname = usePathname();
 
   const downloadPdfReport = async () => {
@@ -181,7 +191,7 @@ const Index: FunctionComponent = () => {
       Title={<AssetTitle />}
     >
       <div className="flex flex-row items-start justify-between">
-        <div className="flex items-center gap-2">
+        <div data-tour="branch-switcher" className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
         </div>
 
@@ -212,11 +222,13 @@ const Index: FunctionComponent = () => {
           className="w-full"
         >
           <div className="relative flex flex-row gap-4">
-            <QueryArtifactSelector
-              unassignPossible
-              artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-            />
-            <div className="mb-4 flex">
+            <div data-tour="artifact-switcher">
+              <QueryArtifactSelector
+                unassignPossible
+                artifacts={(artifacts ?? []).map((a) => a.artifactName)}
+              />
+            </div>
+            <div data-tour="risk-cvss-values" className="mb-4 flex">
               <TabsList>
                 <TabsTrigger value="risk">Risk values</TabsTrigger>
                 <TabsTrigger value="cvss">CVSS values</TabsTrigger>
