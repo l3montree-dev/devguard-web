@@ -18,6 +18,7 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex = () => {
   const params = useDecodedParams();
@@ -161,6 +162,14 @@ const ComplianceIndex = () => {
               )
             }
           >
+            <div className="flex justify-end">
+              <DocDrawer
+                triggerLabel="Learn why compliance matters"
+                drawerTitle="Why Compliance Matters"
+                mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/compliance/why-compliance-matters.mdx"
+                docsUrl="https://docs.devguard.org/explanations/compliance/why-compliance-matters/"
+              />
+            </div>
             <ListRenderer
               isLoading={isLoading}
               error={error}

@@ -1,5 +1,6 @@
 "use client";
 import SortingCaret from "@/components/common/SortingCaret";
+import { DocDrawer } from "@/components/common/DocDrawer";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
@@ -293,6 +294,14 @@ const Index: FunctionComponent = () => {
         description="This table shows all the identified license risks for this repository."
         className="mb-4 mt-4"
       >
+        <div className="flex justify-end">
+          <DocDrawer
+            triggerLabel="Learn about license compliance"
+            drawerTitle="License Compliance"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/license-management/license-compliance.mdx"
+            docsUrl="https://docs.devguard.org/explanations/license-management/license-compliance/"
+          />
+        </div>
         <Card className="px-4">
           {/* License Distribution Radar Chart */}
           <Collapsible className="my-2">
