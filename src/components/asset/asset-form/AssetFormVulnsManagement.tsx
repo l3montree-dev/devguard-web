@@ -678,7 +678,10 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               <ListItem
                 className="!items-start"
                 Description={
-                  <div className="space-y-4">
+                  <div
+                    data-tour="repo-settings-vuln-management"
+                    className="space-y-4"
+                  >
                     <p>
                       By enabling this option, your vulnerability endpoints are
                       made publicly accessible. Select an asset version and

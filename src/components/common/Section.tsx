@@ -27,12 +27,14 @@ interface Props {
   Icon?: ReactNode;
   primaryHeadline?: boolean;
   className?: string;
+  "data-tour"?: string;
 }
 const Section: FunctionComponent<Props> = (props) => {
   return (
     <div
       id={props.id}
       className={classNames(props.className ?? "mb-6 mt-4 pb-6")}
+      data-tour={props["data-tour"]}
     >
       <div
         className={classNames(

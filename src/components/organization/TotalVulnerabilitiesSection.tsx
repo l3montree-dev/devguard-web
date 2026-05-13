@@ -55,7 +55,7 @@ export default function TotalVulnerabilitiesSection({
       description="Distribution of open vulnerabilities across the organization, along with the most common vulnerabilities and components."
       className="mt-16"
     >
-      <div className="grid grid-cols-4 gap-4">
+      <div data-tour="vuln-distribution-section" className="grid grid-cols-4 gap-4">
         {severities.map(({ variant, risk, cvss }) => (
           <SeverityCard
             key={variant}

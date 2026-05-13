@@ -39,7 +39,10 @@ export function DocDrawer({
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
         const text = await res.text();
         const cleanedText = text.replace(/^---\n[\s\S]*?\n---\n/, "");
-        return cleanedText.replace(/^import\s+.*\s+from\s+['"].*['"];?\n/gm, "");
+        return cleanedText.replace(
+          /^import\s+.*\s+from\s+['"].*['"];?\n/gm,
+          "",
+        );
       })
       .then(setContent)
       .catch((err) => {

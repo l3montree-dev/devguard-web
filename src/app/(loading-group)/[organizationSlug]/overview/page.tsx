@@ -15,6 +15,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import AverageStatsSection from "@/components/organization/AverageStatsSection";
 import OrganizationCompositionSection from "@/components/organization/OrganizationCompositionSection";
 import TotalVulnerabilitiesSection from "@/components/organization/TotalVulnerabilitiesSection";
+import { usePageTour } from "@/hooks/usePageTour";
+import { orgOverviewTourSteps } from "@/components/common/tours/org-overview-tour";
 
 const STATS_PARAMS = new URLSearchParams({
   orgComponentsLimit: "5",
@@ -29,6 +31,7 @@ const OrganizationOverview: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
+  const { startTour } = usePageTour(orgOverviewTourSteps);
 
   const {
     data: orgStatistics,
@@ -49,8 +52,15 @@ const OrganizationOverview: FunctionComponent = () => {
       title="Overview"
       description="Displays an overview about the stats of the org"
     >
+      <Button
+        variant="outline"
+        className="absolute right-10 top-30"
+        onClick={startTour}
+      >
+        Guided Tour
+      </Button>
       <div className="mb-6 flex flex-row items-center justify-between">
-        <div>
+        <div data-tour="overview-header">
           <h1 className="text-2xl font-bold">Organization Overview</h1>
           <p className="text-sm text-muted-foreground">
             Insights into the vulnerability distribution and remediation efforts
@@ -59,6 +69,7 @@ const OrganizationOverview: FunctionComponent = () => {
         </div>
         {!hasNoData && !isError && (
           <Tabs
+            data-tour="view-mode-tabs"
             value={mode}
             onValueChange={(value) => setMode(value as "risk" | "cvss")}
           >
