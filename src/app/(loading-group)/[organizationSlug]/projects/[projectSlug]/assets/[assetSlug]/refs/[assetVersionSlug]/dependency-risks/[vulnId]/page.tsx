@@ -643,6 +643,13 @@ const Index: FunctionComponent = () => {
       title={vuln?.cve?.cve ?? "Vulnerability Details"}
     >
       <div className="flex flex-row gap-4">
+        <Button
+          variant="outline"
+          className="absolute right-10 top-30"
+          onClick={startTour}
+        >
+          Guided Tour
+        </Button>
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
@@ -662,8 +669,8 @@ const Index: FunctionComponent = () => {
                     <Markdown>
                       {descriptionExpanded ||
                       (vuln.cve?.description?.length ?? 0) <= 800
-                        ? vuln.cve?.description
-                        : vuln.cve?.description?.slice(0, 800) + "..."}
+                        ? (vuln.cve?.description ?? "")
+                        : `${vuln.cve?.description?.slice(0, 800) ?? ""}...`}
                     </Markdown>
                     {(vuln.cve?.description?.length ?? 0) > 800 && (
                       <button

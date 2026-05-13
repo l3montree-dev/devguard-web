@@ -21,6 +21,82 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import Markdown from "./common/Markdown";
+
+const MDX_URL =
+  "https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx";
+
+const DOCS_URL =
+  "https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/";
+
+function DrawerScrollableContent() {
+  const [content, setContent] = useState<string>("");
+
+  useEffect(() => {
+    fetch(MDX_URL)
+      .then(async (res) => {
+        const text = await res.text();
+        // remove frontmatter
+        const cleanedText = text.replace(/^---\n[\s\S]*?\n---\n/, "");
+        // remove import statements
+        return cleanedText.replace(
+          /^import\s+.*\s+from\s+['"].*['"];?\n/gm,
+          "",
+        );
+      })
+      .then(setContent);
+  }, []);
+
+  return (
+    <Drawer direction="right">
+      <DrawerTrigger asChild>
+        <button className="text-xs cursor-pointer text-primary">
+          See how DevGuard matches vulnerabilities
+        </button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Vulnerability Matching</DrawerTitle>
+        </DrawerHeader>
+        <div className="min-w-0 cve-description overflow-x-hidden overflow-y-auto px-4 pb-4 prose prose-sm dark:prose-invert max-w-none">
+          {/* <iframe
+            id="devguard-docs"
+            src="http://localhost:3001/explanations/vulnerability-management/vulnerability-matching/?embed=true"
+            title="Eingebettete Website"
+            style={{ width: "100%", height: "85vh", border: "none" }}
+          />*/}
+          <Markdown linkBaseURL="https://docs.devguard.org/">
+            {content}
+          </Markdown>
+        </div>
+        <div className="p-4 border-t flex gap-2">
+          <DrawerClose asChild>
+            <Button variant="outline" className="flex-1">
+              Close
+            </Button>
+          </DrawerClose>
+          <Button
+            className="flex-1"
+            onClick={() => window.open(DOCS_URL, "_blank")}
+          >
+            Check Documentation
+          </Button>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
@@ -196,15 +272,7 @@ const AffectedComponentDetails: FunctionComponent<{
           </Collapsible>
         </div>
         <div className="mt-1">
-          <Link
-            target="_blank"
-            className="text-xs"
-            href={
-              "https://devguard.org/explanations/vulnerability-management/vulnerability-matching"
-            }
-          >
-            See how DevGuard matches vulnerabilities
-          </Link>
+          <DrawerScrollableContent />
         </div>
       </div>
     </div>

@@ -57,6 +57,8 @@ import type {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
@@ -191,6 +193,13 @@ const Index: FunctionComponent = () => {
       Title={<AssetTitle />}
     >
       <div className="flex flex-row items-start justify-between">
+        <Button
+          variant="outline"
+          className="absolute right-10 top-30"
+          onClick={startTour}
+        >
+          Guided Tour
+        </Button>
         <div data-tour="branch-switcher" className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
         </div>

@@ -222,6 +222,13 @@ export default function RepositoriesPage() {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
+        <Button
+          variant="outline"
+          className="absolute right-10 top-30"
+          onClick={startTour}
+        >
+          Guided Tour
+        </Button>
         <Section
           Button={
             session &&
