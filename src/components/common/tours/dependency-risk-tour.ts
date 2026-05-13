@@ -2,6 +2,10 @@ import type { StepType } from "@reactour/tour";
 
 export const dependencyRiskTourSteps: StepType[] = [
   {
+    selector: '[data-tour="cve-detail"]',
+    content: "Here you see the ID followed by the Description and our Risk Score and Package.",
+  },
+  {
     selector: '[data-tour="path"]',
     content:
       "Here you can see the path to component. You can interact with the graph to visit your dependencies.",

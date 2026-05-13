@@ -8,6 +8,7 @@ import { Badge } from "./ui/badge";
 import { diffChars } from "diff";
 import { PackageURL } from "packageurl-js";
 import { isValidPackagePurl } from "@/utils/common";
+import { DocDrawer } from "@/components/common/DocDrawer";
 interface DiffHighlighterProps {
   oldVersion: string;
   newVersion?: string;
@@ -164,15 +165,12 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
           </div>
         </div>
         <div className="mb-2">
-          <Link
-            target="_blank"
-            className="text-xs"
-            href={
-              "https://devguard.org/explanations/supply-chain-security/transitive-vulnerability-path-analysis"
-            }
-          >
-            See how Quick Fix works
-          </Link>
+          <DocDrawer
+            triggerLabel="See how Quick Fix works"
+            drawerTitle="Quick Fixes with DevGuard"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/supply-chain-security/transitive-vulnerability-path-analysis.mdx"
+            docsUrl="https://docs.devguard.org/explanations/supply-chain-security/transitive-vulnerability-path-analysis/"
+          />
         </div>
       </div>
     </>

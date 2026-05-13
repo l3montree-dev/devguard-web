@@ -50,7 +50,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { FunctionComponent, ReactNode } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
@@ -82,6 +82,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { usePageTour } from "@/hooks/usePageTour";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -371,23 +372,30 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
+  const handleGraphReady = useCallback(() => {
+    if (searchParams?.get("startTour") !== "4") return;
+    registerSteps(dependencyRiskTourSteps);
+    startTour();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Path explosion: no graph is rendered so onReady never fires — start tour directly
   useEffect(() => {
-    if (searchParams?.get("startTour") === "4" && !graphLoading) {
-      const hasPathExplosion = (vuln?.vulnerabilityPath.length || 0) === 0;
-      const steps = hasPathExplosion
-        ? [
-            {
-              ...dependencyRiskTourSteps[0],
-              content:
-                "This vulnerability has too many dependency paths to display a graph.",
-            },
-            ...dependencyRiskTourSteps.slice(1),
-          ]
-        : dependencyRiskTourSteps;
-      registerSteps(steps);
-      const id = setTimeout(startTour, 300);
-      return () => clearTimeout(id);
-    }
+    if (
+      searchParams?.get("startTour") !== "4" ||
+      graphLoading ||
+      (vuln?.vulnerabilityPath.length || 0) !== 0
+    )
+      return;
+    registerSteps([
+      {
+        ...dependencyRiskTourSteps[0],
+        content:
+          "This vulnerability has too many dependency paths to display a graph.",
+      },
+      ...dependencyRiskTourSteps.slice(1),
+    ]);
+    startTour();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graphLoading]);
 
@@ -654,8 +662,8 @@ const Index: FunctionComponent = () => {
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
               <div className="flex flex-row items-center gap-4">
-                <h1 className="text-2xl font-semibold">
-                  {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
+                <h1 data-tour="cve-detail" className="text-2xl font-semibold">
+                  {vuln ? vuln.cveID : <Skeleton className="w-90 h-10" />}
                 </h1>
                 {vuln ? (
                   <VulnState state={vuln?.state ?? "open"} />
@@ -790,6 +798,7 @@ const Index: FunctionComponent = () => {
                               ]}
                               onVexSelect={createFalsePositive}
                               vexRules={vexRulesData}
+                              onReady={handleGraphReady}
                             />
                           )}
                         </div>
