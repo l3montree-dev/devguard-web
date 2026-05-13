@@ -26,25 +26,33 @@ export function DocDrawer({
   mdxUrl,
   docsUrl,
 }: DocDrawerProps) {
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch(mdxUrl)
+    const controller = new AbortController();
+    setContent(null);
+    setError(false);
+
+    fetch(mdxUrl, { signal: controller.signal })
       .then(async (res) => {
+        if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
         const text = await res.text();
         const cleanedText = text.replace(/^---\n[\s\S]*?\n---\n/, "");
-        return cleanedText.replace(
-          /^import\s+.*\s+from\s+['"].*['"];?\n/gm,
-          "",
-        );
+        return cleanedText.replace(/^import\s+.*\s+from\s+['"].*['"];?\n/gm, "");
       })
-      .then(setContent);
+      .then(setContent)
+      .catch((err) => {
+        if (err.name !== "AbortError") setError(true);
+      });
+
+    return () => controller.abort();
   }, [mdxUrl]);
 
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <button className="text-xs cursor-pointer text-primary">
+        <button className="text-xs cursor-pointer text-primary" type="button">
           {triggerLabel}
         </button>
       </DrawerTrigger>
@@ -53,7 +61,17 @@ export function DocDrawer({
           <DrawerTitle>{drawerTitle}</DrawerTitle>
         </DrawerHeader>
         <div className="min-w-0 cve-description overflow-x-hidden overflow-y-auto px-4 pb-4 prose prose-sm dark:prose-invert max-w-none">
-          <Markdown linkBaseURL="https://docs.devguard.org/">{content}</Markdown>
+          {error ? (
+            <p className="text-sm text-muted-foreground">
+              Failed to load documentation. Please try again later.
+            </p>
+          ) : content === null ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : (
+            <Markdown linkBaseURL="https://docs.devguard.org/">
+              {content}
+            </Markdown>
+          )}
         </div>
         <div className="p-4 border-t flex gap-2">
           <DrawerClose asChild>

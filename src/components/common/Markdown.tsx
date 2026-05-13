@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
-import React, { type PropsWithChildren } from "react";
+import React from "react";
 import remarkGfm from "remark-gfm";
-import remarkMdx from "remark-mdx";
 const BaseMarkdown = dynamic(() => import("react-markdown"), {
   ssr: false,
 });
@@ -11,7 +10,7 @@ const Markdown = (props: { children: string; linkBaseURL?: string }) => {
   return (
     <BaseMarkdown
       components={{
-        a: ({ node, ...props }) => (
+        a: ({ node: _, children, ...props }) => (
           <a
             {...props}
             href={
@@ -22,10 +21,12 @@ const Markdown = (props: { children: string; linkBaseURL?: string }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:underline dark:text-blue-400"
-          ></a>
+          >
+            {children}
+          </a>
         ),
       }}
-      remarkPlugins={[remarkGfm, remarkMdx]}
+      remarkPlugins={[remarkGfm]}
       {...rest}
     />
   );

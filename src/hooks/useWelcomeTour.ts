@@ -1,7 +1,7 @@
 // TODO: später mit DB verknüpfen, damit Modal nur einmal pro User angezeigt wird
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "devguard:welcomeTourSeen";
 
@@ -15,7 +15,13 @@ const markWelcomeSeen = () => {
 };
 
 export function useWelcomeTour() {
-  const [showModal, setShowModal] = useState(!hasSeenWelcome());
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenWelcome()) {
+      setShowModal(true);
+    }
+  }, []);
 
   const handleStartTour = (startTour: () => void) => {
     markWelcomeSeen();

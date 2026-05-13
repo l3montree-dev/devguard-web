@@ -85,7 +85,7 @@ export default function DynamicHeader({
               {menu.map((item) => (
                 <Link
                   className={classNames(
-                    "cursor:pointer relative hover:no-underline",
+                    "cursor-pointer relative hover:no-underline",
                   )}
                   key={item.title}
                   href={item.href}

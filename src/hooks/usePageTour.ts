@@ -9,7 +9,7 @@ export function usePageTour(steps: StepType[]) {
 
   useEffect(() => {
     registerSteps(steps);
-  }, []);
+  }, [steps, registerSteps]);
 
   return { startTour: openTour, registerSteps };
 }

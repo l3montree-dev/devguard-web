@@ -187,10 +187,9 @@ export default function HelpCenterPage() {
   const orgMenu = useOrganizationMenu();
   const activeOrg = useActiveOrg();
 
-  const { data: projects } = useSWR<Paged<ProjectDTO>>(
-    `/organizations/${activeOrg.slug}/projects/`,
-    fetcher,
-  );
+  const { data: projects, isLoading: isProjectsLoading } = useSWR<
+    Paged<ProjectDTO>
+  >(`/organizations/${activeOrg.slug}/projects/`, fetcher);
   const firstProject = projects?.data?.[0];
 
   const { data: resources } = useSWR<Paged<AssetDTO | ProjectDTO>>(
@@ -228,7 +227,10 @@ export default function HelpCenterPage() {
   >(undefined);
 
   useEffect(() => {
-    if (!firstProject || !resources) return;
+    if (!firstProject || !resources) {
+      if (projects && !firstProject) setDepRiskTarget(null);
+      return;
+    }
     setDepRiskTarget(undefined);
 
     const find = async () => {
@@ -290,7 +292,7 @@ export default function HelpCenterPage() {
         ? "Risk scanning not set up yet"
         : undefined;
 
-  const isToursLoading = depRiskTarget === undefined;
+  const isToursLoading = isProjectsLoading || depRiskTarget === undefined;
 
   return (
     <Page Title={null} title="Help Center" Menu={orgMenu}>
@@ -410,7 +412,7 @@ export default function HelpCenterPage() {
             title="Join the Community"
             description="Chat with other DevGuard users and the core team on Matrix."
             cta="Open Matrix"
-            href="matrix url"
+            href="https://matrix.to/#/#devguard:matrix.org"
             external
           />
           <SupportBentoCard

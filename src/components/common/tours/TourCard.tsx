@@ -25,7 +25,9 @@ export function TourCard({
           {currentStep + 1} / {steps.length}
         </span>
         <button
+          type="button"
           onClick={() => setIsOpen(false)}
+          aria-label="Close tour"
           className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <XMarkIcon className="h-4 w-4" />
@@ -42,8 +44,10 @@ export function TourCard({
       {/* Dots */}
       <div className="flex flex-row items-center justify-between">
         <button
+          type="button"
           disabled={isFirst}
           onClick={() => setCurrentStep(currentStep - 1)}
+          aria-label="Previous step"
           className="text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors outline-primary"
         >
           <ArrowLeftIcon className="cursor-pointer h-4 w-4" />
@@ -53,7 +57,10 @@ export function TourCard({
           {steps.map((_, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => setCurrentStep(i)}
+              aria-label={`Go to step ${i + 1}`}
+              aria-current={i === currentStep ? "step" : undefined}
               className={`h-1.5 rounded-full transition-all ${
                 i === currentStep
                   ? "w-4 bg-primary"
@@ -64,6 +71,7 @@ export function TourCard({
         </div>
 
         <button
+          type="button"
           onClick={() => {
             if (isLast) {
               setIsOpen(false);
@@ -71,6 +79,7 @@ export function TourCard({
               setCurrentStep(currentStep + 1);
             }
           }}
+          aria-label={isLast ? "Finish tour" : "Next step"}
           className="text-muted-foreground hover:text-foreground transition-colors outline-primary"
         >
           <ArrowRightIcon className="cursor-pointer h-4 w-4" />
