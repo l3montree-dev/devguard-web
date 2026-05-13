@@ -1,11 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 export async function fetchLatestScannerImage(): Promise<string> {
   const defaultImage = "ghcr.io/l3montree-dev/devguard/scanner:main";
   try {
     const res = await fetch("https://devguard.org/api/latest", {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(10000), // 10 seconds timeout
     });
 
     if (!res.ok) return defaultImage;
