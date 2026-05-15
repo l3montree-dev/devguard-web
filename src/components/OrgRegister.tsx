@@ -45,9 +45,9 @@ export default function OrgRegisterForm(props: Props) {
     });
 
     if (resp.status !== 200) {
-      const error = await resp.json();
-      toast.error("Error creating organization", {
-        description: error,
+      toast.error("Could not create organization", {
+        description:
+          "Organization creation is currently disabled or an error occurred. Please contact your administrator.",
       });
       return;
     }
