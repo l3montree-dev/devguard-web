@@ -4,7 +4,7 @@
 export async function fetchLatestScannerImage(): Promise<string> {
   const defaultImage = "ghcr.io/l3montree-dev/devguard/scanner:main";
   try {
-    const res = await fetch("https://devguard.org/api/latest", {
+    const res = await fetch("/api/landing-page-tunnel/api/latest", {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(10000), // 10 seconds timeout
     });

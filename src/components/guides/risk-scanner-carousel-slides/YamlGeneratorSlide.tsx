@@ -16,6 +16,7 @@ import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 
 interface YamlGeneratorSlideProps {
+  scannerImage: string;
   gitInstance: GitInstances;
   config: Config;
   orgSlug: string;
@@ -60,6 +61,7 @@ const getGitlabStages = (config: Config) => {
 };
 
 const YamlGeneratorSlide: FunctionComponent<YamlGeneratorSlideProps> = ({
+  scannerImage,
   gitInstance,
   config,
   orgSlug,
@@ -101,6 +103,7 @@ jobs:`
       config.attest
     ) {
       codeString = integrationSnippets({
+        scannerImage,
         orgSlug,
         projectSlug,
         assetSlug,
@@ -113,6 +116,7 @@ jobs:`
       if (config.sarif) {
         codeString += `\n${
           integrationSnippets({
+            scannerImage,
             orgSlug,
             projectSlug,
             assetSlug,
@@ -127,6 +131,7 @@ jobs:`
       if (config.sbom) {
         codeString += `\n${
           integrationSnippets({
+            scannerImage,
             orgSlug,
             projectSlug,
             assetSlug,
@@ -144,6 +149,7 @@ jobs:`
         .filter(([_, selectedOptionValue]) => selectedOptionValue)
         .map(([selectedOption]) => {
           return integrationSnippets({
+            scannerImage,
             orgSlug,
             projectSlug,
             assetSlug,

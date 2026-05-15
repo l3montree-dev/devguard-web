@@ -32,13 +32,13 @@ import RiskScannerDialog from "../../../../../../../../../../components/RiskScan
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { useScannerImage } from "../../../../../../../../../../context/ScannerImageContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
+import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;

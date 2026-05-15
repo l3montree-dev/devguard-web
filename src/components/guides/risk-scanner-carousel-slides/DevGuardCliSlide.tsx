@@ -107,7 +107,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet("sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
 `}
                 />
               </CardContent>
@@ -128,7 +128,7 @@ ${generateDockerSnippet("sca", org.slug, project.slug, asset.slug, config.devgua
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet("sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
 `}
                 />
               </CardContent>

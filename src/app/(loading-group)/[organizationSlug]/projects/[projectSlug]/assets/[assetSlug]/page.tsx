@@ -16,7 +16,6 @@ import RiskScannerDialog from "../../../../../../../components/RiskScannerDialog
 import { Button } from "../../../../../../../components/ui/button";
 import { useAsset } from "../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../context/ConfigContext";
-import { useScannerImage } from "../../../../../../../context/ScannerImageContext";
 import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
@@ -31,6 +30,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
+import useScannerImage from "../../../../../../../hooks/useScannerImage";
 
 const Index: FunctionComponent = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();

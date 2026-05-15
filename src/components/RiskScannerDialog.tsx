@@ -616,6 +616,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               config={config}
             />
             <YamlGeneratorSlide
+              scannerImage={devguardWebLatestScannerImage}
               gitInstance={
                 asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
               }
