@@ -317,6 +317,26 @@ export const generateColor = (str: string) => {
   return colors[hash % colors.length];
 };
 
+export const withMockFixableRiskHistory = (
+  data: RiskHistory[],
+): RiskHistory[] => {
+  return data.map((entry) => ({
+    ...entry,
+    fixableLow: entry.fixableLow ?? 2,
+    fixableMedium: entry.fixableMedium ?? 7,
+    fixableHigh: entry.fixableHigh ?? entry.high * 9,
+    fixableCritical: entry.fixableCritical ?? entry.critical * 15,
+    cvePurlFixableLow:
+      entry.cvePurlFixableLow ?? Math.floor(entry.cvePurlLow / 2),
+    cvePurlFixableMedium:
+      entry.cvePurlFixableMedium ?? Math.floor(entry.cvePurlMedium / 4),
+    cvePurlFixableHigh:
+      entry.cvePurlFixableHigh ?? Math.floor(entry.cvePurlHigh / 3),
+    cvePurlFixableCritical:
+      entry.cvePurlFixableCritical ?? Math.floor(entry.cvePurlCritical / 2),
+  }));
+};
+
 export const reduceRiskHistories = (
   histories: RiskHistory[][],
 ): Array<ReleaseRiskHistory> => {
@@ -327,6 +347,10 @@ export const reduceRiskHistories = (
         acc.cvePurlMedium += curr.cvePurlMedium;
         acc.cvePurlHigh += curr.cvePurlHigh;
         acc.cvePurlCritical += curr.cvePurlCritical;
+        acc.cvePurlFixableLow += curr.cvePurlFixableLow ?? 0;
+        acc.cvePurlFixableMedium += curr.cvePurlFixableMedium ?? 0;
+        acc.cvePurlFixableHigh += curr.cvePurlFixableHigh ?? 0;
+        acc.cvePurlFixableCritical += curr.cvePurlFixableCritical ?? 0;
         acc.cvePurlLowCvss += curr.cvePurlLowCvss;
         acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
         acc.cvePurlHighCvss += curr.cvePurlHighCvss;
@@ -342,6 +366,10 @@ export const reduceRiskHistories = (
         cvePurlMedium: 0,
         cvePurlHigh: 0,
         cvePurlCritical: 0,
+        cvePurlFixableLow: 0,
+        cvePurlFixableMedium: 0,
+        cvePurlFixableHigh: 0,
+        cvePurlFixableCritical: 0,
         cvePurlLowCvss: 0,
         cvePurlMediumCvss: 0,
         cvePurlHighCvss: 0,

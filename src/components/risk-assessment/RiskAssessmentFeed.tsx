@@ -34,6 +34,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   ChatBubbleOvalLeftEllipsisIcon,
   CheckIcon,
+  ChevronDownIcon,
   EllipsisVerticalIcon,
   MagnifyingGlassIcon,
   SpeakerXMarkIcon,
@@ -54,7 +55,11 @@ import Alert from "../common/Alert";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Collapsible, CollapsibleContent } from "../ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +103,59 @@ function hasQuickfix(
   return !!directDependencyFixedVersion;
 }
 
+const RiskFeedGroupHeader = ({
+  groupedEvents,
+  children,
+}: {
+  groupedEvents: VulnEventDTO[];
+  children: React.ReactNode;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const type = groupedEvents[0].type;
+
+  return (
+    <Collapsible asChild open={isOpen} onOpenChange={setIsOpen}>
+      <li className="relative flex flex-row items-start gap-4 transition-all">
+        <div
+          className={classNames(
+            evTypeBackground[type],
+            "h-7 w-7 rounded-full border-2 flex flex-row items-center z-10 justify-center border-background p-1 shrink-0",
+          )}
+        >
+          <EventTypeIcon eventType={type} />
+        </div>
+        <div className="w-full overflow-hidden rounded border">
+          <CollapsibleTrigger asChild>
+            <button className="w-full bg-card px-2 py-2 font-medium flex flex-row items-center justify-between hover:bg-muted/50 transition-colors">
+              <span className="flex flex-row items-center gap-2">
+                {(() => {
+                  const msg = eventTypeMessages(groupedEvents[0], "", []);
+                  return msg.charAt(0).toUpperCase() + msg.slice(1);
+                })()}
+                <span className="text-muted-foreground font-normal text-sm">
+                  across other branches
+                </span>
+                <Badge variant="secondary" className="text-xs font-normal">
+                  {groupedEvents.length}x
+                </Badge>
+              </span>
+              <ChevronDownIcon
+                className={classNames(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  isOpen && "rotate-180",
+                )}
+              />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <ul className="flex flex-col gap-10 p-4 pt-6">{children}</ul>
+          </CollapsibleContent>
+        </div>
+      </li>
+    </Collapsible>
+  );
+};
+
 const RiskFeedItem = ({
   event,
   events,
@@ -111,6 +169,7 @@ const RiskFeedItem = ({
   deleteEvent,
   page,
   directDependencyFixedVersion,
+  inGroup,
 }: {
   event: VulnEventDTO;
   events: VulnEventDTO[];
@@ -124,6 +183,7 @@ const RiskFeedItem = ({
   deleteEvent?: (eventId: string) => void;
   page: number;
   directDependencyFixedVersion?: string | null;
+  inGroup?: boolean;
 }) => {
   const user = findUser(event.userId, org, currentUser);
 
@@ -143,19 +203,22 @@ const RiskFeedItem = ({
           event.createdByVexRule || hasQuickfix(directDependencyFixedVersion)
             ? "border-dashed border"
             : "",
-          "absolute left-[13px] h-full border-l border-r -bottom-[35px]",
+          inGroup ? "left-[15px]" : "left-[13px]",
+          "absolute h-full border-l border-r -bottom-[35px]",
         )}
       />
-      <div
-        className={classNames(
-          event.createdByVexRule
-            ? "bg-secondary text-secondary-foreground"
-            : evTypeBackground[event.type],
-          "h-7 w-7 rounded-full border-2 flex flex-row items-center z-10 justify-center border-background p-1",
-        )}
-      >
-        <EventTypeIcon eventType={event.type} />
-      </div>
+      {!inGroup && (
+        <div
+          className={classNames(
+            event.createdByVexRule
+              ? "bg-secondary text-secondary-foreground"
+              : evTypeBackground[event.type],
+            "h-7 w-7 rounded-full border-2 flex flex-row items-center z-10 justify-center border-background p-1",
+          )}
+        >
+          <EventTypeIcon eventType={event.type} />
+        </div>
+      )}
       <div className={classNames("w-full")}>
         <div className="flex w-full flex-col">
           <div className="flex flex-row items-start gap-2">
@@ -199,17 +262,6 @@ const RiskFeedItem = ({
                         event.mechanicalJustification,
                       ).toLowerCase()}
                 </p>
-
-                {event.originalAssetVersionName && (
-                  <div className="absolute right-2 top-2">
-                    <div>
-                      <Badge variant={"outline"}>
-                        <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                        {event.originalAssetVersionName}
-                      </Badge>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {Boolean(msg) && (
@@ -227,37 +279,76 @@ const RiskFeedItem = ({
             </div>
           </div>
         </div>
-        <div className="ml-10 flex flex-row mt-2 text-xs font-normal text-muted-foreground whitespace-nowrap items-start">
-          <FormatDate dateString={event.createdAt} />
-          {deleteEvent && currentUserRole === UserRole.Admin && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size={"icon"}
-                  className="h-4 w-4 p-0 m-0"
-                >
-                  <EllipsisVerticalIcon className="h-4 w-4 text-muted-foreground p-0 m-0" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <Alert
-                  title="Are you sure you want to delete this event?"
-                  description="This action cannot be undone. All data associated with this event will be deleted."
-                  onConfirm={() => deleteEvent(event.id)}
-                >
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    Delete
-                  </DropdownMenuItem>
-                </Alert>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        <div className="flex flex-row items-center justify-between gap-2 mt-2">
+          <div className="ml-10 flex flex-row mt-2 text-xs font-normal text-muted-foreground whitespace-nowrap items-start">
+            <FormatDate dateString={event.createdAt} />
+            {deleteEvent && currentUserRole === UserRole.Admin && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size={"icon"}
+                    className="h-4 w-4 p-0 m-0"
+                  >
+                    <EllipsisVerticalIcon className="h-4 w-4 text-muted-foreground p-0 m-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <Alert
+                    title="Are you sure you want to delete this event?"
+                    description="This action cannot be undone. All data associated with this event will be deleted."
+                    onConfirm={() => deleteEvent(event.id)}
+                  >
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      Delete
+                    </DropdownMenuItem>
+                  </Alert>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+          {event.originalAssetVersionName && (
+            <div>
+              <Badge variant={"outline"}>
+                <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                {event.originalAssetVersionName}
+              </Badge>
+            </div>
           )}
         </div>
       </div>
     </li>
   );
 };
+
+function groupContiguousEventsByType(
+  events: VulnEventDTO[],
+): (VulnEventDTO | VulnEventDTO[])[] {
+  const result: (VulnEventDTO | VulnEventDTO[])[] = [];
+
+  for (const event of events) {
+    if (event.type === "comment" || event.originalAssetVersionName === "") {
+      result.push(event);
+      continue;
+    }
+
+    const last = result[result.length - 1];
+    if (Array.isArray(last) && last[0].type === event.type) {
+      last.push(event);
+    } else if (
+      !Array.isArray(last) &&
+      last &&
+      last.type !== "comment" &&
+      last.type === event.type
+    ) {
+      result[result.length - 1] = [last, event];
+    } else {
+      result.push(event);
+    }
+  }
+
+  return result;
+}
 
 export default function RiskAssessmentFeed({
   events,
@@ -272,6 +363,8 @@ export default function RiskAssessmentFeed({
   deleteEvent: (eventId: string) => Promise<void>;
   directDependencyFixedVersion?: string | null;
 }) {
+  const groupedEvents = groupContiguousEventsByType(events);
+
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -282,17 +375,20 @@ export default function RiskAssessmentFeed({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const deleteHistory = () => {
-    events.slice(0, events.length - 3).forEach(async (event) => {
-      // we are using await on purpose here to not overload the server with delete requests
+  const deleteHistory = async () => {
+    const hiddenGroups = groupedEvents.slice(0, groupedEvents.length - 3);
+    const hiddenEvents = hiddenGroups.flatMap((groupOrEvent) =>
+      Array.isArray(groupOrEvent) ? groupOrEvent : [groupOrEvent],
+    );
+    for (const event of hiddenEvents) {
       await deleteEvent(event.id);
-    });
+    }
   };
 
   return (
     <div>
       <ul className="relative flex flex-col pb-10 text-foreground" role="list">
-        {events.length > 3 && (
+        {groupedEvents.length > 3 && (
           <div className="relative mb-10">
             <div className="border-dotted border-l-2 h-20 absolute left-3.5 -bottom-10" />
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -301,8 +397,8 @@ export default function RiskAssessmentFeed({
                   onClick={() => setIsOpen((prev) => !prev)}
                   variant="ghost"
                 >
-                  {isOpen ? "Hide" : "Show"} whole history (+{events.length - 3}{" "}
-                  elements)
+                  {isOpen ? "Hide" : "Show"} whole history (+
+                  {groupedEvents.length - 3} elements)
                 </Button>
                 {currentUserRole === UserRole.Admin && (
                   <DropdownMenu>
@@ -331,35 +427,98 @@ export default function RiskAssessmentFeed({
               </div>
 
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
-                {events.slice(0, events.length - 3).map((event, index) => {
-                  return (
-                    <RiskFeedItem
-                      activeAssetVersion={activeAssetVersion}
-                      vulnerabilityName={vulnerabilityName}
-                      deleteEvent={deleteEvent}
-                      page={page as unknown as number}
-                      org={org}
-                      project={project}
-                      asset={asset}
-                      currentUser={currentUser}
-                      currentUserRole={currentUserRole}
-                      key={event.id}
-                      event={event}
-                      events={events}
-                      directDependencyFixedVersion={
-                        directDependencyFixedVersion
-                      }
-                    />
-                  );
-                })}
+                {groupedEvents
+                  .slice(0, groupedEvents.length - 3)
+                  .map((groupOrEvent, index) => {
+                    if (Array.isArray(groupOrEvent)) {
+                      return (
+                        <RiskFeedGroupHeader
+                          key={groupOrEvent[0].id}
+                          groupedEvents={groupOrEvent}
+                        >
+                          {groupOrEvent.map((event) => (
+                            <RiskFeedItem
+                              activeAssetVersion={activeAssetVersion}
+                              vulnerabilityName={vulnerabilityName}
+                              deleteEvent={deleteEvent}
+                              page={page as unknown as number}
+                              org={org}
+                              project={project}
+                              asset={asset}
+                              currentUser={currentUser}
+                              currentUserRole={currentUserRole}
+                              key={event.id}
+                              event={event}
+                              events={events}
+                              directDependencyFixedVersion={
+                                directDependencyFixedVersion
+                              }
+                              inGroup
+                            />
+                          ))}
+                        </RiskFeedGroupHeader>
+                      );
+                    }
+                    const event = groupOrEvent as VulnEventDTO;
+
+                    return (
+                      <RiskFeedItem
+                        activeAssetVersion={activeAssetVersion}
+                        vulnerabilityName={vulnerabilityName}
+                        deleteEvent={deleteEvent}
+                        page={page as unknown as number}
+                        org={org}
+                        project={project}
+                        asset={asset}
+                        currentUser={currentUser}
+                        currentUserRole={currentUserRole}
+                        key={event.id}
+                        event={event}
+                        events={events}
+                        directDependencyFixedVersion={
+                          directDependencyFixedVersion
+                        }
+                      />
+                    );
+                  })}
               </CollapsibleContent>
             </Collapsible>
           </div>
         )}
         <div className="flex flex-col gap-10">
-          {events
-            .slice(Math.max(events.length - 3, 0), events.length)
-            .map((event, index) => {
+          {groupedEvents
+            .slice(Math.max(groupedEvents.length - 3, 0), groupedEvents.length)
+            .map((groupOrEvent, index) => {
+              if (Array.isArray(groupOrEvent)) {
+                return (
+                  <RiskFeedGroupHeader
+                    key={groupOrEvent[0].id}
+                    groupedEvents={groupOrEvent}
+                  >
+                    {groupOrEvent.map((event) => (
+                      <RiskFeedItem
+                        activeAssetVersion={activeAssetVersion}
+                        vulnerabilityName={vulnerabilityName}
+                        deleteEvent={deleteEvent}
+                        page={page as unknown as number}
+                        org={org}
+                        project={project}
+                        asset={asset}
+                        currentUser={currentUser}
+                        currentUserRole={currentUserRole}
+                        key={event.id}
+                        event={event}
+                        events={events}
+                        directDependencyFixedVersion={
+                          directDependencyFixedVersion
+                        }
+                        inGroup
+                      />
+                    ))}
+                  </RiskFeedGroupHeader>
+                );
+              }
+              const event = groupOrEvent as VulnEventDTO;
               return (
                 <RiskFeedItem
                   activeAssetVersion={activeAssetVersion}

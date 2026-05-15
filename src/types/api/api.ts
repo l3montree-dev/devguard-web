@@ -143,6 +143,10 @@ export interface PatWithPrivKey extends PersonalAccessTokenDTO {
   privKey: string;
 }
 
+export type SubGroupsAndAsset =
+  | (AssetDTO & { resourceType: "asset" })
+  | (ProjectDTO & { resourceType: "project" });
+
 export interface ProjectDTO {
   avatar?: string;
   name: string;
@@ -173,6 +177,8 @@ export interface ProjectDTO {
   externalEntityProviderId?: string;
 
   state: "active" | "deleted";
+
+  subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
@@ -786,6 +792,16 @@ export interface RiskHistory {
   cvePurlMediumCvss: number;
   cvePurlHighCvss: number;
   cvePurlCriticalCvss: number;
+
+  fixableLow: number;
+  fixableMedium: number;
+  fixableHigh: number;
+  fixableCritical: number;
+
+  cvePurlFixableLow: number;
+  cvePurlFixableMedium: number;
+  cvePurlFixableHigh: number;
+  cvePurlFixableCritical: number;
 }
 
 export type ReleaseRiskHistory = Omit<

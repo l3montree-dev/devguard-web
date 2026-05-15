@@ -513,7 +513,10 @@ const Index: FunctionComponent = () => {
       >
         Guided Tour
       </Button>
-      <div data-tour="dependencies-header" className="flex flex-row items-start justify-between">
+      <div
+        data-tour="dependencies-header"
+        className="flex flex-row items-start justify-between"
+      >
         <BranchTagSelector branches={branches} tags={tags} />
         <div data-tour="dependencies-actions" className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
@@ -563,7 +566,10 @@ const Index: FunctionComponent = () => {
         description="All your Dependencies of the selected artifact on the selected reference (branch/tag)."
         title="All Dependencies"
       >
-        <div data-tour="dependencies-artifact-selector" className="flex flex-row items-center justify-between gap-2">
+        <div
+          data-tour="dependencies-artifact-selector"
+          className="flex flex-row items-center justify-between gap-2"
+        >
           <QueryArtifactSelector
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
@@ -656,7 +662,10 @@ const Index: FunctionComponent = () => {
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
-            <thead data-tour="dependencies-table" className="border-b bg-card text-foreground">
+            <thead
+              data-tour="dependencies-table"
+              className="border-b bg-card text-foreground"
+            >
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header, index) => (

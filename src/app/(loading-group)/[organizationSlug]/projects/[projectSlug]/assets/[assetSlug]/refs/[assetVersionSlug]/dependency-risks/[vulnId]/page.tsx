@@ -45,7 +45,7 @@ import {
   StopIcon,
 } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { Bug, CheckCircleIcon } from "lucide-react";
+import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -78,6 +78,8 @@ import { convertPathsToTree } from "../../../../../../../../../../../utils/depen
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
 import { useSession } from "@/context/SessionContext";
+import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
+import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { usePageTour } from "@/hooks/usePageTour";
@@ -319,6 +321,10 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
   const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
+  const [
+    acceptVexRuleRecommendationDialogOpen,
+    setAcceptVexRuleRecommendationDialogOpen,
+  ] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
@@ -631,6 +637,13 @@ const Index: FunctionComponent = () => {
     [asset, project],
   );
 
+  const { data: recommendedVexRule } = useSWR<VexRule>(
+    vuln
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/crowdsourced-vexing/recommendation/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
+      : null,
+    fetcher,
+  );
+
   // Show error state
   if (error) {
     return (
@@ -642,6 +655,14 @@ const Index: FunctionComponent = () => {
         <Err />
       </Page>
     );
+  }
+
+  function pathEqual<T>(a: T[], b: T[]) {
+    if (a.length === 0 || b.length === 0 || a.length !== b.length) {
+      return false;
+    }
+
+    return a.every((val, i) => val === b[i]);
   }
 
   return (
@@ -846,45 +867,92 @@ const Index: FunctionComponent = () => {
                       )}
                     </div>
                     {/* VEX Rules applied to this vulnerability */}
-                    {vexRulesData && vexRulesData.length > 0 && (
-                      <div className="mt-6">
-                        <span className="font-semibold block mb-2">
-                          VEX Rules ({vexRulesData.length})
-                        </span>
+                    <div className="mt-6">
+                      <span className="font-semibold block mb-2">
+                        VEX Rules
+                      </span>
+                      <span className="font-semibold block mb-2 flex items-center gap-1">
+                        Recommendation
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <CircleHelp className="w-4 h-4 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="relative font-normal">
+                              This recommendation is derived from patterns and
+                              best practices observed across teams in your
+                              DevGuard community.
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </span>
+                      {recommendedVexRule?.cveId && (
+                        <>
+                          {vexRulesData &&
+                            vexRulesData.some((obj) =>
+                              pathEqual(
+                                obj.pathPattern,
+                                recommendedVexRule.pathPattern,
+                              ),
+                            ) && (
+                              <div className="my-2 flex gap-2 items-center text-muted-foreground border rounded-lg p-5">
+                                <div className=" cve-description overflow-x-auto ">
+                                  One of your applied VEX Rules already aligns
+                                  with the community-driven recommendation.
+                                </div>
+                                <BookOpenCheck />
+                              </div>
+                            )}
+                          {vexRulesData &&
+                            !vexRulesData.some((obj) =>
+                              pathEqual(
+                                obj.pathPattern,
+                                recommendedVexRule.pathPattern,
+                              ),
+                            ) && (
+                              <div className="flex flex-col gap-2 my-2">
+                                <VexRuleListItem
+                                  rule={recommendedVexRule}
+                                  onClick={() => {
+                                    setSelectedVexRule(recommendedVexRule);
+                                    setAcceptVexRuleRecommendationDialogOpen(
+                                      true,
+                                    );
+                                  }}
+                                />
+                              </div>
+                            )}
+                        </>
+                      )}
+                      {!recommendedVexRule?.cveId && (
+                        <div className="my-2 cve-description overflow-x-auto text-muted-foreground">
+                          There is currently no VEX Rule recommended.
+                        </div>
+                      )}
+                      <span className="font-semibold block mb-2">
+                        Applied Rules ({vexRulesData?.length || 0})
+                      </span>
+                      {vexRulesData && vexRulesData.length > 0 && (
                         <div className="flex flex-col gap-2">
                           {vexRulesData.map((rule) => (
-                            <button
+                            <VexRuleListItem
                               key={rule.id}
+                              rule={rule}
                               onClick={() => {
                                 setSelectedVexRule(rule);
                                 setVexRuleDialogOpen(true);
                               }}
-                              className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted/50 transition-colors cursor-pointer"
-                            >
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <span className="font-medium truncate">
-                                  {rule.pathPattern?.join(" > ") ||
-                                    "No pattern"}
-                                </span>
-                                {rule.justification && (
-                                  <span className="text-xs text-muted-foreground truncate">
-                                    {rule.justification}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <VexRuleResult
-                                  eventType={rule.eventType}
-                                  mechanicalJustification={
-                                    rule.mechanicalJustification
-                                  }
-                                />
-                              </div>
-                            </button>
+                            />
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                      {!vexRulesData ||
+                        (vexRulesData.length < 1 && (
+                          <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
+                            There have been no VEX Rules applied so far.
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1445,7 +1513,20 @@ const Index: FunctionComponent = () => {
         vulnState={vuln?.state ?? ""}
         vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
       />
-
+      <AcceptVexRuleRecommendationDialog
+        vexRule={selectedVexRule}
+        isOpen={acceptVexRuleRecommendationDialogOpen}
+        onOpenChange={setAcceptVexRuleRecommendationDialogOpen}
+        organizationSlug={organizationSlug}
+        projectSlug={projectSlug}
+        assetSlug={assetSlug}
+        assetVersionSlug={assetVersionSlug}
+        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        onAccepted={() => {
+          mutateVexRules();
+          mutate();
+        }}
+      />
       <VexRuleDetailsDialog
         vexRule={selectedVexRule}
         isOpen={vexRuleDialogOpen}

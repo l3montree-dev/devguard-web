@@ -13,7 +13,7 @@ import VexRuleResult from "./VexRuleResult";
 import VexHasEffectBadge from "./VexHasEffectBadge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ import DependencyGraph from "../DependencyGraph";
 import { convertPathsToTree } from "../../utils/dependencyGraphHelpers";
 import ListItem from "../common/ListItem";
 
-interface VexRuleDetailsDialogProps {
+interface AcceptVexRuleRecommendationDialogProps {
   vexRule: VexRule | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,11 +31,12 @@ interface VexRuleDetailsDialogProps {
   assetSlug?: string;
   assetVersionSlug?: string;
   urlBase?: string;
-  onDeleted?: () => void;
-  onReapplied?: () => void;
+  onAccepted?: () => void;
 }
 
-const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
+const AcceptVexRuleRecommendationDialog: FunctionComponent<
+  AcceptVexRuleRecommendationDialogProps
+> = ({
   vexRule,
   isOpen,
   onOpenChange,
@@ -43,12 +44,11 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   projectSlug,
   assetSlug,
   assetVersionSlug,
-  urlBase: deleteUrlBase,
-  onDeleted,
-  onReapplied,
+  urlBase: vexRulesUrlBase,
+  onAccepted,
 }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isReapplying, setIsReapplying] = useState(false);
+  const [isAcceptingRecommendation, setIsAcceptingRecommendation] =
+    useState(false);
 
   const graph = useMemo(() => {
     if (!vexRule?.pathPattern)
@@ -68,42 +68,32 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
 
   if (!vexRule) return null;
 
-  const handleDelete = async () => {
-    if (!deleteUrlBase) return;
+  const handleAcceptRecommendation = async () => {
+    if (!vexRulesUrlBase) return;
 
-    setIsDeleting(true);
+    setIsAcceptingRecommendation(true);
     try {
-      await browserApiClient(`${deleteUrlBase}/${vexRule.id}`, {
-        method: "DELETE",
-      });
-      toast.success("VEX rule deleted successfully");
-      onOpenChange(false);
-      onDeleted?.();
-    } catch (error) {
-      toast.error("Failed to delete VEX rule");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleReapply = async () => {
-    if (!deleteUrlBase) return;
-
-    setIsReapplying(true);
-
-    const resp = await browserApiClient(
-      `${deleteUrlBase}/${vexRule.id}/reapply`,
-      {
+      const resp = await browserApiClient(vexRulesUrlBase, {
         method: "POST",
-      },
-    );
-    if (!resp.ok) {
-      toast.error("Failed to reapply VEX rule");
-    } else {
-      toast.success("VEX rule reapplied successfully");
-      onReapplied?.();
+        body: JSON.stringify({
+          cveId: vexRule.cveId,
+          justification: vexRule.justification ?? "",
+          mechanicalJustification: vexRule.mechanicalJustification ?? "",
+          pathPattern: vexRule.pathPattern,
+        }),
+      });
+      if (!resp.ok) {
+        toast.error("Failed to apply VEX rule recommendation");
+      } else {
+        toast.success("VEX rule recommendation applied successfully");
+        onOpenChange(false);
+        onAccepted?.();
+      }
+    } catch {
+      toast.error("Failed to apply VEX rule recommendation");
+    } finally {
+      setIsAcceptingRecommendation(false);
     }
-    setIsReapplying(false);
   };
 
   return (
@@ -115,7 +105,6 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             View and manage the details of this VEX rule
           </DialogDescription>
         </DialogHeader>
-
         <div className="flex flex-col gap-6">
           {/* Path Pattern */}
           <Section
@@ -228,28 +217,17 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          {deleteUrlBase && (
+          {vexRulesUrlBase && (
             <>
               <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
+                onClick={handleAcceptRecommendation}
+                disabled={isAcceptingRecommendation}
                 className="gap-2"
               >
-                {isDeleting ? (
+                {isAcceptingRecommendation && (
                   <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
                 )}
-                Delete Rule
-              </Button>
-              <Button
-                onClick={handleReapply}
-                disabled={isReapplying}
-                className="gap-2"
-              >
-                {isReapplying && <Loader2 className="h-4 w-4 animate-spin" />}
-                Reapply
+                Apply Recommendation
               </Button>
             </>
           )}
@@ -259,4 +237,4 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   );
 };
 
-export default VexRuleDetailsDialog;
+export default AcceptVexRuleRecommendationDialog;

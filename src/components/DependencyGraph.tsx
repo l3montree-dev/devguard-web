@@ -847,8 +847,7 @@ const DependencyGraph: FunctionComponent<{
         onEdgeClick={handleEdgeClick}
         onInit={
           onReady
-            ? () =>
-                requestAnimationFrame(() => requestAnimationFrame(onReady))
+            ? () => requestAnimationFrame(() => requestAnimationFrame(onReady))
             : undefined
         }
       >
