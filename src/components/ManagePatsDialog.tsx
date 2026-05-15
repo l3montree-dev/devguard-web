@@ -36,7 +36,10 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent setOpen={setOpen} className="max-w-2xl">
+      <DialogContent
+        setOpen={setOpen}
+        className="max-w-2xl max-h-[90vh] overflow-y-auto"
+      >
         <DialogHeader>
           <DialogTitle>Manage Personal Access Tokens</DialogTitle>
           <DialogDescription>
@@ -44,7 +47,7 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
             tokens that are no longer needed.
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-[60vh] overflow-y-auto">
+        <div className="max-h-[90vh]">
           {personalAccessTokens.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
               <p>No personal access tokens found.</p>
