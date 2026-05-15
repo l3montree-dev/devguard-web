@@ -802,6 +802,16 @@ export interface RiskHistory {
   cvePurlFixableMedium: number;
   cvePurlFixableHigh: number;
   cvePurlFixableCritical: number;
+
+  fixableLowCvss: number;
+  fixableMediumCvss: number;
+  fixableHighCvss: number;
+  fixableCriticalCvss: number;
+
+  cvePurlFixableLowCvss: number;
+  cvePurlFixableMediumCvss: number;
+  cvePurlFixableHighCvss: number;
+  cvePurlFixableCriticalCvss: number;
 }
 
 export type ReleaseRiskHistory = Omit<

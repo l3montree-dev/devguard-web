@@ -16,12 +16,14 @@ import {
 import { Skeleton } from "./ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import { WrenchIcon } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface Props {
   currentAmount: number;
   queryIntervalStart?: number;
   queryIntervalEnd?: number;
-  fixableAmount?: number;
+  fixableAmount: number;
   variant: "high" | "medium" | "low" | "critical";
   mode?: "risk" | "cvss";
   isLoading: boolean;
@@ -89,12 +91,6 @@ const SeverityCard: FunctionComponent<Props> = ({
   }
   return (
     <Card className="relative">
-      {fixableAmount && (
-        <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium text-yellow-500 shadow-sm">
-          <WrenchIcon className="h-3.5 w-3.5" />
-          <span>{fixableAmount}</span>
-        </div>
-      )}
       <CardHeader className="pb-2">
         <CardTitle className="flex flex-row items-start justify-between">
           <span>
@@ -129,12 +125,30 @@ const SeverityCard: FunctionComponent<Props> = ({
         <div className="mr-2 flex">
           <span
             className={classNames(
-              "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+              "px-2 mr-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
               getSeverityClassNames(variant.toUpperCase(), false),
             )}
           >
             {variant.toUpperCase()}
           </span>
+          {fixableAmount > 0 && (
+            <Tooltip>
+              <TooltipTrigger className="p-0 m-0 h-[24px]">
+                <Badge
+                  className="p-1 border-none text-xs font-medium pr-2 m-0"
+                  variant={"secondary"}
+                >
+                  <WrenchIcon className="h-3.5 text-muted-foreground w-3.5 mr-1" />
+                  <span>{fixableAmount}</span>
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                Those vulnerabilities can be fixed by a <strong>direct</strong>{" "}
+                dependency update. Consider prioritizing these as they can be
+                resolved faster.
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </CardContent>
     </Card>

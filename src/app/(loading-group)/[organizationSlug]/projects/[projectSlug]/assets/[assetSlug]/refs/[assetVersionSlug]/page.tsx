@@ -231,7 +231,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={8.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={10}
-                fixableAmount={latest?.cvePurlFixableCritical ?? 0}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableCritical ?? 0)
+                    : (latest?.cvePurlFixableCriticalCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlCritical ?? 0)
@@ -244,7 +248,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={6.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={9}
-                fixableAmount={latest?.cvePurlFixableHigh ?? 0}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableHigh ?? 0)
+                    : (latest?.cvePurlFixableHighCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlHigh ?? 0)
@@ -257,7 +265,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 isLoading={riskHistoryLoading}
-                fixableAmount={latest?.cvePurlFixableMedium ?? 0}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableMedium ?? 0)
+                    : (latest?.cvePurlFixableMediumCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlMedium ?? 0)
@@ -270,7 +282,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={0}
                 queryIntervalEnd={4}
                 isLoading={riskHistoryLoading}
-                fixableAmount={latest?.cvePurlFixableLow ?? 0}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableLow ?? 0)
+                    : (latest?.cvePurlFixableLowCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlLow ?? 0)
