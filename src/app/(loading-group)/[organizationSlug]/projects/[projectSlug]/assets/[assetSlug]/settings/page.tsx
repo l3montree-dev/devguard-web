@@ -12,7 +12,7 @@ import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -105,6 +105,10 @@ const Index: FunctionComponent = () => {
       ),
     },
   });
+
+  useEffect(() => {
+    form.setValue("sharesInformation", asset.sharesInformation);
+  }, [asset.sharesInformation]);
 
   const handleTriggerBackgroundJobs = async () => {
     const resp = await browserApiClient(
