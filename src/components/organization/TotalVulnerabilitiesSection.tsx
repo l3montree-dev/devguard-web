@@ -60,6 +60,7 @@ export default function TotalVulnerabilitiesSection({
           <SeverityCard
             key={variant}
             variant={variant}
+            fixableAmount={0}
             isLoading={isStatisticsLoading}
             currentAmount={(mode === "risk" ? risk : cvss) ?? 0}
             mode={mode}

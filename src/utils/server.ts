@@ -100,6 +100,16 @@ export function padRiskHistory<T extends RiskHistoryEl>(
           cvePurlFixableMedium: 0,
           cvePurlFixableHigh: 0,
           cvePurlFixableCritical: 0,
+
+          cvePurlFixableCriticalCvss: 0,
+          cvePurlFixableHighCvss: 0,
+          cvePurlFixableMediumCvss: 0,
+          cvePurlFixableLowCvss: 0,
+
+          fixableCriticalCvss: 0,
+          fixableHighCvss: 0,
+          fixableMediumCvss: 0,
+          fixableLowCvss: 0,
         },
         ...r.riskHistory,
       ];

@@ -84,6 +84,7 @@ export default function AverageStatsSection({
           <SeverityCard
             key={variant}
             variant={variant}
+            fixableAmount={0}
             isLoading={isStatisticsLoading}
             currentAmount={Math.round((mode === "risk" ? risk : cvss) ?? 0)}
             mode={mode}
