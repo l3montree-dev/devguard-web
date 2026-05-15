@@ -48,6 +48,7 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
     const { code } = await resp.json();
     const url = new URL(window.location.href);
     setInvitationCode(url.origin + "/accept-invitation?code=" + code);
+    form.reset();
   };
 
   return (
