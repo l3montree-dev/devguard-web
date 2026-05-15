@@ -3,185 +3,35 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import ListItem from "@/components/common/ListItem";
+import Section from "@/components/common/Section";
 import Page from "@/components/Page";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { cn } from "@/lib/utils";
 import type {
   AssetDTO,
   Paged,
   ProjectDTO,
   VulnByPackage,
 } from "@/types/api/api";
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
-  MapIcon,
-  ShieldCheckIcon,
-  GitBranchIcon,
-  SearchIcon,
-  LifeBuoyIcon,
-  UsersIcon,
-  ExternalLinkIcon,
-  MessageSquareIcon,
   BookOpenIcon,
   CircleDotIcon,
+  GitBranchIcon,
+  LifeBuoyIcon,
+  MapIcon,
+  MessageSquareIcon,
+  SearchIcon,
+  ShieldCheckIcon,
+  UsersIcon,
 } from "lucide-react";
-import { classNames } from "@/utils/common";
-
-interface TourCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  href?: string;
-  disabled?: boolean;
-  disabledReason?: string;
-  accent?: boolean;
-}
-
-function TourBentoCardSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 h-full">
-      <Skeleton className="w-11 h-11 rounded-lg" />
-      <div className="flex-1 flex flex-col gap-2">
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-4/5" />
-      </div>
-      <Skeleton className="h-3 w-16" />
-    </div>
-  );
-}
-
-function TourBentoCard({
-  icon,
-  title,
-  description,
-  href,
-  disabled,
-  disabledReason,
-  accent,
-}: TourCardProps) {
-  const inner = (
-    <div
-      className={classNames(
-        "flex flex-col gap-4 rounded-xl border p-6 h-full transition-colors",
-        disabled
-          ? "border-border bg-card opacity-50 cursor-not-allowed"
-          : accent
-            ? "border-primary/40 bg-primary/10 hover:bg-primary/20 cursor-pointer"
-            : "border-border bg-card hover:bg-accent cursor-pointer",
-      )}
-    >
-      <div
-        className={classNames(
-          "flex items-center justify-center w-11 h-11 rounded-lg",
-          accent ? "bg-primary" : "bg-muted",
-        )}
-      >
-        <span
-          className={
-            accent ? "text-primary-foreground" : "text-muted-foreground"
-          }
-        >
-          {icon}
-        </span>
-      </div>
-      <div className="flex-1">
-        <p className="font-semibold text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
-      </div>
-      {!disabled && (
-        <span
-          className={classNames(
-            "text-xs font-medium",
-            accent ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          Start Tour →
-        </span>
-      )}
-      {disabled && (
-        <span className="text-xs font-medium text-muted-foreground">
-          {disabledReason ?? "Currently not available"}
-        </span>
-      )}
-    </div>
-  );
-
-  if (href && !disabled) {
-    return (
-      <Link href={href} className="hover:no-underline">
-        {inner}
-      </Link>
-    );
-  }
-
-  return <div>{inner}</div>;
-}
-
-interface SupportCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  cta: string;
-  href: string;
-  external?: boolean;
-  accent?: boolean;
-}
-
-function SupportBentoCard({
-  icon,
-  title,
-  description,
-  cta,
-  href,
-  external,
-  accent,
-}: SupportCardProps) {
-  return (
-    <a
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noopener noreferrer" : undefined}
-      className="hover:no-underline"
-    >
-      <div
-        className={classNames(
-          "flex flex-col gap-4 rounded-xl border p-6 h-full transition-colors cursor-pointer",
-          accent
-            ? "border-primary/40 bg-primary/10 hover:bg-primary/20"
-            : "border-border bg-card hover:bg-accent",
-        )}
-      >
-        <div
-          className={classNames(
-            "flex items-center justify-center w-11 h-11 rounded-lg",
-            accent ? "bg-primary" : "bg-muted",
-          )}
-        >
-          <span
-            className={
-              accent ? "text-primary-foreground" : "text-muted-foreground"
-            }
-          >
-            {icon}
-          </span>
-        </div>
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">{title}</p>
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
-        </div>
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
-          {cta}
-          {external && <ExternalLinkIcon className="h-3 w-3" />}
-        </span>
-      </div>
-    </a>
-  );
-}
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 export default function HelpCenterPage() {
   const orgMenu = useOrganizationMenu();
@@ -335,143 +185,260 @@ export default function HelpCenterPage() {
 
   return (
     <Page Title={null} title="Help Center" Menu={orgMenu}>
-      {/* Hero */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            Help Center
-          </h1>
-        </div>
-        <p className="text-muted-foreground text-base max-w-2xl">
-          New to DevGuard or want to explore specific features? Start an
-          interactive tour to get familiar with the platform at your own pace.
-        </p>
-      </div>
-
-      {/* Tours */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-foreground mb-1">
-          Interactive Tours
-        </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Click a tour to jump right in. You&apos;ll be guided step by step.
-        </p>
-        <div className="grid grid-cols-2 gap-4">
+      <Section
+        primaryHeadline
+        title="Help Center"
+        description="New to DevGuard or want to explore specific features? Start an interactive tour to get familiar with the platform at your own pace."
+        forceVertical
+      >
+        <Section
+          title="Interactive Tours"
+          description="Click a tour to jump right in. You'll be guided step by step."
+          forceVertical
+        >
           {isToursLoading ? (
             <>
-              <TourBentoCardSkeleton />
-              <TourBentoCardSkeleton />
-              <TourBentoCardSkeleton />
-              <TourBentoCardSkeleton />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
             </>
           ) : (
             <>
-              <TourBentoCard
-                icon={<MapIcon className="h-5 w-5" />}
-                title="Welcome Tour"
-                description="Get a guided overview of the organization dashboard."
-                href={`/${activeOrg.slug}?startTour=1`}
-                accent
-              />
-              <TourBentoCard
-                icon={<ShieldCheckIcon className="h-5 w-5" />}
-                title="Group Tour"
-                description="Learn how DevGuard helps you organize your groups."
-                href={
-                  firstProject
-                    ? `/${activeOrg.slug}/projects/${firstProject.slug}?startTour=2`
-                    : undefined
+              <ListItem
+                Title={
+                  <div className="flex items-center gap-2">
+                    <MapIcon className="h-4 text-muted-foreground w-4" />
+                    Welcome Tour
+                  </div>
                 }
-                disabled={!firstProject}
-                disabledReason={!firstProject ? "No group found" : undefined}
+                Description="Get a guided overview of the organization dashboard."
+                Button={
+                  <Link
+                    href={`/${activeOrg.slug}?startTour=1`}
+                    className={cn(
+                      buttonVariants({ variant: "default" }),
+                      "hover:no-underline text-primary-foreground!",
+                    )}
+                  >
+                    Start Tour
+                  </Link>
+                }
               />
-              <TourBentoCard
-                icon={<GitBranchIcon className="h-5 w-5" />}
-                title="Repository Tour"
-                description="Get a guided overview of managing repositories in DevGuard."
-                href={repoTourHref}
-                disabled={!repoTourHref}
-                disabledReason={repoTourDisabledReason}
+              <ListItem
+                Title={
+                  <div className="flex items-center gap-2">
+                    <ShieldCheckIcon className="h-4 text-muted-foreground w-4" />
+                    Group Tour
+                  </div>
+                }
+                Description={
+                  !firstProject
+                    ? "No group found"
+                    : "Learn how DevGuard helps you organize your groups."
+                }
+                Button={
+                  firstProject ? (
+                    <Link
+                      href={`/${activeOrg.slug}/projects/${firstProject.slug}?startTour=2`}
+                      className={cn(
+                        buttonVariants({ variant: "secondary" }),
+                        "hover:no-underline",
+                      )}
+                    >
+                      Start Tour
+                    </Link>
+                  ) : (
+                    <Button variant="secondary" disabled>
+                      Start Tour
+                    </Button>
+                  )
+                }
               />
-              <TourBentoCard
-                icon={<SearchIcon className="h-5 w-5" />}
-                title="Vulnerability Management Tour"
-                description="Learn how to find, triage, and resolve vulnerabilities across your software supply chain."
-                href={depRiskTourHref}
-                disabled={!depRiskTourHref}
-                disabledReason={depRiskTourDisabledReason}
+              <ListItem
+                Title={
+                  <div className="flex items-center gap-2">
+                    <GitBranchIcon className="h-4 text-muted-foreground w-4" />
+                    Repository Tour
+                  </div>
+                }
+                Description={
+                  repoTourDisabledReason ??
+                  "Get a guided overview of managing repositories in DevGuard."
+                }
+                Button={
+                  repoTourHref ? (
+                    <Link
+                      href={repoTourHref}
+                      className={cn(
+                        buttonVariants({ variant: "secondary" }),
+                        "hover:no-underline",
+                      )}
+                    >
+                      Start Tour
+                    </Link>
+                  ) : (
+                    <Button variant="secondary" disabled>
+                      Start Tour
+                    </Button>
+                  )
+                }
+              />
+              <ListItem
+                Title={
+                  <div className="flex items-center gap-2">
+                    <SearchIcon className="h-4 w-4 text-muted-foreground" />
+                    Vulnerability Management Tour
+                  </div>
+                }
+                Description={
+                  depRiskTourDisabledReason ??
+                  "Learn how to find, triage, and resolve vulnerabilities across your software supply chain."
+                }
+                Button={
+                  depRiskTourHref ? (
+                    <Link
+                      href={depRiskTourHref}
+                      className={cn(
+                        buttonVariants({ variant: "secondary" }),
+                        "hover:no-underline",
+                      )}
+                    >
+                      Start Tour
+                    </Link>
+                  ) : (
+                    <Button variant="secondary" disabled>
+                      Start Tour
+                    </Button>
+                  )
+                }
               />
             </>
           )}
-        </div>
-      </div>
+        </Section>
 
-      {/* Documentation Section */}
-      <div className="mt-12">
-        <h2 className="text-lg font-semibold text-foreground mb-1">
-          Documentation
-        </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Browse our official documentation for in-depth guides, references, and
-          integration instructions.
-        </p>
-        <SupportBentoCard
-          icon={<BookOpenIcon className="h-5 w-5" />}
-          title="DevGuard Documentation"
-          description="Find detailed guides on setup, integrations, vulnerability management, and more."
-          cta="Open Documentation"
-          href="https://docs.devguard.org/"
-          external
-        />
-      </div>
-
-      {/* Contact Section */}
-      <div className="mt-12">
-        <h2 className="text-lg font-semibold text-foreground mb-1">
-          Get in Touch
-        </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Can&apos;t find what you&apos;re looking for? We&apos;re here to help.
-        </p>
-
-        {/* Enterprise Support */}
-        <SupportBentoCard
-          icon={<LifeBuoyIcon className="h-5 w-5" />}
-          title="Enterprise Support"
-          description="Get direct help from the DevGuard team. Available for Enterprise and Pro customers."
-          cta="Contact support"
-          href="https://devguard.org"
-          accent
-        />
-
-        {/* Community Support */}
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          <SupportBentoCard
-            icon={<UsersIcon className="h-5 w-5" />}
-            title="Join the Community"
-            description="Chat with other DevGuard users and the core team on Matrix."
-            cta="Open Matrix"
-            href="https://matrix.to/#/#devguard:matrix.org"
-            external
+        <Section
+          title="Documentation"
+          description="Browse our official documentation for in-depth guides, references, and integration instructions."
+          forceVertical
+        >
+          <ListItem
+            Title={
+              <div className="flex items-center gap-2">
+                <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
+                DevGuard Documentation
+              </div>
+            }
+            Description="Find detailed guides on setup, integrations, vulnerability management, and more."
+            Button={
+              <a
+                href="https://docs.devguard.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "inline-flex items-center gap-1 hover:no-underline",
+                )}
+              >
+                Open Documentation
+              </a>
+            }
           />
-          <SupportBentoCard
-            icon={<MessageSquareIcon className="h-5 w-5" />}
-            title="GitHub Discussions"
-            description="Ask questions, share ideas, and get community feedback on GitHub Discussions."
-            cta="Open Discussions"
-            href="https://github.com/l3montree-dev/devguard/discussions"
-            external
+        </Section>
+
+        <Section
+          title="Get in Touch"
+          description="Can't find what you're looking for? We're here to help."
+          forceVertical
+        >
+          <ListItem
+            Title={
+              <div className="flex items-center gap-2">
+                <LifeBuoyIcon className="h-4 w-4 text-muted-foreground" />
+                Enterprise Support
+              </div>
+            }
+            Description="Get direct help from the DevGuard team. Available for Enterprise and Pro customers."
+            Button={
+              <a
+                href="https://devguard.org"
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "hover:no-underline text-primary-foreground!",
+                )}
+              >
+                Contact Support
+              </a>
+            }
           />
-          <SupportBentoCard
-            icon={<CircleDotIcon className="h-5 w-5" />}
-            title="GitHub Issues"
-            description="Found a bug or want to request a feature? Open an issue on GitHub."
-            cta="Open Issues"
-            href="https://github.com/l3montree-dev/devguard/issues"
-            external
+          <ListItem
+            Title={
+              <div className="flex items-center gap-2">
+                <UsersIcon className="h-4 w-4 text-muted-foreground" />
+                Join the Community
+              </div>
+            }
+            Description="Chat with other DevGuard users and the core team on Matrix."
+            Button={
+              <a
+                href="https://matrix.to/#/#devguard:matrix.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "inline-flex items-center gap-1 hover:no-underline",
+                )}
+              >
+                Open Matrix
+              </a>
+            }
           />
-        </div>
-      </div>
+          <ListItem
+            Title={
+              <div className="flex items-center gap-2">
+                <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
+                GitHub Discussions
+              </div>
+            }
+            Description="Ask questions, share ideas, and get community feedback on GitHub Discussions."
+            Button={
+              <a
+                href="https://github.com/l3montree-dev/devguard/discussions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "inline-flex items-center gap-1 hover:no-underline",
+                )}
+              >
+                Open Discussions
+              </a>
+            }
+          />
+          <ListItem
+            Title={
+              <div className="flex items-center gap-2">
+                <CircleDotIcon className="h-4 w-4 text-muted-foreground" />
+                GitHub Issues
+              </div>
+            }
+            Description="Found a bug or want to request a feature? Open an issue on GitHub."
+            Button={
+              <a
+                href="https://github.com/l3montree-dev/devguard/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  "inline-flex items-center gap-1 hover:no-underline",
+                )}
+              >
+                Open Issues
+              </a>
+            }
+          />
+        </Section>
+      </Section>
     </Page>
   );
 }
