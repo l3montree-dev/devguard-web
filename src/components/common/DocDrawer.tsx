@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -12,6 +12,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import Markdown from "./Markdown";
+
+const mdxCache = new Map<string, string>();
 
 export interface DocDrawerProps {
   triggerLabel: string;
@@ -28,13 +30,18 @@ export function DocDrawer({
 }: DocDrawerProps) {
   const [content, setContent] = useState<string | null>(null);
   const [error, setError] = useState(false);
+  const [fetched, setFetched] = useState(false);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setContent(null);
-    setError(false);
+  function handleOpenChange(open: boolean) {
+    if (!open || fetched) return;
+    setFetched(true);
 
-    fetch(mdxUrl, { signal: controller.signal })
+    if (mdxCache.has(mdxUrl)) {
+      setContent(mdxCache.get(mdxUrl)!);
+      return;
+    }
+
+    fetch(mdxUrl)
       .then(async (res) => {
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
         const text = await res.text();
@@ -44,16 +51,15 @@ export function DocDrawer({
           "",
         );
       })
-      .then(setContent)
-      .catch((err) => {
-        if (err.name !== "AbortError") setError(true);
-      });
-
-    return () => controller.abort();
-  }, [mdxUrl]);
+      .then((parsed) => {
+        mdxCache.set(mdxUrl, parsed);
+        setContent(parsed);
+      })
+      .catch(() => setError(true));
+  }
 
   return (
-    <Drawer direction="right">
+    <Drawer direction="right" onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
         <button className="text-xs cursor-pointer text-primary" type="button">
           {triggerLabel}
@@ -82,11 +88,10 @@ export function DocDrawer({
               Close
             </Button>
           </DrawerClose>
-          <Button
-            className="flex-1"
-            onClick={() => window.open(docsUrl, "_blank")}
-          >
-            Check Documentation
+          <Button className="flex-1" asChild>
+            <a href={docsUrl} target="_blank" rel="noopener noreferrer">
+              Check Documentation
+            </a>
           </Button>
         </div>
       </DrawerContent>

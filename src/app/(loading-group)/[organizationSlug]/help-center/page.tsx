@@ -233,17 +233,21 @@ export default function HelpCenterPage() {
     }
     setDepRiskTarget(undefined);
 
+    let cancelled = false;
+
     const find = async () => {
       for (const stub of allAssetStubs) {
         const asset = await fetcher<AssetDTO>(
           `/organizations/${activeOrg.slug}/projects/${firstProject.slug}/assets/${stub.slug}`,
         ).catch(() => null);
+        if (cancelled) return;
         const ref = asset?.refs?.[0];
         if (!ref) continue;
 
         const vulns = await fetcher<Paged<VulnByPackage>>(
           `/organizations/${activeOrg.slug}/projects/${firstProject.slug}/assets/${stub.slug}/refs/${ref.slug}/dependency-vulns/?pageSize=1`,
         ).catch(() => null);
+        if (cancelled) return;
         const vulnId = vulns?.data?.[0]?.vulns?.[0]?.id;
         if (!vulnId) continue;
 
@@ -259,6 +263,9 @@ export default function HelpCenterPage() {
     };
 
     find();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstProject?.slug, resources]);
 

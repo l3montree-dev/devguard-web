@@ -37,7 +37,12 @@ export function TourCard({
       {/* Content */}
       <p className="text-sm text-card-foreground mb-5">
         {typeof step.content === "function"
-          ? (step.content({} as any) ?? null)
+          ? (step.content({
+              currentStep,
+              steps,
+              setCurrentStep,
+              setIsOpen,
+            }) ?? null)
           : step.content}
       </p>
 
