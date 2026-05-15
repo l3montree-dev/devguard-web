@@ -45,10 +45,23 @@ export function DocDrawer({
       .then(async (res) => {
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
         const text = await res.text();
-        const cleanedText = text.replace(/^---\n[\s\S]*?\n---\n/, "");
-        return cleanedText.replace(
-          /^import\s+.*\s+from\s+['"].*['"];?\n/gm,
-          "",
+        return (
+          text
+            // strip frontmatter
+            .replace(/^---\n[\s\S]*?\n---\n/, "")
+            // strip import statements (including multiline)
+            .replace(/^import\s+[\s\S]*?from\s+['"][^'"]*['"];?\n/gm, "")
+            // remove tooltip/popover content blocks entirely (hidden tooltip text)
+            .replace(/<TooltipContent[^>]*>[\s\S]*?<\/TooltipContent>/g, "")
+            .replace(/<PopoverContent[^>]*>[\s\S]*?<\/PopoverContent>/g, "")
+            // strip all remaining JSX component tags (PascalCase), keep inner content
+            .replace(/<\/?[A-Z][a-zA-Z]*(?:\s[^>]*)?\s*\/?>/g, "")
+            // strip plain span tags (keep text content)
+            .replace(/<\/?span[^>]*>/g, "")
+            // remove className and other JSX props from plain HTML tags
+            .replace(/\s+className="[^"]*"/g, "")
+            // collapse multiple blank lines
+            .replace(/\n{3,}/g, "\n\n")
         );
       })
       .then((parsed) => {
@@ -89,7 +102,12 @@ export function DocDrawer({
             </Button>
           </DrawerClose>
           <Button className="flex-1" asChild>
-            <a href={docsUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={docsUrl}
+              className="!text-black"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Check Documentation
             </a>
           </Button>

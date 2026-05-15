@@ -198,22 +198,51 @@ export default function HelpCenterPage() {
       : null,
     fetcher,
   );
-  const firstAssetStub = resources?.data?.find(
-    (r): r is AssetDTO => !("type" in r),
-  );
-
-  const { data: firstAsset } = useSWR<AssetDTO>(
-    firstProject && firstAssetStub
-      ? `/organizations/${activeOrg.slug}/projects/${firstProject.slug}/assets/${firstAssetStub.slug}`
-      : null,
-    fetcher,
-  );
-
-  const isRiskScanningSetUp = Boolean(firstAsset?.refs?.length);
-
   const allAssetStubs = (resources?.data ?? []).filter(
     (r): r is AssetDTO => !("type" in r),
   );
+
+  type RepoTourTarget = {
+    projectSlug: string;
+    assetSlug: string;
+  };
+  // undefined = still searching, null = nothing found
+  const [repoTourTarget, setRepoTourTarget] = useState<
+    RepoTourTarget | null | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (!firstProject || !resources) {
+      if (projects && !firstProject) setRepoTourTarget(null);
+      return;
+    }
+    setRepoTourTarget(undefined);
+
+    let cancelled = false;
+
+    const find = async () => {
+      for (const stub of allAssetStubs) {
+        const asset = await fetcher<AssetDTO>(
+          `/organizations/${activeOrg.slug}/projects/${firstProject.slug}/assets/${stub.slug}`,
+        ).catch(() => null);
+        if (cancelled) return;
+        if (!asset?.refs?.length) continue;
+
+        setRepoTourTarget({
+          projectSlug: firstProject.slug,
+          assetSlug: stub.slug,
+        });
+        return;
+      }
+      setRepoTourTarget(null);
+    };
+
+    find();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firstProject?.slug, resources]);
 
   type DepRiskTarget = {
     projectSlug: string;
@@ -282,24 +311,27 @@ export default function HelpCenterPage() {
         ? "No group found"
         : !allAssetStubs.length
           ? "No repository found"
-          : !isRiskScanningSetUp
-            ? "Risk scanning not set up yet"
-            : undefined;
+          : undefined;
 
-  const repoTourHref =
-    firstProject && firstAssetStub && isRiskScanningSetUp
-      ? `/${activeOrg.slug}/projects/${firstProject.slug}/assets/${firstAssetStub.slug}?startTour=3`
+  const repoTourHref = repoTourTarget
+    ? `/${activeOrg.slug}/projects/${repoTourTarget.projectSlug}/assets/${repoTourTarget.assetSlug}?startTour=3`
+    : undefined;
+
+  const repoTourDisabledReason =
+    repoTourTarget !== undefined
+      ? repoTourTarget === null
+        ? !firstProject
+          ? "No group found"
+          : !allAssetStubs.length
+            ? "No repository found"
+            : "Risk scanning not set up yet"
+        : undefined
       : undefined;
 
-  const repoTourDisabledReason = !firstProject
-    ? "No group found"
-    : !firstAssetStub
-      ? "No repository found"
-      : !isRiskScanningSetUp
-        ? "Risk scanning not set up yet"
-        : undefined;
-
-  const isToursLoading = isProjectsLoading || depRiskTarget === undefined;
+  const isToursLoading =
+    isProjectsLoading ||
+    depRiskTarget === undefined ||
+    repoTourTarget === undefined;
 
   return (
     <Page Title={null} title="Help Center" Menu={orgMenu}>
