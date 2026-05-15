@@ -107,8 +107,10 @@ const Index: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    form.setValue("sharesInformation", asset.sharesInformation);
-  }, [asset.sharesInformation]);
+    form.resetField("sharesInformation", {
+      defaultValue: asset.sharesInformation,
+    });
+  }, [asset.sharesInformation, form]);
 
   const handleTriggerBackgroundJobs = async () => {
     const resp = await browserApiClient(

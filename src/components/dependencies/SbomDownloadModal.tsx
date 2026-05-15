@@ -21,69 +21,11 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import type { ArtifactDTO } from "../../types/api/api";
-import {
-  QueryArtifactSelector,
-  SimpleArtifactSelector,
-  useSelectArtifact,
-} from "../ArtifactSelector";
-import { Switch } from "../ui/switch";
-import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
-import { useActiveOrg } from "../../hooks/useActiveOrg";
-import { useActiveProject } from "../../hooks/useActiveProject";
-import { useActiveAsset } from "../../hooks/useActiveAsset";
-import { useUpdateAsset } from "../../context/AssetContext";
+import { SimpleArtifactSelector, useSelectArtifact } from "../ArtifactSelector";
 import { useConfig } from "../../context/ConfigContext";
 import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
-import { browserApiClient } from "../../services/devGuardApi";
-
-function SbomPublicUrlBox({
-  sharesInformation,
-  selectedArtifact,
-  assetVersionSlug,
-  assetId,
-  devguardApiUrl,
-}: {
-  sharesInformation: boolean;
-  selectedArtifact?: string;
-  assetVersionSlug?: string;
-  assetId?: string;
-  devguardApiUrl: string;
-}) {
-  const handleCopy = () => {
-    const displayUrl =
-      selectedArtifact && assetVersionSlug && assetId
-        ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/sbom.json/`
-        : "";
-    navigator.clipboard.writeText(displayUrl);
-    toast("Copied to clipboard", {
-      description: "The SBOM-URL has been copied to your clipboard.",
-    });
-  };
-
-  const displayUrl =
-    selectedArtifact && assetVersionSlug && assetId
-      ? `${devguardApiUrl}/api/v1/public/${assetId}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/sbom.json/`
-      : "";
-
-  return (
-    <div
-      className={`flex h-10 w-full items-center justify-between rounded-md border dark:border-foreground/20 bg-background px-3 py-2 text-sm transition-opacity ${!sharesInformation ? "opacity-40" : ""}`}
-    >
-      <span className="truncate text-foreground flex-1 min-w-0">
-        {displayUrl}
-      </span>
-      {sharesInformation && displayUrl && (
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="ml-2 shrink-0 cursor-pointer transition-all hover:opacity-100"
-        >
-          <ClipboardDocumentIcon className="h-4 w-4" />
-        </button>
-      )}
-    </div>
-  );
-}
+import { useActiveAsset } from "../../hooks/useActiveAsset";
+import { PublicUrlSection, usePublicSharing } from "./PublicUrlSection";
 
 interface SbomDownloadModalProps {
   showSBOMModal: boolean;
@@ -104,37 +46,10 @@ export default function SbomDownloadModal({
 }: SbomDownloadModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const config = useConfig();
-  const org = useActiveOrg();
-  const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
-  const updateAsset = useUpdateAsset();
-  const [isPublicLoading, setIsPublicLoading] = useState(false);
-
-  const sharesInformation = asset?.sharesInformation ?? false;
-
-  const handleTogglePublic = async (value: boolean) => {
-    setIsPublicLoading(true);
-    try {
-      const resp = await browserApiClient(
-        `/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ sharesInformation: value }),
-        },
-      );
-      if (resp.ok) {
-        const updated = await resp.json();
-        updateAsset(updated);
-      } else {
-        toast.error("Failed to update public access setting.");
-      }
-    } catch {
-      toast.error("Failed to update public access setting.");
-    } finally {
-      setIsPublicLoading(false);
-    }
-  };
+  const { sharesInformation, isPublicLoading, handleTogglePublic } =
+    usePublicSharing();
 
   const handleDownloadPdfSbom = async () => {
     setIsLoading(true);
@@ -192,7 +107,7 @@ export default function SbomDownloadModal({
           </DialogDescription>
         </DialogHeader>
         <hr />
-        <div className="grid grid-cols-2 gap-4 space-between">
+        <div className="grid grid-cols-2 gap-4">
           <div className="pr-6">
             <h4 className="font-semibold mt-4">Artifact</h4>
             <p className="text-sm mb-4 text-muted-foreground">
@@ -205,27 +120,17 @@ export default function SbomDownloadModal({
               onSelect={setSelectedArtifact}
             />
           </div>
-          <div className="pl-4">
-            <div className="mt-4 flex items-center justify-between gap-2">
-              <span className="font-semibold">Public URL</span>
-              <Switch
-                checked={sharesInformation}
-                onCheckedChange={handleTogglePublic}
-                disabled={isPublicLoading}
-                className="scale-75 origin-right"
-              />
-            </div>
-            <p className="text-sm mb-4 text-muted-foreground">
-              You can share your SBOM URL for the selected artifact.
-            </p>
-            <SbomPublicUrlBox
-              sharesInformation={sharesInformation}
-              selectedArtifact={selectedArtifact}
-              assetVersionSlug={assetVersion?.slug}
-              assetId={asset?.id}
-              devguardApiUrl={config.devguardApiUrlPublicInternet}
-            />
-          </div>
+          <PublicUrlSection
+            sharesInformation={sharesInformation}
+            isPublicLoading={isPublicLoading}
+            onToggle={handleTogglePublic}
+            selectedArtifact={selectedArtifact}
+            assetVersionSlug={assetVersion?.slug}
+            assetId={asset?.id}
+            devguardApiUrl={config.devguardApiUrlPublicInternet}
+            fileType="sbom.json"
+            toastLabel="SBOM URL"
+          />
         </div>
         <hr />
         <h4 className="font-semibold mt-4">Machine Readable Formats</h4>
@@ -304,6 +209,7 @@ export default function SbomDownloadModal({
           onClick={handleDownloadPdfSbom}
           variant="secondary"
           disabled={isLoading}
+          aria-label="Download SBOM in PDF/UA format"
         >
           {isLoading ? (
             <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />
