@@ -33,12 +33,14 @@ interface DevGuardCliSlideProps {
 
   onClose: () => void;
   prevIndex: number;
+  scannerImage: string;
 }
 
 export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   api,
   prevIndex,
   onClose,
+  scannerImage,
 }) => {
   const pat = usePersonalAccessToken();
   const org = useActiveOrg();
@@ -70,7 +72,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
             </p>
             <CopyCode
               language="shell"
-              codeString="docker pull ghcr.io/l3montree-dev/devguard/devguard-scanner:latest"
+              codeString={`docker pull ${scannerImage}`}
             />
           </>
         </Section>
@@ -105,7 +107,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet("sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
 `}
                 />
               </CardContent>
@@ -126,7 +128,7 @@ ${generateDockerSnippet("sca", org.slug, project.slug, asset.slug, config.devgua
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet("sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
 `}
                 />
               </CardContent>

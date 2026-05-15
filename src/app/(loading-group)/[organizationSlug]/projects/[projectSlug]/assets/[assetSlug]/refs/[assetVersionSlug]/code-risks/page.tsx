@@ -38,6 +38,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
+import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -186,6 +187,7 @@ const Index: FunctionComponent = () => {
 
   const assetMenu = useAssetMenu();
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
 
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -360,6 +362,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         open={isOpen}
         onOpenChange={setIsOpen}
       />

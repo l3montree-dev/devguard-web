@@ -1,7 +1,6 @@
 "use client";
 
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -9,6 +8,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
 import FalsePositiveDialog from "@/components/FalsePositiveDialog";
+import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -29,16 +29,15 @@ import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import Filter from "@/components/Filter";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -51,6 +50,7 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
+import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
 const severityRanges: Record<string, [number | null, number | null]> = {
   low: [null, 4],
@@ -127,6 +127,7 @@ const Index: FunctionComponent = () => {
     });
   }, []);
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
   const { session } = useSession();
 
   const assetMenu = useAssetMenu();
@@ -686,6 +687,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         assetVersion={assetVersion}
         artifacts={artifacts || []}
       />

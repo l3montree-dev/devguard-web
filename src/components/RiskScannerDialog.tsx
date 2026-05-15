@@ -54,6 +54,7 @@ interface RiskScannerDialogProps {
   devguardCIComponentBase: string;
   assetVersion?: AssetVersionDTO;
   artifacts?: Array<ArtifactDTO>;
+  devguardWebLatestScannerImage: string;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -64,6 +65,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   onOpenChange,
   assetVersion,
   artifacts,
+  devguardWebLatestScannerImage,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -614,6 +616,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               config={config}
             />
             <YamlGeneratorSlide
+              scannerImage={devguardWebLatestScannerImage}
               gitInstance={
                 asset?.repositoryProvider === "github" ? "GitHub" : "Gitlab"
               }
@@ -683,6 +686,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               onClose={() => onOpenChange(false)}
               api={api}
               prevIndex={prevIndex}
+              scannerImage={devguardWebLatestScannerImage}
             />
           </CarouselContent>
         </Carousel>

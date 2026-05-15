@@ -221,6 +221,7 @@ const generateGitlabSnippet = (
 };
 
 export const generateDockerSnippet = (
+  scannerImage: string,
   command: string,
   orgSlug: string,
   projectSlug: string,
@@ -245,7 +246,7 @@ export const generateDockerSnippet = (
   if (apiUrl === "http://localhost:8080") {
     apiUrl = "http://host.docker.internal:8080";
   }
-  return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard/scanner:${config.devguardScannerTag} \\
+  return `docker run -v "$(PWD):/app" ghcr.io/l3montree-dev/devguard/scanner:${scannerImage} \\
 devguard-scanner ${command} \\
     --path=${path} \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
@@ -271,6 +272,7 @@ export const generateCliSnippet = (
 };
 
 export const integrationSnippets = ({
+  scannerImage,
   orgSlug,
   projectSlug,
   assetSlug,
@@ -280,6 +282,7 @@ export const integrationSnippets = ({
   token,
   config,
 }: {
+  scannerImage: string;
   orgSlug: string;
   projectSlug: string;
   assetSlug: string;
@@ -519,6 +522,7 @@ export const integrationSnippets = ({
 
   Docker: {
     iac: generateDockerSnippet(
+      scannerImage,
       "iac",
       orgSlug,
       projectSlug,
@@ -528,6 +532,7 @@ export const integrationSnippets = ({
       token,
     ),
     sast: generateDockerSnippet(
+      scannerImage,
       "sast",
       orgSlug,
       projectSlug,
@@ -537,6 +542,7 @@ export const integrationSnippets = ({
       token,
     ),
     "secret-scanning": generateDockerSnippet(
+      scannerImage,
       "secret-scanning",
       orgSlug,
       projectSlug,
@@ -546,6 +552,7 @@ export const integrationSnippets = ({
       token,
     ),
     sarif: generateDockerSnippet(
+      scannerImage,
       "sarif",
       orgSlug,
       projectSlug,
@@ -555,6 +562,7 @@ export const integrationSnippets = ({
       token,
     ),
     sbom: generateDockerSnippet(
+      scannerImage,
       "sbom",
       orgSlug,
       projectSlug,
@@ -564,6 +572,7 @@ export const integrationSnippets = ({
       token,
     ),
     "software-composition-analysis-from-repository": generateDockerSnippet(
+      scannerImage,
       "software-composition-analysis-from-repository",
       orgSlug,
       projectSlug,
@@ -573,6 +582,7 @@ export const integrationSnippets = ({
       token,
     ),
     "container-scanning": generateDockerSnippet(
+      scannerImage,
       "container-scanning",
       orgSlug,
       projectSlug,
@@ -582,6 +592,7 @@ export const integrationSnippets = ({
       token,
     ),
     sca: generateDockerSnippet(
+      scannerImage,
       "sca",
       orgSlug,
       projectSlug,

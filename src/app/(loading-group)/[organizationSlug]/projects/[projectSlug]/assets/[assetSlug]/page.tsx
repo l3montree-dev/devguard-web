@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
+import useScannerImage from "../../../../../../../hooks/useScannerImage";
 
 const Index: FunctionComponent = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();
@@ -40,6 +41,7 @@ const Index: FunctionComponent = () => {
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
   const autosetup = useAutosetup(
     !riskScanningIsOpen,
     config.devguardApiUrlPublicInternet,
@@ -274,6 +276,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
       />
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}
