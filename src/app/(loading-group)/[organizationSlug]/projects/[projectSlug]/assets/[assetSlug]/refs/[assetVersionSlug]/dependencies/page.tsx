@@ -248,13 +248,17 @@ const columnsDef: ColumnDef<
     cell: (row) => (
       <span className="flex flex-row items-center gap-2">
         <Tooltip>
-          <TooltipTrigger className="flex flex-row items-center gap-2">
-            <EcosystemImage packageName={row.getValue()} size={16} />
-            <span className="font-medium truncate">
-              {beautifyPurl(row.getValue())}
+          <TooltipTrigger className="flex flex-row items-center gap-2 min-w-0 w-full text-left">
+            <span className="shrink-0 mt-0.5">
+              <EcosystemImage packageName={row.getValue()} size={16} />
             </span>
-            <span className="text-xs text-muted-foreground">
-              {extractVersion(row.getValue())}
+            <span className="flex flex-col min-w-0 items-start w-full">
+              <span className="font-medium truncate w-full">
+                {beautifyPurl(row.getValue())}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {extractVersion(row.getValue())}
+              </span>
             </span>
           </TooltipTrigger>
           <TooltipContent>
