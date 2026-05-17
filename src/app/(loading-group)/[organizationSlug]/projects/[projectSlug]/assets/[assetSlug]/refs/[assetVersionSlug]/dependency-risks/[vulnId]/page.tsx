@@ -664,7 +664,7 @@ const Index: FunctionComponent = () => {
                         onClick={() =>
                           setDescriptionExpanded(!descriptionExpanded)
                         }
-                        className="text-sm dark:text-primary text-blue-600 hover:opacity-80 my-2 cursor-pointer"
+                        className="text-sm text-info hover:opacity-80 my-2 cursor-pointer"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}
                       </button>
@@ -755,9 +755,7 @@ const Index: FunctionComponent = () => {
                         </div>
                         <div
                           style={{ height: 400 }}
-                          className={
-                            "w-full rounded-lg border bg-gray-50 dark:bg-black"
-                          }
+                          className={"w-full rounded-lg border bg-muted"}
                         >
                           {graphData && vuln && (
                             <DependencyGraph
@@ -832,7 +830,7 @@ const Index: FunctionComponent = () => {
                         Recommendation
                         <Tooltip>
                           <TooltipTrigger>
-                            <CircleHelp className="w-4 h-4 text-gray-500" />
+                            <CircleHelp className="w-4 h-4 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="relative font-normal">

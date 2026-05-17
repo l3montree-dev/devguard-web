@@ -448,7 +448,7 @@ function OryMessageContent({ message }: OryMessageContentProps) {
     message.type === "error"
       ? "text-destructive"
       : message.type === "success"
-        ? "text-green-600"
+        ? "text-success"
         : "text-muted-foreground";
 
   return <span className={`leading-normal text-sm ${colorClass}`}>{text}</span>;

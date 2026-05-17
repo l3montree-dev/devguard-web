@@ -69,7 +69,7 @@ const VulnWithCveTableRow = ({
   const router = useRouter();
   return (
     <tr
-      className="border-b border-gray-100 dark:border-white/5 hover:bg-muted/30 cursor-pointer"
+      className="border-b border-border hover:bg-muted/50 cursor-pointer"
       key={vuln.id}
       onClick={(e) => {
         // Don't navigate if clicking on checkbox
@@ -275,7 +275,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             <React.Fragment key={cveID}>
               {/* CVE subheader */}
               <tr
-                className="bg-muted/30 border-b border-gray-100 dark:border-white/5 hover:bg-muted/50 cursor-pointer"
+                className="bg-muted/30 border-b border-border hover:bg-muted/50 cursor-pointer"
                 onClick={(e) => {
                   // Don't act if clicking on checkbox or button
                   if (

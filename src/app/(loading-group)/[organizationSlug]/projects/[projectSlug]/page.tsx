@@ -313,7 +313,7 @@ export default function RepositoriesPage() {
               </TabsList>
             </Tabs>
             {isSearchActive && (
-              <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+              <span className="text-xs text-warning bg-warning-muted border border-warning-border rounded px-2 py-1">
                 Filter and sorting options are disabled while searching
               </span>
             )}

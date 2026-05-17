@@ -32,7 +32,7 @@ const CopyInput: FunctionComponent<Props> = (props) => {
     <div className="relative w-full overflow-hidden">
       <button
         onClick={handleCopy}
-        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-gray-700 p-2 text-xs text-white transition-all hover:opacity-80"
+        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-card p-2 text-xs text-foreground transition-all hover:opacity-80"
       >
         <Copy className="h-4 w-4" />
       </button>

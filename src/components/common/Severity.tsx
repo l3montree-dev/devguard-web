@@ -2,37 +2,37 @@ import { classNames } from "../../utils/common";
 
 export const getSeverityClassNames = (severity: string, gray: boolean) => {
   if (gray) {
-    return "text-gray-700 bg-gray-500/20 dark:text-gray-200";
+    return "text-muted-foreground bg-muted";
   } else
     switch (severity) {
       case "CRITICAL":
-        return "text-red-600 bg-red-600/20 dark:text-red-400";
+        return "text-severity-critical bg-severity-critical-muted";
       case "HIGH":
-        return "text-orange-700 dark:text-orange-300 bg-orange-500/20";
+        return "text-severity-high bg-severity-high-muted";
       case "MEDIUM":
-        return "text-yellow-700 dark:text-yellow-300 bg-yellow-500/20";
+        return "text-severity-medium bg-severity-medium-muted";
       case "LOW":
-        return "dark:text-green-300 text-green-600 bg-green-500/20";
+        return "text-severity-low bg-severity-low-muted";
       default:
-        return "text-gray-700 bg-gray-500/20 dark:text-gray-200";
+        return "text-muted-foreground bg-muted";
     }
 };
 
 export const severityToColor = (severity: string, gray?: boolean) => {
   if (gray) {
-    return "gray";
+    return "hsl(var(--muted-foreground))";
   } else
     switch (severity) {
       case "CRITICAL":
-        return "#ef4444";
+        return "hsl(var(--severity-critical))";
       case "HIGH":
-        return "#f97316";
+        return "hsl(var(--severity-high))";
       case "MEDIUM":
-        return "#facc15";
+        return "hsl(var(--severity-medium))";
       case "LOW":
-        return "#22c55e";
+        return "hsl(var(--severity-low))";
       default:
-        return "gray";
+        return "hsl(var(--muted-foreground))";
     }
 };
 

@@ -149,16 +149,14 @@ export default function VexDownloadModal({
                 artifact: selectedArtifact as string,
               })}`
             }
-            icon={
-              <FileCode className="h-5 w-auto inline-block text-green-500" />
-            }
+            icon={<FileCode className="h-5 w-auto inline-block text-success" />}
             label={"Download in XML-Format"}
           />
         </div>
         <hr className="mt-6" />
         <h4 className="font-semibold mt-4">
           PDF/UA-Report{" "}
-          <span className="ml-2 inline-flex items-center rounded-full bg-purple-800/30 px-2 py-1 text-xs font-medium text-purple-500 ring-1 ring-inset ring-purple-600/50">
+          <span className="ml-2 inline-flex items-center rounded-full bg-accent-muted px-2 py-1 text-xs font-medium text-accent-foreground ring-1 ring-inset ring-accent-ring">
             Beta
           </span>
         </h4>
@@ -178,8 +176,8 @@ export default function VexDownloadModal({
             <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />
           ) : (
             <>
-              <FileTextIcon className="h-5 w-auto inline-block mr-2 text-purple-500" />
-              <PersonStandingIcon className="h-5 w-auto inline-block text-purple-500 mr-2" />
+              <FileTextIcon className="h-5 w-auto inline-block mr-2 text-accent-foreground" />
+              <PersonStandingIcon className="h-5 w-auto inline-block text-accent-foreground mr-2" />
             </>
           )}
           Download Vulnerability Report PDF

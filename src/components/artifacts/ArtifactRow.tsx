@@ -166,7 +166,7 @@ const ArtifactRow: FunctionComponent<Props> = ({
           <tr
             key={node.url}
             className={classNames(
-              "border-b border-gray-100 dark:border-white/5 hover:bg-muted/30",
+              "border-b border-border hover:bg-muted/50",
               nodeIndex === rootNodes.length - 1 ? "" : "",
             )}
           >

@@ -2,31 +2,47 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useTheme } from "next-themes";
-import { useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { ShippingContainer, makeLine } from "./ShippingContainer";
+import { CSS_VARS_CHANGED } from "@/components/themes/CSSVariableEditor";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
-// Both themes render on a dark harbor-background, so all palette values are
-// tuned for visibility against navy / near-black canvas backgrounds.
-const PALETTE = {
-  dark: {
-    primary: "#F9BE24", // DevGuard primary amber
-    structure: "#4D7AB3", // structural wireframes
-    dim: "#1F4D80", // yard containers
-    dim2: "#2A5A8C", // ship containers
-    water: "#0A1E3A", // water surface tint
-    shipHull: "#142C4A", // ship hull fill
-  },
-  light: {
-    primary: "#000000",
-    structure: "#6B9CD4", // brighter wireframes on the lighter navy bg
-    dim: "#3A6DA0",
-    dim2: "#1E4670",
-    water: "#0E2648",
-    shipHull: "#183458",
-  },
-};
+// Reads live CSS variables so the scene reacts to theme changes from the editor.
+function hslVarToHex(varName: string): string {
+  if (typeof window === "undefined") return "#000000";
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+  if (!raw) return "#000000";
+  // raw is "h s% l%" — convert to hex via a temporary element
+  const tmp = document.createElement("div");
+  tmp.style.color = `hsl(${raw})`;
+  document.body.appendChild(tmp);
+  const computed = getComputedStyle(tmp).color;
+  document.body.removeChild(tmp);
+  // computed is "rgb(r, g, b)"
+  const m = computed.match(/\d+/g);
+  if (!m) return "#000000";
+  return (
+    "#" +
+    m
+      .slice(0, 3)
+      .map((v) => parseInt(v).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+function readPalette() {
+  return {
+    primary: hslVarToHex("--primary"),
+    structure: hslVarToHex("--header-muted-foreground"),
+    dim: hslVarToHex("--sidebar-accent-foreground"),
+    dim2: hslVarToHex("--muted-foreground"),
+    water: hslVarToHex("--harbor-background"),
+    shipHull: hslVarToHex("--header-background"),
+  };
+}
 
 // ─── Layout constants ───────────────────────────────────────────────────────
 const CRANE_Y = 5.5;
@@ -635,7 +651,17 @@ function SceneObjects({ colors }: { colors: Colors }) {
 // ─── Entry point ────────────────────────────────────────────────────────────
 export default function ContainerYardScene() {
   const { resolvedTheme } = useTheme();
-  const colors = resolvedTheme === "dark" ? PALETTE.dark : PALETTE.light;
+  const [colors, setColors] = useState(readPalette);
+
+  useEffect(() => {
+    setColors(readPalette());
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    const handler = () => setColors(readPalette());
+    window.addEventListener(CSS_VARS_CHANGED, handler);
+    return () => window.removeEventListener(CSS_VARS_CHANGED, handler);
+  }, []);
 
   return (
     <Canvas

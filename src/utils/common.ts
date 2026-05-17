@@ -43,21 +43,21 @@ export function toSearchParams(obj: Record<string, any>): URLSearchParams {
 export function getBGColorByState(state: State) {
   switch (state) {
     case "verifiedFix":
-      return "bg-blue-500";
+      return "bg-info";
     case "pendingFix":
-      return "bg-gray-400";
+      return "bg-muted-foreground/40";
     case "pendingTransfered":
-      return "bg-gray-400";
+      return "bg-muted-foreground/40";
     case "unhandled":
-      return "bg-red-500";
+      return "bg-destructive";
     case "accepted":
-      return "bg-gray-600";
+      return "bg-muted-foreground/60";
     case "avoided":
-      return "bg-gray-600";
+      return "bg-muted-foreground/60";
     case "verifiedTransfered":
-      return "bg-blue-500";
+      return "bg-info";
     default:
-      return "bg-gray-600";
+      return "bg-muted-foreground/60";
   }
 }
 

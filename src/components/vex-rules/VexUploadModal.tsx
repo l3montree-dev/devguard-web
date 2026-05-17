@@ -493,7 +493,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                                       </DropdownMenuItem>
                                       <DropdownMenuItem
                                         onClick={() => handleDelete(source)}
-                                        className="text-red-600 dark:text-red-400"
+                                        className="text-destructive"
                                       >
                                         <Trash2 className="h-4 w-4 mr-2" />
                                         Delete

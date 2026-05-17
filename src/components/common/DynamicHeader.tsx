@@ -83,7 +83,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
                   <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
                 )}
                 <div className="mt-4 flex flex-row items-center gap-1">
-                  <item.Icon className="h-5 w-5 text-gray-400" />
+                  <item.Icon className="h-5 w-5 text-header-muted" />
                   <span className="text-header-foreground">{item.title}</span>
                 </div>
               </Link>

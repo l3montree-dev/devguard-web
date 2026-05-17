@@ -123,7 +123,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
                     <DropdownMenuItem
                       onClick={handleDeleteGroup}
                       disabled={isDeletingGroup}
-                      className="text-red-600 dark:text-red-400"
+                      className="text-destructive"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete all {vexRulesInGroup.length} rules
@@ -146,8 +146,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
               key={vexRule.id}
               className={classNames(
                 "relative align-center transition-all cursor-pointer hover:bg-muted/50",
-                !isLastInGroup &&
-                  "border-b border-gray-100 dark:border-white/5",
+                !isLastInGroup && "border-b border-border",
               )}
               onClick={() => {
                 setSelectedRule(vexRule);

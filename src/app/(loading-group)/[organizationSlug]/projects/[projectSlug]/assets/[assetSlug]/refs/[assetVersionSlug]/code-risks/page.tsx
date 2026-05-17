@@ -334,7 +334,7 @@ const Index: FunctionComponent = () => {
                           "relative cursor-pointer align-top transition-all",
                           i === arr.length - 1 ? "" : "border-b",
                           i % 2 != 0 && "bg-card/50",
-                          "hover:bg-gray-50 dark:hover:bg-card",
+                          "hover:bg-muted",
                         )}
                         key={row.original.id}
                       >

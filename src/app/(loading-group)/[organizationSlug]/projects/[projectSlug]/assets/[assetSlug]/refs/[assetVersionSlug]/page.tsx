@@ -348,12 +348,12 @@ const Index: FunctionComponent = () => {
                               <div className="flex flex-row flex-wrap gap-2">
                                 {el.license.isOsiApproved ? (
                                   <Badge variant={"secondary"}>
-                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-success" />
                                     OSI Approved
                                   </Badge>
                                 ) : (
                                   <Badge variant={"secondary"}>
-                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
+                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-warning" />
                                   </Badge>
                                 )}
                               </div>

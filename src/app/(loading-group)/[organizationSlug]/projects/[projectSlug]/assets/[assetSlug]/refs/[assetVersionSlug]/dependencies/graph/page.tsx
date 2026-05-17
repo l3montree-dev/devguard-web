@@ -131,11 +131,7 @@ const DependencyGraphPage: FunctionComponent = () => {
             )}
           </div>
         </div>
-        <div
-          className={
-            "h-screen w-full rounded-lg border bg-gray-50 dark:bg-black"
-          }
-        >
+        <div className={"h-screen w-full rounded-lg border bg-muted"}>
           {graph ? (
             <DependencyGraph
               vulns={affectedComponents ?? []}

@@ -132,7 +132,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       </span>
       <button
         onClick={handleCopy}
-        className="absolute cursor-pointer right-1 top-1 z-10 rounded-lg bg-gray-700 p-1 px-2 text-xs text-white transition-all opacity-75 hover:opacity-100"
+        className="absolute cursor-pointer right-1 top-1 z-10 rounded-lg bg-card p-1 px-2 text-xs text-foreground transition-all opacity-75 hover:opacity-100"
       >
         Copy
       </button>
