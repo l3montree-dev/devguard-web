@@ -62,8 +62,7 @@
 }
 
 @layer base {
-    :root {      
-        --grid-line-color: 200 20% 98%;
+    :root {
         --background: 200 20% 98%;
         --foreground: 206 59% 16%;
         --card: 0 0% 100%;
@@ -76,7 +75,7 @@
         --secondary-foreground: 205 30% 10%;
         --muted: 200 12% 94%;
         --muted-foreground: 200 12% 46%;
-        --accent: 197 17% 92%;
+        --accent: 201 49% 93%;
         --accent-foreground: 205 30% 10%;
         --border: 200 15% 88%;
         --input: 200 15% 88%;
@@ -93,120 +92,90 @@
         --footer-background: 200 20% 98%;
         --footer-foreground: 205 30% 10%;
         --footer-muted-foreground: 200 12% 48%;
-        --success: 142 69% 37%;
+        --success: 142 71% 45%;
         --success-foreground: 0 0% 100%;
-        --warning: 38 88% 41%;
-        --warning-foreground: 0 0% 5%;
-        --info: 199 89% 40%;
-        --info-foreground: 0 0% 100%;
-        --severity-critical: 0 84% 55%;
-        --severity-high: 25 95% 53%;
-        --severity-medium: 45 70% 45%;
-        --severity-low: 142 70% 35%;
         --success-muted: 142 50% 90%;
-        --success-hover: 142 63% 35%;
+        --success-hover: 142 65% 38%;
+        --warning: 38 92% 50%;
+        --warning-foreground: 0 0% 5%;
         --warning-muted: 38 80% 90%;
         --warning-border: 38 70% 68%;
+        --info: 199 89% 40%;
+        --info-foreground: 0 0% 100%;
         --info-muted: 199 70% 90%;
+        --destructive: 0 100% 35%;
+        --destructive-foreground: 0 0% 100%;
         --destructive-muted: 350 80% 93%;
         --accent-muted: 198 40% 88%;
         --accent-ring: 198 40% 76%;
+        --severity-critical: 0 84% 55%;
         --severity-critical-muted: 0 70% 92%;
+        --severity-high: 25 95% 53%;
         --severity-high-muted: 25 80% 90%;
+        --severity-medium: 45 93% 47%;
         --severity-medium-muted: 45 80% 88%;
+        --severity-low: 142 71% 45%;
         --severity-low-muted: 142 50% 90%;
-        --link: 204 86% 38%;
+        --grid-line-color: 200 15% 88% / 0.6;
+        --link: 199 89% 34%;
     }
 
     .dark {
         --background: 213 27% 7%;
         --foreground: 0 0% 98%;
-
         --card: 215 22% 11%;
         --card-foreground: 0 0% 98%;
-
         --popover: 213 31% 7%;
         --popover-foreground: 0 0% 98%;
-
         --primary: 43 95% 56%;
         --primary-foreground: 0 0% 2%;
-
         --secondary: 215 27.9% 16.9%;
         --secondary-foreground: 210 20% 98%;
-
         --muted: 213 15% 15%;
         --muted-foreground: 212 9% 59%;
-
         --accent: 215 22% 15%;
         --accent-foreground: 0 0% 98%;
-
-        --destructive: 350 100% 55%;
-        --destructive-foreground: 0 0% 98%;
-
         --border: 215 22% 15%;
         --input: 215 22% 15%;
         --ring: 43 95% 40%;
-
-        --grid-line-color: 215 22% 15% / 0.6;
-
-        --chart-1: 42 96% 56%;
-        --chart-2: 223 68% 52%;
-        --chart-3: 339 74% 54%;
-
-        --chart-4: 280 64% 60%;
-        --chart-5: 220 80% 55%;
-
-        --blue: 204 86% 53%;
-        --green: 168 100% 41%;
-
+        --radius: 0.5rem;
         --sidebar-background: 213 31% 7%;
         --sidebar-foreground: 240 4.8% 95.9%;
-        --sidebar-primary: 224.3 76.3% 48%;
-        --sidebar-primary-foreground: 0 0% 100%;
         --sidebar-accent: 215 22% 15%;
         --sidebar-accent-foreground: 0 0% 98%;
         --sidebar-border: 215 22% 15%;
-        --sidebar-ring: 215 22% 15%;
-
         --header-background: 225 66% 2%;
         --header-foreground: 0 0% 100%;
-        --header-muted-foreground: 225 30% 55%;
-
+        --header-muted-foreground: 211 14% 55%;
         --footer-background: 213 27% 7%;
         --footer-foreground: 0 0% 98%;
         --footer-muted-foreground: 213 15% 55%;
-
-        --harbor-background: 213 27% 7%;
-
-        --severity-critical: 0 84% 60%;
-        --severity-high: 25 95% 58%;
-        --severity-medium: 45 93% 55%;
-        --severity-low: 142 71% 50%;
-
         --success: 142 71% 50%;
         --success-foreground: 0 0% 100%;
         --success-muted: 142 30% 18%;
         --success-hover: 142 71% 43%;
-
         --warning: 38 92% 55%;
         --warning-foreground: 0 0% 5%;
         --warning-muted: 38 40% 18%;
         --warning-border: 38 55% 35%;
-
         --info: 199 89% 48%;
         --info-foreground: 0 0% 100%;
         --info-muted: 199 40% 18%;
-
+        --destructive: 350 100% 55%;
+        --destructive-foreground: 0 0% 98%;
         --destructive-muted: 350 35% 18%;
-
         --accent-muted: 215 22% 20%;
         --accent-ring: 215 22% 32%;
-
+        --severity-critical: 0 84% 60%;
         --severity-critical-muted: 0 35% 18%;
+        --severity-high: 25 95% 58%;
         --severity-high-muted: 25 40% 18%;
+        --severity-medium: 45 93% 55%;
         --severity-medium-muted: 45 35% 18%;
+        --severity-low: 142 71% 50%;
         --severity-low-muted: 142 30% 18%;
-        --link: 43 95% 56%;
+        --grid-line-color: 215 22% 15% / 0.6;
+        --link: 43 95% 65%;
     }
 }
 

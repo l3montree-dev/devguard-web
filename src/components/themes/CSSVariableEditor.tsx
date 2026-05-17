@@ -138,8 +138,9 @@ function VarRow({
     setValue(getComputedVar(name));
   }, [name]);
 
-  const isHsl = /^\d/.test(value);
-  const hexValue = isHsl ? hslStringToHex(value) : value;
+  const isColor = /^\d/.test(value) || value.startsWith("#");
+  const isNonColor = name.startsWith("--font-weight") || name === "--radius";
+  const hexValue = isColor && !isNonColor ? hslStringToHex(value) : value;
 
   function handleColorChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newHsl = hexToHsl(e.target.value);
@@ -154,12 +155,16 @@ function VarRow({
 
   return (
     <div className="flex items-center gap-2 py-1 text-xs">
-      <input
-        type="color"
-        value={hexValue.startsWith("#") ? hexValue : "#000000"}
-        onChange={handleColorChange}
-        className="h-6 w-6 shrink-0 cursor-pointer rounded border border-border bg-transparent p-0"
-      />
+      {!isNonColor ? (
+        <input
+          type="color"
+          value={hexValue.startsWith("#") ? hexValue : "#000000"}
+          onChange={handleColorChange}
+          className="h-6 w-6 shrink-0 cursor-pointer rounded border border-border bg-transparent p-0"
+        />
+      ) : (
+        <div className="h-6 w-6 shrink-0" />
+      )}
       <span className="w-56 shrink-0 font-mono text-muted-foreground">
         {name}
       </span>
@@ -442,10 +447,15 @@ export function CSSVariableEditor() {
   }
 
   function copyOverrides() {
-    const lines = Object.entries(overrides)
-      .map(([k, v]) => `  ${k}: ${v};`)
-      .join("\n");
-    navigator.clipboard.writeText(`:root {\n${lines}\n}`);
+    const theme = {
+      name: activeTheme ?? "Custom",
+      description: "",
+      swatch: "#000000",
+      dark: document.documentElement.classList.contains("dark"),
+      style: styleSettings,
+      vars: overrides,
+    };
+    navigator.clipboard.writeText(JSON.stringify(theme, null, 2));
   }
 
   function switchTab(t: TabType) {
