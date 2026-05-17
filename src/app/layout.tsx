@@ -7,6 +7,7 @@ import React from "react";
 import { Toaster } from "sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
+import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
@@ -58,13 +59,18 @@ export default async function RootLayout({
             "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
           }
         >
+          {/* Restores CSS variable overrides before first paint — dev only */}
+          {process.env.NODE_ENV === "development" && (
+            // eslint-disable-next-line @next/next/no-sync-scripts
+            <script src="/dev-theme-init.js" />
+          )}
           {config.theme.cssUrl && (
             <link rel="stylesheet" href={config.theme.cssUrl} />
           )}
           {config.theme.jsUrl && (
+            // eslint-disable-next-line @next/next/no-sync-scripts
             <script
               src={config.theme.jsUrl}
-              defer
               {...(config.theme.jsIntegrity && {
                 integrity: config.theme.jsIntegrity,
                 crossOrigin: "anonymous",
@@ -99,6 +105,9 @@ export default async function RootLayout({
               >
                 <MobileGate>{children}</MobileGate>
                 <Toaster />
+                {process.env.NODE_ENV === "development" && (
+                  <CSSVariableEditor />
+                )}
               </ClientContextWrapper>
             </ClientContextWrapper>
           </ThemeProvider>

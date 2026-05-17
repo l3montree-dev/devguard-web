@@ -39,26 +39,58 @@ module.exports = {
         header: {
           DEFAULT: "hsl(var(--header-background))",
           foreground: "hsl(var(--header-foreground))",
+          muted: "hsl(var(--header-muted-foreground))",
         },
         footer: {
           DEFAULT: "hsl(var(--footer-background))",
           foreground: "hsl(var(--footer-foreground))",
+          muted: "hsl(var(--footer-muted-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          muted: "hsl(var(--success-muted))",
+          hover: "hsl(var(--success-hover))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          muted: "hsl(var(--warning-muted))",
+          border: "hsl(var(--warning-border))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+          muted: "hsl(var(--info-muted))",
+        },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          muted: "hsl(var(--destructive-muted))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          muted: "hsl(var(--accent-muted))",
+          ring: "hsl(var(--accent-ring))",
+        },
+        severity: {
+          critical: "hsl(var(--severity-critical))",
+          "critical-muted": "hsl(var(--severity-critical-muted))",
+          high: "hsl(var(--severity-high))",
+          "high-muted": "hsl(var(--severity-high-muted))",
+          medium: "hsl(var(--severity-medium))",
+          "medium-muted": "hsl(var(--severity-medium-muted))",
+          low: "hsl(var(--severity-low))",
+          "low-muted": "hsl(var(--severity-low-muted))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

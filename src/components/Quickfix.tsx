@@ -34,9 +34,9 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
             key={index}
             className={
               part.added
-                ? "text-green-500 font-mono"
+                ? "text-success font-mono"
                 : part.removed
-                  ? "bg-red-200 text-red-900"
+                  ? "bg-destructive-muted text-destructive"
                   : ""
             }
           >
@@ -128,7 +128,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <Badge
                   variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
+                  className="absolute top-0 left-0 -translate-y-1/2 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-success text-white border-success flex items-center gap-1"
                 >
                   Resolve Vulnerability
                 </Badge>

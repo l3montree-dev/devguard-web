@@ -66,8 +66,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             Title={
               <>
                 <span className="relative mr-2 inline-flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-success"></span>
                 </span>
                 repository
                 {parentRepositoryName}
@@ -114,8 +114,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
             Title={
               <>
                 <span className="relative mr-2 inline-flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-success"></span>
                 </span>
 
                 {repositoryName}

@@ -117,11 +117,42 @@
 
     --header-background: 225 59% 21.18%;
     --header-foreground: 0 0% 100%;
+    --header-muted-foreground: 225 40% 60%;
 
     --footer-background: 214 20% 98%;
     --footer-foreground: 226 57% 0%;
+    --footer-muted-foreground: 226 20% 55%;
 
     --harbor-background: 225 59% 21%;
+
+    --severity-critical: 0 84% 55%;
+    --severity-high: 25 95% 53%;
+    --severity-medium: 45 93% 47%;
+    --severity-low: 142 71% 45%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 50% 90%;
+    --success-hover: 142 71% 38%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 5%;
+    --warning-muted: 38 80% 90%;
+    --warning-border: 38 70% 68%;
+
+    --info: 199 89% 40%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 70% 90%;
+
+    --destructive-muted: 350 80% 93%;
+
+    --accent-muted: 215 30% 88%;
+    --accent-ring: 215 30% 72%;
+
+    --severity-critical-muted: 0 70% 92%;
+    --severity-high-muted: 25 80% 90%;
+    --severity-medium-muted: 45 80% 88%;
+    --severity-low-muted: 142 50% 90%;
   }
 
   .dark {
@@ -176,20 +207,79 @@
 
     --header-background: 225 66% 2%;
     --header-foreground: 0 0% 100%;
+    --header-muted-foreground: 225 30% 55%;
+
     --footer-background: 213 27% 7%;
     --footer-foreground: 0 0% 98%;
+    --footer-muted-foreground: 213 15% 55%;
 
     --harbor-background: 213 27% 7%;
+
+    --severity-critical: 0 84% 60%;
+    --severity-high: 25 95% 58%;
+    --severity-medium: 45 93% 55%;
+    --severity-low: 142 71% 50%;
+
+    --success: 142 71% 50%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 30% 18%;
+    --success-hover: 142 71% 43%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 5%;
+    --warning-muted: 38 40% 18%;
+    --warning-border: 38 55% 35%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 40% 18%;
+
+    --destructive-muted: 350 35% 18%;
+
+    --accent-muted: 215 22% 20%;
+    --accent-ring: 215 22% 32%;
+
+    --severity-critical-muted: 0 35% 18%;
+    --severity-high-muted: 25 40% 18%;
+    --severity-medium-muted: 45 35% 18%;
+    --severity-low-muted: 142 30% 18%;
   }
 }
 
 @layer base {
+  :root {
+    --font-weight-thin: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+  }
+
   * {
     @apply border-border;
+  }
+  html {
+    font-size: var(--base-font-size, 16px);
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .font-thin      { font-weight: var(--font-weight-thin); }
+  .font-extralight{ font-weight: var(--font-weight-extralight); }
+  .font-light     { font-weight: var(--font-weight-light); }
+  .font-normal    { font-weight: var(--font-weight-normal); }
+  .font-medium    { font-weight: var(--font-weight-medium); }
+  .font-semibold  { font-weight: var(--font-weight-semibold); }
+  .font-bold      { font-weight: var(--font-weight-bold); }
+  .font-extrabold { font-weight: var(--font-weight-extrabold); }
+  .font-black     { font-weight: var(--font-weight-black); }
 }
 
 .animated-outline {

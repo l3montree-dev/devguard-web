@@ -186,7 +186,7 @@ const LicenseCall = (props: {
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row capitalize items-center text-sm font-bold">
               {props.license.isOsiApproved && (
-                <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
+                <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-success" />
               )}
               {licenseMap[license] || license}
             </span>
@@ -717,7 +717,7 @@ const Index: FunctionComponent = () => {
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                     row.original.dependency.projectId && "cursor-pointer",
-                    "hover:bg-gray-50 dark:hover:bg-card",
+                    "hover:bg-muted",
                   )}
                   key={row.original.id}
                 >

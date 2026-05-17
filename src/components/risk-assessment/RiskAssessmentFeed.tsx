@@ -242,7 +242,7 @@ const RiskFeedItem = ({
               </Avatar>
             ) : event.userAgent == "devguard-mcp-server" ? (
               <Avatar>
-                <AvatarFallback className="bg-yellow-500 !text-black">
+                <AvatarFallback className="bg-warning !text-black">
                   <Sparkles className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
@@ -282,7 +282,7 @@ const RiskFeedItem = ({
                     {msg}
                   </Markdown>
                   {event.userAgent === "devguard-mcp-server" && (
-                    <div className="mt-3 flex items-start gap-2 rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400">
+                    <div className="mt-3 flex items-start gap-2 rounded-md border border-warning-border bg-warning-muted px-3 py-2 text-xs text-warning">
                       <span aria-hidden="true" className="mt-0.5 shrink-0">
                         ⚠️
                       </span>

@@ -117,7 +117,7 @@ const CustomPagination: FunctionComponent<Props> = ({
           </div>
         )}
       </div>
-      <p className="mt-2 text-center text-sm text-gray-500">
+      <p className="mt-2 text-center text-sm text-muted-foreground">
         Showing {page} of {Math.max(1, pages)} pages ({total} items)
       </p>
     </div>

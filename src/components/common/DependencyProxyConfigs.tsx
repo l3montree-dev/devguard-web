@@ -428,9 +428,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                         <div
                           key={packagePurl}
                           className={
-                            blocked
-                              ? "text-destructive"
-                              : "text-green-600 dark:text-green-400"
+                            blocked ? "text-destructive" : "text-success"
                           }
                         >
                           {packagePurl}

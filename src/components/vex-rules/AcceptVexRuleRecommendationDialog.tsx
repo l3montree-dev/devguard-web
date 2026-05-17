@@ -121,11 +121,7 @@ const AcceptVexRuleRecommendationDialog: FunctionComponent<
             }
             forceVertical
           >
-            <div
-              className={
-                "h-72 w-full rounded-lg border bg-gray-50 dark:bg-black"
-              }
-            >
+            <div className={"h-72 w-full rounded-lg border bg-muted"}>
               <DependencyGraph
                 variant="compact"
                 width={100}

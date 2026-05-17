@@ -28,7 +28,7 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
         "relative cursor-pointer align-top transition-all",
         index === arrLength - 1 ? "" : "border-b",
         index % 2 !== 0 && "bg-card/50",
-        "hover:bg-gray-50 dark:hover:bg-card",
+        "hover:bg-muted",
       )}
     >
       <td className="p-4 flex flex-row items-center gap-2 min-w-0">

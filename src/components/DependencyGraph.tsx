@@ -754,7 +754,7 @@ const DependencyGraph: FunctionComponent<{
                     <span>Normal - Standard dependency</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-gray-500 rounded bg-card flex-shrink-0"></div>
+                    <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
                     <span>False positive - Marked as not exploitable</span>
                   </div>
                 </div>
@@ -763,11 +763,11 @@ const DependencyGraph: FunctionComponent<{
                 <div className="space-y-2">
                   <div className="font-medium text-muted-foreground">Edges</div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-blue-500 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-info flex-shrink-0"></div>
                     <span>Vulnerability path</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-purple-500 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-accent flex-shrink-0"></div>
                     <span>Vulnerability path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -778,7 +778,7 @@ const DependencyGraph: FunctionComponent<{
                     <span>Dependency path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-zinc-400 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-muted-foreground flex-shrink-0"></div>
                     <span>Normal edge</span>
                   </div>
                   <div className="flex items-center gap-2">

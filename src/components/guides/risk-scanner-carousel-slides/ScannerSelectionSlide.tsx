@@ -127,7 +127,7 @@ export default function ScannerSelectionSlide({
                 className="inline-block mr-2 w-4 h-4"
               />
               Use your own Scanner or manually upload
-              <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                 Expert
               </Badge>
             </CardTitle>
@@ -150,7 +150,7 @@ export default function ScannerSelectionSlide({
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <LinkIcon className="inline-block mr-2 w-4 h-4" />
               Supplier provided SBOM (URL)
-              <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                 Expert
               </Badge>
             </CardTitle>

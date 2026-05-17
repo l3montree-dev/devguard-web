@@ -31,8 +31,8 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
                 className={classNames(
                   "aspect-square rounded-sm block",
                   Boolean(policy.compliant)
-                    ? " bg-green-500 shadow-green-400 drop-shadow"
-                    : "border border-gray-500/30 bg-gray-500/20",
+                    ? " bg-success shadow-success drop-shadow"
+                    : "border border-border bg-muted",
                 )}
                 key={policy.title}
               />
@@ -48,7 +48,9 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
               <span
                 className={classNames(
                   "text-sm font-semibold",
-                  Boolean(policy.compliant) ? "text-green-500" : "text-red-500",
+                  Boolean(policy.compliant)
+                    ? "text-success"
+                    : "text-destructive",
                 )}
               >
                 {policy.compliant ? "Passing" : "Failing"}
@@ -71,7 +73,7 @@ const ComplianceGrid: FunctionComponent<Props> = ({ compliance }) => {
         <div className="mt-2">
           <span className="text-sm">
             <Badge variant={"outline"}>
-              <CheckBadgeIcon className="-ml-2 h-8 w-8 text-gray-500" />
+              <CheckBadgeIcon className="-ml-2 h-8 w-8 text-muted-foreground" />
               <span className="pl-2 text-base">
                 No compliance rules are activated
               </span>

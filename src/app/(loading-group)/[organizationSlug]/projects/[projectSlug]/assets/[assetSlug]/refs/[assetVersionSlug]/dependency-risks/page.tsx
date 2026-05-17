@@ -594,7 +594,7 @@ const Index: FunctionComponent = () => {
                               "max_risk" ? (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                  <CircleHelp className="w-4 h-4 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="relative font-normal">
@@ -620,7 +620,7 @@ const Index: FunctionComponent = () => {
                               "max_cvss" ? (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                  <CircleHelp className="w-4 h-4 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="relative font-normal">

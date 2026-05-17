@@ -88,7 +88,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually
-                <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+                <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                   File Upload
                 </Badge>
               </CardTitle>

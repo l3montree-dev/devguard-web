@@ -15,32 +15,30 @@ function Product({
     <div
       key={product.id}
       className={classNames(
-        " dark:text-white rounded-3xl bg-white p-8 shadow-sm dark:bg-gray-900",
-        product.name === "Gold"
-          ? "ring-2 ring-yellow-400"
-          : "ring-1 ring-gray-200 dark:ring-gray-600",
+        " dark:text-white rounded-3xl bg-white p-8 shadow-sm dark:bg-card",
+        product.name === "Gold" ? "ring-2 ring-warning" : "ring-1 ring-border",
       )}
     >
       <h3
         className={classNames(
-          product.name === "Gold" ? "text-yellow-600" : "text-gray-900",
+          product.name === "Gold" ? "text-warning" : "text-foreground",
           "text-lg font-semibold leading-8 dark:text-white",
         )}
       >
         {product.name}
       </h3>
-      <p className="mt-4 text-sm leading-6 text-gray-600 dark:text-white">
+      <p className="mt-4 text-sm leading-6 text-muted-foreground dark:text-white">
         {product.description}
       </p>
       <p className="mt-6 flex items-baseline gap-x-1   ">
-        <span className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <span className="text-4xl font-bold tracking-tight text-foreground dark:text-white">
           {/* TODO: Add currency depending on the locale */}
           {new Intl.NumberFormat("de-DE", {
             style: "currency",
             currency: "EUR",
           }).format(product.price)}
         </span>
-        <span className="text-sm font-semibold leading-6 text-gray-600 dark:text-white">
+        <span className="text-sm font-semibold leading-6 text-muted-foreground dark:text-white">
           /monthly
         </span>
       </p>
@@ -52,7 +50,7 @@ function Product({
           {product.features.map((feature) => (
             <li key={feature} className="flex gap-x-3">
               <CheckIcon
-                className="h-6 w-5 flex-none text-gray-900 dark:text-gray-200"
+                className="h-6 w-5 flex-none text-foreground"
                 aria-hidden="true"
               />
               {feature}
