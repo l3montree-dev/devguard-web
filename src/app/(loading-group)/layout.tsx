@@ -15,9 +15,9 @@ export default function Layout({
     <>
       <RootHeader />
       {/* Left edge grid pattern */}
-      <div className="pointer-events-none fixed inset-y-0 left-0 z-10 hidden w-8 border-r border-r-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
+      <div className="pointer-events-none fixed inset-y-0 left-0 z-10 hidden w-8 border-r border-r-[hsl(var(--grid-line-color))] bg-[repeating-linear-gradient(315deg,hsl(var(--grid-line-color))_0,hsl(var(--grid-line-color))_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
       {/* Right edge grid pattern */}
-      <div className="pointer-events-none fixed inset-y-0 right-0 z-10 hidden w-8 border-l border-l-(--grid-line-color) bg-[repeating-linear-gradient(315deg,var(--grid-line-color)_0,var(--grid-line-color)_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
+      <div className="pointer-events-none fixed inset-y-0 right-0 z-10 hidden w-8 border-l border-l-[hsl(var(--grid-line-color))] bg-[repeating-linear-gradient(315deg,hsl(var(--grid-line-color))_0,hsl(var(--grid-line-color))_1px,transparent_0,transparent_50%)] bg-size-[10px_10px] sm:block" />
       <div className="pt-[112px]">{children}</div>
     </>
   );

@@ -24,6 +24,8 @@ const VAR_GROUPS: VarGroup[] = [
       "--input",
       "--ring",
       "--radius",
+      "--grid-line-color",
+      "--link",
     ],
   },
   {

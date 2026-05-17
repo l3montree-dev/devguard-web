@@ -36,6 +36,7 @@ module.exports = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        link: "hsl(var(--link))",
         header: {
           DEFAULT: "hsl(var(--header-background))",
           foreground: "hsl(var(--header-foreground))",

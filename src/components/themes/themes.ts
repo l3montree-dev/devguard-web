@@ -56,7 +56,7 @@ export const THEMES: Theme[] = [
       "--sidebar-border": "215 22% 15%",
       "--header-background": "225 66% 2%",
       "--header-foreground": "0 0% 100%",
-      "--header-muted-foreground": "225 30% 55%",
+      "--header-muted-foreground": "211 14% 55%",
       "--footer-background": "213 27% 7%",
       "--footer-foreground": "0 0% 98%",
       "--footer-muted-foreground": "213 15% 55%",
@@ -82,6 +82,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 40% 18%",
       "--severity-medium-muted": "45 35% 18%",
       "--severity-low-muted": "142 30% 18%",
+      "--grid-line-color": "215 22% 15% / 0.6",
+      "--link": "43 95% 65%",
     },
   },
   {
@@ -151,6 +153,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 35% 15%",
       "--severity-medium-muted": "45 30% 15%",
       "--severity-low-muted": "142 30% 15%",
+      "--grid-line-color": "140 18% 16% / 0.6",
+      "--link": "142 65% 55%",
     },
   },
   {
@@ -218,6 +222,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 80% 90%",
       "--severity-medium-muted": "45 80% 88%",
       "--severity-low-muted": "142 50% 90%",
+      "--grid-line-color": "345 25% 86% / 0.6",
+      "--link": "338 65% 45%",
     },
   },
   {
@@ -285,6 +291,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 30% 12%",
       "--severity-medium-muted": "45 25% 12%",
       "--severity-low-muted": "142 25% 12%",
+      "--grid-line-color": "0 0% 14% / 0.6",
+      "--link": "43 90% 60%",
     },
   },
   {
@@ -352,6 +360,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 35% 16%",
       "--severity-medium-muted": "45 30% 16%",
       "--severity-low-muted": "142 30% 16%",
+      "--grid-line-color": "205 38% 18% / 0.6",
+      "--link": "188 80% 58%",
     },
   },
   {
@@ -419,6 +429,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 80% 90%",
       "--severity-medium-muted": "45 80% 88%",
       "--severity-low-muted": "142 50% 90%",
+      "--grid-line-color": "28 25% 84% / 0.6",
+      "--link": "24 80% 40%",
     },
   },
   {
@@ -486,6 +498,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 30% 14%",
       "--severity-medium-muted": "45 25% 14%",
       "--severity-low-muted": "142 25% 14%",
+      "--grid-line-color": "265 20% 20% / 0.6",
+      "--link": "272 70% 72%",
     },
   },
   {
@@ -553,6 +567,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 80% 90%",
       "--severity-medium-muted": "45 80% 88%",
       "--severity-low-muted": "142 50% 90%",
+      "--grid-line-color": "270 12% 80% / 0.6",
+      "--link": "265 55% 42%",
     },
   },
   {
@@ -620,6 +636,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 32% 14%",
       "--severity-medium-muted": "45 28% 14%",
       "--severity-low-muted": "142 25% 14%",
+      "--grid-line-color": "8 12% 18% / 0.6",
+      "--link": "0 75% 60%",
     },
   },
   {
@@ -637,7 +655,7 @@ export const THEMES: Theme[] = [
     },
     vars: {
       "--background": "200 20% 98%",
-      "--foreground": "205 30% 10%",
+      "--foreground": "206 59% 16%",
       "--card": "0 0% 100%",
       "--card-foreground": "205 30% 10%",
       "--popover": "0 0% 100%",
@@ -687,6 +705,10 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 80% 90%",
       "--severity-medium-muted": "45 80% 88%",
       "--severity-low-muted": "142 50% 90%",
+      "--grid-line-color": "200 15% 88% / 0.6",
+      "--link": "199 89% 34%",
+      "--destructive": "0 100% 35%",
+      "--destructive-foreground": "0 0% 100%",
     },
   },
   {
@@ -754,6 +776,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 25% 12%",
       "--severity-medium-muted": "45 22% 12%",
       "--severity-low-muted": "120 25% 12%",
+      "--grid-line-color": "120 20% 14% / 0.6",
+      "--link": "120 60% 55%",
     },
   },
   {
@@ -821,6 +845,8 @@ export const THEMES: Theme[] = [
       "--severity-high-muted": "25 32% 14%",
       "--severity-medium-muted": "45 28% 14%",
       "--severity-low-muted": "142 25% 14%",
+      "--grid-line-color": "345 14% 20% / 0.6",
+      "--link": "345 65% 65%",
     },
   },
 ];
