@@ -55,7 +55,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           <Card
             className={classNames(
               "cursor-pointer",
-              variant === "auto" ? "border border-primary" : "border border",
+              variant === "auto" ? "border-primary" : "",
             )}
             onClick={() => setVariant("auto")}
           >
@@ -76,7 +76,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           <Card
             className={classNames(
               "cursor-pointer mt-2",
-              variant === "manual" ? "border border-primary" : "border border",
+              variant === "manual" ? "border-primary" : "",
             )}
             onClick={() => setVariant("manual")}
           >
