@@ -378,6 +378,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               isLoading={isLoading}
               error={error}
               data={projects?.data}
+              skeletonVariant="project"
               Empty={<EmptyParty title={"No groups found"} description="" />}
               renderItem={(project) => {
                 return (

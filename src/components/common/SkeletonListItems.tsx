@@ -1,13 +1,15 @@
 import type { FunctionComponent } from "react";
 import SkeletonListItem from "./SkeletonListItem";
 
-interface Props {}
-const SkeletonListItems: FunctionComponent<Props> = () => {
+interface Props {
+  variant?: "card" | "project";
+}
+const SkeletonListItems: FunctionComponent<Props> = ({ variant }) => {
   return (
     <>
-      <SkeletonListItem />
-      <SkeletonListItem />
-      <SkeletonListItem />
+      <SkeletonListItem variant={variant} />
+      <SkeletonListItem variant={variant} />
+      <SkeletonListItem variant={variant} />
     </>
   );
 };
