@@ -62,13 +62,6 @@ export const useProjectMenu = () => {
     },
   ];
   if (loggedIn) {
-    menu.push({
-      title: "Compliance",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
-      Icon: ScaleIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/compliance`,
-    });
-
     if (
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin

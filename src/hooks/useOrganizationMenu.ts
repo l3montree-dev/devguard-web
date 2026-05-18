@@ -54,13 +54,6 @@ export const useOrganizationMenu = () => {
   });
 
   if (loggedIn && !org.externalEntityProviderId) {
-    menu.push({
-      title: "Compliance",
-      href: "/" + decodedOrgSlug + "/compliance",
-      Icon: ScaleIcon,
-      isActive: decodedPathName === "/" + decodedOrgSlug + "/compliance",
-    });
-
     if (
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin
