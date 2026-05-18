@@ -57,7 +57,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer",
             selectedSetup === "devguard-tools"
               ? "border border-primary"
-              : "border border-transparent",
+              : "border border",
           )}
           onClick={() => setSelectedSetup("devguard-tools")}
         >
@@ -86,7 +86,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2",
             selectedSetup === "devguard-cli"
               ? "border border-primary"
-              : "border border-transparent",
+              : "border border",
           )}
           onClick={() => setSelectedSetup("devguard-cli")}
         >
@@ -115,7 +115,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2",
             selectedSetup === "own-setup"
               ? "border border-primary"
-              : "border border-transparent",
+              : "border border",
           )}
           onClick={() => setSelectedSetup("own-setup")}
         >
@@ -142,7 +142,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2   ",
             selectedSetup === "information-source"
               ? "border border-primary"
-              : "border border-transparent",
+              : "border border",
           )}
           onClick={() => setSelectedSetup("information-source")}
         >
