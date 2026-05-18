@@ -18,7 +18,6 @@ import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
-  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ContainerIcon, FolderSearch } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
