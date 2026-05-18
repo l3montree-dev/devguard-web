@@ -341,7 +341,7 @@ const Index: FunctionComponent = () => {
           title="Incoming Webhook Management"
           description="Details for configuring incoming webhooks to receive for example issue updates from your issue tracker."
         >
-          <div className="space-y-2 pt-4 pb-6 px-6 border rounded-xl bg-card mt-1">
+          <div className="space-y-2 pt-4 pb-6 px-6 border shadow-sm rounded-xl bg-card mt-1">
             <InputWithButton
               label="Webhook URL"
               value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}

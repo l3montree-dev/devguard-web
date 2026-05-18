@@ -52,7 +52,7 @@ const MembersTable: FunctionComponent<Props> = ({
 
   return (
     <div>
-      <div className="overflow-hidden rounded-lg border">
+      <div className="overflow-hidden rounded-lg  border shadow-sm">
         <table className="w-full text-sm">
           <thead className={classNames("w-full text-left", "border-b bg-card")}>
             <tr className="">
