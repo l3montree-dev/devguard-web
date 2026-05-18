@@ -306,3 +306,9 @@ a {
         @apply opacity-80;
     }
 }
+
+a.nav-link {
+    &:hover {
+        opacity: 1;
+    }
+}

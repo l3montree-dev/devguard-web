@@ -17,7 +17,7 @@ const AssetRow: FunctionComponent<Props> = ({ asset, projectSlug }) => {
   return (
     <Link
       href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${asset.slug}/`}
-      className="block no-underline text-inherit"
+      className="nav-link block no-underline text-inherit"
     >
       <div className="flex flex-row items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-accent">
         {asset.avatar ? (
