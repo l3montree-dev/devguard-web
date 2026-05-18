@@ -8,11 +8,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 interface TourContextType {
   registerSteps: (steps: StepType[]) => void;
   openTour: () => void;
+  hasSteps: boolean;
 }
 
 const TourContext = React.createContext<TourContextType>({
   registerSteps: () => {},
   openTour: () => {},
+  hasSteps: false,
 });
 
 function TourController({
@@ -68,8 +70,8 @@ export function TourContextProvider({
   return (
     <TourContext.Provider
       value={useMemo(
-        () => ({ registerSteps, openTour }),
-        [registerSteps, openTour],
+        () => ({ registerSteps, openTour, hasSteps: steps.length > 0 }),
+        [registerSteps, openTour, steps.length],
       )}
     >
       <TourProvider

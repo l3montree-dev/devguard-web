@@ -284,13 +284,6 @@ const Home = () => {
 
   return (
     <Page Title={null} title={""} Menu={orgMenu}>
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Organization Settings</h1>
       </div>

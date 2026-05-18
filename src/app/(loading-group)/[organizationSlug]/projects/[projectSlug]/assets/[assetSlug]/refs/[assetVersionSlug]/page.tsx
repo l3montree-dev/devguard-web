@@ -193,13 +193,6 @@ const Index: FunctionComponent = () => {
       Title={<AssetTitle />}
     >
       <div className="flex flex-row items-start justify-between">
-        <Button
-          variant="outline"
-          className="absolute right-10 top-30"
-          onClick={startTour}
-        >
-          Guided Tour
-        </Button>
         <div data-tour="branch-switcher" className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
         </div>

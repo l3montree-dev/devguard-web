@@ -506,13 +506,6 @@ const Index: FunctionComponent = () => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <div
         data-tour="dependencies-header"
         className="flex flex-row items-start justify-between"

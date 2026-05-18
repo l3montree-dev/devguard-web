@@ -288,13 +288,6 @@ const OrganizationHomePage: FunctionComponent = () => {
         onStartTour={() => handleStartTour(startTour)}
         onSkip={handleSkip}
       />
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <Page Title={null} title={""} Menu={orgMenu}>
         <Dialog open={open}>
           <DialogContent setOpen={setOpen}>

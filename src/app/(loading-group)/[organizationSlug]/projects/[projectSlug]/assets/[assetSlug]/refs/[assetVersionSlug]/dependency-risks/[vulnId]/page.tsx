@@ -672,13 +672,6 @@ const Index: FunctionComponent = () => {
       title={vuln?.cve?.cve ?? "Vulnerability Details"}
     >
       <div className="flex flex-row gap-4">
-        <Button
-          variant="outline"
-          className="absolute right-10 top-30"
-          onClick={startTour}
-        >
-          Guided Tour
-        </Button>
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
