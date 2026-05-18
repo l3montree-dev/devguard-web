@@ -105,7 +105,7 @@ export function PublicUrlSection({
       : "";
 
   return (
-    <div className="pl-4">
+    <div>
       <div className="mt-4 flex items-center justify-between gap-2">
         <span className="font-semibold" id="public-url">
           Public URL
