@@ -23,7 +23,10 @@ export default function HelpDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger aria-label="Open help menu">
         <div className="flex w-10 flex-row justify-center">
-          <MessageCircleQuestionMark className="h-[1.2rem] w-[1.2rem] cursor-pointer dark:text-muted-foreground text-background transition-all" />
+          <MessageCircleQuestionMark
+            data-tour="help-center"
+            className="h-[1.2rem] w-[1.2rem] cursor-pointer dark:text-muted-foreground text-background transition-all"
+          />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

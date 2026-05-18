@@ -28,7 +28,14 @@ function TourController({
   onOpened: () => void;
   children: React.ReactNode;
 }) {
-  const { setSteps, setIsOpen, setCurrentStep } = useTour();
+  const { setSteps, setIsOpen, setCurrentStep, isOpen } = useTour();
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (steps.length > 0) {

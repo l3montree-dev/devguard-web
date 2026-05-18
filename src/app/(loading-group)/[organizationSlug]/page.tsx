@@ -271,7 +271,10 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  const { startTour } = usePageTour(orgHomeTourSteps);
+  const isAdmin =
+    currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin;
+  const tourSteps = useMemo(() => orgHomeTourSteps(isAdmin), [isAdmin]);
+  const { startTour } = usePageTour(tourSteps);
   const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
 
   useEffect(() => {
