@@ -380,7 +380,6 @@ const Home = () => {
               }
             />
           ))}
-          <hr />
           <ListItem
             Title={
               <div className="flex flex-row items-center">
@@ -493,7 +492,6 @@ const Home = () => {
             />
           ))}
 
-          <hr />
           <ListItem
             Title={
               <div className="flex flex-row items-center">Add a Webhook</div>
