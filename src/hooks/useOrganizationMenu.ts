@@ -15,13 +15,12 @@
 
 import { UserRole } from "@/types/api/api";
 import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { ScaleIcon, ChartBarIcon } from "lucide-react";
+import { ChartBarIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
 import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
 import { useCurrentUserRole } from "./useUserRole";
-import { FolderSearch } from "lucide-react";
 
 export const useOrganizationMenu = () => {
   const pathName = usePathname() || "/";
@@ -54,13 +53,6 @@ export const useOrganizationMenu = () => {
   });
 
   if (loggedIn && !org.externalEntityProviderId) {
-    menu.push({
-      title: "Compliance",
-      href: "/" + decodedOrgSlug + "/compliance",
-      Icon: ScaleIcon,
-      isActive: decodedPathName === "/" + decodedOrgSlug + "/compliance",
-    });
-
     if (
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin

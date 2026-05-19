@@ -18,7 +18,6 @@ import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,
   CogIcon,
-  ScaleIcon,
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";

@@ -18,7 +18,6 @@ import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
-  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ContainerIcon, FolderSearch } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
@@ -62,13 +61,6 @@ export const useProjectMenu = () => {
     },
   ];
   if (loggedIn) {
-    menu.push({
-      title: "Compliance",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
-      Icon: ScaleIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/compliance`,
-    });
-
     if (
       currentUserRole === UserRole.Owner ||
       currentUserRole === UserRole.Admin
