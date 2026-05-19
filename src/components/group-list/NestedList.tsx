@@ -61,7 +61,7 @@ const NestedList: FunctionComponent<Props> = ({
 
   return (
     <>
-      {items.map((item) => {
+      {items.map((item, index) => {
         const { asset, subgroup } = checkType(item);
         if (asset) {
           return (
@@ -69,6 +69,8 @@ const NestedList: FunctionComponent<Props> = ({
               key={asset.id}
               asset={asset}
               projectSlug={parentProjectSlug}
+              variant={compact ? "nested" : "default"}
+              isLast={index === items.length - 1}
             />
           );
         }
