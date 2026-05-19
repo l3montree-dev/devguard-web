@@ -81,6 +81,7 @@ const NestedList: FunctionComponent<Props> = ({
             subgroupsWithAssets={subgroup.subGroupsAndAsset}
             onFetchData={onFetchData}
             depth="nested"
+            isLast={index === items.length - 1}
           />
         );
       })}

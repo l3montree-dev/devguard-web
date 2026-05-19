@@ -31,12 +31,14 @@ interface Props {
   onFetchData: (projectSlug: string, projectId: string) => any;
   error?: Error;
   depth: "root" | "nested";
+  isLast?: boolean;
 }
 
 const ProjectRow: FunctionComponent<Props> = ({
   project,
   subgroupsWithAssets,
   onFetchData,
+  isLast,
   error,
   depth,
 }) => {
@@ -91,7 +93,10 @@ const ProjectRow: FunctionComponent<Props> = ({
   const Icon = isRoot ? RectangleGroupIconSolid : RectangleGroupIconOutline;
 
   const body = (
-    <Collapsible open={isOpen}>
+    <Collapsible
+      className={classNames(isLast ? "" : "border-b", "-ml-2 pl-2")}
+      open={isOpen}
+    >
       <div
         role="button"
         tabIndex={0}
@@ -100,7 +105,7 @@ const ProjectRow: FunctionComponent<Props> = ({
         onKeyDown={handleKeyDown}
         className={classNames(
           "flex flex-row items-center gap-3 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          isRoot ? "px-4 py-3" : "rounded-md px-3 py-2",
+          isRoot ? "px-4 py-3" : "rounded-md px-2 py-2",
         )}
       >
         {project.avatar ? (
@@ -169,7 +174,7 @@ const ProjectRow: FunctionComponent<Props> = ({
               className={classNames(
                 "absolute border-l border-border",
                 isRoot
-                  ? "left-[31px] -top-3 -bottom-2"
+                  ? "left-[31px] -top-3 bottom-0"
                   : "left-[14px] top-0 bottom-2",
               )}
             />
@@ -194,7 +199,7 @@ const ProjectRow: FunctionComponent<Props> = ({
   );
 
   if (isRoot) {
-    return <div className="border-b py-2">{body}</div>;
+    return <div>{body}</div>;
   }
   return body;
 };

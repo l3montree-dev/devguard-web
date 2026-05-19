@@ -37,10 +37,10 @@ function readPalette() {
   return {
     primary: hslVarToHex("--primary"),
     structure: hslVarToHex("--header-muted-foreground"),
-    dim: hslVarToHex("--sidebar-accent-foreground"),
-    dim2: hslVarToHex("--muted-foreground"),
-    water: hslVarToHex("--harbor-background"),
-    shipHull: hslVarToHex("--header-background"),
+    dim: hslVarToHex("--header-muted-foreground"),
+    dim2: hslVarToHex("--header-muted-foreground"),
+    water: hslVarToHex("--header-background"),
+    shipHull: hslVarToHex("--header-foreground"),
   };
 }
 
@@ -665,6 +665,7 @@ export default function ContainerYardScene() {
 
   return (
     <Canvas
+      className="bg-header"
       camera={{ position: [15, 50, 20], fov: 12 }}
       onCreated={({ camera }) => {
         camera.lookAt(new THREE.Vector3(2, 0, 0));

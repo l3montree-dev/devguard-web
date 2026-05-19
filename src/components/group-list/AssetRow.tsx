@@ -26,7 +26,7 @@ const AssetRow: FunctionComponent<Props> = ({
     <div
       className={
         variant === "nested"
-          ? cn("-ml-2", isLast ? "-mb-1" : "border-b pb-2")
+          ? cn("-ml-2 pl-1 pb-1", isLast ? "" : "border-b")
           : "border-b pb-4"
       }
     >
