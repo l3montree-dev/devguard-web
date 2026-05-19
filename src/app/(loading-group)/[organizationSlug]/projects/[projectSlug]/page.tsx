@@ -134,7 +134,10 @@ export default function RepositoriesPage() {
 
   const projectMenu = useProjectMenu();
 
-  const { startTour } = usePageTour(groupHomeTourSteps);
+  const isAdmin =
+    currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin;
+  const tourSteps = useMemo(() => groupHomeTourSteps(isAdmin), [isAdmin]);
+  const { startTour } = usePageTour(tourSteps);
 
   useEffect(() => {
     if (searchParams?.get("startTour") === "2") {
@@ -274,13 +277,6 @@ export default function RepositoriesPage() {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
-        <Button
-          variant="outline"
-          className="absolute right-10 top-30"
-          onClick={startTour}
-        >
-          Guided Tour
-        </Button>
         <Section
           Button={
             session &&

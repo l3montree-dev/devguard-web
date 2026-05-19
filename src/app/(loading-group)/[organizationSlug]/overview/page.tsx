@@ -52,13 +52,6 @@ const OrganizationOverview: FunctionComponent = () => {
       title="Overview"
       description="Displays an overview about the stats of the org"
     >
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <div className="mb-6 flex flex-row items-center justify-between">
         <div data-tour="overview-header">
           <h1 className="text-2xl font-bold">Organization Overview</h1>

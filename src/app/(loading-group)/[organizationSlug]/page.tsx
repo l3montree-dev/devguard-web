@@ -271,7 +271,10 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  const { startTour } = usePageTour(orgHomeTourSteps);
+  const isAdmin =
+    currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin;
+  const tourSteps = useMemo(() => orgHomeTourSteps(isAdmin), [isAdmin]);
+  const { startTour } = usePageTour(tourSteps);
   const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
 
   useEffect(() => {
@@ -288,13 +291,6 @@ const OrganizationHomePage: FunctionComponent = () => {
         onStartTour={() => handleStartTour(startTour)}
         onSkip={handleSkip}
       />
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <Page Title={null} title={""} Menu={orgMenu}>
         <Dialog open={open}>
           <DialogContent setOpen={setOpen}>

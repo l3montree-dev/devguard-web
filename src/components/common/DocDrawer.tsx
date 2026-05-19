@@ -74,12 +74,15 @@ export function DocDrawer({
   return (
     <Drawer direction="right" onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
-        <button className="text-xs cursor-pointer text-primary" type="button">
+        <button
+          className="text-xs cursor-pointer text-blue-600 dark:text-primary"
+          type="button"
+        >
           {triggerLabel}
         </button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader>
+        <DrawerHeader className="border-b">
           <DrawerTitle>{drawerTitle}</DrawerTitle>
         </DrawerHeader>
         <div className="min-w-0 cve-description overflow-x-hidden overflow-y-auto px-4 pb-4 prose prose-sm dark:prose-invert max-w-none">

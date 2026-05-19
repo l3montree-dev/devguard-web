@@ -8,11 +8,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 interface TourContextType {
   registerSteps: (steps: StepType[]) => void;
   openTour: () => void;
+  hasSteps: boolean;
 }
 
 const TourContext = React.createContext<TourContextType>({
   registerSteps: () => {},
   openTour: () => {},
+  hasSteps: false,
 });
 
 function TourController({
@@ -26,7 +28,14 @@ function TourController({
   onOpened: () => void;
   children: React.ReactNode;
 }) {
-  const { setSteps, setIsOpen, setCurrentStep } = useTour();
+  const { setSteps, setIsOpen, setCurrentStep, isOpen } = useTour();
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (steps.length > 0) {
@@ -68,8 +77,8 @@ export function TourContextProvider({
   return (
     <TourContext.Provider
       value={useMemo(
-        () => ({ registerSteps, openTour }),
-        [registerSteps, openTour],
+        () => ({ registerSteps, openTour, hasSteps: steps.length > 0 }),
+        [registerSteps, openTour, steps.length],
       )}
     >
       <TourProvider

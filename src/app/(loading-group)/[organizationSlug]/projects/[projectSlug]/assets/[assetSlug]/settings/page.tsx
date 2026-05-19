@@ -322,13 +322,6 @@ const Index: FunctionComponent = () => {
       description="Update the settings of this repository"
       Title={<AssetTitle />}
     >
-      <Button
-        variant="outline"
-        className="absolute right-10 top-30"
-        onClick={startTour}
-      >
-        Guided Tour
-      </Button>
       <div>
         <div
           data-tour="repo-settings-header"
