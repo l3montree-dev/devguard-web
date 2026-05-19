@@ -31,6 +31,7 @@ import { OrgForm } from "@/components/OrgForm";
 import DangerZone from "@/components/common/DangerZone";
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import { TrivyOperatorIntegrationDialog } from "@/components/common/TrivyOperatorIntegrationDialog";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { Card } from "@/components/ui/card";
 import {
@@ -46,6 +47,7 @@ import type {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
+  TrivyOperatorIntegrationDTO,
   WebhookDTO,
 } from "@/types/api/api";
 import Image from "next/image";
@@ -129,6 +131,41 @@ const Home = () => {
         jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
       },
     });
+  };
+
+  const handleNewTrivyOperatorIntegration = (
+    integration: TrivyOperatorIntegrationDTO,
+  ) => {
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        trivyOperatorIntegrations:
+          activeOrg.trivyOperatorIntegrations.concat(integration),
+      },
+    });
+  };
+
+  const handleDeleteTrivyOperatorIntegration = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" +
+        activeOrg.slug +
+        "/integrations/trivy-operator/" +
+        id +
+        "/",
+      { method: "DELETE" },
+    );
+    if (resp.ok) {
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          trivyOperatorIntegrations: activeOrg.trivyOperatorIntegrations.filter(
+            (i) => i.id !== id,
+          ),
+        },
+      });
+    }
   };
 
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
@@ -384,6 +421,38 @@ const Home = () => {
               }
             />
           ))}
+          {activeOrg.trivyOperatorIntegrations.map((integration) => (
+            <ListItem
+              key={integration.id}
+              Title={
+                <div className="flex flex-row items-center">
+                  <img
+                    src="/assets/trivy.svg"
+                    alt="Trivy Operator"
+                    width={20}
+                    height={20}
+                    className="mr-2 inline-block"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  {integration.name}
+                </div>
+              }
+              Description="Trivy Operator integration — sends SbomReports to DevGuard for automatic scanning."
+              Button={
+                <AsyncButton
+                  variant={"destructiveOutline"}
+                  onClick={() =>
+                    handleDeleteTrivyOperatorIntegration(integration.id)
+                  }
+                >
+                  Delete
+                </AsyncButton>
+              }
+            />
+          ))}
+          <hr />
           <ListItem
             Title={
               <div className="flex flex-row items-center">
@@ -467,6 +536,24 @@ const Home = () => {
                   <Button variant={"secondary"}>Integrate with Jira</Button>
                 }
               ></JiraIntegrationDialog>
+            }
+          />
+          <ListItem
+            Title={
+              <div className="flex flex-row items-center">
+                Integrate with Trivy Operator
+              </div>
+            }
+            Description="Connect a Kubernetes cluster running Trivy Operator. DevGuard receives SbomReports and scans them automatically, creating assets per container."
+            Button={
+              <TrivyOperatorIntegrationDialog
+                onNewIntegration={handleNewTrivyOperatorIntegration}
+                Button={
+                  <Button variant={"secondary"}>
+                    Integrate with Trivy Operator
+                  </Button>
+                }
+              />
             }
           />
         </Section>
