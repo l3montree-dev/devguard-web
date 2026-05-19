@@ -61,16 +61,16 @@ export default async function RootLayout({
           }
         >
           {/* Restores CSS variable overrides before first paint — dev only */}
-          {process.env.NODE_ENV === "development" && (
+          {/*process.env.NODE_ENV === "development" && (
             // eslint-disable-next-line @next/next/no-sync-scripts
             <script src="/dev-theme-init.js" />
-          )}
+          )*/}
           {config.theme.cssUrl && (
             <link rel="stylesheet" href={config.theme.cssUrl} />
           )}
           {config.theme.jsUrl && (
-            // eslint-disable-next-line @next/next/no-sync-scripts
             <script
+              defer
               src={config.theme.jsUrl}
               {...(config.theme.jsIntegrity && {
                 integrity: config.theme.jsIntegrity,

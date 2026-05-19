@@ -25,7 +25,7 @@ export default function HelpDropdown() {
         <div className="flex w-10 flex-row justify-center">
           <MessageCircleQuestionMark
             data-tour="help-center"
-            className="h-[1.2rem] w-[1.2rem] cursor-pointer dark:text-muted-foreground text-background transition-all"
+            className="h-[1.2rem] w-[1.2rem] cursor-pointer text-header-foreground transition-all"
           />
         </div>
       </DropdownMenuTrigger>
