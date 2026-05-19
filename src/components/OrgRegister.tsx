@@ -59,6 +59,8 @@ export default function OrgRegisterForm(props: Props) {
       organization: orgDTO,
     }));
 
+    localStorage.setItem("lastActiveOrg", orgDTO.slug);
+
     // move the user to the newly created organization
     router.push(`/${orgDTO.slug}`);
   };
