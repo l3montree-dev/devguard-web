@@ -50,7 +50,7 @@ export default function LicenseRiskRow({ risk, index, arrLength }: Props) {
             Unknown
           </Badge>
         ) : (
-          risk.component.license
+          <Badge variant="secondary">{risk.component.license}</Badge>
         )}
       </td>
       <td className="p-4">
