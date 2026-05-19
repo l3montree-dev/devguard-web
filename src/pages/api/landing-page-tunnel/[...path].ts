@@ -38,7 +38,6 @@ export default async function handler(
 
   url.pathname = url.pathname.replace("/api/landing-page-tunnel", "");
 
-  console.log("Forwarding request to:", url.toString());
   const bytes = await buffer(req);
   // get the path from the url
   const { connection, origin, host, ...rest } = req.headers;
@@ -71,7 +70,6 @@ export default async function handler(
   const nodeStream = Readable.fromWeb(resp.body);
 
   nodeStream.on("data", (chunk) => {
-    console.log(chunk, resp.headers);
     res.write(chunk); // Write chunk to the response
     // @ts-expect-error
     if (typeof res.flush === "function") {

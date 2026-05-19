@@ -45,6 +45,8 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/common/CustomPagination";
+import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
+import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
@@ -54,7 +56,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
 import { useSession } from "@/context/SessionContext";
+import { usePageTour } from "@/hooks/usePageTour";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
@@ -63,11 +67,6 @@ import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import useRouterQuery from "../../../hooks/useRouterQuery";
-import { Badge } from "@/components/ui/badge";
-import { usePageTour } from "@/hooks/usePageTour";
-import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
-import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
-import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
@@ -349,6 +348,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               session &&
               !activeOrg.externalEntityProviderId && (
                 <Button
+                  data-tour="create-group-button"
                   disabled={
                     currentUserRole !== UserRole.Owner &&
                     currentUserRole !== UserRole.Admin
@@ -400,6 +400,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             <div id="group-and-project-list">
               <ListRenderer
                 isLoading={isLoading}
+                skeletonVariant="project"
                 error={error}
                 data={projects?.data}
                 Empty={<EmptyParty title={"No groups found"} description="" />}

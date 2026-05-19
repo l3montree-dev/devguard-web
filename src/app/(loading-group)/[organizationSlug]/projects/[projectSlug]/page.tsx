@@ -351,13 +351,14 @@ export default function RepositoriesPage() {
               placeholder="Search for projects and repositories (min. 3 characters)..."
             />
           </div>
-          <SubgroupsAndAssetsList
-            error={error}
-            subgroupsWithAssets={subgroupsWithAssets?.data}
-            projectSlug={project.slug}
-            onFetchData={handleLazyDataFetching}
-          />
-
+          <div className="flex flex-col gap-1">
+            <SubgroupsAndAssetsList
+              error={error}
+              subgroupsWithAssets={subgroupsWithAssets?.data}
+              projectSlug={project.slug}
+              onFetchData={handleLazyDataFetching}
+            />
+          </div>
           <div className="mt-4">
             {subgroupsWithAssets && (
               <CustomPagination {...subgroupsWithAssets} />

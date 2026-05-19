@@ -33,19 +33,15 @@ const NestedList: FunctionComponent<Props> = ({
   error,
   isLoading = false,
   parentProjectSlug,
-  compact = false,
 }) => {
   if (isLoading) {
-    if (compact) {
-      return (
-        <>
-          <NestedRowSkeleton />
-          <NestedRowSkeleton />
-          <NestedRowSkeleton />
-        </>
-      );
-    }
-    return <SkeletonListItems variant="project" />;
+    return (
+      <>
+        <NestedRowSkeleton />
+        <NestedRowSkeleton />
+        <NestedRowSkeleton />
+      </>
+    );
   }
 
   if (error) {
@@ -53,10 +49,7 @@ const NestedList: FunctionComponent<Props> = ({
   }
 
   if (!items || items.length === 0) {
-    if (compact) {
-      return null;
-    }
-    return <EmptyParty title="No groups found" description="" />;
+    return null;
   }
 
   return (
@@ -69,7 +62,7 @@ const NestedList: FunctionComponent<Props> = ({
               key={asset.id}
               asset={asset}
               projectSlug={parentProjectSlug}
-              variant={compact ? "nested" : "default"}
+              variant={"nested"}
               isLast={index === items.length - 1}
             />
           );

@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { MapIcon, CompassIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 
 interface WelcomeModalProps {
@@ -17,16 +18,27 @@ interface WelcomeModalProps {
 }
 
 export function WelcomeModal({ open, onStartTour, onSkip }: WelcomeModalProps) {
+  const theme = useTheme();
+  const isDark = theme.theme === "dark";
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onSkip()}>
       <DialogContent className="max-w-2xl p-8 pt-20 [&>button]:cursor-pointer">
         <div className="absolute top-6 left-8">
-          <Image
-            src="/logo_inverse_horizontal.svg"
-            alt="DevGuard"
-            width={120}
-            height={32}
-          />
+          {isDark ? (
+            <Image
+              src="/logo_inverse_horizontal.svg"
+              alt="DevGuard"
+              width={120}
+              height={32}
+            />
+          ) : (
+            <Image
+              src="/logo_horizontal.svg"
+              alt="DevGuard"
+              width={120}
+              height={32}
+            />
+          )}
         </div>
 
         <DialogHeader className="mb-8">
