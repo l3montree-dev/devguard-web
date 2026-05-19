@@ -6,11 +6,9 @@ import {
   PersonStandingIcon,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { toast } from "sonner";
 import type { ArtifactDTO } from "../../types/api/api";
-import { SimpleArtifactSelector, useSelectArtifact } from "../ArtifactSelector";
+import { useSelectArtifact } from "../ArtifactSelector";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -22,6 +20,12 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import Callout from "../common/Callout";
+import { useConfig } from "../../context/ConfigContext";
+import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
+import { useActiveAsset } from "../../hooks/useActiveAsset";
+import { usePublicSharing } from "./PublicUrlSection";
+import { useDownloadPdf } from "./useDownloadPdf";
+import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
 
 interface VexDownloadModalProps {
   showVexModal: boolean;
@@ -40,40 +44,16 @@ export default function VexDownloadModal({
   pathname,
   artifacts,
 }: VexDownloadModalProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDownloadPdfVex = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        pathname +
-          `/../vulnerability-report.pdf?${new URLSearchParams({
-            artifact: selectedArtifact || "",
-          })}`,
-        {
-          signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
-          method: "GET",
-        },
-      );
-      if (!response.ok) {
-        setIsLoading(false);
-        toast.error("Failed to download VeX PDF. Please try again later.");
-        return;
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error("Failed to download VeX PDF. Please try again later.");
-    }
-  };
+  const config = useConfig();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
+  const { sharesInformation, isPublicLoading, handleTogglePublic } =
+    usePublicSharing();
+  const { isLoading, handleDownload: handleDownloadPdfVex } = useDownloadPdf(
+    pathname,
+    "vulnerability-report.pdf",
+    "VeX PDF",
+  );
 
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
     false,
@@ -104,19 +84,20 @@ export default function VexDownloadModal({
             </div>
           </DialogDescription>
         </DialogHeader>
-        <div>
-          <hr />
-          <h4 className="font-semibold mt-4">Artifact</h4>
-          <p className="text-sm mb-4 text-muted-foreground">
-            Select the artifact for which you want to download the VEX.
-          </p>
-          <SimpleArtifactSelector
-            unassignPossible={false}
-            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-            selectedArtifact={selectedArtifact}
-            onSelect={setSelectedArtifact}
-          />
-        </div>
+        <hr />
+        <ArtifactAndPublicUrlGrid
+          artifacts={artifacts}
+          selectedArtifact={selectedArtifact}
+          onSelect={setSelectedArtifact}
+          sharesInformation={sharesInformation}
+          isPublicLoading={isPublicLoading}
+          onToggle={handleTogglePublic}
+          assetVersionSlug={assetVersion?.slug}
+          assetId={asset?.id}
+          devguardApiUrl={config.devguardApiUrlPublicInternet}
+          fileType="vex.json"
+          toastLabel="VEX URL"
+        />
         <hr />
         <h4 className="font-semibold mt-4">Machine Readable Formats</h4>
         <p className="text-sm text-muted-foreground">
@@ -168,7 +149,7 @@ export default function VexDownloadModal({
         </p>
 
         <Button
-          onClick={handleDownloadPdfVex}
+          onClick={() => handleDownloadPdfVex(selectedArtifact)}
           variant="secondary"
           disabled={isLoading}
         >

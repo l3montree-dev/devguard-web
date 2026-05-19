@@ -15,17 +15,17 @@ import {
 } from "../ui/dialog";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
-import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import type { ArtifactDTO } from "../../types/api/api";
-import {
-  QueryArtifactSelector,
-  SimpleArtifactSelector,
-  useSelectArtifact,
-} from "../ArtifactSelector";
+import { useSelectArtifact } from "../ArtifactSelector";
+import { useConfig } from "../../context/ConfigContext";
+import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
+import { useActiveAsset } from "../../hooks/useActiveAsset";
+import { usePublicSharing } from "./PublicUrlSection";
+import { useDownloadPdf } from "./useDownloadPdf";
+import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
 
 interface SbomDownloadModalProps {
   showSBOMModal: boolean;
@@ -44,40 +44,16 @@ export default function SbomDownloadModal({
   pathname,
   artifacts,
 }: SbomDownloadModalProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDownloadPdfSbom = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        pathname +
-          `/../sbom.pdf?${new URLSearchParams({
-            artifact: selectedArtifact || "",
-          })}`,
-        {
-          signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
-          method: "GET",
-        },
-      );
-      if (!response.ok) {
-        setIsLoading(false);
-        toast.error("Failed to download SBOM PDF. Please try again later.");
-        return;
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error("Failed to download SBOM PDF. Please try again later.");
-    }
-  };
+  const config = useConfig();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
+  const { sharesInformation, isPublicLoading, handleTogglePublic } =
+    usePublicSharing();
+  const { isLoading, handleDownload: handleDownloadPdfSbom } = useDownloadPdf(
+    pathname,
+    "sbom.pdf",
+    "SBOM PDF",
+  );
 
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
     false,
@@ -101,19 +77,20 @@ export default function SbomDownloadModal({
             asset version.
           </DialogDescription>
         </DialogHeader>
-        <div>
-          <hr />
-          <h4 className="font-semibold mt-4">Artifact</h4>
-          <p className="text-sm mb-4 text-muted-foreground">
-            Select the artifact for which you want to download the SBOM.
-          </p>
-          <SimpleArtifactSelector
-            unassignPossible={false}
-            artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-            selectedArtifact={selectedArtifact}
-            onSelect={setSelectedArtifact}
-          />
-        </div>
+        <hr />
+        <ArtifactAndPublicUrlGrid
+          artifacts={artifacts}
+          selectedArtifact={selectedArtifact}
+          onSelect={setSelectedArtifact}
+          sharesInformation={sharesInformation}
+          isPublicLoading={isPublicLoading}
+          onToggle={handleTogglePublic}
+          assetVersionSlug={assetVersion?.slug}
+          assetId={asset?.id}
+          devguardApiUrl={config.devguardApiUrlPublicInternet}
+          fileType="sbom.json"
+          toastLabel="SBOM URL"
+        />
         <hr />
         <h4 className="font-semibold mt-4">Machine Readable Formats</h4>
         <p className="text-sm text-muted-foreground">
@@ -186,9 +163,10 @@ export default function SbomDownloadModal({
         </p>
 
         <Button
-          onClick={handleDownloadPdfSbom}
+          onClick={() => handleDownloadPdfSbom(selectedArtifact)}
           variant="secondary"
           disabled={isLoading}
+          aria-label="Download SBOM in PDF/UA format"
         >
           {isLoading ? (
             <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />
