@@ -422,7 +422,7 @@ export interface Relationship {
   targetCve: string;
 }
 export interface VulnWithCVE extends DependencyVuln {
-  cve:
+  cve?:
     | (Modify<
         CVE,
         {
