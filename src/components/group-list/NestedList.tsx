@@ -45,7 +45,7 @@ const NestedList: FunctionComponent<Props> = ({
         </>
       );
     }
-    return <SkeletonListItems />;
+    return <SkeletonListItems variant="project" />;
   }
 
   if (error) {
