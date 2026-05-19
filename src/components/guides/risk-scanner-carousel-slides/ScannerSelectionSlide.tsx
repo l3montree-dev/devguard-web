@@ -55,9 +55,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer",
-            selectedSetup === "devguard-tools"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "devguard-tools" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("devguard-tools")}
         >
@@ -84,9 +82,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer mt-2",
-            selectedSetup === "devguard-cli"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "devguard-cli" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("devguard-cli")}
         >
@@ -113,9 +109,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer mt-2",
-            selectedSetup === "own-setup"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "own-setup" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("own-setup")}
         >
@@ -140,9 +134,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer mt-2   ",
-            selectedSetup === "information-source"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "information-source" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("information-source")}
         >
