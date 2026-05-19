@@ -227,6 +227,9 @@ export interface Paged<T> {
   pageSize: number;
 }
 
+export type InstanceSettings = {
+  singleOrganizationMode: boolean;
+};
 export interface MinimalDependencyTree {
   nodes: string[];
   dependencies: { [key: string]: string[] };
