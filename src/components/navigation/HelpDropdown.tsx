@@ -21,10 +21,12 @@ export default function HelpDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger aria-label="Open help menu">
+      <DropdownMenuTrigger
+        data-umami-event="Help Dropdown"
+        aria-label="Open help menu"
+      >
         <div className="flex w-10 flex-row justify-center">
           <MessageCircleQuestionMark
-            data-umami-event="Help Dropdown"
             data-tour="help-center"
             className="h-[1.2rem] w-[1.2rem] cursor-pointer dark:text-muted-foreground text-background transition-all"
           />
