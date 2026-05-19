@@ -24,6 +24,7 @@ export default function HelpDropdown() {
       <DropdownMenuTrigger aria-label="Open help menu">
         <div className="flex w-10 flex-row justify-center">
           <MessageCircleQuestionMark
+            data-umami-event="Help Dropdown"
             data-tour="help-center"
             className="h-[1.2rem] w-[1.2rem] cursor-pointer dark:text-muted-foreground text-background transition-all"
           />
@@ -34,7 +35,10 @@ export default function HelpDropdown() {
           className="hover:bg-transparent hover:no-underline !text-foreground"
           href={`/${slug}/help-center`}
         >
-          <DropdownMenuItem className="hover:bg-transparent hover:no-underline !text-foreground flex items-center cursor-pointer gap-2">
+          <DropdownMenuItem
+            data-umami-event="Help Center"
+            className="hover:bg-transparent hover:no-underline !text-foreground flex items-center cursor-pointer gap-2"
+          >
             Help Center
           </DropdownMenuItem>
         </Link>
@@ -42,6 +46,7 @@ export default function HelpDropdown() {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              data-umami-event="Guided Tour"
               className="flex items-center gap-2 cursor-pointer"
               onClick={openTour}
             >

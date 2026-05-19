@@ -75,6 +75,7 @@ export function DocDrawer({
     <Drawer direction="right" onOpenChange={handleOpenChange}>
       <DrawerTrigger asChild>
         <button
+          data-umami-event="Documentation Drawer"
           className="text-xs cursor-pointer text-blue-600 dark:text-primary"
           type="button"
         >
@@ -110,6 +111,7 @@ export function DocDrawer({
               className="!text-black"
               target="_blank"
               rel="noopener noreferrer"
+              data-umami-event="Documentation Drawer - Check Documentation"
             >
               Check Documentation
             </a>
