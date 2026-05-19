@@ -19,7 +19,7 @@ interface WelcomeModalProps {
 
 export function WelcomeModal({ open, onStartTour, onSkip }: WelcomeModalProps) {
   const theme = useTheme();
-  const isDark = theme.theme === "dark";
+  const isDark = theme.resolvedTheme === "dark";
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onSkip()}>
       <DialogContent className="max-w-2xl p-8 pt-20 [&>button]:cursor-pointer">
