@@ -126,6 +126,7 @@ const DependencyGraph: FunctionComponent<{
   onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
   highlightPath?: string[];
   vexRules?: VexRule[];
+  onReady?: () => void;
 }> = ({
   graph,
   width,
@@ -136,6 +137,7 @@ const DependencyGraph: FunctionComponent<{
   enableContextMenu,
   highlightPath,
   vexRules,
+  onReady,
 }) => {
   const isFirstRender = useRef(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -843,6 +845,11 @@ const DependencyGraph: FunctionComponent<{
         onEdgeMouseEnter={handleEdgeMouseEnter}
         onEdgeMouseLeave={handleEdgeMouseLeave}
         onEdgeClick={handleEdgeClick}
+        onInit={
+          onReady
+            ? () => requestAnimationFrame(() => requestAnimationFrame(onReady))
+            : undefined
+        }
       >
         {variant !== "compact" && (
           <MiniMap

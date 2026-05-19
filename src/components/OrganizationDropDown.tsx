@@ -112,7 +112,10 @@ export const OrganizationDropDown = () => {
 
   return (
     <>
-      <div className="flex w-full flex-row gap-2 items-center justify-between">
+      <div
+        data-tour="org-switcher"
+        className="flex w-full flex-row gap-2 items-center justify-between"
+      >
         {activeOrg && (
           <div className="flex flex-row items-center gap-1 text-ellipsis">
             <div className="flex flex-col gap-0 ">

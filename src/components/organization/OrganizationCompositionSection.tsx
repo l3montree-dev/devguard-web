@@ -54,7 +54,7 @@ export default function OrganizationCompositionSection({
       description="Structure breakdown, ecosystem distribution, and most prevalent dependencies and CVEs."
       className="mt-12"
     >
-      <div className="grid grid-cols-3 gap-4">
+      <div data-tour="composition-section" className="grid grid-cols-3 gap-4">
         {columns.map(({ type, listTitle, count, entries }) => (
           <div key={type} className="flex flex-col gap-4">
             <StructureCard

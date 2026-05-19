@@ -94,7 +94,11 @@ const ProjectRow: FunctionComponent<Props> = ({
 
   const body = (
     <Collapsible
-      className={classNames(isLast ? "" : "border-b", "-ml-2 pl-2")}
+      className={classNames(
+        isLast ? "" : "border-b",
+        "-ml-2 pl-2",
+        depth !== "root" ? "pb-2" : "",
+      )}
       open={isOpen}
     >
       <div

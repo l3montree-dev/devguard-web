@@ -87,6 +87,8 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import { usePageTour } from "@/hooks/usePageTour";
+import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],
@@ -330,6 +332,7 @@ const columnsDef: ColumnDef<
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
+  const { startTour } = usePageTour(dependencyInsightsTourSteps);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
@@ -507,9 +510,19 @@ const Index: FunctionComponent = () => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <div className="flex flex-row items-start justify-between">
+      <Button
+        variant="outline"
+        className="absolute right-10 top-30"
+        onClick={startTour}
+      >
+        Guided Tour
+      </Button>
+      <div
+        data-tour="dependencies-header"
+        className="flex flex-row items-start justify-between"
+      >
         <BranchTagSelector branches={branches} tags={tags} />
-        <div className="flex flex-row gap-2">
+        <div data-tour="dependencies-actions" className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Share your SBOM
           </Button>
@@ -557,7 +570,10 @@ const Index: FunctionComponent = () => {
         description="All your Dependencies of the selected artifact on the selected reference (branch/tag)."
         title="All Dependencies"
       >
-        <div className="flex flex-row items-center justify-between gap-2">
+        <div
+          data-tour="dependencies-artifact-selector"
+          className="flex flex-row items-center justify-between gap-2"
+        >
           <QueryArtifactSelector
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
@@ -571,7 +587,7 @@ const Index: FunctionComponent = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div data-tour="dependencies-filter" className="flex flex-col gap-2">
           <Filter
             options={[
               {
@@ -650,7 +666,10 @@ const Index: FunctionComponent = () => {
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
-            <thead className="border-b bg-card text-foreground">
+            <thead
+              data-tour="dependencies-table"
+              className="border-b bg-card text-foreground"
+            >
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header, index) => (

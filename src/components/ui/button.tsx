@@ -65,8 +65,14 @@ const Button = React.forwardRef<
         {...props}
         disabled={props.disabled || isSubmitting}
       >
-        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {props.children}
+        {asChild ? (
+          props.children
+        ) : (
+          <>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {props.children}
+          </>
+        )}
       </Comp>
     );
   },

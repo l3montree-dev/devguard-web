@@ -16,6 +16,7 @@ import { fetcher } from "../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
 import { browserApiClient } from "../../../../services/devGuardApi";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex: FunctionComponent = () => {
   const menu = useOrganizationMenu();
@@ -129,6 +130,14 @@ const ComplianceIndex: FunctionComponent = () => {
               <Button onClick={() => setOpen(true)}>Upload new Policy</Button>
             }
           >
+            <div className="flex justify-end">
+              <DocDrawer
+                triggerLabel="Learn why compliance matters"
+                drawerTitle="Why Compliance Matters"
+                mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/compliance/why-compliance-matters.mdx"
+                docsUrl="https://docs.devguard.org/explanations/compliance/why-compliance-matters/"
+              />
+            </div>
             <ListRenderer
               isLoading={isLoading}
               error={error}

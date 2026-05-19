@@ -21,6 +21,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
@@ -196,15 +197,12 @@ const AffectedComponentDetails: FunctionComponent<{
           </Collapsible>
         </div>
         <div className="mt-1">
-          <Link
-            target="_blank"
-            className="text-xs"
-            href={
-              "https://devguard.org/explanations/vulnerability-management/vulnerability-matching"
-            }
-          >
-            See how DevGuard matches vulnerabilities
-          </Link>
+          <DocDrawer
+            triggerLabel="See how DevGuard matches vulnerabilities"
+            drawerTitle="Vulnerability Matching"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx"
+            docsUrl="https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/"
+          />
         </div>
       </div>
     </div>

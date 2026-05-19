@@ -7,8 +7,9 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Form, FormProvider, useForm } from "react-hook-form";
+import Markdown from "react-markdown";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
@@ -51,6 +52,8 @@ import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
+import { usePageTour } from "@/hooks/usePageTour";
+import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -130,6 +133,15 @@ export default function RepositoriesPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
 
   const projectMenu = useProjectMenu();
+
+  const { startTour } = usePageTour(groupHomeTourSteps);
+
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "2") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,12 +274,20 @@ export default function RepositoriesPage() {
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
+        <Button
+          variant="outline"
+          className="absolute right-10 top-30"
+          onClick={startTour}
+        >
+          Guided Tour
+        </Button>
         <Section
           Button={
             session &&
             !project.externalEntityProviderId && (
               <div className="flex flex-row gap-2">
                 <Button
+                  data-tour="create-subgroup-button"
                   disabled={
                     project.type !== "default" ||
                     (currentUserRole !== UserRole.Owner &&
@@ -279,6 +299,7 @@ export default function RepositoriesPage() {
                   Create New Subgroup
                 </Button>
                 <Button
+                  data-tour="create-repository-button"
                   disabled={
                     project.type !== "default" ||
                     (currentUserRole !== UserRole.Admin &&

@@ -48,6 +48,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useSession } from "@/context/SessionContext";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -270,6 +271,14 @@ const VexRulesPage: FunctionComponent = () => {
         title="Manage VEX Rules"
         className="mb-4 mt-4"
       >
+        <div className="flex justify-end">
+          <DocDrawer
+            triggerLabel="Learn about CSAF/VEX"
+            drawerTitle="CSAF/VEX Explained"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/compliance/csaf-vex-explained.mdx"
+            docsUrl="https://docs.devguard.org/explanations/compliance/csaf-vex-explained/"
+          />
+        </div>
         <div>
           <Callout intent={"neutral"} showIcon>
             <span className="text-sm flex items-center">

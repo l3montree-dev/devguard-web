@@ -63,6 +63,11 @@ import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";
 import { fetcher } from "../../../data-fetcher/fetcher";
 import useRouterQuery from "../../../hooks/useRouterQuery";
+import { Badge } from "@/components/ui/badge";
+import { usePageTour } from "@/hooks/usePageTour";
+import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
+import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
+import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
@@ -266,149 +271,175 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  return (
-    <Page Title={null} title={""} Menu={orgMenu}>
-      <Dialog open={open}>
-        <DialogContent setOpen={setOpen}>
-          <DialogHeader>
-            <DialogTitle>Create new Group</DialogTitle>
-            <DialogDescription>
-              A project groups multiple software projects (repositories) inside
-              a single entity. Something like: frontend and backend
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <FormProvider {...form}>
-            <form
-              className="space-y-8"
-              onSubmit={form.handleSubmit(handleCreateProject)}
-            >
-              <ProjectForm forceVerticalSections form={form} hideDangerZone />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  isSubmitting={form.formState.isSubmitting}
-                >
-                  Create
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+  const { startTour } = usePageTour(orgHomeTourSteps);
+  const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
 
-      <div>
-        {activeOrg.externalEntityProviderId && (
-          <div className="flex mb-4 flex-row items-center justify-end gap-2">
-            <Button
-              size={"sm"}
-              variant={"outline"}
-              onClick={handleTriggerSync}
-              disabled={syncRunning}
-            >
-              {syncRunning ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Import of projects running</span>
-                </span>
-              ) : (
-                <span>
-                  Import projects from {activeOrg.externalEntityProviderId}
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "1") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <WelcomeModal
+        open={showModal}
+        onStartTour={() => handleStartTour(startTour)}
+        onSkip={handleSkip}
+      />
+      <Button
+        variant="outline"
+        className="absolute right-10 top-30"
+        onClick={startTour}
+      >
+        Guided Tour
+      </Button>
+      <Page Title={null} title={""} Menu={orgMenu}>
+        <Dialog open={open}>
+          <DialogContent setOpen={setOpen}>
+            <DialogHeader>
+              <DialogTitle>Create new Group</DialogTitle>
+              <DialogDescription>
+                A project groups multiple software projects (repositories)
+                inside a single entity. Something like: frontend and backend
+              </DialogDescription>
+            </DialogHeader>
+            <hr />
+            <FormProvider {...form}>
+              <form
+                className="space-y-8"
+                onSubmit={form.handleSubmit(handleCreateProject)}
+              >
+                <ProjectForm forceVerticalSections form={form} hideDangerZone />
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    isSubmitting={form.formState.isSubmitting}
+                  >
+                    Create
+                  </Button>
+                </DialogFooter>
+              </form>
+            </FormProvider>
+          </DialogContent>
+        </Dialog>
+
+        <div>
+          {activeOrg.externalEntityProviderId && (
+            <div className="flex mb-4 flex-row items-center justify-end gap-2">
+              <Button
+                size={"sm"}
+                variant={"outline"}
+                onClick={handleTriggerSync}
+                disabled={syncRunning}
+              >
+                {syncRunning ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Import of projects running</span>
+                  </span>
+                ) : (
+                  <span>
+                    Import projects from {activeOrg.externalEntityProviderId}
+                  </span>
+                )}
+              </Button>
+            </div>
+          )}
+          <Section
+            primaryHeadline
+            Button={
+              session &&
+              !activeOrg.externalEntityProviderId && (
+                <Button
+                  disabled={
+                    currentUserRole !== UserRole.Owner &&
+                    currentUserRole !== UserRole.Admin
+                  }
+                  onClick={() => setOpen(true)}
+                >
+                  Create New Group
+                </Button>
+              )
+            }
+            description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            forceVertical
+            title="Groups"
+          >
+            <div className="flex items-center gap-4">
+              <Tabs
+                defaultValue="all"
+                value={viewedProject}
+                onValueChange={handleSetTabValue}
+                className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+              >
+                <TabsList>
+                  <TabsTrigger value="all">Groups</TabsTrigger>
+                  <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {isSearchActive && (
+                <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+                  Filter and sorting options are disabled while searching
                 </span>
               )}
-            </Button>
-          </div>
-        )}
-        <Section
-          primaryHeadline
-          Button={
-            session &&
-            !activeOrg.externalEntityProviderId && (
-              <Button
-                disabled={
-                  currentUserRole !== UserRole.Owner &&
-                  currentUserRole !== UserRole.Admin
-                }
-                onClick={() => setOpen(true)}
-              >
-                Create New Group
-              </Button>
-            )
-          }
-          description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
-          forceVertical
-          title="Groups"
-        >
-          <div className="flex items-center gap-4">
-            <Tabs
-              defaultValue="all"
-              value={viewedProject}
-              onValueChange={handleSetTabValue}
-              className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
-            >
-              <TabsList>
-                <TabsTrigger value="all">Groups</TabsTrigger>
-                <TabsTrigger value="inactive">Inactive</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            {isSearchActive && (
-              <span className="text-xs text-warning bg-warning-muted border border-warning-border rounded px-2 py-1">
-                Filter and sorting options are disabled while searching
-              </span>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Sort
-              sortOptions={[
-                { label: "Name", value: "name" },
-                { label: "Created at", value: "created_at" },
-                { label: "Updated at", value: "updated_at" },
-              ]}
-            />
+            </div>
+            <div className="flex gap-2">
+              <Sort
+                sortOptions={[
+                  { label: "Name", value: "name" },
+                  { label: "Created at", value: "created_at" },
+                  { label: "Updated at", value: "updated_at" },
+                ]}
+              />
 
-            <Input
-              className="h-11"
-              onChange={debouncedHandleSearch}
-              defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects (min. 3 characters)..."
-            />
-          </div>
-          <div id="group-and-project-list">
-            <ListRenderer
-              isLoading={isLoading}
-              error={error}
-              data={projects?.data}
-              skeletonVariant="project"
-              Empty={<EmptyParty title={"No groups found"} description="" />}
-              renderItem={(project) => {
-                return (
-                  <div key={project.id} className="flex flex-col">
-                    <div className="flex flex-col gap-2">
-                      <SubgroupsAndAssetsList
-                        project={
-                          project as ProjectDTO & { resourceType: "project" }
-                        }
-                        onFetchData={handleLazyDataFetching}
-                        subgroupsWithAssets={
-                          (project as ProjectDTO & { resourceType: "project" })
-                            .subGroupsAndAsset
-                        }
-                        projectSlug={project.slug}
-                      />
+              <Input
+                className="h-11"
+                onChange={debouncedHandleSearch}
+                defaultValue={searchParams?.get("search") || ""}
+                placeholder="Search for projects (min. 3 characters)..."
+              />
+            </div>
+            <div id="group-and-project-list">
+              <ListRenderer
+                isLoading={isLoading}
+                error={error}
+                data={projects?.data}
+                Empty={<EmptyParty title={"No groups found"} description="" />}
+                renderItem={(project) => {
+                  return (
+                    <div key={project.id} className="flex flex-col">
+                      <div className="flex flex-col gap-2">
+                        <SubgroupsAndAssetsList
+                          project={
+                            project as ProjectDTO & { resourceType: "project" }
+                          }
+                          onFetchData={handleLazyDataFetching}
+                          subgroupsWithAssets={
+                            (
+                              project as ProjectDTO & {
+                                resourceType: "project";
+                              }
+                            ).subGroupsAndAsset
+                          }
+                          projectSlug={project.slug}
+                        />
+                      </div>
                     </div>
-                  </div>
-                );
-              }}
-            />
-          </div>
-        </Section>
-        {projects && (
-          <div className="mt-4">
-            <CustomPagination {...projects} />
-          </div>
-        )}
-      </div>
-    </Page>
+                  );
+                }}
+              />
+            </div>
+          </Section>
+          {projects && (
+            <div className="mt-4">
+              <CustomPagination {...projects} />
+            </div>
+          )}
+        </div>
+      </Page>
+    </>
   );
 };
 
