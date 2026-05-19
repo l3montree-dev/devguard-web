@@ -2,6 +2,7 @@ import { CodeBracketSquareIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import type { ComponentPropsWithoutRef, FunctionComponent } from "react";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
+import { cn } from "../../lib/utils";
 import type { AssetDTO } from "../../types/api/api";
 import Markdown from "../common/Markdown";
 import { Badge } from "../ui/badge";
@@ -22,7 +23,13 @@ const AssetRow: FunctionComponent<Props> = ({
   const activeOrg = useActiveOrg();
 
   return (
-    <>
+    <div
+      className={
+        variant === "nested"
+          ? cn("-ml-2", isLast ? "-mb-1" : "border-b pb-2")
+          : "border-b pb-4"
+      }
+    >
       <Link
         href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${asset.slug}/`}
         className="block no-underline text-inherit"
@@ -67,10 +74,7 @@ const AssetRow: FunctionComponent<Props> = ({
           </div>
         </div>
       </Link>
-      {!(variant === "nested" && isLast) && (
-        <div className={variant === "nested" ? "-ml-2 border-b" : "border-b"} />
-      )}
-    </>
+    </div>
   );
 };
 
