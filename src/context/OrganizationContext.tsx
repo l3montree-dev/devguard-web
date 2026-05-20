@@ -46,13 +46,14 @@ export const useUpdateOrganization = () => {
     );
     if (typeof params !== "function") {
       console.log("updating organization with params");
-      if (isOrganization(params.organization))
+      if (isOrganization(params.organization)) {
         console.log(
           "updating organization with slug",
           params.organization.slug,
         );
-      localStorage.setItem("lastActiveOrg", params.organization.slug);
-      update(params);
+        localStorage.setItem("lastActiveOrg", params.organization.slug);
+        update(params);
+      }
     } else {
       console.log("updating organization with function");
       update((prev) => {
