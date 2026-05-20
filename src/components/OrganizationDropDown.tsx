@@ -54,8 +54,15 @@ export const OrganizationDropDown = () => {
   const user = useCurrentUser();
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
+  const [lastActiveOrg, setLastActiveOrg] = useState<string | null>(null);
+  useEffect(() => {
+    setLastActiveOrg(localStorage.getItem("lastActiveOrg"));
+  }, []);
+
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
-  if (!activeOrg && orgs.length > 0) {
+  if (!activeOrg && lastActiveOrg) {
+    activeOrg = orgs.find((o) => o.slug === lastActiveOrg) || null;
+  } else if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
 
