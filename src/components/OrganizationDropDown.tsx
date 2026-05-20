@@ -55,7 +55,10 @@ export const OrganizationDropDown = () => {
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
-  if (!activeOrg && orgs.length > 0) {
+  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+  if (!activeOrg && lastActiveOrg) {
+    activeOrg = orgs.find((o) => o.slug === lastActiveOrg) || null;
+  } else if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
 
