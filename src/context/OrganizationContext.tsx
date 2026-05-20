@@ -28,11 +28,7 @@ export const OrganizationProvider = (
   useEffect(() => {
     const org = props.value.v.organization;
     if (isOrganization(org) && org.id !== "" && org.slug !== "/") {
-      try {
-        localStorage.setItem("lastActiveOrg", org.slug);
-      } catch {
-        // storage blocked or unavailable
-      }
+      localStorage.setItem("lastActiveOrg", org.slug);
     }
   }, [props.value.v.organization]);
   return <OrganizationContext.Provider {...props} />;

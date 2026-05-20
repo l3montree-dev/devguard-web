@@ -56,11 +56,7 @@ export const OrganizationDropDown = () => {
   const instanceSettings = useInstanceSettings();
   const [lastActiveOrg, setLastActiveOrg] = useState<string | null>(null);
   useEffect(() => {
-    try {
-      setLastActiveOrg(localStorage.getItem("lastActiveOrg"));
-    } catch {
-      // storage blocked or unavailable
-    }
+    setLastActiveOrg(localStorage.getItem("lastActiveOrg"));
   }, []);
 
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
