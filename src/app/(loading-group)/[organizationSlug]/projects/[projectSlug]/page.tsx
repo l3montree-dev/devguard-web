@@ -281,7 +281,10 @@ export default function RepositoriesPage() {
           Button={
             session &&
             !project.externalEntityProviderId && (
-              <div className="flex flex-row gap-2">
+              <div
+                data-tour="subgroups-repositories-actions"
+                className="flex flex-row gap-2"
+              >
                 <Button
                   data-tour="create-subgroup-button"
                   disabled={
@@ -335,7 +338,7 @@ export default function RepositoriesPage() {
               </span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div data-tour="group-filter" className="flex gap-2">
             <Sort
               sortOptions={[
                 { label: "Name", value: "name" },
