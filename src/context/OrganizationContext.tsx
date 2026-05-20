@@ -40,19 +40,38 @@ export const useUpdateOrganization = () => {
   return (
     params: OrgContextParams | ((prev: OrgContextParams) => OrgContextParams),
   ) => {
+    console.log(
+      "last active org in update organization before update",
+      localStorage.getItem("lastActiveOrg"),
+    );
     if (typeof params !== "function") {
-      if (isOrganization(params.organization))
+      console.log("updating organization with params");
+      if (isOrganization(params.organization)) {
+        console.log(
+          "updating organization with slug",
+          params.organization.slug,
+        );
         localStorage.setItem("lastActiveOrg", params.organization.slug);
-      update(params);
+        update(params);
+      }
     } else {
+      console.log("updating organization with function");
       update((prev) => {
         const newParams = params(prev);
         if (isOrganization(newParams.organization)) {
+          console.log(
+            "updating organization with slug",
+            newParams.organization.slug,
+          );
           localStorage.setItem("lastActiveOrg", newParams.organization.slug);
         }
         return newParams;
       });
     }
+    console.log(
+      "last active org in update organization after update",
+      localStorage.getItem("lastActiveOrg"),
+    );
   };
 };
 
