@@ -133,6 +133,7 @@ export function useAutosetup(
         const reader = resp.body.getReader();
         const decoder = new TextDecoder();
 
+        let buffer = "";
         while (true) {
           const { done, value } = await reader.read();
 
@@ -140,19 +141,31 @@ export function useAutosetup(
             break;
           }
 
-          const chunk = decoder.decode(value, { stream: true });
-          // parse the json
-          const data = JSON.parse(chunk);
-          if ("url" in data) {
-            window.open(data.url, "_blank");
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            let data: Record<string, unknown>;
+            try {
+              data = JSON.parse(trimmed);
+            } catch {
+              continue;
+            }
+            if ("url" in data) {
+              window.open(data.url as string, "_blank");
+            }
+            setProgress((prev) => {
+              prev[data.step as keyof typeof prev] = {
+                status: data.status as "notStarted" | "pending" | "success",
+                message: prev[data.step as keyof typeof prev].message,
+                url: data.url as string | undefined,
+              };
+              return { ...prev };
+            });
           }
-          setProgress((prev) => {
-            prev[data.step as keyof typeof prev] = {
-              ...data,
-              message: prev[data.step as keyof typeof prev].message,
-            };
-            return { ...prev };
-          });
         }
         resolve();
       } else {
