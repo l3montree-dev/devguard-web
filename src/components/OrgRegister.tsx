@@ -30,7 +30,6 @@ import { useUpdateSession } from "@/context/SessionContext";
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
-  const updateOrganization = useUpdateOrganization();
   const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
 
@@ -56,10 +55,6 @@ export default function OrgRegisterForm(props: Props) {
 
     const orgDTO: OrganizationDetailsDTO = await resp.json();
 
-    updateOrganization((prev) => ({
-      ...prev,
-      organization: orgDTO,
-    }));
     updateSession((prev) => ({
       ...prev,
       organizations: [...prev.organizations, orgDTO],
@@ -67,16 +62,7 @@ export default function OrgRegisterForm(props: Props) {
 
     toast.success("Organization created successfully");
 
-    console.log(
-      "last active org in org register before setting explicitly",
-      localStorage.getItem("lastActiveOrg"),
-    );
     localStorage.setItem("lastActiveOrg", orgDTO.slug);
-    console.log(
-      "last active org in org register after setting explicitly",
-      localStorage.getItem("lastActiveOrg"),
-    );
-
     // move the user to the newly created organization
     setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
   };

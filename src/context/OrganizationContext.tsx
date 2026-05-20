@@ -31,49 +31,13 @@ export const OrganizationProvider = (
       localStorage.setItem("lastActiveOrg", org.slug);
     }
   }, [props.value.v.organization]);
+
   return <OrganizationContext.Provider {...props} />;
 };
 export const useOrganization = () => useContext(OrganizationContext).v;
 
-export const useUpdateOrganization = () => {
-  const { update } = useContext(OrganizationContext);
-  return (
-    params: OrgContextParams | ((prev: OrgContextParams) => OrgContextParams),
-  ) => {
-    console.log(
-      "last active org in update organization before update",
-      localStorage.getItem("lastActiveOrg"),
-    );
-    if (typeof params !== "function") {
-      console.log("updating organization with params");
-      if (isOrganization(params.organization)) {
-        console.log(
-          "updating organization with slug",
-          params.organization.slug,
-        );
-        localStorage.setItem("lastActiveOrg", params.organization.slug);
-        update(params);
-      }
-    } else {
-      console.log("updating organization with function");
-      update((prev) => {
-        const newParams = params(prev);
-        if (isOrganization(newParams.organization)) {
-          console.log(
-            "updating organization with slug",
-            newParams.organization.slug,
-          );
-          localStorage.setItem("lastActiveOrg", newParams.organization.slug);
-        }
-        return newParams;
-      });
-    }
-    console.log(
-      "last active org in update organization after update",
-      localStorage.getItem("lastActiveOrg"),
-    );
-  };
-};
+export const useUpdateOrganization = () =>
+  useContext(OrganizationContext).update;
 
 export const isOrganization = (
   org: OrganizationDetailsDTO | { oauth2Error: boolean } | null,
