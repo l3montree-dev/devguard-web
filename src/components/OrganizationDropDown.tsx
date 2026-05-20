@@ -55,7 +55,12 @@ export const OrganizationDropDown = () => {
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
-  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+  let lastActiveOrg: string | null = null;
+  try {
+    lastActiveOrg = localStorage.getItem("lastActiveOrg");
+  } catch {
+    // storage blocked or unavailable
+  }
   if (!activeOrg && lastActiveOrg) {
     activeOrg = orgs.find((o) => o.slug === lastActiveOrg) || null;
   } else if (!activeOrg && orgs.length > 0) {

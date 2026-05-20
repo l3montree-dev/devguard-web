@@ -26,8 +26,13 @@ export const OrganizationProvider = (
   props: ProviderProps<WithUpdater<OrgContextParams>>,
 ) => {
   useEffect(() => {
-    if (isOrganization(props.value.v.organization)) {
-      localStorage.setItem("lastActiveOrg", props.value.v.organization.slug);
+    const org = props.value.v.organization;
+    if (isOrganization(org) && org.id !== "" && org.slug !== "/") {
+      try {
+        localStorage.setItem("lastActiveOrg", org.slug);
+      } catch {
+        // storage blocked or unavailable
+      }
     }
   }, [props.value.v.organization]);
   return <OrganizationContext.Provider {...props} />;
