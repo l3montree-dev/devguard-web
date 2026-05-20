@@ -186,13 +186,13 @@ const ManualIntegrationSlide: FunctionComponent<
         <Tabs
           value={tab}
           onValueChange={(v) => setTab(v as "sbom" | "sarif")}
-          defaultValue="sbom"
+          defaultValue="sarif"
           className="w-full"
         >
           <div className="flex">
             <TabsList>
-              <TabsTrigger value="sbom">SBOM</TabsTrigger>
               <TabsTrigger value="sarif">SARIF</TabsTrigger>
+              <TabsTrigger value="sbom">SBOM</TabsTrigger>
               <TabsTrigger value="vex">VEX</TabsTrigger>
             </TabsList>
           </div>

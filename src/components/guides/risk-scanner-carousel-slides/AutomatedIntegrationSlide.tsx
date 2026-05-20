@@ -49,32 +49,14 @@ const AutomatedIntegrationSlide: FunctionComponent<
         </DialogDescription>
       </DialogHeader>
 
-      <Tabs defaultValue="sbom" className="w-full mt-10">
+      <Tabs defaultValue="sarif" className="w-full mt-10">
         <div className="flex">
           <TabsList>
-            <TabsTrigger value="sbom">SBOM</TabsTrigger>
             <TabsTrigger value="sarif">SARIF</TabsTrigger>
+            <TabsTrigger value="sbom">SBOM</TabsTrigger>
             <TabsTrigger value="vex">VEX</TabsTrigger>
           </TabsList>
         </div>
-
-        <TabsContent value="sbom" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-md">SBOM Command</CardTitle>
-              <CardDescription>
-                Use the devguard-scanner CLI tool to upload SBOM files
-                (CycloneDX format).
-              </CardDescription>
-            </CardHeader>
-            <div className="p-6 pt-0">
-              <CopyCode
-                language="shell"
-                codeString={`devguard-scanner sbom --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/sbom.json`}
-              />
-            </div>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="sarif" className="mt-6">
           <Card>
@@ -89,6 +71,24 @@ const AutomatedIntegrationSlide: FunctionComponent<
               <CopyCode
                 language="shell"
                 codeString={`devguard-scanner sarif --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/report.sarif`}
+              />
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sbom" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-md">SBOM Command</CardTitle>
+              <CardDescription>
+                Use the devguard-scanner CLI tool to upload SBOM files
+                (CycloneDX format).
+              </CardDescription>
+            </CardHeader>
+            <div className="p-6 pt-0">
+              <CopyCode
+                language="shell"
+                codeString={`devguard-scanner sbom --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/sbom.json`}
               />
             </div>
           </Card>
