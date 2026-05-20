@@ -46,7 +46,7 @@ const activeOrgName = (name: string, slug: string) => {
   }
   return name;
 };
-export const OrganizationDropDown = () => {
+const OrganizationDropDown = () => {
   const orgs = useSession().organizations;
   const updateOrganizations = useUpdateSession();
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
@@ -54,10 +54,8 @@ export const OrganizationDropDown = () => {
   const user = useCurrentUser();
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
-  const [lastActiveOrg, setLastActiveOrg] = useState<string | null>(null);
-  useEffect(() => {
-    setLastActiveOrg(localStorage.getItem("lastActiveOrg"));
-  }, []);
+
+  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
 
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
   if (!activeOrg && lastActiveOrg) {
@@ -198,3 +196,5 @@ export const OrganizationDropDown = () => {
     </>
   );
 };
+
+export default OrganizationDropDown;

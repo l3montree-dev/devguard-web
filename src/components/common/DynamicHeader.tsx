@@ -10,8 +10,12 @@ import { useMemo } from "react";
 import type { ReactNode } from "react";
 import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
-import { OrganizationDropDown } from "../OrganizationDropDown";
 import EntityProviderImage from "./EntityProviderImage";
+import dynamic from "next/dynamic";
+
+const OrganizationDropDown = dynamic(() => import("../OrganizationDropDown"), {
+  ssr: false,
+});
 
 const levelMapping: { [idx: number]: string } = {
   1: "root",
