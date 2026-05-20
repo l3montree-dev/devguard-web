@@ -35,8 +35,26 @@ export const OrganizationProvider = (
 };
 export const useOrganization = () => useContext(OrganizationContext).v;
 
-export const useUpdateOrganization = () =>
-  useContext(OrganizationContext).update;
+export const useUpdateOrganization = () => {
+  const { update } = useContext(OrganizationContext);
+  return (
+    params: OrgContextParams | ((prev: OrgContextParams) => OrgContextParams),
+  ) => {
+    if (typeof params !== "function") {
+      if (isOrganization(params.organization))
+        localStorage.setItem("lastActiveOrg", params.organization.slug);
+      update(params);
+    } else {
+      update((prev) => {
+        const newParams = params(prev);
+        if (isOrganization(newParams.organization)) {
+          localStorage.setItem("lastActiveOrg", newParams.organization.slug);
+        }
+        return newParams;
+      });
+    }
+  };
+};
 
 export const isOrganization = (
   org: OrganizationDetailsDTO | { oauth2Error: boolean } | null,
