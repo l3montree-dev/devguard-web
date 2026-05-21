@@ -196,6 +196,15 @@ export const extractVersion = (purl: string) => {
   return versionPart;
 };
 
+export const extractPurlQualifiers = (purl: string) => {
+  const [, qualifiersPart] = purl.split("?", 2);
+  if (!qualifiersPart) {
+    return "";
+  }
+
+  return qualifiersPart.split("&").join(", ");
+};
+
 export const isValidPackagePurl = (purl: string): boolean => {
   if (!purl) return false;
   // PURL format: pkg:<type>/<namespace?>/<name>@<version?>?<qualifiers?>#<subpath?>
@@ -420,6 +429,9 @@ export const truncateMiddle = (
 
   return text.slice(0, start) + "..." + text.slice(-end);
 };
+
+export const formatPurlQualifiers = (purl: string, maxLength = 48) =>
+  truncateMiddle(extractPurlQualifiers(purl), maxLength);
 
 // round any number to its 2nd digit using math round
 export function roundToSecondDigit(num?: number): number {
