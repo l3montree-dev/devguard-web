@@ -34,18 +34,22 @@ export const useCurrentUserRole = () => {
 
 export const isLoggedIn = (role: UserRole | null): boolean => role !== null;
 
+const ROLE_RANK: Record<string, number> = {
+  [UserRole.Guest]: 0,
+  [UserRole.Member]: 1,
+  [UserRole.Admin]: 2,
+  [UserRole.Owner]: 3,
+};
+
 export const isAtLeast = (
   role: UserRole | null,
   minimum: UserRole,
 ): boolean => {
-  const order = [
-    UserRole.Guest,
-    UserRole.Member,
-    UserRole.Admin,
-    UserRole.Owner,
-  ];
   if (role === null) return false;
-  return order.indexOf(role) >= order.indexOf(minimum);
+  const roleRank = ROLE_RANK[role];
+  const minimumRank = ROLE_RANK[minimum];
+  if (roleRank === undefined || minimumRank === undefined) return false;
+  return roleRank >= minimumRank;
 };
 
 export const isMember = (role: UserRole | null) =>

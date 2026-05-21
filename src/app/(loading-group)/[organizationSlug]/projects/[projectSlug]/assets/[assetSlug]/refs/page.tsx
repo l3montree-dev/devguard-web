@@ -38,7 +38,6 @@ import CreateRefDialog from "../../../../../../../../components/CreateBranchDial
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
 import AuthGuard from "../../../../../../../../components/AuthGuard";
-import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -53,7 +52,6 @@ const RefsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = React.useState<
     false | "tag" | "branch"
   >(false);
-  const currentUserRole = useCurrentUserRole();
   const handleDeleteRef = async () => {
     if (!open) return;
     const resp = await browserApiClient(

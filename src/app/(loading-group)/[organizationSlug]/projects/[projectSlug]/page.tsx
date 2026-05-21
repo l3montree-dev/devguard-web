@@ -33,7 +33,6 @@ import {
   useOrganization,
 } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
-import { useSession } from "../../../../../context/SessionContext";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
@@ -62,7 +61,6 @@ export default function RepositoriesPage() {
   );
   const project = useProject()!;
   const organization = useOrganization();
-  const { session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const searchParams = useSearchParams();
 

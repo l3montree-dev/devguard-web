@@ -1,5 +1,5 @@
 // Copyright 2025 rafaeishikho.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { isAdmin, isLoggedIn, isMember } from "@/hooks/useUserRole";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
