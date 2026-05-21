@@ -13,6 +13,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
@@ -359,7 +360,7 @@ const Index = () => {
                   deleteEvent={handleDeleteEvent}
                 />
               </div>
-              {session && (
+              <AuthGuard require="member">
                 <div>
                   <Card>
                     <CardHeader>
@@ -592,7 +593,7 @@ const Index = () => {
                     </CardContent>
                   </Card>
                 </div>
-              )}
+              </AuthGuard>
             </div>
             <div className="col-span-1 p-4 border-l pt-0">
               <h3 className="mb-2 text-lg font-semibold">Rule Details</h3>

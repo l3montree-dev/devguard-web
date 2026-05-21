@@ -1,5 +1,6 @@
 import type { ArtifactDTO } from "../../types/api/api";
 import { SimpleArtifactSelector } from "../ArtifactSelector";
+import AuthGuard from "../AuthGuard";
 import { PublicUrlSection } from "./PublicUrlSection";
 
 interface ArtifactAndPublicUrlGridProps {
@@ -44,19 +45,21 @@ export function ArtifactAndPublicUrlGrid({
           onSelect={onSelect}
         />
       </div>
-      <div className="pl-4">
-        <PublicUrlSection
-          sharesInformation={sharesInformation}
-          isPublicLoading={isPublicLoading}
-          onToggle={onToggle}
-          selectedArtifact={selectedArtifact}
-          assetVersionSlug={assetVersionSlug}
-          assetId={assetId}
-          devguardApiUrl={devguardApiUrl}
-          fileType={fileType}
-          toastLabel={toastLabel}
-        />
-      </div>
+      <AuthGuard require="admin">
+        <div className="pl-4">
+          <PublicUrlSection
+            sharesInformation={sharesInformation}
+            isPublicLoading={isPublicLoading}
+            onToggle={onToggle}
+            selectedArtifact={selectedArtifact}
+            assetVersionSlug={assetVersionSlug}
+            assetId={assetId}
+            devguardApiUrl={devguardApiUrl}
+            fileType={fileType}
+            toastLabel={toastLabel}
+          />
+        </div>
+      </AuthGuard>
     </div>
   );
 }

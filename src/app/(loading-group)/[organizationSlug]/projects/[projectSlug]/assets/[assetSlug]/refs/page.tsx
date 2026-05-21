@@ -32,18 +32,18 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { useSession } from "../../../../../../../../context/SessionContext";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
 import type { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
+import AuthGuard from "../../../../../../../../components/AuthGuard";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
   const assetVersions = useAssetBranchesAndTags();
   const updateAsset = useUpdateAsset();
-  const { session } = useSession();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -53,7 +53,7 @@ const RefsPage = () => {
   const [createDialogOpen, setCreateDialogOpen] = React.useState<
     false | "tag" | "branch"
   >(false);
-
+  const currentUserRole = useCurrentUserRole();
   const handleDeleteRef = async () => {
     if (!open) return;
     const resp = await browserApiClient(
@@ -126,11 +126,11 @@ const RefsPage = () => {
         forceVertical
         primaryHeadline
         Button={
-          session ? (
+          <AuthGuard require="admin">
             <Button onClick={() => setCreateDialogOpen("tag")}>
               Create Tag
             </Button>
-          ) : undefined
+          </AuthGuard>
         }
         title="Tags"
       >
@@ -172,7 +172,7 @@ const RefsPage = () => {
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(tag.lastAccessedAt)} />
                     </td>
-                    {session && (
+                    <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -187,7 +187,7 @@ const RefsPage = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
-                    )}
+                    </AuthGuard>
                   </tr>
                 ))}
               </tbody>
@@ -200,11 +200,11 @@ const RefsPage = () => {
         primaryHeadline
         title="Branches"
         Button={
-          session ? (
+          <AuthGuard require="admin">
             <Button onClick={() => setCreateDialogOpen("branch")}>
               Create Branch
             </Button>
-          ) : undefined
+          </AuthGuard>
         }
       >
         <div className="overflow-hidden rounded-lg border shadow-sm">
@@ -251,7 +251,7 @@ const RefsPage = () => {
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(branch.lastAccessedAt)} />
                     </td>
-                    {session && (
+                    <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -273,7 +273,7 @@ const RefsPage = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
-                    )}
+                    </AuthGuard>
                   </tr>
                 ))}
               </tbody>

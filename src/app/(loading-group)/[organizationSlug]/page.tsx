@@ -29,7 +29,6 @@ import type {
   ProjectDTO,
   SubGroupsAndAsset,
 } from "../../../types/api/api";
-import { UserRole } from "../../../types/api/api";
 import type { CreateProjectReq } from "../../../types/api/req";
 
 import Section from "@/components/common/Section";
@@ -57,7 +56,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
 import { useSession } from "@/context/SessionContext";
 import { usePageTour } from "@/hooks/usePageTour";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
+import AuthGuard from "@/components/AuthGuard";
 import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
@@ -266,9 +266,10 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  const isAdmin =
-    currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin;
-  const tourSteps = useMemo(() => orgHomeTourSteps(isAdmin), [isAdmin]);
+  const tourSteps = useMemo(
+    () => orgHomeTourSteps(isAdmin(currentUserRole)),
+    [currentUserRole],
+  );
   const { startTour } = usePageTour(tourSteps);
   const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
 
@@ -341,18 +342,15 @@ const OrganizationHomePage: FunctionComponent = () => {
           <Section
             primaryHeadline
             Button={
-              session &&
               !activeOrg.externalEntityProviderId && (
-                <Button
-                  data-tour="create-group-button"
-                  disabled={
-                    currentUserRole !== UserRole.Owner &&
-                    currentUserRole !== UserRole.Admin
-                  }
-                  onClick={() => setOpen(true)}
-                >
-                  Create New Group
-                </Button>
+                <AuthGuard require="admin">
+                  <Button
+                    data-tour="create-group-button"
+                    onClick={() => setOpen(true)}
+                  >
+                    Create New Group
+                  </Button>
+                </AuthGuard>
               )
             }
             description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."

@@ -12,6 +12,7 @@ import { Tooltip } from "@radix-ui/react-tooltip";
 import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import type { FunctionComponent } from "react";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -22,12 +23,12 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import AuthGuard from "../AuthGuard";
 
 interface Props {
   artifact: ArtifactDTO;
   index: number;
   rootNodes: InformationSources[];
-  hasSession: boolean;
   selectedSourceUrls: Set<string>;
   onToggleSource: (url: string) => void;
   onToggleAllSources: (urls: string[]) => void;
@@ -49,7 +50,6 @@ const ArtifactRow: FunctionComponent<Props> = ({
   artifact,
   index,
   rootNodes,
-  hasSession,
   selectedSourceUrls,
   onToggleSource,
   onToggleAllSources,
@@ -58,6 +58,7 @@ const ArtifactRow: FunctionComponent<Props> = ({
   onDelete,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const role = useCurrentUserRole();
   const hasUpstreamUrls = rootNodes && rootNodes.length > 0;
 
   // Track selection state for this artifact's sources
@@ -101,14 +102,14 @@ const ArtifactRow: FunctionComponent<Props> = ({
             ) : (
               <div className="w-4 h-4 flex-shrink-0" />
             )}
-            {hasSession && hasUpstreamUrls && (
+            {isAdmin(role) && hasUpstreamUrls && (
               <div onClick={(e) => e.stopPropagation()} className="pt-1">
                 <Checkbox
                   checked={
                     allSelected ? true : someSelected ? "indeterminate" : false
                   }
                   onCheckedChange={() => onToggleAllSources(sourceUrls)}
-                  disabled={!hasSession}
+                  disabled={!isAdmin(role)}
                 />
               </div>
             )}
@@ -134,26 +135,28 @@ const ArtifactRow: FunctionComponent<Props> = ({
             </span>
           )}
         </td>
-        {hasSession && (
+        {isAdmin(role) && (
           <td
             className="py-3 px-4 text-right"
             onClick={(e) => e.stopPropagation()}
           >
             <DropdownMenu>
-              <DropdownMenuTrigger className="artifact-options" asChild>
-                <Button variant="ghost" size={"icon"}>
-                  <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-                <DropdownMenuItem onClick={onSync}>
-                  Sync SBOM URLs
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onDelete}>
-                  <span className="text-destructive">Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+              <AuthGuard require="admin">
+                <DropdownMenuTrigger className="artifact-options" asChild>
+                  <Button variant="ghost" size={"icon"}>
+                    <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+                  <DropdownMenuItem onClick={onSync}>
+                    Sync SBOM URLs
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onDelete}>
+                    <span className="text-destructive">Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </AuthGuard>
             </DropdownMenu>
           </td>
         )}
@@ -170,14 +173,14 @@ const ArtifactRow: FunctionComponent<Props> = ({
               nodeIndex === rootNodes.length - 1 ? "" : "",
             )}
           >
-            <td className="py-3 pl-10 pr-4" colSpan={hasSession ? 3 : 2}>
+            <td className="py-3 pl-10 pr-4" colSpan={isAdmin(role) ? 3 : 2}>
               <div className="flex items-start gap-3">
-                {hasSession && (
+                {isAdmin(role) && (
                   <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedSourceUrls.has(node.url)}
                       onCheckedChange={() => onToggleSource(node.url)}
-                      disabled={!hasSession}
+                      disabled={!isAdmin(role)}
                     />
                   </div>
                 )}

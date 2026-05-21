@@ -32,6 +32,27 @@ export const useCurrentUserRole = () => {
   }, [currentUser, project, activeOrg, projectSlug]);
 };
 
+export const isLoggedIn = (role: UserRole | null): boolean => role !== null;
+
+export const isAtLeast = (
+  role: UserRole | null,
+  minimum: UserRole,
+): boolean => {
+  const order = [
+    UserRole.Guest,
+    UserRole.Member,
+    UserRole.Admin,
+    UserRole.Owner,
+  ];
+  if (role === null) return false;
+  return order.indexOf(role) >= order.indexOf(minimum);
+};
+
+export const isMember = (role: UserRole | null) =>
+  isAtLeast(role, UserRole.Member);
+export const isAdmin = (role: UserRole | null) =>
+  isAtLeast(role, UserRole.Admin);
+
 export const getCurrentUserRole = (
   currentUser: User | undefined,
   org: OrganizationDetailsDTO,
@@ -40,7 +61,7 @@ export const getCurrentUserRole = (
   asset?: ReturnType<typeof useActiveAsset> | null,
 ): UserRole | null => {
   if (!currentUser) {
-    return UserRole.Guest;
+    return null;
   }
 
   if (asset?.members) {
@@ -70,5 +91,5 @@ export const getCurrentUserRole = (
     }
   }
 
-  return UserRole.Member; // Default role if not found
+  return UserRole.Guest; // Default role if not found
 };

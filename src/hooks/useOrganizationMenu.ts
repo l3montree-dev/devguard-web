@@ -13,14 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UserRole } from "@/types/api/api";
 import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
 import { ChartBarIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
-import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
-import { useCurrentUserRole } from "./useUserRole";
+import { isAdmin, useCurrentUserRole } from "./useUserRole";
 
 export const useOrganizationMenu = () => {
   const pathName = usePathname() || "/";
@@ -28,7 +26,6 @@ export const useOrganizationMenu = () => {
     organizationSlug: string;
   };
 
-  const loggedIn = useCurrentUser();
   const currentUserRole = useCurrentUserRole();
 
   // decode the path name and the org slug
@@ -36,14 +33,16 @@ export const useOrganizationMenu = () => {
   const decodedOrgSlug = decodeURIComponent(orgSlug);
 
   const org = useActiveOrg();
-  const menu = [
-    {
+  const menu = [];
+
+  if (isAdmin(currentUserRole)) {
+    menu.push({
       title: "Overview",
       href: "/" + decodedOrgSlug + "/overview",
       Icon: ChartBarIcon,
       isActive: decodedPathName === "/" + decodedOrgSlug + "/overview",
-    },
-  ];
+    });
+  }
 
   menu.push({
     title: "Groups",
@@ -52,20 +51,13 @@ export const useOrganizationMenu = () => {
     isActive: decodedPathName === "/" + decodedOrgSlug,
   });
 
-  if (loggedIn && !org.externalEntityProviderId) {
-    if (
-      currentUserRole === UserRole.Owner ||
-      currentUserRole === UserRole.Admin
-    ) {
-      menu.push({
-        title: "Settings",
-        href: "/" + decodedOrgSlug + "/settings",
-        Icon: CogIcon,
-        isActive: decodedPathName.startsWith(
-          "/" + decodedOrgSlug + "/settings",
-        ),
-      });
-    }
+  if (isAdmin(currentUserRole) && !org.externalEntityProviderId) {
+    menu.push({
+      title: "Settings",
+      href: "/" + decodedOrgSlug + "/settings",
+      Icon: CogIcon,
+      isActive: decodedPathName.startsWith("/" + decodedOrgSlug + "/settings"),
+    });
   }
   return menu;
 };

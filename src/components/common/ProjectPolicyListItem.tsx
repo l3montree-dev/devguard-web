@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { UserRole } from "../../types/api/api";
 import type { Policy } from "../../types/api/api";
 import ListItem from "./ListItem";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";
 import PolicyDialog from "../PolicyDialog";
-import { useCurrentUserRole } from "../../hooks/useUserRole";
+import { isAdmin, useCurrentUserRole } from "../../hooks/useUserRole";
 
 export const PolicyListItem = ({
   policy,
@@ -37,10 +36,7 @@ export const PolicyListItem = ({
               <Switch
                 checked={policy.enabled}
                 onCheckedChange={handlePolicyToggle}
-                disabled={
-                  currentUserRole !== UserRole.Admin &&
-                  currentUserRole !== UserRole.Owner
-                }
+                disabled={!isAdmin(currentUserRole)}
               />
             </div>
           }
