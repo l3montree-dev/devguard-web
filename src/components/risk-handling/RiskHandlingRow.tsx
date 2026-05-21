@@ -17,7 +17,9 @@ import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   beautifyPurl,
   classNames,
+  extractPurlQualifiers,
   extractVersion,
+  formatPurlQualifiers,
   stateLabels,
 } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -158,13 +160,6 @@ const VulnWithCveTableRow = ({
   );
 };
 
-const extractQualifiers = (purl: string) => {
-  const parts = purl.split("?");
-  if (parts.length < 2) return "";
-  const qualifiersPart = parts[1];
-  const qualifiers = qualifiersPart.split("&").join(", ");
-  return qualifiers;
-};
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
@@ -180,6 +175,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const vulnGroups = useMemo(
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],
+  );
+  const packageQualifiers = extractPurlQualifiers(row.original.packageName);
+  const displayPackageQualifiers = formatPurlQualifiers(
+    row.original.packageName,
   );
 
   const toggleCve = (cveID: string) => {
@@ -205,7 +204,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         onClick={() => setIsPackageOpen((prev) => !prev)}
       >
         <td className="py-3 px-4">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {isPackageOpen ? (
               <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             ) : (
@@ -219,9 +218,18 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               {extractVersion(row.original.packageName)}
             </span>
 
-            <span className="text-xs text-muted-foreground">
-              {extractQualifiers(row.original.packageName)}
-            </span>
+            {packageQualifiers && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="max-w-64 truncate whitespace-nowrap text-xs text-muted-foreground">
+                    {displayPackageQualifiers}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm break-all">
+                  {packageQualifiers}
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </td>
         <td className="py-3 px-4 flex">
