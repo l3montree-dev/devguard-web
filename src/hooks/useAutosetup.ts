@@ -80,22 +80,22 @@ export function useAutosetup(
     }),
   });
 
-  const handleAutosetup = waitFor<boolean, void>((pendingAutosetup = false) => {
-    // check if the asset is an external entity
-    if (asset?.externalEntityProviderId && !pendingAutosetup) {
-      // we need to redirect the user to authorize the "autosetup" oauth2 application
-      sessionStorage.setItem("pending-autosetup", "true");
-      window.location.href =
-        window.location.origin +
-        "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
-        asset.externalEntityProviderId.replace("@", "") +
-        "autosetup?redirectTo=" +
-        encodeURIComponent(window.location.href);
+  const handleAutosetup = waitFor<boolean, void>(
+    async (pendingAutosetup = false) => {
+      // check if the asset is an external entity
+      if (asset?.externalEntityProviderId && !pendingAutosetup) {
+        // we need to redirect the user to authorize the "autosetup" oauth2 application
+        sessionStorage.setItem("pending-autosetup", "true");
+        window.location.href =
+          window.location.origin +
+          "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
+          asset.externalEntityProviderId.replace("@", "") +
+          "autosetup?redirectTo=" +
+          encodeURIComponent(window.location.href);
 
-      return Promise.resolve();
-    }
+        return Promise.resolve();
+      }
 
-    return new Promise<void>(async (resolve) => {
       // create a new one for autosetup
       const privKey = (
         await onCreatePat({
@@ -167,12 +167,12 @@ export function useAutosetup(
             });
           }
         }
-        resolve();
-      } else {
-        toast("Failed to setup GitLab integration");
+        return;
       }
-    });
-  });
+
+      toast("Failed to setup GitLab integration");
+    },
+  );
 
   const autosetupOnce = useCallback(once(handleAutosetup), []);
 
