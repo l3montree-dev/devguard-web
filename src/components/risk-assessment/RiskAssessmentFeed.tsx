@@ -19,6 +19,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
+import AuthGuard from "@/components/AuthGuard";
 import { UserRole } from "@/types/api/api";
 import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
@@ -305,29 +306,31 @@ const RiskFeedItem = ({
         <div className="flex flex-row items-center justify-between gap-2 mt-2">
           <div className="ml-10 flex flex-row mt-2 text-xs font-normal text-muted-foreground whitespace-nowrap items-start">
             <FormatDate dateString={event.createdAt} />
-            {deleteEvent && currentUserRole === UserRole.Admin && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size={"icon"}
-                    className="h-4 w-4 p-0 m-0"
-                  >
-                    <EllipsisVerticalIcon className="h-4 w-4 text-muted-foreground p-0 m-0" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <Alert
-                    title="Are you sure you want to delete this event?"
-                    description="This action cannot be undone. All data associated with this event will be deleted."
-                    onConfirm={() => deleteEvent(event.id)}
-                  >
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      Delete
-                    </DropdownMenuItem>
-                  </Alert>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {deleteEvent && (
+              <AuthGuard require="admin">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size={"icon"}
+                      className="h-4 w-4 p-0 m-0"
+                    >
+                      <EllipsisVerticalIcon className="h-4 w-4 text-muted-foreground p-0 m-0" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <Alert
+                      title="Are you sure you want to delete this event?"
+                      description="This action cannot be undone. All data associated with this event will be deleted."
+                      onConfirm={() => deleteEvent(event.id)}
+                    >
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        Delete
+                      </DropdownMenuItem>
+                    </Alert>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </AuthGuard>
             )}
           </div>
           {event.originalAssetVersionName && (
@@ -423,7 +426,7 @@ export default function RiskAssessmentFeed({
                   {isOpen ? "Hide" : "Show"} whole history (+
                   {groupedEvents.length - 3} elements)
                 </Button>
-                {currentUserRole === UserRole.Admin && (
+                <AuthGuard require="admin">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -446,7 +449,7 @@ export default function RiskAssessmentFeed({
                       </Alert>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                )}
+                </AuthGuard>
               </div>
 
               <CollapsibleContent className="flex mt-10 flex-col gap-10">

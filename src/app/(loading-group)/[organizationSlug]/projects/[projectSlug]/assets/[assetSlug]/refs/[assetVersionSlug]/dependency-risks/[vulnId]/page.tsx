@@ -78,6 +78,8 @@ import { convertPathsToTree } from "../../../../../../../../../../../utils/depen
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import MitigateDialog from "@/components/MitigateDialog";
 import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
 import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
 import { useSearchParams } from "next/navigation";
@@ -296,6 +298,7 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 const Index: FunctionComponent = () => {
   const pathname = usePathname();
   const { session } = useSession();
+  const role = useCurrentUserRole();
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -800,7 +803,7 @@ const Index: FunctionComponent = () => {
                               enableContextMenu={
                                 vuln.vulnerabilityPath.length !== 0 &&
                                 vuln.state === "open" &&
-                                session !== null
+                                isMember(role)
                               }
                               graph={graphData}
                               vulns={[vuln]}
@@ -823,7 +826,7 @@ const Index: FunctionComponent = () => {
                           this vulnerability in your dependency tree. Therefore
                           the graph is not displayed by default to avoid
                           performance issues.
-                          {session
+                          {isMember(role)
                             ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
                             : ""}
                         </Callout>
@@ -960,11 +963,11 @@ const Index: FunctionComponent = () => {
                     }
                   />
                   {vuln && <Quickfix vuln={vuln} />}
-                  {(session || vuln.ticketUrl) && (
+                  {(isMember(role) || vuln.ticketUrl) && (
                     <div data-tour="vuln-management">
                       <Card>
                         <CardContent className="mt-4">
-                          {session && (
+                          <AuthGuard require="member">
                             <>
                               {vuln.state === "open" ? (
                                 <form
@@ -1107,7 +1110,7 @@ const Index: FunctionComponent = () => {
                                 </form>
                               )}
                             </>
-                          )}
+                          </AuthGuard>
 
                           {vuln.ticketUrl && (
                             <small className="mt-2 block w-full text-right text-muted-foreground">

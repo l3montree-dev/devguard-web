@@ -27,6 +27,7 @@ import type { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
+import { isMember, useCurrentUserRole } from "../../hooks/useUserRole";
 import Severity from "../common/Severity";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
@@ -50,7 +51,6 @@ interface Props {
     justification: string;
     mechanicalJustification?: string;
   }) => Promise<void>;
-  hasSession: boolean;
 }
 
 const VulnWithCveTableRow = ({
@@ -59,15 +59,14 @@ const VulnWithCveTableRow = ({
   selectable,
   selected,
   onToggle,
-  hasSession,
 }: {
   vuln: VulnWithCVE;
   href: string;
   selectable: boolean;
   selected: boolean;
   onToggle: () => void;
-  hasSession: boolean;
 }) => {
+  const isMemberRole = isMember(useCurrentUserRole());
   const router = useRouter();
   return (
     <tr
@@ -89,7 +88,7 @@ const VulnWithCveTableRow = ({
               <Checkbox
                 checked={selected}
                 onCheckedChange={onToggle}
-                disabled={!hasSession}
+                disabled={!isMemberRole}
               />
             </div>
           )}
@@ -167,8 +166,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
-  hasSession,
 }) => {
+  const isMemberRole = isMember(useCurrentUserRole());
   const [isPackageOpen, setIsPackageOpen] = useState(false);
   const [expandedCves, setExpandedCves] = useState<Set<string>>(new Set());
   const pathname = useDecodedPathname();
@@ -332,7 +331,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                             : false
                       }
                       onCheckedChange={() => onToggleAll(selectableIds)}
-                      disabled={!hasSession}
+                      disabled={!isMemberRole}
                     />
                     <span className="font-medium text-foreground">{cveID}</span>
 
@@ -385,7 +384,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     selectable={vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
-                    hasSession={hasSession}
                   />
                 ))}
             </React.Fragment>

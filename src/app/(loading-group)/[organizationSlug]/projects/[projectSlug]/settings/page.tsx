@@ -16,7 +16,7 @@ import Link from "next/link";
 
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -191,10 +191,7 @@ const Index: FunctionComponent = () => {
   const params = useDecodedParams();
 
   useEffect(() => {
-    if (
-      currentUserRole !== UserRole.Owner &&
-      currentUserRole !== UserRole.Admin
-    ) {
+    if (!isAdmin(currentUserRole)) {
       router.replace("/" + params?.organizationSlug);
     }
   }, [router, currentUserRole, params]);

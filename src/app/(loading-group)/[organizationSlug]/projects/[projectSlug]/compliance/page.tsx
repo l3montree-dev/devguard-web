@@ -2,10 +2,9 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { UserRole } from "@/types/api/api";
 import type { Policy } from "@/types/api/api";
 
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -55,8 +54,6 @@ const ComplianceIndex = () => {
       }));
     },
   );
-
-  const currentUserRole = useCurrentUserRole();
 
   const handleEnablePolicy = async (policy: Policy) => {
     mutate(
@@ -147,8 +144,7 @@ const ComplianceIndex = () => {
             title="Organization Compliance Controls"
             forceVertical
             Button={
-              currentUserRole === UserRole.Admin ||
-              currentUserRole === UserRole.Owner ? (
+              <AuthGuard require="admin">
                 <Link
                   className={buttonVariants({
                     variant: "outline",
@@ -157,9 +153,7 @@ const ComplianceIndex = () => {
                 >
                   Modify Policies
                 </Link>
-              ) : (
-                <> </>
-              )
+              </AuthGuard>
             }
           >
             <div className="flex justify-end">

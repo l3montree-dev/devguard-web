@@ -2,7 +2,7 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 
 import Page from "@/components/Page";
 import type { FirstPartyVuln, Paged } from "@/types/api/api";
@@ -85,7 +85,6 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
 const Index: FunctionComponent = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const { session } = useSession();
 
   let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -199,11 +198,11 @@ const Index: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        {session && (
+        <AuthGuard require="admin">
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Risks
           </Button>
-        )}
+        </AuthGuard>
       </div>
       <Section
         forceVertical

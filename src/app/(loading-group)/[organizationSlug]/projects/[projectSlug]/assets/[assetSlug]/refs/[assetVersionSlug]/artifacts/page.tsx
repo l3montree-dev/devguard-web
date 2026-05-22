@@ -8,7 +8,7 @@ import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { documentationLinks } from "@/const/documentationLinks";
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { browserApiClient } from "@/services/devGuardApi";
 import type {
@@ -47,7 +47,6 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
-  const { session } = useSession();
 
   const artifacts = useArtifacts();
 
@@ -349,9 +348,9 @@ const Artifacts = () => {
         <div className="flex-1">
           <div className="mb-4 flex items-center justify-between">
             <BranchTagSelector branches={branches} tags={tags} />
-            {session && (
+            <AuthGuard require="admin">
               <Button onClick={openCreateDialog}>Create new Artifact</Button>
-            )}
+            </AuthGuard>
           </div>
           <Section
             primaryHeadline
@@ -386,43 +385,47 @@ const Artifacts = () => {
                     <table className="w-full overflow-x-auto text-sm">
                       <thead className="border-b bg-card text-foreground">
                         {/* Bulk action row - shown when sources are selected and user is logged in */}
-                        {session && selectedSourceUrls.size > 0 && (
-                          <tr className="bg-muted/50">
-                            <td colSpan={3} className="px-4 py-2">
-                              <div className="flex flex-row items-center justify-between">
-                                <span className="text-sm mr-2">
-                                  {selectedSourceUrls.size} SBOM source
-                                  {selectedSourceUrls.size !== 1
-                                    ? "s"
-                                    : ""}{" "}
-                                  selected
-                                </span>
-                                <div className="flex flex-row items-center gap-2">
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={handleBulkDeleteSources}
-                                  >
-                                    Delete Selected
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      setSelectedSourceUrls(new Set())
-                                    }
-                                  >
-                                    Clear Selection
-                                  </Button>
+                        <AuthGuard require="admin">
+                          {selectedSourceUrls.size > 0 && (
+                            <tr className="bg-muted/50">
+                              <td colSpan={3} className="px-4 py-2">
+                                <div className="flex flex-row items-center justify-between">
+                                  <span className="text-sm mr-2">
+                                    {selectedSourceUrls.size} SBOM source
+                                    {selectedSourceUrls.size !== 1
+                                      ? "s"
+                                      : ""}{" "}
+                                    selected
+                                  </span>
+                                  <div className="flex flex-row items-center gap-2">
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={handleBulkDeleteSources}
+                                    >
+                                      Delete Selected
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        setSelectedSourceUrls(new Set())
+                                      }
+                                    >
+                                      Clear Selection
+                                    </Button>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
+                              </td>
+                            </tr>
+                          )}
+                        </AuthGuard>
                         <tr>
                           <th className="p-4 text-left">Artifact Name</th>
                           <th className="p-4 text-left">SBOM Sources</th>
-                          {session && <th className="w-12" />}
+                          <AuthGuard require="admin">
+                            <th className="w-12" />
+                          </AuthGuard>
                         </tr>
                       </thead>
                       <tbody className="text-sm text-foreground">
@@ -432,7 +435,6 @@ const Artifacts = () => {
                             artifact={artifact}
                             index={i}
                             rootNodes={rootNodes![artifact.artifactName] || []}
-                            hasSession={!!session}
                             selectedSourceUrls={selectedSourceUrls}
                             onToggleSource={handleToggleSource}
                             onToggleAllSources={handleToggleAllSources}
