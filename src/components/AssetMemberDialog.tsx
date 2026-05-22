@@ -101,7 +101,15 @@ const AssetMemberDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
-            Invite a new member to the asset by entering their email address.
+            Invite someone to collaborate on this repository{" "}
+            <span className="font-semibold text-foreground">
+              {activeAsset.name}
+            </span>
+            . Make sure they are already a member of the project{" "}
+            <span className="font-semibold text-foreground">
+              {activeProject.name}
+            </span>
+            .
           </DialogDescription>
         </DialogHeader>
         <MultiselectCombobox
