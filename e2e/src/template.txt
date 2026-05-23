@@ -12,4 +12,15 @@ test('test', async ({ page }) => {
 
     await page.waitForTimeout(500_000);
 });
+
+Befor testing:
+
+
+
+npm i
+npx playwright install    
+
+Test example:
+npx playwright test --headed --trace on --debug devguard-prerelease-test.e2e.spec.ts:9
+
 */
