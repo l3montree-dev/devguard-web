@@ -56,7 +56,9 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
 
   return (
     <div
-      className={cn("flex h-11 rounded-md border flex flex-row items-center")}
+      className={cn(
+        "flex h-11 rounded-md px-[1px] border flex flex-row items-center",
+      )}
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -85,7 +87,7 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
 
       <Button
         variant="outline"
-        className=" border-0 "
+        className=" border-0 h-10"
         size={"sm"}
         onClick={() => {
           const newDirection = sortDirection === "asc" ? "desc" : "asc";
