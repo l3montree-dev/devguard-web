@@ -183,7 +183,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
             });
           }}
           values={selectedMembers}
-          emptyMessage="No repositories found"
+          emptyMessage="No members found"
         />
         <DialogFooter className="mt-2">
           <div className="flex flex-col items-end justify-end gap-2">
