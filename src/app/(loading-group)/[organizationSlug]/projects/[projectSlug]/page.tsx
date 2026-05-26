@@ -279,35 +279,38 @@ export default function RepositoriesPage() {
       >
         <Section
           Button={
-            session &&
             !project.externalEntityProviderId && (
               <div
                 data-tour="subgroups-repositories-actions"
                 className="flex flex-row gap-2"
               >
-                <Button
-                  data-tour="create-subgroup-button"
-                  disabled={
-                    project.type !== "default" ||
-                    (currentUserRole !== UserRole.Owner &&
-                      currentUserRole !== UserRole.Admin)
-                  }
-                  variant={"secondary"}
-                  onClick={() => setShowProjectModal(true)}
-                >
-                  Create New Subgroup
-                </Button>
-                <Button
-                  data-tour="create-repository-button"
-                  disabled={
-                    project.type !== "default" ||
-                    (currentUserRole !== UserRole.Admin &&
-                      currentUserRole !== UserRole.Owner)
-                  }
-                  onClick={() => setShowModal(true)}
-                >
-                  Create New Repository
-                </Button>
+                {session && (
+                  <>
+                    <Button
+                      data-tour="create-subgroup-button"
+                      disabled={
+                        project.type !== "default" ||
+                        (currentUserRole !== UserRole.Owner &&
+                          currentUserRole !== UserRole.Admin)
+                      }
+                      variant={"secondary"}
+                      onClick={() => setShowProjectModal(true)}
+                    >
+                      Create New Subgroup
+                    </Button>
+                    <Button
+                      data-tour="create-repository-button"
+                      disabled={
+                        project.type !== "default" ||
+                        (currentUserRole !== UserRole.Admin &&
+                          currentUserRole !== UserRole.Owner)
+                      }
+                      onClick={() => setShowModal(true)}
+                    >
+                      Create New Repository
+                    </Button>
+                  </>
+                )}
               </div>
             )
           }
