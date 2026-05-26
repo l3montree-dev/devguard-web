@@ -284,6 +284,15 @@ export class DevGuardPOM {
     await this.page.getByRole("button", { name: "Confirm" }).click();
   }
 
+  async deleteGroup() {
+    await this.page
+      .locator(DevGuardNavigationLevel.Group)
+      .getByRole("link", { name: "Settings" })
+      .click({ timeout: 5_000 });
+    await this.page.getByRole("button", { name: "Delete" }).click();
+    await this.page.getByRole("button", { name: "Confirm" }).click();
+  }
+
   async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
     await this.page
       .locator(level)

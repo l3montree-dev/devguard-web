@@ -4,7 +4,12 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "./run-tests.sh",
+    "test:headed": "./run-tests.sh --headed",
+    "test:ci": "./run-tests.sh --stop-on-fail",
+    "test:debug": "npx playwright test --headed --debug",
+    "report": "npx playwright show-report"
   },
   "keywords": [],
   "author": "",
