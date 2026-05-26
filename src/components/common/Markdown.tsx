@@ -27,7 +27,7 @@ const Markdown = (props: Options & { linkBaseURL?: string }) => {
           </a>
         ),
         code: ({ children, ...props }) => (
-          <code {...props} className="text-black! dark:text-white!">
+          <code {...props} className="!text-black dark:!text-white">
             {children}
           </code>
         ),
