@@ -97,7 +97,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="My GitLab Personal Access Token"
+                  placeholder="My GitLab Access Token"
                   autoComplete="url"
                   {...field}
                 />
@@ -113,7 +113,7 @@ export default function GitLabIntegrationForm({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GitLab/ openCode URL</FormLabel>
+              <FormLabel>GitLab Base URL</FormLabel>
               <FormControl>
                 <Input
                   placeholder={
@@ -138,20 +138,22 @@ export default function GitLabIntegrationForm({
           name="token"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Access-Token</FormLabel>
+              <FormLabel>
+                Access-Token (Project or Personal Access Token)
+              </FormLabel>
               <FormControl>
                 <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
               </FormControl>
               <FormDescription>
                 To later use the <strong>Auto Setup Feature</strong> the token
-                needs <strong>at least the maintainer role</strong>.<br />
-                Otherwise the token only needs <strong>
-                  reporter role
+                needs the <strong>api scope</strong>. <br />
+                It is recommended to use a dedicated <strong>
+                  project
                 </strong>{" "}
-                permissions.
+                access token instead of a personal access token.
                 <br />
-                Additionally the api scope is needed for the seamless
-                integration of DevGuard.
+                If so the token needs at least{" "}
+                <strong>the maintainer role</strong>.
               </FormDescription>
             </FormItem>
           )}
