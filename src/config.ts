@@ -47,4 +47,6 @@ export const config = {
     process.env.ISSUE_TRACKER_URL ||
     "https://github.com/l3montree-dev/devguard/issues/new/choose",
   billingUrl: process.env.BILLING_URL || "https://devguard.org/trial-expired",
+  devguardWebsiteUrl:
+    process.env.DEVGUARD_WEBSITE_URL || "https://devguard.org",
 };
