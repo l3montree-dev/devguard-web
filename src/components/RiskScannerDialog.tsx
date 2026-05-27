@@ -485,10 +485,16 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     return activeOrg.gitLabIntegrations.length > 0 ? 3 : 2;
   };
 
-  // save the slide history to make the back button implementation easier
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+  useEffect(() => {
+    if (open) {
+      setSlideHistory([getStartIndex()]);
+    }
+  }, [open, initialSlide]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const prevIndex =
+    slideHistory[slideHistory.length - 2] ?? slideHistory[0] ?? 0;
 
   const setProxyApi = useCallback((emblaApi: CarouselApi) => {
     return setApi({

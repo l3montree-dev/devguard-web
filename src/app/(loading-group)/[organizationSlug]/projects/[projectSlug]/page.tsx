@@ -7,7 +7,7 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
@@ -140,9 +140,12 @@ export default function RepositoriesPage() {
   );
   const { startTour } = usePageTour(tourSteps);
   const { showModal: shouldStartTour, markSeen } = useTourSeen("group-home");
+  const tourStarted = useRef(false);
 
   useEffect(() => {
+    if (tourStarted.current) return;
     if (searchParams?.get("startTour") === "2" || shouldStartTour) {
+      tourStarted.current = true;
       markSeen();
       startTour();
     }

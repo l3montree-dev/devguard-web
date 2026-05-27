@@ -15,7 +15,7 @@ import { repoHomeTourSteps } from "@/components/common/tours/repo-home-tour";
 import { useTourSeen } from "@/hooks/useTourSeen";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -143,9 +143,12 @@ const Index: FunctionComponent = () => {
 
   const { startTour } = usePageTour(repoHomeTourSteps);
   const { showModal: shouldStartTour, markSeen } = useTourSeen("repo-home");
+  const tourStarted = useRef(false);
 
   useEffect(() => {
+    if (tourStarted.current) return;
     if (searchParams?.get("startTour") === "3" || shouldStartTour) {
+      tourStarted.current = true;
       markSeen();
       startTour();
     }

@@ -154,7 +154,7 @@ const Index: FunctionComponent = () => {
                     {
                       icon: <Code />,
                       name: "DevGuard CLI",
-                      sub: "Use the devguard cli to run scans and upload the results to Devguard.",
+                      sub: "Use the DevGuard CLI to run scans and upload the results to DevGuard.",
                       recommended: false,
                       githubOnly: false,
                       slide: 16,
@@ -170,7 +170,7 @@ const Index: FunctionComponent = () => {
                     {
                       icon: <Link2 />,
                       name: "Supplier provided URL",
-                      sub: "Provide an SBOM URLs to setup Devguard based on external data sources. This data will be periodically fetched and updated.",
+                      sub: "Provide SBOM URLs to setup DevGuard based on external data sources. This data will be periodically fetched and updated.",
                       recommended: false,
                       githubOnly: false,
                       slide: 15,
@@ -186,12 +186,13 @@ const Index: FunctionComponent = () => {
                       className={`grid gap-4 mt-4 ${cards.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
                     >
                       {cards.map(({ icon, name, sub, recommended, slide }) => (
-                        <div
+                        <button
                           key={name}
+                          type="button"
                           data-tour={
                             recommended ? "setup-risk-scan" : undefined
                           }
-                          className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 ${
+                          className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
                             recommended ? "border-primary" : "border-secondary"
                           }`}
                           onClick={() => {
@@ -216,7 +217,7 @@ const Index: FunctionComponent = () => {
                           <span className="text-[11px] leading-relaxed text-muted-foreground">
                             {sub}
                           </span>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   );
