@@ -60,7 +60,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -89,6 +89,7 @@ import { useActiveProject } from "../../../../../../../../../../hooks/useActiveP
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { usePageTour } from "@/hooks/usePageTour";
 import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],
@@ -332,6 +333,15 @@ const columnsDef: ColumnDef<
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const { startTour } = usePageTour(dependencyInsightsTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("dependency-insights");
+
+  useEffect(() => {
+    if (shouldStartTour) {
+      markSeen();
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldStartTour]);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);

@@ -55,6 +55,7 @@ interface RiskScannerDialogProps {
   assetVersion?: AssetVersionDTO;
   artifacts?: Array<ArtifactDTO>;
   devguardWebLatestScannerImage: string;
+  initialSlide?: number;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -66,6 +67,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   assetVersion,
   artifacts,
   devguardWebLatestScannerImage,
+  initialSlide,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -458,6 +460,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     // display the update repository provider slide if asset is not connected already
     if (!asset.externalEntityId && !asset.repositoryProvider) {
       return 0; // start with the update repository provider slide
+    }
+    if (initialSlide !== undefined) {
+      return initialSlide;
     }
     if (asset.repositoryProvider === "github") {
       // we can skip setup method selection slide - and the whole autosetup slides

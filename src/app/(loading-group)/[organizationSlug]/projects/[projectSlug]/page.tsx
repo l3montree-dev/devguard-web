@@ -54,6 +54,7 @@ import SubgroupsAndAssetsList, {
 } from "@/components/SubgroupsAndAssetsList";
 import { usePageTour } from "@/hooks/usePageTour";
 import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -138,13 +139,15 @@ export default function RepositoriesPage() {
     [currentUserRole],
   );
   const { startTour } = usePageTour(tourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("group-home");
 
   useEffect(() => {
-    if (searchParams?.get("startTour") === "2") {
+    if (searchParams?.get("startTour") === "2" || shouldStartTour) {
+      markSeen();
       startTour();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [shouldStartTour]);
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {

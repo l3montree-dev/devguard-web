@@ -86,6 +86,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { usePageTour } from "@/hooks/usePageTour";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 import { DocDrawer } from "@/components/common/DocDrawer";
 
 const MarkdownEditor = dynamic(
@@ -324,6 +325,7 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
   const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("dependency-risk");
   const [
     acceptVexRuleRecommendationDialogOpen,
     setAcceptVexRuleRecommendationDialogOpen,
@@ -382,20 +384,22 @@ const Index: FunctionComponent = () => {
   );
 
   const handleGraphReady = useCallback(() => {
-    if (searchParams?.get("startTour") !== "4") return;
+    if (searchParams?.get("startTour") !== "4" && !shouldStartTour) return;
+    markSeen();
     registerSteps(dependencyRiskTourSteps);
     startTour();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, shouldStartTour]);
 
   // Path explosion: no graph is rendered so onReady never fires — start tour directly
   useEffect(() => {
     if (
-      searchParams?.get("startTour") !== "4" ||
+      (searchParams?.get("startTour") !== "4" && !shouldStartTour) ||
       graphLoading ||
       (vuln?.vulnerabilityPath.length || 0) !== 0
     )
       return;
+    markSeen();
     registerSteps([
       {
         ...dependencyRiskTourSteps[0],
@@ -406,7 +410,7 @@ const Index: FunctionComponent = () => {
     ]);
     startTour();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [graphLoading]);
+  }, [graphLoading, shouldStartTour]);
 
   const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
     if (!vuln || vuln.vulnerabilityPath.length === 0) {
