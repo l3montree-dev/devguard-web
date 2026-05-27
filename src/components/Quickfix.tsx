@@ -82,16 +82,7 @@ function renderQuickFixText(
 }
 
 function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
-  if (vuln.componentFixedVersion && vuln.vulnerabilityPath.length === 1) {
-    try {
-      const p = PackageURL.fromString(vuln.vulnerabilityPath[0]);
-      p.version = vuln.componentFixedVersion;
-      return p.toString();
-    } catch {
-      return null;
-    }
-  }
-  return vuln.directDependencyFixedVersion ?? null;
+  return vuln.directDependencyFixedVersion;
 }
 
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
@@ -127,7 +118,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <Badge
                   variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-white border-success flex items-center gap-1"
+                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-success-foreground border-success flex items-center gap-1"
                 >
                   Resolve Vulnerability
                 </Badge>
