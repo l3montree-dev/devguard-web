@@ -164,6 +164,11 @@ const DependencyGraph: FunctionComponent<{
       ) {
         // The direct dependency is the first element in the path
         set.add(vuln.vulnerabilityPath[0]);
+      } else if (
+        vuln.componentFixedVersion &&
+        vuln.vulnerabilityPath.length === 1
+      ) {
+        set.add(vuln.vulnerabilityPath[0]);
       }
     });
     return set;
