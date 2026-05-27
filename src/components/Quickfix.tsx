@@ -91,6 +91,10 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
+  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+    return null;
+  }
+
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
   // Validate the vulnerability path is a valid PURL before parsing

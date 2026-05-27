@@ -21,7 +21,7 @@ const Markdown = (props: Options & { linkBaseURL?: string }) => {
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline dark:text-blue-400"
+            className="text-link hover:underline dark:text-blue-400"
           >
             {children}
           </a>
