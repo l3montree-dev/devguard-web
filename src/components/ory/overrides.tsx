@@ -2,6 +2,11 @@
 
 import { FingerPrintIcon, KeyIcon } from "@heroicons/react/24/outline";
 import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/solid";
+import {
   type OryCardContentProps,
   type OryCardSettingsSectionProps,
   type OryFlowComponentOverrides,
@@ -32,6 +37,7 @@ import {
 import type { PropsWithChildren } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { usePathname } from "next/navigation";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
@@ -183,6 +189,217 @@ const providerDisplayNames: Record<string, string> = {
   opencode: "openCode",
 };
 
+type PasswordCheckStatus = "idle" | "loading" | "pass" | "fail";
+
+const PASSWORD_CHECKS = [
+  {
+    id: "length",
+    label: "At least 12 characters",
+    test: (password: string) => password.length >= 12,
+  },
+  {
+    id: "upper",
+    label: "Contains an uppercase letter",
+    test: (password: string) => /[A-Z]/.test(password),
+  },
+  {
+    id: "number",
+    label: "Contains a number",
+    test: (password: string) => /\d/.test(password),
+  },
+  {
+    id: "symbol",
+    label: "Contains a symbol",
+    test: (password: string) => /[^A-Za-z0-9]/.test(password),
+  },
+  {
+    id: "base-strength",
+    label: "Base strength requirements met",
+    test: (password: string) =>
+      password.length >= 12 &&
+      /[A-Z]/.test(password) &&
+      /\d/.test(password) &&
+      /[^A-Za-z0-9]/.test(password),
+  },
+];
+
+function evaluatePasswordChecks(password: string) {
+  return PASSWORD_CHECKS.map((check) => ({
+    ...check,
+    passed: check.test(password),
+  }));
+}
+
+function PasswordCheckIcon({ status }: { status: PasswordCheckStatus }) {
+  if (status === "loading") {
+    return (
+      <ArrowPathIcon className="h-4 w-4 animate-spin text-muted-foreground" />
+    );
+  }
+
+  if (status === "pass") {
+    return <CheckCircleIcon className="h-4 w-4 text-green-600" />;
+  }
+
+  if (status === "fail") {
+    return <XCircleIcon className="h-4 w-4 text-destructive" />;
+  }
+
+  return (
+    <span className="h-4 w-4 rounded-full border border-border" aria-hidden />
+  );
+}
+
+async function sha1Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-1", data);
+  const bytes = Array.from(new Uint8Array(digest));
+  return bytes
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+async function getPwnedPasswordCount(
+  password: string,
+  signal?: AbortSignal,
+): Promise<number> {
+  const hash = await sha1Hex(password);
+  const prefix = hash.slice(0, 5);
+  const suffix = hash.slice(5);
+
+  const response = await fetch(
+    `https://api.pwnedpasswords.com/range/${prefix}`,
+    {
+      method: "GET",
+      headers: {
+        "Add-Padding": "true",
+      },
+      signal,
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Unable to check leaked-password database");
+  }
+
+  const body = await response.text();
+  const lines = body.split("\n");
+
+  for (const line of lines) {
+    const [candidateSuffix, count] = line.trim().split(":");
+    if (candidateSuffix === suffix) {
+      return Number.parseInt(count ?? "0", 10) || 0;
+    }
+  }
+
+  return 0;
+}
+
+function PasswordQualityCard({ password }: { password: string }) {
+  const [checkStatuses, setCheckStatuses] = useState<
+    Record<string, PasswordCheckStatus>
+  >(
+    Object.fromEntries(
+      PASSWORD_CHECKS.map((check) => [check.id, "idle"]),
+    ) as Record<string, PasswordCheckStatus>,
+  );
+  const [pwnedStatus, setPwnedStatus] = useState<PasswordCheckStatus>("idle");
+  const [pwnedCount, setPwnedCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!password) {
+      setCheckStatuses(
+        Object.fromEntries(
+          PASSWORD_CHECKS.map((check) => [check.id, "idle"]),
+        ) as Record<string, PasswordCheckStatus>,
+      );
+      setPwnedStatus("idle");
+      setPwnedCount(null);
+      return;
+    }
+
+    setCheckStatuses(
+      Object.fromEntries(
+        PASSWORD_CHECKS.map((check) => [check.id, "loading"]),
+      ) as Record<string, PasswordCheckStatus>,
+    );
+    setPwnedStatus("loading");
+    setPwnedCount(null);
+
+    const timeoutId = window.setTimeout(() => {
+      const evaluated = evaluatePasswordChecks(password);
+      setCheckStatuses(
+        Object.fromEntries(
+          evaluated.map((check) => [check.id, check.passed ? "pass" : "fail"]),
+        ) as Record<string, PasswordCheckStatus>,
+      );
+    }, 220);
+
+    const abortController = new AbortController();
+
+    const pwnedTimeoutId = window.setTimeout(async () => {
+      try {
+        const count = await getPwnedPasswordCount(
+          password,
+          abortController.signal,
+        );
+        setPwnedCount(count);
+        setPwnedStatus(count > 0 ? "fail" : "pass");
+      } catch {
+        // Keep the check non-blocking for UX if network lookup is unavailable.
+        setPwnedCount(null);
+        setPwnedStatus("idle");
+      }
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearTimeout(pwnedTimeoutId);
+      abortController.abort();
+    };
+  }, [password]);
+
+  if (!password) {
+    return null;
+  }
+
+  return (
+    <Card className="mt-3 border bg-muted/30 p-3">
+      <div className="mb-2 text-xs font-medium text-muted-foreground">
+        Password checks (local, before submit)
+      </div>
+      <ul className="space-y-2">
+        {PASSWORD_CHECKS.map((check) => {
+          const status = checkStatuses[check.id] ?? "idle";
+          return (
+            <li key={check.id} className="flex items-center gap-2 text-sm">
+              <PasswordCheckIcon status={status} />
+              <span>{check.label}</span>
+            </li>
+          );
+        })}
+        <li className="flex items-center gap-2 text-sm">
+          <PasswordCheckIcon status={pwnedStatus} />
+          <span>
+            Not found in leaked password datasets (ORY/HIBP policy)
+            {typeof pwnedCount === "number" && pwnedCount > 0
+              ? ` (${pwnedCount.toLocaleString()} breaches)`
+              : ""}
+          </span>
+        </li>
+      </ul>
+      {(Object.values(checkStatuses).includes("fail") ||
+        pwnedStatus === "fail") && (
+        <p className="mt-3 text-xs text-destructive">
+          This password is not strong enough yet. Try a longer passphrase with
+          mixed characters.
+        </p>
+      )}
+    </Card>
+  );
+}
+
 function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
   return (
     <div className="flex flex-row flex-wrap gap-2">
@@ -244,29 +461,70 @@ function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
 }
 
 function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
+  const pathname = usePathname();
   const { value, name, autocomplete, maxlength, ...rest } = attributes;
+  const isRegistrationPasswordInput =
+    pathname === "/registration" &&
+    rest.type === "password" &&
+    name === "password";
+  const currentPasswordValue = watch(name);
 
   if (rest.type === "hidden") {
     return <input type="hidden" {...register(name, { value })} />;
   }
 
-  const { ref, ...restRegister } = register(name, { value });
+  const { ref, ...restRegister } = register(
+    name,
+    isRegistrationPasswordInput
+      ? {
+          value,
+          validate: (inputValue: string) => {
+            if (!inputValue) {
+              return false;
+            }
+
+            return getPwnedPasswordCount(inputValue)
+              .then((breachCount) => {
+                const allChecksPassed = evaluatePasswordChecks(
+                  inputValue,
+                ).every((check) => check.passed);
+
+                if (!allChecksPassed) {
+                  return "This password is not strong enough yet.";
+                }
+
+                if (breachCount > 0) {
+                  return "This password appears in leaked password databases.";
+                }
+
+                return true;
+              })
+              .catch(() => true);
+          },
+        }
+      : { value },
+  );
 
   return (
-    <Input
-      variant="onCard"
-      ref={ref}
-      type={rest.type}
-      maxLength={maxlength}
-      autoComplete={autocomplete}
-      required={rest.required}
-      disabled={rest.disabled}
-      pattern={rest.pattern}
-      placeholder={node.meta.label?.text}
-      onClick={onClick}
-      {...restRegister}
-    />
+    <>
+      <Input
+        variant="onCard"
+        ref={ref}
+        type={rest.type}
+        maxLength={maxlength}
+        autoComplete={autocomplete}
+        required={rest.required}
+        disabled={rest.disabled}
+        pattern={rest.pattern}
+        placeholder={node.meta.label?.text}
+        onClick={onClick}
+        {...restRegister}
+      />
+      {isRegistrationPasswordInput && (
+        <PasswordQualityCard password={String(currentPasswordValue ?? "")} />
+      )}
+    </>
   );
 }
 
