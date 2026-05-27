@@ -25,14 +25,16 @@ const nextConfig = {
     turbopackModuleIds: "deterministic",
     turbopackFileSystemCacheForDev: true,
   },
+  cacheComponents: true,
   output: "standalone",
-  webpack: (config) => {
-    // this will override the experiments
-    config.experiments = { ...config.experiments, topLevelAwait: true };
-    // this will just update topLevelAwait property of config.experiments
-    // config.experiments.topLevelAwait = true
-    return config;
-  },
+  // TODO: clarify if this is needed, is seems not to be:
+  // webpack: (config) => {
+  //   // this will override the experiments
+  //   config.experiments = { ...config.experiments, topLevelAwait: true };
+  //   // this will just update topLevelAwait property of config.experiments
+  //   // config.experiments.topLevelAwait = true
+  //   return config;
+  // },
 };
 
 module.exports = nextConfig;
