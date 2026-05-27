@@ -31,8 +31,6 @@ export async function fetchOrgs() {
   ]);
 
   if (!r.ok) {
-    console.log("LOGIN REDIRECT", r);
-    // it must be an 500
     throw new HttpError();
   }
   // parse the organization

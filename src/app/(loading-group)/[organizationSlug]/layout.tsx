@@ -1,18 +1,32 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import React from "react";
+import React, { Suspense } from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { config } from "../../../config";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { HttpError } from "../../../data-fetcher/http-error";
 
-export default async function OrganizationLayout({
-  // Layouts must accept a children prop.
-  // This will be populated with nested layouts or pages
+export default function OrganizationLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ organizationSlug: string }>;
+}) {
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Suspense>
+        <OrganizationShell params={params}>{children}</OrganizationShell>
+      </Suspense>
+    </TooltipProvider>
+  );
+}
+
+async function OrganizationShell({
   children,
   params,
 }: {
@@ -37,7 +51,7 @@ export default async function OrganizationLayout({
         }}
       >
         <OrgHeader />
-        <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
+        {children}
       </ClientContextWrapper>
     );
   } catch (error) {
