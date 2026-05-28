@@ -53,6 +53,17 @@ interface Props {
   }) => Promise<void>;
 }
 
+const QuickfixButton = ({ href }: { href: string }) => (
+  <Link href={href} onClick={(e) => e.stopPropagation()}>
+    <Badge
+      variant="outline"
+      className="cursor-pointer border-success bg-success text-success-foreground hover:bg-success-hover"
+    >
+      Quickfix
+    </Badge>
+  </Link>
+);
+
 const VulnWithCveTableRow = ({
   vuln,
   href,
@@ -145,6 +156,11 @@ const VulnWithCveTableRow = ({
               </TooltipContent>
             </Tooltip>
           </div>
+          {vuln.directDependencyFixedVersion ? (
+            <div className="ml-auto shrink-0">
+              <QuickfixButton href={href} />
+            </div>
+          ) : null}
         </div>
       </td>
       <td className="py-3 px-4 flex-col">
@@ -179,6 +195,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const packageQualifiers = extractPurlQualifiers(row.original.packageName);
   const displayPackageQualifiers = formatPurlQualifiers(
     row.original.packageName,
+  );
+  const firstQuickfixVuln = row.original.vulns.find((vuln) =>
+    Boolean(vuln.directDependencyFixedVersion),
   );
 
   const toggleCve = (cveID: string) => {
@@ -230,6 +249,15 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 </TooltipContent>
               </Tooltip>
             )}
+            {firstQuickfixVuln ? (
+              <div className="ml-auto shrink-0">
+                <QuickfixButton
+                  href={
+                    pathname + "/../dependency-risks/" + firstQuickfixVuln.id
+                  }
+                />
+              </div>
+            ) : null}
           </div>
         </td>
         <td className="py-3 px-4 flex">
@@ -277,6 +305,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
+          const firstCveQuickfixVuln = sortedVulns.find((vuln) =>
+            Boolean(vuln.directDependencyFixedVersion),
+          );
 
           return (
             <React.Fragment key={cveID}>
@@ -355,6 +386,17 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       <Badge variant="outline" className="text-xs">
                         {vulns.length} path{vulns.length !== 1 ? "s" : ""}
                       </Badge>
+                    ) : null}
+                    {firstCveQuickfixVuln ? (
+                      <div className="ml-auto shrink-0">
+                        <QuickfixButton
+                          href={
+                            pathname +
+                            "/../dependency-risks/" +
+                            firstCveQuickfixVuln.id
+                          }
+                        />
+                      </div>
                     ) : null}
                   </div>
                 </td>
