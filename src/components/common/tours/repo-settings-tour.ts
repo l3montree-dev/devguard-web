@@ -31,4 +31,8 @@ export const repoSettingsTourSteps: StepType[] = [
     content:
       "The Danger Zone lets you delete this repository permanently. All associated vulnerability data, settings, and history will be removed — this action cannot be undone.",
   },
+  {
+    selector: '[data-tour="help-center"]',
+    content: "Need help? Find guides and restart tours here anytime.",
+  },
 ];
