@@ -48,6 +48,8 @@ export default async function OrganizationLayout({
         billingUrl.searchParams.set("orgName", organizationSlug);
       }
       redirect(billingUrl.toString());
+    } else {
+      console.error("An unexpected error occurred:", error);
     }
   }
   redirect("/");
