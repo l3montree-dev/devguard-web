@@ -17,6 +17,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
+import ThemeToggle from "@/components/misc/ThemeToggle";
 
 // Renders the registration page
 const RegistrationPage = async (props: OryPageParams) => {
@@ -37,6 +38,9 @@ const RegistrationPage = async (props: OryPageParams) => {
       </Head>
       <div className="relative flex min-h-screen flex-col bg-background">
         <FourSideGridPattern />
+        <div className="absolute top-9 right-7 z-10">
+          <ThemeToggle />
+        </div>
         <div className="flex min-h-screen items-center justify-center flex-col pt-8">
           <div className="w-full max-w-6xl">
             <Card className="overflow-hidden p-0">
