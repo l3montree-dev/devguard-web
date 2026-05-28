@@ -62,7 +62,8 @@ const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
 
 export const CVSSBadge = ({ cvss, gray }: { cvss: number; gray?: boolean }) => {
   const rounded = Math.floor(cvss * 10) / 10;
-  const cls = getSeverityClassNames(riskToSeverity(rounded), Boolean(gray));
+  const severity = riskToSeverity(rounded);
+  const cls = getSeverityClassNames(severity, Boolean(gray));
 
   return (
     <span
@@ -71,7 +72,7 @@ export const CVSSBadge = ({ cvss, gray }: { cvss: number; gray?: boolean }) => {
         cls,
       )}
     >
-      {rounded.toFixed(1)}
+      {severity} ({rounded.toFixed(1)})
     </span>
   );
 };

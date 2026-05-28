@@ -18,7 +18,7 @@ import {
 import { Input } from "./ui/input";
 import { useUpdateAsset } from "../context/AssetContext";
 import Link from "next/link";
-import { useSession } from "@/context/SessionContext";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 
 export function BranchTagSelector({
   branches,
@@ -39,7 +39,7 @@ export function BranchTagSelector({
     projectSlug: string;
   };
 
-  const { session } = useSession();
+  const role = useCurrentUserRole();
 
   const initAssetVersion = branches
     .concat(tags)
@@ -169,7 +169,7 @@ export function BranchTagSelector({
           </div>
         </div>
 
-        {filteredItems.length === 0 && filter.length > 0 && session && (
+        {filteredItems.length === 0 && filter.length > 0 && isAdmin(role) && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem

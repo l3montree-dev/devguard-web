@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -123,7 +123,6 @@ const LicenseCall = (props: {
   dependencyPurl: string;
   justification: string;
 }) => {
-  const { session } = useSession();
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -207,7 +206,7 @@ const LicenseCall = (props: {
             </span>
           </div>
 
-          {session && (
+          <AuthGuard require="member">
             <div className="mt-4" onClick={(e) => e.stopPropagation()}>
               <div className="flex flex-row items-center justify-between">
                 <span className="text-sm mb-2 block text-muted-foreground">
@@ -229,7 +228,7 @@ const LicenseCall = (props: {
                 />
               </div>
             </div>
-          )}
+          </AuthGuard>
         </PopoverContent>
       </div>
     </Popover>

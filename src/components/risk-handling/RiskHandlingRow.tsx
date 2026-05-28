@@ -17,7 +17,9 @@ import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import {
   beautifyPurl,
   classNames,
+  extractPurlQualifiers,
   extractVersion,
+  formatPurlQualifiers,
   stateLabels,
 } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -25,7 +27,8 @@ import type { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
-import Severity from "../common/Severity";
+import { isMember, useCurrentUserRole } from "../../hooks/useUserRole";
+import Severity, { CVSSBadge } from "../common/Severity";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
@@ -48,8 +51,17 @@ interface Props {
     justification: string;
     mechanicalJustification?: string;
   }) => Promise<void>;
-  hasSession: boolean;
 }
+
+const CvssCell = ({ cvss }: { cvss?: number | null }) => (
+  <div className="flex">
+    {cvss == null || cvss === -1 ? (
+      <span className="text-sm">N/A</span>
+    ) : (
+      <CVSSBadge cvss={cvss} />
+    )}
+  </div>
+);
 
 const VulnWithCveTableRow = ({
   vuln,
@@ -57,15 +69,14 @@ const VulnWithCveTableRow = ({
   selectable,
   selected,
   onToggle,
-  hasSession,
 }: {
   vuln: VulnWithCVE;
   href: string;
   selectable: boolean;
   selected: boolean;
   onToggle: () => void;
-  hasSession: boolean;
 }) => {
+  const isMemberRole = isMember(useCurrentUserRole());
   const router = useRouter();
   return (
     <tr
@@ -87,7 +98,7 @@ const VulnWithCveTableRow = ({
               <Checkbox
                 checked={selected}
                 onCheckedChange={onToggle}
-                disabled={!hasSession}
+                disabled={!isMemberRole}
               />
             </div>
           )}
@@ -152,28 +163,21 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
       <td className="py-3 px-4">
-        <span className="text-sm">{(vuln.cve?.cvss ?? 0).toFixed(1)}</span>
+        <CvssCell cvss={vuln.cve?.cvss} />
       </td>
       <td className="py-3 px-4"></td>
     </tr>
   );
 };
 
-const extractQualifiers = (purl: string) => {
-  const parts = purl.split("?");
-  if (parts.length < 2) return "";
-  const qualifiersPart = parts[1];
-  const qualifiers = qualifiersPart.split("&").join(", ");
-  return qualifiers;
-};
 const RiskHandlingRow: FunctionComponent<Props> = ({
   row,
   index,
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
-  hasSession,
 }) => {
+  const isMemberRole = isMember(useCurrentUserRole());
   const [isPackageOpen, setIsPackageOpen] = useState(false);
   const [expandedCves, setExpandedCves] = useState<Set<string>>(new Set());
   const pathname = useDecodedPathname();
@@ -181,6 +185,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const vulnGroups = useMemo(
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],
+  );
+  const packageQualifiers = extractPurlQualifiers(row.original.packageName);
+  const displayPackageQualifiers = formatPurlQualifiers(
+    row.original.packageName,
   );
 
   const toggleCve = (cveID: string) => {
@@ -206,7 +214,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
         onClick={() => setIsPackageOpen((prev) => !prev)}
       >
         <td className="py-3 px-4">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             {isPackageOpen ? (
               <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             ) : (
@@ -220,20 +228,25 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               {extractVersion(row.original.packageName)}
             </span>
 
-            <span className="text-xs text-muted-foreground">
-              {extractQualifiers(row.original.packageName)}
-            </span>
+            {packageQualifiers && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="max-w-64 truncate whitespace-nowrap text-xs text-muted-foreground">
+                    {displayPackageQualifiers}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm break-all">
+                  {packageQualifiers}
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </td>
         <td className="py-3 px-4 flex">
           <Severity risk={row.original.maxRisk} />
         </td>
         <td className="py-3 px-4">
-          <span className="text-sm">
-            {row.original.maxCvss == null || row.original.maxCvss === -1
-              ? "N/A"
-              : row.original.maxCvss.toFixed(1)}
-          </span>
+          <CvssCell cvss={row.original.maxCvss} />
         </td>
         <td className="py-3 px-4">
           <Badge variant="outline" className="w-fit">
@@ -324,7 +337,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                             : false
                       }
                       onCheckedChange={() => onToggleAll(selectableIds)}
-                      disabled={!hasSession}
+                      disabled={!isMemberRole}
                     />
                     <span className="font-medium text-foreground">{cveID}</span>
 
@@ -355,12 +368,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   <Severity risk={sortedVulns[0]?.rawRiskAssessment ?? 0} />
                 </td>
                 <td className="py-2 px-4">
-                  <span className="text-sm">
-                    {sortedVulns[0]?.cve?.cvss == null ||
-                    sortedVulns[0]?.cve?.cvss === -1
-                      ? "N/A"
-                      : sortedVulns[0]?.cve?.cvss.toFixed(1)}
-                  </span>
+                  <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
                 </td>
                 <td />
               </tr>
@@ -377,7 +385,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     selectable={vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
-                    hasSession={hasSession}
                   />
                 ))}
             </React.Fragment>

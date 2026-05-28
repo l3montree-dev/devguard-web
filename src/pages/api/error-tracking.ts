@@ -15,7 +15,7 @@ const getSentryConfig = () => {
     // format: https://<public_key>@<host>/<project_id>
     const publicKey = dsnUrl.username;
 
-    const sentryPackageVersion = "sentry.javascript.nextjs%2F9.34.0"; //url encoded
+    const sentryPackageVersion = "sentry.javascript.nextjs%2F10.53.1"; //url encoded
 
     return { host, projectId, publicKey, sentryPackageVersion };
   } catch (e) {

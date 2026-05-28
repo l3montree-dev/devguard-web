@@ -130,7 +130,7 @@ const ManualIntegrationSlide: FunctionComponent<
       "/" +
       params.assetSlug,
   );
-  const [origin, setOrigin] = useState("SBOM_DEFAULT");
+  const [origin, setOrigin] = useState(tab.toUpperCase() + "_DEFAULT");
   const [isTag, setIsTag] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -185,14 +185,13 @@ const ManualIntegrationSlide: FunctionComponent<
       <div className="mt-4 px-1">
         <Tabs
           value={tab}
-          onValueChange={(v) => setTab(v as "sbom" | "sarif")}
-          defaultValue="sbom"
+          onValueChange={(v) => setTab(v as "sbom" | "sarif" | "vex")}
           className="w-full"
         >
           <div className="flex">
             <TabsList>
-              <TabsTrigger value="sbom">SBOM</TabsTrigger>
               <TabsTrigger value="sarif">SARIF</TabsTrigger>
+              <TabsTrigger value="sbom">SBOM</TabsTrigger>
               <TabsTrigger value="vex">VEX</TabsTrigger>
             </TabsList>
           </div>
@@ -325,10 +324,10 @@ const ManualIntegrationSlide: FunctionComponent<
                 </div>
               )}
             </div>
-            <div className="mt-2 flex text-primary flex-row items-center">
+            <div className="mt-2 flex text-link flex-row items-center">
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
-                className="flex text-primary text-sm"
+                className="flex text-sm"
                 href={documentationLinks.sbomExplaining}
                 target="_blank"
               >
@@ -582,10 +581,10 @@ const ManualIntegrationSlide: FunctionComponent<
                 </div>
               )}
             </div>
-            <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2 text-primary" />
+            <div className="mt-2 flex flex-row items-center">
+              <QuestionMarkCircleIcon className="flex w-4 m-2 text-link" />
               <Link
-                className="flex text-primary text-sm"
+                className="flex text-sm"
                 href={documentationLinks.vexExplaining}
                 target="_blank"
               >

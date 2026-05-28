@@ -26,4 +26,8 @@ export const dependencyInsightsTourSteps: StepType[] = [
     content:
       "The table lists your dependencies with columns for package name, license, source repository, OpenSSF Scorecard score, and publish date. Click any row to open the full dependency detail dialog.",
   },
+  {
+    selector: '[data-tour="help-center"]',
+    content: "Need help? Find guides and restart tours here anytime.",
+  },
 ];

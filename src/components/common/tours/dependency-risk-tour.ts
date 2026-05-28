@@ -26,4 +26,8 @@ export const dependencyRiskTourSteps: StepType[] = [
     content:
       "Here you can manage vulnerabilities and their associated risks to identify them as false positives or confirmed issues.",
   },
+  {
+    selector: '[data-tour="help-center"]',
+    content: "Need help? Find guides and restart tours here anytime.",
+  },
 ];

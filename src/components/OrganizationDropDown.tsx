@@ -46,7 +46,7 @@ const activeOrgName = (name: string, slug: string) => {
   }
   return name;
 };
-export const OrganizationDropDown = () => {
+const OrganizationDropDown = () => {
   const orgs = useSession().organizations;
   const updateOrganizations = useUpdateSession();
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
@@ -54,8 +54,13 @@ export const OrganizationDropDown = () => {
   const user = useCurrentUser();
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
+
+  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
-  if (!activeOrg && orgs.length > 0) {
+  if (!activeOrg && lastActiveOrg) {
+    activeOrg = orgs.find((o) => o.slug === lastActiveOrg) || null;
+  } else if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
 
@@ -191,3 +196,5 @@ export const OrganizationDropDown = () => {
     </>
   );
 };
+
+export default OrganizationDropDown;

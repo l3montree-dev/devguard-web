@@ -3,8 +3,11 @@
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
 
+import AuthGuard from "@/components/AuthGuard";
+import MitigateDialog from "@/components/MitigateDialog";
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
+import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +24,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
+import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
+import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import { usePageTour } from "@/hooks/usePageTour";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useCreateVexRule } from "@/hooks/useCreateVexRule";
-import { RequirementsLevel } from "@/types/api/api";
 import type {
   AssetDTO,
   DependencyVulnHints,
@@ -37,6 +44,7 @@ import type {
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
+import { RequirementsLevel } from "@/types/api/api";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
   InformationCircleIcon,
@@ -49,42 +57,32 @@ import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
-import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import FalsePositiveDialog from "../../../../../../../../../../../components/FalsePositiveDialog";
-import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
-import VexRuleResult from "../../../../../../../../../../../components/vex-rules/VexRuleResult";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
+import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import Callout from "../../../../../../../../../../../components/common/Callout";
 import Err from "../../../../../../../../../../../components/common/Err";
 import Markdown from "../../../../../../../../../../../components/common/Markdown";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
+import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import MitigateDialog from "@/components/MitigateDialog";
-import { useSession } from "@/context/SessionContext";
-import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
-import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
-import { usePageTour } from "@/hooks/usePageTour";
-import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
-import { DocDrawer } from "@/components/common/DocDrawer";
+import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -294,8 +292,8 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 };
 
 const Index: FunctionComponent = () => {
-  const pathname = usePathname();
   const { session } = useSession();
+  const role = useCurrentUserRole();
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -800,7 +798,7 @@ const Index: FunctionComponent = () => {
                               enableContextMenu={
                                 vuln.vulnerabilityPath.length !== 0 &&
                                 vuln.state === "open" &&
-                                session !== null
+                                isMember(role)
                               }
                               graph={graphData}
                               vulns={[vuln]}
@@ -823,7 +821,7 @@ const Index: FunctionComponent = () => {
                           this vulnerability in your dependency tree. Therefore
                           the graph is not displayed by default to avoid
                           performance issues.
-                          {session
+                          {isMember(role)
                             ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
                             : ""}
                         </Callout>
@@ -960,11 +958,11 @@ const Index: FunctionComponent = () => {
                     }
                   />
                   {vuln && <Quickfix vuln={vuln} />}
-                  {(session || vuln.ticketUrl) && (
+                  {(isMember(role) || vuln.ticketUrl) && (
                     <div data-tour="vuln-management">
                       <Card>
                         <CardContent className="mt-4">
-                          {session && (
+                          <AuthGuard require="member">
                             <>
                               {vuln.state === "open" ? (
                                 <form
@@ -1107,7 +1105,7 @@ const Index: FunctionComponent = () => {
                                 </form>
                               )}
                             </>
-                          )}
+                          </AuthGuard>
 
                           {vuln.ticketUrl && (
                             <small className="mt-2 block w-full text-right text-muted-foreground">

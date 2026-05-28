@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
 import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -425,11 +426,11 @@ const Index: FunctionComponent = () => {
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Share your VEX
           </Button>
-          {session && (
+          <AuthGuard require="member">
             <Button onClick={() => setIsOpen(true)} variant="default">
               Identify Risks
             </Button>
-          )}
+          </AuthGuard>
         </div>
       </div>
       <VexDownloadModal
@@ -517,58 +518,60 @@ const Index: FunctionComponent = () => {
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
                   {/* Batch action row - shown when items are selected and user is logged in */}
-                  {session && selectedVulnIds.size > 0 && (
-                    <tr className="bg-muted/50">
-                      <td colSpan={4} className="px-4 py-2">
-                        <div className="flex flex-row items-center justify-end">
-                          <div className="flex flex-row items-center gap-2">
-                            {selectedClosedIds.length > 0 && (
-                              <AsyncButton
-                                variant="secondary"
-                                onClick={async () => {
-                                  const count = selectedClosedIds.length;
-                                  await handleBulkAction({
-                                    vulnIds: selectedClosedIds,
-                                    status: "reopened",
-                                    justification: "",
-                                  });
-                                  toast("Reopened", {
-                                    description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
-                                  });
-                                }}
+                  <AuthGuard require="member">
+                    {selectedVulnIds.size > 0 && (
+                      <tr className="bg-muted/50">
+                        <td colSpan={4} className="px-4 py-2">
+                          <div className="flex flex-row items-center justify-end">
+                            <div className="flex flex-row items-center gap-2">
+                              {selectedClosedIds.length > 0 && (
+                                <AsyncButton
+                                  variant="secondary"
+                                  onClick={async () => {
+                                    const count = selectedClosedIds.length;
+                                    await handleBulkAction({
+                                      vulnIds: selectedClosedIds,
+                                      status: "reopened",
+                                      justification: "",
+                                    });
+                                    toast("Reopened", {
+                                      description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
+                                    });
+                                  }}
+                                >
+                                  Reopen ({selectedClosedIds.length})
+                                </AsyncButton>
+                              )}
+                              {selectedOpenIds.length > 0 && (
+                                <>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() =>
+                                      setFalsePositiveDialogOpen(true)
+                                    }
+                                  >
+                                    False Positive ({selectedOpenIds.length})
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() => setAcceptDialogOpen(true)}
+                                  >
+                                    Accept Risk ({selectedOpenIds.length})
+                                  </Button>
+                                </>
+                              )}
+                              <Button
+                                variant="ghost"
+                                onClick={() => setSelectedVulnIds(new Set())}
                               >
-                                Reopen ({selectedClosedIds.length})
-                              </AsyncButton>
-                            )}
-                            {selectedOpenIds.length > 0 && (
-                              <>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() =>
-                                    setFalsePositiveDialogOpen(true)
-                                  }
-                                >
-                                  False Positive ({selectedOpenIds.length})
-                                </Button>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() => setAcceptDialogOpen(true)}
-                                >
-                                  Accept Risk ({selectedOpenIds.length})
-                                </Button>
-                              </>
-                            )}
-                            <Button
-                              variant="ghost"
-                              onClick={() => setSelectedVulnIds(new Set())}
-                            >
-                              Clear
-                            </Button>
+                                Clear
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </tr>
+                    )}
+                  </AuthGuard>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
@@ -663,7 +666,6 @@ const Index: FunctionComponent = () => {
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
                       onBulkAction={handleBulkAction}
-                      hasSession={!!session}
                     />
                   ))}
                 </tbody>

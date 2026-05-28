@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import { groupBy } from "lodash";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -60,7 +60,6 @@ import {
 
 const OverviewPage = () => {
   const search = useSearchParams();
-  const { session } = useSession();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -278,7 +277,7 @@ const OverviewPage = () => {
         <EmptyParty
           title={"No data available for this group yet..."}
           Button={
-            session ? (
+            <AuthGuard require="admin">
               <Button
                 onClick={() => {
                   router?.push(
@@ -288,7 +287,7 @@ const OverviewPage = () => {
               >
                 Create new release
               </Button>
-            ) : undefined
+            </AuthGuard>
           }
           description="Create a release to group multiple repository artifacts into their own release. This allows you to track and monitor your software over time."
         />

@@ -41,6 +41,7 @@ import {
 import { useConfig } from "../../context/ConfigContext";
 import { getUserFullName } from "../../types/auth";
 import HelpDropdown from "./HelpDropdown";
+import StarRepo from "./StarRepo";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
@@ -55,7 +56,8 @@ export default function UserNav() {
   };
 
   return (
-    <div className="flex text-header-foreground user-nav flex-row justify-between gap-1">
+    <div className="flex items-center text-header-foreground user-nav flex-row justify-between gap-1">
+      <StarRepo />
       <HelpDropdown />
       <DropdownMenu>
         <DropdownMenuTrigger aria-label="Open tools menu">
