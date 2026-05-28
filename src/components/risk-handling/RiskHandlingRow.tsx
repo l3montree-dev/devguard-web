@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import { isMember, useCurrentUserRole } from "../../hooks/useUserRole";
-import Severity from "../common/Severity";
+import Severity, { CVSSBadge } from "../common/Severity";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
@@ -52,6 +52,16 @@ interface Props {
     mechanicalJustification?: string;
   }) => Promise<void>;
 }
+
+const CvssCell = ({ cvss }: { cvss?: number | null }) => (
+  <div className="flex">
+    {cvss == null || cvss === -1 ? (
+      <span className="text-sm">N/A</span>
+    ) : (
+      <CVSSBadge cvss={cvss} />
+    )}
+  </div>
+);
 
 const VulnWithCveTableRow = ({
   vuln,
@@ -153,7 +163,7 @@ const VulnWithCveTableRow = ({
         </div>
       </td>
       <td className="py-3 px-4">
-        <span className="text-sm">{(vuln.cve?.cvss ?? 0).toFixed(1)}</span>
+        <CvssCell cvss={vuln.cve?.cvss} />
       </td>
       <td className="py-3 px-4"></td>
     </tr>
@@ -236,11 +246,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           <Severity risk={row.original.maxRisk} />
         </td>
         <td className="py-3 px-4">
-          <span className="text-sm">
-            {row.original.maxCvss == null || row.original.maxCvss === -1
-              ? "N/A"
-              : row.original.maxCvss.toFixed(1)}
-          </span>
+          <CvssCell cvss={row.original.maxCvss} />
         </td>
         <td className="py-3 px-4">
           <Badge variant="outline" className="w-fit">
@@ -362,12 +368,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   <Severity risk={sortedVulns[0]?.rawRiskAssessment ?? 0} />
                 </td>
                 <td className="py-2 px-4">
-                  <span className="text-sm">
-                    {sortedVulns[0]?.cve?.cvss == null ||
-                    sortedVulns[0]?.cve?.cvss === -1
-                      ? "N/A"
-                      : sortedVulns[0]?.cve?.cvss.toFixed(1)}
-                  </span>
+                  <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
                 </td>
                 <td />
               </tr>
