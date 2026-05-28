@@ -392,7 +392,7 @@ function OryRegistrationInput({
             placeholder="Confirm Password"
             className="w-full py-2 pl-3"
             onBlur={(e) => {
-              if (e.target.value !== passwordValue) {
+              if (confirmPasswordValue !== passwordValue) {
                 setPasswordError("Confirm password is not equal to password");
               } else {
                 setPasswordError("");
