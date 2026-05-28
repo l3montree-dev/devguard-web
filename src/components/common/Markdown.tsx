@@ -26,6 +26,11 @@ const Markdown = (props: Options & { linkBaseURL?: string }) => {
             {children}
           </a>
         ),
+        code: ({ children, ...props }) => (
+          <code {...props} className="!text-foreground">
+            {children}
+          </code>
+        ),
       }}
       remarkPlugins={[remarkGfm]}
       {...rest}
