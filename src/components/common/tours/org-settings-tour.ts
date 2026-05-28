@@ -26,4 +26,8 @@ export const orgSettingsTourSteps: StepType[] = [
     content:
       "Set your Organization public if your projects are publicly accessible and you want to share your Vulnerability Management with others.",
   },
+  {
+    selector: '[data-tour="help-center"]',
+    content: "Need help? Find guides and restart tours here anytime.",
+  },
 ];
