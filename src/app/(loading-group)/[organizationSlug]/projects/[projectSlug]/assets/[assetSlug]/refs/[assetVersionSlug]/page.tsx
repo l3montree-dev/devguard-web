@@ -4,6 +4,7 @@ import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
+import QuickfixOverview from "@/components/QuickfixOverview";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -52,6 +53,7 @@ import type {
   LicenseResponse,
   Paged,
   RiskHistory,
+  VulnByPackage,
   VulnEventDTO,
 } from "../../../../../../../../../types/api/api";
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
@@ -124,6 +126,56 @@ const Index: FunctionComponent = () => {
   const { data: licenses, isLoading: licenseLoading } = useSWR<
     LicenseResponse[]
   >(url + "/components/licenses/" + urlQueryAppendixForArtifact, fetcher);
+
+  const quickfixQuery = useMemo(() => {
+    const params = new URLSearchParams({
+      pageSize: "100",
+      "filterQuery[state][is]": "open",
+      "sort[max_risk]": "desc",
+    });
+
+    if (selectedArtifact) {
+      params.append(
+        "filterQuery[artifact_dependency_vulns.artifact_artifact_name][is]",
+        selectedArtifact,
+      );
+    }
+
+    return params.toString();
+  }, [selectedArtifact]);
+
+  const { data: quickfixVulnPackages, isLoading: quickfixesLoading } = useSWR<
+    Paged<VulnByPackage>
+  >(url + "/dependency-vulns/?" + quickfixQuery, fetcher);
+
+  const allQuickfixVulns = useMemo(() => {
+    const seen = new Set<string>();
+    return (quickfixVulnPackages?.data ?? [])
+      .flatMap((pkg) => pkg.vulns)
+      .filter((vuln) => {
+        const quickfixKey = [
+          vuln.cveID,
+          vuln.vulnerabilityPath[0],
+          vuln.directDependencyFixedVersion,
+        ].join(":");
+
+        if (
+          seen.has(quickfixKey) ||
+          !vuln.directDependencyFixedVersion ||
+          vuln.vulnerabilityPath.length === 0
+        ) {
+          return false;
+        }
+        seen.add(quickfixKey);
+        return true;
+      })
+      .sort((a, b) => b.rawRiskAssessment - a.rawRiskAssessment);
+  }, [quickfixVulnPackages]);
+
+  const quickfixVulns = useMemo(
+    () => allQuickfixVulns.slice(0, 5),
+    [allQuickfixVulns],
+  );
 
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");
@@ -309,11 +361,24 @@ const Index: FunctionComponent = () => {
                 mode={mode}
               />
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-6 gap-4">
               <VulnerableComponents
                 isLoading={componentRiskLoading}
                 mode={mode}
                 data={componentRisk}
+              />
+
+              <QuickfixOverview
+                dependencyRisksHref={
+                  `${pathname}/dependency-risks` +
+                  (artifactName ? `?artifact=${artifactName}` : "")
+                }
+                getVulnHref={(vuln) =>
+                  `${pathname}/dependency-risks/${vuln.id}`
+                }
+                isLoading={quickfixesLoading}
+                totalAmount={allQuickfixVulns.length}
+                vulns={quickfixVulns}
               />
 
               <Card className="col-span-2 flex flex-col">
