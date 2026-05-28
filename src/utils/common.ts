@@ -17,6 +17,7 @@ import type { State } from "@/types/common";
 import { defaultScanner } from "./view";
 import { UserRole } from "@/types/api/api";
 import type { DependencyVuln } from "@/types/api/api";
+import { PackageURL } from "packageurl-js";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
@@ -162,38 +163,39 @@ export const isNumber = (v: any): v is number => {
   return typeof v === "number" && v === v;
 };
 
-export const beautifyPurl = (purl: string) => {
+export const beautifyPurl = (purl: string): string => {
   if (purl === "ROOT") {
     return "Your application";
   }
   if (!purl) {
     return "";
   }
-  const parts = purl.split("@");
-  let first = parts[0];
-
-  if (parts.length > 2) {
-    // all other parts than the last
-    first = parts.slice(0, parts.length - 1).join("@");
+  try {
+    const p = PackageURL.fromString(purl);
+    return p.namespace ? `${p.namespace}/${p.name}` : p.name;
+  } catch {
+    return purl;
   }
-
-  // remove everything before the first slash
-  const slashIndex = first.indexOf("/");
-  if (slashIndex > 0) {
-    first = first.substring(slashIndex + 1);
-  }
-
-  return first.replace("%40", "@");
 };
 
-export const extractVersion = (purl: string) => {
-  if (!purl.includes("@")) {
+export const extractVersion = (purl: string): string => {
+  if (!purl) return "";
+  try {
+    return PackageURL.fromString(purl).version ?? "";
+  } catch {
     return "";
   }
-  const parts = purl.split("@");
-  // remove qualifiers from the version part if they exist
-  const versionPart = parts[parts.length - 1].split("?")[0];
-  return versionPart;
+};
+
+export const purlToDisplayString = (purl: string): string => {
+  if (!purl) return "";
+  try {
+    const { namespace, name, version } = PackageURL.fromString(purl);
+    const base = namespace ? `${namespace}/${name}` : name;
+    return version ? `${base}@${version}` : base;
+  } catch {
+    return purl;
+  }
 };
 
 export const extractPurlQualifiers = (purl: string) => {

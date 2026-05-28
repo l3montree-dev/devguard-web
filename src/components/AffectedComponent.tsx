@@ -137,8 +137,10 @@ const AffectedComponentDetails: FunctionComponent<{
                     Fixed in:{" "}
                   </span>
                   <Badge variant={"outline"}>
-                    {extractVersion(vuln.directDependencyFixedVersion || "") ||
-                      extractVersion(vuln.componentFixedVersion || "") ||
+                    {vuln.directDependencyFixedVersion ||
+                      "" ||
+                      vuln.componentFixedVersion ||
+                      "" ||
                       "no patch available"}
                   </Badge>
                 </div>
