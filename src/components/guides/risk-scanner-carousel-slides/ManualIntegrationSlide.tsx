@@ -324,10 +324,10 @@ const ManualIntegrationSlide: FunctionComponent<
                 </div>
               )}
             </div>
-            <div className="mt-2 flex text-primary flex-row items-center">
+            <div className="mt-2 flex text-link flex-row items-center">
               <QuestionMarkCircleIcon className="flex w-4 m-2" />
               <Link
-                className="flex !text-primary text-sm"
+                className="flex text-sm"
                 href={documentationLinks.sbomExplaining}
                 target="_blank"
               >
@@ -581,10 +581,10 @@ const ManualIntegrationSlide: FunctionComponent<
                 </div>
               )}
             </div>
-            <div className="mt-2 flex text-primary flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2 text-primary" />
+            <div className="mt-2 flex flex-row items-center">
+              <QuestionMarkCircleIcon className="flex w-4 m-2 text-link" />
               <Link
-                className="flex !text-primary text-sm"
+                className="flex text-sm"
                 href={documentationLinks.vexExplaining}
                 target="_blank"
               >
