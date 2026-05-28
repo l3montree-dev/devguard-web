@@ -97,6 +97,17 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
 
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
+  // Only show quickfix for direct dependencies, or for ecosystems with a resolver (deb, npm)
+  const isDirectDep = vuln.vulnerabilityPath.length === 1;
+  const ecosystem = isValidPackagePurl(vulnerabilityPath)
+    ? PackageURL.fromString(vulnerabilityPath).type
+    : null;
+  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
+
+  if (!isDirectDep && !hasResolver) {
+    return null;
+  }
+
   // Validate the vulnerability path is a valid PURL before parsing
   if (!isValidPackagePurl(vulnerabilityPath)) {
     return (
