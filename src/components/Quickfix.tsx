@@ -108,15 +108,8 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
     return null;
   }
 
-  // Validate the vulnerability path is a valid PURL before parsing
   if (!isValidPackagePurl(vulnerabilityPath)) {
-    return (
-      <div className="rounded-lg border bg-card p-4">
-        <span className="text-xs text-muted-foreground">
-          Invalid package URL: {vulnerabilityPath}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   return (
