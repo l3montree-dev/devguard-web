@@ -340,10 +340,8 @@ function OryRegistrationInput({
 
   const { ref, ...restRegister } = register(name, { value });
 
-  const { onBlur, ...restRegisterConfirmPassword } = register(
-    "confirmPassword",
-    { required: true },
-  );
+  const { onBlur, ...restRegisterConfirmPassword } =
+    register("confirmPassword");
 
   if (rest.type === "password") {
     return (
@@ -390,10 +388,11 @@ function OryRegistrationInput({
             autoComplete={autocomplete}
             disabled={rest.disabled}
             pattern={rest.pattern}
-            placeholder={"Confirm Password"}
+            required={rest.required}
+            placeholder="Confirm Password"
             className="w-full py-2 pl-3"
             onBlur={(e) => {
-              if (confirmPasswordValue !== passwordValue) {
+              if (e.target.value !== passwordValue) {
                 setPasswordError("Confirm password is not equal to password");
               } else {
                 setPasswordError("");
