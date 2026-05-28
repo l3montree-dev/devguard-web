@@ -14,8 +14,8 @@ import { SessionProvider } from "../context/SessionContext";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
 import type { OrganizationDTO } from "../types/api/api";
-import { TourContextProvider } from "@/context/TourContext";
 import InternalServerErrorPage from "./error";
+import { TourContextProvider } from "@/context/TourContext";
 
 export const lexend = localFont({
   src: "../../public/fonts/Lexend/Lexend-VariableFont_wght.ttf",
@@ -30,6 +30,8 @@ export const inter = localFont({
 });
 
 export default function RootLayout({
+  // Layouts must accept a children prop.
+  // This will be populated with nested layouts or pages
   children,
 }: {
   children: React.ReactNode;

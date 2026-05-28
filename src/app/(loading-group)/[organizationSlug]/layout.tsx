@@ -11,6 +11,8 @@ import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { HttpError } from "../../../data-fetcher/http-error";
 
 export default function OrganizationLayout({
+  // Layouts must accept a children prop.
+  // This will be populated with nested layouts or pages
   children,
   params,
 }: {
