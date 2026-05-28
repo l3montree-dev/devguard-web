@@ -39,6 +39,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Checkbox } from "../ui/checkbox";
+import { Eye, EyeOff } from "lucide-react";
 
 function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
   const label = node.meta.label?.text ?? "";
@@ -46,7 +47,15 @@ function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
   const {
     formState: { isSubmitting },
     setValue,
+    watch,
   } = useFormContext();
+
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+  const passwordsMismatch =
+    typeof confirmPassword === "string" &&
+    confirmPassword.length > 0 &&
+    password !== confirmPassword;
 
   useEffect(() => {
     if (!isSubmitting) setClicked(false);
@@ -57,7 +66,7 @@ function OryButton({ node, attributes, onClick, ...rest }: OryNodeButtonProps) {
       name={attributes.name}
       type={attributes.type === "button" ? "button" : "submit"}
       value={attributes.value?.toString()}
-      disabled={attributes.disabled ?? isSubmitting}
+      disabled={attributes.disabled || isSubmitting || passwordsMismatch}
       variant={node.group === "passkey" ? "default" : "secondary"}
       onClick={(e) => {
         onClick?.(e);
@@ -246,12 +255,158 @@ function OrySsoSettings({ linkButtons, unlinkButtons }: OrySettingsSsoProps) {
 function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
   const { register } = useFormContext();
   const { value, name, autocomplete, maxlength, ...rest } = attributes;
+  const [revealPassword, setRevealPassword] = useState(false);
 
   if (rest.type === "hidden") {
     return <input type="hidden" {...register(name, { value })} />;
   }
 
   const { ref, ...restRegister } = register(name, { value });
+
+  if (rest.type === "password") {
+    return (
+      <div className="bg-background/70 flex h-10 w-full rounded-md border border-input text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 items-center">
+        <input
+          ref={ref}
+          type={revealPassword ? "text" : "password"}
+          maxLength={maxlength}
+          autoComplete={autocomplete}
+          required={rest.required}
+          disabled={rest.disabled}
+          pattern={rest.pattern}
+          placeholder={node.meta.label?.text}
+          onClick={onClick}
+          {...restRegister}
+          className="w-full py-2 pl-3"
+        />
+        <Button
+          className="bg-transparent hover:bg-transparent"
+          type="button"
+          onClick={() => {
+            setRevealPassword((prevState) => !prevState);
+          }}
+        >
+          {!revealPassword && <Eye />}
+          {revealPassword && <EyeOff />}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Input
+      variant="onCard"
+      ref={ref}
+      type={rest.type}
+      maxLength={maxlength}
+      autoComplete={autocomplete}
+      required={rest.required}
+      disabled={rest.disabled}
+      pattern={rest.pattern}
+      placeholder={node.meta.label?.text}
+      onClick={onClick}
+      {...restRegister}
+    />
+  );
+}
+
+function OryRegistrationInput({
+  node,
+  attributes,
+  onClick,
+}: OryNodeInputProps) {
+  const {
+    register,
+    watch,
+    formState: { isSubmitSuccessful },
+  } = useFormContext();
+  const { value, name, autocomplete, maxlength, ...rest } = attributes;
+  const [revealPassword, setRevealPassword] = useState(false);
+  const [revealConfirmPassword, setRevealConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+  const passwordValue = watch("password");
+  const confirmPasswordValue = watch("confirmPassword");
+
+  useEffect(() => {
+    setPasswordError("");
+  }, [isSubmitSuccessful]);
+
+  if (rest.type === "hidden") {
+    return <input type="hidden" {...register(name, { value })} />;
+  }
+
+  const { ref, ...restRegister } = register(name, { value });
+
+  const { onBlur, ...restRegisterConfirmPassword } =
+    register("confirmPassword");
+
+  if (rest.type === "password") {
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="mb-3 bg-background/70 flex h-10 w-full rounded-md border border-input text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 items-center">
+          <input
+            ref={ref}
+            type={revealPassword ? "text" : "password"}
+            maxLength={maxlength}
+            autoComplete={autocomplete}
+            required={rest.required}
+            disabled={rest.disabled}
+            pattern={rest.pattern}
+            placeholder={node.meta.label?.text}
+            onClick={onClick}
+            {...restRegister}
+            className="w-full py-2 pl-3"
+            onFocus={()=>{setPasswordError("")}}
+          />
+          <Button
+            className="bg-transparent hover:bg-transparent"
+            type="button"
+            onClick={() => {
+              setRevealPassword((prevState) => !prevState);
+            }}
+          >
+            {!revealPassword && <Eye />}
+            {revealPassword && <EyeOff />}
+          </Button>
+        </div>
+        <div className="text-sm font-medium">Confirm Password</div>
+        <div className="bg-background/70 flex h-10 w-full rounded-md border border-input text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 items-center">
+          <input
+            type={revealConfirmPassword ? "text" : "password"}
+            maxLength={maxlength}
+            autoComplete={autocomplete}
+            disabled={rest.disabled}
+            pattern={rest.pattern}
+            placeholder={"Confirm Password"}
+            className="w-full py-2 pl-3"
+            onBlur={(e) => {
+              if (confirmPasswordValue !== passwordValue){
+                setPasswordError("Confirm password is not equal to password")
+              }else {
+                setPasswordError("")
+              }
+            }}
+            onFocus={()=>{setPasswordError("")}}
+            {...restRegisterConfirmPassword}
+          />
+          <Button
+            className="bg-transparent hover:bg-transparent"
+            type="button"
+            onClick={() => {
+              setRevealConfirmPassword((prevState) => !prevState);
+            }}
+          >
+            {!revealConfirmPassword && <Eye />}
+            {revealConfirmPassword && <EyeOff />}
+          </Button>
+        </div>
+        {passwordError && (
+          <p className="text-sm text-destructive">{passwordError}</p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Input
@@ -518,7 +673,7 @@ export const oryComponentOverrides: OryFlowComponentOverrides = {
   Node: {
     Button: OryButton,
     SsoButton: OrySsoButton,
-    Input: OryInput,
+    Input: OryRegistrationInput,
     CodeInput: OryCodeInput,
     Checkbox: OryCheckbox,
     // Image: OryImage,
