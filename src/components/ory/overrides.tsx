@@ -285,9 +285,11 @@ function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
           onClick={() => {
             setRevealPassword((prevState) => !prevState);
           }}
+          aria-label={revealPassword ? "Hide password" : "Show password"}
+          aria-pressed={revealPassword}
         >
-          {!revealPassword && <Eye />}
-          {revealPassword && <EyeOff />}
+          {!revealPassword && <Eye aria-hidden="true" />}
+          {revealPassword && <EyeOff aria-hidden="true" />}
         </Button>
       </div>
     );
@@ -338,8 +340,10 @@ function OryRegistrationInput({
 
   const { ref, ...restRegister } = register(name, { value });
 
-  const { onBlur, ...restRegisterConfirmPassword } =
-    register("confirmPassword");
+  const { onBlur, ...restRegisterConfirmPassword } = register(
+    "confirmPassword",
+    { required: true },
+  );
 
   if (rest.type === "password") {
     return (
@@ -357,7 +361,9 @@ function OryRegistrationInput({
             onClick={onClick}
             {...restRegister}
             className="w-full py-2 pl-3"
-            onFocus={()=>{setPasswordError("")}}
+            onFocus={() => {
+              setPasswordError("");
+            }}
           />
           <Button
             className="bg-transparent hover:bg-transparent"
@@ -365,9 +371,15 @@ function OryRegistrationInput({
             onClick={() => {
               setRevealPassword((prevState) => !prevState);
             }}
+            aria-label={
+              revealConfirmPassword
+                ? "Hide confirm password"
+                : "Show confirm password"
+            }
+            aria-pressed={revealConfirmPassword}
           >
-            {!revealPassword && <Eye />}
-            {revealPassword && <EyeOff />}
+            {!revealPassword && <Eye aria-hidden="true" />}
+            {revealPassword && <EyeOff aria-hidden="true" />}
           </Button>
         </div>
         <div className="text-sm font-medium">Confirm Password</div>
@@ -381,13 +393,16 @@ function OryRegistrationInput({
             placeholder={"Confirm Password"}
             className="w-full py-2 pl-3"
             onBlur={(e) => {
-              if (confirmPasswordValue !== passwordValue){
-                setPasswordError("Confirm password is not equal to password")
-              }else {
-                setPasswordError("")
+              if (confirmPasswordValue !== passwordValue) {
+                setPasswordError("Confirm password is not equal to password");
+              } else {
+                setPasswordError("");
               }
+              onBlur(e);
             }}
-            onFocus={()=>{setPasswordError("")}}
+            onFocus={() => {
+              setPasswordError("");
+            }}
             {...restRegisterConfirmPassword}
           />
           <Button
@@ -396,9 +411,15 @@ function OryRegistrationInput({
             onClick={() => {
               setRevealConfirmPassword((prevState) => !prevState);
             }}
+            aria-label={
+              revealConfirmPassword
+                ? "Hide confirm password"
+                : "Show confirm password"
+            }
+            aria-pressed={revealConfirmPassword}
           >
-            {!revealConfirmPassword && <Eye />}
-            {revealConfirmPassword && <EyeOff />}
+            {!revealConfirmPassword && <Eye aria-hidden="true" />}
+            {revealConfirmPassword && <EyeOff aria-hidden="true" />}
           </Button>
         </div>
         {passwordError && (
