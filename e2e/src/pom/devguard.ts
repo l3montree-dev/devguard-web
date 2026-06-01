@@ -336,4 +336,11 @@ export class DevGuardPOM {
     await this.page.getByTestId("delete-artifact-menu-item").click();
     await this.page.getByTestId("confirm-artifact-deletion").click();
   }
+
+  async inviteUserOrg(mail: string) {
+    await this.page.getByTestId("nav-org-settings").click();
+    await this.page.getByTestId("add-member-button").click();
+    await this.page.getByTestId("mail-input").fill(mail)
+    await this.page.getByTestId("invite-member-button").click({ timeout: 5_000 });;
+  }
 }

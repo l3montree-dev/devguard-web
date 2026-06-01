@@ -7,7 +7,7 @@ import { envConfig } from "./utils";
 import path from "path";
 
 describe("DevGuard repo flows", () => {
-  test.skip("test create, settings and delete (through settings) of repo", async ({
+  test("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {
     const devguardPOM = new DevGuardPOM(page);
@@ -27,7 +27,7 @@ describe("DevGuard repo flows", () => {
     await devguardPOM.deleteRepo();
   });
 
-  test.skip("test manual sbom upload", async ({ page }) => {
+  test("test manual sbom upload", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();
@@ -53,7 +53,7 @@ describe("DevGuard repo flows", () => {
     await page.waitForTimeout(2_000);
   });
 
-  test.skip("test if we can add artifact manually", async ({ page }) => {
+  test("test if we can add artifact manually", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();

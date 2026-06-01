@@ -74,11 +74,17 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
           <form onSubmit={form.handleSubmit(handleInvite)}>
             <FormItem>
               <FormLabel>E-Mail Address</FormLabel>
-              <Input type="email" {...form.register("email")} />
+              <Input
+                data-testid="mail-input"
+                type="email"
+                {...form.register("email")}
+              />
             </FormItem>
             <DialogFooter className="mt-4">
               <div className="flex flex-col items-end justify-end gap-2">
-                <Button type="submit">Invite</Button>
+                <Button data-testid="invite-member-button" type="submit">
+                  Invite
+                </Button>
                 {Boolean(invitationCode) && (
                   <Callout intent="info">
                     <p>
