@@ -4,7 +4,7 @@ import { OpenCodePOM } from "./pom/opencode";
 import { DevGuardPOM } from "./pom/devguard";
 import { loginToDevGuardUsingOpenCode, TEMPORARY_WORKAROUND } from "./utils";
 
-describe.skip("DevGuard <-> OpenCode login / logout flows", () => {
+describe("DevGuard <-> OpenCode login / logout flows", () => {
   test.beforeEach(async ({ page }) => {
     const openCodePOM = new OpenCodePOM(page);
     // login to openCode and make sure we don't have authorized DevGuard yet

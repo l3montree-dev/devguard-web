@@ -4,7 +4,7 @@ import { describe } from "node:test";
 import { DevGuardPOM } from "./pom/devguard";
 import { OpenCodePOM } from "./pom/opencode";
 
-describe.skip("OpenCode project handling", () => {
+describe("OpenCode project handling", () => {
   test.beforeEach(async ({ page }) => {
     const openCodePOM = new OpenCodePOM(page);
     await openCodePOM.login(true);
