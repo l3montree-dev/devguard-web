@@ -203,11 +203,11 @@ export class DevGuardPOM {
     await this.page
       .getByRole("button", { name: "Create Organization" })
       .click();
+    await this.page.getByTestId('explore-button').click();
   }
 
   async createTestOrganizationGroupAndRepo() {
     await this.createOrganization("Test Organization");
-    await this.page.getByTestId('explore-button').click();
     await this.createGroup(
       "Test Group",
       "Test Group that contains very important projects!",
@@ -277,29 +277,13 @@ export class DevGuardPOM {
   }
 
   async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
-    await this.page
-      .locator(level)
-      .locator(".theme-chooser")
-      .click({ timeout: 5_000 });
-    await this.page
-      .getByRole("menuitem", { name: "Dark" })
-      .click({ timeout: 5_000 });
-    await this.page.waitForTimeout(1_000);
-    await this.page
-      .locator(level)
-      .locator(".theme-chooser")
-      .click({ timeout: 5_000 });
-    await this.page
-      .getByRole("menuitem", { name: "System" })
-      .click({ timeout: 5_000 });
-    await this.page.waitForTimeout(1_000);
-    await this.page
-      .locator(level)
-      .locator(".theme-chooser")
-      .click({ timeout: 5_000 });
-    await this.page
-      .getByRole("menuitem", { name: "Light" })
-      .click({ timeout: 5_000 });
+    const themeChooser = this.page.locator(`${level} [data-testid="theme-chooser"]`);
+    await themeChooser.click();
+    await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
+    await this.page.getByTestId("light-mode").click();
+    await themeChooser.click();
+    await this.page.getByTestId("dark-mode").waitFor({ state: "visible" });
+    await this.page.getByTestId("dark-mode").click();
   }
 
   async settingClickthroughRepo() {

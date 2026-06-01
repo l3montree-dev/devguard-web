@@ -11,16 +11,16 @@ describe("DevGuard test light and dark mode", () => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();
-    await devguardPOM.registerWithEmail(username, envConfig.devGuard.password);
+    const email = envConfig.devGuard.uniqueEMail();
+    console.log(`Registering new user ${username}`);
+    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     // Creates Organization
-    await devguardPOM.createOrganization("Test");
+    await devguardPOM.createOrganization("TestOrg");
 
     // Test light, dark and system mode
     await devguardPOM.testLightDarkSystemMode(
       DevGuardNavigationLevel.Organization,
     );
-
-    // await page.waitForTimeout(500_000);
   });
 });
