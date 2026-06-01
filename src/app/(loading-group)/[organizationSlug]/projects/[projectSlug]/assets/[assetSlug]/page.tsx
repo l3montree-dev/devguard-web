@@ -36,7 +36,6 @@ const Index: FunctionComponent = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();
   const assetMenu = useAssetMenu();
 
-
   const role = useCurrentUserRole();
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
@@ -129,6 +128,7 @@ const Index: FunctionComponent = () => {
               Button={
                 <div className="flex flex-row gap-2">
                   <Button
+                    data-testid="setup-risk-scanning-button"
                     onClick={() => setRiskScanningOpen(true)}
                     variant={
                       asset?.externalEntityProviderId &&

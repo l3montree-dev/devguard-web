@@ -221,33 +221,30 @@ export class DevGuardPOM {
   async setupFlow_setupRiskScanning() {
     // setup risk scanning
     await this.page
-      .getByRole("button", { name: "Setup Risk Scanning" })
+      .getByTestId('setup-risk-scanning-button')
       .click();
     await this.page.waitForTimeout(500);
     await this.page
-      .getByRole("heading", { name: "Use your own Scanner Expert" })
+      .getByTestId('own-setup-card')
       .click();
-    await this.page.locator('button[id="scanner-selection-continue"]').click();
+    await this.page.getByTestId('scanner-selection-continue').click();
   }
 
   async setupFlow_selectManualUpload() {
     await this.page.waitForTimeout(500);
     await this.page
-      .getByRole("heading", { name: "Upload manually File Upload" })
-      .click({ timeout: 5_000 });
-    await this.page
-      .locator('button[id="integration-method-selection-continue"]')
-      .click({ timeout: 5_000 });
+      .getByTestId('manual-upload-card')
+      .click();
+    await this.page.getByTestId('integration-method-selection-continue').click();
   }
 
   async setupFlow_uploadSbomFile(inputFile: string) {
     await this.page.waitForTimeout(500);
+    await this.page.getByTestId('sbom-tab').click();
     await this.page
-      .locator("#file-upload-sbom  input")
+      .getByTestId("file-upload-input")
       .setInputFiles(inputFile);
-    await this.page
-      .locator('button[id="manual-integration-continue"]')
-      .click({ timeout: 5_000 });
+    await this.page.getByTestId('manual-integration-continue').click();
   }
 
   async setupFlow_automatedCLI() {
@@ -307,25 +304,14 @@ export class DevGuardPOM {
 
   async settingClickthroughRepo() {
     await this.page.getByTestId("repository-settings").click();
-    await this.page
-      .getByRole("combobox", { name: "Confidentiality Requirement" })
-      .click();
-    await this.page.getByRole("option", { name: "Low" }).click();
-    await this.page
-      .getByRole("combobox", { name: "Integrity Requirement" })
-      .click();
-    await this.page.getByRole("option", { name: "High" }).click();
-    await this.page
-      .getByRole("combobox", { name: "Availability Requirement" })
-      .click();
-    await this.page.getByRole("option", { name: "Low" }).click();
-    await this.page
-      .getByRole("combobox", { name: "Automatically reopen accepted" })
-      .click();
-    await this.page.getByLabel("Year").getByText("Year").click();
-    await this.page.getByRole("button", { name: "Add Member" }).click();
-    await this.page.getByRole("combobox").click();
-    await this.page.getByRole("button", { name: "Close" }).click();
+    await this.page.getByTestId('configure-security-requirements-button').click();
+    await this.page.getByTestId('confidentiality-requirement-low').click();
+    await this.page.getByTestId('integrity-requirement-high').click();
+    await this.page.getByTestId('availability-requirement-low').click();
+    await this.page.getByTestId('save-security-requirements-button').click(); 
+    await this.page.getByTestId('enable-public-access-switch').click();
+    await this.page.getByTestId('vuln-auto-reopen-switch').click();
+    await this.page.getByTestId('save-vulnerability-management-settings-button').click();
   }
 
   async checkHeaderGroup() {
@@ -349,25 +335,21 @@ export class DevGuardPOM {
   }
 
   async createNewArtifact(name: string, url: string) {
-    await this.page.getByRole("link", { name: "Artifacts" }).click();
+    await this.page.getByTestId("nav-asset-artifacts").click();
     await this.page
-      .getByRole("button", { name: "Create new Artifact" })
+      .getByTestId("create-artifact-button")
       .click();
-    await this.page.getByRole("textbox", { name: "Artifact Name" }).click();
-    await this.page.getByRole("textbox", { name: "Artifact Name" }).fill(name);
-    await this.page.getByRole("button", { name: "Add Upstream URL" }).click();
-    await this.page
-      .getByRole("textbox", { name: "Enter upstream URL (e.g.," })
-      .click();
-    await this.page
-      .getByRole("textbox", { name: "Enter upstream URL (e.g.," })
-      .fill(url);
-    await this.page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByTestId("artifact-name-input").click();
+    await this.page.getByTestId("artifact-name-input").fill(name);
+    await this.page.getByTestId("sbom-url-upload-button").click();
+    await this.page.getByTestId("upstream-url-field").click();
+    await this.page.getByTestId("upstream-url-field").fill(url)
+    await this.page.getByTestId("submit-artifact-button").click();
   }
 
   async deleteFirstArtifact() {
-    await this.page.locator(".artifact-options").nth(0).click();
-    await this.page.getByRole("menuitem", { name: "Delete" }).click();
-    await this.page.getByRole("button", { name: "Confirm" }).click();
+    await this.page.getByTestId("artifact-options-button").click();
+    await this.page.getByTestId("delete-artifact-menu-item").click();
+    await this.page.getByTestId("confirm-artifact-deletion").click();
   }
 }

@@ -15,7 +15,7 @@ export default function FileUpload({ dropzone, files, id }: Props) {
         {...dropzone.getRootProps()}
         className="flex h-20 bg-card cursor-pointer items-center justify-center rounded dash-border"
       >
-        <input {...dropzone.getInputProps()} />
+        <input {...dropzone.getInputProps()} data-testid="file-upload-input" />
         {files.length > 0 ? (
           <div className="flex flex-col items-center">
             {files.map((file, index) => (

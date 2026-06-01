@@ -113,7 +113,7 @@ export default function ScannerSelectionSlide({
           )}
           onClick={() => setSelectedSetup("own-setup")}
         >
-          <CardHeader>
+          <CardHeader data-testid="own-setup-card">
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <CubeTransparentIcon
                 width={20}
@@ -156,7 +156,7 @@ export default function ScannerSelectionSlide({
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
           variant={"secondary"}
-          id="scanner-selection-back"
+          data-testid="scanner-selection-back"
           onClick={() => {
             api?.scrollTo(prevIndex); // Back to SetupMethodSelectionSlide
           }}
@@ -165,7 +165,7 @@ export default function ScannerSelectionSlide({
         </Button>
         <Button
           disabled={selectedSetup === undefined}
-          id="scanner-selection-continue"
+          data-testid="scanner-selection-continue"
           onClick={() => {
             api?.scrollTo(
               selectedSetup === "devguard-tools"
