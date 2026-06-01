@@ -487,7 +487,12 @@ const Index: FunctionComponent = () => {
                     description="This action cannot be undone. All data associated with this repository will be deleted."
                     onConfirm={handleDeleteAsset}
                   >
-                    <Button variant={"destructive"}>Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      data-testid="delete-repository-button"
+                    >
+                      Delete
+                    </Button>
                   </Alert>
                 }
               />

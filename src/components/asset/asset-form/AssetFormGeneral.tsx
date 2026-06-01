@@ -41,7 +41,12 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           <FormItem>
             <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input disabled={disable} required={true} {...field} />
+              <Input
+                data-testid="repository-name"
+                disabled={disable}
+                required={true}
+                {...field}
+              />
             </FormControl>
             <FormDescription>The name of the repository.</FormDescription>
             <FormMessage />
@@ -55,7 +60,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Input disabled={disable} {...field} />
+              <Input
+                data-testid="repository-description"
+                disabled={disable}
+                {...field}
+              />
             </FormControl>
             <FormDescription>
               The description of the repository.

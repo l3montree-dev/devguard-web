@@ -22,7 +22,7 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
           <FormItem>
             <FormLabel>Organization name*</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input data-testid="org-name-label" {...field} />
             </FormControl>
           </FormItem>
         )}

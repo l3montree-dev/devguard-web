@@ -55,16 +55,13 @@ export class DevGuardPOM {
     await this.page.waitForLoadState("networkidle");
   }
 
-  async registerWithEmail(username: string, password: string) {
+  async registerWithEmailAndPassword(email:string, username: string, password: string) {
     await this.page.goto(`${this.devGuardDomain}/login`);
-    await this.page.getByRole("tab", { name: "Legacy Password Login" }).click();
-    await this.page.getByRole("link", { name: "Sign up for free" }).click();
-    await this.page.locator('input[name="traits.email"]').click();
-    await this.page.locator('input[name="traits.email"]').fill(username);
-    await this.page.locator('input[name="traits.name.first"]').click();
-    await this.page.locator('input[name="traits.name.first"]').fill("Test");
-    await this.page.locator('input[name="traits.name.last"]').click();
-    await this.page.locator('input[name="traits.name.last"]').fill("User");
+    await this.page.getByTestId('ory/screen/login/action/register').click();
+    await this.page.getByTestId('traits.email').click();
+    await this.page.getByTestId('traits.email').fill(email);
+    await this.page.getByTestId('traits.name').click();
+    await this.page.getByTestId('traits.name').fill(username);
     await this.page
       .getByRole("checkbox", { name: "I agree to the terms of use" })
       .click();
@@ -73,14 +70,8 @@ export class DevGuardPOM {
     ).toBeChecked();
 
     await this.page.getByRole("button", { name: "Sign up" }).click();
-
-    await expect(
-      this.page.getByText(
-        "Please choose a credential to authenticate yourself with.",
-      ),
-    ).toBeVisible({ timeout: 10_000 });
-    await this.page.locator('input[name="password"]').click();
-    await this.page.locator('input[name="password"]').fill(password);
+    await this.page.getByTestId('password-button').click();
+    await this.page.getByTestId('password').fill(password);
     await this.page
       .getByRole("button", { name: "Sign up", exact: true })
       .click();
@@ -169,37 +160,39 @@ export class DevGuardPOM {
 
   async createRepo(name: string, description: string) {
     await this.page
-      .getByRole("button", { name: "Create new Repository" })
+      .getByTestId("create-repository-button")
       .click({ timeout: 10_000 });
     await expect(
-      this.page.getByRole("textbox", { name: "Name" }),
+      this.page.getByTestId('repository-name'),
     ).toBeVisible();
-    await this.page.getByRole("textbox", { name: "Name" }).click();
-    await this.page.getByRole("textbox", { name: "Name" }).fill(name);
+    await this.page.getByTestId('repository-name').click();
+    await this.page.getByTestId('repository-name').fill(name);
+    await this.page.getByTestId('repository-description').click();
     await this.page
-      .getByRole("textbox", { name: "Description" })
+      .getByTestId('repository-description')
       .fill(description);
-    await this.page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByTestId('create-repository-submit-button').click();
   }
 
   async createGroup(name: string, description: string) {
     await this.page
-      .getByRole("button", { name: "New Group" })
+      .getByTestId('create-group-button')
       .click({ timeout: 30_000 });
     await expect(
-      this.page.getByRole("textbox", { name: "Name" }),
+      this.page.getByTestId('group-name'),
     ).toBeVisible();
-    await this.page.getByRole("textbox", { name: "Name" }).fill(name);
-    await this.page.getByRole("textbox", { name: "Description" }).click();
+    await this.page.getByTestId('group-name').click();
+    await this.page.getByTestId('group-name').fill(name);
+    await this.page.getByTestId('group-description').click();
     await this.page
-      .getByRole("textbox", { name: "Description" })
+      .getByTestId('group-description')
       .fill(description);
-    await this.page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByTestId('create-group-submit-button').click();
   }
 
   async createOrganization(name: string) {
     await this.page
-      .getByRole("textbox", { name: "Organization name*" })
+      .getByTestId('org-name-label')
       .click();
     await expect(
       this.page.getByRole("textbox", { name: "Organization name*" }),
@@ -214,6 +207,7 @@ export class DevGuardPOM {
 
   async createTestOrganizationGroupAndRepo() {
     await this.createOrganization("Test Organization");
+    await this.page.getByTestId('explore-button').click();
     await this.createGroup(
       "Test Group",
       "Test Group that contains very important projects!",
@@ -279,10 +273,10 @@ export class DevGuardPOM {
   async deleteRepo() {
     await this.page
       .locator(DevGuardNavigationLevel.Repo)
-      .getByRole("link", { name: "Settings" })
-      .click({ timeout: 5_000 }); // todo.. find better way to select the correct Settings button
-    await this.page.getByRole("button", { name: "Delete" }).click();
-    await this.page.getByRole("button", { name: "Confirm" }).click();
+      .getByTestId("repository-settings")
+      .click({ timeout: 5_000 });
+    await this.page.getByTestId("delete-repository-button").click();
+    await this.page.getByTestId("alert-confirm-button").click();
   }
 
   async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
@@ -312,7 +306,7 @@ export class DevGuardPOM {
   }
 
   async settingClickthroughRepo() {
-    await this.page.getByRole("link", { name: "Settings" }).nth(3).click(); // todo.. find better way to select the correct copy button
+    await this.page.getByTestId("repository-settings").click();
     await this.page
       .getByRole("combobox", { name: "Confidentiality Requirement" })
       .click();

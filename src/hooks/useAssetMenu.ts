@@ -100,6 +100,7 @@ export const useAssetMenu = () => {
       } & RefAttributes<SVGSVGElement>
     >;
     isActive: boolean;
+    testId?: string;
   }> = [];
 
   if ((activeAsset?.refs?.length ?? 0) > 0) {
@@ -249,6 +250,7 @@ export const useAssetMenu = () => {
         isActive:
           pathname ===
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+        testId: "repository-settings",
       },
     ]);
   }

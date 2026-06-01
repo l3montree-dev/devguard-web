@@ -263,6 +263,7 @@ function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
       required={rest.required}
       disabled={rest.disabled}
       pattern={rest.pattern}
+      data-testid={name}
       placeholder={node.meta.label?.text}
       onClick={onClick}
       {...restRegister}
@@ -465,6 +466,7 @@ function OryAuthMethodListItem({
       variant={isPasskey ? "default" : "secondary"}
       className="h-auto w-full justify-start gap-3 p-3 text-left"
       onClick={onClick}
+      data-testid={isPasskey ? "passkey-button" : "password-button"}
     >
       {isPasskey ? (
         <FingerPrintIcon className="w-5 h-5 shrink-0" />

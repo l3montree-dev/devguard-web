@@ -71,6 +71,7 @@ export function WelcomeModal({ open, onStartTour, onSkip }: WelcomeModalProps) {
           <button
             onClick={onSkip}
             className="cursor-pointer outline-none focus:outline-none flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-left hover:bg-accent transition-colors"
+            data-testid="explore-button"
           >
             <div className="flex items-center justify-center w-10 h-10 rounded-md bg-muted">
               <CompassIcon className="h-5 w-5 text-muted-foreground" />

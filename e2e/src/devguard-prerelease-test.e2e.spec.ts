@@ -10,10 +10,8 @@ describe("DevGuard pre-Release Test flow", () => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();
-    await devguardPOM.registerWithEmailwithoutVerification(
-      username,
-      envConfig.devGuard.password,
-    );
+    const email = envConfig.devGuard.uniqueEMail();
+    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
 
