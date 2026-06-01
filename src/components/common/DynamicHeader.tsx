@@ -39,6 +39,7 @@ interface Props {
     href: string;
     Icon: React.ComponentType<{ className?: string }>;
     isActive?: boolean;
+    testId?: string;
   }> | null;
   z: number;
 }

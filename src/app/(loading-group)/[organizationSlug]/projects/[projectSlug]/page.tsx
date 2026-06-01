@@ -286,6 +286,7 @@ export default function RepositoriesPage() {
                     data-tour="create-subgroup-button"
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
+                    data-testid="create-subgroup-button"
                   >
                     Create New Subgroup
                   </Button>

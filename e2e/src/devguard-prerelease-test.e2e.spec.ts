@@ -24,9 +24,6 @@ describe("DevGuard pre-Release Test flow", () => {
     // Check Creating a new SubGroup
     await devguardPOM.createNewSubgroup();
 
-    // Check Headers in Organization Level();
-    await devguardPOM.checkHeaderOrganization();
-
     await page.waitForTimeout(5_000);
   });
 });

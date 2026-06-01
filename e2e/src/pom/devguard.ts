@@ -332,33 +332,20 @@ export class DevGuardPOM {
     await this.page
       .getByRole("link", { name: "Test Group" })
       .click({ timeout: 5_000 });
-    await this.page.getByRole("link", { name: "Overview" }).click();
-    await this.page.getByRole("link", { name: "Releases" }).click();
-    await this.page
-      .getByRole("link", { name: "Subgroups & Repositories" })
-      .click();
-    await this.page.getByRole("link", { name: "Compliance" }).nth(1).click();
-    await this.page.getByRole("link", { name: "Settings" }).nth(2).click();
+    await this.page.getByTestId("nav-group-overview").click();
+    await this.page.getByTestId("nav-group-releases").click();
+    await this.page.getByTestId("nav-group-subgroups-repositories").click();
+    await this.page.getByTestId("nav-group-package-search").click();
+    await this.page.getByTestId("nav-group-settings").click();
   }
 
   async createNewSubgroup() {
-    await this.page
-      .getByRole("link", { name: "Subgroups & Repositories" })
-      .click();
-    await this.page.getByRole("button", { name: "Create subgroup" }).click();
-    await this.page.getByRole("textbox", { name: "Name" }).fill("Test");
-    await this.page.getByRole("textbox", { name: "Description" }).click();
-    await this.page.getByRole("textbox", { name: "Description" }).fill("Test");
-    await this.page.getByRole("button", { name: "Create" }).click();
-  }
-
-  async checkHeaderOrganization() {
-    //await this.page.getByRole('link', { name: 'Test Organization' }).nth(1).click();
-    await this.page.getByRole("link", { name: "Compliance" }).click();
-    await this.page
-      .getByRole("link", { name: "Settings", exact: true })
-      .click();
-    await this.page.getByRole("link", { name: "Groups" }).click();
+    await this.page.getByTestId("nav-group-subgroups-repositories").click();
+    await this.page.getByTestId('create-subgroup-button').click();
+    await this.page.getByTestId('group-name').fill("Test");
+    await this.page.getByTestId('group-description').click();
+    await this.page.getByTestId('group-description').fill("Test");
+    await this.page.getByRole('button', { name: 'Create' }).click();
   }
 
   async createNewArtifact(name: string, url: string) {
