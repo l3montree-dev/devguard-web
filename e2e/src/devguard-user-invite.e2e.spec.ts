@@ -1,9 +1,9 @@
 // Copyright 2025 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { test, expect } from "@playwright/test";
+import { test } from "@playwright/test";
 import { describe } from "node:test";
-import { DevGuardNavigationLevel, DevGuardPOM } from "./pom/devguard";
+import { DevGuardPOM } from "./pom/devguard";
 import { envConfig } from "./utils";
 
 describe("DevGuard invite a user to your organization", () => {
