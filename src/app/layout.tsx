@@ -4,7 +4,7 @@ import "focus-visible";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import React, { Suspense } from "react";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
