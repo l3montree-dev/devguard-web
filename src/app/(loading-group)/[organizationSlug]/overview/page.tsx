@@ -4,7 +4,6 @@ import { orgOverviewTourSteps } from "@/components/common/tours/org-overview-tou
 import AverageStatsSection from "@/components/organization/AverageStatsSection";
 import OrganizationCompositionSection from "@/components/organization/OrganizationCompositionSection";
 import TotalVulnerabilitiesSection from "@/components/organization/TotalVulnerabilitiesSection";
-import { type FunctionComponent, useEffect } from "react";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +15,7 @@ import { usePageTour } from "@/hooks/usePageTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
 import Link from "next/link";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, useEffect } from "react";
 import useSWR from "swr";
 import { useTourSeen } from "@/hooks/useTourSeen";
 
