@@ -97,6 +97,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
+                  data-testid="gitlab-pat-name"
                   placeholder="My GitLab Personal Access Token"
                   autoComplete="url"
                   {...field}
@@ -116,6 +117,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>GitLab/ openCode URL</FormLabel>
               <FormControl>
                 <Input
+                  data-testid="gitlab-base-url-input"
                   placeholder={
                     "https://gitlab.com/ or https://gitlab.opencode.de/"
                   }
@@ -140,7 +142,11 @@ export default function GitLabIntegrationForm({
             <FormItem>
               <FormLabel>Access-Token</FormLabel>
               <FormControl>
-                <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
+                <Input
+                  data-testid="gitlab-pat-input"
+                  placeholder="glpat-xxxxxxxxxxx-xxxx"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 To later use the <strong>Auto Setup Feature</strong> the token
@@ -168,7 +174,11 @@ export default function GitLabIntegrationForm({
                   Back
                 </Button>
               )}
-              <Button disabled={isLoading} type="submit">
+              <Button
+                data-testid="gitlab-pat-save-button"
+                disabled={isLoading}
+                type="submit"
+              >
                 <Loader />
                 Test and Save
               </Button>

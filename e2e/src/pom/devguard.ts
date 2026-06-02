@@ -91,7 +91,7 @@ export class DevGuardPOM {
       "Test Group",
       "Test Group that contains very important projects!",
     );
-    await this.repo().createRepo(
+    await this.repo().createGitHubRepo(
       "Test Repo",
       "This repo contains top secret information. Without a Provider though..",
     );

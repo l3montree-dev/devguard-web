@@ -21,19 +21,14 @@ describe("DevGuard handle vuln flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    // setup risk scanning
-    await devguardPOM.setup().setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupOwnRiskScanning();
 
-    // select manual upload
-    await devguardPOM.setup().setupFlow_selectManualUpload();
+    await devguardPOM.setup().selectManualUpload();
 
-    // upload sbom file
-    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().uploadSbomFile(inputFile);
 
-    // check one affected vuln
     await devguardPOM.vuln().openFirstAffectedComponent();
 
-    // handle vuln to false positive
     await devguardPOM.vuln().markVulnAsFalsePositive();
 
     await page.waitForTimeout(2_000);
@@ -53,16 +48,41 @@ describe("DevGuard handle vuln flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    await devguardPOM.setup().setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupOwnRiskScanning();
 
-    await devguardPOM.setup().setupFlow_selectManualUpload();
+    await devguardPOM.setup().selectManualUpload();
 
-    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().uploadSbomFile(inputFile);
 
     await devguardPOM.vuln().openFirstAffectedComponent();
 
     await devguardPOM.vuln().markVulnAsAcceptedRisk();
 
     await page.waitForTimeout(2_000);
+  });
+
+  test("test auto setup to gitlab repo", async ({ page }) => {
+    const devguardPOM = new DevGuardPOM(page);
+    await devguardPOM.loadDevGuard();
+    const username = envConfig.devGuard.uniqueUsername();
+    const email = envConfig.devGuard.uniqueEMail();
+    console.log(`Registering new user ${username}`);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+
+    await devguardPOM.org().createOrganization("TestOrganization");
+    await devguardPOM.group().createGroup("TestGroup", "This is a test group");
+    await devguardPOM.repo().createGitLabRepo("TestRepo", "This is a test repo");
+
+    await devguardPOM.setup().setupAutoRiskScanning();
+
+    const gitlabToken = process.env.GITLAB_TOKEN;
+    if (!gitlabToken) {
+      throw new Error("GITLAB_TOKEN is not set in .env");
+    }
+    await devguardPOM.setup().createGitLabIntegration("My Token", "https://gitlab.com", gitlabToken);
+
+    await devguardPOM.setup().selectGitLabRepo();
+
+    await devguardPOM.setup().startAutoSetupGitLab();
   });
 });

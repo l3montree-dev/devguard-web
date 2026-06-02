@@ -39,11 +39,11 @@ describe("DevGuard repo flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    await devguardPOM.setup().setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupRiskScanning();
 
-    await devguardPOM.setup().setupFlow_selectManualUpload();
+    await devguardPOM.setup().selectManualUpload();
 
-    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().uploadSbomFile(inputFile);
 
     await page.waitForTimeout(2_000);
   });
@@ -63,9 +63,9 @@ describe("DevGuard repo flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    await devguardPOM.setup().setupFlow_setupRiskScanning();
-    await devguardPOM.setup().setupFlow_selectManualUpload();
-    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().setupRiskScanning();
+    await devguardPOM.setup().selectManualUpload();
+    await devguardPOM.setup().uploadSbomFile(inputFile);
 
     await devguardPOM.artifacts().createNewArtifact(
       "pkg:test/artifact",

@@ -3,13 +3,24 @@ import type { Page } from "@playwright/test";
 export class RepoFlow {
   constructor(private page: Page) {}
 
-  async createRepo(name: string, description: string) {
+  async createGitHubRepo(name: string, description: string) {
     await this.page.getByTestId("create-repository-button").click({ timeout: 10_000 });
     await this.page.getByTestId("repository-name").waitFor({ state: "visible" });
     await this.page.getByTestId("repository-name").click();
     await this.page.getByTestId("repository-name").fill(name);
     await this.page.getByTestId("repository-description").click();
     await this.page.getByTestId("repository-description").fill(description);
+    await this.page.getByTestId("create-repository-submit-button").click();
+  }
+
+  async createGitLabRepo(name: string, description: string) {
+    await this.page.getByTestId("create-repository-button").click({ timeout: 10_000 });
+    await this.page.getByTestId("repository-name").waitFor({ state: "visible" });
+    await this.page.getByTestId("repository-name").click();
+    await this.page.getByTestId("repository-name").fill(name);
+    await this.page.getByTestId("repository-description").click();
+    await this.page.getByTestId("repository-description").fill(description);
+    await this.page.getByTestId("gitlab-repository-provider-button").click();
     await this.page.getByTestId("create-repository-submit-button").click();
   }
 

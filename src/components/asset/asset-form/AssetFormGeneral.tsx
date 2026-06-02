@@ -81,6 +81,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
 
           <div className="flex gap-2 w-full">
             <Button
+              data-testid="github-repository-provider-button"
               variant={"secondary"}
               type="button"
               className={classNames(
@@ -103,6 +104,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
               GitHub
             </Button>
             <Button
+              data-testid="gitlab-repository-provider-button"
               variant={"secondary"}
               type="button"
               className={classNames(
