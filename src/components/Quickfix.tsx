@@ -82,16 +82,7 @@ function renderQuickFixText(
 }
 
 function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
-  if (vuln.componentFixedVersion && vuln.vulnerabilityPath.length === 1) {
-    try {
-      const p = PackageURL.fromString(vuln.vulnerabilityPath[0]);
-      p.version = vuln.componentFixedVersion;
-      return p.toString();
-    } catch {
-      return null;
-    }
-  }
-  return vuln.directDependencyFixedVersion ?? null;
+  return vuln.directDependencyFixedVersion;
 }
 
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
@@ -100,17 +91,25 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
+  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+    return null;
+  }
+
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
-  // Validate the vulnerability path is a valid PURL before parsing
+  // Only show quickfix for direct dependencies, or for ecosystems with a resolver (deb, npm)
+  const isDirectDep = vuln.vulnerabilityPath.length === 1;
+  const ecosystem = isValidPackagePurl(vulnerabilityPath)
+    ? PackageURL.fromString(vulnerabilityPath).type
+    : null;
+  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
+
+  if (!isDirectDep && !hasResolver) {
+    return null;
+  }
+
   if (!isValidPackagePurl(vulnerabilityPath)) {
-    return (
-      <div className="rounded-lg border bg-card p-4">
-        <span className="text-xs text-muted-foreground">
-          Invalid package URL: {vulnerabilityPath}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -127,7 +126,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <Badge
                   variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-white border-success flex items-center gap-1"
+                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-success-foreground border-success flex items-center gap-1"
                 >
                   Resolve Vulnerability
                 </Badge>

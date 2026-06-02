@@ -15,7 +15,7 @@ import useSWR from "swr";
 
 const defaultConfigFiles = [
   { value: "trivy", label: "Trivy", language: "yaml" },
-  { value: "gitleaks-config", label: "Gitleaks", language: "json" },
+  { value: "gitleaks-config", label: "Gitleaks", language: "toml" },
   { value: "semgrep-config", label: "Semgrep", language: "toml" },
   { value: "checkov-config", label: "Checkov", language: "yaml" },
 ];

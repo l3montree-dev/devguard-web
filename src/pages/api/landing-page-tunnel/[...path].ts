@@ -34,7 +34,7 @@ export default async function handler(
   // just forward the request to devguard
   // include the session cookie
   // check the url
-  const url = new URL(req.url!, "https://devguard.org");
+  const url = new URL(req.url!, appConfig.devguardWebsiteUrl);
 
   url.pathname = url.pathname.replace("/api/landing-page-tunnel", "");
 

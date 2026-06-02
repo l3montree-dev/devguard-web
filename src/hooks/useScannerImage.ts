@@ -6,7 +6,6 @@ let scannerImage: string = "ghcr.io/l3montree-dev/devguard/scanner:main";
 export default function useScannerImage() {
   const [image, setScannerImage] = useState<string>(scannerImage);
   useEffect(() => {
-    console.log("FETCHING");
     if (scannerImage !== "ghcr.io/l3montree-dev/devguard/scanner:main") {
       setScannerImage(scannerImage);
     } else {
