@@ -172,7 +172,7 @@ export default function SelectRepoSlide({
                       }
                     }}
                     disabled={!Boolean(selectedRepo) || !hasIntegration}
-                    variant="outlineYellow"
+                    variant="default"
                   >
                     Connect
                   </Button>

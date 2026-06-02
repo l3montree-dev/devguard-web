@@ -145,15 +145,12 @@ export default function GitLabIntegrationForm({
                 <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
               </FormControl>
               <FormDescription>
-                To later use the <strong>Auto Setup Feature</strong> the token
-                needs the <strong>api scope</strong>. <br />
-                It is recommended to use a dedicated <strong>
-                  project
-                </strong>{" "}
-                access token instead of a personal access token.
+                Use a <strong>Project Access Token</strong> (recommended) or a
+                Personal Access Token with the <strong>api scope</strong> and at
+                least the <strong>Maintainer role</strong>.
                 <br />
-                If so the token needs at least{" "}
-                <strong>the maintainer role</strong>.
+                To create one: GitLab Project →{" "}
+                <strong>Settings → Access Tokens → Add new token</strong>.
               </FormDescription>
             </FormItem>
           )}
