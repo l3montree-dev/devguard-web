@@ -13,7 +13,7 @@ describe("DevGuard handle vuln flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
 
@@ -22,19 +22,19 @@ describe("DevGuard handle vuln flows", () => {
     console.log(`Usign SBOM from path: ${inputFile}`);
 
     // setup risk scanning
-    await devguardPOM.setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupFlow_setupRiskScanning();
 
     // select manual upload
-    await devguardPOM.setupFlow_selectManualUpload();
+    await devguardPOM.setup().setupFlow_selectManualUpload();
 
     // upload sbom file
-    await devguardPOM.setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
 
     // check one affected vuln
-    await devguardPOM.openFirstAffectedComponent();
+    await devguardPOM.vuln().openFirstAffectedComponent();
 
     // handle vuln to false positive
-    await devguardPOM.markVulnAsFalsePositive();
+    await devguardPOM.vuln().markVulnAsFalsePositive();
 
     await page.waitForTimeout(2_000);
   });
@@ -45,7 +45,7 @@ describe("DevGuard handle vuln flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
 
@@ -53,20 +53,15 @@ describe("DevGuard handle vuln flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    // setup risk scanning
-    await devguardPOM.setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupFlow_setupRiskScanning();
 
-    // select manual upload
-    await devguardPOM.setupFlow_selectManualUpload();
+    await devguardPOM.setup().setupFlow_selectManualUpload();
 
-    // upload sbom file
-    await devguardPOM.setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
 
-    // check one affected vuln
-    await devguardPOM.openFirstAffectedComponent();
+    await devguardPOM.vuln().openFirstAffectedComponent();
 
-    // handle vuln to risk accepted
-    await devguardPOM.markVulnAsAcceptedRisk();
+    await devguardPOM.vuln().markVulnAsAcceptedRisk();
 
     await page.waitForTimeout(2_000);
   });

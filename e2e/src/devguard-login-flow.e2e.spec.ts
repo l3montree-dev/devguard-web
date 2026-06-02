@@ -10,7 +10,7 @@ describe("DevGuard Email login flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
   });
 
   test("test registration with already existing user", async ({ page }) => {
@@ -18,19 +18,30 @@ describe("DevGuard Email login flows", () => {
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
-    await devguardPOM.page.locator("#user-nav-user").click();
-    await page.waitForTimeout(500);
-    await devguardPOM.page.locator("#user-nav-logout-button").click();
+    await devguardPOM.auth().logout();
 
     // try to register again with the same username
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await expect(
       devguardPOM.page.getByText(
         "An account with the same identifier (email, phone, username, ...) exists already.",
       ),
     ).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("test sign up and logout and login again with email and password", async ({ page }) => {
+    const devguardPOM = new DevGuardPOM(page);
+    await devguardPOM.loadDevGuard();
+    const username = envConfig.devGuard.uniqueUsername();
+    const email = envConfig.devGuard.uniqueEMail();
+    console.log(`Registering new user ${username}`);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+
+    await devguardPOM.auth().logout();
+
+    await devguardPOM.auth().loginWithEmailAndPassword(email, envConfig.devGuard.password);
   });
 });

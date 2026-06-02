@@ -128,7 +128,7 @@ export default function UserNav() {
       )}
       {user ? (
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger data-testid="user-nav-dropdown-trigger">
             <Link
               id="user-nav-user"
               className={classNames(
@@ -161,8 +161,8 @@ export default function UserNav() {
             </Link>
             <button onClick={handleLogout} className="w-full">
               <DropdownMenuItem
-                id="user-nav-logout-button"
                 className="text-foreground hover:no-underline"
+                data-testid="user-nav-logout-button"
               >
                 <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground" />
                 Logout

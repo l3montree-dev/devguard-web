@@ -15,16 +15,14 @@ describe("DevGuard repo flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
     await page.waitForTimeout(500);
 
-    // Check Setting Functionalities
-    await devguardPOM.settingClickthroughRepo();
+    await devguardPOM.repo().settingClickthroughRepo();
 
-    // Delete Repo through Settings Page
-    await devguardPOM.deleteRepo();
+    await devguardPOM.repo().deleteRepo();
   });
 
   test("test manual sbom upload", async ({ page }) => {
@@ -33,7 +31,7 @@ describe("DevGuard repo flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
 
@@ -41,14 +39,11 @@ describe("DevGuard repo flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    // setup risk scanning
-    await devguardPOM.setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupFlow_setupRiskScanning();
 
-    // select manual upload
-    await devguardPOM.setupFlow_selectManualUpload();
+    await devguardPOM.setup().setupFlow_selectManualUpload();
 
-    // upload sbom file
-    await devguardPOM.setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
 
     await page.waitForTimeout(2_000);
   });
@@ -59,7 +54,7 @@ describe("DevGuard repo flows", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
     await page.waitForTimeout(500);
@@ -68,18 +63,18 @@ describe("DevGuard repo flows", () => {
     const inputFile = path.join(__dirname, "../assets/", "sbom.json");
     console.log(`Usign SBOM from path: ${inputFile}`);
 
-    await devguardPOM.setupFlow_setupRiskScanning();
-    await devguardPOM.setupFlow_selectManualUpload();
-    await devguardPOM.setupFlow_uploadSbomFile(inputFile);
+    await devguardPOM.setup().setupFlow_setupRiskScanning();
+    await devguardPOM.setup().setupFlow_selectManualUpload();
+    await devguardPOM.setup().setupFlow_uploadSbomFile(inputFile);
 
-    await devguardPOM.createNewArtifact(
+    await devguardPOM.artifacts().createNewArtifact(
       "pkg:test/artifact",
       "http://github.com/user-attachments/files/23216827/vex_l3montree_web_reopened.json",
     );
     await page.waitForTimeout(1_000);
-    await devguardPOM.deleteFirstArtifact();
+    await devguardPOM.artifacts().deleteFirstArtifact();
     await page.waitForTimeout(1_000);
-    await devguardPOM.deleteFirstArtifact();
+    await devguardPOM.artifacts().deleteFirstArtifact();
     await page
       .getByRole("heading", { name: "No Artifacts Available" })
       .isVisible();

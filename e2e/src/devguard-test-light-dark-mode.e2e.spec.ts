@@ -13,12 +13,10 @@ describe("DevGuard test light and dark mode", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
-    // Creates Organization
-    await devguardPOM.createOrganization("TestOrg");
+    await devguardPOM.org().createOrganization("TestOrg");
 
-    // Test light, dark and system mode
     await devguardPOM.testLightDarkSystemMode(
       DevGuardNavigationLevel.Organization,
     );

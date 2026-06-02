@@ -13,12 +13,10 @@ describe("DevGuard invite a user to your organization", () => {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
-    // Creates Organization
-    await devguardPOM.createOrganization("TestOrg");
+    await devguardPOM.org().createOrganization("TestOrg");
 
-    // Invite Member
-    await devguardPOM.inviteUserOrg("testuser@example.com");
+    await devguardPOM.org().inviteUserOrg("testuser@example.com");
   });
 });

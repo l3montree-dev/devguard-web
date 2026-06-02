@@ -11,18 +11,15 @@ describe("DevGuard pre-Release Test flow", () => {
     await devguardPOM.loadDevGuard();
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
-    await devguardPOM.registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
 
     await devguardPOM.createTestOrganizationGroupAndRepo();
 
-    // delete repo
-    await devguardPOM.deleteRepo();
+    await devguardPOM.repo().deleteRepo();
 
-    // Check Header Gruops
-    await devguardPOM.checkHeaderGroup();
+    await devguardPOM.group().checkHeaderGroup();
 
-    // Check Creating a new SubGroup
-    await devguardPOM.createNewSubgroup();
+    await devguardPOM.group().createNewSubgroup();
 
     await page.waitForTimeout(5_000);
   });
