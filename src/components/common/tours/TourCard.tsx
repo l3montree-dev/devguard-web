@@ -35,7 +35,7 @@ export function TourCard({
       </div>
 
       {/* Content */}
-      <p className="text-sm text-card-foreground mb-5">
+      <div className="text-sm text-card-foreground mb-5">
         {typeof step.content === "function"
           ? (step.content({
               currentStep,
@@ -44,7 +44,7 @@ export function TourCard({
               setIsOpen,
             }) ?? null)
           : step.content}
-      </p>
+      </div>
 
       {/* Dots */}
       <div className="flex flex-row items-center justify-between">
