@@ -108,7 +108,7 @@ export function DocDrawer({
           <Button className="flex-1" asChild>
             <a
               href={docsUrl}
-              className="!text-black"
+              className="!text-primary-foreground"
               target="_blank"
               rel="noopener noreferrer"
               data-umami-event="Documentation Drawer - Check Documentation"
