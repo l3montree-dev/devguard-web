@@ -12,7 +12,7 @@ export function TourLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-primary underline hover:opacity-80"
+      className="text-link underline hover:opacity-80"
     >
       {children}
     </a>
