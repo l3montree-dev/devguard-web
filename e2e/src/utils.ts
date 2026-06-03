@@ -51,7 +51,7 @@ export async function loginToDevGuardUsingOpenCode(page: Page) {
   const openCodePOM = new OpenCodePOM(page);
 
   // start login flow in devguard
-  await devguardPOM.loginWithOpenCode(); // click on login with openCode button
+  await devguardPOM.auth().loginWithOpenCode(); // click on login with openCode button
   await openCodePOM.login(false); // complete login via openCode without redirect
   await openCodePOM.grantAccess();
 
@@ -73,10 +73,10 @@ function loadEnvVariables() {
       password: process.env.DEVGUARD_EMAIL_LOGIN_PASSWORD!,
       domain: process.env.DEVGUARD_DOMAIN!,
       uniqueUsername: () =>
-        config.devGuard.usernameTemplate.replace("XXX", Date.now().toString()),
+        config.devGuard.usernameTemplate.replace("XXX", `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`),
       uniqueEMail: () =>
         config.devGuard.usernameTemplate
-          .replace("XXX", Date.now().toString())
+          .replace("XXX", `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`)
           .concat("@example.com"),
     },
   };

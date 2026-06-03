@@ -19,7 +19,7 @@ export class SetupFlow {
   async uploadSbomFile(inputFile: string) {
     await this.page.waitForTimeout(500);
     await this.page.getByTestId("sbom-tab").click();
-    await this.page.getByTestId("file-upload-input").setInputFiles(inputFile);
+    await this.page.getByTestId("file-upload-input-file-upload-sbom").setInputFiles(inputFile);
     await this.page.getByTestId("manual-integration-continue").click();
   }
 
@@ -30,7 +30,7 @@ export class SetupFlow {
     await this.page.getByTestId("setup-method-continue").click();
   }
 
-  async createGitLabIntegration(name : string, url : string, token : string) {
+  async createGitLabIntegration(name: string, url: string, token: string) {
     await this.page.getByTestId("gitlab-pat-name").click();
     await this.page.getByTestId("gitlab-pat-name").fill(name);
     await this.page.getByTestId("gitlab-base-url-input").click();

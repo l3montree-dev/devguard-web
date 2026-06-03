@@ -77,7 +77,7 @@ export class DevGuardPOM {
     await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
     await this.page.getByTestId("light-mode").click();
     await this.page.getByTestId("light-mode").waitFor({ state: "hidden" });
-    await themeChooser.click({timeout: 10_000});
+    await themeChooser.click({ timeout: 10_000 });
     await this.page.getByTestId("dark-mode").waitFor({ state: "visible" });
     await this.page.getByTestId("dark-mode").click();
   }

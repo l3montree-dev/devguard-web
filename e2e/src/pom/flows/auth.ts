@@ -38,7 +38,7 @@ export class AuthFlow {
     await this.page.getByTestId("password").fill(password);
     await this.page.getByRole("button", { name: "Sign up", exact: true }).click();
 
-    console.log("Registered user with email: " + username + " and password: " + password);
+    console.log(`Registered user: ${username} (${email})`);
 
     if (!this.domain.includes("localhost")) {
       await expect(
