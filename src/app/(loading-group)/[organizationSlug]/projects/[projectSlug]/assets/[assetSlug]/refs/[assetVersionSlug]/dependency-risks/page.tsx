@@ -456,6 +456,7 @@ const Index: FunctionComponent = () => {
           >
             <TabsList>
               <TabsTrigger
+                data-testid="dependency-risk-open-button"
                 onClick={() =>
                   push({
                     state: "open",
@@ -466,6 +467,7 @@ const Index: FunctionComponent = () => {
                 Open
               </TabsTrigger>
               <TabsTrigger
+                data-testid="dependency-risk-closed-button"
                 onClick={() =>
                   push({
                     state: "closed",
@@ -638,6 +640,7 @@ const Index: FunctionComponent = () => {
                               </Tooltip>
                             ) : null}
                             <SortingCaret
+                              data-testid="sorting-cvss-value"
                               sortDirection={header.column.getIsSorted()}
                             />
                           </div>

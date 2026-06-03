@@ -1,22 +1,13 @@
 // Copyright 2025 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
-
 import { test } from "@playwright/test";
-import { describe } from "node:test";
 import { DevGuardPOM } from "./pom/devguard";
-import { envConfig } from "./utils";
 
-describe("DevGuard invite a user to your organization", () => {
+test.describe("DevGuard invite a user to your organization", () => {
   test("test", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadDevGuard();
-    const username = envConfig.devGuard.uniqueUsername();
-    const email = envConfig.devGuard.uniqueEMail();
-    console.log(`Registering new user ${username}`);
-    await devguardPOM.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
-
+    await devguardPOM.loadAndRegister();
     await devguardPOM.org().createOrganization("TestOrg");
-
     await devguardPOM.org().inviteUserOrg("testuser@example.com");
   });
 });

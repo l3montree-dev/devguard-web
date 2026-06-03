@@ -28,4 +28,15 @@ export class VulnFlow {
     await this.page.getByRole("textbox", { name: "editable markdown" }).getByRole("paragraph").fill("This is an accepted risk because...");
     await this.page.getByTestId("confirm-accepted-risk").click();
   }
+
+  async filterDependencyRisksTable() {
+    await this.page.getByTestId("nav-asset-dependency-risks").click({ timeout: 5_000 });
+    await this.page.getByTestId("filter-open-button").click();
+    await this.page.getByTestId("filter-field-select").click();
+    await this.page.getByRole("option", { name: "CVSS" }).click();
+    await this.page.getByTestId("filter-operator-select").click();
+    await this.page.getByRole("option", { name: "is greater than" }).click();
+    await this.page.getByTestId("filter-value-input").fill("7");
+    await this.page.getByTestId("filter-apply-button").click();
+  }
 }

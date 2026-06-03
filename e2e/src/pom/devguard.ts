@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { envConfig, LoggingAnalyzer } from "../utils";
+import path from "path";
 import { AuthFlow } from "./flows/auth";
 import { OrgFlow } from "./flows/org";
 import { GroupFlow } from "./flows/group";
@@ -8,7 +9,6 @@ import { RepoFlow } from "./flows/repo";
 import { SetupFlow } from "./flows/setup";
 import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
-import { TIMEOUT } from "node:dns";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -21,11 +21,8 @@ export class DevGuardPOM {
   readonly devGuardDomain = envConfig.devGuard.domain;
 
   constructor(public page: Page) {
-    const loggingAnalyzer = new LoggingAnalyzer(page);
-
-    page.on("close", () => {
-      // expect(loggingAnalyzer.logs).toEqual([]); // todo!!
-    });
+    new LoggingAnalyzer(page);
+    // page.on("close", () => expect(loggingAnalyzer.logs).toEqual([])); // todo!!
   }
 
   auth(): AuthFlow {
@@ -83,6 +80,25 @@ export class DevGuardPOM {
     await themeChooser.click({timeout: 10_000});
     await this.page.getByTestId("dark-mode").waitFor({ state: "visible" });
     await this.page.getByTestId("dark-mode").click();
+  }
+
+  async loadAndRegister() {
+    await this.loadDevGuard();
+    await this.registerNewUser();
+  }
+
+  async registerNewUser() {
+    const username = envConfig.devGuard.uniqueUsername();
+    const email = envConfig.devGuard.uniqueEMail();
+    console.log(`Registering new user ${username}`);
+    await this.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+  }
+
+  async setupSbomUpload() {
+    const inputFile = path.join(__dirname, "../../assets/", "sbom.json");
+    await this.setup().setupOwnRiskScanning();
+    await this.setup().selectManualUpload();
+    await this.setup().uploadSbomFile(inputFile);
   }
 
   async createTestOrganizationGroupAndRepo() {
