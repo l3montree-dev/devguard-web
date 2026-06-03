@@ -42,6 +42,7 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { usePageTour } from "@/hooks/usePageTour";
 import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { EssentialProjectConfigDrawer } from "@/components/common/EssentialProjectConfigDrawer";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -313,7 +314,7 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
-  const { startTour } = usePageTour(repoSettingsTourSteps);
+  usePageTour(repoSettingsTourSteps);
 
   return (
     <Page
@@ -438,6 +439,22 @@ const Index: FunctionComponent = () => {
                   Go to Dependency Proxy Settings
                 </Button>
               </Link>
+            </div>
+          </Card>
+        </Section>
+        <Section
+          id="essential-project-config"
+          title="Essential Project Config"
+          description="These values are required to connect your CI/CD pipeline or tooling to this asset."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <EssentialProjectConfigDrawer
+                organizationSlug={organizationSlug}
+                projectSlug={projectSlug}
+                assetSlug={assetSlug}
+                repositoryProvider={asset.repositoryProvider}
+              />
             </div>
           </Card>
         </Section>
