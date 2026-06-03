@@ -19,7 +19,6 @@ import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,

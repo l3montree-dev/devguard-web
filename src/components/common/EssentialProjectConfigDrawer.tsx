@@ -22,7 +22,7 @@ interface ContentProps {
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
-  repositoryProvider?: string;
+  repositoryProvider?: "github" | "gitlab";
 }
 
 export function EssentialProjectConfigContent({
