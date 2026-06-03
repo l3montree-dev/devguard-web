@@ -41,6 +41,7 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
       <FormField
         control={form.control}
         name="artifactName"
+        rules={{ required: "Artifact name is required" }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Artifact Name</FormLabel>
