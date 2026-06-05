@@ -79,15 +79,6 @@ export const SetupInformationSourceSlide: FunctionComponent<
           <ArtifactForm form={form} isEditMode={false} />
           <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
             <Button
-              variant={"secondary"}
-              id="setup-information-sources-back"
-              onClick={() => {
-                api?.scrollTo(prevIndex);
-              }}
-            >
-              Back
-            </Button>
-            <Button
               isSubmitting={form.formState.isSubmitting}
               id="setup-information-sources-create"
               type="submit"
