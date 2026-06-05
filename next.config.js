@@ -24,6 +24,7 @@ const nextConfig = {
   experimental: {
     turbopackModuleIds: "deterministic",
     turbopackFileSystemCacheForDev: true,
+    useCache: true,
   },
   cacheComponents: true,
   output: "standalone",
