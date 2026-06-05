@@ -19,7 +19,7 @@ import { useConfig } from "../../../../../../../context/ConfigContext";
 import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
-import { useSession } from "@/context/SessionContext";
+import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,8 +36,8 @@ const Index: FunctionComponent = () => {
   const { pat, onCreatePat } = usePersonalAccessToken();
   const assetMenu = useAssetMenu();
 
-  const { session } = useSession();
 
+  const role = useCurrentUserRole();
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
   const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const config = useConfig();
@@ -98,7 +98,7 @@ const Index: FunctionComponent = () => {
       description="Overview of the asset"
       Title={<AssetTitle />}
     >
-      {session ? (
+      {isLoggedIn(role) ? (
         <Section
           primaryHeadline
           forceVertical

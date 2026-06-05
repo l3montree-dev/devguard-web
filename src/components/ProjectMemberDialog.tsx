@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import {
   Dialog,
@@ -73,16 +73,57 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
     }
   };
 
-  const membersToInvite = useMemo(() => {
+  const [membersToInvite, setMembersToInvite] = useState<
+    Array<{ id: string; name: string; avatarUrl?: string; role?: string }>
+  >([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+
+  useEffect(() => {
     const projectMemberIds = activeProject.members.reduce(
       (acc, m) => {
         acc[m.id] = true;
         return acc;
       },
-      {} as { [key: string]: boolean },
+      {} as Record<string, boolean>,
     );
-    return activeOrg.members.filter((m) => !projectMemberIds[m.id]);
-  }, [activeProject.members, activeOrg.members]);
+
+    if (activeProject.parentId && activeProject.parent?.slug) {
+      setLoadingMembers(true);
+      browserApiClient(
+        "/organizations/" +
+          activeOrg.slug +
+          "/projects/" +
+          activeProject.parent.slug +
+          "/members",
+      )
+        .then(async (resp) => {
+          if (!resp.ok) {
+            toast.error("Failed to fetch parent project members");
+            return;
+          }
+          const parentMembers = (await resp.json()) as Array<{
+            id: string;
+            name: string;
+            avatarUrl?: string;
+            role?: string;
+          }>;
+          setMembersToInvite(
+            parentMembers.filter((m) => !projectMemberIds[m.id]),
+          );
+        })
+        .finally(() => setLoadingMembers(false));
+    } else {
+      setMembersToInvite(
+        activeOrg.members.filter((m) => !projectMemberIds[m.id]),
+      );
+    }
+  }, [
+    activeProject.members,
+    activeProject.parentId,
+    activeProject.parent?.slug,
+    activeOrg.slug,
+    activeOrg.members,
+  ]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -90,9 +131,33 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
-            Invite someone to participate in the project {activeProject.name}.
-            Make sure they are part of the organization already. Otherwise they
-            need to be invited to the organization first.
+            Invite someone to participate in the project{" "}
+            <span className="font-semibold text-foreground">
+              {activeProject.name}
+            </span>
+            .{" "}
+            {activeProject.parentId ? (
+              <>
+                Make sure they are already a member of the parent project{" "}
+                <span className="font-semibold text-foreground">
+                  {activeProject.parent?.name}
+                </span>
+                . Otherwise they need to be invited to{" "}
+                <span className="font-semibold text-foreground">
+                  {activeProject.parent?.name}
+                </span>{" "}
+                first.
+              </>
+            ) : (
+              <>
+                Make sure they are part of the organization{" "}
+                <span className="font-semibold text-foreground">
+                  {activeOrg.name}
+                </span>{" "}
+                already. Otherwise they need to be invited to the organization
+                first.
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
         <MultiselectCombobox
@@ -101,7 +166,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
             label: r.name,
             value: r.id,
           }))}
-          loading={false}
+          loading={loadingMembers}
           onRemove={(item) => {
             setSelectedMembers((prev) =>
               prev.filter((el) => el.value !== item.value),
@@ -118,7 +183,7 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
             });
           }}
           values={selectedMembers}
-          emptyMessage="No repositories found"
+          emptyMessage="No members found"
         />
         <DialogFooter className="mt-2">
           <div className="flex flex-col items-end justify-end gap-2">

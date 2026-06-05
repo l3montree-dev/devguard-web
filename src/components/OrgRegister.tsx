@@ -25,11 +25,12 @@ import { Button } from "./ui/button";
 
 import { toast } from "sonner";
 import { useUpdateOrganization } from "../context/OrganizationContext";
+import { useUpdateSession } from "@/context/SessionContext";
 
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
-  const updateOrganization = useUpdateOrganization();
+  const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
 
   const router = useRouter();
@@ -54,15 +55,16 @@ export default function OrgRegisterForm(props: Props) {
 
     const orgDTO: OrganizationDetailsDTO = await resp.json();
 
-    updateOrganization((prev) => ({
+    updateSession((prev) => ({
       ...prev,
-      organization: orgDTO,
+      organizations: [...prev.organizations, orgDTO],
     }));
 
-    localStorage.setItem("lastActiveOrg", orgDTO.slug);
+    toast.success("Organization created successfully");
 
+    localStorage.setItem("lastActiveOrg", orgDTO.slug);
     // move the user to the newly created organization
-    router.push(`/${orgDTO.slug}`);
+    setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
   };
 
   return (

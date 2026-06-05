@@ -21,7 +21,7 @@ import {
 import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
-import { useSession } from "../../../../../../context/SessionContext";
+import AuthGuard from "../../../../../../components/AuthGuard";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 import type {
   CandidatesDTO,
@@ -34,7 +34,6 @@ const Releases = () => {
   const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
-  const { session } = useSession();
   const { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -114,11 +113,11 @@ const Releases = () => {
             title="Releases"
             forceVertical
             Button={
-              session ? (
+              <AuthGuard require="admin">
                 <Button onClick={() => setOpen(true)}>
                   Create new Release
                 </Button>
-              ) : undefined
+              </AuthGuard>
             }
           >
             <ListRenderer
@@ -136,7 +135,7 @@ const Releases = () => {
                   key={release.id}
                   Title={release.name}
                   Button={
-                    session && (
+                    <AuthGuard require="admin">
                       <Alert
                         onConfirm={() => deleteRelease(release)}
                         title="Delete Release"
@@ -144,7 +143,7 @@ const Releases = () => {
                       >
                         <Button variant="destructive">Delete</Button>
                       </Alert>
-                    )
+                    </AuthGuard>
                   }
                   Description={
                     <div>

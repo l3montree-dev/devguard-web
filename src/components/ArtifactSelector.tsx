@@ -21,7 +21,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import Link from "next/link";
-import { useSession } from "@/context/SessionContext";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 
 export function useSelectArtifact(
   unassignPossible: boolean,
@@ -51,7 +51,7 @@ export function SimpleArtifactSelector({
   isReleaseSelector?: boolean;
   assetVersionSlug?: string;
 }) {
-  const { session } = useSession();
+  const role = useCurrentUserRole();
   const [filter, setFilter] = useState("");
 
   const filteredArtifacts = useMemo(() => {
@@ -143,7 +143,7 @@ export function SimpleArtifactSelector({
         {filteredArtifacts.length === 0 &&
           filter.length > 0 &&
           !isReleaseSelector &&
-          session && (
+          isAdmin(role) && (
             <DropdownMenuItem
               onClick={handleArtifactCreation}
               className="bg-card cursor-pointer mt-2 border flex flex-row justify-between font-medium"

@@ -3,8 +3,8 @@ import "focus-visible";
 
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
-import React from "react";
-import { Toaster } from "sonner";
+import React, { Suspense } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
@@ -29,13 +29,79 @@ export const inter = localFont({
   variable: "--font-inter",
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <html
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={
+        "h-full scroll-smooth antialiased " +
+        lexend.className +
+        " " +
+        inter.className
+      }
+      lang="en"
+    >
+      <body
+        suppressHydrationWarning
+        className={
+          "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
+        }
+      >
+        {/* Restores CSS variable overrides before first paint — dev only */}
+        {/*process.env.NODE_ENV === "development" && (
+          // eslint-disable-next-line @next/next/no-sync-scripts
+          <script src="/dev-theme-init.js" />
+        )*/}
+        {config.theme.cssUrl && (
+          <link rel="stylesheet" href={config.theme.cssUrl} />
+        )}
+        {config.theme.jsUrl && (
+          <script
+            defer
+            src={config.theme.jsUrl}
+            {...(config.theme.jsIntegrity && {
+              integrity: config.theme.jsIntegrity,
+              crossOrigin: "anonymous",
+            })}
+          ></script>
+        )}
+        {config.analytics.scriptUrl && config.analytics.websiteId && (
+          <script
+            defer
+            src={config.analytics.scriptUrl}
+            data-website-id={config.analytics.websiteId}
+            {...(config.analytics.integrity && {
+              integrity: config.analytics.integrity,
+              crossOrigin: "anonymous",
+            })}
+          />
+        )}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          forcedTheme={config?.enforceTheme ? config.enforceTheme : undefined}
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ClientContextWrapper Provider={ConfigProvider} value={config}>
+            <Suspense>
+              <SessionShell>{children}</SessionShell>
+            </Suspense>
+          </ClientContextWrapper>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+
+async function  SessionShell({ children }: { children: React.ReactNode }) {
   try {
     const session = await fetchSession();
     let orgs: OrganizationDTO[] = [];
@@ -44,112 +110,25 @@ export default async function RootLayout({
     }
 
     return (
-      <html
-        suppressHydrationWarning
-        className={
-          "h-full scroll-smooth antialiased " +
-          lexend.className +
-          " " +
-          inter.className
-        }
-        lang="en"
+      <ClientContextWrapper
+        Provider={SessionProvider}
+        value={{
+          session,
+          organizations: orgs,
+        }}
       >
-        <body
-          suppressHydrationWarning
-          className={
-            "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
-          }
-        >
-          {/* Restores CSS variable overrides before first paint — dev only */}
-          {/*process.env.NODE_ENV === "development" && (
-            // eslint-disable-next-line @next/next/no-sync-scripts
-            <script src="/dev-theme-init.js" />
-          )*/}
-          {config.theme.cssUrl && (
-            <link rel="stylesheet" href={config.theme.cssUrl} />
-          )}
-          {config.theme.jsUrl && (
-            <script
-              defer
-              src={config.theme.jsUrl}
-              {...(config.theme.jsIntegrity && {
-                integrity: config.theme.jsIntegrity,
-                crossOrigin: "anonymous",
-              })}
-            ></script>
-          )}
-          {config.analytics.scriptUrl && config.analytics.websiteId && (
-            <script
-              defer
-              src={config.analytics.scriptUrl}
-              data-website-id={config.analytics.websiteId}
-              {...(config.analytics.integrity && {
-                integrity: config.analytics.integrity,
-                crossOrigin: "anonymous",
-              })}
-            />
-          )}
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            forcedTheme={config?.enforceTheme ? config.enforceTheme : undefined}
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ClientContextWrapper Provider={ConfigProvider} value={config}>
-              <ClientContextWrapper
-                Provider={SessionProvider}
-                value={{
-                  session,
-                  organizations: orgs,
-                }}
-              >
-                <TourContextProvider>
-                  <MobileGate>{children}</MobileGate>
-                  <Toaster />
-                  {process.env.NODE_ENV === "development" && (
-                    <CSSVariableEditor />
-                  )}
-                </TourContextProvider>
-              </ClientContextWrapper>
-            </ClientContextWrapper>
-          </ThemeProvider>
-        </body>
-      </html>
+        <TourContextProvider>
+          <MobileGate>{children}</MobileGate>
+          <Toaster />
+          {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
+        </TourContextProvider>
+      </ClientContextWrapper>
     );
   } catch (error) {
-    console.error("Error in RootLayout:", error);
     return (
-      <html
-        suppressHydrationWarning
-        className={
-          "h-full scroll-smooth antialiased " +
-          lexend.className +
-          " " +
-          inter.className
-        }
-        lang="en"
-      >
-        <body
-          suppressHydrationWarning
-          className={
-            "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
-          }
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            forcedTheme={config?.enforceTheme ? config.enforceTheme : undefined}
-            enableSystem
-            disableTransitionOnChange
-          >
-            <MobileGate>
-              <InternalServerErrorPage error={error as Error} />
-            </MobileGate>
-            <Toaster />
-          </ThemeProvider>
-        </body>
-      </html>
+      <MobileGate>
+        <InternalServerErrorPage error={error as Error} />
+      </MobileGate>
     );
   }
 }

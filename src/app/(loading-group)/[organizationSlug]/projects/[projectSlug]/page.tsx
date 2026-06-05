@@ -33,11 +33,11 @@ import {
   useOrganization,
 } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
-import { useSession } from "../../../../../context/SessionContext";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
-import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
+import { isAdmin, useCurrentUserRole } from "../../../../../hooks/useUserRole";
+import AuthGuard from "../../../../../components/AuthGuard";
 import { browserApiClient } from "../../../../../services/devGuardApi";
 import type {
   AssetDTO,
@@ -46,7 +46,7 @@ import type {
   ProjectDTO,
   SubGroupsAndAsset,
 } from "../../../../../types/api/api";
-import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
+import { RequirementsLevel } from "../../../../../types/api/api";
 
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
@@ -61,7 +61,6 @@ export default function RepositoriesPage() {
   );
   const project = useProject()!;
   const organization = useOrganization();
-  const { session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const searchParams = useSearchParams();
 
@@ -134,9 +133,10 @@ export default function RepositoriesPage() {
 
   const projectMenu = useProjectMenu();
 
-  const isAdmin =
-    currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin;
-  const tourSteps = useMemo(() => groupHomeTourSteps(isAdmin), [isAdmin]);
+  const tourSteps = useMemo(
+    () => groupHomeTourSteps(isAdmin(currentUserRole)),
+    [currentUserRole],
+  );
   const { startTour } = usePageTour(tourSteps);
 
   useEffect(() => {
@@ -280,38 +280,23 @@ export default function RepositoriesPage() {
         <Section
           Button={
             !project.externalEntityProviderId && (
-              <div
-                data-tour="subgroups-repositories-actions"
-                className="flex flex-row gap-2"
-              >
-                {session && (
-                  <>
-                    <Button
-                      data-tour="create-subgroup-button"
-                      disabled={
-                        project.type !== "default" ||
-                        (currentUserRole !== UserRole.Owner &&
-                          currentUserRole !== UserRole.Admin)
-                      }
-                      variant={"secondary"}
-                      onClick={() => setShowProjectModal(true)}
-                    >
-                      Create New Subgroup
-                    </Button>
-                    <Button
-                      data-tour="create-repository-button"
-                      disabled={
-                        project.type !== "default" ||
-                        (currentUserRole !== UserRole.Admin &&
-                          currentUserRole !== UserRole.Owner)
-                      }
-                      onClick={() => setShowModal(true)}
-                    >
-                      Create New Repository
-                    </Button>
-                  </>
-                )}
-              </div>
+              <AuthGuard require="admin">
+                <div className="flex flex-row gap-2">
+                  <Button
+                    data-tour="create-subgroup-button"
+                    variant={"secondary"}
+                    onClick={() => setShowProjectModal(true)}
+                  >
+                    Create New Subgroup
+                  </Button>
+                  <Button
+                    data-tour="create-repository-button"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Create New Repository
+                  </Button>
+                </div>
+              </AuthGuard>
             )
           }
           primaryHeadline

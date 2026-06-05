@@ -126,8 +126,8 @@ export default function ScannerSelectionSlide({
               </Badge>
             </CardTitle>
             <CardDescription>
-              You already have a Scanner or an SBOM file and want to just upload
-              your results...
+              You already have a Scanner or a SARIF/SBOM file and want to just
+              upload your results...
             </CardDescription>
           </CardHeader>
         </Card>

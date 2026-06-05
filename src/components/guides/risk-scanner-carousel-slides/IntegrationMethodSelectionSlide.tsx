@@ -68,8 +68,8 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Use the devguard-scanner CLI tool to upload SBOM files or SARIF
-                reports from your own scanner.
+                Use the devguard-scanner CLI tool to upload SARIF reports or
+                SBOM files from your own scanner.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -89,7 +89,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
                 </Badge>
               </CardTitle>
               <CardDescription>
-                You got a SBOM or SARIF file and want to upload it via web
+                You got a SARIF or SBOM file and want to upload it via web
                 interface
               </CardDescription>
             </CardHeader>
