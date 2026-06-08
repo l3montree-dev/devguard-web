@@ -21,6 +21,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import Filter from "@/components/Filter";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
@@ -30,7 +31,7 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { violationLengthToLevel } from "@/utils/view";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 // TEMP: mock "backend". Replace `complianceRisksListMock` with the shared
@@ -199,6 +200,10 @@ const Index: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Compliance Risks"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
+        <Button variant={"secondary"} onClick={() => alert("Share your VEX")}>
+            <Download className="mr-2 h-4 w-4" />
+            Share your VEX
+        </Button>
       </div>
       <Section
         forceVertical
