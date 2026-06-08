@@ -65,7 +65,7 @@ All commands must be run from the `e2e/` directory.
 npm install
 
 # Run all DevGuard tests sequentially (recommended – see run-devguard-tests.sh)
-./run-devguard-tests.sh
+./e2e/run-devguard-tests.sh
 
 # Run a single test file for debugging
 npx playwright test devguard-xx.e2e.spec.ts --headed --trace on --debug
