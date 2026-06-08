@@ -134,9 +134,6 @@ const RiskFeedGroupHeader = ({
                   const msg = eventTypeMessages(groupedEvents[0], "", []);
                   return msg.charAt(0).toUpperCase() + msg.slice(1);
                 })()}
-                <span className="text-muted-foreground font-normal text-sm">
-                  across other branches
-                </span>
                 <Badge variant="secondary" className="text-xs font-normal">
                   {groupedEvents.length}x
                 </Badge>
@@ -390,6 +387,7 @@ export default function RiskAssessmentFeed({
   directDependencyFixedVersion?: string | null;
 }) {
   const groupedEvents = groupContiguousEventsByType(events);
+  console.log(groupedEvents);
 
   const org = useActiveOrg();
   const project = useActiveProject();

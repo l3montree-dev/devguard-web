@@ -77,7 +77,7 @@ export function WelcomeModal({ open, onStartTour, onSkip }: WelcomeModalProps) {
               <CompassIcon className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-semibold text-foreground">Explore myself</p>
+              <p className="font-semibold text-foreground">Explore by myself</p>
               <p className="text-sm text-muted-foreground mt-1">
                 I know my way around, let me dive right in.
               </p>

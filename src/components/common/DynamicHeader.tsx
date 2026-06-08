@@ -71,6 +71,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
             <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-header-foreground">
               {Title}
             </h1>
+
             <UserNav />
           </div>
         </div>

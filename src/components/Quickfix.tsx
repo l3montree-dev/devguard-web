@@ -1,31 +1,33 @@
-import type { FunctionComponent } from "react";
 import CopyCode from "@/components/common/CopyCode";
-import type { DetailedDependencyVulnDTO } from "@/types/api/api";
-import { beautifyPurl, getEcosystem } from "@/utils/common";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "./ui/badge";
-import { diffChars } from "diff";
-import { PackageURL } from "packageurl-js";
-import { isValidPackagePurl } from "@/utils/common";
 import { DocDrawer } from "@/components/common/DocDrawer";
+import type { DetailedDependencyVulnDTO } from "@/types/api/api";
+import {
+  beautifyPurl,
+  isValidPackagePurl,
+  purlToDisplayString,
+} from "@/utils/common";
+import { diffChars } from "diff";
+import { ArrowRight } from "lucide-react";
+import { PackageURL } from "packageurl-js";
+import type { FunctionComponent } from "react";
+import { Badge } from "./ui/badge";
 interface DiffHighlighterProps {
-  oldVersion: string;
-  newVersion?: string;
+  oldVersionPurl: string;
+  newVersionPurl?: string; // has to be a purl
 }
 
 export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
-  oldVersion,
-  newVersion,
+  oldVersionPurl: oldVersionPurl,
+  newVersionPurl: newVersionPurl,
 }) => {
-  if (!isValidPackagePurl(oldVersion)) {
-    return <span className="font-mono text-xs">{oldVersion}</span>;
+  if (!isValidPackagePurl(oldVersionPurl)) {
+    return <span className="font-mono text-xs">{oldVersionPurl}</span>;
   }
 
-  const { name, version } = PackageURL.fromString(oldVersion);
+  const { name, version } = PackageURL.fromString(oldVersionPurl);
 
-  if (newVersion && isValidPackagePurl(newVersion)) {
-    const { version: newVer } = PackageURL.fromString(newVersion);
+  if (newVersionPurl && isValidPackagePurl(newVersionPurl)) {
+    const { version: newVer } = PackageURL.fromString(newVersionPurl);
     const differences = diffChars(name + "@" + version, name + "@" + newVer);
 
     return (
@@ -51,68 +53,63 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
 };
 
 function renderQuickFixText(
-  componentPurl: string,
-  directDependencyFixedVersion: string | null | undefined,
+  fixedVersionPurl: string | null | undefined,
 ): string {
-  if (!directDependencyFixedVersion) return "";
+  if (!fixedVersionPurl || !isValidPackagePurl(fixedVersionPurl)) return "";
 
-  const ecosystem = getEcosystem(componentPurl);
+  const { type, namespace, name, version } =
+    PackageURL.fromString(fixedVersionPurl);
+  const fullName = namespace ? `${namespace}/${name}` : name;
 
-  switch (ecosystem) {
-    case "npm": {
-      return `npm install ${directDependencyFixedVersion}`;
-    }
-    case "golang": {
-      return `go get ${directDependencyFixedVersion}`;
-    }
-    case "pypi": {
-      return `pip install ${directDependencyFixedVersion}`;
-    }
-    case "cargo": {
-      return `# in Cargo.toml: ${directDependencyFixedVersion}`;
-    }
-    case "nuget": {
-      return `dotnet add package ${directDependencyFixedVersion}`;
-    }
-    case "apk": {
-      return `apk add ${directDependencyFixedVersion}`;
-    }
-    case "deb": {
-      if (isValidPackagePurl(directDependencyFixedVersion)) {
-        const { name, version } = PackageURL.fromString(
-          directDependencyFixedVersion,
-        );
-        return `apt-get install -y ${name}=${version}`;
-      }
-      return `apt-get install -y ${directDependencyFixedVersion}`;
-    }
+  switch (type) {
+    case "npm":
+      return `npm install ${fullName}@${version}`;
+    case "golang":
+      return `go get ${fullName}@v${version}`;
+    case "pypi":
+      return `pip install ${fullName}==${version}`;
+    case "cargo":
+      return `# in Cargo.toml: ${name} = "${version}"`;
+    case "nuget":
+      return `dotnet add package ${name} --version ${version}`;
+    case "apk":
+      return `apk add ${name}=${version}`;
+    case "deb":
+      return `apt-get install -y ${name}=${version}`;
     default:
       return "";
   }
 }
 
+function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
+  return vuln.directDependencyFixedVersion;
+}
+
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {
-  const componentPurl = vuln.componentPurl;
-  const directDependencyFixedVersion =
-    vuln.directDependencyFixedVersion ?? undefined;
-  const ecosystemUpdate = renderQuickFixText(
-    componentPurl,
-    directDependencyFixedVersion,
-  );
+  const fixedVersionPurl = getFixedVersionPurl(vuln);
+  const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
+
+  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+    return null;
+  }
 
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
-  // Validate the vulnerability path is a valid PURL before parsing
+  // Only show quickfix for direct dependencies, or for ecosystems with a resolver (deb, npm)
+  const isDirectDep = vuln.vulnerabilityPath.length === 1;
+  const ecosystem = isValidPackagePurl(vulnerabilityPath)
+    ? PackageURL.fromString(vulnerabilityPath).type
+    : null;
+  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
+
+  if (!isDirectDep && !hasResolver) {
+    return null;
+  }
+
   if (!isValidPackagePurl(vulnerabilityPath)) {
-    return (
-      <div className="rounded-lg border bg-card p-4">
-        <span className="text-xs text-muted-foreground">
-          Invalid package URL: {vulnerabilityPath}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -121,7 +118,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
         <div className="flex flex-row mb-2 gap-0.5 items-center"></div>
         <div className="relative rounded-lg border bg-card p-4 border">
           <div className="text-sm">
-            {!directDependencyFixedVersion ? (
+            {!fixedVersionPurl ? (
               <span className="text-xs text-muted-foreground">
                 {`No Update for ${beautifyPurl(vulnerabilityPath)} that patches ${vuln.cveID}`}
               </span>
@@ -129,31 +126,27 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
               <>
                 <Badge
                   variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 text-[10px] px-1.5 py-0 font-semibold shadow-md bg-success text-white border-success flex items-center gap-1"
+                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-success-foreground border-success flex items-center gap-1"
                 >
                   Resolve Vulnerability
                 </Badge>
                 <div className="flex flex-row gap-1 items-center">
                   <span>Fix the vulnerability </span>
-                  <span className="font-semibold text-primary">
-                    {vuln.cveID}
-                  </span>
+                  <span className="font-semibold">{vuln.cveID}</span>
                   <span> by upgrading from: </span>
                   <span className="flex flex-row gap-2">
                     <Badge className="font-mono" variant={"outline"}>
-                      {beautifyPurl(vulnerabilityPath)}
+                      {purlToDisplayString(vulnerabilityPath)}
                     </Badge>
                     <ArrowRight className="w-4" />
                     <Badge
                       variant={"outline"}
                       className="font-mono scale-100 relative border-2"
                     >
-                      {
-                        <DiffHighlighter
-                          oldVersion={vuln.vulnerabilityPath[0] || ""}
-                          newVersion={vuln.directDependencyFixedVersion || ""}
-                        ></DiffHighlighter>
-                      }
+                      <DiffHighlighter
+                        oldVersionPurl={vulnerabilityPath}
+                        newVersionPurl={fixedVersionPurl ?? ""}
+                      />
                     </Badge>
                   </span>
                 </div>

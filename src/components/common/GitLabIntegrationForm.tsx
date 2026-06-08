@@ -98,7 +98,7 @@ export default function GitLabIntegrationForm({
               <FormControl>
                 <Input
                   data-testid="gitlab-pat-name"
-                  placeholder="My GitLab Personal Access Token"
+                  placeholder="My GitLab Access Token"
                   autoComplete="url"
                   {...field}
                 />
@@ -114,7 +114,7 @@ export default function GitLabIntegrationForm({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>GitLab/ openCode URL</FormLabel>
+              <FormLabel>GitLab Base URL</FormLabel>
               <FormControl>
                 <Input
                   data-testid="gitlab-base-url-input"
@@ -140,7 +140,9 @@ export default function GitLabIntegrationForm({
           name="token"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Access-Token</FormLabel>
+              <FormLabel>
+                Access-Token (Project or Personal Access Token)
+              </FormLabel>
               <FormControl>
                 <Input
                   data-testid="gitlab-pat-input"
@@ -149,15 +151,12 @@ export default function GitLabIntegrationForm({
                 />
               </FormControl>
               <FormDescription>
-                To later use the <strong>Auto Setup Feature</strong> the token
-                needs <strong>at least the maintainer role</strong>.<br />
-                Otherwise the token only needs <strong>
-                  reporter role
-                </strong>{" "}
-                permissions.
+                Use a <strong>Project Access Token</strong> (recommended) or a
+                Personal Access Token with the <strong>api scope</strong> and at
+                least the <strong>Maintainer role</strong>.
                 <br />
-                Additionally the api scope is needed for the seamless
-                integration of DevGuard.
+                To create one: GitLab Project →{" "}
+                <strong>Settings → Access Tokens → Add new token</strong>.
               </FormDescription>
             </FormItem>
           )}

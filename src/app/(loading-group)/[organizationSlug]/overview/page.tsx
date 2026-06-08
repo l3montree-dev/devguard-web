@@ -1,22 +1,22 @@
 "use client";
 
-import type { FunctionComponent } from "react";
-import Page from "@/components/Page";
-import { useViewMode } from "@/hooks/useViewMode";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
-import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import useSWR from "swr";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { orgOverviewTourSteps } from "@/components/common/tours/org-overview-tour";
 import AverageStatsSection from "@/components/organization/AverageStatsSection";
 import OrganizationCompositionSection from "@/components/organization/OrganizationCompositionSection";
 import TotalVulnerabilitiesSection from "@/components/organization/TotalVulnerabilitiesSection";
+import Page from "@/components/Page";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { usePageTour } from "@/hooks/usePageTour";
-import { orgOverviewTourSteps } from "@/components/common/tours/org-overview-tour";
+import { useViewMode } from "@/hooks/useViewMode";
+import type { OrgOverview } from "@/types/api/api";
+import Link from "next/link";
+import type { FunctionComponent } from "react";
+import useSWR from "swr";
 
 const STATS_PARAMS = new URLSearchParams({
   orgComponentsLimit: "5",
