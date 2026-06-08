@@ -3,8 +3,6 @@
 
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -13,11 +11,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { NoSymbolIcon } from "@heroicons/react/20/solid";
+import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 
 export default function InstanceSettingsCard() {
-  const [orgCreationDisabled, setOrgCreationDisabled] = useState(false);
+  // Reuses the shared hook backing RootHeader (GET /api/v1/instance-settings/).
+  const instanceSettings = useInstanceSettings();
+  const loading = instanceSettings === null;
+  const singleOrganizationMode =
+    instanceSettings?.singleOrganizationMode ?? false;
 
   return (
     <Card>
@@ -32,32 +35,33 @@ export default function InstanceSettingsCard() {
       </CardHeader>
       <CardContent>
         <div className="divide-y">
+          {/* Single Organisation Mode — real value, currently env-controlled */}
           <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
             <div>
-              <p className="text-sm font-medium">
-                Disable Organisation Creation
-              </p>
+              <p className="text-sm font-medium">Single Organisation Mode</p>
               <p className="text-xs text-muted-foreground">
-                When enabled, regular users cannot create new organisations.
+                When enabled, the instance runs with a single organisation and
+                regular users cannot create new organisations. Currently
+                configured via the{" "}
+                <code className="font-mono">SINGLE_ORGANIZATION_MODE</code>{" "}
+                environment variable — in-app editing is coming soon.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
-              <Switch
-                disabled={true} // TODO: This setting is not actually implemented yet
-                checked={orgCreationDisabled}
-                onCheckedChange={(checked) => {
-                  setOrgCreationDisabled(checked);
-                  toast.success(
-                    checked
-                      ? "Organisation creation disabled for regular users."
-                      : "Organisation creation re-enabled.",
-                  );
-                }}
-              />
+            <div className="min-w-26 flex items-center justify-end gap-3">
+              {loading ? (
+                <Skeleton className="h-5 w-16 rounded-full" />
+              ) : (
+                <Badge
+                  variant={singleOrganizationMode ? "danger" : "secondary"}
+                >
+                  {singleOrganizationMode ? "Enabled" : "Disabled"}
+                </Badge>
+              )}
             </div>
           </div>
-          <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
+
+          {/* Placeholders for settings not yet backed by the API. */}
+          <div className="flex items-center justify-between gap-4 py-4">
             <div>
               <p className="text-sm font-medium">Disable Public OCI Proxy</p>
               <p className="text-xs text-muted-foreground">
@@ -65,43 +69,20 @@ export default function InstanceSettingsCard() {
                 from pulling container images through it.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
-              <Switch
-                disabled={true} // TODO: This setting is not actually implemented yet
-                checked={orgCreationDisabled}
-                onCheckedChange={(checked) => {
-                  setOrgCreationDisabled(checked);
-                  toast.success(
-                    checked
-                      ? "Organisation creation disabled for regular users."
-                      : "Organisation creation re-enabled.",
-                  );
-                }}
-              />
+            <div className="min-w-26 flex items-center justify-end gap-3">
+              <Badge variant="outline">Coming soon</Badge>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
+
+          <div className="flex items-center justify-between gap-4 py-4">
             <div>
               <p className="text-sm font-medium">Disable User Registration</p>
               <p className="text-xs text-muted-foreground">
                 When enabled, new user registrations are disabled.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              {orgCreationDisabled && <Badge variant="danger">Disabled</Badge>}
-              <Switch
-                disabled={true} // TODO: This setting is not actually implemented yet
-                checked={orgCreationDisabled}
-                onCheckedChange={(checked) => {
-                  setOrgCreationDisabled(checked);
-                  toast.success(
-                    checked
-                      ? "Organisation creation disabled for regular users."
-                      : "Organisation creation re-enabled.",
-                  );
-                }}
-              />
+            <div className="min-w-26 flex items-center justify-end gap-3">
+              <Badge variant="outline">Coming soon</Badge>
             </div>
           </div>
         </div>

@@ -37,6 +37,36 @@ export function formatDuration(seconds: number): string {
 }
 
 /**
+ * Format an ISO date string, `Date`, or epoch-millis value into a locale-aware
+ * date+time string. Invalid input is returned as-is.
+ *
+ * @param value   - An ISO 8601 string, `Date`, or millisecond timestamp.
+ * @param options - Optional `Intl.DateTimeFormatOptions` overrides.
+ * @returns A formatted date+time string like "Jun 8, 2026, 03:07 PM".
+ */
+export function formatDateTime(
+  value: string | number | Date,
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  if (value === "" || value === null || value === undefined) {
+    return String(value);
+  }
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return date.toLocaleString(
+    undefined,
+    options ?? {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
+}
+
+/**
  * Format a Unix timestamp (seconds) into a locale-aware date string.
  * If the input is not a valid numeric timestamp it is returned as-is.
  *

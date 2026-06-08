@@ -33,11 +33,7 @@ import {
   checkForUpdate,
   type VersionCheckResult,
 } from "@/services/versionCheck";
-import {
-  formatBytes,
-  formatDuration,
-  formatUnixTimestamp,
-} from "@/utils/format";
+import { formatBytes, formatDateTime, formatDuration } from "@/utils/format";
 
 export interface InstanceTechnicalInfoHandle {
   refresh: () => void;
@@ -160,9 +156,7 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
     const commitShort = info.build.commit.slice(0, 8);
     const commitUrl = `https://github.com/l3montree-dev/devguard/commit/${info.build.commit}`;
     const vulndbUrl =
-      "https://github.com/l3montree-dev/devguard/pkgs/container/devguard%2Fvulndb%2Fv1";
-
-    console.log("Instance info loaded:", info, versionCheck);
+      "https://github.com/l3montree-dev/devguard/pkgs/container/devguard%2Fvulndb%2Fv2";
 
     return (
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -296,7 +290,7 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
             />
             <Row
               label="VulnDB Version"
-              value={formatUnixTimestamp(info.database.vulndbVersion)}
+              value={formatDateTime(info.database.vulndbVersion)}
               href={vulndbUrl}
             />
           </CardContent>

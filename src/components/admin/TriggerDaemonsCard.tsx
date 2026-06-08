@@ -47,12 +47,6 @@ const daemons: Daemon[] = [
     endpoint: "/admin/daemons/vulndb/trigger",
   },
   {
-    id: "vulndbCleanup",
-    label: "VulnDB Cleanup",
-    description: "Remove orphaned database tables from failed imports.",
-    endpoint: "/admin/daemons/vulndb-cleanup/trigger",
-  },
-  {
     id: "fixedVersions",
     label: "Fixed Versions",
     description: "Update known fixed versions for tracked vulnerabilities.",

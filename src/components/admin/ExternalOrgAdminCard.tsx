@@ -80,6 +80,11 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
     orgId: string;
     email: string;
   } | null>(null);
+  const [confirmRevoke, setConfirmRevoke] = useState<{
+    orgId: string;
+    adminId: string;
+    name: string;
+  } | null>(null);
 
   const requestAssignAdmin = useCallback(
     (orgId: string) => {
@@ -211,6 +216,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
               : o,
           ),
         );
+        setConfirmRevoke(null);
         toast.success(
           `Revoked admin privileges for ${admin?.name ?? adminId}.`,
         );
@@ -293,7 +299,13 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
                           size="sm"
                           className="h-7 text-xs text-destructive hover:text-destructive"
                           disabled={revokingId === admin.id}
-                          onClick={() => handleRevokeAdmin(org.id, admin.id)}
+                          onClick={() =>
+                            setConfirmRevoke({
+                              orgId: org.id,
+                              adminId: admin.id,
+                              name: admin.name,
+                            })
+                          }
                         >
                           <TrashIcon className="mr-1 h-3.5 w-3.5" />
                           {revokingId === admin.id ? "Revoking…" : "Revoke"}
@@ -394,6 +406,52 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
                 }}
               >
                 {assigning ? "Adding…" : "Confirm & Add Admin"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Revoke confirmation dialog */}
+        <AlertDialog
+          open={!!confirmRevoke}
+          onOpenChange={(open) => {
+            if (!open && !revokingId) setConfirmRevoke(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Revoke admin privileges?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You are about to revoke admin privileges from{" "}
+                <span className="font-mono font-medium text-foreground">
+                  {confirmRevoke?.name}
+                </span>{" "}
+                for the organisation{" "}
+                <span className="font-mono font-medium text-foreground">
+                  {orgs.find((o) => o.id === confirmRevoke?.orgId)?.slug}
+                </span>
+                . They will immediately lose the ability to manage projects and
+                settings within this organisation.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={!!revokingId}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                disabled={!!revokingId}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (confirmRevoke) {
+                    handleRevokeAdmin(
+                      confirmRevoke.orgId,
+                      confirmRevoke.adminId,
+                    );
+                  }
+                }}
+              >
+                {revokingId ? "Revoking…" : "Revoke admin"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

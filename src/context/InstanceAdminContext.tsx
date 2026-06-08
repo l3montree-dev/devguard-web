@@ -10,6 +10,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { RefreshCw } from "lucide-react";
 
 const STORAGE_KEY = "devguard-admin-key";
 const EXPIRES_KEY = "devguard-admin-expires-at";
@@ -22,6 +23,8 @@ interface InstanceAdminContextValue {
   authenticate: (hexPrivateKey: string) => void;
   /** Remove the stored private key from session storage. */
   logout: () => void;
+  /** Reset the auto-logout timer back to the full session duration. */
+  refreshSession: () => void;
   /** Retrieve the stored hex-encoded private key. Returns null if not set. */
   getPrivateKey: () => string | null;
   /** Absolute timestamp (ms) when the admin session is auto-cleared. */
@@ -32,6 +35,7 @@ const InstanceAdminContext = createContext<InstanceAdminContextValue>({
   isAuthenticated: false,
   authenticate: () => {},
   logout: () => {},
+  refreshSession: () => {},
   getPrivateKey: () => null,
   expiresAt: null,
 });
@@ -77,6 +81,14 @@ export function InstanceAdminProvider({
     setState({ isAuthenticated: false, expiresAt: null });
   }, []);
 
+  const refreshSession = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (!sessionStorage.getItem(STORAGE_KEY)) return;
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    sessionStorage.setItem(EXPIRES_KEY, String(expiresAt));
+    setState((prev) => ({ ...prev, expiresAt }));
+  }, []);
+
   const getPrivateKey = useCallback((): string | null => {
     if (typeof window === "undefined") return null;
     return sessionStorage.getItem(STORAGE_KEY);
@@ -99,6 +111,7 @@ export function InstanceAdminProvider({
         isAuthenticated: state.isAuthenticated,
         authenticate,
         logout,
+        refreshSession,
         getPrivateKey,
         expiresAt: state.expiresAt,
       }}
@@ -111,7 +124,7 @@ export function InstanceAdminProvider({
 export const useInstanceAdmin = () => useContext(InstanceAdminContext);
 
 export function SessionCountdown() {
-  const { expiresAt } = useInstanceAdmin();
+  const { expiresAt, refreshSession } = useInstanceAdmin();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!expiresAt) return;
@@ -123,8 +136,17 @@ export function SessionCountdown() {
   const minutes = Math.floor(remaining / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
   return (
-    <p className="text-xs text-muted-foreground tabular-nums">
+    <p className="flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums">
       Auto-logout in {minutes}:{String(seconds).padStart(2, "0")}
+      <button
+        type="button"
+        onClick={refreshSession}
+        className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-2 hover:underline"
+        title="Reset the auto-logout timer to 10 minutes"
+      >
+        <RefreshCw className="h-3 w-3" />
+        Refresh
+      </button>
     </p>
   );
 }

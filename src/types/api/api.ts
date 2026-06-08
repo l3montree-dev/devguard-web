@@ -998,26 +998,27 @@ export type EcosystemUsageInOrg = {
 };
 
 export type AverageRemediationTimes = {
-  lowRiskAverage: number;
-  mediumRiskAverage: number;
-  highRiskAverage: number;
-  criticalRiskAverage: number;
+  // average time until vulns are remediated
+  lowRiskRemediated: number;
+  mediumRiskRemediated: number;
+  highRiskRemediated: number;
+  criticalRiskRemediated: number;
 
-  lowCVSSAverage: number;
-  mediumCVSSAverage: number;
-  highCVSSAverage: number;
-  criticalCVSSAverage: number;
-};
+  lowCVSSRemediated: number;
+  mediumCVSSRemediated: number;
+  highCVSSRemediated: number;
+  criticalCVSSRemediated: number;
 
-export type ProjectVulnCountAverageBySeverity = {
-  riskLowAverage: number;
-  riskMediumAverage: number;
-  riskHighAverage: number;
-  riskCriticalAverage: number;
-  cvssLowAverage: number;
-  cvssMediumAverage: number;
-  cvssHighAverage: number;
-  cvssCriticalAverage: number;
+  // average age of non-remediated (open) vulns
+  lowRiskOpen: number;
+  mediumRiskOpen: number;
+  highRiskOpen: number;
+  criticalRiskOpen: number;
+
+  lowCVSSOpen: number;
+  mediumCVSSOpen: number;
+  highCVSSOpen: number;
+  criticalCVSSOpen: number;
 };
 
 export type RemediationTypeUsage = {
@@ -1042,65 +1043,52 @@ export type OrgOverview = {
   averageRemediationTimes: AverageRemediationTimes;
   averageAgeOfDependencies: number;
   averageOpenCodeRisksPerProject: number;
-  projectOpenVulnAverage: ProjectVulnCountAverageBySeverity;
   remediationTypeDistribution: RemediationTypeUsage;
 };
 
-export interface SeverityBreakdown {
-  critical: number;
-  high: number;
-  medium: number;
-  low: number;
+// Instance-wide usage counters from `GET /admin/statistics/usage/`.
+// NOTE: the backend `dtos.InstanceUsageStatistics` struct carries no `json`
+// tags, so the serialized keys are the Go field names verbatim (PascalCase).
+export interface InstanceUsageStatistics {
+  NumberOfUsers: number;
+  NumberOfOrganizations: number;
+  NumberOfProjects: number;
+  NumberOfAssetVersions: number;
+  NumberOfTicketSyncedProjects: number;
+  NumberOfProjectsWithGitlabIntegration: number;
 }
 
-export interface OrgVulnStats extends SeverityBreakdown {
-  org: string;
+// A malicious package detected somewhere across the instance, with the full
+// slug path needed to locate it. Mirrors `dtos.MaliciousPackage`.
+export interface MaliciousPackage {
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
+  assetName: string;
+  assetVersionName: string;
+  component: string;
+  maliciousPackageID: string;
 }
 
-export interface VulnerableAssetStats {
-  asset: string;
-  org: string;
-  open: number;
-  critical: number;
+// Like ComponentUsageInOrg but with the instance-wide relative share. Mirrors
+// `dtos.ComponentOccurrenceAcrossInstance`. Assignable to ComponentUsageInOrg.
+export interface ComponentOccurrenceAcrossInstance {
+  purl: string;
+  totalAmount: number;
+  relativeAmount: number;
 }
 
-export interface TopCVEStats {
-  cve: string;
-  affected: number;
-  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
-}
-
-export interface TopDependencyStats {
-  pkg: string;
-  count: number;
-  ecosystem: string;
-}
-
-export interface OrgCodeRiskStats {
-  org: string;
-  risks: number;
-}
-
-export interface MaliciousPackageStats {
-  pkg: string;
-  ecosystem: string;
-  affected: number;
-  type: string;
-}
-
-export interface InstanceAdminStatsDTO {
-  totalUsers: number;
-  totalOrganisations: number;
-  nonEmptyProjects: number;
-  totalProjectRefs: number;
-  ticketSyncProjects: number;
-  enabledIntegrations: number;
-  avgVulnsPerOrg: OrgVulnStats[];
-  topVulnerableAssets: VulnerableAssetStats[];
-  topCVEs: TopCVEStats[];
-  topDependencies: TopDependencyStats[];
-  avgCodeRisksPerOrg: OrgCodeRiskStats[];
-  maliciousPackages: MaliciousPackageStats[];
+// Instance-wide vulnerability overview from
+// `GET /admin/statistics/vulnerabilities/`. Mirrors `dtos.InstanceOverview`.
+export interface InstanceOverview {
+  topCVEs: CVEOccurrenceInOrg[];
+  topComponents: ComponentOccurrenceAcrossInstance[];
+  maliciousPackages: MaliciousPackage[];
+  averageOpenCodeRisks: number;
+  topVulnerableProjects: VulnDistributionInStructure[];
+  // `dtos.OrgVulnAverage` = `RemediationTimeAverages`: the same 8 risk/cvss
+  // average keys already modelled by AllAverageFixingTimes.
+  averageOpenVulnsPerOrg: AllAverageFixingTimes;
 }
 
 export interface InstanceBuildInfo {
