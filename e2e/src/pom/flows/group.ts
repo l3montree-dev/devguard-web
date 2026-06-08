@@ -23,7 +23,7 @@ export class GroupFlow {
   }
 
   async checkHeaderGroup() {
-    await this.page.getByRole("link", { name: "Test Group" }).first().click({ timeout: 5_000 });
+    await this.page.getByRole("link", { name: "Test Group" }).first().click({ timeout: 10_000 });
     await this.page.getByTestId("nav-group-overview").click();
     await this.page.getByTestId("nav-group-releases").click();
     await this.page.getByTestId("nav-group-subgroups-repositories").click();

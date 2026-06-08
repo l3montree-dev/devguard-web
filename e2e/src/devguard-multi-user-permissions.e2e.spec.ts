@@ -24,8 +24,7 @@ test.describe("DevGuard multi-user: invite and permission flow", () => {
       .auth()
       .registerWithEmailAndPassword(invitedEmail, username2, envConfig.devGuard.password);
 
-    await page2.waitForLoadState("networkidle");
-    await page2.evaluate((url) => { window.location.href = url; }, inviteUrl);
+    await page2.goto(inviteUrl);
     await page2.waitForURL(
       new RegExp(`^${envConfig.devGuard.domain}/(?!setup|accept-invitation)[^/]+`),
       { timeout: 20_000 },

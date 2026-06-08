@@ -1,45 +1,90 @@
-# DevGuard - E2E Testing
+# DevGuard – E2E Testing
 
-## Tips
+The tests are written with [Playwright](https://playwright.dev/) and use a Page Object Model (POM) pattern.  
+All test files live in `src/` and are named `<suite>-<flow>.e2e.spec.ts`.
 
-npx playwright codegen https://main.devguard.org/login
+## Structure
 
-## Run Tests
+```
+e2e/
+├── src/
+│   ├── devguard-*.e2e.spec.ts      # DevGuard test suites (run these)
+│   ├── opencode-*.e2e.spec.ts      # OpenCode tests (ignored – see below)
+│   ├── pom/
+│   │   ├── devguard.ts             # Root POM – entry point for all DevGuard flows
+│   │   └── flows/                  # Individual flow helpers (auth, org, repo, vuln, …)
+│   └── utils.ts                    # Env loading, OTP helpers, shared utilities
+├── assets/                         # Test fixture files (SBOM, VEX, …)
+├── playwright.config.ts
+└── .env                            # Local secrets (never commit this file)
+```
+
+### POM flows
+
+Each file in `src/pom/flows/` encapsulates one functional area:
+
+| File | Responsibility |
+|------|---------------|
+| `auth.ts` | Registration, login, logout |
+| `org.ts` | Organisation management |
+| `group.ts` | Group management |
+| `repo.ts` | Repository / asset management |
+| `vuln.ts` | Vulnerability and VEX rule flows |
+| `artifact.ts` | Artifact uploads and scanning |
+| `sharing.ts` | Sharing / permissions |
+| `setup.ts` | Initial setup steps |
+
+---
+
+## Environment variables
+
+Copy `.env.example` to `.env` and fill in all values **before** running any test.
 
 ```bash
-# run all e2e tests
-npx playwright test --headed --trace on
-
-# run single e2e test file (e.g. devguard-login-flow.e2e.spec.ts)
-npx playwright test --headed --trace on devguard-login-flow
-
-npx playwright test --headed --trace on --debug # note that you need to press the "Play" button sometimes to actually start the test
-
-npx playwright test --headed --trace on --debug devguard-login-flow.e2e.spec.ts:67 # run single test (the test defined at line 77 of file devguard-login-flow)
+cp .env.example .env
 ```
+
+### Required variables
+
+| Variable | Description |
+|----------|-------------|
+| `DEVGUARD_DOMAIN` | Full URL of the DevGuard instance, e.g. `https://main.devguard.org` |
+| `DEVGUARD_EMAIL_LOGIN_USERNAME` | Username template for generated test accounts – must contain the literal string `XXX` which is replaced at runtime, e.g. `test-user-XXX` |
+| `DEVGUARD_EMAIL_LOGIN_PASSWORD` | Password used when registering / logging in test accounts |
+
+> The `OPEN_CODE_*` variables are only needed for the OpenCode test suite (see below) and can be left empty if you only run the DevGuard tests.
+
+---
+
+## Running the tests
+
+All commands must be run from the `e2e/` directory.
+
+```bash
+# Install dependencies (first time only)
+npm install
+
+# Run all DevGuard tests sequentially (recommended – see run-devguard-tests.sh)
+./run-devguard-tests.sh
+
+# Run a single test file for debugging
+npx playwright test devguard-xx.e2e.spec.ts --headed --trace on --debug
+```
+
+### OpenCode tests
+
+The `opencode-*.e2e.spec.ts` files test the OpenCode OAuth integration and require separate credentials (`OPEN_CODE_*`).  
+**These tests are excluded from `run-devguard-tests.sh`** and should not be run as part of the regular DevGuard test suite.
+
+---
 
 ## Debugging
 
-### via VSCode
+### VSCode
 
-If you need to adjust/debug a tests - open the Testing Tab in VSCode and go to the Playwright section and launch test
+1. Open the **Testing** tab in VSCode and expand the **Playwright** section.
+2. Add `await page.waitForTimeout(500_000);` where you want to pause.
+3. Click **Pick locator** at the bottom of the Playwright panel → a recording bar appears in the browser.
+4. Click the red recorder icon to generate selectors directly in VSCode.
 
-- add `await page.waitForTimeout(500_000);` where you need to stop the test
-  - make sure to add an extra empty line below and set the cursor there
-- go to vscode -> testing -> on the bottom is a "Playwright" section -> click on "Pick locator"
-  - -> At the top of the browser will appear a bar with a recording sign.
-  - Click on the red recorder icon and it should generate code right in VSCode
-
-### via Commandline / Playwright Debug UI
-
-- Add `await page.waitForTimeout(500_000);` where you need to stop the test
-- Launch Test `npx playwright test --headed --trace on --debug devguard-login-flow` (run single e2e test e.g. devguard-login-flow.e2e.spec.ts)
-  - You might need to click "Play" button to start the test
-- Wait until tests stops at page.waitForTimeout - use "Record" Button at the top of the page to record changes (copy code into test after you are done)
-
-## Making UI Changes
-
-- Run the devguard-web project (`npm run dev`)
-- Either launch Backend locally as well or forward Ports (Kratos and API)
-  - `docker compose up` in backend project
-  - VSCode "Run and Debug" -> Launch Server
+---
