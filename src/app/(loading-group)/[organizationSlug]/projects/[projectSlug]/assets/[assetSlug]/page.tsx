@@ -1,6 +1,5 @@
 "use client";
 import AssetTitle from "@/components/common/AssetTitle";
-import CopyCode from "@/components/common/CopyCode";
 import Section from "@/components/common/Section";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
@@ -29,10 +28,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
-import Link from "next/link";
+import { EssentialProjectConfigContent } from "@/components/common/EssentialProjectConfigDrawer";
 
 const Index: FunctionComponent = () => {
-  const { pat, onCreatePat } = usePersonalAccessToken();
   const assetMenu = useAssetMenu();
   const role = useCurrentUserRole();
   const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
@@ -239,66 +237,14 @@ const Index: FunctionComponent = () => {
               <ChevronDownIcon className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <Card className="mt-4">
-                <CardContent className="flex flex-col gap-6 pt-6">
-                  <div>
-                    <p className="text-sm font-semibold mb-2">Asset Name</p>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Use this as the{" "}
-                      <code className="font-mono text-xs">
-                        {asset.repositoryProvider === "github"
-                          ? "asset-name"
-                          : "devguard_asset_name"}
-                      </code>{" "}
-                      config parameter when sending scan reports or SBOMs to
-                      DevGuard.
-                    </p>
-                    <CopyCode
-                      language="shell"
-                      codeString={`${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}`}
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-semibold">
-                        Personal Access Token
-                      </p>
-                      <Link
-                        href="/user-settings#pat"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-muted-foreground hover:text-foreground underline"
-                      >
-                        Manage existing tokens
-                      </Link>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Used for API authentication. Set this as{" "}
-                      <code className="font-mono text-xs">DEVGUARD_TOKEN</code>{" "}
-                      in your CI/CD variables.
-                    </p>
-                    <InputWithButton
-                      label="Personal Access token"
-                      nameKey="devguard-secret-token"
-                      copyable={true}
-                      copyToastDescription="The DevGuard token has been copied to your clipboard."
-                      mutable={true}
-                      variant="onCard"
-                      value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
-                      update={{
-                        update: () =>
-                          onCreatePat({
-                            scopes: "scan",
-                            description: "DevGuard token with 'scan' scope",
-                          }),
-                        updateConfirmTitle: "Create new personal access token",
-                        updateConfirmDescription:
-                          "Are you sure you want to create a new personal access token? Make sure to copy it, as you won't be able to see it again.",
-                      }}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-4">
+                <EssentialProjectConfigContent
+                  organizationSlug={params.organizationSlug}
+                  projectSlug={params.projectSlug}
+                  assetSlug={params.assetSlug}
+                  repositoryProvider={asset.repositoryProvider}
+                />
+              </div>
             </CollapsibleContent>
           </Collapsible>
         </Section>

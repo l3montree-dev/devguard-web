@@ -351,6 +351,10 @@ const Index: FunctionComponent = () => {
               parentRepositoryName={parentRepositoryName}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              assetSlug={assetSlug}
+              repositoryProvider={asset.repositoryProvider}
               members={asset.members}
               onRemoveMember={handleRemoveMember}
               onChangeMemberRole={handleChangeMemberRole}
