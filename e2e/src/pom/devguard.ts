@@ -77,7 +77,9 @@ export class DevGuardPOM {
   }
 
   async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
-    const themeChooser = this.page.locator(`${level} [data-testid="theme-chooser"]`);
+    const themeChooser = this.page.locator(
+      `${level} [data-testid="theme-chooser"]`,
+    );
     await themeChooser.click();
     await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
     await this.page.getByTestId("light-mode").click();
@@ -96,7 +98,11 @@ export class DevGuardPOM {
     const username = envConfig.devGuard.uniqueUsername();
     const email = envConfig.devGuard.uniqueEMail();
     console.log(`Registering new user ${username}`);
-    await this.auth().registerWithEmailAndPassword(email, username, envConfig.devGuard.password);
+    await this.auth().registerWithEmailAndPassword(
+      email,
+      username,
+      envConfig.devGuard.password,
+    );
   }
 
   async setupSbomUpload() {

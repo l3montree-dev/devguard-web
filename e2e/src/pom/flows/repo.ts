@@ -4,8 +4,12 @@ export class RepoFlow {
   constructor(private page: Page) {}
 
   async createGitHubRepo(name: string, description: string) {
-    await this.page.getByTestId("create-repository-button").click({ timeout: 10_000 });
-    await this.page.getByTestId("repository-name").waitFor({ state: "visible" });
+    await this.page
+      .getByTestId("create-repository-button")
+      .click({ timeout: 10_000 });
+    await this.page
+      .getByTestId("repository-name")
+      .waitFor({ state: "visible" });
     await this.page.getByTestId("repository-name").click();
     await this.page.getByTestId("repository-name").fill(name);
     await this.page.getByTestId("repository-description").click();
@@ -14,8 +18,12 @@ export class RepoFlow {
   }
 
   async createGitLabRepo(name: string, description: string) {
-    await this.page.getByTestId("create-repository-button").click({ timeout: 10_000 });
-    await this.page.getByTestId("repository-name").waitFor({ state: "visible" });
+    await this.page
+      .getByTestId("create-repository-button")
+      .click({ timeout: 10_000 });
+    await this.page
+      .getByTestId("repository-name")
+      .waitFor({ state: "visible" });
     await this.page.getByTestId("repository-name").click();
     await this.page.getByTestId("repository-name").fill(name);
     await this.page.getByTestId("repository-description").click();
@@ -35,13 +43,17 @@ export class RepoFlow {
 
   async settingClickthroughRepo() {
     await this.page.getByTestId("repository-settings").click();
-    await this.page.getByTestId("configure-security-requirements-button").click();
+    await this.page
+      .getByTestId("configure-security-requirements-button")
+      .click();
     await this.page.getByTestId("confidentiality-requirement-low").click();
     await this.page.getByTestId("integrity-requirement-high").click();
     await this.page.getByTestId("availability-requirement-low").click();
     await this.page.getByTestId("save-security-requirements-button").click();
     await this.page.getByTestId("enable-public-access-switch").click();
     await this.page.getByTestId("vuln-auto-reopen-switch").click();
-    await this.page.getByTestId("save-vulnerability-management-settings-button").click();
+    await this.page
+      .getByTestId("save-vulnerability-management-settings-button")
+      .click();
   }
 }

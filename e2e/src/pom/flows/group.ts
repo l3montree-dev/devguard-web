@@ -4,7 +4,9 @@ export class GroupFlow {
   constructor(private page: Page) {}
 
   async createGroup(name: string, description: string) {
-    await this.page.getByTestId("create-group-button").click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("create-group-button")
+      .click({ timeout: 30_000 });
     await this.page.getByTestId("group-name").waitFor({ state: "visible" });
     await this.page.getByTestId("group-name").click();
     await this.page.getByTestId("group-name").fill(name);
@@ -23,7 +25,10 @@ export class GroupFlow {
   }
 
   async checkHeaderGroup() {
-    await this.page.getByRole("link", { name: "Test Group" }).first().click({ timeout: 10_000 });
+    await this.page
+      .getByRole("link", { name: "Test Group" })
+      .first()
+      .click({ timeout: 10_000 });
     await this.page.getByTestId("nav-group-overview").click();
     await this.page.getByTestId("nav-group-releases").click();
     await this.page.getByTestId("nav-group-subgroups-repositories").click();

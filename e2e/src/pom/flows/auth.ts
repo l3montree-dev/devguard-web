@@ -2,14 +2,19 @@ import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 export class AuthFlow {
-  constructor(private page: Page, private domain: string) {}
+  constructor(
+    private page: Page,
+    private domain: string,
+  ) {}
 
   async loginWithEmailAndPassword(email: string, password: string) {
     await this.page.getByTestId("identifier").click();
     await this.page.getByTestId("identifier").fill(email);
     await this.page.getByTestId("password").click();
     await this.page.getByTestId("password").fill(password);
-    await this.page.getByRole("button", { name: "Sign in with password" }).click();
+    await this.page
+      .getByRole("button", { name: "Sign in with password" })
+      .click();
   }
 
   async loginWithOpenCode() {
@@ -20,7 +25,11 @@ export class AuthFlow {
     await this.page.waitForLoadState("networkidle");
   }
 
-  async registerWithEmailAndPassword(email: string, username: string, password: string) {
+  async registerWithEmailAndPassword(
+    email: string,
+    username: string,
+    password: string,
+  ) {
     await this.page.getByTestId("ory/screen/login/action/register").click();
     await this.page.getByTestId("traits.email").click();
     await this.page.getByTestId("traits.email").fill(email);
@@ -36,7 +45,9 @@ export class AuthFlow {
     await this.page.getByRole("button", { name: "Sign up" }).click();
     await this.page.getByTestId("password-button").click();
     await this.page.getByTestId("password").fill(password);
-    await this.page.getByRole("button", { name: "Sign up", exact: true }).click();
+    await this.page
+      .getByRole("button", { name: "Sign up", exact: true })
+      .click();
 
     console.log(`Registered user: ${username} (${email})`);
 
@@ -47,20 +58,28 @@ export class AuthFlow {
         ),
       ).toBeVisible({ timeout: 10_000 });
 
-      console.log("Please check your emails, enter the verification code and click on 'Continue'");
+      console.log(
+        "Please check your emails, enter the verification code and click on 'Continue'",
+      );
 
       await expect(
         this.page.getByText("You successfully verified your email address."),
       ).toBeVisible({ timeout: 120_000 });
 
-      await this.page.getByRole("button", { name: "Continue", exact: true }).click();
+      await this.page
+        .getByRole("button", { name: "Continue", exact: true })
+        .click();
     }
   }
 
   async logout() {
-    const userSettings = this.page.locator(`.level-root [data-testid="user-nav-dropdown-trigger"]`);
+    const userSettings = this.page.locator(
+      `.level-root [data-testid="user-nav-dropdown-trigger"]`,
+    );
     await userSettings.click();
-    await this.page.getByTestId("user-nav-logout-button").waitFor({ state: "visible" });
+    await this.page
+      .getByTestId("user-nav-logout-button")
+      .waitFor({ state: "visible" });
     await this.page.getByTestId("user-nav-logout-button").click();
   }
 }

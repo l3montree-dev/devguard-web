@@ -73,10 +73,16 @@ function loadEnvVariables() {
       password: process.env.DEVGUARD_EMAIL_LOGIN_PASSWORD!,
       domain: process.env.DEVGUARD_DOMAIN!,
       uniqueUsername: () =>
-        config.devGuard.usernameTemplate.replace("XXX", `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`),
+        config.devGuard.usernameTemplate.replace(
+          "XXX",
+          `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        ),
       uniqueEMail: () =>
         config.devGuard.usernameTemplate
-          .replace("XXX", `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`)
+          .replace(
+            "XXX",
+            `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          )
           .concat("@example.com"),
     },
   };

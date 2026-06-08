@@ -15,7 +15,9 @@ test.describe("DevGuard handle vuln flows", () => {
     await page.waitForTimeout(2_000);
   });
 
-  test("test sbom upload to path vexxing and verification of vex rule", async ({ page }) => {
+  test("test sbom upload to path vexxing and verification of vex rule", async ({
+    page,
+  }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadAndRegister();
     await devguardPOM.createTestOrganizationGroupAndRepo();
@@ -40,19 +42,29 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.loadAndRegister();
     await devguardPOM.org().createOrganization("TestOrganization");
     await devguardPOM.group().createGroup("TestGroup", "This is a test group");
-    await devguardPOM.repo().createGitLabRepo("TestRepo", "This is a test repo");
+    await devguardPOM
+      .repo()
+      .createGitLabRepo("TestRepo", "This is a test repo");
     await devguardPOM.setup().setupAutoRiskScanning();
 
     const gitlabToken = process.env.GITLAB_TOKEN;
     if (!gitlabToken) {
-      throw new Error("GITLAB_TOKEN is not set in .env");
+      test.skip(
+        true,
+        "GITLAB_TOKEN is not set — skipping GitLab integration test",
+      );
+      return;
     }
-    await devguardPOM.setup().createGitLabIntegration("My Token", "https://gitlab.com", gitlabToken);
+    await devguardPOM
+      .setup()
+      .createGitLabIntegration("My Token", "https://gitlab.com", gitlabToken);
     await devguardPOM.setup().selectGitLabRepo();
     await devguardPOM.setup().startAutoSetupGitLab();
   });
 
-  test("test the filter possibilities of dependency risk page", async ({ page }) => {
+  test("test the filter possibilities of dependency risk page", async ({
+    page,
+  }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadAndRegister();
     await devguardPOM.createTestOrganizationGroupAndRepo();

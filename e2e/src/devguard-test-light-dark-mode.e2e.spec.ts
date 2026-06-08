@@ -8,6 +8,8 @@ test.describe("DevGuard test light and dark mode", () => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadAndRegister();
     await devguardPOM.org().createOrganization("TestOrg");
-    await devguardPOM.testLightDarkSystemMode(DevGuardNavigationLevel.Organization);
+    await devguardPOM.testLightDarkSystemMode(
+      DevGuardNavigationLevel.Organization,
+    );
   });
 });

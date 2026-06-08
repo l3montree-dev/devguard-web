@@ -13,13 +13,17 @@ export class SetupFlow {
   async selectManualUpload() {
     await this.page.waitForTimeout(500);
     await this.page.getByTestId("manual-upload-card").click();
-    await this.page.getByTestId("integration-method-selection-continue").click();
+    await this.page
+      .getByTestId("integration-method-selection-continue")
+      .click();
   }
 
   async uploadSbomFile(inputFile: string) {
     await this.page.waitForTimeout(500);
     await this.page.getByTestId("sbom-tab").click();
-    await this.page.getByTestId("file-upload-input-file-upload-sbom").setInputFiles(inputFile);
+    await this.page
+      .getByTestId("file-upload-input-file-upload-sbom")
+      .setInputFiles(inputFile);
     await this.page.getByTestId("manual-integration-continue").click();
   }
 
@@ -38,7 +42,7 @@ export class SetupFlow {
     await this.page.getByTestId("gitlab-pat-input").click();
     await this.page.getByTestId("gitlab-pat-input").fill(token);
     await this.page.getByTestId("gitlab-pat-save-button").click();
-  }  
+  }
 
   async selectGitLabRepo() {
     await this.page.getByTestId("repo-selector").click();
@@ -50,15 +54,21 @@ export class SetupFlow {
 
   async startAutoSetupGitLab() {
     await this.page.getByTestId("use-autosetup-button").click();
-    await this.page.getByTestId("view-merge-request-button").waitFor({ state: "visible" });
+    await this.page
+      .getByTestId("view-merge-request-button")
+      .waitFor({ state: "visible" });
   }
 
   async uploadVEX(inputFile: string) {
-    await this.page.getByTestId("nav-asset-vex-rules").click({ timeout: 5_000 });
+    await this.page
+      .getByTestId("nav-asset-vex-rules")
+      .click({ timeout: 5_000 });
     await this.page.getByTestId("upload-vex-button").click();
     await this.page.getByTestId("upload-vex-file").click();
     await this.page.getByTestId("manage-vex-continue").click();
-    await this.page.getByTestId("file-upload-input-file-upload-vex").setInputFiles(inputFile);
+    await this.page
+      .getByTestId("file-upload-input-file-upload-vex")
+      .setInputFiles(inputFile);
     await this.page.getByTestId("upload-vex-file-selected-button").click();
   }
 }

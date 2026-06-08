@@ -5,7 +5,10 @@ import { DevGuardPOM } from "./pom/devguard";
 import { envConfig } from "./utils";
 
 test.describe("DevGuard multi-user: invite and permission flow", () => {
-  test("invited user can join organization via invite link", async ({ page, browser }) => {
+  test("invited user can join organization via invite link", async ({
+    page,
+    browser,
+  }) => {
     const user1POM = new DevGuardPOM(page);
     await user1POM.loadAndRegister();
     await user1POM.org().createOrganization("MultiUserTestOrg");
@@ -22,11 +25,17 @@ test.describe("DevGuard multi-user: invite and permission flow", () => {
     const username2 = envConfig.devGuard.uniqueUsername();
     await user2POM
       .auth()
-      .registerWithEmailAndPassword(invitedEmail, username2, envConfig.devGuard.password);
+      .registerWithEmailAndPassword(
+        invitedEmail,
+        username2,
+        envConfig.devGuard.password,
+      );
 
     await page2.goto(inviteUrl);
     await page2.waitForURL(
-      new RegExp(`^${envConfig.devGuard.domain}/(?!setup|accept-invitation)[^/]+`),
+      new RegExp(
+        `^${envConfig.devGuard.domain}/(?!setup|accept-invitation)[^/]+`,
+      ),
       { timeout: 20_000 },
     );
     await user2POM.org().dismissWelcomeModalIfPresent();

@@ -9,7 +9,9 @@ export class ShareFlow {
       .getByTestId("nav-asset-dependency-risks")
       .click({ timeout: 5_000 });
     await this.page.getByTestId("share-sbom-button").click();
-    await this.page.getByTestId("download-sbom-json-format").waitFor({ state: "visible", timeout: 5_000 });
+    await this.page
+      .getByTestId("download-sbom-json-format")
+      .waitFor({ state: "visible", timeout: 5_000 });
     const [download] = await Promise.all([
       this.page.waitForEvent("download"),
       this.page.getByTestId("download-sbom-json-format").click(),
@@ -22,7 +24,9 @@ export class ShareFlow {
       .getByTestId("nav-asset-dependency-risks")
       .click({ timeout: 5_000 });
     await this.page.getByTestId("share-vex-button").click();
-    await this.page.getByTestId("download-vex-json-format").waitFor({ state: "visible", timeout: 5_000 });
+    await this.page
+      .getByTestId("download-vex-json-format")
+      .waitFor({ state: "visible", timeout: 5_000 });
     const [download] = await Promise.all([
       this.page.waitForEvent("download"),
       this.page.getByTestId("download-vex-json-format").click(),
