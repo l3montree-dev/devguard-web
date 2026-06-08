@@ -29,6 +29,28 @@ export class VulnFlow {
     await this.page.getByTestId("confirm-accepted-risk").click();
   }
 
+  async markEdgeAsDoesNotCallVulnerableFunction() {
+    const firstEdge = this.page.locator(".react-flow__edge").first();
+    await expect(firstEdge).toBeVisible({ timeout: 10_000 });
+    await firstEdge.click();
+
+    const menuItem = this.page.getByTestId("vex-does-not-call-vulnerable-function");
+    await expect(menuItem).toBeVisible({ timeout: 5_000 });
+    await menuItem.click();
+}
+
+  async verifyVEXRule() {
+    await this.page.getByTestId("nav-asset-vex-rules").click({ timeout: 5_000 });
+    const firstHeaderRow = this.page.getByTestId("vex-header-row").first();
+    await expect(firstHeaderRow).toBeVisible({ timeout: 20_000 });
+    await firstHeaderRow.click();
+    const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
+    await expect(firstRuleRow).toBeVisible({ timeout: 5_000 });
+    await firstRuleRow.click();
+    const dialog = this.page.getByLabel("VEX Rule Details");
+    await expect(dialog.getByText(/Applies to \d+ findings?/)).toBeVisible({ timeout: 5_000 });
+  }
+
   async filterDependencyRisksTable() {
     await this.page.getByTestId("nav-asset-dependency-risks").click({ timeout: 5_000 });
     await this.page.getByTestId("filter-open-button").click();

@@ -9,6 +9,7 @@ import { RepoFlow } from "./flows/repo";
 import { SetupFlow } from "./flows/setup";
 import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
+import { ShareFlow } from "./flows/sharing";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -51,6 +52,10 @@ export class DevGuardPOM {
 
   artifacts(): ArtifactFlow {
     return new ArtifactFlow(this.page);
+  }
+
+  sharing(): ShareFlow {
+    return new ShareFlow(this.page);
   }
 
   async loadDevGuard() {

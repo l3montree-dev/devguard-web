@@ -52,4 +52,13 @@ export class SetupFlow {
     await this.page.getByTestId("use-autosetup-button").click();
     await this.page.getByTestId("view-merge-request-button").waitFor({ state: "visible" });
   }
+
+  async uploadVEX(inputFile: string) {
+    await this.page.getByTestId("nav-asset-vex-rules").click({ timeout: 5_000 });
+    await this.page.getByTestId("upload-vex-button").click();
+    await this.page.getByTestId("upload-vex-file").click();
+    await this.page.getByTestId("manage-vex-continue").click();
+    await this.page.getByTestId("file-upload-input-file-upload-vex").setInputFiles(inputFile);
+    await this.page.getByTestId("upload-vex-file-selected-button").click();
+  }
 }

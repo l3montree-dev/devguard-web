@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { DevGuardNavigationLevel } from "../devguard";
 
 export class OrgFlow {
   constructor(private page: Page) {}
@@ -10,7 +11,13 @@ export class OrgFlow {
       .waitFor({ state: "visible" });
     await this.page.getByRole("textbox", { name: "Organization name*" }).fill(name);
     await this.page.getByRole("button", { name: "Create Organization" }).click();
-    await this.page.getByTestId("explore-button").click();
+    const exploreButton = this.page.getByTestId("explore-button");
+    try {
+      await exploreButton.waitFor({ state: "visible", timeout: 5_000 });
+      await exploreButton.click();
+    } catch {
+      // explore button not shown, continuing
+    }
   }
 
   async inviteUserOrg(mail: string) {
@@ -18,5 +25,11 @@ export class OrgFlow {
     await this.page.getByTestId("add-member-button").click();
     await this.page.getByTestId("mail-input").fill(mail);
     await this.page.getByTestId("invite-member-button").click({ timeout: 5_000 });
+  }
+
+  async createSecondOrganization(name: string, level: DevGuardNavigationLevel) {
+    await this.page.locator(`${level} [data-testid="org-switcher-dropdown"]`).click();
+    await this.page.getByTestId("create-new-organization-button").click();
+    await this.createOrganization(name);
   }
 }

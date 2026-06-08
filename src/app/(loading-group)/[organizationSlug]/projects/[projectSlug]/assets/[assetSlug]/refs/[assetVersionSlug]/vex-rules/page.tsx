@@ -257,7 +257,10 @@ const VexRulesPage: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <AuthGuard require="member">
-          <Button onClick={() => setUploadVexModal(true)}>
+          <Button
+            data-testid="upload-vex-button"
+            onClick={() => setUploadVexModal(true)}
+          >
             Upload a VEX-File or add a VEX-URL
           </Button>
         </AuthGuard>

@@ -420,10 +420,18 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
-          <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
+          <Button
+            data-testid="share-sbom-button"
+            variant={"secondary"}
+            onClick={() => setShowSBOMModal(true)}
+          >
             Share your SBOM
           </Button>
-          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+          <Button
+            data-testid="share-vex-button"
+            variant={"secondary"}
+            onClick={() => setShowVexModal(true)}
+          >
             Share your VEX
           </Button>
           <AuthGuard require="member">
