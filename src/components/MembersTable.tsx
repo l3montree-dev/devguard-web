@@ -105,6 +105,7 @@ const MembersTable: FunctionComponent<Props> = ({
                       ) : (
                         <DropdownMenu>
                           <DropdownMenuTrigger
+                            data-testid="change-user-role"
                             className={buttonVariants({
                               variant: "outline",
                               size: "icon",
@@ -115,6 +116,7 @@ const MembersTable: FunctionComponent<Props> = ({
                           <DropdownMenuContent>
                             {m.role === UserRole.Member && (
                               <DropdownMenuItem
+                                data-testid="make-user-admin"
                                 onClick={() =>
                                   onChangeMemberRole(m.id, UserRole.Admin)
                                 }
