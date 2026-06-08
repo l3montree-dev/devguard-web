@@ -16,6 +16,7 @@ import { AssetFormVulnsManagement } from "./asset-form/AssetFormVulnsManagement"
 import MembersTable from "../MembersTable";
 import AssetMemberDialog from "../AssetMemberDialog";
 import { Button } from "../ui/button";
+import { EssentialProjectConfigContent } from "../common/EssentialProjectConfigDrawer";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -88,6 +89,10 @@ export const AssetSettingsForm: FunctionComponent<
     parentRepositoryName?: string;
     repositoryName?: string;
     repositoryId?: string;
+    organizationSlug?: string;
+    projectSlug?: string;
+    assetSlug?: string;
+    repositoryProvider?: "github" | "gitlab";
     members?: Array<{
       id: string;
       name: string;
@@ -113,6 +118,10 @@ export const AssetSettingsForm: FunctionComponent<
   parentRepositoryName,
   repositoryName,
   repositoryId,
+  organizationSlug,
+  projectSlug,
+  assetSlug,
+  repositoryProvider,
   members,
   onRemoveMember,
   onChangeMemberRole,
@@ -127,6 +136,23 @@ export const AssetSettingsForm: FunctionComponent<
       >
         <AssetFormGeneral disable={disable} form={form} onUpdate={onUpdate} />
       </Section>
+      {organizationSlug && projectSlug && assetSlug && (
+        <>
+          <hr />
+          <Section
+            forceVertical={forceVerticalSections}
+            title="CI/CD Configuration"
+            description="These values are required to connect your CI/CD pipeline or tooling to this asset."
+          >
+            <EssentialProjectConfigContent
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              assetSlug={assetSlug}
+              repositoryProvider={repositoryProvider}
+            />
+          </Section>
+        </>
+      )}
       {!disable && members && onRemoveMember && onChangeMemberRole && (
         <>
           <hr />
