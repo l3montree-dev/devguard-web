@@ -123,7 +123,7 @@ const PatManagementSection: FunctionComponent = () => {
 
               <div className="mt-4">
                 <span>Select scopes</span>
-                <span className="block text-sm text-gray-500">
+                <span className="block text-sm text-muted-foreground">
                   Scopes set the permissions of the token. You can choose
                   multiple scopes.
                 </span>
@@ -132,7 +132,7 @@ const PatManagementSection: FunctionComponent = () => {
               <div className="mt-4 flex items-center justify-between gap-2">
                 <Label htmlFor="scan" className="flex-1">
                   Scan
-                  <span className="block text-sm text-gray-500">
+                  <span className="block text-sm text-muted-foreground">
                     Use this token to scan your repositories.
                   </span>
                 </Label>
@@ -145,7 +145,7 @@ const PatManagementSection: FunctionComponent = () => {
               <div className="mt-4 flex items-center justify-between gap-2">
                 <Label htmlFor="manage" className="flex-1">
                   Manage
-                  <span className="block text-sm text-gray-500">
+                  <span className="block text-sm text-muted-foreground">
                     Use this token to manage your repositories.
                   </span>
                 </Label>

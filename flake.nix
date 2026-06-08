@@ -51,6 +51,11 @@
           '';
           installPhase = ''
             mkdir -p $out
+            # .next/node_modules/ is a build-time artifact Next.js 16 uses for module
+            # deduplication during the build (via symlinks back into the source tree).
+            # It is not part of the standalone runtime output (.next/standalone/) and
+            # its dangling symlinks would fail Nix's noBrokenSymlinks check.
+            rm -rf .next/node_modules
             cp -r .next $out/
           '';
         };

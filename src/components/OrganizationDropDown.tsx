@@ -35,6 +35,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useSession, useUpdateSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
+import { useInstanceSettings } from "../hooks/useInstanceSettings";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -45,15 +46,21 @@ const activeOrgName = (name: string, slug: string) => {
   }
   return name;
 };
-export const OrganizationDropDown = () => {
+const OrganizationDropDown = () => {
   const orgs = useSession().organizations;
   const updateOrganizations = useUpdateSession();
   const [orgSyncRunning, setOrgSyncRunning] = useState(false);
 
   const user = useCurrentUser();
   const router = useRouter();
+  const instanceSettings = useInstanceSettings();
+
+  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
-  if (!activeOrg && orgs.length > 0) {
+  if (!activeOrg && lastActiveOrg) {
+    activeOrg = orgs.find((o) => o.slug === lastActiveOrg) || null;
+  } else if (!activeOrg && orgs.length > 0) {
     activeOrg = orgs[0];
   }
 
@@ -110,7 +117,10 @@ export const OrganizationDropDown = () => {
 
   return (
     <>
-      <div className="flex w-full flex-row gap-2 items-center justify-between">
+      <div
+        data-tour="org-switcher"
+        className="flex w-full flex-row gap-2 items-center justify-between"
+      >
         {activeOrg && (
           <div className="flex flex-row items-center gap-1 text-ellipsis">
             <div className="flex flex-col gap-0 ">
@@ -134,7 +144,7 @@ export const OrganizationDropDown = () => {
           <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-header-foreground transition-all hover:bg-white/10">
             <ChevronUpDownIcon className="block h-7 w-7 p-1" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="min-w-48">
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-xs text-muted-foreground">
                 Organizations
@@ -169,16 +179,22 @@ export const OrganizationDropDown = () => {
                 </>
               )}
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
-              <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
-                <PlusIcon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              Create Organization
-            </DropdownMenuItem>
+            {!instanceSettings?.singleOrganizationMode && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+                  <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
+                    <PlusIcon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  Create Organization
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </>
   );
 };
+
+export default OrganizationDropDown;

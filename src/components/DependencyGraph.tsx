@@ -126,6 +126,7 @@ const DependencyGraph: FunctionComponent<{
   onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
   highlightPath?: string[];
   vexRules?: VexRule[];
+  onReady?: () => void;
 }> = ({
   graph,
   width,
@@ -136,6 +137,7 @@ const DependencyGraph: FunctionComponent<{
   enableContextMenu,
   highlightPath,
   vexRules,
+  onReady,
 }) => {
   const isFirstRender = useRef(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -161,6 +163,11 @@ const DependencyGraph: FunctionComponent<{
         vuln.vulnerabilityPath.length > 0
       ) {
         // The direct dependency is the first element in the path
+        set.add(vuln.vulnerabilityPath[0]);
+      } else if (
+        vuln.componentFixedVersion &&
+        vuln.vulnerabilityPath.length === 1
+      ) {
         set.add(vuln.vulnerabilityPath[0]);
       }
     });
@@ -754,7 +761,7 @@ const DependencyGraph: FunctionComponent<{
                     <span>Normal - Standard dependency</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-gray-500 rounded bg-card flex-shrink-0"></div>
+                    <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
                     <span>False positive - Marked as not exploitable</span>
                   </div>
                 </div>
@@ -763,11 +770,11 @@ const DependencyGraph: FunctionComponent<{
                 <div className="space-y-2">
                   <div className="font-medium text-muted-foreground">Edges</div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-blue-500 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-info flex-shrink-0"></div>
                     <span>Vulnerability path</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-purple-500 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-accent flex-shrink-0"></div>
                     <span>Vulnerability path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -778,7 +785,7 @@ const DependencyGraph: FunctionComponent<{
                     <span>Dependency path (hover)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-zinc-400 flex-shrink-0"></div>
+                    <div className="w-8 h-0.5 bg-muted-foreground flex-shrink-0"></div>
                     <span>Normal edge</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -843,6 +850,11 @@ const DependencyGraph: FunctionComponent<{
         onEdgeMouseEnter={handleEdgeMouseEnter}
         onEdgeMouseLeave={handleEdgeMouseLeave}
         onEdgeClick={handleEdgeClick}
+        onInit={
+          onReady
+            ? () => requestAnimationFrame(() => requestAnimationFrame(onReady))
+            : undefined
+        }
       >
         {variant !== "compact" && (
           <MiniMap

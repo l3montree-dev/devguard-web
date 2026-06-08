@@ -6,11 +6,21 @@ import { Badge } from "../ui/badge";
 import type { ProjectDTO } from "../../types/api/api";
 import Image from "next/image";
 import { truncateMiddle } from "@/utils/common";
+import { cn } from "@/lib/utils";
 
-export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
+export const ProjectBadge = ({
+  type,
+  inHeader = false,
+}: {
+  type: ProjectDTO["type"];
+  inHeader?: boolean;
+}) => {
   if (type === "kubernetesNamespace") {
     return (
-      <Badge className="!text-header-foreground" variant="outline">
+      <Badge
+        className={cn(inHeader ? "!text-header-foreground" : "text-foreground")}
+        variant="outline"
+      >
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -23,7 +33,10 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else if (type === "kubernetesCluster") {
     return (
-      <Badge className="!text-header-foreground" variant="outline">
+      <Badge
+        className={cn(inHeader ? "!text-header-foreground" : "text-foreground")}
+        variant="outline"
+      >
         <Image
           src="/assets/kubernetes.svg"
           width={16}
@@ -36,7 +49,10 @@ export const ProjectBadge = ({ type }: { type: ProjectDTO["type"] }) => {
     );
   } else {
     return (
-      <Badge className="!text-header-foreground" variant="outline">
+      <Badge
+        className={cn(inHeader ? "!text-header-foreground" : "text-foreground")}
+        variant="outline"
+      >
         {type === "default" ? "Group" : "Subgroup"}
       </Badge>
     );
@@ -88,7 +104,7 @@ export const ProjectElement = ({
         title={displayName}
       >
         <span className="truncate">{truncateMiddle(displayName)}</span>
-        <ProjectBadge type={project.type} />
+        <ProjectBadge type={project.type} inHeader={true} />
       </Link>
       {!isLast && <span className="opacity-75 flex-shrink-0">/</span>}
     </>

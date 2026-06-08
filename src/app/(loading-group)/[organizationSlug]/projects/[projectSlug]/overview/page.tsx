@@ -1,9 +1,11 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import AuthGuard from "@/components/AuthGuard";
 import { groupBy } from "lodash";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
 import Avatar from "../../../../../../components/Avatar";
@@ -36,14 +38,15 @@ import {
 } from "../../../../../../components/ui/tooltip";
 import { useOrganization } from "../../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../../context/ProjectContext";
-import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { fetcher } from "../../../../../../data-fetcher/fetcher";
+import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
+import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
+import { browserApiClient } from "../../../../../../services/devGuardApi";
 import type {
   AllAverageFixingTimes,
-  AverageFixingTime,
   Paged,
   ReleaseDTO,
   RiskHistory,
@@ -54,15 +57,9 @@ import {
   reduceRiskHistories,
   sortRisk,
 } from "../../../../../../utils/view";
-import useRouterQuery from "../../../../../../hooks/useRouterQuery";
-import Link from "next/link";
-import { toast } from "sonner";
-import { useSession } from "@/context/SessionContext";
-import { browserApiClient } from "../../../../../../services/devGuardApi";
 
 const OverviewPage = () => {
   const search = useSearchParams();
-  const { session } = useSession();
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -206,6 +203,38 @@ const OverviewPage = () => {
     );
   }, [completeRiskHistory, mode]);
 
+  const criticalFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableCritical ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const highFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableHigh ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const mediumFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableMedium ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
+  const lowFixableAmount = useMemo(() => {
+    if (completeRiskHistory.length === 0) return 0;
+    return completeRiskHistory[completeRiskHistory.length - 1].reduce(
+      (sum, r) => sum + (r?.cvePurlFixableLow ?? 0),
+      0,
+    );
+  }, [completeRiskHistory]);
+
   const vulnerableArtifacts = useMemo(() => {
     if (completeRiskHistory.length === 0) return [];
     const latestRiskHistory =
@@ -217,7 +246,6 @@ const OverviewPage = () => {
   }, [completeRiskHistory, mode]);
 
   const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
-  const pathname = usePathname();
 
   const downloadSBOMReport = async () => {
     try {
@@ -249,7 +277,7 @@ const OverviewPage = () => {
         <EmptyParty
           title={"No data available for this group yet..."}
           Button={
-            session ? (
+            <AuthGuard require="admin">
               <Button
                 onClick={() => {
                   router?.push(
@@ -259,7 +287,7 @@ const OverviewPage = () => {
               >
                 Create new release
               </Button>
-            ) : undefined
+            </AuthGuard>
           }
           description="Create a release to group multiple repository artifacts into their own release. This allows you to track and monitor your software over time."
         />
@@ -311,6 +339,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="critical"
                 currentAmount={criticalAmount}
+                fixableAmount={criticalFixableAmount}
                 queryIntervalStart={8.9}
                 queryIntervalEnd={10}
                 mode={mode}
@@ -319,6 +348,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="high"
                 currentAmount={highAmount}
+                fixableAmount={highFixableAmount}
                 queryIntervalStart={6.9}
                 queryIntervalEnd={9}
                 mode={mode}
@@ -327,6 +357,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="medium"
                 currentAmount={mediumAmount}
+                fixableAmount={mediumFixableAmount}
                 queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 mode={mode}
@@ -335,6 +366,7 @@ const OverviewPage = () => {
                 isLoading={riskHistoryLoading}
                 variant="low"
                 currentAmount={lowAmount}
+                fixableAmount={lowFixableAmount}
                 queryIntervalStart={0}
                 queryIntervalEnd={4}
                 mode={mode}

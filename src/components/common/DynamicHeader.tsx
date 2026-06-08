@@ -10,8 +10,12 @@ import { useMemo } from "react";
 import type { ReactNode } from "react";
 import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
-import { OrganizationDropDown } from "../OrganizationDropDown";
 import EntityProviderImage from "./EntityProviderImage";
+import dynamic from "next/dynamic";
+
+const OrganizationDropDown = dynamic(() => import("../OrganizationDropDown"), {
+  ssr: false,
+});
 
 const levelMapping: { [idx: number]: string } = {
   1: "root",
@@ -66,15 +70,19 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
             <h1 className="font-display whitespace-nowrap text-lg font-semibold leading-7 text-header-foreground">
               {Title}
             </h1>
+
             <UserNav />
           </div>
         </div>
         {menu && (
-          <div className="flex flex-row items-end gap-6 text-sm">
+          <div
+            data-tour="menu"
+            className="flex flex-row items-end gap-6 text-sm"
+          >
             {menu.map((item) => (
               <Link
                 className={classNames(
-                  "cursor:pointer relative hover:no-underline",
+                  "cursor-pointer relative hover:no-underline",
                 )}
                 key={item.title}
                 href={item.href}

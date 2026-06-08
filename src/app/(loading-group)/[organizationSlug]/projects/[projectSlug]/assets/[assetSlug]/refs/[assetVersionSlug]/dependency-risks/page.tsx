@@ -1,7 +1,6 @@
 "use client";
 
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -9,6 +8,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
 import FalsePositiveDialog from "@/components/FalsePositiveDialog";
+import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
 import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -29,16 +30,15 @@ import useTable from "@/hooks/useTable";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import Filter from "@/components/Filter";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -51,6 +51,7 @@ import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebo
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
+import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
 const severityRanges: Record<string, [number | null, number | null]> = {
   low: [null, 4],
@@ -127,6 +128,7 @@ const Index: FunctionComponent = () => {
     });
   }, []);
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
   const { session } = useSession();
 
   const assetMenu = useAssetMenu();
@@ -424,11 +426,11 @@ const Index: FunctionComponent = () => {
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Share your VEX
           </Button>
-          {session && (
+          <AuthGuard require="member">
             <Button onClick={() => setIsOpen(true)} variant="default">
               Identify Risks
             </Button>
-          )}
+          </AuthGuard>
         </div>
       </div>
       <VexDownloadModal
@@ -505,7 +507,7 @@ const Index: FunctionComponent = () => {
         </div>
       ) : (
         <div>
-          <div className="rounded-lg border shadow-sm">
+          <div className="rounded-lg overflow-hidden border shadow-sm">
             <div>
               <table className="w-full text-left text-sm table-fixed">
                 <colgroup>
@@ -516,58 +518,60 @@ const Index: FunctionComponent = () => {
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
                   {/* Batch action row - shown when items are selected and user is logged in */}
-                  {session && selectedVulnIds.size > 0 && (
-                    <tr className="bg-muted/50">
-                      <td colSpan={4} className="px-4 py-2">
-                        <div className="flex flex-row items-center justify-end">
-                          <div className="flex flex-row items-center gap-2">
-                            {selectedClosedIds.length > 0 && (
-                              <AsyncButton
-                                variant="secondary"
-                                onClick={async () => {
-                                  const count = selectedClosedIds.length;
-                                  await handleBulkAction({
-                                    vulnIds: selectedClosedIds,
-                                    status: "reopened",
-                                    justification: "",
-                                  });
-                                  toast("Reopened", {
-                                    description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
-                                  });
-                                }}
+                  <AuthGuard require="member">
+                    {selectedVulnIds.size > 0 && (
+                      <tr className="bg-muted/50">
+                        <td colSpan={4} className="px-4 py-2">
+                          <div className="flex flex-row items-center justify-end">
+                            <div className="flex flex-row items-center gap-2">
+                              {selectedClosedIds.length > 0 && (
+                                <AsyncButton
+                                  variant="secondary"
+                                  onClick={async () => {
+                                    const count = selectedClosedIds.length;
+                                    await handleBulkAction({
+                                      vulnIds: selectedClosedIds,
+                                      status: "reopened",
+                                      justification: "",
+                                    });
+                                    toast("Reopened", {
+                                      description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
+                                    });
+                                  }}
+                                >
+                                  Reopen ({selectedClosedIds.length})
+                                </AsyncButton>
+                              )}
+                              {selectedOpenIds.length > 0 && (
+                                <>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() =>
+                                      setFalsePositiveDialogOpen(true)
+                                    }
+                                  >
+                                    False Positive ({selectedOpenIds.length})
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() => setAcceptDialogOpen(true)}
+                                  >
+                                    Accept Risk ({selectedOpenIds.length})
+                                  </Button>
+                                </>
+                              )}
+                              <Button
+                                variant="ghost"
+                                onClick={() => setSelectedVulnIds(new Set())}
                               >
-                                Reopen ({selectedClosedIds.length})
-                              </AsyncButton>
-                            )}
-                            {selectedOpenIds.length > 0 && (
-                              <>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() =>
-                                    setFalsePositiveDialogOpen(true)
-                                  }
-                                >
-                                  False Positive ({selectedOpenIds.length})
-                                </Button>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() => setAcceptDialogOpen(true)}
-                                >
-                                  Accept Risk ({selectedOpenIds.length})
-                                </Button>
-                              </>
-                            )}
-                            <Button
-                              variant="ghost"
-                              onClick={() => setSelectedVulnIds(new Set())}
-                            >
-                              Clear
-                            </Button>
+                                Clear
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </tr>
+                    )}
+                  </AuthGuard>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
@@ -593,7 +597,7 @@ const Index: FunctionComponent = () => {
                               "max_risk" ? (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                  <CircleHelp className="w-4 h-4 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="relative font-normal">
@@ -619,7 +623,7 @@ const Index: FunctionComponent = () => {
                               "max_cvss" ? (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <CircleHelp className="w-4 h-4 text-gray-500" />
+                                  <CircleHelp className="w-4 h-4 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <div className="relative font-normal">
@@ -662,7 +666,6 @@ const Index: FunctionComponent = () => {
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
                       onBulkAction={handleBulkAction}
-                      hasSession={!!session}
                     />
                   ))}
                 </tbody>
@@ -686,6 +689,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         assetVersion={assetVersion}
         artifacts={artifacts || []}
       />

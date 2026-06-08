@@ -126,17 +126,13 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
                 The dependency path where this rule applies. The wildcard * will
                 match any component (Zero or more).{" "}
                 <Link href="https://devguard.org/explanations/vulnerability-management/mitigation-strategies#vex-rules-automating-mitigation-at-scale">
-                  Checkout the documentation for path patterns
+                  Check out the documentation for path patterns
                 </Link>
               </p>
             }
             forceVertical
           >
-            <div
-              className={
-                "h-72 w-full rounded-lg border bg-gray-50 dark:bg-black"
-              }
-            >
+            <div className={"h-72 w-full rounded-lg border bg-muted"}>
               <DependencyGraph
                 variant="compact"
                 width={100}

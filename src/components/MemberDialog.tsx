@@ -48,6 +48,7 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
     const { code } = await resp.json();
     const url = new URL(window.location.href);
     setInvitationCode(url.origin + "/accept-invitation?code=" + code);
+    form.reset();
   };
 
   return (
@@ -56,8 +57,11 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
         <DialogHeader>
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
-            Invite a new member to your organization by entering their email
-            address.
+            Invite a new member to your organization{" "}
+            <span className="font-semibold text-foreground">
+              {activeOrg.name}
+            </span>{" "}
+            by entering their email address.
             <div className="mt-2">
               <Callout intent="warning">
                 Currently DevGuard does not send any E-Mails. Please copy the

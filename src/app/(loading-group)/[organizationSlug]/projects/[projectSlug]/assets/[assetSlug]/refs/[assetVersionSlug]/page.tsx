@@ -10,9 +10,11 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
+import { usePageTour } from "@/hooks/usePageTour";
+import { repoHomeTourSteps } from "@/components/common/tours/repo-home-tour";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -55,6 +57,8 @@ import type {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
   const activeOrg = useActiveOrg();
@@ -136,6 +140,14 @@ const Index: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const artifactName = searchParams?.get("artifact") ?? "";
 
+  const { startTour } = usePageTour(repoHomeTourSteps);
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "3") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const pathname = usePathname();
 
   const downloadPdfReport = async () => {
@@ -181,7 +193,7 @@ const Index: FunctionComponent = () => {
       Title={<AssetTitle />}
     >
       <div className="flex flex-row items-start justify-between">
-        <div className="flex items-center gap-2">
+        <div data-tour="branch-switcher" className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
         </div>
 
@@ -212,11 +224,13 @@ const Index: FunctionComponent = () => {
           className="w-full"
         >
           <div className="relative flex flex-row gap-4">
-            <QueryArtifactSelector
-              unassignPossible
-              artifacts={(artifacts ?? []).map((a) => a.artifactName)}
-            />
-            <div className="mb-4 flex">
+            <div data-tour="artifact-switcher">
+              <QueryArtifactSelector
+                unassignPossible
+                artifacts={(artifacts ?? []).map((a) => a.artifactName)}
+              />
+            </div>
+            <div data-tour="risk-cvss-values" className="mb-4 flex">
               <TabsList>
                 <TabsTrigger value="risk">Risk values</TabsTrigger>
                 <TabsTrigger value="cvss">CVSS values</TabsTrigger>
@@ -231,6 +245,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={8.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={10}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableCritical ?? 0)
+                    : (latest?.cvePurlFixableCriticalCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlCritical ?? 0)
@@ -243,6 +262,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={6.9}
                 isLoading={riskHistoryLoading}
                 queryIntervalEnd={9}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableHigh ?? 0)
+                    : (latest?.cvePurlFixableHighCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlHigh ?? 0)
@@ -255,6 +279,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={3.9}
                 queryIntervalEnd={7}
                 isLoading={riskHistoryLoading}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableMedium ?? 0)
+                    : (latest?.cvePurlFixableMediumCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlMedium ?? 0)
@@ -267,6 +296,11 @@ const Index: FunctionComponent = () => {
                 queryIntervalStart={0}
                 queryIntervalEnd={4}
                 isLoading={riskHistoryLoading}
+                fixableAmount={
+                  mode === "risk"
+                    ? (latest?.cvePurlFixableLow ?? 0)
+                    : (latest?.cvePurlFixableLowCvss ?? 0)
+                }
                 currentAmount={
                   mode === "risk"
                     ? (latest?.cvePurlLow ?? 0)
@@ -328,12 +362,12 @@ const Index: FunctionComponent = () => {
                               <div className="flex flex-row flex-wrap gap-2">
                                 {el.license.isOsiApproved ? (
                                   <Badge variant={"secondary"}>
-                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-green-500" />
+                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-success" />
                                     OSI Approved
                                   </Badge>
                                 ) : (
                                   <Badge variant={"secondary"}>
-                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-amber-500" />
+                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-warning" />
                                   </Badge>
                                 )}
                               </div>

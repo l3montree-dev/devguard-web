@@ -7,30 +7,33 @@ import {
   CogIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
+import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 import DynamicHeader from "./DynamicHeader";
 
 export default function RootHeader() {
-  return (
-    <DynamicHeader
-      z={1}
-      Title={null}
-      menu={[
-        {
-          title: "Create Organization",
-          href: "/setup",
-          Icon: PlusIcon,
-        },
-        {
-          title: "Join Organization",
-          href: "/join",
-          Icon: ArrowRightEndOnRectangleIcon,
-        },
-        {
-          title: "User-Settings",
-          href: "/user-settings",
-          Icon: CogIcon,
-        },
-      ]}
-    />
-  );
+  const instanceSettings = useInstanceSettings();
+
+  const menu = [
+    ...(!instanceSettings?.singleOrganizationMode
+      ? [
+          {
+            title: "Create Organization",
+            href: "/setup",
+            Icon: PlusIcon,
+          },
+        ]
+      : []),
+    {
+      title: "Join Organization",
+      href: "/join",
+      Icon: ArrowRightEndOnRectangleIcon,
+    },
+    {
+      title: "User-Settings",
+      href: "/user-settings",
+      Icon: CogIcon,
+    },
+  ];
+
+  return <DynamicHeader z={1} Title={null} menu={menu} />;
 }

@@ -55,9 +55,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer",
-            selectedSetup === "devguard-tools"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "devguard-tools" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("devguard-tools")}
         >
@@ -84,9 +82,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer mt-2",
-            selectedSetup === "devguard-cli"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "devguard-cli" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("devguard-cli")}
         >
@@ -113,9 +109,7 @@ export default function ScannerSelectionSlide({
         <Card
           className={classNames(
             "cursor-pointer mt-2",
-            selectedSetup === "own-setup"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "own-setup" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("own-setup")}
         >
@@ -127,22 +121,20 @@ export default function ScannerSelectionSlide({
                 className="inline-block mr-2 w-4 h-4"
               />
               Use your own Scanner or manually upload
-              <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                 Expert
               </Badge>
             </CardTitle>
             <CardDescription>
-              You already have a Scanner or an SBOM file and want to just upload
-              your results...
+              You already have a Scanner or a SARIF/SBOM file and want to just
+              upload your results...
             </CardDescription>
           </CardHeader>
         </Card>
         <Card
           className={classNames(
             "cursor-pointer mt-2   ",
-            selectedSetup === "information-source"
-              ? "border border-primary"
-              : "border border-transparent",
+            selectedSetup === "information-source" ? "border-primary" : "",
           )}
           onClick={() => setSelectedSetup("information-source")}
         >
@@ -150,7 +142,7 @@ export default function ScannerSelectionSlide({
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <LinkIcon className="inline-block mr-2 w-4 h-4" />
               Supplier provided SBOM (URL)
-              <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                 Expert
               </Badge>
             </CardTitle>

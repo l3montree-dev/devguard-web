@@ -103,69 +103,84 @@ export const eventTypeMessages = (
   flawName: string,
   events?: VulnEventDTO[],
 ) => {
+  let message = "";
   switch (event.type) {
     case "licenseDecision":
-      return (
+      message =
         "made a license decision: " +
-        event.arbitraryJSONData.finalLicenseDecision
-      );
+          event.arbitraryJSONData.finalLicenseDecision ||
+        event.arbitraryJSONData.license ||
+        "unknown license";
+      break;
     case "ticketClosed":
-      return "closed the ticket for " + flawName;
+      message = "closed the ticket for " + flawName;
+      break;
     case "ticketDeleted":
-      return "deleted the ticket for " + flawName;
+      message = "deleted the ticket for " + flawName;
+      break;
     case "mitigate":
-      return "created a ticket for " + flawName;
+      message = "created a ticket for " + flawName;
+      break;
     case "reopened":
-      return "reopened " + flawName;
+      message = "reopened " + flawName;
+      break;
     case "accepted":
-      return "accepted the risk of " + flawName;
+      message = "accepted the risk of " + flawName;
+      break;
     case "fixed":
-      return "fixed " + flawName;
+      message = "fixed " + flawName;
+      break;
     case "comment":
-      return "added a comment";
+      message = "added a comment";
+      break;
     case "detected":
       if (event.arbitraryJSONData.risk === 0) {
-        return "detected " + flawName;
+        message = "detected " + flawName;
+      } else {
+        message =
+          "detected " +
+          flawName +
+          " with a risk of " +
+          event.arbitraryJSONData.risk;
       }
-      return (
-        "detected " +
-        flawName +
-        " with a risk of " +
-        event.arbitraryJSONData.risk
-      );
+      break;
     case "falsePositive":
-      return "marked " + flawName + " as false positive ";
-    case "rawRiskAssessmentUpdated":
-      if (events === undefined) {
-        return "Updated the risk assessment to " + event.arbitraryJSONData.risk;
-      }
+      message = "marked " + flawName + " as false positive";
+      break;
+    case "rawRiskAssessmentUpdated": {
       const oldRisk = event.arbitraryJSONData.oldRisk;
-      if (!oldRisk && oldRisk !== 0) {
-        return "updated the risk assessment to " + event.arbitraryJSONData.risk;
+      if (events === undefined || (!oldRisk && oldRisk !== 0)) {
+        message =
+          "updated the risk assessment to " + event.arbitraryJSONData.risk;
+      } else {
+        message =
+          "updated the risk assessment from " +
+          oldRisk +
+          " to " +
+          event.arbitraryJSONData.risk;
       }
-      return (
-        "updated the risk assessment from " +
-        oldRisk +
-        " to " +
-        event.arbitraryJSONData.risk
-      );
+      break;
+    }
   }
-  return "";
+  if (event.userAgent === "devguard-mcp-server") {
+    message += " (applied by AI agent)";
+  }
+  return message;
 };
 
 export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
-  accepted: "bg-purple-600 text-white!",
-  fixed: "bg-green-600 text-white!",
-  detected: "bg-red-600 text-white!",
-  falsePositive: "bg-purple-600 text-white!",
-  mitigate: "bg-green-600 text-white!",
-  markedForTransfer: "bg-blue-600 text-white!",
+  accepted: "bg-info text-info-foreground!",
+  fixed: "bg-success text-success-foreground!",
+  detected: "bg-destructive text-destructive-foreground!",
+  falsePositive: "bg-info text-info-foreground!",
+  mitigate: "bg-success text-success-foreground!",
+  markedForTransfer: "bg-info text-info-foreground!",
   rawRiskAssessmentUpdated: "bg-secondary text-secondary-foreground!",
-  reopened: "bg-red-600 text-white!",
+  reopened: "bg-destructive text-destructive-foreground!",
   comment: "bg-secondary text-secondary-foreground!",
-  ticketClosed: "bg-red-600 text-white!",
-  ticketDeleted: "bg-red-600 text-white!",
-  licenseDecision: "bg-yellow-500 !text-black",
+  ticketClosed: "bg-destructive text-destructive-foreground!",
+  ticketDeleted: "bg-destructive text-destructive-foreground!",
+  licenseDecision: "bg-warning text-warning-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {
@@ -317,6 +332,26 @@ export const generateColor = (str: string) => {
   return colors[hash % colors.length];
 };
 
+export const withMockFixableRiskHistory = (
+  data: RiskHistory[],
+): RiskHistory[] => {
+  return data.map((entry) => ({
+    ...entry,
+    fixableLow: entry.fixableLow ?? 2,
+    fixableMedium: entry.fixableMedium ?? 7,
+    fixableHigh: entry.fixableHigh ?? entry.high * 9,
+    fixableCritical: entry.fixableCritical ?? entry.critical * 15,
+    cvePurlFixableLow:
+      entry.cvePurlFixableLow ?? Math.floor(entry.cvePurlLow / 2),
+    cvePurlFixableMedium:
+      entry.cvePurlFixableMedium ?? Math.floor(entry.cvePurlMedium / 4),
+    cvePurlFixableHigh:
+      entry.cvePurlFixableHigh ?? Math.floor(entry.cvePurlHigh / 3),
+    cvePurlFixableCritical:
+      entry.cvePurlFixableCritical ?? Math.floor(entry.cvePurlCritical / 2),
+  }));
+};
+
 export const reduceRiskHistories = (
   histories: RiskHistory[][],
 ): Array<ReleaseRiskHistory> => {
@@ -327,6 +362,10 @@ export const reduceRiskHistories = (
         acc.cvePurlMedium += curr.cvePurlMedium;
         acc.cvePurlHigh += curr.cvePurlHigh;
         acc.cvePurlCritical += curr.cvePurlCritical;
+        acc.cvePurlFixableLow += curr.cvePurlFixableLow ?? 0;
+        acc.cvePurlFixableMedium += curr.cvePurlFixableMedium ?? 0;
+        acc.cvePurlFixableHigh += curr.cvePurlFixableHigh ?? 0;
+        acc.cvePurlFixableCritical += curr.cvePurlFixableCritical ?? 0;
         acc.cvePurlLowCvss += curr.cvePurlLowCvss;
         acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
         acc.cvePurlHighCvss += curr.cvePurlHighCvss;
@@ -342,6 +381,10 @@ export const reduceRiskHistories = (
         cvePurlMedium: 0,
         cvePurlHigh: 0,
         cvePurlCritical: 0,
+        cvePurlFixableLow: 0,
+        cvePurlFixableMedium: 0,
+        cvePurlFixableHigh: 0,
+        cvePurlFixableCritical: 0,
         cvePurlLowCvss: 0,
         cvePurlMediumCvss: 0,
         cvePurlHighCvss: 0,

@@ -24,7 +24,7 @@ const buttonVariants = cva(
           "bg-secondary !text-secondary-foreground hover:bg-secondary/80 border",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        green: "bg-green-500 text-white hover:bg-green-600",
+        green: "bg-success text-white hover:bg-success-hover",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -65,8 +65,14 @@ const Button = React.forwardRef<
         {...props}
         disabled={props.disabled || isSubmitting}
       >
-        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {props.children}
+        {asChild ? (
+          props.children
+        ) : (
+          <>
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {props.children}
+          </>
+        )}
       </Comp>
     );
   },

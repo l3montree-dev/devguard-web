@@ -13,19 +13,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { UserRole } from "@/types/api/api";
 import {
   ChartBarSquareIcon,
   CogIcon,
   ListBulletIcon,
-  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { ContainerIcon, FolderSearch } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
-import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
 import useDecodedPathname from "./useDecodedPathname";
-import { useCurrentUserRole } from "./useUserRole";
+import { isAdmin, isMember, useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
   const params = useDecodedParams();
@@ -35,65 +32,55 @@ export const useProjectMenu = () => {
   const projectSlug = params?.projectSlug as string;
   const currentUserRole = useCurrentUserRole();
 
-  const loggedIn = useCurrentUser();
+  const menu = [];
 
-  const menu = [
-    {
-      title: "Overview",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
-      Icon: ChartBarSquareIcon,
-      isActive: pathname.startsWith(
-        `/${orgSlug}/projects/${projectSlug}/overview`,
-      ),
-    },
-    {
-      title: "Releases",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
-      Icon: ContainerIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
-    },
-    {
-      title: project.externalEntityProviderId
-        ? "Repositories"
-        : "Subgroups & Repositories",
-      href: "/" + orgSlug + "/projects/" + projectSlug,
-      Icon: ListBulletIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
-    },
-  ];
-  if (loggedIn) {
-    menu.push({
-      title: "Compliance",
-      href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance",
-      Icon: ScaleIcon,
-      isActive: pathname === `/${orgSlug}/projects/${projectSlug}/compliance`,
-    });
+  if (isMember(currentUserRole)) {
+    menu.push(
+      {
+        title: "Overview",
+        href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
+        Icon: ChartBarSquareIcon,
+        isActive: pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/overview`,
+        ),
+      },
+      {
+        title: "Releases",
+        href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
+        Icon: ContainerIcon,
+        isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
+      },
+    );
+  }
 
-    if (
-      currentUserRole === UserRole.Owner ||
-      currentUserRole === UserRole.Admin
-    ) {
-      menu.push(
-        ...[
-          {
-            title: "Package Search",
-            href:
-              "/" + orgSlug + "/projects/" + projectSlug + "/dependency-search",
-            Icon: FolderSearch,
-            isActive:
-              pathname ===
-              `/${orgSlug}/projects/${projectSlug}/dependency-search`,
-          },
-          {
-            title: "Settings",
-            href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
-            Icon: CogIcon,
-            isActive:
-              pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
-          },
-        ],
-      );
-    }
+  menu.push({
+    title: project.externalEntityProviderId
+      ? "Repositories"
+      : "Subgroups & Repositories",
+    href: "/" + orgSlug + "/projects/" + projectSlug,
+    Icon: ListBulletIcon,
+    isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
+  });
+  if (isAdmin(currentUserRole)) {
+    menu.push(
+      ...[
+        {
+          title: "Package Search",
+          href:
+            "/" + orgSlug + "/projects/" + projectSlug + "/dependency-search",
+          Icon: FolderSearch,
+          isActive:
+            pathname ===
+            `/${orgSlug}/projects/${projectSlug}/dependency-search`,
+        },
+        {
+          title: "Settings",
+          href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
+          Icon: CogIcon,
+          isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
+        },
+      ],
+    );
   }
 
   return menu;

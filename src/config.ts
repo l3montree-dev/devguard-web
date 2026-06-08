@@ -7,7 +7,6 @@ export const config = {
   devGuardApiUrl: process.env.DEVGUARD_API_URL,
   devguardApiUrlPublicInternet:
     process.env.DEVGUARD_API_URL_PUBLIC_INTERNET || "https://api.devguard.org",
-  devguardScannerTag: "main-latest",
   retryInterval: 3000,
   privacyPolicyLink:
     process.env.PRIVACY_POLICY_LINK || "https://devguard.org/privacy-policy",
@@ -47,5 +46,7 @@ export const config = {
   issueTrackerUrl:
     process.env.ISSUE_TRACKER_URL ||
     "https://github.com/l3montree-dev/devguard/issues/new/choose",
-  billingUrl: process.env.BILLING_URL || "https://devguard.org",
+  billingUrl: process.env.BILLING_URL || "https://devguard.org/trial-expired",
+  devguardWebsiteUrl:
+    process.env.DEVGUARD_WEBSITE_URL || "https://devguard.org",
 };

@@ -19,6 +19,7 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
+import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 
 const Lanyard = dynamic(
   () => import("@/components/misc/Lanyard").then((mod) => mod.default),
@@ -30,6 +31,12 @@ export default function SetupOrg() {
   if (session.session === null) {
     redirect("/login");
   }
+
+  const instanceSettings = useInstanceSettings();
+  if (instanceSettings?.singleOrganizationMode) {
+    redirect("/join");
+  }
+
   return (
     <Page title="Setup Your Organization">
       <div className="">

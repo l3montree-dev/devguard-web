@@ -12,7 +12,7 @@ import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,6 +40,8 @@ import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
+import { usePageTour } from "@/hooks/usePageTour";
+import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -105,6 +107,12 @@ const Index: FunctionComponent = () => {
       ),
     },
   });
+
+  useEffect(() => {
+    form.resetField("sharesInformation", {
+      defaultValue: asset.sharesInformation,
+    });
+  }, [asset.sharesInformation, form]);
 
   const handleTriggerBackgroundJobs = async () => {
     const resp = await browserApiClient(
@@ -305,6 +313,8 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
+  usePageTour(repoSettingsTourSteps);
+
   return (
     <Page
       Menu={assetMenu}
@@ -313,7 +323,10 @@ const Index: FunctionComponent = () => {
       Title={<AssetTitle />}
     >
       <div>
-        <div className="flex flex-row justify-between">
+        <div
+          data-tour="repo-settings-header"
+          className="flex flex-row justify-between"
+        >
           <h1 className="text-2xl font-semibold">Repository Settings</h1>
         </div>
         <FormProvider {...form}>
@@ -328,6 +341,10 @@ const Index: FunctionComponent = () => {
               parentRepositoryName={parentRepositoryName}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              assetSlug={assetSlug}
+              repositoryProvider={asset.repositoryProvider}
               members={asset.members}
               onRemoveMember={handleRemoveMember}
               onChangeMemberRole={handleChangeMemberRole}
@@ -338,10 +355,11 @@ const Index: FunctionComponent = () => {
       <hr />
       <div>
         <Section
+          data-tour="repo-settings-webhook"
           title="Incoming Webhook Management"
           description="Details for configuring incoming webhooks to receive for example issue updates from your issue tracker."
         >
-          <div className="space-y-2 pt-4 pb-6 px-6 border rounded-xl bg-card mt-1">
+          <div className="space-y-2 pt-4 pb-6 px-6 border shadow-sm rounded-xl bg-card mt-1">
             <InputWithButton
               label="Webhook URL"
               value={`${config.devguardApiUrlPublicInternet}/api/v1/webhook/`}
@@ -389,7 +407,12 @@ const Index: FunctionComponent = () => {
                   "/settings/config"
                 }
               >
-                <Button variant={"outline"}>Go to Configuration Files</Button>
+                <Button
+                  data-tour="repo-settings-config-files"
+                  variant={"outline"}
+                >
+                  Go to Configuration Files
+                </Button>
               </Link>
             </div>
           </Card>
@@ -412,7 +435,10 @@ const Index: FunctionComponent = () => {
                   "/settings/dependency-proxy"
                 }
               >
-                <Button variant={"outline"}>
+                <Button
+                  data-tour="repo-settings-dependency-proxy"
+                  variant={"outline"}
+                >
                   Go to Dependency Proxy Settings
                 </Button>
               </Link>
@@ -422,53 +448,57 @@ const Index: FunctionComponent = () => {
         <hr />
       </div>
 
-      <DangerZone>
-        <Section
-          className="m-2"
-          title="Advanced"
-          description="These settings are for advanced users only. Please be careful when changing these settings."
-        >
-          <ListItem
-            Description={
-              "Setting this to true will make the repository visible to the public."
-            }
-            Title="Public Repository"
-            Button={
-              <Switch
-                disabled={!project.isPublic}
-                checked={asset.isPublic}
-                onCheckedChange={(checked) =>
-                  handleUpdate({
-                    isPublic: checked,
-                  })
+      <div data-tour="repo-settings-danger">
+        <DangerZone>
+          <Section
+            className="m-2"
+            title="Advanced"
+            description="These settings are for advanced users only. Please be careful when changing these settings."
+          >
+            <div data-tour="repo-settings-public">
+              <ListItem
+                Description={
+                  "Setting this to true will make the repository visible to the public."
+                }
+                Title="Public Repository"
+                Button={
+                  <Switch
+                    disabled={!project.isPublic}
+                    checked={asset.isPublic}
+                    onCheckedChange={(checked) =>
+                      handleUpdate({
+                        isPublic: checked,
+                      })
+                    }
+                  />
                 }
               />
-            }
-          />
-          {!project.isPublic && (
-            <small>
-              The group is not public. You can not make the repository public.
-            </small>
-          )}
-          {!asset.externalEntityProviderId && (
-            <ListItem
-              Title="Delete Repository"
-              Description={
-                "This will delete the repository and all of its data. This action cannot be undone."
-              }
-              Button={
-                <Alert
-                  title="Are you sure to delete this repository?"
-                  description="This action cannot be undone. All data associated with this repository will be deleted."
-                  onConfirm={handleDeleteAsset}
-                >
-                  <Button variant={"destructive"}>Delete</Button>
-                </Alert>
-              }
-            />
-          )}
-        </Section>
-      </DangerZone>
+            </div>
+            {!project.isPublic && (
+              <small>
+                The group is not public. You can not make the repository public.
+              </small>
+            )}
+            {!asset.externalEntityProviderId && (
+              <ListItem
+                Title="Delete Repository"
+                Description={
+                  "This will delete the repository and all of its data. This action cannot be undone."
+                }
+                Button={
+                  <Alert
+                    title="Are you sure to delete this repository?"
+                    description="This action cannot be undone. All data associated with this repository will be deleted."
+                    onConfirm={handleDeleteAsset}
+                  >
+                    <Button variant={"destructive"}>Delete</Button>
+                  </Alert>
+                }
+              />
+            )}
+          </Section>
+        </DangerZone>
+      </div>
 
       <Collapsible>
         <CollapsibleTrigger className="w-full cursor-pointer text-muted-foreground text-right px-4 py-2 mt-4 rounded-md font-medium text-xs">

@@ -26,17 +26,17 @@ function ageToColorLevel(seconds: number): ColorLevel {
 }
 
 const textColorClass: Record<ColorLevel, string> = {
-  green: "text-green-500",
-  yellow: "text-yellow-500",
-  orange: "text-orange-500",
-  red: "text-red-500",
+  green: "text-success",
+  yellow: "text-warning",
+  orange: "text-severity-high",
+  red: "text-destructive",
 };
 
 const markerColorClass: Record<ColorLevel, string> = {
-  green: "bg-green-500",
-  yellow: "bg-yellow-500",
-  orange: "bg-orange-500",
-  red: "bg-red-500",
+  green: "bg-success",
+  yellow: "bg-warning",
+  orange: "bg-severity-high",
+  red: "bg-destructive",
 };
 
 const DependencyAge: FunctionComponent<Props> = ({ averageAge }) => {
@@ -67,10 +67,10 @@ const DependencyAge: FunctionComponent<Props> = ({ averageAge }) => {
         <div className="w-full max-w-[240px]">
           <div className="relative h-2 w-full overflow-hidden rounded-full">
             <div className="absolute inset-0 flex">
-              <div className="h-full w-[10%] bg-green-500/20" />
-              <div className="h-full w-[10%] bg-yellow-500/20" />
-              <div className="h-full w-[30%] bg-orange-500/20" />
-              <div className="h-full w-[50%] bg-red-500/20" />
+              <div className="h-full w-[10%] bg-success-muted" />
+              <div className="h-full w-[10%] bg-warning-muted" />
+              <div className="h-full w-[30%] bg-severity-high-muted" />
+              <div className="h-full w-[50%] bg-destructive-muted" />
             </div>
             <div
               className={`absolute top-0 h-full rounded-full ${markerColorClass[colorLevel]}`}

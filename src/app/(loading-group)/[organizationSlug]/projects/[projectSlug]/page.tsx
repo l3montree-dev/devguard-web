@@ -1,9 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import CustomPagination from "@/components/common/CustomPagination";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useRouterQuery from "@/hooks/useRouterQuery";
+import { buildFilterSearchParams } from "@/utils/url";
+import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
@@ -11,15 +15,10 @@ import useSWR from "swr";
 import AssetForm, {
   type AssetFormValues,
 } from "../../../../../components/asset/AssetForm";
-import AssetOverviewListItem from "../../../../../components/AssetOverviewListItem";
-import Avatar from "../../../../../components/Avatar";
-import EmptyParty from "../../../../../components/common/EmptyParty";
-import ListItem from "../../../../../components/common/ListItem";
 import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
 import { ProjectForm } from "../../../../../components/project/ProjectForm";
-import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import {
   Dialog,
@@ -34,44 +33,27 @@ import {
   useOrganization,
 } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
-import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
+import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
-import { useCurrentUserRole } from "../../../../../hooks/useUserRole";
-import { useSession } from "../../../../../context/SessionContext";
+import { isAdmin, useCurrentUserRole } from "../../../../../hooks/useUserRole";
+import AuthGuard from "../../../../../components/AuthGuard";
 import { browserApiClient } from "../../../../../services/devGuardApi";
-import { RequirementsLevel, UserRole } from "../../../../../types/api/api";
 import type {
   AssetDTO,
   EnvDTO,
   Paged,
   ProjectDTO,
+  SubGroupsAndAsset,
 } from "../../../../../types/api/api";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { debounce } from "lodash";
-import useRouterQuery from "@/hooks/useRouterQuery";
-import { buildFilterSearchParams } from "@/utils/url";
-import CustomPagination from "@/components/common/CustomPagination";
-import ListRenderer from "@/components/common/ListRenderer";
+import { RequirementsLevel } from "../../../../../types/api/api";
 
 import Sort from "@/components/Sort";
-
-function isProject(d: AssetDTO | ProjectDTO): d is ProjectDTO {
-  return "type" in d && (d as ProjectDTO).type === "project";
-}
-
-function checkType(data: SubGroupsAndAsset): {
-  asset: AssetDTO | null;
-  subgroup: ProjectDTO | null;
-} {
-  return isProject(data)
-    ? { asset: null, subgroup: data }
-    : { asset: data, subgroup: null };
-}
-
-type SubGroupsAndAsset = AssetDTO | ProjectDTO;
-type SubGroupsAndAssets = Array<SubGroupsAndAsset>;
+import SubgroupsAndAssetsList, {
+  checkType,
+} from "@/components/SubgroupsAndAssetsList";
+import { usePageTour } from "@/hooks/usePageTour";
+import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -79,9 +61,11 @@ export default function RepositoriesPage() {
   );
   const project = useProject()!;
   const organization = useOrganization();
-  const { session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const searchParams = useSearchParams();
+
+  const searchQuery = searchParams?.get("search") ?? "";
+  const isSearchActive = searchQuery.length >= 3;
 
   const queryWithState = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
@@ -95,18 +79,35 @@ export default function RepositoriesPage() {
     return p;
   }, [searchParams]);
 
-  const {
-    isLoading,
-    data: subgroupsWithAssets,
-    error,
-  } = useSWR<Paged<SubGroupsAndAsset>>(() => {
+  const pushQuery = useRouterQuery();
+
+  const swrUrl = (() => {
     if (!isOrganization(organization.organization)) return null;
-    const base = `/organizations/${decodeURIComponent(organization.organization.slug)}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
+    const orgSlug = decodeURIComponent(organization.organization.slug);
+    if (isSearchActive) {
+      return `/organizations/${orgSlug}/projects/search?parentId=${project?.id}&${queryWithState.toString()}`;
+    }
+    const base = `/organizations/${orgSlug}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
     const query = queryWithState.toString();
     return query ? `${base}&${query}` : base;
-  }, fetcher);
+  })();
 
-  const pushQuery = useRouterQuery();
+  const {
+    data: subgroupsWithAssets,
+    error,
+    mutate,
+  } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
+    if (isSearchActive) {
+      const raw = (await fetcher(url)) as Paged<
+        ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
+      >;
+      return {
+        ...raw,
+        data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
+      };
+    }
+    return fetcher<Paged<SubGroupsAndAsset>>(url);
+  });
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
@@ -132,15 +133,29 @@ export default function RepositoriesPage() {
 
   const projectMenu = useProjectMenu();
 
+  const tourSteps = useMemo(
+    () => groupHomeTourSteps(isAdmin(currentUserRole)),
+    [currentUserRole],
+  );
+  const { startTour } = usePageTour(tourSteps);
+
+  useEffect(() => {
+    if (searchParams?.get("startTour") === "2") {
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value === "") {
-        pushQuery({ search: undefined, page: "1" });
-      } else if (e.target.value.length >= 3) {
-        pushQuery({ search: e.target.value, page: "1" });
+      const value = e.target.value;
+      if (value === "") {
+        pushQuery({ search: undefined, page: 1 });
+      } else if (value.length >= 3) {
+        pushQuery({ search: value, page: 1 });
       }
     }, 500),
-    [],
+    [pushQuery],
   );
 
   const handleSetTabValue = (value: string) => {
@@ -203,6 +218,57 @@ export default function RepositoriesPage() {
     }
   };
 
+  const handleLazyDataFetching = useCallback(
+    async (projectSlug: string, projectId: string) => {
+      const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+
+      const resp = await browserApiClient(base);
+      if (resp.ok) {
+        const data = await resp.json();
+        const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+
+        mutate(
+          (prev) => {
+            if (!prev) return prev;
+            // traverse the whole tree, find the correct project and update it with the new data
+            const recursiveFn = (
+              item: SubGroupsAndAsset,
+            ): SubGroupsAndAsset => {
+              const { asset, subgroup } = checkType(item);
+              if (asset != null) {
+                return asset;
+              }
+
+              if (subgroup.id === projectId) {
+                return {
+                  ...subgroup,
+                  subGroupsAndAsset: subGroupsAndAsset.data,
+                };
+              }
+
+              return {
+                ...subgroup,
+                subGroupsAndAsset:
+                  subgroup?.subGroupsAndAsset?.map(recursiveFn),
+              };
+            };
+
+            return {
+              ...prev,
+              data: prev.data.map(recursiveFn) as SubGroupsAndAsset[],
+            };
+          },
+          { revalidate: false },
+        );
+      } else {
+        toast.error(
+          "Failed to load subgroups and assets. Please try again later.",
+        );
+      }
+    },
+    [activeOrg.slug, mutate],
+  );
+
   return (
     <>
       <Page
@@ -213,31 +279,24 @@ export default function RepositoriesPage() {
       >
         <Section
           Button={
-            session &&
             !project.externalEntityProviderId && (
-              <div className="flex flex-row gap-2">
-                <Button
-                  disabled={
-                    project.type !== "default" ||
-                    (currentUserRole !== UserRole.Owner &&
-                      currentUserRole !== UserRole.Admin)
-                  }
-                  variant={"secondary"}
-                  onClick={() => setShowProjectModal(true)}
-                >
-                  Create New Subgroup
-                </Button>
-                <Button
-                  disabled={
-                    project.type !== "default" ||
-                    (currentUserRole !== UserRole.Admin &&
-                      currentUserRole !== UserRole.Owner)
-                  }
-                  onClick={() => setShowModal(true)}
-                >
-                  Create New Repository
-                </Button>
-              </div>
+              <AuthGuard require="admin">
+                <div className="flex flex-row gap-2">
+                  <Button
+                    data-tour="create-subgroup-button"
+                    variant={"secondary"}
+                    onClick={() => setShowProjectModal(true)}
+                  >
+                    Create New Subgroup
+                  </Button>
+                  <Button
+                    data-tour="create-repository-button"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Create New Repository
+                  </Button>
+                </div>
+              </AuthGuard>
             )
           }
           primaryHeadline
@@ -245,21 +304,28 @@ export default function RepositoriesPage() {
           forceVertical
           title={project.name}
         >
-          <Tabs
-            defaultValue="active"
-            value={viewedProject}
-            onValueChange={handleSetTabValue}
-          >
-            <TabsList>
-              <TabsTrigger value="active">
-                {project.externalEntityProviderId
-                  ? "Repositories"
-                  : "Subgroups & Repositories"}
-              </TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
+          <div className="flex items-center gap-4">
+            <Tabs
+              defaultValue="active"
+              value={viewedProject}
+              onValueChange={handleSetTabValue}
+              className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+            >
+              <TabsList>
+                <TabsTrigger value="active">
+                  {project.externalEntityProviderId
+                    ? "Repositories"
+                    : "Subgroups & Repositories"}
+                </TabsTrigger>
+                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            {isSearchActive && (
+              <span className="text-xs text-warning bg-warning-muted border border-warning-border rounded px-2 py-1">
+                Filter and sorting options are disabled while searching
+              </span>
+            )}
+          </div>
           <div className="flex gap-2">
             <Sort
               sortOptions={[
@@ -273,70 +339,17 @@ export default function RepositoriesPage() {
               className="h-11"
               onChange={debouncedHandleSearch}
               defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects and repositories..."
+              placeholder="Search for projects and repositories (min. 3 characters)..."
             />
           </div>
-          <ListRenderer
-            isLoading={isLoading}
-            error={error}
-            data={subgroupsWithAssets?.data}
-            Empty={<EmptyParty title={"No groups found"} description="" />}
-            renderItem={(item) => {
-              const { asset, subgroup } = checkType(item);
-              if (subgroup)
-                return (
-                  <Link
-                    key={subgroup.id}
-                    href={`/${activeOrg.slug}/projects/${subgroup.slug}`}
-                    className="flex flex-col gap-2 hover:no-underline"
-                  >
-                    <ListItem
-                      reactOnHover
-                      Title={
-                        <div className="flex items-center flex-row gap-2">
-                          <Avatar {...subgroup} />
-                          <span>
-                            {subgroup.name.replace(project.name + " /", "")}
-                          </span>
-                          <Badge variant={"outline"}>Subgroup</Badge>
-                          {subgroup.state === "deleted" && (
-                            <Badge variant={"destructive"}>
-                              Pending deletion
-                            </Badge>
-                          )}
-                          {subgroup.type === "kubernetesNamespace" && (
-                            <Badge variant={"outline"}>
-                              <Image
-                                alt="Kubernetes logo"
-                                src="/assets/kubernetes.svg"
-                                className="-ml-1.5 mr-2"
-                                width={16}
-                                height={16}
-                              />
-                              Kubernetes Namespace
-                            </Badge>
-                          )}
-                        </div>
-                      }
-                      Description={
-                        <Markdown
-                          components={{
-                            a: (props: React.ComponentPropsWithoutRef<"a">) => (
-                              <span>{props.children}</span>
-                            ),
-                          }}
-                        >
-                          {subgroup.description}
-                        </Markdown>
-                      }
-                    />
-                  </Link>
-                );
-              if (asset)
-                return <AssetOverviewListItem key={asset.id} asset={asset} />;
-            }}
-          />
-
+          <div className="flex flex-col gap-1">
+            <SubgroupsAndAssetsList
+              error={error}
+              subgroupsWithAssets={subgroupsWithAssets?.data}
+              projectSlug={project.slug}
+              onFetchData={handleLazyDataFetching}
+            />
+          </div>
           <div className="mt-4">
             {subgroupsWithAssets && (
               <CustomPagination {...subgroupsWithAssets} />

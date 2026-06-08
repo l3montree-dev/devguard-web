@@ -25,11 +25,12 @@ import { Button } from "./ui/button";
 
 import { toast } from "sonner";
 import { useUpdateOrganization } from "../context/OrganizationContext";
+import { useUpdateSession } from "@/context/SessionContext";
 
 interface Props {}
 
 export default function OrgRegisterForm(props: Props) {
-  const updateOrganization = useUpdateOrganization();
+  const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
 
   const router = useRouter();
@@ -45,22 +46,25 @@ export default function OrgRegisterForm(props: Props) {
     });
 
     if (resp.status !== 200) {
-      const error = await resp.json();
-      toast.error("Error creating organization", {
-        description: error,
+      toast.error("Could not create organization", {
+        description:
+          "Organization creation is currently disabled or an error occurred. Please contact your administrator.",
       });
       return;
     }
 
     const orgDTO: OrganizationDetailsDTO = await resp.json();
 
-    updateOrganization((prev) => ({
+    updateSession((prev) => ({
       ...prev,
-      organization: orgDTO,
+      organizations: [...prev.organizations, orgDTO],
     }));
 
+    toast.success("Organization created successfully");
+
+    localStorage.setItem("lastActiveOrg", orgDTO.slug);
     // move the user to the newly created organization
-    router.push(`/${orgDTO.slug}`);
+    setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
   };
 
   return (

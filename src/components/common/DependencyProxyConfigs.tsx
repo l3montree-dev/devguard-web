@@ -17,6 +17,7 @@ import type { Diagnostic } from "@codemirror/lint";
 import Section from "./Section";
 import { CopyCodeFragment } from "./CopyCode";
 import Callout from "./Callout";
+import { DocDrawer } from "./DocDrawer";
 
 function matchPattern(pattern: string, packagePurl: string): boolean {
   const parts = pattern.split("*");
@@ -288,6 +289,14 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   return (
     <div>
       <div className="flex flex-col gap-4">
+        <div className="flex justify-end">
+          <DocDrawer
+            triggerLabel="Learn how the Dependency Proxy works"
+            drawerTitle="Dependency Proxy"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/how-to-guides/security/dependency-proxy.mdx"
+            docsUrl="https://docs.devguard.org/how-to-guides/security/dependency-proxy/"
+          />
+        </div>
         <Section
           title="Dependency Proxy URLs"
           description="Configure your package manager to use the dependency proxy by using the URLs below. Click on each URL for specific configuration instructions for different ecosystems."
@@ -428,9 +437,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                         <div
                           key={packagePurl}
                           className={
-                            blocked
-                              ? "text-destructive"
-                              : "text-green-600 dark:text-green-400"
+                            blocked ? "text-destructive" : "text-success"
                           }
                         >
                           {packagePurl}

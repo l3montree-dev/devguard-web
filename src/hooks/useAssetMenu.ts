@@ -12,13 +12,11 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { UserRole } from "@/types/api/api";
 import type { AssetDTO, AssetVersionDTO } from "@/types/api/api";
 import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,
   CogIcon,
-  ScaleIcon,
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
@@ -26,10 +24,9 @@ import { CodeIcon, BookCheckIcon, ScanText, TextSelect } from "lucide-react";
 import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
-import { useCurrentUser } from "./useCurrentUser";
 import useDecodedParams from "./useDecodedParams";
 import useDecodedPathname from "./useDecodedPathname";
-import { useCurrentUserRole } from "./useUserRole";
+import { isAdmin, useCurrentUserRole } from "./useUserRole";
 
 export const getDefaultAssetVersionSlug = (asset: AssetDTO) => {
   if (!asset.refs || asset.refs.length === 0) {
@@ -84,7 +81,6 @@ export const useAssetMenu = () => {
 
   const pathname = useDecodedPathname();
 
-  const loggedIn = useCurrentUser();
   const assetVersion = useActiveAssetVersion();
   const activeAsset = useActiveAsset();
 
@@ -237,10 +233,7 @@ export const useAssetMenu = () => {
     });
   }
 
-  if (
-    loggedIn &&
-    (currentUserRole === UserRole.Owner || currentUserRole === UserRole.Admin)
-  ) {
+  if (isAdmin(currentUserRole)) {
     return menu.concat([
       {
         title: "Settings",

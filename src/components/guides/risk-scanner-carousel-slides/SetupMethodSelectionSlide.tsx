@@ -93,7 +93,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           <CardTitle className="text-lg items-center flex flex-row leading-tight">
             <FlaskConical className="inline-block mr-2 w-4 h-4" />
             Custom Setup
-            <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+            <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
               Expert
             </Badge>
           </CardTitle>
@@ -116,7 +116,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           <CardTitle className="text-lg items-center flex flex-row leading-tight">
             <LinkIcon className="inline-block mr-2 w-4 h-4" />
             Supplier provided SBOM (URL)
-            <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+            <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
               Expert
             </Badge>
           </CardTitle>

@@ -3,39 +3,35 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { CSS_VARS_CHANGED } from "@/components/themes/CSSVariableEditor";
 
 function isLightColor(cssVariable: string) {
   const color = getComputedStyle(document.documentElement)
     .getPropertyValue(cssVariable)
     .trim();
 
-  // Parse HSL format: "0 0% 0%" or "hsl(0, 0%, 0%)"
-  const hslMatch = color.match(/(\d+),\s(\d+)%,\s(\d+)%/);
+  // Handles both "h s% l%" (space-separated) and "h, s%, l%" (comma-separated)
+  const match = color.match(/[\d.]+[\s,]+[\d.]+%[\s,]+([\d.]+)%/);
+  if (!match) return null;
 
-  if (!hslMatch) return null;
-
-  const lightness = parseFloat(hslMatch[3]);
-
-  // Lightness > 50% is generally considered light
-  return lightness > 50;
+  return parseFloat(match[1]) > 50;
 }
 
 const EntityProviderImage = ({ provider }: { provider: string }) => {
   const [isLightForegroundColor, setLightForegroundColor] = useState(false);
-  const theme = useTheme();
+  const { resolvedTheme } = useTheme();
+
   useEffect(() => {
-    const isLight = isLightColor("--header-background");
-    if (isLight !== null) {
-      setLightForegroundColor(isLight);
-    }
-    // test again after 1 second - to catch late theme changes
-    setTimeout(() => {
+    function update() {
       const isLight = isLightColor("--header-background");
-      if (isLight !== null) {
-        setLightForegroundColor(isLight);
-      }
-    }, 1000);
-  }, [theme]);
+      if (isLight !== null) setLightForegroundColor(isLight);
+    }
+
+    update();
+
+    window.addEventListener(CSS_VARS_CHANGED, update);
+    return () => window.removeEventListener(CSS_VARS_CHANGED, update);
+  }, [resolvedTheme]);
 
   if (provider === "@gitlab") {
     return (

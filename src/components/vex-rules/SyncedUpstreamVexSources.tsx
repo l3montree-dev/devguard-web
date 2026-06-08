@@ -184,8 +184,8 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
               Synced Upstream VEX Sources
               {vexSources.length > 0 && (
                 <span className="relative flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-green-500"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
+                  <span className="relative inline-flex size-3 rounded-full bg-success"></span>
                 </span>
               )}
             </h3>
@@ -257,7 +257,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleDelete(source)}
-                                  className="text-red-600 dark:text-red-400"
+                                  className="text-destructive"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Delete

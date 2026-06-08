@@ -4,15 +4,15 @@ import { classNames } from "../../utils/common";
 export const getClassNames = (severity: string) => {
   switch (severity) {
     case "CRITICAL":
-      return "text-red-600 bg-red-600/20 dark:text-red-400";
+      return "text-destructive bg-destructive-muted";
     case "HIGH":
-      return "text-orange-700 dark:text-orange-300 bg-orange-500/20";
+      return "text-severity-high bg-severity-high-muted";
     case "MEDIUM":
-      return "text-yellow-700 dark:text-yellow-300 bg-yellow-500/20";
+      return "text-warning bg-warning-muted";
     case "LOW":
-      return "dark:text-green-300 text-green-600 bg-green-500/20";
+      return "text-success bg-success-muted";
     default:
-      return "text-gray-700 bg-gray-500/20 dark:text-gray-200";
+      return "text-muted-foreground bg-muted";
   }
 };
 

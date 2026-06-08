@@ -105,11 +105,11 @@ export const DependencyGraphNode: FunctionComponent<
           ? "cursor-pointer active:cursor-grabbing"
           : "cursor-grab active:cursor-grabbing",
         props.data.hasPatch
-          ? "border-green-500"
+          ? "border-success"
           : props.data.vuln
             ? props.data.vuln.every((v) => v.state === "falsePositive")
-              ? "border-gray-500/50 shadow-md"
-              : "border-red-500 shadow-lg"
+              ? "border-border shadow-md"
+              : "border-destructive shadow-lg"
             : "border-border",
       )}
     >
@@ -124,7 +124,7 @@ export const DependencyGraphNode: FunctionComponent<
             {props.data.hasPatch ? (
               <Badge
                 variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-green-500 text-white border-green-500 flex items-center gap-1"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-success text-white border-success flex items-center gap-1"
               >
                 <ArrowUp className="h-3 w-3" />
                 Upgradeable
@@ -132,14 +132,14 @@ export const DependencyGraphNode: FunctionComponent<
             ) : props.data.vuln.every((v) => v.state === "falsePositive") ? (
               <Badge
                 variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-gray-500/80 text-white border-gray-500/80"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-muted text-muted-foreground border-border"
               >
                 False Positive
               </Badge>
             ) : (
               <Badge
                 variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-red-500 text-white border-red-500"
+                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-destructive text-white border-destructive"
                 title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
               >
                 Vulnerable

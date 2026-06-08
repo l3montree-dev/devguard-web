@@ -1,16 +1,16 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import React from "react";
+import React, { Suspense } from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { config } from "../../../config";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { HttpError } from "../../../data-fetcher/http-error";
 
-export default async function OrganizationLayout({
+export default function OrganizationLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
@@ -19,8 +19,26 @@ export default async function OrganizationLayout({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string }>;
 }) {
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Suspense>
+        <OrganizationShell params={params}>{children}</OrganizationShell>
+      </Suspense>
+    </TooltipProvider>
+  );
+}
+
+async function OrganizationShell({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ organizationSlug: string }>;
+}) {
+  let organizationSlug = "";
   try {
-    const { organizationSlug } = await params;
+    const { organizationSlug: slug } = await params;
+    organizationSlug = slug;
     const [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
@@ -35,13 +53,20 @@ export default async function OrganizationLayout({
         }}
       >
         <OrgHeader />
-        <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
+        {children}
       </ClientContextWrapper>
     );
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 402) {
-      redirect(config.billingUrl);
+      const billingUrl = new URL(config.billingUrl);
+      billingUrl.searchParams.set("expired", "1");
+      if (organizationSlug) {
+        billingUrl.searchParams.set("orgName", organizationSlug);
+      }
+      redirect(billingUrl.toString());
+    } else {
+      console.error("An unexpected error occurred:", error);
     }
-    redirect("/");
   }
+  redirect("/");
 }

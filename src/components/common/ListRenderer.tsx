@@ -8,6 +8,7 @@ interface Props<T> {
   data: T[] | undefined;
   renderItem: (item: T, i: number, arr: T[]) => React.ReactNode;
   Empty: React.ReactNode;
+  skeletonVariant?: "card" | "project";
 }
 
 function ListRenderer<T>({
@@ -16,9 +17,10 @@ function ListRenderer<T>({
   data,
   renderItem,
   Empty,
+  skeletonVariant,
 }: Props<T>) {
   if (isLoading) {
-    return <SkeletonListItems />;
+    return <SkeletonListItems variant={skeletonVariant} />;
   }
   if (error) {
     return <Err />;

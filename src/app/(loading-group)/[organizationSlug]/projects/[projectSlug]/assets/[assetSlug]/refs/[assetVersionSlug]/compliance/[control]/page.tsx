@@ -135,7 +135,7 @@ const Index = () => {
                         key={violation}
                         className="flex flex-row items-center gap-2 rounded-lg border p-2"
                       >
-                        <XIcon className="h-4 w-4 text-red-500" />
+                        <XIcon className="h-4 w-4 text-destructive" />
                         {violation}
                       </div>
                     ))}
@@ -147,7 +147,7 @@ const Index = () => {
                     Control evaluation result
                   </h2>
                   <div className="flex flex-row items-center gap-2 rounded-lg border p-2 mt-4">
-                    <CheckBadgeIcon className="h-4 w-4 text-green-500" />
+                    <CheckBadgeIcon className="h-4 w-4 text-success" />
                     Your asset is compliant with this control
                   </div>
                 </div>
@@ -157,7 +157,7 @@ const Index = () => {
                     No attestation available
                   </h2>
                   <div className="flex items-start flex-row  gap-2 rounded-lg border p-2 mt-4">
-                    <TriangleAlert className="h-4 w-4 mt-2 text-yellow-500" />
+                    <TriangleAlert className="h-4 w-4 mt-2 text-warning" />
 
                     <div className="flex-1 text-sm/7">
                       No attestation available for this control. This control

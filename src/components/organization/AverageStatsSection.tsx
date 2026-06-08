@@ -79,11 +79,12 @@ export default function AverageStatsSection({
       description="Mean number of unresolved vulnerabilities across projects, broken down by severity."
       className="mt-16"
     >
-      <div className="grid grid-cols-4 gap-4">
+      <div data-tour="average-stats-section" className="grid grid-cols-4 gap-4">
         {severities.map(({ variant, risk, cvss }) => (
           <SeverityCard
             key={variant}
             variant={variant}
+            fixableAmount={0}
             isLoading={isStatisticsLoading}
             currentAmount={Math.round((mode === "risk" ? risk : cvss) ?? 0)}
             mode={mode}

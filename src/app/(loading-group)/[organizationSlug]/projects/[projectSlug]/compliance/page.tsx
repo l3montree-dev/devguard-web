@@ -2,10 +2,9 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import { UserRole } from "@/types/api/api";
 import type { Policy } from "@/types/api/api";
 
-import { useCurrentUserRole } from "@/hooks/useUserRole";
+import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -18,6 +17,7 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
+import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex = () => {
   const params = useDecodedParams();
@@ -54,8 +54,6 @@ const ComplianceIndex = () => {
       }));
     },
   );
-
-  const currentUserRole = useCurrentUserRole();
 
   const handleEnablePolicy = async (policy: Policy) => {
     mutate(
@@ -146,8 +144,7 @@ const ComplianceIndex = () => {
             title="Organization Compliance Controls"
             forceVertical
             Button={
-              currentUserRole === UserRole.Admin ||
-              currentUserRole === UserRole.Owner ? (
+              <AuthGuard require="admin">
                 <Link
                   className={buttonVariants({
                     variant: "outline",
@@ -156,11 +153,17 @@ const ComplianceIndex = () => {
                 >
                   Modify Policies
                 </Link>
-              ) : (
-                <> </>
-              )
+              </AuthGuard>
             }
           >
+            <div className="flex justify-end">
+              <DocDrawer
+                triggerLabel="Learn why compliance matters"
+                drawerTitle="Why Compliance Matters"
+                mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/compliance/why-compliance-matters.mdx"
+                docsUrl="https://docs.devguard.org/explanations/compliance/why-compliance-matters/"
+              />
+            </div>
             <ListRenderer
               isLoading={isLoading}
               error={error}

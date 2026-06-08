@@ -55,9 +55,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           <Card
             className={classNames(
               "cursor-pointer",
-              variant === "auto"
-                ? "border border-primary"
-                : "border border-transparent",
+              variant === "auto" ? "border-primary" : "",
             )}
             onClick={() => setVariant("auto")}
           >
@@ -70,17 +68,15 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Use the devguard-scanner CLI tool to upload SBOM files or SARIF
-                reports from your own scanner.
+                Use the devguard-scanner CLI tool to upload SARIF reports or
+                SBOM files from your own scanner.
               </CardDescription>
             </CardHeader>
           </Card>
           <Card
             className={classNames(
               "cursor-pointer mt-2",
-              variant === "manual"
-                ? "border border-primary"
-                : "border border-transparent",
+              variant === "manual" ? "border-primary" : "",
             )}
             onClick={() => setVariant("manual")}
           >
@@ -88,12 +84,12 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually
-                <Badge className="ml-4 ring-1 ring-purple-500 text-secondary-content bg-purple-500/20">
+                <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                   File Upload
                 </Badge>
               </CardTitle>
               <CardDescription>
-                You got a SBOM or SARIF file and want to upload it via web
+                You got a SARIF or SBOM file and want to upload it via web
                 interface
               </CardDescription>
             </CardHeader>

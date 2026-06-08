@@ -143,6 +143,10 @@ export interface PatWithPrivKey extends PersonalAccessTokenDTO {
   privKey: string;
 }
 
+export type SubGroupsAndAsset =
+  | (AssetDTO & { resourceType: "asset" })
+  | (ProjectDTO & { resourceType: "project" });
+
 export interface ProjectDTO {
   avatar?: string;
   name: string;
@@ -173,6 +177,8 @@ export interface ProjectDTO {
   externalEntityProviderId?: string;
 
   state: "active" | "deleted";
+
+  subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
   | DependencyVuln["state"]
@@ -221,6 +227,9 @@ export interface Paged<T> {
   pageSize: number;
 }
 
+export type InstanceSettings = {
+  singleOrganizationMode: boolean;
+};
 export interface MinimalDependencyTree {
   nodes: string[];
   dependencies: { [key: string]: string[] };
@@ -260,6 +269,7 @@ interface BaseVulnEventDTO {
   packageName: string | null;
   uri: string | null;
   createdByVexRule: boolean;
+  userAgent: string;
 }
 
 export interface ExternalReferenceErrorDTO {
@@ -412,7 +422,7 @@ export interface Relationship {
   targetCve: string;
 }
 export interface VulnWithCVE extends DependencyVuln {
-  cve:
+  cve?:
     | (Modify<
         CVE,
         {
@@ -786,6 +796,26 @@ export interface RiskHistory {
   cvePurlMediumCvss: number;
   cvePurlHighCvss: number;
   cvePurlCriticalCvss: number;
+
+  fixableLow: number;
+  fixableMedium: number;
+  fixableHigh: number;
+  fixableCritical: number;
+
+  cvePurlFixableLow: number;
+  cvePurlFixableMedium: number;
+  cvePurlFixableHigh: number;
+  cvePurlFixableCritical: number;
+
+  fixableLowCvss: number;
+  fixableMediumCvss: number;
+  fixableHighCvss: number;
+  fixableCriticalCvss: number;
+
+  cvePurlFixableLowCvss: number;
+  cvePurlFixableMediumCvss: number;
+  cvePurlFixableHighCvss: number;
+  cvePurlFixableCriticalCvss: number;
 }
 
 export type ReleaseRiskHistory = Omit<

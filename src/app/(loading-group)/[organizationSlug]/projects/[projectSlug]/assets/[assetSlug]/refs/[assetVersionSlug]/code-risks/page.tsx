@@ -2,7 +2,7 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 
 import Page from "@/components/Page";
 import type { FirstPartyVuln, Paged } from "@/types/api/api";
@@ -38,6 +38,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
+import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
 interface Props {
   vulns: Paged<FirstPartyVuln>;
@@ -84,7 +85,6 @@ const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
 const Index: FunctionComponent = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const { session } = useSession();
 
   let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -186,6 +186,7 @@ const Index: FunctionComponent = () => {
 
   const assetMenu = useAssetMenu();
   const config = useConfig();
+  const latestScannerImage = useScannerImage();
 
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -197,11 +198,11 @@ const Index: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
-        {session && (
+        <AuthGuard require="admin">
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Risks
           </Button>
-        )}
+        </AuthGuard>
       </div>
       <Section
         forceVertical
@@ -332,7 +333,7 @@ const Index: FunctionComponent = () => {
                           "relative cursor-pointer align-top transition-all",
                           i === arr.length - 1 ? "" : "border-b",
                           i % 2 != 0 && "bg-card/50",
-                          "hover:bg-gray-50 dark:hover:bg-card",
+                          "hover:bg-muted",
                         )}
                         key={row.original.id}
                       >
@@ -360,6 +361,7 @@ const Index: FunctionComponent = () => {
         apiUrl={config.devguardApiUrlPublicInternet}
         frontendUrl={config.frontendUrl}
         devguardCIComponentBase={config.devguardCIComponentBase}
+        devguardWebLatestScannerImage={latestScannerImage}
         open={isOpen}
         onOpenChange={setIsOpen}
       />

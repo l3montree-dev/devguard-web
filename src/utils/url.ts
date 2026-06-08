@@ -1,3 +1,4 @@
+import { diffTrimmedLines } from "diff";
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const buildFilterQuery = (params: ReadonlyURLSearchParams) => {
@@ -39,6 +40,9 @@ export const parseHttpsUrl = (
   varName: string,
 ): string => {
   const trimmed = raw?.trim();
+  if (trimmed?.includes("localhost")) {
+    return trimmed;
+  }
   if (!trimmed) return "";
   try {
     const u = new URL(trimmed);

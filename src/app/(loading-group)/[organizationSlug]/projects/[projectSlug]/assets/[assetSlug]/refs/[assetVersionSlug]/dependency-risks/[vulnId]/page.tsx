@@ -3,8 +3,11 @@
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
 
+import AuthGuard from "@/components/AuthGuard";
+import MitigateDialog from "@/components/MitigateDialog";
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
+import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +24,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
+import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
+import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import { usePageTour } from "@/hooks/usePageTour";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useCreateVexRule } from "@/hooks/useCreateVexRule";
-import { RequirementsLevel } from "@/types/api/api";
 import type {
   AssetDTO,
   DependencyVulnHints,
@@ -37,6 +44,7 @@ import type {
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
+import { RequirementsLevel } from "@/types/api/api";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
   InformationCircleIcon,
@@ -45,39 +53,36 @@ import {
   StopIcon,
 } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import { Bug, CheckCircleIcon } from "lucide-react";
+import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
-import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
 import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
 import FalsePositiveDialog from "../../../../../../../../../../../components/FalsePositiveDialog";
-import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
-import VexRuleResult from "../../../../../../../../../../../components/vex-rules/VexRuleResult";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
+import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import Callout from "../../../../../../../../../../../components/common/Callout";
 import Err from "../../../../../../../../../../../components/common/Err";
 import Markdown from "../../../../../../../../../../../components/common/Markdown";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
+import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import MitigateDialog from "@/components/MitigateDialog";
-import { useSession } from "@/context/SessionContext";
+import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -287,8 +292,8 @@ const describeCVSS = (cvss: { [key: string]: string }) => {
 };
 
 const Index: FunctionComponent = () => {
-  const pathname = usePathname();
   const { session } = useSession();
+  const role = useCurrentUserRole();
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
@@ -311,6 +316,13 @@ const Index: FunctionComponent = () => {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [selectedVexRule, setSelectedVexRule] = useState<VexRule | null>(null);
   const [vexRuleDialogOpen, setVexRuleDialogOpen] = useState(false);
+
+  const searchParams = useSearchParams();
+  const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
+  const [
+    acceptVexRuleRecommendationDialogOpen,
+    setAcceptVexRuleRecommendationDialogOpen,
+  ] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
@@ -363,6 +375,33 @@ const Index: FunctionComponent = () => {
       : null,
     fetcher,
   );
+
+  const handleGraphReady = useCallback(() => {
+    if (searchParams?.get("startTour") !== "4") return;
+    registerSteps(dependencyRiskTourSteps);
+    startTour();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Path explosion: no graph is rendered so onReady never fires — start tour directly
+  useEffect(() => {
+    if (
+      searchParams?.get("startTour") !== "4" ||
+      graphLoading ||
+      (vuln?.vulnerabilityPath.length || 0) !== 0
+    )
+      return;
+    registerSteps([
+      {
+        ...dependencyRiskTourSteps[0],
+        content:
+          "This vulnerability has too many dependency paths to display a graph.",
+      },
+      ...dependencyRiskTourSteps.slice(1),
+    ]);
+    startTour();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graphLoading]);
 
   const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
     if (!vuln || vuln.vulnerabilityPath.length === 0) {
@@ -596,6 +635,13 @@ const Index: FunctionComponent = () => {
     [asset, project],
   );
 
+  const { data: recommendedVexRule } = useSWR<VexRule>(
+    vuln
+      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/crowdsourced-vexing/recommendation/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
+      : null,
+    fetcher,
+  );
+
   // Show error state
   if (error) {
     return (
@@ -609,6 +655,14 @@ const Index: FunctionComponent = () => {
     );
   }
 
+  function pathEqual<T>(a: T[], b: T[]) {
+    if (a.length === 0 || b.length === 0 || a.length !== b.length) {
+      return false;
+    }
+
+    return a.every((val, i) => val === b[i]);
+  }
+
   return (
     <Page
       Menu={assetMenu}
@@ -620,8 +674,8 @@ const Index: FunctionComponent = () => {
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
               <div className="flex flex-row items-center gap-4">
-                <h1 className="text-2xl font-semibold">
-                  {vuln ? vuln.cveID : <Skeleton className="w-52 h-10" />}
+                <h1 data-tour="cve-detail" className="text-2xl font-semibold">
+                  {vuln ? vuln.cveID : <Skeleton className="w-90 h-10" />}
                 </h1>
                 {vuln ? (
                   <VulnState state={vuln?.state ?? "open"} />
@@ -635,15 +689,15 @@ const Index: FunctionComponent = () => {
                     <Markdown>
                       {descriptionExpanded ||
                       (vuln.cve?.description?.length ?? 0) <= 800
-                        ? vuln.cve?.description
-                        : vuln.cve?.description?.slice(0, 800) + "..."}
+                        ? (vuln.cve?.description ?? "")
+                        : `${vuln.cve?.description?.slice(0, 800) ?? ""}...`}
                     </Markdown>
                     {(vuln.cve?.description?.length ?? 0) > 800 && (
                       <button
                         onClick={() =>
                           setDescriptionExpanded(!descriptionExpanded)
                         }
-                        className="text-sm dark:text-primary text-blue-600 hover:opacity-80 my-2 cursor-pointer"
+                        className="text-sm text-info hover:opacity-80 my-2 cursor-pointer"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}
                       </button>
@@ -694,7 +748,7 @@ const Index: FunctionComponent = () => {
                   />
                 ))}
               </div>
-              <div>
+              <div data-tour="path">
                 {!graphLoading && (
                   <div className="mt-10">
                     {graphData && vuln && (
@@ -734,9 +788,7 @@ const Index: FunctionComponent = () => {
                         </div>
                         <div
                           style={{ height: 400 }}
-                          className={
-                            "w-full rounded-lg border bg-gray-50 dark:bg-black"
-                          }
+                          className={"w-full rounded-lg border bg-muted"}
                         >
                           {graphData && vuln && (
                             <DependencyGraph
@@ -746,7 +798,7 @@ const Index: FunctionComponent = () => {
                               enableContextMenu={
                                 vuln.vulnerabilityPath.length !== 0 &&
                                 vuln.state === "open" &&
-                                session !== null
+                                isMember(role)
                               }
                               graph={graphData}
                               vulns={[vuln]}
@@ -756,6 +808,7 @@ const Index: FunctionComponent = () => {
                               ]}
                               onVexSelect={createFalsePositive}
                               vexRules={vexRulesData}
+                              onReady={handleGraphReady}
                             />
                           )}
                         </div>
@@ -768,7 +821,7 @@ const Index: FunctionComponent = () => {
                           this vulnerability in your dependency tree. Therefore
                           the graph is not displayed by default to avoid
                           performance issues.
-                          {session
+                          {isMember(role)
                             ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
                             : ""}
                         </Callout>
@@ -803,45 +856,92 @@ const Index: FunctionComponent = () => {
                       )}
                     </div>
                     {/* VEX Rules applied to this vulnerability */}
-                    {vexRulesData && vexRulesData.length > 0 && (
-                      <div className="mt-6">
-                        <span className="font-semibold block mb-2">
-                          VEX Rules ({vexRulesData.length})
-                        </span>
+                    <div className="mt-6">
+                      <span className="font-semibold block mb-2">
+                        VEX Rules
+                      </span>
+                      <span className="font-semibold block mb-2 flex items-center gap-1">
+                        Recommendation
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <CircleHelp className="w-4 h-4 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="relative font-normal">
+                              This recommendation is derived from patterns and
+                              best practices observed across teams in your
+                              DevGuard community.
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </span>
+                      {recommendedVexRule?.cveId && (
+                        <>
+                          {vexRulesData &&
+                            vexRulesData.some((obj) =>
+                              pathEqual(
+                                obj.pathPattern,
+                                recommendedVexRule.pathPattern,
+                              ),
+                            ) && (
+                              <div className="my-2 flex gap-2 items-center text-muted-foreground border rounded-lg p-5">
+                                <div className=" cve-description overflow-x-auto ">
+                                  One of your applied VEX Rules already aligns
+                                  with the community-driven recommendation.
+                                </div>
+                                <BookOpenCheck />
+                              </div>
+                            )}
+                          {vexRulesData &&
+                            !vexRulesData.some((obj) =>
+                              pathEqual(
+                                obj.pathPattern,
+                                recommendedVexRule.pathPattern,
+                              ),
+                            ) && (
+                              <div className="flex flex-col gap-2 my-2">
+                                <VexRuleListItem
+                                  rule={recommendedVexRule}
+                                  onClick={() => {
+                                    setSelectedVexRule(recommendedVexRule);
+                                    setAcceptVexRuleRecommendationDialogOpen(
+                                      true,
+                                    );
+                                  }}
+                                />
+                              </div>
+                            )}
+                        </>
+                      )}
+                      {!recommendedVexRule?.cveId && (
+                        <div className="my-2 cve-description overflow-x-auto text-muted-foreground">
+                          There is currently no VEX Rule recommended.
+                        </div>
+                      )}
+                      <span className="font-semibold block mb-2">
+                        Applied Rules ({vexRulesData?.length || 0})
+                      </span>
+                      {vexRulesData && vexRulesData.length > 0 && (
                         <div className="flex flex-col gap-2">
                           {vexRulesData.map((rule) => (
-                            <button
+                            <VexRuleListItem
                               key={rule.id}
+                              rule={rule}
                               onClick={() => {
                                 setSelectedVexRule(rule);
                                 setVexRuleDialogOpen(true);
                               }}
-                              className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 text-left text-sm hover:bg-muted/50 transition-colors cursor-pointer"
-                            >
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <span className="font-medium truncate">
-                                  {rule.pathPattern?.join(" > ") ||
-                                    "No pattern"}
-                                </span>
-                                {rule.justification && (
-                                  <span className="text-xs text-muted-foreground truncate">
-                                    {rule.justification}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <VexRuleResult
-                                  eventType={rule.eventType}
-                                  mechanicalJustification={
-                                    rule.mechanicalJustification
-                                  }
-                                />
-                              </div>
-                            </button>
+                            />
                           ))}
                         </div>
-                      </div>
-                    )}
+                      )}
+                      {!vexRulesData ||
+                        (vexRulesData.length < 1 && (
+                          <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
+                            There have been no VEX Rules applied so far.
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -858,11 +958,11 @@ const Index: FunctionComponent = () => {
                     }
                   />
                   {vuln && <Quickfix vuln={vuln} />}
-                  {(session || vuln.ticketUrl) && (
-                    <div>
+                  {(isMember(role) || vuln.ticketUrl) && (
+                    <div data-tour="vuln-management">
                       <Card>
                         <CardContent className="mt-4">
-                          {session && (
+                          <AuthGuard require="member">
                             <>
                               {vuln.state === "open" ? (
                                 <form
@@ -1005,7 +1105,7 @@ const Index: FunctionComponent = () => {
                                 </form>
                               )}
                             </>
-                          )}
+                          </AuthGuard>
 
                           {vuln.ticketUrl && (
                             <small className="mt-2 block w-full text-right text-muted-foreground">
@@ -1031,234 +1131,248 @@ const Index: FunctionComponent = () => {
             </div>
             {vuln ? (
               <div className="border-l">
-                <div>
-                  <ChartContainer config={{}} className="aspect-square w-full">
-                    <PieChart>
-                      <Pie
-                        data={[
-                          {
-                            name: "Total",
-                            score: 10 - vuln.rawRiskAssessment,
-                            fill: "hsl(var(--secondary))",
-                          },
-                          {
-                            name: "Risk",
-                            score: vuln.rawRiskAssessment,
-                            fill: "hsl(var(--primary))",
-                          },
-                        ]}
-                        startAngle={-270}
-                        dataKey="score"
-                        nameKey="name"
-                        innerRadius={80}
-                        strokeWidth={5}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
+                <div data-tour="risk-score with details">
+                  <div>
+                    <ChartContainer
+                      config={{}}
+                      className="aspect-square w-full"
+                    >
+                      <PieChart>
+                        <Pie
+                          data={[
+                            {
+                              name: "Total",
+                              score: 10 - vuln.rawRiskAssessment,
+                              fill: "hsl(var(--secondary))",
+                            },
+                            {
+                              name: "Risk",
+                              score: vuln.rawRiskAssessment,
+                              fill: "hsl(var(--primary))",
+                            },
+                          ]}
+                          startAngle={-270}
+                          dataKey="score"
+                          nameKey="name"
+                          innerRadius={80}
+                          strokeWidth={5}
+                        >
+                          <Label
+                            content={({ viewBox }) => {
+                              if (
+                                viewBox &&
+                                "cx" in viewBox &&
+                                "cy" in viewBox
+                              ) {
+                                return (
+                                  <text
                                     x={viewBox.cx}
                                     y={viewBox.cy}
-                                    className="fill-foreground text-3xl font-bold"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
                                   >
-                                    {vuln.rawRiskAssessment}
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Risk
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
-                </div>
-                <div className="p-5">
-                  <Collapsible>
-                    <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">
-                      Show detailed risk assessment
-                      <CaretDownIcon />
-                    </CollapsibleTrigger>
-                    <small className="text-muted-foreground">
-                      Last calculated at:{" "}
-                      <FormatDate dateString={vuln.riskRecalculatedAt} />
-                    </small>
-                    <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
-                      <div className="w-full border-b pb-4">
-                        <div className="flex w-full flex-row items-center justify-between">
-                          <span className="font-semibold">
-                            EPSS{" "}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-screen-sm font-normal">
-                                <p>
-                                  The epss score describes the propability of
-                                  this vulnerability being exploited in the
-                                  upcoming 30 days. The score gets recalculated
-                                  every 24 hours and is the output of an AI
-                                  model maintained by the FIRST organization,
-                                  which is the publisher of the cvss standard
-                                  itself.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </span>
-                          <div className="whitespace-nowrap">
-                            <Badge variant="outline">
-                              {((vuln.cve?.epss ?? 0) * 100).toFixed(1)}%
-                            </Badge>
+                                    <tspan
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      className="fill-foreground text-3xl font-bold"
+                                    >
+                                      {vuln.rawRiskAssessment}
+                                    </tspan>
+                                    <tspan
+                                      x={viewBox.cx}
+                                      y={(viewBox.cy || 0) + 24}
+                                      className="fill-muted-foreground"
+                                    >
+                                      Risk
+                                    </tspan>
+                                  </text>
+                                );
+                              }
+                            }}
+                          />
+                        </Pie>
+                      </PieChart>
+                    </ChartContainer>
+                  </div>
+                  <div className="p-5">
+                    <Collapsible>
+                      <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">
+                        Show detailed risk assessment
+                        <CaretDownIcon />
+                      </CollapsibleTrigger>
+                      <small className="text-muted-foreground">
+                        Last calculated at:{" "}
+                        <FormatDate dateString={vuln.riskRecalculatedAt} />
+                      </small>
+                      <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
+                        <div className="w-full border-b pb-4">
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <span className="font-semibold">
+                              EPSS{" "}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    The epss score describes the propability of
+                                    this vulnerability being exploited in the
+                                    upcoming 30 days. The score gets
+                                    recalculated every 24 hours and is the
+                                    output of an AI model maintained by the
+                                    FIRST organization, which is the publisher
+                                    of the cvss standard itself.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <div className="whitespace-nowrap">
+                              <Badge variant="outline">
+                                {((vuln.cve?.epss ?? 0) * 100).toFixed(1)}%
+                              </Badge>
+                            </div>
                           </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {epssMessage(vuln.cve?.epss ?? 0)}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {epssMessage(vuln.cve?.epss ?? 0)}
-                        </p>
-                      </div>
-                      <div className="w-full border-b pb-4">
-                        <div className="flex w-full flex-row items-center justify-between">
-                          <span className="font-semibold">
-                            Exploit{" "}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-screen-sm font-normal">
-                                <p>
-                                  An exploit is software or commands that take
-                                  advantage of a bug to cause unintended
-                                  behavior, like unauthorized access or system
-                                  disruption. Exploits can be shared on the dark
-                                  web or GitHub. Many use these shared exploits
-                                  because they can&quot;t create their own. If
-                                  an exploit is available, <i>script kiddies</i>{" "}
-                                  are more likely to use it.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </span>
-                          <div className="whitespace-nowrap">
-                            <Badge variant="outline">{exploitShort}</Badge>
+                        <div className="w-full border-b pb-4">
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <span className="font-semibold">
+                              Exploit{" "}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    An exploit is software or commands that take
+                                    advantage of a bug to cause unintended
+                                    behavior, like unauthorized access or system
+                                    disruption. Exploits can be shared on the
+                                    dark web or GitHub. Many use these shared
+                                    exploits because they can&quot;t create
+                                    their own. If an exploit is available,{" "}
+                                    <i>script kiddies</i> are more likely to use
+                                    it.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <div className="whitespace-nowrap">
+                              <Badge variant="outline">{exploitShort}</Badge>
+                            </div>
                           </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {ExploitLong}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {ExploitLong}
-                        </p>
-                      </div>
-                      <div className="w-full border-b pb-4">
-                        <div className="flex w-full flex-row items-center justify-between">
-                          <span className="font-semibold">
-                            Vulnerability depth{" "}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-screen-sm font-normal">
-                                <p>
-                                  The depth of the component describes how many
-                                  levels deep the vulnerability is in your
-                                  project. The deeper a vulnerability is inside
-                                  the tree, the propability decreases, that it
-                                  can be exploited.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </span>
-                          <div className="whitespace-nowrap">
-                            <Badge variant="outline">
-                              {vuln.vulnerabilityPath.filter((el) =>
+                        <div className="w-full border-b pb-4">
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <span className="font-semibold">
+                              Vulnerability depth{" "}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    The depth of the component describes how
+                                    many levels deep the vulnerability is in
+                                    your project. The deeper a vulnerability is
+                                    inside the tree, the propability decreases,
+                                    that it can be exploited.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <div className="whitespace-nowrap">
+                              <Badge variant="outline">
+                                {vuln.vulnerabilityPath.filter((el) =>
+                                  el.startsWith("pkg:"),
+                                ).length === 1
+                                  ? "Direct"
+                                  : "Transitive"}
+                              </Badge>
+                            </div>
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {componentDepthMessages(
+                              vuln.vulnerabilityPath.filter((el) =>
                                 el.startsWith("pkg:"),
-                              ).length === 1
-                                ? "Direct"
-                                : "Transitive"}
-                            </Badge>
-                          </div>
+                              ).length ?? 0,
+                            )}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {componentDepthMessages(
-                            vuln.vulnerabilityPath.filter((el) =>
-                              el.startsWith("pkg:"),
-                            ).length ?? 0,
-                          )}
-                        </p>
-                      </div>
-                      <div className="w-full border-b pb-4">
-                        <div className="flex w-full flex-row items-center justify-between">
-                          <span className="font-semibold">
-                            CVSS-BE{" "}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-screen-sm font-normal">
-                                <p>
-                                  The cvss-be score describes the risk of this
-                                  vulnerability in the context of the asset it
-                                  affects. The score is calculated by the cvss
-                                  standard and takes your asset requirements
-                                  into account.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </span>
-                          <div className="whitespace-nowrap">
-                            <Badge variant="outline">
-                              {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)}
-                            </Badge>
+                        <div className="w-full border-b pb-4">
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <span className="font-semibold">
+                              CVSS-BE{" "}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    The cvss-be score describes the risk of this
+                                    vulnerability in the context of the asset it
+                                    affects. The score is calculated by the cvss
+                                    standard and takes your asset requirements
+                                    into account.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <div className="whitespace-nowrap">
+                              <Badge variant="outline">
+                                {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(
+                                  1,
+                                )}
+                              </Badge>
+                            </div>
                           </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {cvssBE(asset!, cvssVectorObj)}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {cvssBE(asset!, cvssVectorObj)}
-                        </p>
-                      </div>
 
-                      <div className="w-full">
-                        <div className="flex w-full flex-row items-center justify-between">
-                          <span className="font-semibold">
-                            CVSS{" "}
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-screen-sm font-normal">
-                                <p>
-                                  The CVSS score indicates the severity of this
-                                  vulnerability in general. It is calculated
-                                  according to the CVSS standard and does not
-                                  take into account your asset&quot;s specific
-                                  requirements or any threat intelligence
-                                  information.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </span>
-                          <div className="whitespace-nowrap">
-                            <Badge variant="outline">
-                              {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
-                            </Badge>
+                        <div className="w-full">
+                          <div className="flex w-full flex-row items-center justify-between">
+                            <span className="font-semibold">
+                              CVSS{" "}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InformationCircleIcon className="inline h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-screen-sm font-normal">
+                                  <p>
+                                    The CVSS score indicates the severity of
+                                    this vulnerability in general. It is
+                                    calculated according to the CVSS standard
+                                    and does not take into account your
+                                    asset&quot;s specific requirements or any
+                                    threat intelligence information.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <div className="whitespace-nowrap">
+                              <Badge variant="outline">
+                                {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
+                              </Badge>
+                            </div>
                           </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {describeCVSS(cvssVectorObj)}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {describeCVSS(cvssVectorObj)}
-                        </p>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </div>
-                <AffectedComponentDetails vuln={vuln} />
+                <div data-tour="affected-component">
+                  <AffectedComponentDetails vuln={vuln} />
+                </div>
 
                 <div className="p-5">
                   <h3 className="mb-2 text-sm font-semibold">
@@ -1388,7 +1502,20 @@ const Index: FunctionComponent = () => {
         vulnState={vuln?.state ?? ""}
         vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
       />
-
+      <AcceptVexRuleRecommendationDialog
+        vexRule={selectedVexRule}
+        isOpen={acceptVexRuleRecommendationDialogOpen}
+        onOpenChange={setAcceptVexRuleRecommendationDialogOpen}
+        organizationSlug={organizationSlug}
+        projectSlug={projectSlug}
+        assetSlug={assetSlug}
+        assetVersionSlug={assetVersionSlug}
+        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        onAccepted={() => {
+          mutateVexRules();
+          mutate();
+        }}
+      />
       <VexRuleDetailsDialog
         vexRule={selectedVexRule}
         isOpen={vexRuleDialogOpen}

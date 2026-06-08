@@ -26,7 +26,7 @@ const DangerZone: FunctionComponent<PropsWithChildren<DangerZoneProps>> = ({
       {displayTitle && (
         <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
       )}
-      <div className="rounded-lg border border-red-500 p-4 bg-red-500/5">
+      <div className="rounded-lg border border-destructive p-4 bg-destructive-muted">
         {children}
       </div>
     </div>

@@ -104,11 +104,11 @@ const AutoSetupProgressSlide: FunctionComponent<
                 {value.status === "notStarted" ? (
                   i + 1 + "."
                 ) : value.status === "pending" && !isReallyLoading ? (
-                  <ExclamationCircleIcon className="mr-2 h-4 w-4 text-red-600" />
+                  <ExclamationCircleIcon className="mr-2 h-4 w-4 text-destructive" />
                 ) : value.status === "pending" && isReallyLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin " />
                 ) : (
-                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                  <CheckCircleIcon className="h-4 w-4 text-success" />
                 )}
                 <span className="flex-1">
                   {value.message}

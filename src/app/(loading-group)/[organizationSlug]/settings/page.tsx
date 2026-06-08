@@ -59,6 +59,8 @@ import {
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
 import Alert from "../../../../components/common/Alert";
+import { usePageTour } from "@/hooks/usePageTour";
+import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -276,6 +278,8 @@ const Home = () => {
     }
   };
 
+  const { startTour } = usePageTour(orgSettingsTourSteps);
+
   const config = useConfig();
 
   return (
@@ -283,7 +287,7 @@ const Home = () => {
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Organization Settings</h1>
       </div>
-      <div>
+      <div data-tour="third-party-integrations">
         <Section
           description={
             "Manage any third party integrations. You can connect the organization with a GitHub App Installation, a JIRA Project any many more."
@@ -380,7 +384,6 @@ const Home = () => {
               }
             />
           ))}
-          <hr />
           <ListItem
             Title={
               <div className="flex flex-row items-center">
@@ -469,7 +472,7 @@ const Home = () => {
         </Section>
       </div>
       <hr />
-      <div>
+      <div data-tour="webhook">
         <Section
           description={
             "Manage the webhooks that are used to connect DevGuard with your Applications."
@@ -493,7 +496,6 @@ const Home = () => {
             />
           ))}
 
-          <hr />
           <ListItem
             Title={
               <div className="flex flex-row items-center">Add a Webhook</div>
@@ -541,75 +543,81 @@ const Home = () => {
         </FormProvider>
       </div>
       <hr />
-      <Section
-        id="config-files"
-        title="Configuration Files"
-        description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
-      >
-        <Card className="p-6">
-          <div className="flex justify-end">
-            <Link href={"/" + activeOrg.slug + "/settings/config"}>
-              <Button variant={"outline"}>Go to Configuration Files</Button>
-            </Link>
-          </div>
-        </Card>
-      </Section>
-      <Section
-        id="dependency-proxy"
-        title="Dependency Proxy Settings"
-        description="View and edit the settings for the Dependency Proxy, which caches dependencies to speed up builds and reduce load on external package registries."
-      >
-        <Card className="p-6">
-          <div className="flex justify-end">
-            <Link href={"/" + activeOrg.slug + "/settings/dependency-proxy"}>
-              <Button variant={"outline"}>
-                Go to Dependency Proxy Settings{" "}
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </Section>
+      <div data-tour="config-file">
+        <Section
+          id="config-files"
+          title="Configuration Files"
+          description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <Link href={"/" + activeOrg.slug + "/settings/config"}>
+                <Button variant={"outline"}>Go to Configuration Files</Button>
+              </Link>
+            </div>
+          </Card>
+        </Section>
+      </div>
+      <div data-tour="dependency-proxy">
+        <Section
+          id="dependency-proxy"
+          title="Dependency Proxy Settings"
+          description="View and edit the settings for the Dependency Proxy, which caches dependencies to speed up builds and reduce load on external package registries."
+        >
+          <Card className="p-6">
+            <div className="flex justify-end">
+              <Link href={"/" + activeOrg.slug + "/settings/dependency-proxy"}>
+                <Button variant={"outline"}>
+                  Go to Dependency Proxy Settings{" "}
+                </Button>
+              </Link>
+            </div>
+          </Card>
+        </Section>
+      </div>
       <hr />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleUpdate)}>
-          <Section
-            title="Visibility"
-            description="Control the visibility of your organization and its projects. If a Organization is public, only the projects that are public will be visible to the public. Private projects are only visible to members of the organization."
-          >
-            <DangerZone displayTitle={false}>
-              <FormField
-                name="isPublic"
-                render={({ field }) => (
-                  <FormItem>
-                    <ListItem
-                      Description={
-                        "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
-                      }
-                      Title="Public Organization"
-                      Button={
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      }
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-6 flex items-center justify-end gap-x-6">
-                <Button
-                  isSubmitting={form.formState.isSubmitting}
-                  variant="destructive"
-                  type="submit"
-                >
-                  Save
-                </Button>
-              </div>
-            </DangerZone>
-          </Section>
+          <div data-tour="visibility">
+            <Section
+              title="Visibility"
+              description="Control the visibility of your organization and its projects. If a Organization is public, only the projects that are public will be visible to the public. Private projects are only visible to members of the organization."
+            >
+              <DangerZone displayTitle={false}>
+                <FormField
+                  name="isPublic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <ListItem
+                        Description={
+                          "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
+                        }
+                        Title="Public Organization"
+                        Button={
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        }
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-6 flex items-center justify-end gap-x-6">
+                  <Button
+                    isSubmitting={form.formState.isSubmitting}
+                    variant="destructive"
+                    type="submit"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </DangerZone>
+            </Section>
+          </div>
         </form>
       </FormProvider>
       <hr />

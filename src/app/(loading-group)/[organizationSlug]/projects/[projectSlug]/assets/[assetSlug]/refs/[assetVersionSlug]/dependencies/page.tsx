@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useSession } from "@/context/SessionContext";
+import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
@@ -87,6 +87,8 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import { usePageTour } from "@/hooks/usePageTour";
+import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],
@@ -121,7 +123,6 @@ const LicenseCall = (props: {
   dependencyPurl: string;
   justification: string;
 }) => {
-  const { session } = useSession();
   const [open, setOpen] = useState(false);
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
@@ -186,7 +187,7 @@ const LicenseCall = (props: {
           <div className="flex flex-col items-start justify-start gap-1">
             <span className="flex flex-row capitalize items-center text-sm font-bold">
               {props.license.isOsiApproved && (
-                <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-green-500" />
+                <CheckBadgeIcon className="mr-1 inline-block h-4 w-4 text-success" />
               )}
               {licenseMap[license] || license}
             </span>
@@ -205,7 +206,7 @@ const LicenseCall = (props: {
             </span>
           </div>
 
-          {session && (
+          <AuthGuard require="member">
             <div className="mt-4" onClick={(e) => e.stopPropagation()}>
               <div className="flex flex-row items-center justify-between">
                 <span className="text-sm mb-2 block text-muted-foreground">
@@ -227,7 +228,7 @@ const LicenseCall = (props: {
                 />
               </div>
             </div>
-          )}
+          </AuthGuard>
         </PopoverContent>
       </div>
     </Popover>
@@ -248,13 +249,17 @@ const columnsDef: ColumnDef<
     cell: (row) => (
       <span className="flex flex-row items-center gap-2">
         <Tooltip>
-          <TooltipTrigger className="flex flex-row items-center gap-2">
-            <EcosystemImage packageName={row.getValue()} size={16} />
-            <span className="font-medium truncate">
-              {beautifyPurl(row.getValue())}
+          <TooltipTrigger className="flex flex-row items-center gap-2 min-w-0 w-full text-left">
+            <span className="shrink-0 mt-0.5">
+              <EcosystemImage packageName={row.getValue()} size={16} />
             </span>
-            <span className="text-xs text-muted-foreground">
-              {extractVersion(row.getValue())}
+            <span className="flex flex-col min-w-0 items-start w-full">
+              <span className="font-medium truncate w-full">
+                {beautifyPurl(row.getValue())}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {extractVersion(row.getValue())}
+              </span>
             </span>
           </TooltipTrigger>
           <TooltipContent>
@@ -326,6 +331,7 @@ const columnsDef: ColumnDef<
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
+  const { startTour } = usePageTour(dependencyInsightsTourSteps);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
@@ -503,9 +509,12 @@ const Index: FunctionComponent = () => {
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >
-      <div className="flex flex-row items-start justify-between">
+      <div
+        data-tour="dependencies-header"
+        className="flex flex-row items-start justify-between"
+      >
         <BranchTagSelector branches={branches} tags={tags} />
-        <div className="flex flex-row gap-2">
+        <div data-tour="dependencies-actions" className="flex flex-row gap-2">
           <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
             Share your SBOM
           </Button>
@@ -553,7 +562,10 @@ const Index: FunctionComponent = () => {
         description="All your Dependencies of the selected artifact on the selected reference (branch/tag)."
         title="All Dependencies"
       >
-        <div className="flex flex-row items-center justify-between gap-2">
+        <div
+          data-tour="dependencies-artifact-selector"
+          className="flex flex-row items-center justify-between gap-2"
+        >
           <QueryArtifactSelector
             unassignPossible
             artifacts={(artifacts ?? []).map((a) => a.artifactName)}
@@ -567,7 +579,7 @@ const Index: FunctionComponent = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div data-tour="dependencies-filter" className="flex flex-col gap-2">
           <Filter
             options={[
               {
@@ -646,7 +658,10 @@ const Index: FunctionComponent = () => {
         </div>
         <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
-            <thead className="border-b bg-card text-foreground">
+            <thead
+              data-tour="dependencies-table"
+              className="border-b bg-card text-foreground"
+            >
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header, index) => (
@@ -713,7 +728,7 @@ const Index: FunctionComponent = () => {
                     index === arr.length - 1 ? "" : "border-b",
                     index % 2 != 0 && "bg-card/50",
                     row.original.dependency.projectId && "cursor-pointer",
-                    "hover:bg-gray-50 dark:hover:bg-card",
+                    "hover:bg-muted",
                   )}
                   key={row.original.id}
                 >
