@@ -202,7 +202,7 @@ const Index: FunctionComponent = () => {
         <BranchTagSelector branches={branches} tags={tags} />
         <Button variant={"secondary"} onClick={() => alert("Share your VEX")}>
             <Download className="mr-2 h-4 w-4" />
-            Share your VEX
+            Export OSCAL
         </Button>
       </div>
       <Section
