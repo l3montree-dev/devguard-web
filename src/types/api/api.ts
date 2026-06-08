@@ -647,6 +647,28 @@ export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
   events: VulnEventDTO[];
 }
 
+export interface ComplianceRiskDTO {
+  id: string;
+  assetVersionName: string;
+  assetId: string;
+  artifacts: ArtifactDTO[];
+  policyId: string;
+  policyTitle: string;
+  policyDescription: string | null;
+  state: BaseVulnDTO["state"];
+  createdAt: string;                 // ISO (Go time.Time)
+  ticketId: string | null;
+  ticketUrl: string | null;
+  manualTicketCreation: boolean;
+  predicateType: string;
+  attestationUpdatedAt: string | null;
+  attestationViolations: string[];
+}
+
+export interface DetailedComplianceRiskDTO extends ComplianceRiskDTO {
+  events: VulnEventDTO[];
+}
+
 interface snippetContents {
   startLine: number;
   endLine: number;

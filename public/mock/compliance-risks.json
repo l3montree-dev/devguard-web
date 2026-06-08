@@ -1,0 +1,154 @@
+[
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e01",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [
+      {
+        "artifactName": "api-server",
+        "assetId": "550e8400-e29b-41d4-a716-446655440000",
+        "assetVersionName": "main"
+      }
+    ],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000001",
+    "policyTitle": "SLSA Build Provenance",
+    "policyDescription": "Every released artifact must ship with a verifiable SLSA build provenance attestation.",
+    "state": "open",
+    "createdAt": "2026-05-12T09:30:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://slsa.dev/provenance/v1",
+    "attestationUpdatedAt": "2026-05-20T10:15:00Z",
+    "attestationViolations": [
+      "No provenance attestation found for artifact 'api-server'",
+      "Builder ID does not match the trusted builder",
+      "Provenance subject digest could not be verified"
+    ]
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e02",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000002",
+    "policyTitle": "SBOM Attestation Present",
+    "policyDescription": "A CycloneDX SBOM attestation must be attached to every build.",
+    "state": "open",
+    "createdAt": "2026-05-14T11:00:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://cyclonedx.org/bom",
+    "attestationUpdatedAt": "2026-05-21T08:05:00Z",
+    "attestationViolations": ["SBOM attestation is missing for the latest build"]
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e03",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [
+      {
+        "artifactName": "worker",
+        "assetId": "550e8400-e29b-41d4-a716-446655440000",
+        "assetVersionName": "main"
+      }
+    ],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000003",
+    "policyTitle": "Signed Container Images",
+    "policyDescription": "All container images must be signed with a trusted cosign key.",
+    "state": "open",
+    "createdAt": "2026-05-15T15:45:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://cosign.sigstore.dev/attestation/v1",
+    "attestationUpdatedAt": "2026-05-22T12:00:00Z",
+    "attestationViolations": [
+      "Image 'worker' is not signed",
+      "No cosign signature found in the registry",
+      "Signature key is not in the trusted key set",
+      "Rekor transparency log entry is missing",
+      "Image was built outside the approved pipeline"
+    ]
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e04",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000004",
+    "policyTitle": "Two-Person Review",
+    "policyDescription": "Every change must be reviewed and approved by at least two maintainers.",
+    "state": "accepted",
+    "createdAt": "2026-04-28T13:20:00Z",
+    "ticketId": "gitlab:42",
+    "ticketUrl": "https://gitlab.example.com/acme/api/-/issues/42",
+    "manualTicketCreation": true,
+    "predicateType": "https://in-toto.io/attestation/code-review/v1",
+    "attestationUpdatedAt": "2026-05-01T09:00:00Z",
+    "attestationViolations": [
+      "Commit a1b2c3d was merged with a single approval",
+      "Self-approval detected on merge request !17"
+    ]
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e05",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000005",
+    "policyTitle": "No Critical CVEs at Release",
+    "policyDescription": "Releases must not contain dependencies with known critical CVEs.",
+    "state": "falsePositive",
+    "createdAt": "2026-04-30T16:10:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://in-toto.io/attestation/vuln/v0.1",
+    "attestationUpdatedAt": "2026-05-02T10:30:00Z",
+    "attestationViolations": [
+      "CVE-2025-1234 (critical) present in transitive dependency",
+      "CVE-2025-5678 (critical) present in base image",
+      "Scanner attestation older than 24h",
+      "No waiver recorded for CVE-2025-1234"
+    ]
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e06",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000006",
+    "policyTitle": "Pinned Dependencies",
+    "policyDescription": "All build dependencies must be pinned to immutable digests.",
+    "state": "fixed",
+    "createdAt": "2026-04-10T08:00:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://in-toto.io/attestation/link/v0.3",
+    "attestationUpdatedAt": "2026-05-18T14:25:00Z",
+    "attestationViolations": []
+  },
+  {
+    "id": "0f9c2d61-4b1a-4c3e-9a11-1a2b3c4d5e07",
+    "assetVersionName": "main",
+    "assetId": "550e8400-e29b-41d4-a716-446655440000",
+    "artifacts": [],
+    "policyId": "1c9e0a00-0000-4000-8000-000000000007",
+    "policyTitle": "Hermetic Builds",
+    "policyDescription": "Builds must run hermetically with no network access.",
+    "state": "markedForTransfer",
+    "createdAt": "2026-05-03T17:40:00Z",
+    "ticketId": null,
+    "ticketUrl": null,
+    "manualTicketCreation": false,
+    "predicateType": "https://slsa.dev/provenance/v1",
+    "attestationUpdatedAt": "2026-05-19T11:50:00Z",
+    "attestationViolations": [
+      "Build step accessed the network",
+      "Non-hermetic toolchain detected"
+    ]
+  }
+]

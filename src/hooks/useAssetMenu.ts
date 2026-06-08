@@ -20,7 +20,13 @@ import {
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { CodeIcon, BookCheckIcon, ScanText, TextSelect } from "lucide-react";
+import {
+  CodeIcon,
+  BookCheckIcon,
+  ScanText,
+  TextSelect,
+  ShieldCheck,
+} from "lucide-react";
 import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
@@ -172,6 +178,21 @@ export const useAssetMenu = () => {
           "/license-risks",
         Icon: ScanText,
         isActive: pathname.includes("license-risks"),
+      },
+      {
+        title: "Compliance Risks",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/compliance-risks",
+        Icon: ShieldCheck,
+        isActive: pathname.includes("compliance-risks"),
       },
       {
         title: "Dependency Insights",
