@@ -294,7 +294,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
           <CarouselContent className="border-0">
             {/* Step 1: Method Selection */}
             <CarouselItem>
-              <div className="px-1">
+              <div className="px-1 pb-2">
                 <DialogHeader>
                   <DialogTitle>Manage VEX</DialogTitle>
                   <DialogDescription>
@@ -305,8 +305,11 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
                 <div className="space-y-4 mt-6">
                   <Card
-                    onClick={() => setUploadMethod("file")}
-                    className={`cursor-pointer ${
+                    onClick={() => {
+                      setUploadMethod("file");
+                      carouselApi?.scrollTo(1);
+                    }}
+                    className={`cursor-pointer hover:border hover:border-primary ${
                       uploadMethod === "file"
                         ? "border border-primary"
                         : "border border-transparent"
@@ -325,8 +328,11 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   </Card>
 
                   <Card
-                    onClick={() => setUploadMethod("source-url")}
-                    className={`cursor-pointer ${
+                    onClick={() => {
+                      setUploadMethod("source-url");
+                      carouselApi?.scrollTo(2);
+                    }}
+                    className={`cursor-pointer hover:border hover:border-primary ${
                       uploadMethod === "source-url"
                         ? "border border-primary"
                         : "border border-transparent"
@@ -345,33 +351,11 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     </CardHeader>
                   </Card>
                 </div>
-
-                <div className="mt-8 flex flex-wrap flex-row gap-2 justify-end">
-                  <Button
-                    variant="secondary"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={uploadMethod === undefined}
-                    onClick={() => {
-                      if (uploadMethod === "file") {
-                        carouselApi?.scrollTo(1);
-                      } else {
-                        carouselApi?.scrollTo(2);
-                      }
-                    }}
-                  >
-                    {uploadMethod === undefined
-                      ? "Select an option"
-                      : "Continue"}
-                  </Button>
-                </div>
               </div>
             </CarouselItem>
 
             {/* Step 2: File Upload */}
+
             <CarouselItem>
               <div className="px-1">
                 <DialogHeader>
