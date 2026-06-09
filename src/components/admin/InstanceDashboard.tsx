@@ -60,15 +60,18 @@ const SEVERITIES = [
 
 export default forwardRef<InstanceDashboardHandle>(
   function InstanceDashboard(_, ref) {
-    const { getPrivateKey } = useInstanceAdmin();
+    const { getSigningKey } = useInstanceAdmin();
     const [usage, setUsage] = useState<InstanceUsageStatistics | null>(null);
     const [overview, setOverview] = useState<InstanceOverview | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const loadStats = useCallback(async () => {
-      const key = getPrivateKey();
-      if (!key) return;
+      const key = getSigningKey();
+      if (!key) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
@@ -92,7 +95,7 @@ export default forwardRef<InstanceDashboardHandle>(
       } finally {
         setLoading(false);
       }
-    }, [getPrivateKey]);
+    }, [getSigningKey]);
 
     useImperativeHandle(ref, () => ({ refresh: loadStats }), [loadStats]);
 
@@ -100,7 +103,7 @@ export default forwardRef<InstanceDashboardHandle>(
       loadStats();
     }, [loadStats]);
 
-    if (loading || !usage || !overview) {
+    if (loading) {
       return (
         <div className="flex flex-col gap-4">
           {/* Summary skeleton */}
@@ -137,11 +140,13 @@ export default forwardRef<InstanceDashboardHandle>(
       );
     }
 
-    if (error) {
+    if (error || !usage || !overview) {
       return (
         <Card>
           <CardContent className="flex items-center justify-center py-12">
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-sm text-destructive">
+              {error ?? "No instance statistics available."}
+            </p>
           </CardContent>
         </Card>
       );
@@ -159,9 +164,6 @@ export default forwardRef<InstanceDashboardHandle>(
       (max, p) => Math.max(max, p.critical + p.high + p.medium + p.low),
       0,
     );
-
-    console.log("Instance overview:", overview);
-    console.log("Instance usage:", usage);
 
     const summaryCards: {
       icon: typeof UsersIcon;

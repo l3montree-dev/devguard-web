@@ -8,9 +8,11 @@ import {
   useInstanceAdmin,
 } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient } from "@/services/adminApi";
+import { importAdminKey } from "@/services/admin-request-signing";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import Callout from "@/components/common/Callout";
 import {
   Card,
   CardContent,
@@ -36,8 +38,7 @@ import Section from "@/components/common/Section";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 
 export default function InstanceAdminPage() {
-  const { isAuthenticated, authenticate, logout, getPrivateKey } =
-    useInstanceAdmin();
+  const { isAuthenticated, authenticate, logout } = useInstanceAdmin();
   const [keyInput, setKeyInput] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -62,10 +63,20 @@ export default function InstanceAdminPage() {
 
     setVerifying(true);
     try {
-      const resp = await adminBrowserApiClient("/admin", trimmedKey);
+      // Import the hex into a non-extractable CryptoKey. The raw hex is never
+      // persisted; only this key (which cannot be exported) is kept in memory.
+      let key: CryptoKey;
+      try {
+        key = await importAdminKey(trimmedKey);
+      } catch {
+        toast.error("Invalid key format. The private key must be hex-encoded.");
+        return;
+      }
+
+      const resp = await adminBrowserApiClient("/admin", key);
 
       if (resp.ok) {
-        authenticate(trimmedKey);
+        authenticate(key);
         setKeyInput("");
         toast.success("Authenticated as instance admin.");
       } else if (resp.status === 401 || resp.status === 403) {
@@ -102,7 +113,19 @@ export default function InstanceAdminPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <Callout intent="warning" showIcon>
+                <p className="font-medium">Verify you trust this site</p>
+                <p className="mt-1">
+                  You are about to enter your instance admin private key on{" "}
+                  <span className="font-mono font-semibold break-all">
+                    {window.location.host}
+                  </span>
+                  . Only continue if this is your own DevGuard instance — never
+                  paste your key on a site you don&apos;t recognise.
+                </p>
+              </Callout>
               <form
+                className="mt-6"
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleAuthenticate();
@@ -124,9 +147,9 @@ export default function InstanceAdminPage() {
                       required
                     />
                     <FieldDescription>
-                      The key is stored in session storage and cleared when you
-                      close the tab. It is never sent to the server — it signs
-                      requests locally.
+                      The key is held in memory for this tab only and cleared on
+                      reload, logout, or after 10 minutes. It is never sent to
+                      the server — it signs requests locally.
                     </FieldDescription>
                   </Field>
                   <Field>

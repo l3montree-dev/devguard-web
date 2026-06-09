@@ -66,7 +66,7 @@ interface Props {
 // ── Component ──────────────────────────────────────────────────
 
 export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
-  const { getPrivateKey } = useInstanceAdmin();
+  const { getSigningKey } = useInstanceAdmin();
   const [orgs, setOrgs] = useState<ExternalOrg[]>(initialOrgs);
 
   useEffect(() => {
@@ -105,8 +105,8 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
     async (orgId: string, email: string) => {
       const org = orgs.find((o) => o.id === orgId);
 
-      const privateKey = getPrivateKey();
-      if (!privateKey) {
+      const signingKey = getSigningKey();
+      if (!signingKey) {
         toast.error("Admin session expired. Please re-authenticate.");
         return;
       }
@@ -115,7 +115,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
       try {
         const resp = await adminBrowserApiClient(
           `/admin/external-orgs/${encodeURIComponent(orgId)}/admins/${encodeURIComponent(email)}`,
-          privateKey,
+          signingKey,
           {
             method: "PUT",
           },
@@ -171,7 +171,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
         setAssigning(false);
       }
     },
-    [orgs, getPrivateKey],
+    [orgs, getSigningKey],
   );
 
   const handleRevokeAdmin = useCallback(
@@ -179,8 +179,8 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
       const org = orgs.find((o) => o.id === orgId);
       const admin = org?.admins.find((a) => a.id === adminId);
 
-      const privateKey = getPrivateKey();
-      if (!privateKey) {
+      const signingKey = getSigningKey();
+      if (!signingKey) {
         toast.error("Admin session expired. Please re-authenticate.");
         return;
       }
@@ -189,7 +189,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
       try {
         const resp = await adminBrowserApiClient(
           `/admin/external-orgs/${encodeURIComponent(orgId)}/admins/${encodeURIComponent(adminId)}`,
-          privateKey,
+          signingKey,
           {
             method: "DELETE",
           },
@@ -227,7 +227,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
         setRevokingId(null);
       }
     },
-    [orgs, getPrivateKey],
+    [orgs, getSigningKey],
   );
 
   return (

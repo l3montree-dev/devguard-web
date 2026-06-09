@@ -13,17 +13,17 @@ import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient } from "@/services/adminApi";
 
 export default function AdminTools() {
-  const { getPrivateKey } = useInstanceAdmin();
+  const { getSigningKey } = useInstanceAdmin();
   const [externalOrgs, setExternalOrgs] = useState<ExternalOrg[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const privateKey = getPrivateKey();
-      if (!privateKey) return;
+      const signingKey = getSigningKey();
+      if (!signingKey) return;
       try {
         const resp = await adminBrowserApiClient(
           "/admin/external-orgs",
-          privateKey,
+          signingKey,
         );
         if (resp.ok) {
           const data = (await resp.json()) as ExternalOrg[];
@@ -34,7 +34,7 @@ export default function AdminTools() {
       }
     };
     load();
-  }, [getPrivateKey]);
+  }, [getSigningKey]);
 
   return (
     <div className="flex flex-col gap-4">

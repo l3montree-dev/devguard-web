@@ -8,25 +8,24 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { RefreshCw } from "lucide-react";
 
-const STORAGE_KEY = "devguard-admin-key";
-const EXPIRES_KEY = "devguard-admin-expires-at";
 const SESSION_DURATION_MS = 10 * 60 * 1000;
 
 interface InstanceAdminContextValue {
-  /** Whether the admin private key is currently stored in session storage. */
+  /** Whether an admin signing key is currently held in memory. */
   isAuthenticated: boolean;
-  /** Store the hex-encoded private key in session storage. */
-  authenticate: (hexPrivateKey: string) => void;
-  /** Remove the stored private key from session storage. */
+  /** Store the imported, non-extractable signing key in memory for this tab. */
+  authenticate: (key: CryptoKey) => void;
+  /** Drop the in-memory signing key. */
   logout: () => void;
   /** Reset the auto-logout timer back to the full session duration. */
   refreshSession: () => void;
-  /** Retrieve the stored hex-encoded private key. Returns null if not set. */
-  getPrivateKey: () => string | null;
+  /** Retrieve the in-memory signing key. Returns null if not authenticated. */
+  getSigningKey: () => CryptoKey | null;
   /** Absolute timestamp (ms) when the admin session is auto-cleared. */
   expiresAt: number | null;
 }
@@ -36,7 +35,7 @@ const InstanceAdminContext = createContext<InstanceAdminContextValue>({
   authenticate: () => {},
   logout: () => {},
   refreshSession: () => {},
-  getPrivateKey: () => null,
+  getSigningKey: () => null,
   expiresAt: null,
 });
 
@@ -45,53 +44,43 @@ interface AdminAuthState {
   expiresAt: number | null;
 }
 
-function readInitialState(): AdminAuthState {
-  if (typeof window === "undefined") {
-    return { isAuthenticated: false, expiresAt: null };
-  }
-  const key = sessionStorage.getItem(STORAGE_KEY);
-  if (!key) return { isAuthenticated: false, expiresAt: null };
-  const rawExpires = sessionStorage.getItem(EXPIRES_KEY);
-  const expiresAt = rawExpires ? Number(rawExpires) : NaN;
-  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
-    sessionStorage.removeItem(STORAGE_KEY);
-    sessionStorage.removeItem(EXPIRES_KEY);
-    return { isAuthenticated: false, expiresAt: null };
-  }
-  return { isAuthenticated: true, expiresAt };
-}
-
 export function InstanceAdminProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [state, setState] = useState<AdminAuthState>(() => readInitialState());
+  // The signing key lives only in memory (never sessionStorage/localStorage),
+  // is non-extractable, and does not survive a page reload — a deliberate
+  // hardening tradeoff against key exfiltration via XSS.
+  const keyRef = useRef<CryptoKey | null>(null);
+  const [state, setState] = useState<AdminAuthState>({
+    isAuthenticated: false,
+    expiresAt: null,
+  });
 
-  const authenticate = useCallback((hexPrivateKey: string) => {
-    const expiresAt = Date.now() + SESSION_DURATION_MS;
-    sessionStorage.setItem(STORAGE_KEY, hexPrivateKey);
-    sessionStorage.setItem(EXPIRES_KEY, String(expiresAt));
-    setState({ isAuthenticated: true, expiresAt });
+  const authenticate = useCallback((key: CryptoKey) => {
+    keyRef.current = key;
+    setState({
+      isAuthenticated: true,
+      expiresAt: Date.now() + SESSION_DURATION_MS,
+    });
   }, []);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem(STORAGE_KEY);
-    sessionStorage.removeItem(EXPIRES_KEY);
+    keyRef.current = null;
     setState({ isAuthenticated: false, expiresAt: null });
   }, []);
 
   const refreshSession = useCallback(() => {
-    if (typeof window === "undefined") return;
-    if (!sessionStorage.getItem(STORAGE_KEY)) return;
-    const expiresAt = Date.now() + SESSION_DURATION_MS;
-    sessionStorage.setItem(EXPIRES_KEY, String(expiresAt));
-    setState((prev) => ({ ...prev, expiresAt }));
+    if (!keyRef.current) return;
+    setState((prev) => ({
+      ...prev,
+      expiresAt: Date.now() + SESSION_DURATION_MS,
+    }));
   }, []);
 
-  const getPrivateKey = useCallback((): string | null => {
-    if (typeof window === "undefined") return null;
-    return sessionStorage.getItem(STORAGE_KEY);
+  const getSigningKey = useCallback((): CryptoKey | null => {
+    return keyRef.current;
   }, []);
 
   useEffect(() => {
@@ -112,7 +101,7 @@ export function InstanceAdminProvider({
         authenticate,
         logout,
         refreshSession,
-        getPrivateKey,
+        getSigningKey,
         expiresAt: state.expiresAt,
       }}
     >
@@ -141,11 +130,11 @@ export function SessionCountdown() {
       <button
         type="button"
         onClick={refreshSession}
-        className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-2 hover:underline"
+        className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
         title="Reset the auto-logout timer to 10 minutes"
       >
         <RefreshCw className="h-3 w-3" />
-        Refresh
+        Reset
       </button>
     </p>
   );

@@ -24,7 +24,7 @@ import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
 export default function InstanceSettingsCard() {
   // Reuses the shared hook backing RootHeader (GET /api/v1/instance-settings/).
   const instanceSettings = useInstanceSettings();
-  const { getPrivateKey } = useInstanceAdmin();
+  const { getSigningKey } = useInstanceAdmin();
   const loading = instanceSettings === null;
   const singleOrganizationMode =
     instanceSettings?.singleOrganizationMode ?? false;
@@ -33,8 +33,8 @@ export default function InstanceSettingsCard() {
   const [saving, setSaving] = useState(false);
 
   const handleToggleOrgCreation = async (creationEnabled: boolean) => {
-    const privateKey = getPrivateKey();
-    if (!privateKey) {
+    const signingKey = getSigningKey();
+    if (!signingKey) {
       toast.error("Admin session expired. Please re-authenticate.");
       return;
     }
@@ -52,7 +52,7 @@ export default function InstanceSettingsCard() {
       false,
     );
     try {
-      const resp = await adminBrowserApiClient("/admin/settings", privateKey, {
+      const resp = await adminBrowserApiClient("/admin/settings", signingKey, {
         method: "PATCH",
         body: JSON.stringify({ disable_org_creation: disableOrgCreation }),
       });

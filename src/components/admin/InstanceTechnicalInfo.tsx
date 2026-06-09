@@ -76,7 +76,7 @@ function Row({
 
 export default forwardRef<InstanceTechnicalInfoHandle>(
   function InstanceTechnicalInfo(_, ref) {
-    const { getPrivateKey } = useInstanceAdmin();
+    const { getSigningKey } = useInstanceAdmin();
     const [info, setInfo] = useState<InstanceInfoDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -85,8 +85,11 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
     );
 
     const loadInfo = useCallback(async () => {
-      const key = getPrivateKey();
-      if (!key) return;
+      const key = getSigningKey();
+      if (!key) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
@@ -110,7 +113,7 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
       } finally {
         setLoading(false);
       }
-    }, [getPrivateKey]);
+    }, [getSigningKey]);
 
     useImperativeHandle(ref, () => ({ refresh: loadInfo }), [loadInfo]);
 

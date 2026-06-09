@@ -68,7 +68,7 @@ const daemons: Daemon[] = [
 ];
 
 export default function TriggerDaemonsCard() {
-  const { getPrivateKey } = useInstanceAdmin();
+  const { getSigningKey } = useInstanceAdmin();
   const [running, setRunning] = useState<Record<string, boolean>>({});
   const [logs, setLogs] = useState<Record<string, string[]>>({});
   const [assetId, setAssetId] = useState("");
@@ -95,8 +95,8 @@ export default function TriggerDaemonsCard() {
         return;
       }
 
-      const privateKey = getPrivateKey();
-      if (!privateKey) {
+      const signingKey = getSigningKey();
+      if (!signingKey) {
         toast.error("Admin session expired. Please re-authenticate.");
         return;
       }
@@ -112,7 +112,7 @@ export default function TriggerDaemonsCard() {
 
         await adminSSETrigger(
           daemon.endpoint,
-          privateKey,
+          signingKey,
           (evt: DaemonSSEEvent) => {
             switch (evt.event) {
               case "log":
@@ -148,7 +148,7 @@ export default function TriggerDaemonsCard() {
         setRunning((prev) => ({ ...prev, [daemon.id]: false }));
       }
     },
-    [assetId, getPrivateKey, appendLog],
+    [assetId, getSigningKey, appendLog],
   );
 
   return (

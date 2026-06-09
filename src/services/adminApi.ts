@@ -5,12 +5,13 @@ import { signAdminRequest } from "./admin-request-signing";
 
 /**
  * Create an API client for instance admin requests.
- * All requests are HTTP-signed with the provided ECDSA P-256 private key.
+ * All requests are HTTP-signed with the provided non-extractable ECDSA P-256
+ * CryptoKey (imported via `importAdminKey`).
  * Requests go through the devguard-tunnel proxy which forwards the signing headers.
  */
 export const adminBrowserApiClient = async (
   input: string,
-  hexPrivateKey: string,
+  key: CryptoKey,
   init?: RequestInit,
   prefix = "/api/v1",
 ): Promise<Response> => {
@@ -24,7 +25,7 @@ export const adminBrowserApiClient = async (
     typeof init?.body === "string" ? init.body : init?.body ? "" : undefined;
 
   // Sign the request — produces Signature, Signature-Input, and Content-Digest headers
-  const sigHeaders = await signAdminRequest(url, method, body, hexPrivateKey);
+  const sigHeaders = await signAdminRequest(url, method, body, key);
 
   return fetch(url, {
     ...init,
@@ -66,11 +67,11 @@ export class AdminAPIError extends Error {
  */
 export async function adminSSETrigger(
   input: string,
-  hexPrivateKey: string,
+  key: CryptoKey,
   onEvent: (evt: DaemonSSEEvent) => void,
   body?: string,
 ): Promise<void> {
-  const resp = await adminBrowserApiClient(input, hexPrivateKey, {
+  const resp = await adminBrowserApiClient(input, key, {
     method: "POST",
     body,
     headers: body ? { "Content-Type": "application/json" } : undefined,
