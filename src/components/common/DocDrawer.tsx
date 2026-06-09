@@ -76,7 +76,7 @@ export function DocDrawer({
       <DrawerTrigger asChild>
         <button
           data-umami-event="Documentation Drawer"
-          className="text-xs cursor-pointer text-blue-600 dark:text-primary"
+          className="text-xs cursor-pointer text-link"
           type="button"
         >
           {triggerLabel}
@@ -108,7 +108,7 @@ export function DocDrawer({
           <Button className="flex-1" asChild>
             <a
               href={docsUrl}
-              className="!text-black"
+              className="!text-primary-foreground"
               target="_blank"
               rel="noopener noreferrer"
               data-umami-event="Documentation Drawer - Check Documentation"

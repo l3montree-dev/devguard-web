@@ -15,6 +15,7 @@ import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
+import ThemeToggle from "@/components/misc/ThemeToggle";
 
 const LoginPage = async (props: OryPageParams) => {
   const flow = await getLoginFlow(oryConfig, props.searchParams);
@@ -31,6 +32,9 @@ const LoginPage = async (props: OryPageParams) => {
       </Head>
       <div className="relative flex min-h-screen flex-col bg-background">
         <FourSideGridPattern />
+        <div className="absolute top-9 right-7 z-10">
+          <ThemeToggle />
+        </div>
         <div className="flex min-h-screen items-center justify-center flex-col pt-6">
           <div className="w-full max-w-6xl">
             <Card className="overflow-hidden p-0">

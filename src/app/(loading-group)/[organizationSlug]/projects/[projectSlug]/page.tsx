@@ -326,7 +326,7 @@ export default function RepositoriesPage() {
               </span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div data-tour="group-filter" className="flex gap-2">
             <Sort
               sortOptions={[
                 { label: "Name", value: "name" },

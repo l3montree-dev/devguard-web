@@ -313,7 +313,7 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
-  const { startTour } = usePageTour(repoSettingsTourSteps);
+  usePageTour(repoSettingsTourSteps);
 
   return (
     <Page
@@ -341,6 +341,10 @@ const Index: FunctionComponent = () => {
               parentRepositoryName={parentRepositoryName}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              assetSlug={assetSlug}
+              repositoryProvider={asset.repositoryProvider}
               members={asset.members}
               onRemoveMember={handleRemoveMember}
               onChangeMemberRole={handleChangeMemberRole}

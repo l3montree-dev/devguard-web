@@ -17,19 +17,25 @@ const nextConfig = {
   reactStrictMode: true,
   generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? "dev",
   turbopack: {
-    moduleIds: "deterministic",
     resolveAlias: {
       istextorbinary: "./src/lib/istextorbinary-wrapper.js",
     },
   },
-  output: "standalone",
-  webpack: (config) => {
-    // this will override the experiments
-    config.experiments = { ...config.experiments, topLevelAwait: true };
-    // this will just update topLevelAwait property of config.experiments
-    // config.experiments.topLevelAwait = true
-    return config;
+  experimental: {
+    turbopackModuleIds: "deterministic",
+    turbopackFileSystemCacheForDev: true,
+    useCache: true,
   },
+  cacheComponents: true,
+  output: "standalone",
+  // TODO: clarify if this is needed, is seems not to be:
+  // webpack: (config) => {
+  //   // this will override the experiments
+  //   config.experiments = { ...config.experiments, topLevelAwait: true };
+  //   // this will just update topLevelAwait property of config.experiments
+  //   // config.experiments.topLevelAwait = true
+  //   return config;
+  // },
 };
 
 module.exports = nextConfig;
@@ -62,12 +68,4 @@ module.exports = withSentryConfig(module.exports, {
   // side errors will fail.
   // tunnelRoute: "/monitoring",
 
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true,
 });
