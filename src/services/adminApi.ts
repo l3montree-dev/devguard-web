@@ -21,8 +21,14 @@ export const adminBrowserApiClient = async (
       : "/api/devguard-tunnel" + prefix + input;
 
   const method = init?.method ?? "GET";
-  const body =
-    typeof init?.body === "string" ? init.body : init?.body ? "" : undefined;
+  // Only string bodies are supported: the signed Content-Digest must be computed
+  // over the exact bytes sent, so a non-string body would sign empty but send
+  // non-empty and fail admin auth in a hard-to-debug way.
+  if (init?.body !== undefined && typeof init.body !== "string") {
+    throw new Error("adminBrowserApiClient only supports string request bodies");
+  }
+  const body: string | undefined =
+    typeof init?.body === "string" ? init.body : undefined;
 
   // Sign the request — produces Signature, Signature-Input, and Content-Digest headers
   const sigHeaders = await signAdminRequest(url, method, body, key);
@@ -125,7 +131,9 @@ export async function adminSSETrigger(
     buffer = lines.pop() ?? ""; // keep incomplete line in buffer
 
     let currentEvent = "";
-    for (const line of lines) {
+    for (const rawLine of lines) {
+      // Strip a trailing \r so CRLF (\r\n) line endings parse correctly.
+      const line = rawLine.endsWith("\r") ? rawLine.slice(0, -1) : rawLine;
       if (line.startsWith("event: ")) {
         currentEvent = line.slice(7);
       } else if (line.startsWith("data: ")) {

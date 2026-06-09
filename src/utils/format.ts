@@ -67,21 +67,21 @@ export function formatDateTime(
 }
 
 /**
- * Format a Unix timestamp (seconds) into a locale-aware date string.
+ * Format a Unix timestamp (seconds) into a locale-aware date+time string.
  * If the input is not a valid numeric timestamp it is returned as-is.
  *
  * @param timestamp - A Unix timestamp in seconds (number or numeric string).
  * @param options   - Optional `Intl.DateTimeFormatOptions` overrides.
- * @returns A formatted date string.
+ * @returns A formatted date+time string.
  */
 export function formatUnixTimestamp(
   timestamp: string | number,
   options?: Intl.DateTimeFormatOptions,
 ): string {
   const n = Number(timestamp);
-  if (Number.isNaN(n) || n === 0) return String(timestamp);
+  if (Number.isNaN(n)) return String(timestamp);
 
-  return new Date(n * 1000).toLocaleDateString(
+  return new Date(n * 1000).toLocaleString(
     undefined,
     options ?? {
       year: "numeric",

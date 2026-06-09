@@ -57,9 +57,9 @@ const GITHUB_RELEASES_API =
 export async function checkForUpdate(
   currentVersion: string,
 ): Promise<VersionCheckResult> {
+  // Runs in the client - fetches once per page load
   const res = await fetch(GITHUB_RELEASES_API, {
     headers: { Accept: "application/vnd.github+json" },
-    next: { revalidate: 3600 }, // cache for 1 hour in Next.js fetch
   });
 
   if (!res.ok) {
