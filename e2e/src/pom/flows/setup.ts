@@ -65,7 +65,6 @@ export class SetupFlow {
       .click({ timeout: 5_000 });
     await this.page.getByTestId("upload-vex-button").click();
     await this.page.getByTestId("upload-vex-file").click();
-    await this.page.getByTestId("manage-vex-continue").click();
     await this.page
       .getByTestId("file-upload-input-file-upload-vex")
       .setInputFiles(inputFile);
