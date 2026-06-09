@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "../ui/dialog";
 import {
   Card,
@@ -23,7 +22,6 @@ import { Input } from "../ui/input";
 import { BranchTagSelector } from "../BranchTagSelector";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useDropzone } from "react-dropzone";
-import { classNames } from "@/utils/common";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import {
   Loader2,
@@ -63,8 +61,6 @@ interface VexUploadModalProps {
   }) => Promise<void>;
 }
 
-type UploadMethod = "file" | "source-url" | undefined;
-
 const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   open,
   onOpenChange,
@@ -74,7 +70,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
 
-  const [uploadMethod, setUploadMethod] = useState<UploadMethod>();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [branchOrTagName, setBranchOrTagName] = useState("");
   const [branchOrTagSlug, setBranchOrTagSlug] = useState("");
@@ -140,7 +135,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     setTimeout(() => {
       carouselApi?.reInit();
     }, 0);
-  }, [uploadMethod, carouselApi, activeTab]);
+  }, [carouselApi, activeTab]);
 
   const handleUploadClick = async () => {
     if (!vexFile) return;
@@ -155,7 +150,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
       });
       // Reset form
       setVexFile(null);
-      setUploadMethod(undefined);
       onOpenChange(false);
     } catch (error) {
       console.error("Upload failed:", error);
@@ -306,14 +300,9 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                 <div className="space-y-4 mt-6">
                   <Card
                     onClick={() => {
-                      setUploadMethod("file");
                       carouselApi?.scrollTo(1);
                     }}
-                    className={`cursor-pointer hover:border hover:border-primary ${
-                      uploadMethod === "file"
-                        ? "border border-primary"
-                        : "border border-transparent"
-                    }`}
+                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -329,14 +318,9 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
                   <Card
                     onClick={() => {
-                      setUploadMethod("source-url");
                       carouselApi?.scrollTo(2);
                     }}
-                    className={`cursor-pointer hover:border hover:border-primary ${
-                      uploadMethod === "source-url"
-                        ? "border border-primary"
-                        : "border border-transparent"
-                    }`}
+                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -401,7 +385,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      setUploadMethod(undefined);
                       setVexFile(null);
                       carouselApi?.scrollTo(0);
                     }}
@@ -622,7 +605,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      setUploadMethod(undefined);
                       setNewVexUrl("");
                       setNewCsafUrl("");
                       setCsafPackageScope("");
