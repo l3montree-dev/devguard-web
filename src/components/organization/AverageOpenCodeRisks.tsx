@@ -21,7 +21,11 @@ const AverageOpenCodeRisks: FunctionComponent<Props> = ({ amount }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 items-center justify-start">
-        <p className="text-4xl font-semibold">{amount ?? 0}</p>
+        <p className="text-4xl font-semibold">
+          {(amount ?? 0).toLocaleString(undefined, {
+            maximumFractionDigits: 2,
+          })}
+        </p>
       </CardContent>
     </Card>
   );

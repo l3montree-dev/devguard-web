@@ -49,7 +49,7 @@ export interface InstanceDashboardHandle {
 }
 
 const formatAvg = (n: number | undefined) =>
-  (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
 const SEVERITIES = [
   { key: "critical", label: "Critical" },
@@ -183,9 +183,9 @@ export default forwardRef<InstanceDashboardHandle>(
       },
       {
         icon: FolderOpenIcon,
-        label: "Projects",
+        label: "Active Projects",
         value: usage.NumberOfProjects,
-        hint: "Projects across all organisations",
+        hint: "Projects with min. 1 Asset across all organisations",
       },
       {
         icon: TagIcon,
@@ -195,9 +195,9 @@ export default forwardRef<InstanceDashboardHandle>(
       },
       {
         icon: ArrowsRightLeftIcon,
-        label: "Ticket Sync",
+        label: "Ticket Sync Option",
         value: usage.NumberOfTicketSyncedProjects,
-        hint: "Projects with ticket sync enabled",
+        hint: "Projects with ticket sync option available",
       },
       {
         icon: LinkIcon,

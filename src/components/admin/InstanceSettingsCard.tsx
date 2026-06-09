@@ -3,6 +3,9 @@
 
 "use client";
 
+import { useState } from "react";
+import { mutate } from "swr";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -12,15 +15,69 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { NoSymbolIcon } from "@heroicons/react/20/solid";
 import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useInstanceAdmin } from "@/context/InstanceAdminContext";
+import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
 
 export default function InstanceSettingsCard() {
   // Reuses the shared hook backing RootHeader (GET /api/v1/instance-settings/).
   const instanceSettings = useInstanceSettings();
+  const { getPrivateKey } = useInstanceAdmin();
   const loading = instanceSettings === null;
   const singleOrganizationMode =
     instanceSettings?.singleOrganizationMode ?? false;
+  // User-facing framing: org creation is *enabled* when single-org mode is off.
+  const orgCreationEnabled = !singleOrganizationMode;
+  const [saving, setSaving] = useState(false);
+
+  const handleToggleOrgCreation = async (creationEnabled: boolean) => {
+    const privateKey = getPrivateKey();
+    if (!privateKey) {
+      toast.error("Admin session expired. Please re-authenticate.");
+      return;
+    }
+
+    // The technical flag is the inverse of the user-facing toggle:
+    // SINGLE_ORGANIZATION_MODE / disable_org_creation is true when creation is off.
+    const disableOrgCreation = !creationEnabled;
+
+    setSaving(true);
+    // Optimistically reflect the new value across all consumers of the hook
+    // (RootHeader, OrganizationDropDown, …) while the request is in flight.
+    mutate(
+      "/instance-settings/",
+      { singleOrganizationMode: disableOrgCreation },
+      false,
+    );
+    try {
+      const resp = await adminBrowserApiClient("/admin/settings", privateKey, {
+        method: "PATCH",
+        body: JSON.stringify({ disable_org_creation: disableOrgCreation }),
+      });
+      if (!resp.ok) {
+        throw new AdminAPIError(
+          `Failed to update instance settings (HTTP ${resp.status})`,
+          resp.status,
+        );
+      }
+      toast.success(
+        creationEnabled
+          ? "Organisation creation enabled."
+          : "Organisation creation disabled.",
+      );
+    } catch (err) {
+      const message =
+        err instanceof AdminAPIError
+          ? err.message
+          : "Failed to update instance settings. Is the API reachable?";
+      toast.error(message);
+    } finally {
+      mutate("/instance-settings/");
+      setSaving(false);
+    }
+  };
 
   return (
     <Card>
@@ -35,27 +92,33 @@ export default function InstanceSettingsCard() {
       </CardHeader>
       <CardContent>
         <div className="divide-y">
-          {/* Single Organisation Mode — real value, currently env-controlled */}
           <div className="flex items-center justify-between gap-4 py-4 first:pt-0">
             <div>
-              <p className="text-sm font-medium">Single Organisation Mode</p>
+              <p className="text-sm font-medium">Organisation Creation</p>
               <p className="text-xs text-muted-foreground">
-                When enabled, the instance runs with a single organisation and
-                regular users cannot create new organisations. Currently
-                configured via the{" "}
+                When disabled, regular users cannot create new organisations.
+                Organisations that already exist continue to work as normal.
+                Seeded from the{" "}
                 <code className="font-mono">SINGLE_ORGANIZATION_MODE</code>{" "}
-                environment variable — in-app editing is coming soon.
+                environment variable; changes made here are stored on the
+                instance and take precedence.
               </p>
             </div>
-            <div className="min-w-26 flex items-center justify-end gap-3">
+            <div className="min-w-36 flex items-center justify-end gap-3">
               {loading ? (
-                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-6 w-11 rounded-full" />
               ) : (
-                <Badge
-                  variant={singleOrganizationMode ? "danger" : "secondary"}
-                >
-                  {singleOrganizationMode ? "Enabled" : "Disabled"}
-                </Badge>
+                <>
+                  <Badge variant={orgCreationEnabled ? "secondary" : "danger"}>
+                    {orgCreationEnabled ? "Enabled" : "Disabled"}
+                  </Badge>
+                  <Switch
+                    checked={orgCreationEnabled}
+                    disabled={saving}
+                    onCheckedChange={handleToggleOrgCreation}
+                    aria-label="Toggle Organisation Creation"
+                  />
+                </>
               )}
             </div>
           </div>
@@ -69,7 +132,7 @@ export default function InstanceSettingsCard() {
                 from pulling container images through it.
               </p>
             </div>
-            <div className="min-w-26 flex items-center justify-end gap-3">
+            <div className="min-w-36 flex items-center justify-end gap-3">
               <Badge variant="outline">Coming soon</Badge>
             </div>
           </div>
@@ -81,7 +144,7 @@ export default function InstanceSettingsCard() {
                 When enabled, new user registrations are disabled.
               </p>
             </div>
-            <div className="min-w-26 flex items-center justify-end gap-3">
+            <div className="min-w-36 flex items-center justify-end gap-3">
               <Badge variant="outline">Coming soon</Badge>
             </div>
           </div>
