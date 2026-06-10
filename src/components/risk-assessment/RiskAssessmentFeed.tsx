@@ -322,7 +322,7 @@ const RiskFeedItem = ({
                       onConfirm={() => deleteEvent(event.id)}
                     >
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        Delete
+                        Delete Message
                       </DropdownMenuItem>
                     </Alert>
                   </DropdownMenuContent>
