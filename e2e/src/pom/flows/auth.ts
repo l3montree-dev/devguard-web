@@ -31,10 +31,10 @@ export class AuthFlow {
     password: string,
   ) {
     await this.page.getByTestId("ory/screen/login/action/register").click();
-    await this.page.getByTestId("traits.email").click();
-    await this.page.getByTestId("traits.email").fill(email);
     await this.page.getByTestId("traits.name").click();
     await this.page.getByTestId("traits.name").fill(username);
+    await this.page.getByTestId("traits.email").click();
+    await this.page.getByTestId("traits.email").fill(email);
     await this.page
       .getByRole("checkbox", { name: "I agree to the terms of use" })
       .click();
@@ -42,12 +42,13 @@ export class AuthFlow {
       this.page.getByRole("checkbox", { name: "I agree to the terms of use" }),
     ).toBeChecked();
 
-    await this.page.getByRole("button", { name: "Sign up" }).click();
-    await this.page.getByTestId("password-button").click();
+    await this.page.getByTestId("profile-submit").click();
+    await this.page.getByTestId("auth-method-password").click();
+    await this.page.getByTestId("password").click();
     await this.page.getByTestId("password").fill(password);
-    await this.page
-      .getByRole("button", { name: "Sign up", exact: true })
-      .click();
+    await this.page.getByTestId("confirmPassword").click();
+    await this.page.getByTestId("confirmPassword").fill(password);
+    await this.page.getByTestId("password-submit").click();
 
     console.log(`Registered user: ${username} (${email})`);
 

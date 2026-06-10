@@ -36,7 +36,7 @@ export const getUserFullName = (user: User) => {
   }
 };
 
-const order = ["email", "name", "confirmedTerms"];
+const order = ["name", "email", "confirmedTerms"];
 
 export const rewriteFlow = (flow: any) => {
   let first: string;
