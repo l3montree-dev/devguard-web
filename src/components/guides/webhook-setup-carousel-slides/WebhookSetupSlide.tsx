@@ -10,7 +10,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import { useConfig } from "../../../context/ConfigContext";
 

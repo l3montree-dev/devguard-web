@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type { GitLabIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";

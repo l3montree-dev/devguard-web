@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import useDecodedParams from "../../../hooks/useDecodedParams";
 import { browserApiClient } from "../../../services/devGuardApi";

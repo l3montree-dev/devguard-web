@@ -1,6 +1,6 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import useDecodedParams from "./useDecodedParams";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export const useDeleteEvent = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =

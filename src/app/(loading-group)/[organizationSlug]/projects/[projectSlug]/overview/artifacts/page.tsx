@@ -15,7 +15,7 @@ import { groupBy } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import SortingCaret from "../../../../../../../components/common/SortingCaret";
 import { Skeleton } from "../../../../../../../components/ui/skeleton";

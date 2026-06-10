@@ -34,7 +34,7 @@ import {
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
 } from "@/utils/view";
 import dynamic from "next/dynamic";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import CopyCode from "@/components/common/CopyCode";
 import VulnState from "@/components/common/VulnState";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";

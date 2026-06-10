@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { Project, ScoreCard } from "@/types/api/api";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 import { Badge } from "@/components/ui/badge";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
