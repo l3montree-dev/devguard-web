@@ -1,6 +1,6 @@
 "use client";
 
-import { useTourSeen } from "./useTourSeen";
+import { dismissAllTours, useTourSeen } from "./useTourSeen";
 
 export function useWelcomeTour() {
   const { showModal, markSeen } = useTourSeen("org-home");
@@ -11,6 +11,7 @@ export function useWelcomeTour() {
   };
 
   const handleSkip = () => {
+    dismissAllTours();
     markSeen();
   };
 

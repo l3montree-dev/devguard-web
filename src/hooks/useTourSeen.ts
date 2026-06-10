@@ -2,7 +2,24 @@
 
 import { useState } from "react";
 
+const ALL_TOUR_KEYS = [
+  "org-home",
+  "org-settings",
+  "org-overview",
+  "group-home",
+  "repo-home",
+  "repo-settings",
+  "dependency-risk",
+  "dependency-insights",
+] as const;
+
 const storageKey = (tourKey: string) => `devguard:tourSeen:${tourKey}`;
+
+export const dismissAllTours = () => {
+  ALL_TOUR_KEYS.forEach((key) => {
+    localStorage.setItem(storageKey(key), "true");
+  });
+};
 
 export const hasTourSeen = (tourKey: string): boolean => {
   if (typeof window === "undefined") return false;
