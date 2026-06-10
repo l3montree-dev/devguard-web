@@ -20,6 +20,7 @@ import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
+import { Button } from "@/components/ui/button";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "lucide-react";
 import { EssentialProjectConfigContent } from "@/components/common/EssentialProjectConfigDrawer";
+import { useActiveOrg } from "../../../../../../../hooks/useActiveOrg";
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
@@ -52,6 +54,7 @@ const Index: FunctionComponent = () => {
     projectSlug: string;
     assetSlug: string;
   };
+  const activeOrg = useActiveOrg();
   // check if we can redirect to the first ref
   const asset = useAsset();
 
@@ -105,9 +108,58 @@ const Index: FunctionComponent = () => {
             asset?.repositoryProvider === "gitlab") && (
             <>
               <div className="mb-8">
-                <div className="">
-                  <Autosetup {...autosetup} />
-                </div>
+                {asset?.externalEntityId || asset?.repositoryId ? (
+                  // Asset is connected to an actual repository — autosetup is usable
+                  activeOrg.gitLabIntegrations.length > 0 ? (
+                    <Autosetup {...autosetup} />
+                  ) : (
+                    <div className="flex flex-col gap-4 rounded-lg border bg-card p-8">
+                      <div className="flex flex-col gap-2">
+                        <span className="font-semibold text-foreground">
+                          GitLab Integration required for Auto Setup
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          To use the Auto Setup feature, you need to configure a
+                          GitLab integration for your organization first.
+                        </span>
+                      </div>
+                      <Button
+                        className="self-start"
+                        onClick={() => {
+                          setRiskScanningInitialSlide(2);
+                          setRiskScanningOpen(true);
+                        }}
+                      >
+                        Set up GitLab Integration
+                      </Button>
+                    </div>
+                  )
+                ) : (
+                  // No repository connected yet — guide the user to connect one
+                  <div className="flex flex-col gap-4 rounded-lg border bg-card p-8">
+                    <div className="flex flex-col gap-2">
+                      <span className="font-semibold text-foreground">
+                        Connect a GitLab repository for Auto Setup
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        Link this asset to a GitLab repository to use the Auto
+                        Setup feature.
+                      </span>
+                    </div>
+                    <Button
+                      className="self-start"
+                      onClick={() => {
+                        // ProviderSetupSlide (slide 3) if integration exists, else GitLabIntegrationSlide (slide 2)
+                        setRiskScanningInitialSlide(
+                          activeOrg.gitLabIntegrations.length > 0 ? 3 : 2,
+                        );
+                        setRiskScanningOpen(true);
+                      }}
+                    >
+                      Connect Repository
+                    </Button>
+                  </div>
+                )}
               </div>
               <hr className="mb-8" />
             </>
@@ -160,9 +212,9 @@ const Index: FunctionComponent = () => {
                     {
                       icon: <Upload />,
                       name: "Manually Upload",
-                      sub: "You already have a Scanner or a SARIF/SBOM file and want to just upload your results...",
+                      sub: "You already have a SARIF/ SBOM file and want to scan for known vulnerabilities or manage your findings.",
                       recommended: false,
-                      githubOnly: true,
+                      githubOnly: false,
                       slide: 11,
                     },
                     {
