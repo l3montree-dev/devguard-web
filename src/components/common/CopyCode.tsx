@@ -17,7 +17,7 @@ import { CopyIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 
 export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({

@@ -15,7 +15,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type { PatWithPrivKey } from "@/types/api/api";
 import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";

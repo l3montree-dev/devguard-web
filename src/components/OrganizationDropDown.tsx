@@ -20,7 +20,7 @@ import { Loader2, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "../services/devGuardApi";
 import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";

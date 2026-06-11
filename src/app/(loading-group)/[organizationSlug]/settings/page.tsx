@@ -52,7 +52,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useConfig } from "../../../../context/ConfigContext";
 import {
   useOrganization,

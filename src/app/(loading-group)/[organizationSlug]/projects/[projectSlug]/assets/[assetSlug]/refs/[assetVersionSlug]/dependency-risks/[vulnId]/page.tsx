@@ -61,7 +61,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";

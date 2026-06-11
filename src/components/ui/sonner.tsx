@@ -23,6 +23,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
       }}
+      id="devguard"
       position="top-center"
       {...props}
       duration={6000}

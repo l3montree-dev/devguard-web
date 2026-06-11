@@ -1,5 +1,5 @@
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useState } from "react";
 import { Switch } from "../ui/switch";
 import { useActiveOrg } from "../../hooks/useActiveOrg";

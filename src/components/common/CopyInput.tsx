@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Input } from "../ui/input";
 import { Copy } from "lucide-react";
 

@@ -23,7 +23,7 @@ import { Form } from "./ui/form";
 import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
 
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useUpdateSession } from "@/context/SessionContext";
 

@@ -1,6 +1,6 @@
 import { CopyIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 const InlineCopy: FunctionComponent<{ content: string }> = ({ content }) => {
   const handleCopy = () => {

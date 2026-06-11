@@ -22,7 +22,7 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";

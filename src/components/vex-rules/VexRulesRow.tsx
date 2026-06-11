@@ -15,7 +15,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 
 interface VexRulesRowProps {

@@ -6,7 +6,7 @@ import type { Policy } from "@/types/api/api";
 
 import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import ListRenderer from "../../../../../../components/common/ListRenderer";

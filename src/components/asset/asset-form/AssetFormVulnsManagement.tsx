@@ -37,7 +37,7 @@ import { cn } from "@/lib/utils";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { validateArtifactNameAgainstPurlSpec } from "../../../utils/common";
 import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
 

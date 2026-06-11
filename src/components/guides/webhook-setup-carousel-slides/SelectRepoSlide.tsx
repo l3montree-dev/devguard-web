@@ -9,7 +9,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 

@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import type { ExternalReference } from "@/types/api/api";

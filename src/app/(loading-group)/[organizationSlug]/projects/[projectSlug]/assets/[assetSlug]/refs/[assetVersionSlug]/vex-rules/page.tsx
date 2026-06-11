@@ -34,7 +34,7 @@ import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { useArtifacts } from "@/context/AssetVersionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import Callout from "@/components/common/Callout";
 import useSWR from "swr";

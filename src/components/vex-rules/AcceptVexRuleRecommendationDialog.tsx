@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Badge } from "@/components/ui/badge";
 import Section from "@/components/common/Section";
 import DependencyGraph from "../DependencyGraph";

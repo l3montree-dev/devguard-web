@@ -12,7 +12,7 @@ import {
 import { browserApiClient } from "@/services/devGuardApi";
 import type { InviteRequest } from "@/types/api/api";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Callout from "./common/Callout";
 import { Button } from "./ui/button";
 import { Form, FormItem, FormLabel } from "./ui/form";
