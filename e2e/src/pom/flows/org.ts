@@ -4,17 +4,6 @@ import { DevGuardNavigationLevel } from "../devguard";
 export class OrgFlow {
   constructor(private page: Page) {}
 
-  async dismissWelcomeModalIfPresent() {
-    const exploreButton = this.page.getByTestId("explore-button");
-    try {
-      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
-      await exploreButton.click();
-      await this.page.locator(".DialogOverlay").waitFor({ state: "hidden", timeout: 10_000 });
-    } catch {
-      // welcome modal not shown, continuing
-    }
-  }
-
   async createOrganization(name: string) {
     await this.page.getByTestId("org-name-label").click();
     await this.page
@@ -26,7 +15,16 @@ export class OrgFlow {
     await this.page
       .getByRole("button", { name: "Create Organization" })
       .click();
-    await this.dismissWelcomeModalIfPresent();
+    const exploreButton = this.page.getByTestId("explore-button");
+    try {
+      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
+      await exploreButton.click();
+      await this.page
+        .locator(".DialogOverlay")
+        .waitFor({ state: "hidden", timeout: 10_000 });
+    } catch {
+      // welcome modal not shown, continuing
+    }
   }
 
   async inviteUserOrg(mail: string) {

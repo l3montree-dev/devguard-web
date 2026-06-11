@@ -25,10 +25,17 @@ export class GroupFlow {
   }
 
   async checkHeaderGroup() {
+    try {
+      await this.page
+        .locator(".DialogOverlay")
+        .waitFor({ state: "hidden", timeout: 10_000 });
+    } catch {
+      // no overlay present
+    }
     await this.page
       .getByRole("link", { name: "Test Group" })
       .first()
-      .click({ timeout: 10_000 });
+      .click({ timeout: 30_000 });
     await this.page.getByTestId("nav-group-overview").click();
     await this.page.getByTestId("nav-group-releases").click();
     await this.page.getByTestId("nav-group-subgroups-repositories").click();

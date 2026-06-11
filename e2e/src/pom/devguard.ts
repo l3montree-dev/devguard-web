@@ -89,6 +89,19 @@ export class DevGuardPOM {
     await this.page.getByTestId("dark-mode").click();
   }
 
+  async dismissWelcomeModalIfPresent() {
+    const exploreButton = this.page.getByTestId("explore-button");
+    try {
+      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
+      await exploreButton.click();
+      await this.page
+        .locator(".DialogOverlay")
+        .waitFor({ state: "hidden", timeout: 10_000 });
+    } catch {
+      // welcome modal not shown, continuing
+    }
+  }
+
   async loadAndRegister() {
     await this.loadDevGuard();
     await this.registerNewUser();
