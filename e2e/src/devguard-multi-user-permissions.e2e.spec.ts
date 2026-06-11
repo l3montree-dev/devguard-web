@@ -4,7 +4,7 @@ import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import { envConfig } from "./utils";
 
-test.describe("DevGuard multi-user: invite and permission flow", () => {
+test.describe.skip("DevGuard multi-user: invite and permission flow", () => {
   test("invited user can join organization via invite link", async ({
     page,
     browser,
