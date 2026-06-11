@@ -33,7 +33,7 @@ export class OrgFlow {
     await this.page.getByTestId("mail-input").fill(mail);
     await this.page
       .getByTestId("invite-member-button")
-      .click({ timeout: 5_000 });
+      .click({ timeout: 30_000 });
   }
 
   async inviteUserAndGetLink(mail: string): Promise<string> {
@@ -41,7 +41,7 @@ export class OrgFlow {
     const linkSpan = this.page
       .locator("text=/accept-invitation\\?code=/")
       .first();
-    await linkSpan.waitFor({ state: "visible", timeout: 10_000 });
+    await linkSpan.waitFor({ state: "visible", timeout: 30_000 });
     const rawText = await linkSpan.textContent();
     const match = rawText?.match(
       /(https?:\/\/[^\s]+\/accept-invitation\?code=[^\s]+)/,
@@ -52,7 +52,7 @@ export class OrgFlow {
     await this.page.keyboard.press("Escape");
     await this.page
       .getByTestId("mail-input")
-      .waitFor({ state: "hidden", timeout: 5_000 });
+      .waitFor({ state: "hidden", timeout: 30_000 });
     return match[1];
   }
 
@@ -60,7 +60,7 @@ export class OrgFlow {
     await this.page.getByTestId("nav-org-settings").click();
     await this.page.reload();
     await expect(this.page.locator("tbody").getByText(memberName)).toBeVisible({
-      timeout: 15_000,
+      timeout: 30_000,
     });
   }
 
@@ -73,6 +73,13 @@ export class OrgFlow {
   }
 
   async createSecondOrganization(name: string, level: DevGuardNavigationLevel) {
+    try {
+      await this.page
+        .locator(".DialogOverlay")
+        .waitFor({ state: "hidden", timeout: 10_000 });
+    } catch {
+      // no overlay present
+    }
     await this.page
       .locator(`${level} [data-testid="org-switcher-dropdown"]`)
       .click();

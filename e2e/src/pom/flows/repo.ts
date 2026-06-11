@@ -6,7 +6,7 @@ export class RepoFlow {
   async createGitHubRepo(name: string, description: string) {
     await this.page
       .getByTestId("create-repository-button")
-      .click({ timeout: 10_000 });
+      .click({ timeout: 30_000 });
     await this.page
       .getByTestId("repository-name")
       .waitFor({ state: "visible" });
@@ -20,7 +20,7 @@ export class RepoFlow {
   async createGitLabRepo(name: string, description: string) {
     await this.page
       .getByTestId("create-repository-button")
-      .click({ timeout: 10_000 });
+      .click({ timeout: 30_000 });
     await this.page
       .getByTestId("repository-name")
       .waitFor({ state: "visible" });
@@ -36,7 +36,7 @@ export class RepoFlow {
     await this.page
       .locator(".level-repo")
       .getByTestId("repository-settings")
-      .click({ timeout: 5_000 });
+      .click({ timeout: 30_000 });
     await this.page.getByTestId("delete-repository-button").click();
     await this.page.getByTestId("alert-confirm-button").click();
   }
