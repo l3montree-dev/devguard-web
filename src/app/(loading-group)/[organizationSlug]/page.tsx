@@ -114,6 +114,7 @@ const OrganizationHomePage: FunctionComponent = () => {
     mutate,
   } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
     const data = await fetcher<Paged<ProjectDTO>>(url);
+    console.log("Fetched projects:", data);
     // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
     return {
       ...data,
