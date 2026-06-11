@@ -59,6 +59,9 @@ jobs:
           DEVGUARD_DOMAIN=http://localhost:3000
           DEVGUARD_EMAIL_LOGIN_USERNAME=test-user-XXX
           DEVGUARD_EMAIL_LOGIN_PASSWORD=Test1234!secure
+          OPEN_CODE_USERNAME=placeholder
+          OPEN_CODE_PASSWORD=placeholder
+          OPEN_CODE_TOTP_SECRET=placeholder
           EOF
 
       - name: Run E2E tests
