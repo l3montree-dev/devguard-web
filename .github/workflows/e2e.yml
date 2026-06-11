@@ -70,10 +70,21 @@ jobs:
             --network host \
             -v ${{ github.workspace }}:/work \
             -w /work \
+            -u $(id -u):$(id -g) \
             -e CI=true \
-            -e HOME=/root \
+            -e HOME=/tmp \
             mcr.microsoft.com/playwright:v1.56.1-noble \
             bash e2e/run-devguard-tests.sh
+
+      - name: Debug report paths
+        if: always()
+        run: |
+          echo "=== e2e/ contents ==="
+          ls -la ${{ github.workspace }}/e2e/ || echo "e2e/ not found"
+          echo "=== playwright-report/ ==="
+          ls -la ${{ github.workspace }}/e2e/playwright-report/ || echo "playwright-report/ not found"
+          echo "=== test-results/ ==="
+          ls -la ${{ github.workspace }}/e2e/test-results/ || echo "test-results/ not found"
 
       - name: Upload Playwright report
         if: always()

@@ -3,6 +3,19 @@ import type { Page } from "@playwright/test";
 export class GroupFlow {
   constructor(private page: Page) {}
 
+  private async dismissAnyOverlay() {
+    const exploreButton = this.page.getByTestId("explore-button");
+    try {
+      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
+      await exploreButton.click();
+      await this.page
+        .locator(".DialogOverlay")
+        .waitFor({ state: "hidden", timeout: 10_000 });
+    } catch {
+      // no modal present
+    }
+  }
+
   async createGroup(name: string, description: string) {
     await this.page
       .getByTestId("create-group-button")
@@ -25,13 +38,7 @@ export class GroupFlow {
   }
 
   async checkHeaderGroup() {
-    try {
-      await this.page
-        .locator(".DialogOverlay")
-        .waitFor({ state: "hidden", timeout: 10_000 });
-    } catch {
-      // no overlay present
-    }
+    await this.dismissAnyOverlay();
     await this.page
       .getByRole("link", { name: "Test Group" })
       .first()
