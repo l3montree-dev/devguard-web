@@ -81,6 +81,6 @@ jobs:
         with:
           name: playwright-report
           path: |
-            e2e/playwright-report/
-            e2e/test-results/
+            ${{ github.workspace }}/e2e/playwright-report/
+            ${{ github.workspace }}/e2e/test-results/
           retention-days: 14
