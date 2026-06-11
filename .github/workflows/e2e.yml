@@ -72,7 +72,7 @@ jobs:
             -w /work \
             -e CI=true \
             -e HOME=/root \
-            mcr.microsoft.com/playwright:v1.50.0-noble \
+            mcr.microsoft.com/playwright:v1.56.1-noble \
             bash e2e/run-devguard-tests.sh
 
       - name: Upload Playwright report
