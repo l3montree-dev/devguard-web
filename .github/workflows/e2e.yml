@@ -1,0 +1,78 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Start backend services
+        working-directory: .github/e2e
+        run: docker compose up -d
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create frontend .env.local
+        run: |
+          cat > .env.local << 'EOF'
+          ORY_SDK_URL=http://localhost:4433
+          ORY_SDK_PUBLIC_URL=http://localhost:3000
+          DEVGUARD_API_URL=http://localhost:8080
+          DEVGUARD_API_URL_PUBLIC_INTERNET=http://localhost:8080
+          FRONTEND_URL=http://localhost:3000
+          REGISTRATION_ENABLED=true
+          EOF
+
+      - name: Start frontend dev server
+        run: NEXT_TELEMETRY_DISABLED=1 npm run dev &
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Wait for backend to be ready
+        run: |
+          echo "Waiting for devguard-api..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/api/v1/health/ > /dev/null 2>&1; do sleep 3; done'
+          echo "Backend ready."
+
+      - name: Wait for frontend to be ready
+        run: |
+          echo "Waiting for frontend dev server..."
+          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 3; done'
+          echo "Frontend ready."
+
+      - name: Create e2e .env
+        run: |
+          cat > e2e/.env << 'EOF'
+          DEVGUARD_DOMAIN=http://localhost:3000
+          DEVGUARD_EMAIL_LOGIN_USERNAME=test-user-XXX
+          DEVGUARD_EMAIL_LOGIN_PASSWORD=Test1234!secure
+          EOF
+
+      - name: Run E2E tests
+        run: bash e2e/run-devguard-tests.sh
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 14
