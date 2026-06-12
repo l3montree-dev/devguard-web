@@ -15,7 +15,7 @@ export class ArtifactFlow {
   }
 
   async deleteFirstArtifact() {
-    await this.page.getByTestId("artifact-options-button").click();
+    await this.page.getByTestId("artifact-options-button").first().click();
     await this.page.getByTestId("delete-artifact-menu-item").click();
     await this.page.getByTestId("confirm-artifact-deletion").click();
   }
