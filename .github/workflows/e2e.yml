@@ -84,9 +84,6 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit == 'true'
         run: docker load -i /tmp/playwright-image.tar
 
-      - name: Prepare report directories
-        run: mkdir -p ${{ github.workspace }}/e2e/playwright-report ${{ github.workspace }}/e2e/test-results
-
       - name: Run E2E tests
         run: |
           docker run --rm \
@@ -98,23 +95,3 @@ jobs:
             -e HOME=/tmp \
             mcr.microsoft.com/playwright:v1.56.1-noble \
             bash e2e/run-devguard-tests.sh
-
-      - name: Debug report paths
-        if: always()
-        run: |
-          echo "=== e2e/ contents ==="
-          ls -la ${{ github.workspace }}/e2e/ || echo "e2e/ not found"
-          echo "=== playwright-report/ ==="
-          ls -la ${{ github.workspace }}/e2e/playwright-report/ || echo "playwright-report/ not found"
-          echo "=== test-results/ ==="
-          ls -la ${{ github.workspace }}/e2e/test-results/ || echo "test-results/ not found"
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: playwright-report
-          path: |
-            ${{ github.workspace }}/e2e/playwright-report/
-            ${{ github.workspace }}/e2e/test-results/
-          retention-days: 14
