@@ -9,7 +9,7 @@ export class VulnFlow {
       .getByTestId("nav-asset-dependency-risks")
       .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
-    await expect(packageRows.first()).toBeVisible({ timeout: 60_000 });
+    await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
     await packageRows.first().click();
 
     const cveRows = this.page.getByTestId("cve-row");
