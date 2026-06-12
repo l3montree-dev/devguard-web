@@ -7,6 +7,7 @@ interface DelayedDownloadButtonProps {
   icon: React.ReactNode;
   label: string;
   className?: string;
+  "data-testid"?: string;
 }
 
 export function DelayedDownloadButton({
@@ -14,6 +15,7 @@ export function DelayedDownloadButton({
   icon,
   label,
   className = "",
+  "data-testid": dataTestId,
 }: DelayedDownloadButtonProps) {
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +30,6 @@ export function DelayedDownloadButton({
       const filename = parts[parts.length - 1].split("?")[0];
 
       link.download = filename;
-      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -42,6 +43,7 @@ export function DelayedDownloadButton({
       variant="secondary"
       disabled={loading}
       className={className}
+      data-testid={dataTestId}
     >
       {loading ? (
         <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />

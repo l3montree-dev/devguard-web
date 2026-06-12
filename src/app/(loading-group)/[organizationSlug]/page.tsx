@@ -306,6 +306,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 <ProjectForm forceVerticalSections form={form} hideDangerZone />
                 <DialogFooter>
                   <Button
+                    data-testid="create-group-submit-button"
                     type="submit"
                     isSubmitting={form.formState.isSubmitting}
                   >
@@ -345,6 +346,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               !activeOrg.externalEntityProviderId && (
                 <AuthGuard require="admin">
                   <Button
+                    data-testid="create-group-button"
                     data-tour="create-group-button"
                     onClick={() => setOpen(true)}
                   >

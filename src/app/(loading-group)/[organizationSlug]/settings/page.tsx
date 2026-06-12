@@ -526,7 +526,12 @@ const Home = () => {
           onOpenChange={setMemberDialogOpen}
         />
         <div className="flex flex-row justify-end">
-          <Button onClick={() => setMemberDialogOpen(true)}>Add Member</Button>
+          <Button
+            data-testid="add-member-button"
+            onClick={() => setMemberDialogOpen(true)}
+          >
+            Add Member
+          </Button>
         </div>
       </Section>
       <hr />

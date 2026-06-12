@@ -37,6 +37,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
       <PasswordField
         field={register(name, { value })}
         label="password"
+        data-testid={name}
         placeholder={node.meta.label?.text}
         maxLength={maxlength}
         autoComplete={autocomplete}
@@ -53,6 +54,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
         id="confirm-password"
         field={register("confirmPassword")}
         label="confirm password"
+        data-testid="confirmPassword"
         placeholder={CONFIRM_PASSWORD_LABEL}
         autoComplete="new-password"
         required={rest.required}

@@ -1039,6 +1039,7 @@ const Index: FunctionComponent = () => {
                                         </Button>
                                       )}
                                       <Button
+                                        data-testid="mark-false-positive"
                                         onClick={() =>
                                           setFalsePositiveDialogOpen(true)
                                         }
@@ -1047,6 +1048,7 @@ const Index: FunctionComponent = () => {
                                         Mark as False Positive
                                       </Button>
                                       <Button
+                                        data-testid="mark-accepted-risk"
                                         onClick={() =>
                                           setAcceptRiskDialogOpen(true)
                                         }
@@ -1055,6 +1057,7 @@ const Index: FunctionComponent = () => {
                                         Accept risk
                                       </Button>
                                       <Button
+                                        data-testid="add-comment"
                                         onClick={() =>
                                           setCommentDialogOpen(true)
                                         }

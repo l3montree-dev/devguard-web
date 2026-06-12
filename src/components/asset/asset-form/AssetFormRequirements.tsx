@@ -52,7 +52,8 @@ const RequirementSlider: FunctionComponent<{
   description: string;
   value: string;
   onChange: (value: string) => void;
-}> = ({ label, description, value, onChange }) => {
+  testId: string;
+}> = ({ label, description, value, onChange, testId }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -70,9 +71,17 @@ const RequirementSlider: FunctionComponent<{
         showBadge={false}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>Low</span>
-        <span>Medium</span>
-        <span>High</span>
+        {requirementLevels.map((level) => (
+          <button
+            key={level}
+            type="button"
+            data-testid={`${testId}-${level}`}
+            className="capitalize hover:text-foreground transition-colors"
+            onClick={() => onChange(level)}
+          >
+            {level.charAt(0).toUpperCase() + level.slice(1)}
+          </button>
+        ))}
       </div>
       <p className="text-sm text-muted-foreground">{description}</p>
     </div>
@@ -128,7 +137,11 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
       Button={
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              data-testid="configure-security-requirements-button"
+            >
               <Settings2 className="mr-2 h-4 w-4" />
               Configure
             </Button>
@@ -152,6 +165,7 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                       description="How crucial is it to protect sensitive information from unauthorized access?"
                       value={field.value}
                       onChange={field.onChange}
+                      testId="confidentiality-requirement"
                     />
                     <FormMessage />
                   </FormItem>
@@ -168,6 +182,7 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                       description="How crucial is it to maintain the accuracy and reliability of your information?"
                       value={field.value}
                       onChange={field.onChange}
+                      testId="integrity-requirement"
                     />
                     <FormMessage />
                   </FormItem>
@@ -184,6 +199,7 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                       description="How important is it for your systems to remain accessible and operational?"
                       value={field.value}
                       onChange={field.onChange}
+                      testId="availability-requirement"
                     />
                     <FormMessage />
                   </FormItem>
@@ -219,7 +235,10 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
               </Button>
-              <AsyncButton onClick={handleSaveRequirements}>
+              <AsyncButton
+                onClick={handleSaveRequirements}
+                data-testid="save-security-requirements-button"
+              >
                 Save Changes
               </AsyncButton>
             </DialogFooter>

@@ -60,6 +60,7 @@ export function OryAuthMethodListItem({
       variant={meta?.recommended ? "default" : "secondary"}
       className="h-auto w-full justify-start gap-3 p-3 text-left"
       onClick={onClick}
+      data-testid={`auth-method-${group}`}
     >
       <Icon className="w-5 h-5 shrink-0" />
       <span className="flex flex-col">

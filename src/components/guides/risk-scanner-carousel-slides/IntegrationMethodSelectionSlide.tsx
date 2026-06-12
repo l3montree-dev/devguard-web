@@ -80,7 +80,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
             )}
             onClick={() => setVariant("manual")}
           >
-            <CardHeader>
+            <CardHeader data-testid="manual-upload-card">
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually
@@ -98,13 +98,13 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
         <div className="mt-10 flex flex-row gap-2 justify-end">
           <Button
             variant="secondary"
-            id="integration-method-selection-back"
+            data-testid="integration-method-selection-back"
             onClick={() => api?.scrollTo(prevIndex)}
           >
             Back
           </Button>
           <Button
-            id="integration-method-selection-continue"
+            data-testid="integration-method-selection-continue"
             onClick={() =>
               api?.scrollTo(
                 variant === "auto" ? cliSlideIndex : fileUploadSlideIndex,

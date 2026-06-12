@@ -141,7 +141,10 @@ const OrganizationDropDown = () => {
           </div>
         )}
         <DropdownMenu>
-          <DropdownMenuTrigger className="rounded-lg focus:ring py-2 px-1 text-header-foreground transition-all hover:bg-white/10">
+          <DropdownMenuTrigger
+            data-testid="org-switcher-dropdown"
+            className="cursor-pointer rounded-lg focus:ring py-2 px-1 text-header-foreground transition-all hover:bg-white/10"
+          >
             <ChevronUpDownIcon className="block h-7 w-7 p-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-48">
@@ -163,6 +166,7 @@ const OrganizationDropDown = () => {
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .map((o) => (
                       <DropdownMenuItem
+                        className="cursor-pointer"
                         key={o.id}
                         onClick={handleActiveOrgChange(o.slug)}
                       >
@@ -182,7 +186,11 @@ const OrganizationDropDown = () => {
             {!instanceSettings?.singleOrganizationMode && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleNavigateToSetupOrg}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  data-testid="create-new-organization-button"
+                  onClick={handleNavigateToSetupOrg}
+                >
                   <div className="mr-2 flex items-center justify-center rounded-md border bg-background p-1">
                     <PlusIcon className="h-4 w-4 text-muted-foreground" />
                   </div>

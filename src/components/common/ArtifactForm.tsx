@@ -47,6 +47,7 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
             <FormLabel>Artifact Name</FormLabel>
             <FormControl>
               <Input
+                data-testid="artifact-name-input"
                 placeholder="Enter artifact name"
                 disabled={isEditMode}
                 {...field}
@@ -90,6 +91,7 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
         <div className="flex items-center justify-between">
           <FormLabel>SBOM Sources/ Origins</FormLabel>
           <Button
+            data-testid="sbom-url-upload-button"
             type="button"
             variant="outline"
             size="sm"
@@ -130,6 +132,7 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
                       <FormItem>
                         <FormControl>
                           <Input
+                            data-testid="upstream-url-field"
                             placeholder="Enter upstream URL (e.g., https://example.com/sbom.json)"
                             {...field}
                           />

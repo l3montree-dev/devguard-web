@@ -216,6 +216,7 @@ const FalsePositiveDialog: FunctionComponent<FalsePositiveDialogProps> = ({
             <div className="flex flex-row items-center justify-end">
               <div className="flex flex-row items-center">
                 <AsyncButton
+                  data-testid="confirm-false-positive"
                   onClick={handleSubmit}
                   variant={"default"}
                   className="mr-0 rounded-r-none pr-0 capitalize"
