@@ -1,6 +1,6 @@
 services:
   postgresql:
-    image: ghcr.io/l3montree-dev/devguard/postgresql:v1.3.0
+    image: ghcr.io/l3montree-dev/devguard/postgresql:v1.4.2
     shm_size: 1g
     environment:
       POSTGRES_USER: postgres
@@ -49,7 +49,7 @@ services:
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
 
   devguard-migrate:
-    image: ghcr.io/l3montree-dev/devguard:v1.4.2
+    image: ghcr.io/l3montree-dev/devguard:main
     tmpfs:
       - /tmp:size=1G
     depends_on:
@@ -64,8 +64,30 @@ services:
       - FRONTEND_URL=http://localhost:3000
     command: ["devguard-cli", "migrate"]
 
+  devguard-vulndb-import:
+    image: ghcr.io/l3montree-dev/devguard:main
+    tmpfs:
+      - /tmp:size=4G
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      devguard-migrate:
+        condition: service_completed_successfully
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=change-me-definitely-when-not-testing
+      - POSTGRES_DB=devguard
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_PORT=5432
+      - FRONTEND_URL=http://localhost:3000
+    command: ["devguard-cli", "vulndb", "import"]
+  
   devguard-api:
-    image: ghcr.io/l3montree-dev/devguard:v1.4.2
+    image: ghcr.io/l3montree-dev/devguard:main
+    volumes:
+      - type: bind
+        source: ./test-secret.pem
+        target: /test-secret.pem
     tmpfs:
       - /tmp:size=1G
     depends_on:
@@ -74,6 +96,8 @@ services:
       kratos:
         condition: service_started
       devguard-migrate:
+        condition: service_completed_successfully
+      devguard-vulndb-import:
         condition: service_completed_successfully
     ports:
       - "8080:8080"
@@ -89,6 +113,7 @@ services:
       - FRONTEND_URL=http://localhost:3000
       - ENVIRONMENT=dev
       - CSAF_PASSPHRASE=ci-test-passphrase
+      - APP_SIDE_ENCRYPTION_KEY_PATH=/test-secret.pem
 
 volumes:
   postgres:

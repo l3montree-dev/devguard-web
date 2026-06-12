@@ -47,3 +47,5 @@ result
 # playwright
 playwright-report/
 test-results/
+
+!test-secret.pem
