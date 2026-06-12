@@ -84,6 +84,9 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit == 'true'
         run: docker load -i /tmp/playwright-image.tar
 
+      - name: Prepare report directories
+        run: mkdir -p ${{ github.workspace }}/e2e/playwright-report ${{ github.workspace }}/e2e/test-results
+
       - name: Run E2E tests
         run: |
           docker run --rm \
