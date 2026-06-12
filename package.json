@@ -19,9 +19,10 @@
         "@codemirror/state": "^6.6.0",
         "@dagrejs/dagre": "^3.0.0",
         "@heroicons/react": "^2.2.0",
+        "@ltonetwork/http-message-signatures": "^0.1.12",
         "@iarna/toml": "^2.2.5",
         "@mdxeditor/editor": "^3.53.1",
-        "@ory/client-fetch": "^1.22.33",
+        "@ory/client-fetch": "^1.22.37",
         "@ory/elements-react": "^1.1.0",
         "@ory/nextjs": "^1.0.0-rc.1",
         "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -75,7 +76,7 @@
         "react": "19.2.6",
         "react-dom": "19.2.6",
         "react-dropzone": "^15.0.0",
-        "react-hook-form": "^7.56.4",
+        "react-hook-form": "7.56.4",
         "react-markdown": "^10.1.0",
         "react-syntax-highlighter": "^16.1.1",
         "recharts": "^2.15.4",
@@ -92,11 +93,14 @@
         "vaul": "1.1.2",
         "zod": "^4.3.6"
     },
+    "overrides": {
+        "react-hook-form": "7.56.4"
+    },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.5",
         "@eslint/js": "^9.39.4",
         "@playwright/test": "^1.56.1",
-        "@tailwindcss/postcss": "^4.2.2",
+        "@tailwindcss/postcss": "^4.2.4",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^6.9.1",
         "@testing-library/react": "^16.3.2",
@@ -113,10 +117,10 @@
         "globals": "^17.4.0",
         "jest": "^30.3.0",
         "jest-environment-jsdom": "^30.3.0",
-        "otpauth": "^9.5.0",
+        "otpauth": "^9.5.1",
         "patch-package": "^8.0.1",
-        "postcss": "^8.5.8",
-        "prettier": "^3.8.1",
-        "tailwindcss": "^4.2.2"
+        "postcss": "^8.5.12",
+        "prettier": "^3.8.3",
+        "tailwindcss": "^4.2.4"
     }
 }
