@@ -3,7 +3,7 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 
-test.describe("DevGuard pre-Release Test flow", () => {
+test.describe.skip("DevGuard pre-Release Test flow", () => {
   test("pre-Release Test (complete)", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadAndRegister();

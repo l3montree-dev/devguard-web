@@ -8,11 +8,7 @@ cd "$SCRIPT_DIR"
 
 echo "Running DevGuard E2E tests..."
 
-for spec in src/devguard-*.e2e.spec.ts; do
-  echo ""
-  echo ">>> $spec"
-  npx playwright test --trace on "$spec"
-done
+npx playwright test src/devguard-*.e2e.spec.ts
 
 echo ""
 echo "All DevGuard E2E tests finished."

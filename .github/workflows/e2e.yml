@@ -38,8 +38,11 @@ jobs:
           REGISTRATION_ENABLED=true
           EOF
 
-      - name: Start frontend dev server
-        run: NEXT_TELEMETRY_DISABLED=1 npm run dev &
+      - name: Build frontend
+        run: NEXT_TELEMETRY_DISABLED=1 npm run build
+
+      - name: Start frontend
+        run: NEXT_TELEMETRY_DISABLED=1 npm run start &
 
       - name: Wait for backend to be ready
         run: |
@@ -63,6 +66,23 @@ jobs:
           OPEN_CODE_PASSWORD=placeholder
           OPEN_CODE_TOTP_SECRET=placeholder
           EOF
+
+      - name: Cache Playwright Docker image
+        id: cache-playwright
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: /tmp/playwright-image.tar
+          key: playwright-docker-v1.56.1-noble
+
+      - name: Pull Playwright Docker image
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: |
+          docker pull mcr.microsoft.com/playwright:v1.56.1-noble
+          docker save mcr.microsoft.com/playwright:v1.56.1-noble -o /tmp/playwright-image.tar
+
+      - name: Load Playwright Docker image from cache
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/playwright-image.tar
 
       - name: Run E2E tests
         run: |
