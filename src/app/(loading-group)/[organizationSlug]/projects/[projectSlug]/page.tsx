@@ -7,7 +7,7 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "@/lib/toast";
@@ -54,6 +54,7 @@ import SubgroupsAndAssetsList, {
 } from "@/components/SubgroupsAndAssetsList";
 import { usePageTour } from "@/hooks/usePageTour";
 import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -138,13 +139,18 @@ export default function RepositoriesPage() {
     [currentUserRole],
   );
   const { startTour } = usePageTour(tourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("group-home");
+  const tourStarted = useRef(false);
 
   useEffect(() => {
-    if (searchParams?.get("startTour") === "2") {
+    if (tourStarted.current) return;
+    if (searchParams?.get("startTour") === "2" || shouldStartTour) {
+      tourStarted.current = true;
+      markSeen();
       startTour();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [shouldStartTour]);
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {

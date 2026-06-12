@@ -42,6 +42,7 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { usePageTour } from "@/hooks/usePageTour";
 import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -313,7 +314,16 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
-  usePageTour(repoSettingsTourSteps);
+  const { startTour } = usePageTour(repoSettingsTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("repo-settings");
+
+  useEffect(() => {
+    if (shouldStartTour) {
+      markSeen();
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldStartTour]);
 
   return (
     <Page

@@ -15,8 +15,9 @@ import { usePageTour } from "@/hooks/usePageTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
 import Link from "next/link";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, useEffect } from "react";
 import useSWR from "swr";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 const STATS_PARAMS = new URLSearchParams({
   orgComponentsLimit: "5",
@@ -32,6 +33,15 @@ const OrganizationOverview: FunctionComponent = () => {
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
   const { startTour } = usePageTour(orgOverviewTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("org-overview");
+
+  useEffect(() => {
+    if (shouldStartTour) {
+      markSeen();
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldStartTour]);
 
   const {
     data: orgStatistics,

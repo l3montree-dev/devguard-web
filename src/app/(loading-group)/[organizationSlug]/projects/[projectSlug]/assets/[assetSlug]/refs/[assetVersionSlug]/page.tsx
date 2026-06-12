@@ -12,9 +12,10 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import { usePageTour } from "@/hooks/usePageTour";
 import { repoHomeTourSteps } from "@/components/common/tours/repo-home-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -141,12 +142,18 @@ const Index: FunctionComponent = () => {
   const artifactName = searchParams?.get("artifact") ?? "";
 
   const { startTour } = usePageTour(repoHomeTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("repo-home");
+  const tourStarted = useRef(false);
+
   useEffect(() => {
-    if (searchParams?.get("startTour") === "3") {
+    if (tourStarted.current) return;
+    if (searchParams?.get("startTour") === "3" || shouldStartTour) {
+      tourStarted.current = true;
+      markSeen();
       startTour();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [shouldStartTour]);
 
   const pathname = usePathname();
 

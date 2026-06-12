@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Page from "../../../../components/Page";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
@@ -61,6 +61,7 @@ import {
 import Alert from "../../../../components/common/Alert";
 import { usePageTour } from "@/hooks/usePageTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -279,6 +280,15 @@ const Home = () => {
   };
 
   const { startTour } = usePageTour(orgSettingsTourSteps);
+  const { showModal: shouldStartTour, markSeen } = useTourSeen("org-settings");
+
+  useEffect(() => {
+    if (shouldStartTour) {
+      markSeen();
+      startTour();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldStartTour]);
 
   const config = useConfig();
 

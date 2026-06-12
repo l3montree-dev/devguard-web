@@ -55,6 +55,7 @@ interface RiskScannerDialogProps {
   assetVersion?: AssetVersionDTO;
   artifacts?: Array<ArtifactDTO>;
   devguardWebLatestScannerImage: string;
+  initialSlide?: number;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -66,6 +67,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   assetVersion,
   artifacts,
   devguardWebLatestScannerImage,
+  initialSlide,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -459,6 +461,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     if (!asset.externalEntityId && !asset.repositoryProvider) {
       return 0; // start with the update repository provider slide
     }
+    if (initialSlide !== undefined) {
+      return initialSlide;
+    }
     if (asset.repositoryProvider === "github") {
       // we can skip setup method selection slide - and the whole autosetup slides
       return 6;
@@ -480,10 +485,16 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     return activeOrg.gitLabIntegrations.length > 0 ? 3 : 2;
   };
 
-  // save the slide history to make the back button implementation easier
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  const prevIndex = slideHistory[slideHistory.length - 2] || 0;
+  useEffect(() => {
+    if (open) {
+      setSlideHistory([getStartIndex()]);
+    }
+  }, [open, initialSlide]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const prevIndex =
+    slideHistory[slideHistory.length - 2] ?? slideHistory[0] ?? 0;
 
   const setProxyApi = useCallback((emblaApi: CarouselApi) => {
     return setApi({
