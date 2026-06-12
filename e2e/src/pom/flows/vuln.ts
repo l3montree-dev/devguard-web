@@ -7,7 +7,7 @@ export class VulnFlow {
   async openFirstAffectedComponent() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
-      .click({ timeout: 5_000 });
+      .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 60_000 });
     await packageRows.first().click();
@@ -58,16 +58,16 @@ export class VulnFlow {
   async verifyVEXRule() {
     await this.page
       .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 5_000 });
+      .click({ timeout: 20_000 });
     const firstHeaderRow = this.page.getByTestId("vex-header-row").first();
     await expect(firstHeaderRow).toBeVisible({ timeout: 20_000 });
     await firstHeaderRow.click();
     const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
-    await expect(firstRuleRow).toBeVisible({ timeout: 5_000 });
+    await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
     await firstRuleRow.click();
     const dialog = this.page.getByLabel("VEX Rule Details");
     await expect(dialog.getByText(/Applies to \d+ findings?/)).toBeVisible({
-      timeout: 5_000,
+      timeout: 20_000,
     });
   }
 

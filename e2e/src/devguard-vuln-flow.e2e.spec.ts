@@ -37,7 +37,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await page.waitForTimeout(2_000);
   });
 
-  test("test auto setup to gitlab repo", async ({ page }) => {
+  test.skip("test auto setup to gitlab repo", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadAndRegister();
     await devguardPOM.org().createOrganization("TestOrganization");

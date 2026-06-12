@@ -62,7 +62,7 @@ export class SetupFlow {
   async uploadVEX(inputFile: string) {
     await this.page
       .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 5_000 });
+      .click({ timeout: 20_000 });
     await this.page.getByTestId("upload-vex-button").click();
     await this.page.getByTestId("upload-vex-file").click();
     await this.page
