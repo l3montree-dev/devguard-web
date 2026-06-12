@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import type { PatWithPrivKey } from "../types/api/api";
+import { useState } from "react";
+import type { SeeOncePatWithPrivKey } from "../types/api/api";
+import { DatePicker } from "./DatePicker";
 import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
 import { Button } from "./ui/button";
@@ -10,9 +14,16 @@ const PatSection = ({
   onCreatePat,
 }: {
   description: string;
-  pat?: PatWithPrivKey;
-  onCreatePat: (data: { description: string; scopes: string }) => void;
+  pat?: SeeOncePatWithPrivKey;
+  onCreatePat: (data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: boolean;
+  }) => void;
 }) => {
+  const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
+
   return (
     <Section
       className="mb-0 mt-0 pb-0 pt-0"
@@ -41,14 +52,21 @@ const PatSection = ({
         </div>
       ) : (
         <div>
-          <div className="flex flex-wrap gap-2 justify-between">
+          <div className="flex flex-wrap gap-2 justify-between items-end">
+            <DatePicker
+              date={expiryDate}
+              onDateChange={setExpiryDate}
+              label="Expiry date"
+            />
             <Button
               variant="outline"
-              className=""
+              disabled={!expiryDate}
               onClick={() =>
+                expiryDate &&
                 onCreatePat({
                   description,
                   scopes: "scan",
+                  expiryDateUnix: Math.floor(expiryDate.getTime() / 1000),
                 })
               }
             >
