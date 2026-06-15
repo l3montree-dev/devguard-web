@@ -215,6 +215,8 @@ export default function RepositoriesPage() {
       const res: AssetDTO & {
         env: Array<EnvDTO>;
       } = await resp.json();
+      setShowModal(false);
+      form.reset();
       // navigate to the new application
       router.push(
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
