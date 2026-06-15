@@ -124,7 +124,6 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     avatarUrl?: string;
     role?: UserRole.Owner | UserRole.Admin | UserRole.Member;
   }>;
-  oauth2Error?: boolean;
 }
 
 export type PersonalAccessTokenDTO =

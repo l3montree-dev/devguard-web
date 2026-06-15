@@ -34,8 +34,9 @@ export async function fetchOrganization(organizationSlug: string) {
     if (!org.ok) {
       if (org.status === 402) {
         throw new HttpError("Payment Required", { statusCode: 402 });
+      } else if (org.status === 403) {
+        throw new HttpError("Forbidden", { statusCode: 403 });
       }
-      throw new HttpError();
     }
     // parse the organization
     const organization: OrganizationDetailsDTO = await org.json();
