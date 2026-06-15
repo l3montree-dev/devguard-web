@@ -61,7 +61,7 @@ function PublicUrlBox({
 
   return (
     <div
-      className={`flex h-10 w-full items-center justify-between rounded-md border dark:border-foreground/20 bg-background px-3 py-2 text-sm transition-opacity ${!sharesInformation ? "opacity-40" : ""}`}
+      className={`flex h-10 w-full items-center justify-between rounded-md border dark:border-foreground/10 bg-background px-3 py-2 text-sm transition-opacity ${!sharesInformation ? "opacity-40" : ""}`}
     >
       <span className="truncate text-foreground flex-1 min-w-0">{url}</span>
       {sharesInformation && url && (

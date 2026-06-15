@@ -82,6 +82,8 @@ export function EssentialProjectConfigContent({
                 onCreatePat({
                   scopes: "scan",
                   description: "DevGuard token with 'scan' scope",
+                  expiryDateUnix:
+                    Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
                 }),
               updateConfirmTitle: "Create new personal access token",
               updateConfirmDescription:

@@ -1,5 +1,5 @@
 // Copyright 2026 L3montree GmbH.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { useState } from "react";
 import type { FunctionComponent, PropsWithChildren } from "react";
@@ -15,12 +15,22 @@ import type { PersonalAccessTokenDTO } from "@/types/api/api";
 import { Button } from "./ui/button";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ConfirmTokenDeletion from "./common/ConfirmTokenDeletion";
-import { Badge } from "./ui/badge";
+import ListItem from "./common/ListItem";
+import { AlertTriangleIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   personalAccessTokens: PersonalAccessTokenDTO[];
   onDeletePat: (pat: PersonalAccessTokenDTO) => Promise<void>;
 }
+
+const getExpiryState = (expiryDateUnix: number | undefined) => {
+  if (!expiryDateUnix) return "none";
+  const now = Date.now() / 1000;
+  if (expiryDateUnix < now) return "expired";
+  if (expiryDateUnix - now < 7 * 24 * 60 * 60) return "soon";
+  return "ok";
+};
 
 const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
   personalAccessTokens,
@@ -29,10 +39,6 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
 }) => {
   const [open, setOpen] = useState(false);
 
-  const handleDelete = async (pat: PersonalAccessTokenDTO) => {
-    await onDeletePat(pat);
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -40,8 +46,7 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
         <DialogHeader>
           <DialogTitle>Manage Personal Access Tokens</DialogTitle>
           <DialogDescription>
-            View and manage your existing personal access tokens. You can revoke
-            tokens that are no longer needed.
+            View and revoke your existing personal access tokens.
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -51,63 +56,65 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {personalAccessTokens.map((pat) => (
-                <div
-                  key={pat.id}
-                  className="flex flex-col gap-2 rounded-lg border bg-card p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium truncate">
-                        {pat.description || "Unnamed Token"}
-                      </h4>
-                      <div className="my-2 flex flex-wrap gap-1 items-center">
-                        <span className="text-muted-foreground text-sm">
-                          Scopes:
-                        </span>
-                        {pat.scopes.split(" ").map((scope, index) => (
-                          <Badge key={`${scope}-${index}`} variant="secondary">
-                            {scope}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <ConfirmTokenDeletion
-                      Button={
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDelete(pat)}
-                        >
-                          Yes, Revoke
-                        </Button>
-                      }
-                    >
-                      <Button variant="destructiveOutline" size="sm">
-                        Revoke
-                      </Button>
-                    </ConfirmTokenDeletion>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      <span>
-                        Created:{" "}
+              {personalAccessTokens.map((pat) => {
+                const isAsymmetric = "fingerprint" in pat && !!pat.fingerprint;
+                const expiryState = getExpiryState(pat.expiryDateUnix);
+
+                return (
+                  <ListItem
+                    key={pat.id}
+                    Title={pat.description || "Unnamed Token"}
+                    Description={
+                      <span className="inline-flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+                        {isAsymmetric ? "Asymmetric" : "Symmetric (Bearer)"}
+                        {", scopes: "}
+                        {pat.scopes.split(" ").filter(Boolean).join(", ")}
+                        {", created "}
                         <DateString date={parseDateOnly(pat.createdAt)} />
+                        {", expires "}
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-0.5",
+                            expiryState === "expired" && "text-destructive",
+                            expiryState === "soon" &&
+                              "text-yellow-600 dark:text-yellow-400",
+                          )}
+                        >
+                          {(expiryState === "expired" ||
+                            expiryState === "soon") && (
+                            <AlertTriangleIcon className="h-3 w-3 shrink-0" />
+                          )}
+                          {pat.expiryDateUnix
+                            ? new Date(
+                                pat.expiryDateUnix * 1000,
+                              ).toLocaleDateString(undefined, {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "never"}
+                        </span>
                       </span>
-                      <span>
-                        Last used:{" "}
-                        {pat.lastUsedAt ? (
-                          <DateString date={parseDateOnly(pat.lastUsedAt)} />
-                        ) : (
-                          "Never"
-                        )}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-xs font-mono truncate">
-                      Fingerprint: {pat.fingerprint}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                    }
+                    Button={
+                      <ConfirmTokenDeletion
+                        Button={
+                          <Button
+                            variant="destructive"
+                            onClick={() => onDeletePat(pat)}
+                          >
+                            Yes, Revoke
+                          </Button>
+                        }
+                      >
+                        <Button variant="destructiveOutline" size="sm">
+                          Revoke
+                        </Button>
+                      </ConfirmTokenDeletion>
+                    }
+                  />
+                );
+              })}
             </div>
           )}
         </div>
