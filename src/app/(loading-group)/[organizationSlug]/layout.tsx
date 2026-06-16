@@ -35,27 +35,15 @@ async function OrganizationShell({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string }>;
 }) {
+  let org, contentTree;
   let organizationSlug = "";
   try {
     const { organizationSlug: slug } = await params;
     organizationSlug = slug;
-    const [org, contentTree] = await Promise.all([
+    [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
     ]);
-
-    return (
-      <ClientContextWrapper
-        Provider={OrganizationProvider}
-        value={{
-          organization: org,
-          contentTree,
-        }}
-      >
-        <OrgHeader />
-        {children}
-      </ClientContextWrapper>
-    );
   } catch (error) {
     if (error instanceof HttpError && error.statusCode === 402) {
       const billingUrl = new URL(config.billingUrl);
@@ -67,6 +55,18 @@ async function OrganizationShell({
     } else {
       console.error("An unexpected error occurred:", error);
     }
+    redirect("/");
   }
-  redirect("/");
+  return (
+    <ClientContextWrapper
+      Provider={OrganizationProvider}
+      value={{
+        organization: org,
+        contentTree,
+      }}
+    >
+      <OrgHeader />
+      {children}
+    </ClientContextWrapper>
+  );
 }
