@@ -304,7 +304,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     }}
                     className="cursor-pointer hover:border hover:border-primary border border-transparent"
                   >
-                    <CardHeader>
+                    <CardHeader data-testid="upload-vex-file">
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
                         <CloudUpload className="w-5 h-5" />
                         Upload a VEX File
@@ -393,6 +393,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     Back
                   </Button>
                   <Button
+                    data-testid="upload-vex-file-selected-button"
                     onClick={handleUploadClick}
                     disabled={isFileUploadDisabled}
                     isSubmitting={isUploading}

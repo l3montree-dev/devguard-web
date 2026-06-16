@@ -282,10 +282,12 @@ export default function RepositoriesPage() {
                     data-tour="create-subgroup-button"
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
+                    data-testid="create-subgroup-button"
                   >
                     Create New Subgroup
                   </Button>
                   <Button
+                    data-testid="create-repository-button"
                     data-tour="create-repository-button"
                     onClick={() => setShowModal(true)}
                   >
@@ -411,6 +413,7 @@ export default function RepositoriesPage() {
               />
               <DialogFooter>
                 <Button
+                  data-testid="create-repository-submit-button"
                   isSubmitting={form.formState.isSubmitting}
                   type="submit"
                   variant="default"

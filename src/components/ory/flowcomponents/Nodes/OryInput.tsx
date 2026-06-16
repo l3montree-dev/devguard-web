@@ -23,6 +23,7 @@ export function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
       <PasswordField
         field={field}
         label="password"
+        data-testid={name}
         placeholder={node.meta.label?.text}
         maxLength={maxlength}
         autoComplete={autocomplete}
@@ -48,6 +49,7 @@ export function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
       pattern={rest.pattern}
       placeholder={node.meta.label?.text}
       onClick={onClick}
+      data-testid={name}
       {...restRegister}
     />
   );

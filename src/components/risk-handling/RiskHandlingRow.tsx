@@ -207,6 +207,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     <>
       {/* Package header row - clickable to expand/collapse */}
       <tr
+        data-testid="package-row"
         className={classNames(
           "cursor-pointer hover:bg-muted/50 border-b",
           index % 2 !== 0 && "bg-card/50",
@@ -288,6 +289,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             <React.Fragment key={cveID}>
               {/* CVE subheader */}
               <tr
+                data-testid="cve-row"
                 className="bg-muted/30 border-b border-border hover:bg-muted/50 cursor-pointer"
                 onClick={(e) => {
                   // Don't act if clicking on checkbox or button

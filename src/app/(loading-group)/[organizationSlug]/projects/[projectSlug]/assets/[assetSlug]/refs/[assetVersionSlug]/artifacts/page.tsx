@@ -349,7 +349,12 @@ const Artifacts = () => {
           <div className="mb-4 flex items-center justify-between">
             <BranchTagSelector branches={branches} tags={tags} />
             <AuthGuard require="admin">
-              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+              <Button
+                data-testid="create-artifact-button"
+                onClick={openCreateDialog}
+              >
+                Create new Artifact
+              </Button>
             </AuthGuard>
           </div>
           <Section
@@ -480,7 +485,10 @@ const Artifacts = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleDelete()}>
+            <AlertDialogAction
+              data-testid="confirm-artifact-deletion"
+              onClick={() => handleDelete()}
+            >
               <span>Confirm</span>
             </AlertDialogAction>
           </AlertDialogFooter>

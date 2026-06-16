@@ -94,7 +94,10 @@ export default function UserNav() {
       </DropdownMenu>
       {!config.enforceTheme && (
         <DropdownMenu>
-          <DropdownMenuTrigger className="theme-chooser">
+          <DropdownMenuTrigger
+            data-testid="theme-chooser"
+            className="theme-chooser"
+          >
             <div className="flex w-10 flex-row justify-center">
               <SunIcon className="h-[1.2rem] cursor-pointer w-[1.2rem] rotate-0 scale-100 text-background transition-all dark:-rotate-90 dark:scale-0 text-header-foreground" />
               <MoonIcon className="absolute cursor-pointer h-[1.2rem] w-[1.2rem] rotate-90 scale-0 text-background transition-all dark:rotate-0 dark:scale-100 text-header-foreground" />
@@ -103,12 +106,14 @@ export default function UserNav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
+              data-testid="light-mode"
               className="cursor-pointer"
               onClick={() => setTheme("light")}
             >
               Light
             </DropdownMenuItem>
             <DropdownMenuItem
+              data-testid="dark-mode"
               className="cursor-pointer"
               onClick={() => setTheme("dark")}
             >
@@ -125,7 +130,7 @@ export default function UserNav() {
       )}
       {user ? (
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger data-testid="user-nav-dropdown-trigger">
             <Link
               id="user-nav-user"
               className={classNames(
@@ -158,8 +163,8 @@ export default function UserNav() {
             </Link>
             <button onClick={handleLogout} className="w-full">
               <DropdownMenuItem
-                id="user-nav-logout-button"
                 className="text-foreground hover:no-underline"
+                data-testid="user-nav-logout-button"
               >
                 <ArrowRightStartOnRectangleIcon className="mr-2 h-5 w-5 text-muted-foreground" />
                 Logout

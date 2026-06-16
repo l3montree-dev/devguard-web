@@ -391,7 +391,12 @@ const Filter: FunctionComponent<Props> = ({
         {/* Filter button */}
         <Popover open={filterOpen} onOpenChange={setFilterOpen}>
           <PopoverTrigger asChild>
-            <Button variant="secondary" size="sm" className="h-10 gap-1.5">
+            <Button
+              data-testid="filter-open-button"
+              variant="secondary"
+              size="sm"
+              className="h-10 gap-1.5"
+            >
               <FilterIcon className="h-4 w-4" />
               Filter
             </Button>
@@ -408,7 +413,7 @@ const Filter: FunctionComponent<Props> = ({
               </button>
             </div>
             <Select value={filterField} onValueChange={handleFilterFieldChange}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="filter-field-select">
                 <SelectValue placeholder="Select field" />
               </SelectTrigger>
               <SelectContent>
@@ -420,7 +425,7 @@ const Filter: FunctionComponent<Props> = ({
               </SelectContent>
             </Select>
             <Select value={filterOperator} onValueChange={setFilterOperator}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="filter-operator-select">
                 <SelectValue placeholder="Select operator" />
               </SelectTrigger>
               <SelectContent>
@@ -450,6 +455,7 @@ const Filter: FunctionComponent<Props> = ({
               </Select>
             ) : (
               <Input
+                data-testid="filter-value-input"
                 placeholder="Value"
                 value={filterValueInput}
                 onChange={(e) => setFilterValueInput(e.target.value)}
@@ -478,6 +484,7 @@ const Filter: FunctionComponent<Props> = ({
                 </Button>
               )}
               <Button
+                data-testid="filter-apply-button"
                 className="flex-1"
                 variant="ghost"
                 size="sm"
