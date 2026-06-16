@@ -4,7 +4,11 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import type { ComplianceRiskDTO, Paged } from "@/types/api/api";
+import type {
+  ComplianceRiskDTO,
+  Paged,
+  PolicyFrameworks,
+} from "@/types/api/api";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -23,29 +27,27 @@ import Filter from "@/components/Filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { violationLengthToLevel } from "@/utils/view";
 import { Loader2, Download } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
-// TEMP: mock "backend". Replace `complianceRisksListMock` with the shared
-// `fetcher` (and delete ./mockBackend + public/mock/compliance-risks.json) to
-// go live — nothing else in this file needs to change.
-import { complianceRisksListMock } from "./mockBackend";
+import FrameworkSelect from "./FrameworkSelect";
 
 const columnHelper = createColumnHelper<ComplianceRiskDTO>();
 
+// Sorting is disabled on every column: the backend only applies a default
+// open-first ordering and ignores per-column sort params for now.
 const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
   columnHelper.accessor("policyTitle", {
     header: "Policy",
     id: "policy_title",
-    enableSorting: true,
+    enableSorting: false,
     cell: (info) => (
       <div className="flex flex-col">
         <span className="font-medium">{info.getValue()}</span>
@@ -57,20 +59,43 @@ const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
       </div>
     ),
   }),
-  columnHelper.accessor("predicateType", {
-    header: "Predicate Type",
-    id: "predicate_type",
+  columnHelper.accessor("policyFrameworks", {
+    header: "Frameworks",
+    id: "policy_frameworks",
     enableSorting: false,
-    cell: (info) =>
-      info.getValue() ? (
-        <Badge variant="secondary" className="whitespace-nowrap">
-          {info.getValue()}
-        </Badge>
-      ) : null,
+    cell: (info) => {
+      const frameworks = info.getValue() ?? [];
+      if (!frameworks.length) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+      return (
+        <div className="flex flex-row flex-wrap gap-1">
+          {frameworks.map((f: PolicyFrameworks) => (
+            <Badge
+              key={f.framework}
+              variant="secondary"
+              className="whitespace-nowrap"
+            >
+              {f.framework}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
   }),
-  columnHelper.accessor("attestationViolations", {
+  columnHelper.accessor("state", {
+    header: "State",
+    id: "state",
+    enableSorting: false,
+    cell: (info) => (
+      <Badge variant="outline" className="whitespace-nowrap capitalize">
+        {info.getValue()}
+      </Badge>
+    ),
+  }),
+  columnHelper.accessor("violations", {
     header: "Violations",
-    id: "attestation_violations",
+    id: "violations",
     enableSorting: false,
     cell: (info) => {
       const count = info.getValue()?.length ?? 0;
@@ -81,10 +106,10 @@ const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
       );
     },
   }),
-  columnHelper.accessor("attestationUpdatedAt", {
-    header: "Attestation Updated",
-    id: "attestation_updated_at",
-    enableSorting: true,
+  columnHelper.accessor("createdAt", {
+    header: "Created",
+    id: "created_at",
+    enableSorting: false,
     cell: (info) => (
       <span className="whitespace-nowrap text-muted-foreground">
         {info.getValue()
@@ -108,19 +133,15 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
 
-  // Build the request query exactly like the other risk pages — the Open/Closed
-  // tab, Filter chips, column sort and search all live in the URL and get
-  // forwarded to the backend. (The mock backend parses this same query string.)
-  const query = useMemo(() => {
-    const p = buildFilterSearchParams(searchParams);
-    const state = searchParams?.get("state");
-    if (!Boolean(state) || state === "open") {
-      p.append("filterQuery[state][is]", "open");
-    } else {
-      p.append("filterQuery[state][is not]", "open");
-    }
-    return p;
-  }, [searchParams]);
+  // The URL is the single source of truth: search, Filter chips and the
+  // framework dropdown all write independent filterQuery/search params, and
+  // buildFilterSearchParams forwards page/pageSize/search/filterQuery[...] (incl.
+  // the framework filter) to the backend. Open + closed risks come back
+  // together, open-first.
+  const query = useMemo(
+    () => buildFilterSearchParams(searchParams),
+    [searchParams],
+  );
 
   const uri =
     "/organizations/" +
@@ -131,20 +152,22 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/";
 
-  const { data: vulns, isLoading } = useSWR<Paged<ComplianceRiskDTO>>(
+  const { data: vulns, isLoading } = useSWR<
+    Paged<ComplianceRiskDTO> & { frameworks: string[] }
+  >(
     uri + "refs/" + assetVersionSlug + "/compliance-risks/?" + query.toString(),
-    complianceRisksListMock,
+    fetcher,
     {
       keepPreviousData: true,
     },
   );
 
-  const isClosed = searchParams?.get("state") === "closed";
-
   // NOTE: filter `value`s map to the backend's filterable columns
-  // (filterQuery[<value>][<op>]). Align these with the compliance-risks endpoint.
+  // (filterQuery[<value>][<op>]). The "Framework" option uses the JSONB
+  // `frameworkContains` operator; it also gives the framework dropdown's
+  // selection a human-readable native chip label.
   const filterOptions = useMemo(() => {
-    const options = [
+    return [
       {
         label: "Policy",
         value: "policy_title",
@@ -155,31 +178,15 @@ const Index: FunctionComponent = () => {
         ],
       },
       {
-        label: "Predicate Type",
-        value: "predicate_type",
-        operators: [
-          { value: "ilike", label: "contains" },
-          { value: "is" },
-          { value: "is not" },
-        ],
+        // Driven by the dedicated FrameworkSelect dropdown, not the builder —
+        // hidden from the field list but still used for the native chip label.
+        label: "Framework",
+        value: "policyFrameworks",
+        operators: [{ value: "frameworkContains", label: "is" }],
+        hidden: true,
       },
-      ...(isClosed
-        ? [
-            {
-              label: "State",
-              value: "state",
-              operators: [{ value: "is" }],
-              filterValues: [
-                { value: "accepted", label: "Accepted" },
-                { value: "falsePositive", label: "False Positive" },
-                { value: "fixed", label: "Fixed" },
-              ],
-            },
-          ]
-        : []),
     ];
-    return options;
-  }, [isClosed]);
+  }, []);
 
   const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
@@ -194,15 +201,14 @@ const Index: FunctionComponent = () => {
 
   const params = useSearchParams();
   const pathname = usePathname();
-  const push = useRouterQuery();
 
   return (
-    <Page Menu={assetMenu} title={"Compliance Risks"} Title={<AssetTitle />}>
+    <Page Menu={assetMenu} title={"Compliance"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <Button variant={"secondary"} onClick={() => alert("Share your VEX")}>
-            <Download className="mr-2 h-4 w-4" />
-            Export OSCAL
+          <Download className="mr-2 h-4 w-4" />
+          Export OSCAL
         </Button>
       </div>
       <Section
@@ -213,45 +219,22 @@ const Index: FunctionComponent = () => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-col gap-2">
-          <Tabs
-            defaultValue={
-              params?.has("state") ? (params.get("state") as string) : "open"
-            }
-          >
-            <TabsList>
-              <TabsTrigger
-                onClick={() =>
-                  push({
-                    state: "open",
-                  })
-                }
-                value="open"
-              >
-                Open
-              </TabsTrigger>
-              <TabsTrigger
-                onClick={() =>
-                  push({
-                    state: "closed",
-                  })
-                }
-                value="closed"
-              >
-                Closed
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Filter
-            options={filterOptions}
-            onFilter={handleFilter}
-            onRemoveFilter={removeFilter}
-            onClearAllFilters={clearAllFilters}
-            search={{
-              onChange: handleSearch,
-              defaultValue: params?.get("search") ?? "",
-              placeholder: "Search or filter results...",
-            }}
-          />
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex-1 space-y-2">
+              <FrameworkSelect frameworks={vulns?.frameworks ?? []} />
+              <Filter
+                options={filterOptions}
+                onFilter={handleFilter}
+                onRemoveFilter={removeFilter}
+                onClearAllFilters={clearAllFilters}
+                search={{
+                  onChange: handleSearch,
+                  defaultValue: params?.get("search") ?? "",
+                  placeholder: "Search or filter results...",
+                }}
+              />
+            </div>
+          </div>
           <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
             {isLoading && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -321,6 +304,9 @@ const Index: FunctionComponent = () => {
                           </td>
                           <td className="p-4">
                             <Skeleton className="w-full h-[20px]" />
+                          </td>
+                          <td className="p-4">
+                            <Skeleton className="w-1/2 h-[20px]" />
                           </td>
                           <td className="p-4">
                             <Skeleton className="w-1/2 h-[20px]" />

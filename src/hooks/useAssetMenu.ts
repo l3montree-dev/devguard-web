@@ -180,7 +180,7 @@ export const useAssetMenu = () => {
         isActive: pathname.includes("license-risks"),
       },
       {
-        title: "Compliance Risks",
+        title: "Compliance",
         href:
           "/" +
           orgSlug +

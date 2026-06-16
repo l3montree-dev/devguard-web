@@ -32,6 +32,9 @@ interface FilterOption {
   value: string;
   operators: Array<{ value: string; label?: string }>;
   filterValues?: Array<{ value: string; label?: string }>;
+  // Excluded from the filter-builder field list (still used for chip labels).
+  // Use for filters driven by a dedicated control elsewhere (e.g. a dropdown).
+  hidden?: boolean;
 }
 
 interface Props {
@@ -96,11 +99,13 @@ const Filter: FunctionComponent<Props> = ({
     selectedOption?.filterValues &&
     (selectedOperator === "is" || selectedOperator === "is not");
 
+  // Options offered in the filter builder (hidden ones are driven elsewhere).
+  const builderOptions = options.filter((o) => !o.hidden);
   const filteredOptions = inputQuery
-    ? options.filter((o) =>
+    ? builderOptions.filter((o) =>
         o.label.toLowerCase().includes(inputQuery.toLowerCase()),
       )
-    : options;
+    : builderOptions;
 
   const getFieldLabel = (fieldValue: string) =>
     options.find((o) => o.value === fieldValue)?.label ?? fieldValue;
@@ -412,7 +417,7 @@ const Filter: FunctionComponent<Props> = ({
                 <SelectValue placeholder="Select field" />
               </SelectTrigger>
               <SelectContent>
-                {options.map((opt) => (
+                {builderOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>

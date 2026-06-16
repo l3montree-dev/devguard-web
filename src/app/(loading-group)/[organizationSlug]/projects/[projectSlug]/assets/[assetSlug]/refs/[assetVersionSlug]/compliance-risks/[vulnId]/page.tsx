@@ -3,10 +3,7 @@
 import Page from "@/components/Page";
 
 import { browserApiClient } from "@/services/devGuardApi";
-import type {
-  DetailedComplianceRiskDTO,
-  VulnEventDTO,
-} from "@/types/api/api";
+import type { DetailedComplianceRiskDTO, VulnEventDTO } from "@/types/api/api";
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -39,8 +36,7 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import GitProviderIcon from "@/components/GitProviderIcon";
 import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";
-// TEMP mock backend — replace `complianceRiskDetailMock` with `fetcher` to go live.
-import { complianceRiskDetailMock } from "../mockBackend";
+import { fetcher } from "@/data-fetcher/fetcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
@@ -64,10 +60,7 @@ const Index = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
     params;
 
-  // Fetch the compliance risk. Uses the mock backend until the real endpoint
-  // exists — swap `complianceRiskDetailMock` → `fetcher` to go live. NOTE: the
-  // mutation handlers below still POST to the (not-yet-existing) API, so accept
-  // / false-positive / comment / ticket actions only work once it lands.
+  // Fetch the compliance risk from the real endpoint.
   const {
     data: vuln,
     error,
@@ -75,9 +68,9 @@ const Index = () => {
     mutate,
   } = useSWR<DetailedComplianceRiskDTO>(
     organizationSlug && projectSlug && assetSlug && assetVersionSlug && vulnId
-      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance-risks/${vulnId}`
+      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance-risks/${vulnId}/`
       : null,
-    complianceRiskDetailMock,
+    fetcher,
   );
 
   const activeOrg = useActiveOrg();
@@ -286,7 +279,9 @@ const Index = () => {
                 {vuln.policyTitle ?? "Compliance Risk"}
               </h1>
               <div className="mt-4 text-muted-foreground">
-                <Markdown>{vuln.policyDescription?.replaceAll("\n", "\n\n")}</Markdown>
+                <Markdown>
+                  {vuln.policyDescription?.replaceAll("\n", "\n\n")}
+                </Markdown>
               </div>
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm">
                 {vuln.ticketUrl && (
@@ -317,18 +312,19 @@ const Index = () => {
                 )}
                 <VulnState state={vuln.state} />
 
-                {vuln.predicateType && (
-                  <Badge variant={"secondary"}>{vuln.predicateType}</Badge>
-                )}
+                {vuln.policyFrameworks?.map((f) => (
+                  <Badge key={f.framework} variant={"secondary"}>
+                    {f.framework}
+                  </Badge>
+                ))}
               </div>
               <div className="mt-4 rounded-lg border bg-secondary p-4">
                 <h3 className="mb-2 text-sm font-semibold">
-                  Attestation Violations (
-                  {vuln.attestationViolations?.length ?? 0})
+                  Violations ({vuln.violations?.length ?? 0})
                 </h3>
-                {vuln.attestationViolations?.length ? (
+                {vuln.violations?.length ? (
                   <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                    {vuln.attestationViolations.map((violation, idx) => (
+                    {vuln.violations.map((violation, idx) => (
                       <li key={idx}>{violation}</li>
                     ))}
                   </ul>
@@ -585,19 +581,25 @@ const Index = () => {
               <h3 className="mb-2 text-lg font-semibold">Policy Details</h3>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-muted-foreground">Predicate Type</dt>
-                  <dd className="break-all font-medium">
-                    {vuln.predicateType || "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Attestation Updated</dt>
+                  <dt className="text-muted-foreground">Created</dt>
                   <dd className="font-medium">
-                    {vuln.attestationUpdatedAt
-                      ? new Date(vuln.attestationUpdatedAt).toLocaleString()
+                    {vuln.createdAt
+                      ? new Date(vuln.createdAt).toLocaleString()
                       : "—"}
                   </dd>
                 </div>
+                {vuln.policyFrameworks?.length > 0 && (
+                  <div>
+                    <dt className="text-muted-foreground">Frameworks</dt>
+                    <dd className="flex flex-row flex-wrap gap-1 pt-1">
+                      {vuln.policyFrameworks.map((f) => (
+                        <Badge key={f.framework} variant="secondary">
+                          {f.framework}
+                        </Badge>
+                      ))}
+                    </dd>
+                  </div>
+                )}
                 {vuln.policyDescription && (
                   <div>
                     <dt className="text-muted-foreground">Description</dt>
