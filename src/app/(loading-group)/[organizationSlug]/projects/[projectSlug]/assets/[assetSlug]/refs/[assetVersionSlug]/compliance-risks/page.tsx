@@ -19,7 +19,6 @@ import { classNames } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
-import ColoredBadge from "@/components/common/ColoredBadge";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
@@ -27,23 +26,41 @@ import Filter from "@/components/Filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
+import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
-import { violationLengthToLevel } from "@/utils/view";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, CircleCheck, CircleX } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
+import FrameworkIcon from "./FrameworkIcon";
 
 const columnHelper = createColumnHelper<ComplianceRiskDTO>();
 
-// Sorting is disabled on every column: the backend only applies a default
-// open-first ordering and ignores per-column sort params for now.
+// Sorting is disabled on every column: the backend ignores per-column sort
+// params for compliance risks.
 const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
+  // Leading compliance indicator derived from the row's own state: open risks
+  // are not compliant (red ✗), any closed/resolved state is compliant (green ✓).
+  columnHelper.accessor("state", {
+    header: "",
+    id: "compliant",
+    enableSorting: false,
+    cell: (info) =>
+      info.getValue() === "open" ? (
+        <CircleX className="h-5 w-5 text-red-500" aria-label="Not compliant" />
+      ) : (
+        <CircleCheck
+          className="h-5 w-5 text-green-500"
+          aria-label="Compliant"
+        />
+      ),
+  }),
   columnHelper.accessor("policyTitle", {
     header: "Policy",
     id: "policy_title",
@@ -74,9 +91,36 @@ const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
             <Badge
               key={f.framework}
               variant="secondary"
-              className="whitespace-nowrap"
+              className="flex items-center gap-1.5 whitespace-nowrap"
             >
-              {f.framework}
+              <FrameworkIcon framework={f.framework} />
+              <span>{f.framework}</span>
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor("policyFrameworks", {
+    header: "Controls",
+    id: "controls",
+    enableSorting: false,
+    cell: (info) => {
+      const controls = (info.getValue() ?? []).flatMap(
+        (f: PolicyFrameworks) => f.controls ?? [],
+      );
+      if (!controls.length) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+      return (
+        <div className="flex flex-row flex-wrap gap-1">
+          {controls.map((control: string) => (
+            <Badge
+              key={control}
+              variant="outline"
+              className="whitespace-nowrap font-mono text-xs"
+            >
+              {control}
             </Badge>
           ))}
         </div>
@@ -91,31 +135,6 @@ const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
       <Badge variant="outline" className="whitespace-nowrap capitalize">
         {info.getValue()}
       </Badge>
-    ),
-  }),
-  columnHelper.accessor("violations", {
-    header: "Violations",
-    id: "violations",
-    enableSorting: false,
-    cell: (info) => {
-      const count = info.getValue()?.length ?? 0;
-      return (
-        <ColoredBadge variant={violationLengthToLevel(count)}>
-          {count} {count === 1 ? "violation" : "violations"}
-        </ColoredBadge>
-      );
-    },
-  }),
-  columnHelper.accessor("createdAt", {
-    header: "Created",
-    id: "created_at",
-    enableSorting: false,
-    cell: (info) => (
-      <span className="whitespace-nowrap text-muted-foreground">
-        {info.getValue()
-          ? new Date(info.getValue() as string).toLocaleDateString()
-          : "—"}
-      </span>
     ),
   }),
 ];
@@ -134,14 +153,19 @@ const Index: FunctionComponent = () => {
   const searchParams = useSearchParams();
 
   // The URL is the single source of truth: search, Filter chips and the
-  // framework dropdown all write independent filterQuery/search params, and
-  // buildFilterSearchParams forwards page/pageSize/search/filterQuery[...] (incl.
-  // the framework filter) to the backend. Open + closed risks come back
-  // together, open-first.
-  const query = useMemo(
-    () => buildFilterSearchParams(searchParams),
-    [searchParams],
-  );
+  // framework dropdown all write independent filterQuery/search params, which
+  // buildFilterSearchParams forwards to the backend. The Open/Closed tab adds a
+  // server-side state filter so pagination works per tab (same as other tabs).
+  const query = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    const state = searchParams?.get("state");
+    if (!Boolean(state) || state === "open") {
+      p.append("filterQuery[state][is]", "open");
+    } else {
+      p.append("filterQuery[state][is not]", "open");
+    }
+    return p;
+  }, [searchParams]);
 
   const uri =
     "/organizations/" +
@@ -161,6 +185,8 @@ const Index: FunctionComponent = () => {
       keepPreviousData: true,
     },
   );
+
+  const isClosed = searchParams?.get("state") === "closed";
 
   // NOTE: filter `value`s map to the backend's filterable columns
   // (filterQuery[<value>][<op>]). The "Framework" option uses the JSONB
@@ -185,14 +211,28 @@ const Index: FunctionComponent = () => {
         operators: [{ value: "frameworkContains", label: "is" }],
         hidden: true,
       },
+      // On the Closed tab, let the user narrow by the specific closed state.
+      ...(isClosed
+        ? [
+            {
+              label: "State",
+              value: "state",
+              operators: [{ value: "is" }],
+              filterValues: [
+                { value: "accepted", label: "Accepted" },
+                { value: "falsePositive", label: "False Positive" },
+                { value: "fixed", label: "Fixed" },
+              ],
+            },
+          ]
+        : []),
     ];
-  }, []);
+  }, [isClosed]);
 
   const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
     data: vulns?.data || [],
   });
-
   const handleSearch = useDebouncedQuerySearch();
 
   const assetMenu = useAssetMenu();
@@ -201,6 +241,7 @@ const Index: FunctionComponent = () => {
 
   const params = useSearchParams();
   const pathname = usePathname();
+  const push = useRouterQuery();
 
   return (
     <Page Menu={assetMenu} title={"Compliance"} Title={<AssetTitle />}>
@@ -219,6 +260,23 @@ const Index: FunctionComponent = () => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-col gap-2">
+          <Tabs
+            defaultValue={
+              params?.has("state") ? (params.get("state") as string) : "open"
+            }
+          >
+            <TabsList>
+              <TabsTrigger onClick={() => push({ state: "open" })} value="open">
+                Open
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => push({ state: "closed" })}
+                value="closed"
+              >
+                Closed
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <div className="flex flex-row items-center gap-2">
             <div className="flex-1 space-y-2">
               <FrameworkSelect frameworks={vulns?.frameworks ?? []} />
@@ -322,7 +380,7 @@ const Index: FunctionComponent = () => {
                           router?.push(pathname + "/" + row.original.id)
                         }
                         className={classNames(
-                          "relative cursor-pointer align-top transition-all",
+                          "relative cursor-pointer align-center transition-all",
                           i === arr.length - 1 ? "" : "border-b",
                           i % 2 != 0 && "bg-card/50",
                           "hover:bg-muted",

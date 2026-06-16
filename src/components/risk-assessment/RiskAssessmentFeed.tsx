@@ -387,7 +387,6 @@ export default function RiskAssessmentFeed({
   directDependencyFixedVersion?: string | null;
 }) {
   const groupedEvents = groupContiguousEventsByType(events);
-  console.log(groupedEvents);
 
   const org = useActiveOrg();
   const project = useActiveProject();

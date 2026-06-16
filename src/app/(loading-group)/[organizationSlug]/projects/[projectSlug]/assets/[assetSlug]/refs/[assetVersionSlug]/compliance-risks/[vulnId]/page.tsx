@@ -38,6 +38,7 @@ import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { Skeleton } from "@/components/ui/skeleton";
+import FrameworkIcon from "../FrameworkIcon";
 import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
@@ -172,6 +173,8 @@ const Index = () => {
       async (current) => {
         let json: any;
         if (data.status === "mitigate") {
+          // The mitigate endpoint creates the ticket; it reads `comment` from
+          // the body (not `justification`).
           const resp = await browserApiClient(
             "/organizations/" +
               activeOrg.slug +
@@ -189,7 +192,7 @@ const Index = () => {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(data),
+              body: JSON.stringify({ comment: data.justification }),
             },
           );
           json = await resp.json();
@@ -204,7 +207,8 @@ const Index = () => {
               "/refs/" +
               assetVersion?.slug +
               "/compliance-risks/" +
-              vuln.id,
+              vuln.id +
+              "/",
             {
               method: "POST",
               headers: {
@@ -318,6 +322,39 @@ const Index = () => {
                   </Badge>
                 ))}
               </div>
+              {vuln.policyTags?.length > 0 && (
+                <div className="mt-4 flex flex-row flex-wrap gap-1">
+                  {vuln.policyTags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              {vuln.message && (
+                <div className="mt-4">
+                  <h3 className="mb-1 text-sm font-semibold">Message</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {vuln.message}
+                  </p>
+                </div>
+              )}
+              {vuln.artifacts?.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="mb-1 text-sm font-semibold">Artifacts</h3>
+                  <div className="flex flex-row flex-wrap gap-1">
+                    {vuln.artifacts.map((artifact) => (
+                      <Badge
+                        key={artifact.artifactName}
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        {artifact.artifactName}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="mt-4 rounded-lg border bg-secondary p-4">
                 <h3 className="mb-2 text-sm font-semibold">
                   Violations ({vuln.violations?.length ?? 0})
@@ -591,20 +628,53 @@ const Index = () => {
                 {vuln.policyFrameworks?.length > 0 && (
                   <div>
                     <dt className="text-muted-foreground">Frameworks</dt>
-                    <dd className="flex flex-row flex-wrap gap-1 pt-1">
+                    <dd className="flex flex-row flex-wrap items-center gap-2 pt-1">
                       {vuln.policyFrameworks.map((f) => (
-                        <Badge key={f.framework} variant="secondary">
-                          {f.framework}
-                        </Badge>
+                        <span key={f.framework} title={f.framework}>
+                          <FrameworkIcon
+                            framework={f.framework}
+                            className="h-10 w-10"
+                          />
+                        </span>
                       ))}
                     </dd>
                   </div>
                 )}
-                {vuln.policyDescription && (
+                {(() => {
+                  const controls = (vuln.policyFrameworks ?? []).flatMap(
+                    (f) => f.controls ?? [],
+                  );
+                  return controls.length > 0 ? (
+                    <div>
+                      <dt className="text-muted-foreground">Controls</dt>
+                      <dd className="flex flex-row flex-wrap gap-1 pt-1">
+                        {controls.map((control) => (
+                          <Badge
+                            key={control}
+                            variant="outline"
+                            className="font-mono text-xs"
+                          >
+                            {control}
+                          </Badge>
+                        ))}
+                      </dd>
+                    </div>
+                  ) : null;
+                })()}
+                {vuln.policyRelatedResources?.length > 0 && (
                   <div>
-                    <dt className="text-muted-foreground">Description</dt>
-                    <dd className="text-muted-foreground">
-                      <Markdown>{vuln.policyDescription}</Markdown>
+                    <dt className="text-muted-foreground">Related resources</dt>
+                    <dd className="flex flex-col gap-1 pt-1">
+                      {vuln.policyRelatedResources.map((url) => (
+                        <Link
+                          key={url}
+                          href={url}
+                          target="_blank"
+                          className="truncate text-primary hover:underline"
+                        >
+                          {url}
+                        </Link>
+                      ))}
                     </dd>
                   </div>
                 )}
