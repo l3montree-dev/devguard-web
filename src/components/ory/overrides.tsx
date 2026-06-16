@@ -24,12 +24,7 @@ import {
   OryInput,
   OryRegistrationInput,
 } from "./flowcomponents/Nodes";
-import {
-  OrySsoButton,
-  OrySsoRoot,
-  OrySsoSettings,
-} from "./flowcomponents/SSO";
-
+import { OrySsoButton, OrySsoRoot, OrySsoSettings } from "./flowcomponents/SSO";
 
 export const loginComponentOverrides: OryFlowComponentOverrides = {
   Node: {
@@ -58,7 +53,6 @@ export const loginComponentOverrides: OryFlowComponentOverrides = {
     Toast: OryToast,
   },
 };
-
 
 export const oryComponentOverrides: OryFlowComponentOverrides = {
   Node: {

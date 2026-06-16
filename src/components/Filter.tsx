@@ -391,7 +391,12 @@ const Filter: FunctionComponent<Props> = ({
         {/* Filter button */}
         <Popover open={filterOpen} onOpenChange={setFilterOpen}>
           <PopoverTrigger asChild>
-            <Button data-testid="filter-open-button" variant="secondary" size="sm" className="h-10 gap-1.5">
+            <Button
+              data-testid="filter-open-button"
+              variant="secondary"
+              size="sm"
+              className="h-10 gap-1.5"
+            >
               <FilterIcon className="h-4 w-4" />
               Filter
             </Button>
