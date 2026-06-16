@@ -67,9 +67,15 @@ async function OrganizationShell({
     } else if (error instanceof HttpError && error.statusCode === 403) {
       // this only happens, if the user needs to reauthorize an identity provider. In this case we can show a specific error message.
       redirect("/" + organizationSlug + "/oauth2error");
+    } else if (
+      error instanceof HttpError &&
+      (error.statusCode === 401 || error.statusCode === 404)
+    ) {
+      // Let the error boundary handle 401/404 to show proper error pages
+      throw error;
     } else {
       console.error("An unexpected error occurred:", error);
+      throw error;
     }
   }
-  redirect("/");
 }
