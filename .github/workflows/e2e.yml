@@ -67,22 +67,10 @@ jobs:
           OPEN_CODE_TOTP_SECRET=placeholder
           EOF
 
-      - name: Cache Playwright Docker image
-        id: cache-playwright
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
-        with:
-          path: /tmp/playwright-image.tar
-          key: playwright-docker-v1.56.1-noble
-
       - name: Pull Playwright Docker image
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: |
           docker pull mcr.microsoft.com/playwright:v1.56.1-noble@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
-          docker save mcr.microsoft.com/playwright:v1.56.1-noble -o /tmp/playwright-image.tar
-
-      - name: Load Playwright Docker image from cache
-        if: steps.cache-playwright.outputs.cache-hit == 'true'
-        run: docker load -i /tmp/playwright-image.tar
 
       - name: Run E2E tests
         run: |
