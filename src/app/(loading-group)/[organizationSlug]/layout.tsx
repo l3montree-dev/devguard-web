@@ -64,6 +64,9 @@ async function OrganizationShell({
         billingUrl.searchParams.set("orgName", organizationSlug);
       }
       redirect(billingUrl.toString());
+    } else if (error instanceof HttpError && error.statusCode === 403) {
+      // this only happens, if the user needs to reauthorize an identity provider. In this case we can show a specific error message.
+      redirect("/" + organizationSlug + "/oauth2error");
     } else {
       console.error("An unexpected error occurred:", error);
     }

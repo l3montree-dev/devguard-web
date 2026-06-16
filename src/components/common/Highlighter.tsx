@@ -66,7 +66,7 @@ const Highlighter: FunctionComponent<{
   const syntaxTheme = isDark ? anOldHope : githubLightTheme;
 
   return (
-    <div className="w-full bg-white dark:bg-black">
+    <div className="w-full py-0.5 bg-muted">
       <SyntaxHighlighter
         showLineNumbers
         startingLineNumber={startLine}

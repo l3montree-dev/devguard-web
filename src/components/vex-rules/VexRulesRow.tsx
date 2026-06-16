@@ -15,7 +15,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 
 interface VexRulesRowProps {
@@ -78,6 +78,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
     <>
       {/* Group header row - clickable to expand/collapse */}
       <tr
+        data-testid="vex-header-row"
         className={classNames(
           "cursor-pointer hover:bg-muted/50 border-b",
           index % 2 !== 0 && "bg-card/50",
@@ -143,6 +144,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
 
           return (
             <tr
+              data-testid="vex-rule-row"
               key={vexRule.id}
               className={classNames(
                 "relative align-center transition-all cursor-pointer hover:bg-muted/50",

@@ -4,7 +4,7 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { browserApiClient } from "../services/devGuardApi";
 import { convertRepos } from "./useRepositorySearch";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type { ExternalTicketProvider } from "../types/common";
 
 export default function useRepositoryConnection() {

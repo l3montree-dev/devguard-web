@@ -4,7 +4,7 @@ import { TagIcon } from "@heroicons/react/24/outline";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
 import React from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 import DateString, {

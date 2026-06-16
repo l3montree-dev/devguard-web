@@ -81,13 +81,17 @@ const AutoSetupProgressSlide: FunctionComponent<
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button disabled={isReallyLoading}>
+              <Button
+                data-testid="view-merge-request-button"
+                disabled={isReallyLoading}
+              >
                 <Loader />
                 View Merge Request
               </Button>
             </Link>
           ) : (
             <Button
+              data-testid="use-autosetup-button"
               disabled={isReallyLoading}
               onClick={() => handleAutosetup(false)}
             >

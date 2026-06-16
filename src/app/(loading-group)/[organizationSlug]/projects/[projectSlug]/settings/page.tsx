@@ -19,7 +19,7 @@ import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegration
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import MembersTable from "../../../../../../components/MembersTable";
 import ProjectMemberDialog from "../../../../../../components/ProjectMemberDialog";
 import CopyInput from "../../../../../../components/common/CopyInput";

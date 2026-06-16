@@ -5,7 +5,7 @@ import Page from "@/components/Page";
 import type { Policy } from "@/types/api/api";
 import { useState } from "react";
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import EmptyParty from "../../../../components/common/EmptyParty";
 import ListRenderer from "../../../../components/common/ListRenderer";

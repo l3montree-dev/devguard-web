@@ -92,6 +92,7 @@ const AcceptRiskDialog: FunctionComponent<AcceptRiskDialogProps> = ({
               Cancel
             </Button>
             <AsyncButton
+              data-testid="confirm-accepted-risk"
               onClick={handleSubmit}
               disabled={justification.length > 4000}
             >

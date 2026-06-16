@@ -20,7 +20,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 interface ReleaseDialogProps {
   isOpen: boolean;

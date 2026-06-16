@@ -61,7 +61,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
@@ -1039,6 +1039,7 @@ const Index: FunctionComponent = () => {
                                         </Button>
                                       )}
                                       <Button
+                                        data-testid="mark-false-positive"
                                         onClick={() =>
                                           setFalsePositiveDialogOpen(true)
                                         }
@@ -1047,6 +1048,7 @@ const Index: FunctionComponent = () => {
                                         Mark as False Positive
                                       </Button>
                                       <Button
+                                        data-testid="mark-accepted-risk"
                                         onClick={() =>
                                           setAcceptRiskDialogOpen(true)
                                         }
@@ -1055,6 +1057,7 @@ const Index: FunctionComponent = () => {
                                         Accept risk
                                       </Button>
                                       <Button
+                                        data-testid="add-comment"
                                         onClick={() =>
                                           setCommentDialogOpen(true)
                                         }

@@ -1,0 +1,119 @@
+services:
+  postgresql:
+    image: ghcr.io/l3montree-dev/devguard/postgresql:v1.4.2
+    shm_size: 1g
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: change-me-definitely-when-not-testing
+      POSTGRES_DB: devguard
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./initdb.sql:/docker-entrypoint-initdb.d/init.sql
+    tmpfs: /run/postgresql:rw,uid=999,gid=999
+
+  kratos-migrate:
+    image: oryd/kratos:v25.4.0-distroless@sha256:368667ee3713797f86ddec669c36751f6484c7d675c78fd27c795b2e79271c31
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - DSN=postgres://kratos:change-me-definitely-when-not-testing@postgresql:5432/kratos?sslmode=disable
+    volumes:
+      - type: bind
+        source: ./kratos
+        target: /etc/config/kratos
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+
+  kratos:
+    image: oryd/kratos:v25.4.0-distroless@sha256:368667ee3713797f86ddec669c36751f6484c7d675c78fd27c795b2e79271c31
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      kratos-migrate:
+        condition: service_completed_successfully
+    ports:
+      - "4433:4433"
+      - "4434:4434"
+    environment:
+      - DSN=postgres://kratos:change-me-definitely-when-not-testing@postgresql:5432/kratos?sslmode=disable
+      - LOG_LEVEL=debug
+    volumes:
+      - type: bind
+        source: ./kratos
+        target: /etc/config/kratos
+    command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
+
+  devguard-migrate:
+    image: ghcr.io/l3montree-dev/devguard:main
+    tmpfs:
+      - /tmp:size=1G
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=change-me-definitely-when-not-testing
+      - POSTGRES_DB=devguard
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_PORT=5432
+      - FRONTEND_URL=http://localhost:3000
+    command: ["devguard-cli", "migrate"]
+
+  devguard-vulndb-import:
+    image: ghcr.io/l3montree-dev/devguard:main
+    tmpfs:
+      - /tmp:size=4G
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      devguard-migrate:
+        condition: service_completed_successfully
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=change-me-definitely-when-not-testing
+      - POSTGRES_DB=devguard
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_PORT=5432
+      - FRONTEND_URL=http://localhost:3000
+    command: ["devguard-cli", "vulndb", "import"]
+  
+  devguard-api:
+    image: ghcr.io/l3montree-dev/devguard:main
+    volumes:
+      - type: bind
+        source: ./test-secret.pem
+        target: /test-secret.pem
+    tmpfs:
+      - /tmp:size=1G
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      kratos:
+        condition: service_started
+      devguard-migrate:
+        condition: service_completed_successfully
+      devguard-vulndb-import:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=change-me-definitely-when-not-testing
+      - POSTGRES_DB=devguard
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_PORT=5432
+      - ORY_KRATOS_PUBLIC=http://kratos:4433
+      - ORY_KRATOS_ADMIN=http://kratos:4434
+      - INSTANCE_DOMAIN=http://localhost:8080
+      - FRONTEND_URL=http://localhost:3000
+      - ENVIRONMENT=dev
+      - CSAF_PASSPHRASE=ci-test-passphrase
+      - APP_SIDE_ENCRYPTION_KEY_PATH=/test-secret.pem
+
+volumes:
+  postgres:

@@ -898,6 +898,7 @@ const DependencyGraph: FunctionComponent<{
               {contextMenu.type === "edge" && contextMenu.path.length >= 2 && (
                 <>
                   <DropdownMenuItem
+                    data-testid="vex-does-not-call-vulnerable-function"
                     className="flex-col items-start gap-1 py-3"
                     onClick={() =>
                       handleVexOptionClick("does_not_call_vulnerable_function")

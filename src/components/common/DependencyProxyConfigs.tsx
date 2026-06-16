@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

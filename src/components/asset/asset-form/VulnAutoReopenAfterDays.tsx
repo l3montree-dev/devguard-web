@@ -76,6 +76,7 @@ export const VulnAutoReopenAfterDays: FunctionComponent<Props> = ({ form }) => {
             Button={
               <FormControl>
                 <Switch
+                  data-testid="vuln-auto-reopen-switch"
                   checked={isEnabled}
                   onCheckedChange={(v) => {
                     if (v) {
